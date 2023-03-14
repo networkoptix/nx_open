@@ -326,8 +326,8 @@ TreeView
                 enforced: delegateItem === resourceTree.hoveredItem
 
                 refreshIntervalSeconds: isArmServer
-                    ? ClientSettings.iniConfigValue("resourcePreviewRefreshIntervalArm")
-                    : ClientSettings.iniConfigValue("resourcePreviewRefreshInterval")
+                    ? LocalSettings.iniConfigValue("resourcePreviewRefreshIntervalArm")
+                    : LocalSettings.iniConfigValue("resourcePreviewRefreshInterval")
             }
         }
     }

@@ -4,20 +4,17 @@
 
 #include <algorithm>
 
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QPushButton>
-
-#include <client/client_settings.h>
+#include <QtWidgets/QWidget>
 
 #include <core/resource/resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
-
-#include <ui/dialogs/common/message_box.h>
-
-#include <utils/common/delayed.h>
-
 #include <nx/branding.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
+#include <ui/dialogs/common/message_box.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -53,7 +50,7 @@ bool Videowall::checkLocalFiles(QWidget* parent,
     const QnResourceList& resources,
     bool displayDelayed)
 {
-    const bool itemBelongsToThisPc = index.item().pcUuid == qnSettings->pcUuid();
+    const bool itemBelongsToThisPc = index.item().pcUuid == appContext()->localSettings()->pcUuid();
     if (itemBelongsToThisPc)
         return true;
 

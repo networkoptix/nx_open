@@ -24,6 +24,7 @@ class ClientStateHandler;
 class CloudCrossSystemManager;
 class CloudLayoutsManager;
 class ContextStatisticsModule;
+class LocalSettings;
 class ObjectDisplaySettings;
 class RadassController;
 class ResourceFactory;
@@ -151,6 +152,11 @@ public:
      * Unified interface to access all available Resource Pools.
      */
     UnifiedResourcePool* unifiedResourcePool() const;
+
+    /**
+     * Local Client settings.
+     */
+    LocalSettings* localSettings() const;
 
     /**
      * Map of analytics objects colors by object type. Persistently stored on a PC.

@@ -2,9 +2,9 @@
 
 #include "layout_item_adaptor.h"
 
-#include <nx/utils/log/assert.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/log/assert.h>
 
 #include "layout_model.h"
 
@@ -14,7 +14,7 @@ class LayoutItemAdaptor::Private
 {
 public:
     QnLayoutResourcePtr layout;
-    QnLayoutItemData itemData;
+    common::LayoutItemData itemData;
 };
 
 LayoutItemAdaptor::LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const QnUuid& itemId):
@@ -28,7 +28,7 @@ LayoutItemAdaptor::LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const Qn
     d->itemData = layout->getItem(itemId);
 
     connect(d->layout.data(), &QnLayoutResource::itemChanged, this,
-        [this](const QnLayoutResourcePtr& resource, const QnLayoutItemData& itemData)
+        [this](const QnLayoutResourcePtr& resource, const common::LayoutItemData& itemData)
         {
             NX_ASSERT(d->layout == resource);
             if (itemData.uuid != d->itemData.uuid)

@@ -4,7 +4,6 @@
 
 #include <QtWidgets/QWidget>
 
-#include <client/client_model_types.h>
 #include <core/resource/resource_fwd.h>
 #include <ui/processors/drag_process_handler.h>
 

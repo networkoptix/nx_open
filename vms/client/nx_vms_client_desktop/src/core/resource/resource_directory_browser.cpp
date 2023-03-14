@@ -7,7 +7,6 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
-#include <client/client_settings.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/file_layout_resource.h>
@@ -15,8 +14,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/utils/qset.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 
 namespace nx::vms::client::desktop {
 
@@ -38,7 +39,7 @@ void UpdateFileLayoutHelper::startUpdateLayout(const QnFileLayoutResourcePtr& so
         "Must be called from the main thread");
 
     const auto resources = layoutResources(sourceLayout);
-    sourceLayout->setItems(QnLayoutItemDataList());
+    sourceLayout->setItems(nx::vms::common::LayoutItemDataList());
     for (const auto& resource: resources)
     {
         if (resource.dynamicCast<QnAviResource>())
@@ -192,11 +193,11 @@ ResourceDirectoryBrowser::ResourceDirectoryBrowser(
 
     m_resourceProducerThread->start(QThread::IdlePriority);
 
-    setLocalResourcesDirectories(qnSettings->mediaFolders());
-    connect(qnSettings->notifier(QnClientSettings::MEDIA_FOLDERS),
-        &QnPropertyNotifier::valueChanged,
+    setLocalResourcesDirectories(appContext()->localSettings()->mediaFolders());
+    connect(&appContext()->localSettings()->mediaFolders,
+        &nx::utils::property_storage::BaseProperty::changed,
         this,
-        [this]() { setLocalResourcesDirectories(qnSettings->mediaFolders()); });
+        [this]() { setLocalResourcesDirectories(appContext()->localSettings()->mediaFolders()); });
 }
 
 ResourceDirectoryBrowser::~ResourceDirectoryBrowser()

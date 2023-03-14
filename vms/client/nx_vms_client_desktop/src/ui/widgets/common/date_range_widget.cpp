@@ -5,7 +5,6 @@
 
 #include <QtCore/QDateTime>
 
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -14,6 +13,7 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/current_date_monitor.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>
@@ -135,7 +135,7 @@ QDateTime QnDateRangeWidget::actualDateTime(const QDate& userDate) const
 {
     // QDateTime is created from date, thus it always started from the start of the day in the
     // current timezone
-    if (qnSettings->timeMode() == Qn::ClientTimeMode)
+    if (appContext()->localSettings()->timeMode() == Qn::ClientTimeMode)
         return userDate.startOfDay();
 
     const auto server = currentServer();

@@ -2,20 +2,20 @@
 
 #include "recording_stats_model.h"
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/resource_display_info.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
-
-#include <client/client_settings.h>
-
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-
+#include <core/resource/resource_display_info.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
-#include <nx/vms/text/time_strings.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/text/archive_duration.h>
+#include <nx/vms/text/time_strings.h>
 #include <utils/math/math.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -132,7 +132,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
 
             return nx::utils::elideString(
                 QnResourceDisplayInfo(resourcePool()->getNetworkResourceByPhysicalId(value.physicalId))
-                    .toString(qnSettings->resourceInfoLevel()),
+                    .toString(appContext()->localSettings()->resourceInfoLevel()),
                 m_data.maxNameLength);
         }
         case BytesColumn: return formatBytesString(value.recordedBytes);

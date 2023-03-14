@@ -506,7 +506,7 @@ Item
                 const pageIndex = buttonGroup.indexByTab[stateDelegate.currentTab]
                 const page = pages.children[pageIndex]
 
-                if (ClientSettings.iniConfigValue("newPanelsLayout"))
+                if (LocalSettings.iniConfigValue("newPanelsLayout"))
                 {
                     reportStatistics("left_panel_active_tab", page.objectName)
                     reportStatistics("left_panel_motion_thumbnails", motionThumbnails)

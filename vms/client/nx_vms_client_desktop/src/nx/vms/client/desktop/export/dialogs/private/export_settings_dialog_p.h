@@ -54,9 +54,9 @@ public:
     void setLayout(const LayoutResourcePtr& layout, const QPalette& palette);
 
     bool mediaSupportsUtc() const;
-    Filename selectedFileName(Mode mode) const;
+    Filename selectedFileName(ExportMode mode) const;
 
-    static FileExtensionList allowedFileExtensions(Mode mode);
+    static FileExtensionList allowedFileExtensions(ExportMode mode);
 
     QnMediaResourcePtr mediaResource() const;
     LayoutResourcePtr layout() const;
@@ -69,7 +69,7 @@ public:
 
     bool isOverlayVisible(ExportOverlayType type) const;
 
-    void validateSettings(Mode mode);
+    void validateSettings(ExportMode mode);
     bool hasCameraData() const;
 
     QString timestampText(qint64 timeMs) const;
@@ -84,7 +84,8 @@ public:
     void renderState();
 
 signals:
-    void validated(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
+    void validated(
+        ExportMode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
     void overlaySelected(ExportOverlayType type);
     void frameSizeChanged(const QSize& size);
     void transcodingModeChanged();

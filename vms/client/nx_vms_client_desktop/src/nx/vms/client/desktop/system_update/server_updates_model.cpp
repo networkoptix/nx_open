@@ -4,7 +4,6 @@
 
 #include <QtWidgets/QApplication>
 
-#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>

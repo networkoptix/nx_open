@@ -8,7 +8,6 @@
 #include <camera/resource_display.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/ptz/abstract_ptz_controller.h>
@@ -31,6 +30,7 @@
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
+#include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
@@ -53,6 +53,7 @@
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -794,7 +795,7 @@ ActionVisibility LayoutItemRemovalCondition::check(
             QSet<QnUuid> intercomLayoutItemIds; // Other intercom item copies on the layout.
 
             const auto intercomLayoutItems = item.layout()->getItems();
-            for (const QnLayoutItemData& intercomLayoutItem: intercomLayoutItems)
+            for (const common::LayoutItemData& intercomLayoutItem: intercomLayoutItems)
             {
                 const auto itemResourceId = intercomLayoutItem.resource.id;
                 if (itemResourceId == intercomToDeleteId && intercomLayoutItem.uuid != item.uuid())
@@ -1096,7 +1097,7 @@ ActionVisibility OpenInFolderCondition::check(const LayoutItemIndexList& layoutI
 {
     foreach(const LayoutItemIndex &index, layoutItems)
     {
-        QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
+        common::LayoutItemData itemData = index.layout()->getItem(index.uuid());
         if (itemData.zoomRect.isNull())
             return Condition::check(layoutItems, context);
     }
@@ -1287,7 +1288,7 @@ ActionVisibility OpenInNewEntityCondition::check(
 {
     for (const LayoutItemIndex& index: layoutItems)
     {
-        QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
+        common::LayoutItemData itemData = index.layout()->getItem(index.uuid());
         if (itemData.zoomRect.isNull())
             return Condition::check(layoutItems, context);
     }
@@ -1328,7 +1329,7 @@ ActionVisibility SetAsBackgroundCondition::check(
 {
     for (const LayoutItemIndex& index: layoutItems)
     {
-        QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
+        common::LayoutItemData itemData = index.layout()->getItem(index.uuid());
         if (itemData.zoomRect.isNull())
             return Condition::check(layoutItems, context);
     }
@@ -1343,7 +1344,7 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     if (!layout)
         return InvisibleAction;
 
-    std::vector<QnLayoutItemData> items;
+    std::vector<common::LayoutItemData> items;
     if (!parameters.layoutItems().empty())
     {
         for (const auto& idx: parameters.layoutItems())
@@ -1514,7 +1515,7 @@ ActionVisibility StartVideowallCondition::check(
     const QnResourceList& resources,
     QnWorkbenchContext* /*context*/)
 {
-    QnUuid pcUuid = qnSettings->pcUuid();
+    QnUuid pcUuid = appContext()->localSettings()->pcUuid();
     if (pcUuid.isNull())
         return InvisibleAction;
 

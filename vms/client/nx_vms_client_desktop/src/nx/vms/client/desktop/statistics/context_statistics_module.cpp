@@ -2,8 +2,8 @@
 
 #include "context_statistics_module.h"
 
-#include <client/client_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -29,7 +29,7 @@ ContextStatisticsModule::ContextStatisticsModule():
     d(new Private())
 {
     d->manager = std::make_unique<QnStatisticsManager>();
-    d->manager->setClientId(qnSettings->pcUuid());
+    d->manager->setClientId(appContext()->localSettings()->pcUuid());
     d->manager->setStorage(std::make_unique<QnStatisticsFileStorage>());
 
     d->genericModule = std::make_unique<QnGenericStatisticsModule>();

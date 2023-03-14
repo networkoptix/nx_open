@@ -3,23 +3,21 @@
 #include "business_rule_widget.h"
 #include "ui_business_rule_widget.h"
 
-#include <QtCore/QScopedValueRollback>
-#include <QtCore/QPropertyAnimation>
 #include <QtCore/QParallelAnimationGroup>
-
-#include <QtGui/QStandardItemModel>
-#include <QtGui/QStandardItem>
-#include <QtGui/QIcon>
+#include <QtCore/QPropertyAnimation>
+#include <QtCore/QScopedValueRollback>
 #include <QtGui/QDragEnterEvent>
+#include <QtGui/QIcon>
+#include <QtGui/QStandardItem>
+#include <QtGui/QStandardItemModel>
 #include <QtWidgets/QCheckBox>
 
 #include <business/business_resource_validation.h>
-#include <client/client_settings.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/server_selection_dialog.h>

@@ -4,6 +4,8 @@
 
 #include <core/resource/layout_resource.h>
 
+using namespace nx::vms::common;
+
 QnLayoutItemAggregator::QnLayoutItemAggregator(QObject* parent):
     base_type(parent)
 {
@@ -32,13 +34,13 @@ bool QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
     }
 
     connect(layout.get(), &QnLayoutResource::itemAdded, this,
-        [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
+        [this](const QnLayoutResourcePtr& /*layout*/, const LayoutItemData& item)
         {
             handleItemAdded(item);
         }, Qt::DirectConnection);
 
     connect(layout.get(), &QnLayoutResource::itemRemoved, this,
-        [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
+        [this](const QnLayoutResourcePtr& /*layout*/, const LayoutItemData& item)
         {
             handleItemRemoved(item);
         }, Qt::DirectConnection);
@@ -93,7 +95,7 @@ bool QnLayoutItemAggregator::hasItem(const QnUuid& id) const
     return m_items.contains(id);
 }
 
-void QnLayoutItemAggregator::handleItemAdded(const QnLayoutItemData& item)
+void QnLayoutItemAggregator::handleItemAdded(const LayoutItemData& item)
 {
     const auto resourceId = item.resource.id;
     if (resourceId.isNull())
@@ -107,7 +109,7 @@ void QnLayoutItemAggregator::handleItemAdded(const QnLayoutItemData& item)
     }
 }
 
-void QnLayoutItemAggregator::handleItemRemoved(const QnLayoutItemData& item)
+void QnLayoutItemAggregator::handleItemRemoved(const LayoutItemData& item)
 {
     const auto resourceId = item.resource.id;
     if (resourceId.isNull())

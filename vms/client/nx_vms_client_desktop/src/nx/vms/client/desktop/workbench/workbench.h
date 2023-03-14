@@ -5,11 +5,11 @@
 #include <QtCore/QObject>
 
 #include <client/client_globals.h>
-#include <client/client_model_types.h>
 #include <core/resource/resource_fwd.h>
 #include <network/base_system_description.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/workbench/state/workbench_state.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 Q_MOC_INCLUDE("ui/workbench/workbench_context.h")
@@ -196,8 +196,8 @@ public:
      */
     void setItem(Qn::ItemRole role, QnWorkbenchItem* item);
 
-    void update(const QnWorkbenchState& state);
-    void submit(QnWorkbenchState& state);
+    void update(const WorkbenchState& state);
+    void submit(WorkbenchState& state);
 
     void applyLoadedState();
 

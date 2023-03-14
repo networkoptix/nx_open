@@ -2,25 +2,13 @@
 
 #include "layout_item_data.h"
 
-#include <nx/utils/math/fuzzy.h>
+#include <nx/reflect/compare.h>
 
-bool QnLayoutItemData::operator==(const QnLayoutItemData& other) const
+namespace nx::vms::common {
+
+bool LayoutItemData::operator==(const LayoutItemData& other) const
 {
-    return (
-        uuid == other.uuid
-        && resource.id == other.resource.id
-        && resource.path == other.resource.path
-        && flags == other.flags
-        && qFuzzyEquals(combinedGeometry, other.combinedGeometry)
-        && zoomTargetUuid == other.zoomTargetUuid
-        && qFuzzyEquals(zoomRect, other.zoomRect)
-        && qFuzzyEquals(rotation, other.rotation)
-        && displayInfo == other.displayInfo
-        && controlPtz == other.controlPtz
-        && displayAnalyticsObjects == other.displayAnalyticsObjects
-        && displayRoi == other.displayRoi
-        && frameDistinctionColor == other.frameDistinctionColor
-        && contrastParams == other.contrastParams
-        && dewarpingParams == other.dewarpingParams
-        );
+    return nx::reflect::equals(*this, other);
 }
+
+} // namespace nx::vms::common

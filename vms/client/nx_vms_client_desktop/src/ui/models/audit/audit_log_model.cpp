@@ -7,7 +7,6 @@
 #include <QtGui/QPalette>
 
 #include <api/common_message_processor.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
@@ -20,6 +19,7 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -271,7 +271,7 @@ QString QnAuditLogModel::getResourceNameById(const QnUuid &id)
 {
     auto resourcePool = qnClientCoreModule->resourcePool();
     return QnResourceDisplayInfo(resourcePool->getResourceById(id)).toString(
-        qnSettings->resourceInfoLevel());
+        appContext()->localSettings()->resourceInfoLevel());
 }
 
 QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime) const

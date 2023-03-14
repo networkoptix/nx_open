@@ -14,7 +14,6 @@
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
@@ -25,12 +24,14 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -204,8 +205,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->cameraButton,       &QAbstractButton::clicked,          this,   &QnEventLogDialog::at_cameraButton_clicked);
     connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnEventLogDialog::at_eventsGrid_clicked);
     connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnEventLogDialog::at_eventsGrid_customContextMenuRequested);
-    connect(qnSettings->notifier(QnClientSettings::RESOURCE_INFO_LEVEL),
-        &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
+    connect(&appContext()->localSettings()->resourceInfoLevel,
+        &nx::utils::property_storage::BaseProperty::changed,
+        ui->gridEvents,
+        &QAbstractItemView::reset);
 
     // Pending is implemented on the dialog side, so no additional delay is needed.
     ui->textSearchLineEdit->setTextChangedSignalFilterMs(0);

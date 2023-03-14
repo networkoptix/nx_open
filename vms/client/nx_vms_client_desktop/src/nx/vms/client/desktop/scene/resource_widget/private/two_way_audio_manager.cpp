@@ -2,7 +2,6 @@
 
 #include "two_way_audio_manager.h"
 
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -12,6 +11,8 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
@@ -57,7 +58,7 @@ void TwoWayAudioManager::startStreaming()
         {
             if (success)
             {
-                if (qnSettings->muteOnAudioTransmit()
+                if (appContext()->localSettings()->muteOnAudioTransmit()
                     && !nx::audio::AudioDevice::instance()->isMute())
                 {
                     m_unmuteAudioOnStreamingStop = true;

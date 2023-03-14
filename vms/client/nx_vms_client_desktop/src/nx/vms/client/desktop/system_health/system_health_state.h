@@ -5,7 +5,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
-#include <health/system_health.h>
+#include <nx/vms/common/system_health/message_type.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
@@ -20,7 +20,7 @@ public:
     SystemHealthState(QObject* parent = nullptr);
     virtual ~SystemHealthState() override;
 
-    using SystemHealthIndex = QnSystemHealth::MessageType;
+    using SystemHealthIndex = common::system_health::MessageType;
     bool state(SystemHealthIndex index) const;
 
     QVariant data(SystemHealthIndex index) const;

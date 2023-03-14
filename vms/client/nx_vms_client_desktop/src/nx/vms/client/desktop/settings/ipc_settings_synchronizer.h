@@ -2,11 +2,11 @@
 
 #pragma once
 
-class QnClientSettings;
 class QnClientShowOnceSettings;
 
 namespace nx::vms::client::desktop {
 
+class LocalSettings;
 class SharedMemoryManager;
 
 /**
@@ -16,7 +16,7 @@ class IpcSettingsSynchronizer
 {
 public:
     static void setup(
-        QnClientSettings* localSettings,
+        LocalSettings* localSettings,
         QnClientShowOnceSettings* showOnceSettings,
         SharedMemoryManager* sharedMemoryManager);
 };

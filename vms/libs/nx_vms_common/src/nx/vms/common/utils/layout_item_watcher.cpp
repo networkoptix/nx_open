@@ -17,8 +17,8 @@ class LayoutItemWatcher::Private: public QObject
 public:
     explicit Private(LayoutItemWatcher* q): q(q) {}
 
-    void handleItemAdded(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item);
-    void handleItemRemoved(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item);
+    void handleItemAdded(const QnLayoutResourcePtr& layout, const LayoutItemData& item);
+    void handleItemRemoved(const QnLayoutResourcePtr& layout, const LayoutItemData& item);
 
 public:
     QSet<QnLayoutResourcePtr> watchedLayouts;
@@ -109,7 +109,7 @@ QnCounterHash<QnLayoutResourcePtr> LayoutItemWatcher::resourceLayouts(
 // LayoutItemWatcher::Private
 
 void LayoutItemWatcher::Private::handleItemAdded(
-    const QnLayoutResourcePtr& layout, const QnLayoutItemData& item)
+    const QnLayoutResourcePtr& layout, const LayoutItemData& item)
 {
     const auto resourceId = item.resource.id;
     if (resourceId.isNull())
@@ -124,7 +124,7 @@ void LayoutItemWatcher::Private::handleItemAdded(
 }
 
 void LayoutItemWatcher::Private::handleItemRemoved(
-    const QnLayoutResourcePtr& layout, const QnLayoutItemData& item)
+    const QnLayoutResourcePtr& layout, const LayoutItemData& item)
 {
     const auto resourceId = item.resource.id;
     if (resourceId.isNull() || !NX_ASSERT(itemLayouts.contains(resourceId)))

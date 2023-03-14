@@ -3,29 +3,16 @@
 #include "object_display_settings.h"
 
 #include <regex>
-#include <unordered_map>
 
-#include <client/client_settings.h>
 #include <nx/analytics/analytics_attributes.h>
 #include <nx/kit/utils.h>
-#include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <nx/vms/common/serialization/qt_gui_types.h>
 
 namespace nx::vms::client::desktop {
-
-namespace  {
-
-struct ObjectDisplaySettingsItem
-{
-    QColor color;
-};
-
-NX_REFLECTION_INSTRUMENT(ObjectDisplaySettingsItem, (color))
-
-} // namespace
 
 const std::map<std::string, std::string> ObjectDisplaySettings::kBoundingBoxPalette{
     {"Magenta", "#E040FB"},
@@ -39,51 +26,16 @@ const std::map<std::string, std::string> ObjectDisplaySettings::kBoundingBoxPale
     {"White", "#FFFFFF"},
 };
 
-class ObjectDisplaySettings::Private
-{
-public:
-    std::unordered_map<QString, ObjectDisplaySettingsItem> settingsByObjectTypeId;
-
-    void loadSettings()
-    {
-        // Client settings are absent in unit tests.
-        if (auto settings = QnClientSettings::instance())
-        {
-            nx::reflect::json::deserialize(
-                settings->detectedObjectDisplaySettings().toUtf8().data(),
-                &settingsByObjectTypeId);
-        }
-    }
-
-    void saveSettings()
-    {
-        // Client settings are absent in unit tests.
-        if (auto settings = QnClientSettings::instance())
-        {
-            settings->setDetectedObjectDisplaySettings(
-                QString::fromStdString(nx::reflect::json::serialize(settingsByObjectTypeId)));
-        }
-    }
-};
-
-ObjectDisplaySettings::ObjectDisplaySettings(QObject* parent):
-    QObject(parent),
-    d(new Private())
-{
-    d->loadSettings();
-}
-
-ObjectDisplaySettings::~ObjectDisplaySettings()
-{
-}
-
 QColor ObjectDisplaySettings::objectColor(const QString& objectTypeId)
 {
-    auto& settings = d->settingsByObjectTypeId[objectTypeId];
+    DetectedObjectSettingsMap settingsMap =
+        appContext()->localSettings()->detectedObjectSettings();
+    auto& settings = settingsMap[objectTypeId];
+
     if (!settings.color.isValid())
     {
-        settings.color = utils::random::choice(colorTheme()->colors("detectedObject"));
-        d->saveSettings();
+        settings.color = nx::utils::random::choice(colorTheme()->colors("detectedObject"));
+        appContext()->localSettings()->detectedObjectSettings = settingsMap;
     }
     return settings.color;
 }

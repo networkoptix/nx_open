@@ -71,7 +71,8 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
 
     if (ini().validateCloudLayouts)
     {
-        auto validate = [](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
+        auto validate = [](
+            const QnLayoutResourcePtr& /*layout*/, const common::LayoutItemData& item)
             {
                 auto resource = getResourceByDescriptor(item.resource);
                 if (resource && resource->hasFlags(Qn::local_media))

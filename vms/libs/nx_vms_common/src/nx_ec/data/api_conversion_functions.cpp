@@ -268,7 +268,7 @@ void fromApiToResource(const EmailSettingsData& src, QnEmailSettings& dst)
     dst.connectionType = src.connectionType;
 }
 
-void fromApiToResource(const LayoutItemData& src, QnLayoutItemData& dst)
+void fromApiToResource(const LayoutItemData& src, nx::vms::common::LayoutItemData& dst)
 {
     dst.uuid = src.id;
     dst.flags = src.flags;
@@ -286,7 +286,7 @@ void fromApiToResource(const LayoutItemData& src, QnLayoutItemData& dst)
     dst.displayRoi = src.displayRoi;
 }
 
-void fromResourceToApi(const QnLayoutItemData& src, LayoutItemData& dst)
+void fromResourceToApi(const nx::vms::common::LayoutItemData& src, LayoutItemData& dst)
 {
     dst.id = src.uuid;
     dst.flags = src.flags;
@@ -324,10 +324,10 @@ void fromApiToResource(const LayoutData& src, QnLayoutResourcePtr& dst)
     dst->setBackgroundSize(QSize(src.backgroundWidth, src.backgroundHeight));
     dst->setBackgroundOpacity(src.backgroundOpacity);
 
-    QnLayoutItemDataList dstItems;
+    nx::vms::common::LayoutItemDataList dstItems;
     for (const LayoutItemData& srcItem: src.items)
     {
-        dstItems.push_back(QnLayoutItemData());
+        dstItems.push_back(nx::vms::common::LayoutItemData());
         fromApiToResource(srcItem, dstItems.back());
     }
     dst->setItems(dstItems);
@@ -351,11 +351,11 @@ void fromResourceToApi(const QnLayoutResourcePtr& src, LayoutData& dst)
     dst.backgroundHeight = src->backgroundSize().height();
     dst.backgroundOpacity = src->backgroundOpacity();
 
-    const QnLayoutItemDataMap& srcItems = src->getItems();
+    const nx::vms::common::LayoutItemDataMap& srcItems = src->getItems();
     dst.items.clear();
     dst.items.reserve(srcItems.size());
 
-    for (const QnLayoutItemData& item: srcItems)
+    for (const nx::vms::common::LayoutItemData& item: srcItems)
     {
         dst.items.push_back(LayoutItemData());
         fromResourceToApi(item, dst.items.back());

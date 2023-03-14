@@ -13,9 +13,9 @@
 
 #include "../export_settings_dialog.h"
 
-class QnClientSettings;
-
 namespace nx::vms::client::desktop {
+
+class LocalSettings;
 
 struct NX_VMS_CLIENT_DESKTOP_API ExportSettingsDialogState: public AbstractFluxState
 {
@@ -23,7 +23,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportSettingsDialogState: public AbstractFluxS
     QString bookmarkName;
     QString bookmarkDescription;
 
-    ExportSettingsDialog::Mode mode = ExportSettingsDialog::Mode::Media;
+    ExportMode mode = ExportMode::media;
 
     ExportMediaSettings exportMediaSettings;
     ExportMediaPersistentSettings exportMediaPersistentSettings;
@@ -130,7 +130,9 @@ public:
 
     static State setServerTimeZoneOffsetMs(State state, qint64 offsetMs);
 
-    static State loadSettings(State state, const QnClientSettings* settings, const QString& cacheDirLocation);
+    static State loadSettings(State state,
+        const LocalSettings* localSettings,
+        const QString& cacheDirLocation);
 
     static State setLayoutReadOnly(State state, bool value);
 
@@ -148,11 +150,11 @@ public:
 
     static State setLayoutFilename(State state, const Filename& filename);
 
-    static std::pair<bool, State> setMode(State state, ExportSettingsDialog::Mode mode);
+    static std::pair<bool, State> setMode(State state, ExportMode mode);
 
-    static State enableTab(State state, ExportSettingsDialog::Mode mode);
+    static State enableTab(State state, ExportMode mode);
 
-    static State disableTab(State state, ExportSettingsDialog::Mode mode, const QString& reason);
+    static State disableTab(State state, ExportMode mode, const QString& reason);
 
     static State setSpeed(State state, int speed);
 

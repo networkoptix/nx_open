@@ -3,15 +3,10 @@
 #include "resource_list_model.h"
 
 #include <client/client_globals.h>
-#include <client/client_settings.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
-
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-
 #include <utils/common/checked_cast.h>
 
 using namespace nx::vms::client::desktop;

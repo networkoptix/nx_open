@@ -128,7 +128,7 @@ FocusScope
                             return ""
                         }
 
-                        if (!ClientSettings.iniConfigValue("compactSearchFilterEditors"))
+                        if (!LocalSettings.iniConfigValue("compactSearchFilterEditors"))
                             return "ColorRadioGroup.qml"
 
                         return attributeEditor.attribute.colorSet.items.length < 5
@@ -146,7 +146,7 @@ FocusScope
                             return ""
                         }
 
-                        if (!ClientSettings.iniConfigValue("compactSearchFilterEditors"))
+                        if (!LocalSettings.iniConfigValue("compactSearchFilterEditors"))
                             return "EnumerationRadioGroup.qml"
 
                         return attributeEditor.attribute.enumeration.items.length < 5

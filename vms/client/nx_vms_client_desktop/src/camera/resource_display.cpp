@@ -4,21 +4,21 @@
 
 #include <cassert>
 
-#include <client_core/client_core_module.h>
-
-#include <nx/streaming/abstract_media_stream_data_provider.h>
-#include <nx/streaming/abstract_archive_stream_reader.h>
-
-#include <core/resource/resource_media_layout.h>
-#include <core/resource/media_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/dataprovider/data_provider_factory.h>
-
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
+#include <client_core/client_core_module.h>
+#include <core/dataprovider/data_provider_factory.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_media_layout.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/utils/counter.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <utils/common/util.h>
-#include <client/client_settings.h>
+
+using namespace nx::vms::client::desktop;
 
 QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
     base_type(parent),
@@ -57,7 +57,8 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
             connect(m_counter, &nx::utils::CounterWithSignal::reachedZero, m_counter, &QObject::deleteLater);
             connect(m_counter, &nx::utils::CounterWithSignal::reachedZero, m_camera, &QObject::deleteLater);
 
-            m_camera->getCamDisplay()->playAudio(qnSettings->playAudioForAllItems());
+            m_camera->getCamDisplay()->playAudio(
+                appContext()->localSettings()->playAudioForAllItems());
         }
         else
         {
@@ -88,12 +89,12 @@ void QnResourceDisplay::beforeDestroy()
 {
 }
 
-const QnResourcePtr& QnResourceDisplay::resource() const 
+const QnResourcePtr& QnResourceDisplay::resource() const
 {
     return m_resource;
 }
 
-const QnMediaResourcePtr& QnResourceDisplay::mediaResource() const 
+const QnMediaResourcePtr& QnResourceDisplay::mediaResource() const
 {
     return m_mediaResource;
 }
@@ -131,7 +132,7 @@ QnCamDisplay *QnResourceDisplay::camDisplay() const {
     return m_camera->getCamDisplay();
 }
 
-void QnResourceDisplay::disconnectFromResource() 
+void QnResourceDisplay::disconnectFromResource()
 {
     if (!m_dataProvider)
         return;

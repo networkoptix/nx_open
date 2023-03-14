@@ -6,16 +6,17 @@
 
 #include <QtQml/QtQml>
 
-#include <client/client_settings.h>
 #include <core/resource/resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_drag_drop_decorator_model.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 
@@ -114,12 +115,10 @@ ResourceSelectionModelAdapter::ResourceSelectionModelAdapter(QObject* parent):
     base_type(parent),
     d(new Private(this))
 {
-    connect(qnSettings, &QnClientSettings::valueChanged, this,
-        [this](int id)
-        {
-            if (id == QnClientSettings::RESOURCE_INFO_LEVEL)
-                emit extraInfoRequiredChanged();
-        });
+    connect(&appContext()->localSettings()->resourceInfoLevel,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        &ResourceSelectionModelAdapter::extraInfoRequiredChanged);
 
     connect(d->selectionDecoratorModel.get(),
         &ResourceSelectionDecoratorModel::selectedResourcesChanged,
@@ -231,7 +230,7 @@ void ResourceSelectionModelAdapter::setResourceFilter(nx::vms::common::ResourceF
 
 bool ResourceSelectionModelAdapter::isExtraInfoRequired() const
 {
-    return qnSettings->resourceInfoLevel() > Qn::RI_NameOnly;
+    return appContext()->localSettings()->resourceInfoLevel() > Qn::RI_NameOnly;
 }
 
 bool ResourceSelectionModelAdapter::isExtraInfoForced(QnResource* resource) const

@@ -11,12 +11,11 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <health/system_health.h>
-#include <nx_ec/abstract_ec_connection.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -25,6 +24,8 @@
 #include <utils/common/util.h>
 
 using namespace nx;
+
+using MessageType = nx::vms::common::system_health::MessageType;
 
 namespace {
 static const int kDefaultHistoryCheckDelay = 1000 * 15;
@@ -160,16 +161,15 @@ void QnCameraHistoryPool::setMessageProcessor(QnCommonMessageProcessor* messageP
                 if (eventType >= vms::api::EventType::systemHealthEvent
                     && eventType <= vms::api::EventType::maxSystemHealthEvent)
                 {
-                    QnSystemHealth::MessageType healthMessage =
-                        QnSystemHealth::MessageType(eventType - vms::api::EventType::systemHealthEvent);
-                    if (healthMessage == QnSystemHealth::ArchiveRebuildFinished
-                        || healthMessage == QnSystemHealth::ArchiveFastScanFinished
-                        || healthMessage == QnSystemHealth::RemoteArchiveSyncError)
+                    auto healthMessage = MessageType(eventType - vms::api::EventType::systemHealthEvent);
+                    if (healthMessage == MessageType::archiveRebuildFinished
+                        || healthMessage == MessageType::archiveFastScanFinished
+                        || healthMessage == MessageType::remoteArchiveSyncError)
                     {
                         auto eventParams = businessAction->getRuntimeParams();
                         QSet<QnUuid> cameras;
 
-                        if (healthMessage == QnSystemHealth::RemoteArchiveSyncError)
+                        if (healthMessage == MessageType::remoteArchiveSyncError)
                         {
                             if (eventParams.metadata.cameraRefs.empty())
                                 return;

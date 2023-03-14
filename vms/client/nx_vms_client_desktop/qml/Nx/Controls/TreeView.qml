@@ -62,7 +62,7 @@ FocusScope
     property alias highlight: listView.highlight
 
     property int autoExpandDelayMs:
-        Utils.getValue(ClientSettings.iniConfigValue("autoExpandDelayMs"), -1)
+        Utils.getValue(LocalSettings.iniConfigValue("autoExpandDelayMs"), -1)
 
     property int maximumDragIndicatorLines: 10
     property real maximumDragIndicatorWidth: 640

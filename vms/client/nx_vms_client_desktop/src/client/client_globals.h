@@ -357,11 +357,10 @@ namespace Qn
     /**
      * Time display mode.
      */
-    enum TimeMode
-    {
+    NX_REFLECTION_ENUM(TimeMode,
         ServerTimeMode,
         ClientTimeMode
-    };
+    )
 
     /**
      * Columns in the resource tree model.

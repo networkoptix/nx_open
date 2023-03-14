@@ -11,7 +11,6 @@
 
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
-#include <client/client_settings.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -727,7 +726,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     {
         auto resource = resList[i];
 
-        QnLayoutItemData item = layoutItemFromResource(resource);
+        nx::vms::common::LayoutItemData item = layoutItemFromResource(resource);
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         layout->setItemData(
             item.uuid,

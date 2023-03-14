@@ -5,9 +5,11 @@
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <nx/utils/math/fuzzy.h>
 
+using namespace nx::vms::common;
+
 QnLayoutResource::QnLayoutResource():
     base_type(),
-    m_items(new QnThreadsafeItemStorage<QnLayoutItemData>(&m_mutex, this))
+    m_items(new QnThreadsafeItemStorage<LayoutItemData>(&m_mutex, this))
 {
     addFlags(Qn::layout);
     setTypeId(nx::vms::api::LayoutData::kResourceTypeId);
@@ -26,10 +28,10 @@ void QnLayoutResource::setStatus(nx::vms::api::ResourceStatus newStatus,
     NX_ASSERT(false, "Not implemented");
 }
 
-void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
+void QnLayoutResource::setItems(const LayoutItemDataList& items)
 {
-    QnLayoutItemDataMap map;
-    for (QnLayoutItemData item: items)
+    LayoutItemDataMap map;
+    for (LayoutItemData item: items)
     {
         // Workaround against corrupted layouts in the database
         if (item.uuid.isNull())
@@ -39,12 +41,12 @@ void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
     setItems(map);
 }
 
-void QnLayoutResource::setItems(const QnLayoutItemDataMap &items)
+void QnLayoutResource::setItems(const LayoutItemDataMap &items)
 {
     m_items->setItems(items);
 }
 
-QnLayoutItemDataMap QnLayoutResource::getItems() const
+LayoutItemDataMap QnLayoutResource::getItems() const
 {
     return m_items->getItems();
 }
@@ -69,24 +71,24 @@ void QnLayoutResource::setUrl(const QString& value)
     }
 }
 
-QnLayoutItemData QnLayoutResource::getItem(const QnUuid &itemUuid) const
+LayoutItemData QnLayoutResource::getItem(const QnUuid &itemUuid) const
 {
     return m_items->getItem(itemUuid);
 }
 
-Qn::Notifier QnLayoutResource::storedItemAdded(const QnLayoutItemData& item)
+Qn::Notifier QnLayoutResource::storedItemAdded(const LayoutItemData& item)
 {
     return [r = toSharedPointer(this), item]{ emit r->itemAdded(r, item); };
 }
 
-Qn::Notifier QnLayoutResource::storedItemRemoved(const QnLayoutItemData& item)
+Qn::Notifier QnLayoutResource::storedItemRemoved(const LayoutItemData& item)
 {
     return [r = toSharedPointer(this), item]{ emit r->itemRemoved(r, item); };
 }
 
 Qn::Notifier QnLayoutResource::storedItemChanged(
-    const QnLayoutItemData& item,
-    const QnLayoutItemData& /*oldItem*/)
+    const LayoutItemData& item,
+    const LayoutItemData& /*oldItem*/)
 {
     return [r = toSharedPointer(this), item]{ emit r->itemChanged(r, item); };
 }
@@ -150,12 +152,12 @@ void QnLayoutResource::updateInternal(const QnResourcePtr& source, NotifierList&
     }
 }
 
-void QnLayoutResource::addItem(const QnLayoutItemData &item)
+void QnLayoutResource::addItem(const LayoutItemData &item)
 {
     m_items->addItem(item);
 }
 
-void QnLayoutResource::removeItem(const QnLayoutItemData &item)
+void QnLayoutResource::removeItem(const LayoutItemData &item)
 {
     m_items->removeItem(item);
 }
@@ -165,7 +167,7 @@ void QnLayoutResource::removeItem(const QnUuid &itemUuid)
     m_items->removeItem(itemUuid);
 }
 
-void QnLayoutResource::updateItem(const QnLayoutItemData &item)
+void QnLayoutResource::updateItem(const LayoutItemData &item)
 {
     m_items->updateItem(item);
 }

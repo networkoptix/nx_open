@@ -22,7 +22,7 @@ QDir calculatePath(SystemContext* systemContext)
         ? connection->moduleInformation().localSystemId.toString()
         : kLocalSettingsPlaceholder;
 
-    return QDir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+    return QDir(QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
         + "/settings/"
         + systemId);
 }

@@ -7,7 +7,6 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QStyledItemDelegate>
 
-#include <client/client_settings.h>
 #include <common/common_globals.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_tour.h>
@@ -16,7 +15,9 @@
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/ptz/helpers.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_conditions.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -198,7 +199,8 @@ void QnPtzManageDialog::setWidget(QnMediaResourceWidget* widget)
         if (const auto resource = m_widget->resource()->toResourcePtr())
         {
             setWindowTitle(tr("Manage PTZ for %1...").arg(
-                QnResourceDisplayInfo(resource).toString(qnSettings->resourceInfoLevel())));
+                QnResourceDisplayInfo(resource).toString(
+                    appContext()->localSettings()->resourceInfoLevel())));
         }
     }
 

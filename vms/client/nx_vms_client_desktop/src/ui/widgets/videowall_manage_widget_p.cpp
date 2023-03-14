@@ -5,7 +5,6 @@
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 
-#include <client/client_settings.h>
 #include <core/resource/videowall_resource.h>
 #include <nx/build_info.h>
 #include <nx/utils/string.h>

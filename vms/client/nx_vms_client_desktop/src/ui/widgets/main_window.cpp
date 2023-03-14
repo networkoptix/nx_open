@@ -14,7 +14,6 @@
 
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client/self_updater.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/media_resource.h>
@@ -34,6 +33,7 @@
 #include <nx/vms/client/desktop/radass/radass_action_handler.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/showreel/showreel_actions_handler.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -303,17 +303,19 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
     context->instance<KeyboardModifiersWatcher>();
 
-    const auto timeModeNotifier = qnSettings->notifier(QnClientSettings::TIME_MODE);
     const auto updateTimeMode =
         []()
         {
-            const auto newMode = qnSettings->timeMode() == Qn::ClientTimeMode
+            const auto newMode = (appContext()->localSettings()->timeMode() == Qn::ClientTimeMode)
                 ? nx::vms::client::core::ServerTimeWatcher::clientTimeMode
                 : nx::vms::client::core::ServerTimeWatcher::serverTimeMode;
             for (auto systemContext: appContext()->systemContexts())
                 systemContext->serverTimeWatcher()->setTimeMode(newMode);
         };
-    connect(timeModeNotifier, &QnPropertyNotifier::valueChanged, this, updateTimeMode);
+    connect(&appContext()->localSettings()->timeMode,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        updateTimeMode);
 
     // Apply already loaded time mode settings
     updateTimeMode();

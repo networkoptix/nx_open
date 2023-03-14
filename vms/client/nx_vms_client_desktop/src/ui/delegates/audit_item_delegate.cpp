@@ -6,13 +6,13 @@
 #include <QtWidgets/QAbstractScrollArea>
 #include <QtWidgets/QApplication>
 
-#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/time/formatter.h>
@@ -589,7 +589,8 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
             }
 
             /* Draw camera name: */
-            QString name = QnResourceDisplayInfo(camera).toString(qnSettings->resourceInfoLevel());
+            QString name = QnResourceDisplayInfo(camera).toString(
+                appContext()->localSettings()->resourceInfoLevel());
             QString elidedName = smallFontMetrics.elidedText(name, option.textElideMode, nameRect.width());
             painter->drawText(nameRect, kTextFlags, elidedName);
             nameRect.moveTop(nameRect.top() + smallRowHeight);

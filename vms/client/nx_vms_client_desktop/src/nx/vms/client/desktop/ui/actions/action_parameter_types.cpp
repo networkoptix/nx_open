@@ -233,7 +233,7 @@ QnResourceList ParameterTypes::resources(const LayoutItemIndexList& layoutItems)
         if (index.isNull())
             continue;
 
-        QnLayoutItemData data = index.layout()->getItem(index.uuid());
+        common::LayoutItemData data = index.layout()->getItem(index.uuid());
         if (auto resource = getResourceByDescriptor(data.resource))
             result.push_back(resource);
     }

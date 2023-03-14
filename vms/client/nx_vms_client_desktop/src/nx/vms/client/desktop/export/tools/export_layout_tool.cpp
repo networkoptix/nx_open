@@ -7,7 +7,6 @@
 
 #include <camera/camera_data_manager.h>
 #include <camera/client_video_camera.h>
-#include <client/client_settings.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>
@@ -22,8 +21,8 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
@@ -31,7 +30,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 
 #ifdef Q_OS_WIN
-    #include <launcher/nov_launcher_win.h>
+#include <launcher/nov_launcher_win.h>
 #endif
 
 namespace {
@@ -207,7 +206,7 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     ItemInfoList result;
 
     QSet<QnUuid> idList;
-    QnLayoutItemDataMap items;
+    common::LayoutItemDataMap items;
 
     for (const auto& item: d->layout->getItems())
     {
@@ -227,7 +226,7 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
             idList << id;
         }
 
-        QnLayoutItemData localItem = item;
+        common::LayoutItemData localItem = item;
         localItem.resource.id = resource->getId();
         localItem.resource.path = fileNameForResource(resource);
         items.insert(localItem.uuid, localItem);

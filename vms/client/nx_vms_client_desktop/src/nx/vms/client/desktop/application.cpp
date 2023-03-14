@@ -3,15 +3,15 @@
 #include "application.h"
 
 #ifdef Q_OS_LINUX
-    #include <unistd.h>
+#include <unistd.h>
 #endif
 
 #ifdef Q_WS_X11
-    #include <X11/Xlib.h>
+#include <X11/Xlib.h>
 #endif
 
 #if defined(Q_OS_MACOS)
-    #include <sys/sysctl.h>
+#include <sys/sysctl.h>
 #endif
 
 #include <iostream>
@@ -36,7 +36,6 @@
 
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
 #include <client_core/client_core_module.h>
@@ -46,7 +45,6 @@
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/kit/output_redirector.h>
-#include <nx/vms/client/core/media/decoder_registrar.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -55,10 +53,12 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/rlimit.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/vms/client/core/media/decoder_registrar.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/joystick/joystick_settings_action_handler.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/window_controller.h>
 #include <nx/vms/client/desktop/state/window_geometry_manager.h>
@@ -78,11 +78,11 @@
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 #if defined(Q_OS_MACOS)
-    #include <ui/workaround/mac_utils.h>
+#include <ui/workaround/mac_utils.h>
 #endif
 
 #if defined(Q_OS_WIN)
-    #include <QtGui/qpa/qplatformwindow_p.h>
+#include <QtGui/qpa/qplatformwindow_p.h>
 #endif
 
 namespace {
@@ -223,7 +223,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         return kSuccessCode;
 
     /* Initialize sound. */
-    nx::audio::AudioDevice::instance()->setVolume(qnSettings->audioVolume());
+    nx::audio::AudioDevice::instance()->setVolume(appContext()->localSettings()->audioVolume());
 
     qApp->installEventFilter(&QnHelpHandler::instance());
 
@@ -247,7 +247,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     // Dealing with EULA in videowall mode can make people frown.
     if (!qnRuntime->isVideoWallMode() && qnRuntime->isDesktopMode())
     {
-        int accepted = qnSettings->acceptedEulaVersion();
+        int accepted = appContext()->localSettings()->acceptedEulaVersion();
         int current = nx::branding::eulaVersion();
         const bool showEula = accepted < current && qgetenv("VMS_ACCEPT_EULA") != "YES";
 
@@ -313,8 +313,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     applicationContext->clientStateHandler()->unregisterDelegate(kWindowGeometryData);
 
     /* Write out settings. */
-    qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());
-    qnSettings->save();
+    appContext()->localSettings()->audioVolume = nx::audio::AudioDevice::instance()->volume();
 
     // Wait while deleteLater objects will be freed
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);

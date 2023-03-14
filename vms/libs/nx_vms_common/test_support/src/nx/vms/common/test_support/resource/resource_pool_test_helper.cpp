@@ -2,18 +2,20 @@
 
 #include "resource_pool_test_helper.h"
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/common/intercom/utils.h>
 
 #include "storage_resource_stub.h"
+
+using namespace nx::vms::common;
 
 QnUserResourcePtr QnResourcePoolTestHelper::createUser(GlobalPermissions globalPermissions,
     const QString& name,
@@ -60,7 +62,7 @@ QnUuid QnResourcePoolTestHelper::addToLayout(
     const QnLayoutResourcePtr& layout,
     const QnResourcePtr& resource)
 {
-    QnLayoutItemData item;
+    LayoutItemData item;
     item.uuid = QnUuid::createUuid();
     item.resource.id = resource->getId();
     layout->addItem(item);

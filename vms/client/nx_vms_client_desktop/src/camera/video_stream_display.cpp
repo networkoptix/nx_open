@@ -5,13 +5,13 @@
 #include <algorithm>
 #include <chrono>
 
-extern "C" {
-    #include <libavutil/imgutils.h>
-    #include <libswscale/swscale.h>
+extern "C"
+{
+#include <libavutil/imgutils.h>
+#include <libswscale/swscale.h>
 } // extern "C"
 
 #include <client/client_module.h>
-#include <client/client_settings.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource/security_cam_resource.h>
 #include <decoders/video/abstract_video_decoder.h>
@@ -19,7 +19,9 @@ extern "C" {
 #include <nx/media/quick_sync/qsv_supported.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/long_runnable.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
@@ -29,8 +31,8 @@ extern "C" {
 #include <utils/media/utils.h>
 
 #ifdef __QSV_SUPPORTED__
-#include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
 #include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
+#include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
 #endif // __QSV_SUPPORTED__
 
 #include "buffered_frame_displayer.h"
@@ -377,9 +379,9 @@ void QnVideoStreamDisplay::calcSampleAR(CLVideoDecoderOutputPtr outFrame, QnAbst
 
 MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding) const
 {
-    if (!qnSettings->allowMtDecoding())
+    if (!appContext()->localSettings()->allowMtDecoding())
         return MultiThreadDecodePolicy::disabled;
-    if (qnSettings->forceMtDecoding())
+    if (appContext()->localSettings()->forceMtDecoding())
         return MultiThreadDecodePolicy::enabled;
 
     if (useMtDecoding)
@@ -393,14 +395,16 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     QnAbstractVideoDecoder* decoder = nullptr;
 
 #ifdef __QSV_SUPPORTED__
-    if (qnSettings->isHardwareDecodingEnabled() && !m_reverseMode)
+    if (appContext()->localSettings()->hardwareDecodingEnabled() && !m_reverseMode)
     {
-        if (QuickSyncVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
+        if (QuickSyncVideoDecoderOldPlayer::instanceCount()
+                < appContext()->localSettings()->maxHardwareDecoders()
             && QuickSyncVideoDecoderOldPlayer::isSupported(data))
         {
             decoder = new QuickSyncVideoDecoderOldPlayer();
         }
-        else if (NvidiaVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
+        else if (NvidiaVideoDecoderOldPlayer::instanceCount()
+                < appContext()->localSettings()->maxHardwareDecoders()
             && NvidiaVideoDecoderOldPlayer::isSupported(data))
         {
             decoder = new NvidiaVideoDecoderOldPlayer();

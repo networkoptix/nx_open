@@ -3,15 +3,14 @@
 #include "welcome_screen.h"
 
 #include <QtCore/QMimeData>
+#include <QtGui/QAction>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
-#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 
 #include <api/runtime_info_manager.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client/forgotten_systems_manager.h>
 #include <client_core/client_core_module.h>
 #include <client_core/client_core_settings.h>
@@ -37,13 +36,14 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/svg_icon_provider.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
@@ -124,12 +124,10 @@ WelcomeScreen::WelcomeScreen(QWidget* parent):
 
     setHelpTopic(this, Qn::Login_Help);
 
-    connect(qnSettings, &QnClientSettings::valueChanged, this,
-        [this](int valueId)
-        {
-            if (valueId == QnClientSettings::AUTO_LOGIN)
-                emit resetAutoLogin();
-        });
+    connect(&appContext()->localSettings()->autoLogin,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        &WelcomeScreen::resetAutoLogin);
 
     createSystemModel();
 }
@@ -804,7 +802,7 @@ void WelcomeScreen::deleteSystem(const QString& systemId, const QString& localSy
 
 bool WelcomeScreen::saveCredentialsAllowed() const
 {
-    return qnSettings->saveCredentialsAllowed();
+    return appContext()->localSettings()->saveCredentialsAllowed();
 }
 
 bool WelcomeScreen::is2FaEnabledForUser() const

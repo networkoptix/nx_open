@@ -5,10 +5,9 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
-class QnClientSettings;
-
 namespace nx::vms::client::desktop {
 
+class LocalSettings;
 class SharedMemoryManager;
 
 /**
@@ -18,7 +17,7 @@ class SharedMemoryManager;
 class RunningInstancesManager
 {
 public:
-    explicit RunningInstancesManager(QnClientSettings* settings, SharedMemoryManager* memory);
+    explicit RunningInstancesManager(LocalSettings* settings, SharedMemoryManager* memory);
     virtual ~RunningInstancesManager();
 
     QnUuid currentInstanceGuid() const;

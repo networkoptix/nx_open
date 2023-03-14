@@ -11,34 +11,31 @@
 #include <QtWidgets/QMenu>
 
 #include <client/client_globals.h>
-#include <client/client_settings.h>
-
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
+#include <nx/vms/client/desktop/common/widgets/dropdown_button.h>
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
+#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/actions/action.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <server/server_storage_manager.h>
 #include <ui/delegates/recording_stats_item_delegate.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/models/recording_stats_model.h>
 #include <ui/models/recording_stats_adapter.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
+#include <ui/models/recording_stats_model.h>
 #include <ui/utils/table_export_helper.h>
-#include <nx/vms/client/desktop/common/widgets/dropdown_button.h>
-#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
-#include <nx/vms/client/desktop/common/widgets/hint_button.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
-
+#include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
 using namespace nx::vms::client::desktop;

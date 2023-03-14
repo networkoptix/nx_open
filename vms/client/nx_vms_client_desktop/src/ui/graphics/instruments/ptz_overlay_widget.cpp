@@ -2,6 +2,9 @@
 
 #include "ptz_overlay_widget.h"
 
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
+
 using namespace nx::vms::client::desktop;
 
 PtzOverlayWidget::PtzOverlayWidget(QGraphicsItem* parent, Qt::WindowFlags windowFlags):
@@ -211,7 +214,7 @@ void PtzOverlayWidget::updateLayout()
 
     m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
 
-    if (qnSettings->isPtzAimOverlayEnabled())
+    if (appContext()->localSettings()->ptzAimOverlayEnabled())
     {
         m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
         m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));

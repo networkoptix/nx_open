@@ -27,7 +27,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
 {
     // Create storage handler and read layout info.
     QnLayoutFileStorageResource layoutStorage(layoutUrl);
-    QScopedPointer<QIODevice> layoutFile(layoutStorage.open(lit("layout.pb"), QIODevice::ReadOnly));
+    QScopedPointer<QIODevice> layoutFile(layoutStorage.open("layout.pb", QIODevice::ReadOnly));
     if (!layoutFile)
         return QnFileLayoutResourcePtr();
 
@@ -80,14 +80,14 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
     if (!layoutIsAccessible)
         return layout;
 
-    QnLayoutItemDataList orderedItems;
+    common::LayoutItemDataList orderedItems;
     foreach(const auto& item, apiLayout.items)
     {
-        orderedItems << QnLayoutItemData();
+        orderedItems << common::LayoutItemData();
         ec2::fromApiToResource(item, orderedItems.last());
     }
 
-    QScopedPointer<QIODevice> rangeFile(layoutStorage.open(lit("range.bin"), QIODevice::ReadOnly));
+    QScopedPointer<QIODevice> rangeFile(layoutStorage.open("range.bin", QIODevice::ReadOnly));
     if (rangeFile)
     {
         QByteArray data = rangeFile->readAll();
@@ -95,7 +95,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         rangeFile.reset();
     }
 
-    QScopedPointer<QIODevice> miscFile(layoutStorage.open(lit("misc.bin"), QIODevice::ReadOnly));
+    QScopedPointer<QIODevice> miscFile(layoutStorage.open("misc.bin", QIODevice::ReadOnly));
     bool layoutWithCameras = false;
     if (miscFile)
     {
@@ -125,7 +125,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         }
     }
 
-    QScopedPointer<QIODevice> watermarkFile(layoutStorage.open(lit("watermark.txt"), QIODevice::ReadOnly));
+    QScopedPointer<QIODevice> watermarkFile(layoutStorage.open("watermark.txt", QIODevice::ReadOnly));
     if (watermarkFile)
     {
         QByteArray data = watermarkFile->readAll();
@@ -137,24 +137,24 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         watermarkFile.reset();
     }
 
-    QnLayoutItemDataMap updatedItems;
+    nx::vms::common::LayoutItemDataMap updatedItems;
 
-    QScopedPointer<QIODevice> itemNamesIO(layoutStorage.open(lit("item_names.txt"), QIODevice::ReadOnly));
+    QScopedPointer<QIODevice> itemNamesIO(layoutStorage.open("item_names.txt", QIODevice::ReadOnly));
     QTextStream itemNames(itemNamesIO.data());
 
-    QScopedPointer<QIODevice> itemTimeZonesIO(layoutStorage.open(lit("item_timezones.txt"), QIODevice::ReadOnly));
+    QScopedPointer<QIODevice> itemTimeZonesIO(layoutStorage.open("item_timezones.txt", QIODevice::ReadOnly));
     QTextStream itemTimeZones(itemTimeZonesIO.data());
 
     // TODO: #sivanov Here is bad place to add resources to the pool. Need refactor.
     // All AVI resources are added to pool here. Layout itself is added later outside this module.
-    QnLayoutItemDataList& items = orderedItems;
+    nx::vms::common::LayoutItemDataList& items = orderedItems;
     for (int i = 0; i < items.size(); ++i)
     {
-        QnLayoutItemData& item = items[i];
+        nx::vms::common::LayoutItemData& item = items[i];
         QString path = item.resource.path;
         NX_ASSERT(!path.isEmpty(), "Resource path should not be empty. Exported file is not valid.");
-        if (!path.endsWith(lit(".mkv")))
-            path += lit(".mkv");
+        if (!path.endsWith(".mkv"))
+            path += ".mkv";
         item.resource.path = QnLayoutFileStorageResource::itemUniqueId(layoutUrl, path);
 
         QnLayoutFileStorageResourcePtr fileStorage(new QnLayoutFileStorageResource(layoutUrl));
@@ -190,9 +190,10 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel)
         {
             QString normMotionName = path.mid(path.lastIndexOf('?') + 1);
-            QScopedPointer<QIODevice> motionIO(layoutStorage.open(lit("motion%1_%2.bin")
-                .arg(channel)
-                .arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly));
+            QScopedPointer<QIODevice> motionIO(layoutStorage.open(
+                nx::format(
+                    "motion%1_%2.bin", channel, QFileInfo(normMotionName).completeBaseName()),
+                QIODevice::ReadOnly));
             // Doing some additional checks in case data is broken.
             if (motionIO && (motionIO->size() % sizeof(QnMetaDataV1Light) == 0))
             {
@@ -233,7 +234,7 @@ bool layout::reloadFromFile(
 
     // Remove all layout AVI streams from resource pool.
     const auto resources = layoutResources(layout);
-    layout->setItems(QnLayoutItemDataList());
+    layout->setItems(nx::vms::common::LayoutItemDataList{});
     for (const auto& resource: resources)
     {
         if (resource.dynamicCast<QnAviResource>())

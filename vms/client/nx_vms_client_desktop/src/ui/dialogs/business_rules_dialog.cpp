@@ -18,7 +18,6 @@
 #include <business/business_types_comparator.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>

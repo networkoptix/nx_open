@@ -2,16 +2,18 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QObject>
 
-#include "property.h"
 #include "abstract_backend.h"
+#include "property.h"
 
 namespace nx::utils::property_storage {
 
 class NX_VMS_COMMON_API Storage: public QObject
 {
+    Q_OBJECT
+
 public:
     using BaseProperty = nx::utils::property_storage::BaseProperty;
 
@@ -24,8 +26,15 @@ public:
     explicit Storage(AbstractBackend* backend, QObject* parent = nullptr);
     virtual ~Storage() = default;
 
+    bool isWritable() const;
     void registerProperty(BaseProperty* property);
     void unregisterProperty(BaseProperty* property);
+    Q_INVOKABLE bool exists(const QString& name) const;
+    Q_INVOKABLE QVariant value(const QString& name) const;
+    Q_INVOKABLE void setValue(const QString& name, const QVariant& value);
+
+signals:
+    void changed(BaseProperty* property);
 
 protected:
     void load();

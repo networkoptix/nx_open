@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QVariant>
 
 #include <nx/reflect/json.h>
 
@@ -23,6 +24,9 @@ public:
 
     virtual QString serialized() const = 0;
     virtual void loadSerializedValue(const QString& value) = 0;
+    virtual QVariant variantValue() const = 0;
+    virtual void setVariantValue(const QVariant& value) = 0;
+    bool exists() const;
 
 signals:
     void changed(BaseProperty* property);
@@ -92,6 +96,16 @@ public:
 
         m_value = newValue;
         notify();
+    }
+
+    virtual QVariant variantValue() const override
+    {
+        return QVariant::fromValue(value());
+    }
+
+    virtual void setVariantValue(const QVariant& value) override
+    {
+        setValue(value.value<T>());
     }
 
 protected:

@@ -8,7 +8,6 @@
 #include <camera/camera_data_manager.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
@@ -58,7 +57,7 @@
 #include <ui/workbench/workbench_layout.h>
 
 #ifdef Q_OS_WIN
-    #include <launcher/nov_launcher_win.h>
+#include <launcher/nov_launcher_win.h>
 #endif
 
 namespace nx::vms::client::desktop {
@@ -125,7 +124,7 @@ LayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnR
     {
         gridWalker.next();
 
-        QnLayoutItemData item = layoutItemFromResource(camera);
+        nx::vms::common::LayoutItemData item = layoutItemFromResource(camera);
         item.flags = Qn::ItemFlag::Pinned;
         item.combinedGeometry = QRect(gridWalker.pos(), kCellSize);
 
@@ -466,12 +465,12 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
         // We have no permission for camera, but still can view the rest of layout
         static const QString reason =
             tr("Selected period cannot be exported for the current camera.");
-        dialog.disableTab(ExportSettingsDialog::Mode::Media, reason);
+        dialog.disableTab(ExportMode::media, reason);
         dialog.setLayout(widget->layoutResource());
     }
     else if (widget)
     {
-        const QnLayoutItemData itemData = widget->item()->data();
+        const nx::vms::common::LayoutItemData itemData = widget->item()->data();
         // Exporting from the scene and timeline
         dialog.setMediaParams(centralResource, itemData);
 
@@ -483,7 +482,7 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
     }
     else
     {
-        dialog.setMediaParams(centralResource, QnLayoutItemData());
+        dialog.setMediaParams(centralResource, nx::vms::common::LayoutItemData());
     }
 
     if (dialog.exec() != QDialog::Accepted)
@@ -527,7 +526,7 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
             &ExportSettingsDialog::forcedUpdate);
     }
 
-    const QnLayoutItemData itemData = widget ? widget->item()->data() : QnLayoutItemData();
+    const auto itemData = widget ? widget->item()->data() : common::LayoutItemData();
     dialog.setMediaParams(camera, itemData);
 
     if (dialog.exec() != QDialog::Accepted)
@@ -567,7 +566,7 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
 
     static const QString reason =
         tr("Several bookmarks can be exported as layout only.");
-    dialog.disableTab(ExportSettingsDialog::Mode::Media, reason);
+    dialog.disableTab(ExportMode::media, reason);
     dialog.setLayout(layoutFromBookmarks(bookmarks, resourcePool()));
     dialog.setBookmarks(bookmarks);
 
@@ -664,7 +663,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
 
     switch (dialog.mode())
     {
-        case ExportSettingsDialog::Mode::Media:
+        case ExportMode::media:
         {
             auto settings = dialog.exportMediaSettings();
 
@@ -689,7 +688,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
                 auto layoutItems = layout->getItems();
                 if (!layoutItems.empty())
                 {
-                    QnLayoutItemData item = *layoutItems.begin();
+                    common::LayoutItemData item = *layoutItems.begin();
                     item.rotation = settings.transcodingSettings.rotation;
                     layout->updateItem(item);
                 }
@@ -708,7 +707,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
             }
             break;
         }
-        case ExportSettingsDialog::Mode::Layout:
+        case ExportMode::layout:
         {
             const auto settings = dialog.exportLayoutSettings();
             exportId = d->createExportContext(
@@ -773,7 +772,7 @@ bool WorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr& layout
     bool hasImage = false;
     bool hasLocal = false;
 
-    for (const QnLayoutItemData &item : layout->getItems())
+    for (const common::LayoutItemData& item: layout->getItems())
     {
         QnResourcePtr resource = getResourceByDescriptor(item.resource);
         if (!resource)

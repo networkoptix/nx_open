@@ -15,37 +15,37 @@
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
-QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType)
+QString QnSystemHealthStringsHelper::messageTitle(MessageType messageType)
 {
     switch (messageType)
     {
-        case QnSystemHealth::EmailIsEmpty:
+        case MessageType::emailIsEmpty:
             return tr("Email address is not set");
-        case QnSystemHealth::NoLicenses:
+        case MessageType::noLicenses:
             return tr("No licenses");
-        case QnSystemHealth::SmtpIsNotSet:
+        case MessageType::smtpIsNotSet:
             return tr("Email server is not set");
-        case QnSystemHealth::UsersEmailIsEmpty:
+        case MessageType::usersEmailIsEmpty:
             return tr("Some users have not set their email addresses");
-        case QnSystemHealth::EmailSendError:
+        case MessageType::emailSendError:
             return tr("Error while sending email");
-        case QnSystemHealth::StoragesNotConfigured:
+        case MessageType::storagesNotConfigured:
             return tr("Storage is not configured");
-        case QnSystemHealth::backupStoragesNotConfigured:
+        case MessageType::backupStoragesNotConfigured:
             return tr("Backup storage is not configured");
-        case QnSystemHealth::ArchiveRebuildFinished:
+        case MessageType::archiveRebuildFinished:
             return tr("Rebuilding archive index is completed");
-        case QnSystemHealth::ArchiveRebuildCanceled:
+        case MessageType::archiveRebuildCanceled:
             return tr("Rebuilding archive index is canceled by user");
-        case QnSystemHealth::ArchiveIntegrityFailed:
+        case MessageType::archiveIntegrityFailed:
             return tr("Archive integrity problem detected");
-        case QnSystemHealth::NoInternetForTimeSync:
+        case MessageType::noInternetForTimeSync:
             return tr("The System has no internet access for time synchronization");
-        case QnSystemHealth::cameraRecordingScheduleIsInvalid:
+        case MessageType::cameraRecordingScheduleIsInvalid:
             return tr("Camera recording schedule is invalid");
-        case QnSystemHealth::metadataStorageNotSet:
+        case MessageType::metadataStorageNotSet:
             return tr("Storage for analytics data is not set");
-        case QnSystemHealth::metadataOnSystemStorage:
+        case MessageType::metadataOnSystemStorage:
             return tr("System storage is used for analytics data");
         default:
             break;
@@ -54,7 +54,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
     return QString();
 }
 
-QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType messageType,
+QString QnSystemHealthStringsHelper::messageText(MessageType messageType,
    const QString& resourceName)
 {
     namespace html = nx::vms::common::html;
@@ -64,11 +64,11 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
 
     switch (messageType)
     {
-        case QnSystemHealth::UsersEmailIsEmpty:
+        case MessageType::usersEmailIsEmpty:
             return tr("Email address is not set for user %1")
                 .arg(nx::utils::elideString(resourceName, kMaxNameLength));
 
-        case QnSystemHealth::CloudPromo:
+        case MessageType::cloudPromo:
         {
             const bool isLoggedIntoCloud =
                 qnCloudStatusWatcher->status() != core::CloudStatusWatcher::LoggedOut;
@@ -98,13 +98,13 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
                 .arg(nx::style::Metrics::kStandardPadding);
         }
 
-        case QnSystemHealth::DefaultCameraPasswords:
+        case MessageType::defaultCameraPasswords:
             return tr("Some cameras require passwords to be set");
 
-        case QnSystemHealth::NoInternetForTimeSync:
+        case MessageType::noInternetForTimeSync:
             return tr("No server has internet access for time synchronization");
 
-        case QnSystemHealth::RemoteArchiveSyncError:
+        case MessageType::remoteArchiveSyncError:
             return tr("Error occurred during remote archive synchronization");
 
         default:
@@ -113,7 +113,7 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
     return messageTitle(messageType);
 }
 
-QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType messageType,
+QString QnSystemHealthStringsHelper::messageTooltip(MessageType messageType,
     QString resourceName)
 {
     QStringList messageParts;
@@ -121,42 +121,42 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
     switch (messageType)
     {
         // disable tooltip for promo
-        case QnSystemHealth::CloudPromo:
+        case MessageType::cloudPromo:
             return QString();
 
-        case QnSystemHealth::DefaultCameraPasswords:
+        case MessageType::defaultCameraPasswords:
             return QString(); //< TODO: #vkutin #sivanov Some tooltip would be nice.
 
-        case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::backupStoragesNotConfigured:
-        case QnSystemHealth::metadataStorageNotSet:
+        case MessageType::storagesNotConfigured:
+        case MessageType::backupStoragesNotConfigured:
+        case MessageType::metadataStorageNotSet:
             return QString(); //< Server list is displayed separately.
 
-        case QnSystemHealth::NoInternetForTimeSync:
+        case MessageType::noInternetForTimeSync:
             return tr("No online server in the System has internet access for time synchronization.");
 
-        case QnSystemHealth::EmailIsEmpty:
+        case MessageType::emailIsEmpty:
             messageParts << tr("Email address is not set.") << tr("You cannot receive System notifications by email.");
             break;
-        case QnSystemHealth::SmtpIsNotSet:
+        case MessageType::smtpIsNotSet:
             messageParts << tr("Email server is not set.") << tr("You cannot receive System notifications by email.");
             break;
-        case QnSystemHealth::UsersEmailIsEmpty:
+        case MessageType::usersEmailIsEmpty:
             messageParts << tr("Some users have not set their email addresses.") << tr("They cannot receive System notifications by email.");
             break;
-        case QnSystemHealth::ArchiveIntegrityFailed:
+        case MessageType::archiveIntegrityFailed:
             messageParts << resourceName;
             break;
-        case QnSystemHealth::NoLicenses:
+        case MessageType::noLicenses:
             messageParts << tr("You have no licenses.") << tr("You cannot record video from cameras.");
             break;
-        case QnSystemHealth::ArchiveRebuildFinished:
+        case MessageType::archiveRebuildFinished:
             messageParts << tr("Rebuilding archive index is completed on the following Server:") << resourceName;
             break;
-        case QnSystemHealth::ArchiveRebuildCanceled:
+        case MessageType::archiveRebuildCanceled:
             messageParts << tr("Rebuilding archive index is canceled by user on the following Server:") << resourceName;
             break;
-        case QnSystemHealth::metadataOnSystemStorage:
+        case MessageType::metadataOnSystemStorage:
             messageParts << tr("Analytics data can take up large amounts of space.");
             messageParts << tr("We recommend choosing another location for it instead of the "
                 "system partition.");

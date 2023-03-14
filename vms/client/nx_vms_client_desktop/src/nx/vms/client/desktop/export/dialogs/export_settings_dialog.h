@@ -6,10 +6,10 @@
 
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/reflect/enum_instrument.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/settings/types/export_mode.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_state_manager.h>
 
@@ -19,7 +19,7 @@ class QnMediaResourceWidget;
 struct QnTimePeriod;
 class QnWorkbenchContext;
 struct QnCameraBookmark;
-struct QnLayoutItemData;
+namespace nx::vms::common { struct LayoutItemData; }
 
 namespace nx::vms::client::desktop {
 
@@ -37,15 +37,9 @@ struct ExportLayoutSettings;
 class ExportSettingsDialog: public QnButtonBoxDialog, public QnSessionAwareDelegate
 {
     Q_OBJECT
-    Q_ENUMS(Mode)
     using base_type = QnButtonBoxDialog;
 
 public:
-    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Mode,
-        Media,
-        Layout
-    )
-
     using FileNameValidator = std::function<bool (const Filename& fileName, bool quiet)>;
     ExportSettingsDialog(const QnTimePeriod& timePeriod,
         const QnCameraBookmark& bookmark,
@@ -58,8 +52,7 @@ public:
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
 
-    Mode mode() const;
-
+    ExportMode mode() const;
     ExportMediaSettings exportMediaSettings() const;
     ExportLayoutSettings exportLayoutSettings() const;
 
@@ -69,9 +62,10 @@ public:
     virtual void accept() override;
 
     // Making this methods private causes pointless code bloat
-    void disableTab(Mode mode, const QString& reason);
+    void disableTab(ExportMode mode, const QString& reason);
     void setLayout(const LayoutResourcePtr& layout);
-    void setMediaParams(const QnMediaResourcePtr& mediaResource, const QnLayoutItemData& itemData);
+    void setMediaParams(
+        const QnMediaResourcePtr& mediaResource, const nx::vms::common::LayoutItemData& itemData);
     void setBookmarks(const QnCameraBookmarkList& bookmarks);
 
     virtual int exec() override;
@@ -81,7 +75,8 @@ private:
     void setupSettingsButtons();
     void initSettingsWidgets();
     void updateTabWidgetSize();
-    void updateAlerts(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
+    void updateAlerts(
+        ExportMode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
     static void updateAlertsInternal(QLayout* layout, const QStringList& texts, bool severe);
 
     // Updates state of widgets according to internal state

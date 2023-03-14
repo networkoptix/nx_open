@@ -4,7 +4,6 @@
 
 #include <api/runtime_info_manager.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <core/resource/user_resource.h>
 #include <licensing/license.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>

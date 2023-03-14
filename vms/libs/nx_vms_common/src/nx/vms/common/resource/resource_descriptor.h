@@ -30,6 +30,8 @@ struct ResourceDescriptor
      * resource') while actual resource instance is not initialized yet.
      */
     QString name;
+
+    bool operator==(const ResourceDescriptor&) const = default;
 };
 
 #define ResourceDescriptor_Fields (id)(path)(name)

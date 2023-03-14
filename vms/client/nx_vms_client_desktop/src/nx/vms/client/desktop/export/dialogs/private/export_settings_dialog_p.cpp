@@ -8,7 +8,6 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QStandardPaths>
 
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_bookmark.h>
@@ -18,11 +17,13 @@
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/utils/file_system.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/image_providers/proxy_image_provider.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/utils/transcoding_image_processor.h>
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
@@ -82,30 +83,38 @@ void ExportSettingsDialog::Private::updateOverlaysVisibility()
 // Called outside from ExportSettingsDialog
 void ExportSettingsDialog::Private::saveSettings()
 {
-    qnSettings->setLastExportMode(
-        QString::fromStdString(nx::reflect::enumeration::toString(state().mode)));
+    appContext()->localSettings()->lastExportMode = state().mode;
 
     switch (state().mode)
     {
-        case Mode::Media:
+        case ExportMode::media:
         {
             const auto imageSettings = state().exportMediaPersistentSettings.imageOverlay;
             if (!imageSettings.image.isNull() && !imageSettings.name.trimmed().isEmpty())
                 imageSettings.image.save(state().cachedImageFileName(), "png");
 
             if (state().bookmarkName.isEmpty())
-                qnSettings->setExportMediaSettings(state().exportMediaPersistentSettings);
+            {
+                appContext()->localSettings()->exportMediaSettings =
+                    state().exportMediaPersistentSettings;
+            }
             else
-                qnSettings->setExportBookmarkSettings(state().exportMediaPersistentSettings);
+            {
+                appContext()->localSettings()->exportBookmarkSettings =
+                    state().exportMediaPersistentSettings;
+            }
 
-            qnSettings->setLastExportDir(state().exportMediaSettings.fileName.path);
+            appContext()->localSettings()->lastExportDir =
+                state().exportMediaSettings.fileName.path;
             break;
         }
 
-        case Mode::Layout:
+        case ExportMode::layout:
         {
-            qnSettings->setExportLayoutSettings(state().exportLayoutPersistentSettings);
-            qnSettings->setLastExportDir(state().exportLayoutSettings.fileName.path);
+            appContext()->localSettings()->exportLayoutSettings =
+                state().exportLayoutPersistentSettings;
+            appContext()->localSettings()->lastExportDir =
+                state().exportLayoutSettings.fileName.path;
             break;
         }
     }
@@ -201,10 +210,10 @@ void ExportSettingsDialog::Private::setLayout(const LayoutResourcePtr& layout, c
     m_layoutPreviewWidget->setImageProvider(m_layoutPreviewProvider.get());
 }
 
-FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode)
+FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(ExportMode mode)
 {
     FileExtensionList result;
-    if (mode == Mode::Media)
+    if (mode == ExportMode::media)
         result << FileExtension::mkv << FileExtension::avi << FileExtension::mp4;
 
     // Both media and layout can be exported to layouts.
@@ -231,10 +240,10 @@ bool ExportSettingsDialog::Private::isOverlayVisible(ExportOverlayType type) con
     return overlayWidget && !overlayWidget->isHidden();
 }
 
-void ExportSettingsDialog::Private::validateSettings(Mode mode)
+void ExportSettingsDialog::Private::validateSettings(ExportMode mode)
 {
     ExportMediaValidator::Results results;
-    if (mode == Mode::Media)
+    if (mode == ExportMode::media)
     {
         if (!m_mediaResource)
             return;
@@ -490,9 +499,9 @@ QSize ExportSettingsDialog::Private::fullFrameSize() const
     return state().fullFrameSize;
 }
 
-Filename ExportSettingsDialog::Private::selectedFileName(Mode mode) const
+Filename ExportSettingsDialog::Private::selectedFileName(ExportMode mode) const
 {
-    return mode == Mode::Media
+    return mode == ExportMode::media
         ? state().exportMediaSettings.fileName
         : state().exportLayoutSettings.fileName;
 }
@@ -579,8 +588,8 @@ void ExportSettingsDialog::Private::renderState()
     updateOverlaysVisibility();
 
     // Render alerts
-    validateSettings(Mode::Media);
-    validateSettings(Mode::Layout);
+    validateSettings(ExportMode::media);
+    validateSettings(ExportMode::layout);
 }
 
 } // namespace nx::vms::client::desktop

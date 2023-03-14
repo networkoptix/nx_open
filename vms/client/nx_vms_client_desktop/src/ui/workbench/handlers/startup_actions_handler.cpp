@@ -12,7 +12,6 @@
 #include <api/helpers/layout_id_helper.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
@@ -40,6 +39,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
@@ -591,10 +591,13 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
 
 bool StartupActionsHandler::attemptAutoLogin()
 {
-    if (!qnSettings->autoLogin() || !qnSettings->saveCredentialsAllowed())
+    if (!appContext()->localSettings()->autoLogin()
+        || !appContext()->localSettings()->saveCredentialsAllowed())
+    {
         return false;
+    }
 
-    const auto [url, systemId] = qnSettings->lastUsedConnection();
+    const auto [url, systemId] = appContext()->localSettings()->lastUsedConnection();
 
     if (!url.isValid() || systemId.isNull())
         return false;

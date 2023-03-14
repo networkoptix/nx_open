@@ -13,7 +13,7 @@
 #include <QtWidgets/QVBoxLayout>
 
 #include <business/business_resource_validation.h>
-#include <client/client_settings.h>
+#include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>

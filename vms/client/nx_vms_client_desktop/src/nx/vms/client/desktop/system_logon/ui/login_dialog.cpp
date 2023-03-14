@@ -11,7 +11,6 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QApplication>
 
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <network/system_helpers.h>
 #include <nx/build_info.h>
@@ -20,6 +19,7 @@
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -131,7 +131,7 @@ LoginDialog::LoginDialog(QWidget *parent):
     connect(ui->portSpinBox, QnSpinboxIntValueChanged, this,
         &LoginDialog::updateAcceptibility);
 
-    const auto url = nx::utils::Url(qnSettings->lastLocalConnectionUrl());
+    const auto url = nx::utils::Url(appContext()->localSettings()->lastLocalConnectionUrl());
     if (url.host().isEmpty()) //< No last used connection.
     {
         ui->hostnameLineEdit->setText(kLocalHost);

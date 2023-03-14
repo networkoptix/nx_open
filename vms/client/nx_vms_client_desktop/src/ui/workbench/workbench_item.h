@@ -45,7 +45,9 @@ public:
      * \param data                      Item data to create an item from.
      * \param parent                    Parent of this object.
      */
-    QnWorkbenchItem(const QnResourcePtr& resource, const QnLayoutItemData& data, QObject* parent = nullptr);
+    QnWorkbenchItem(const QnResourcePtr& resource,
+        const nx::vms::common::LayoutItemData& data,
+        QObject* parent = nullptr);
 
     /**
      * Virtual destructor.
@@ -61,7 +63,7 @@ public:
     /**
      * \returns                         Layout item data of this workbench item.
      */
-    QnLayoutItemData data() const;
+    nx::vms::common::LayoutItemData data() const;
 
     /**
      * Update from QnLayoutData.
@@ -72,12 +74,12 @@ public:
      * \param data                      Data to update from.
      * \returns                         Whether all fields were successfully updated.
      */
-    bool update(const QnLayoutItemData &data);
+    bool update(const nx::vms::common::LayoutItemData& data);
 
     /**
      * \param[out] data                 Data to submit to.
      */
-    void submit(QnLayoutItemData &data) const;
+    void submit(nx::vms::common::LayoutItemData& data) const;
 
     /**
      * \returns                         Layout that this item belongs to, if any.

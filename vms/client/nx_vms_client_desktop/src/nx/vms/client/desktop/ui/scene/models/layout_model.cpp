@@ -30,9 +30,9 @@ public:
     void updateGridBoundingRect();
 
 private:
-    void at_itemAdded(const QnLayoutResourcePtr& resource, const QnLayoutItemData& item);
-    void at_itemRemoved(const QnLayoutResourcePtr& resource, const QnLayoutItemData& item);
-    void at_itemChanged(const QnLayoutResourcePtr& resource, const QnLayoutItemData& item);
+    void at_itemAdded(const QnLayoutResourcePtr& resource, const common::LayoutItemData& item);
+    void at_itemRemoved(const QnLayoutResourcePtr& resource, const common::LayoutItemData& item);
+    void at_itemChanged(const QnLayoutResourcePtr& resource, const common::LayoutItemData& item);
 
     void setGridBoundingRect(const QRect& rect);
 
@@ -107,7 +107,7 @@ void LayoutModel::Private::updateGridBoundingRect()
 }
 
 void LayoutModel::Private::at_itemAdded(
-    const QnLayoutResourcePtr& /*resource*/, const QnLayoutItemData& item)
+    const QnLayoutResourcePtr& /*resource*/, const common::LayoutItemData& item)
 {
     const auto it = std::lower_bound(itemIds.begin(), itemIds.end(), item.uuid);
     if (it != itemIds.end() && *it == item.uuid)
@@ -122,7 +122,7 @@ void LayoutModel::Private::at_itemAdded(
 }
 
 void LayoutModel::Private::at_itemRemoved(
-    const QnLayoutResourcePtr& /*resource*/, const QnLayoutItemData& item)
+    const QnLayoutResourcePtr& /*resource*/, const common::LayoutItemData& item)
 {
     const int row = itemIndex(item.uuid);
     if (row == -1)
@@ -138,7 +138,7 @@ void LayoutModel::Private::at_itemRemoved(
 }
 
 void LayoutModel::Private::at_itemChanged(
-    const QnLayoutResourcePtr& /*resource*/, const QnLayoutItemData& item)
+    const QnLayoutResourcePtr& /*resource*/, const common::LayoutItemData& item)
 {
     const int row = itemIndex(item.uuid);
     if (row == -1)

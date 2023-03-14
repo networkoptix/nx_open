@@ -11,7 +11,6 @@
 
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client/client_show_once_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
@@ -26,6 +25,7 @@
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -109,7 +109,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     ui->openLogsFolderButton->setIcon(qnSkin->icon("text_buttons/newfolder.svg"));
     ui->openLogsFolderButton->setFlat(true);
 
-    ui->logsManagementBox->setVisible(qnSettings->isBrowseLogsVisible());
+    ui->logsManagementBox->setVisible(appContext()->localSettings()->browseLogsButtonVisible());
 
     connect(ui->clearCacheButton, &QPushButton::clicked, this,
         &QnAdvancedSettingsWidget::at_clearCacheButton_clicked);
@@ -233,12 +233,12 @@ QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
 
 void QnAdvancedSettingsWidget::applyChanges()
 {
-    qnSettings->setAudioDownmixed(isAudioDownmixed());
-    qnSettings->setGLDoubleBuffer(isDoubleBufferingEnabled());
-    qnSettings->setAutoFpsLimit(isAutoFpsLimitEnabled());
-    qnSettings->setMaximumLiveBufferMs(maximumLiveBufferMs());
-    qnSettings->setGlBlurEnabled(isBlurEnabled());
-    qnSettings->setHardwareDecodingEnabled(isHardwareDecodingEnabled());
+    appContext()->localSettings()->downmixAudio = isAudioDownmixed();
+    appContext()->localSettings()->glDoubleBuffer = isDoubleBufferingEnabled();
+    appContext()->localSettings()->autoFpsLimit = isAutoFpsLimitEnabled();
+    appContext()->localSettings()->maximumLiveBufferMs = maximumLiveBufferMs();
+    appContext()->localSettings()->glBlurEnabled = isBlurEnabled();
+    appContext()->localSettings()->hardwareDecodingEnabledProperty = isHardwareDecodingEnabled();
 
     const auto oldCertificateValidationLevel =
         nx::vms::client::core::settings()->certificateValidationLevel();
@@ -336,12 +336,12 @@ void QnAdvancedSettingsWidget::applyChanges()
 
 void QnAdvancedSettingsWidget::loadDataToUi()
 {
-    setAudioDownmixed(qnSettings->isAudioDownmixed());
-    setDoubleBufferingEnabled(qnSettings->isGlDoubleBuffer());
-    setAutoFpsLimitEnabled(qnSettings->isAutoFpsLimit());
-    setMaximumLiveBufferMs(qnSettings->maximumLiveBufferMs());
-    setBlurEnabled(qnSettings->isGlBlurEnabled());
-    setHardwareDecodingEnabled(qnSettings->isHardwareDecodingEnabled());
+    setAudioDownmixed(appContext()->localSettings()->downmixAudio());
+    setDoubleBufferingEnabled(appContext()->localSettings()->glDoubleBuffer());
+    setAutoFpsLimitEnabled(appContext()->localSettings()->autoFpsLimit());
+    setMaximumLiveBufferMs(appContext()->localSettings()->maximumLiveBufferMs());
+    setBlurEnabled(appContext()->localSettings()->glBlurEnabled());
+    setHardwareDecodingEnabled(appContext()->localSettings()->hardwareDecodingEnabled());
     setCertificateValidationLevel(nx::vms::client::core::settings()->certificateValidationLevel());
     updateCertificateValidationLevelDescription();
     updateNvidiaHardwareAccelerationWarning();
@@ -349,13 +349,14 @@ void QnAdvancedSettingsWidget::loadDataToUi()
 
 bool QnAdvancedSettingsWidget::hasChanges() const
 {
-    return qnSettings->isAudioDownmixed() != isAudioDownmixed()
-        || qnSettings->isGlDoubleBuffer() != isDoubleBufferingEnabled()
-        || qnSettings->isAutoFpsLimit() != isAutoFpsLimitEnabled()
-        || qnSettings->maximumLiveBufferMs() != maximumLiveBufferMs()
-        || qnSettings->isGlBlurEnabled() != isBlurEnabled()
-        || qnSettings->isHardwareDecodingEnabled() != isHardwareDecodingEnabled()
-        || nx::vms::client::core::settings()->certificateValidationLevel() != certificateValidationLevel();
+    return appContext()->localSettings()->downmixAudio() != isAudioDownmixed()
+        || appContext()->localSettings()->glDoubleBuffer() != isDoubleBufferingEnabled()
+        || appContext()->localSettings()->autoFpsLimit() != isAutoFpsLimitEnabled()
+        || appContext()->localSettings()->maximumLiveBufferMs() != maximumLiveBufferMs()
+        || appContext()->localSettings()->glBlurEnabled() != isBlurEnabled()
+        || appContext()->localSettings()->hardwareDecodingEnabled() != isHardwareDecodingEnabled()
+        || nx::vms::client::core::settings()->certificateValidationLevel()
+            != certificateValidationLevel();
 }
 
 bool QnAdvancedSettingsWidget::isRestartRequired() const
@@ -371,7 +372,7 @@ bool QnAdvancedSettingsWidget::isRestartRequired() const
 
 void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
 {
-    QString backgroundImage = qnSettings->backgroundImage().name;
+    QString backgroundImage = appContext()->localSettings()->backgroundImage().name;
     /* Lock background image so it will not be deleted. */
     if (!backgroundImage.isEmpty())
     {
@@ -455,8 +456,9 @@ void QnAdvancedSettingsWidget::setHardwareDecodingEnabled(bool value)
 {
     // TODO: #vbreus If nx::media::getHardwareAccelerationType returns 'none' then 'Use hardware
     // video decoding check box should be unchecked and disabled.
-    // Also, in this case qnSettings->isHardwareDecodingEnabled() should return false disregarding
-    // previously set value, and there is no proper way to implement such behavior for now.
+    // Also, in this case localSettings()->hardwareDecodingEnabled() should return false
+    // disregarding previously set value, and there is no proper way to implement such behavior for
+    // now.
     ui->useHardwareDecodingCheckbox->setChecked(value);
 }
 

@@ -366,7 +366,6 @@ protected slots:
 
     bool canShowLayoutBackground() const;
 
-    void at_settingsValueChanged(int id);
     void updateAudioPlayback();
 
 private:

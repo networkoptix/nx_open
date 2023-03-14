@@ -93,6 +93,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
 #include <nx/vms/client/desktop/rules/rules_dialog.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
@@ -116,6 +117,7 @@
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/state/thumbnail_search_state.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
@@ -459,7 +461,7 @@ void ActionHandler::addToLayout(
     }
 
     // Force cloud resource descriptor for cloud layouts.
-    QnLayoutItemData data = layoutItemFromResource(resource,
+    LayoutItemData data = layoutItemFromResource(resource,
         /*forceCloud*/ layout->hasFlags(Qn::cross_system));
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
@@ -894,10 +896,10 @@ void ActionHandler::at_openInLayoutAction_triggered()
         using ExtraItemDataHash = QHash<Qn::ItemDataRole, QVariant>;
         QHash<QnUuid, ExtraItemDataHash> extraItemRoleValues;
 
-        QHash<QnUuid, QnLayoutItemData> itemDataByUuid;
+        QHash<QnUuid, LayoutItemData> itemDataByUuid;
         for (auto widget: widgets)
         {
-            QnLayoutItemData data = widget->item()->data();
+            LayoutItemData data = widget->item()->data();
             const auto oldUuid = data.uuid;
             data.uuid = QnUuid::createUuid();
             data.flags = Qn::PendingGeometryAdjustment;
@@ -2001,7 +2003,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
         0,
     };
 
-    const qint64 maxItems = qnSettings->maxPreviewSearchItems();
+    const qint64 maxItems = appContext()->localSettings()->maxPreviewSearchItems();
 
     if (period.durationMs < steps[1])
     {
@@ -2096,7 +2098,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
         if (!localPeriods.empty())
             localTime = qMax(localTime, localPeriods.begin()->startTimeMs);
 
-        QnLayoutItemData item = layoutItemFromResource(resource);
+        LayoutItemData item = layoutItemFromResource(resource);
         item.flags = Qn::Pinned;
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.contrastParams = widget->item()->imageEnhancement();
@@ -2120,7 +2122,8 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
 
     layout->setData(Qn::LayoutTimeLabelsRole, true);
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
-    layout->setData(Qn::LayoutSearchStateRole, QVariant::fromValue<QnThumbnailsSearchState>(QnThumbnailsSearchState(period, step)));
+    layout->setData(Qn::LayoutSearchStateRole,
+        QVariant::fromValue<ThumbnailsSearchState>(ThumbnailsSearchState{period, step}));
     layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);

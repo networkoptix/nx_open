@@ -9,7 +9,6 @@
 #include <QtWidgets/QGraphicsWidget>
 
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/videowall_resource.h>
@@ -266,11 +265,11 @@ bool QnWorkbenchLayout::update(const LayoutResourcePtr& resource)
 
 void QnWorkbenchLayout::submit(const LayoutResourcePtr& resource) const
 {
-    QnLayoutItemDataList datas;
+    nx::vms::common::LayoutItemDataList datas;
     datas.reserve(items().size());
     for (auto item: items())
     {
-        QnLayoutItemData data = item->data();
+        nx::vms::common::LayoutItemData data = item->data();
         data.zoomTargetUuid = this->zoomTargetUuidInternal(item);
         datas.push_back(data);
     }

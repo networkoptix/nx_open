@@ -2,12 +2,12 @@
 
 #include "connection_diagnostics_helper.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QThread>
 #include <QtWidgets/QPushButton>
 
 #include <api/runtime_info_manager.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
 #include <client_core/client_core_module.h>

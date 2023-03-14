@@ -5,11 +5,12 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <client/client_settings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
 #include <health/system_health_strings_helper.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/event/events/abstract_event.h>
@@ -53,9 +54,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
             &QnAbstractPreferencesWidget::hasChangesChanged);
     }
 
-    static_assert(QnSystemHealth::Count < 64, "We are packing messages to single quint64");
-
-    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
+    for (auto messageType: nx::vms::common::system_health::allVisibleMessageTypes())
     {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(QnSystemHealthStringsHelper::messageTitle(messageType));
@@ -97,9 +96,10 @@ void QnPopupSettingsWidget::loadDataToUi()
 
     bool all = true;
 
-    QSet<QnSystemHealth::MessageType> messageTypes = qnSettings->popupSystemHealth();
+    std::set<nx::vms::common::system_health::MessageType> messageTypes =
+        appContext()->localSettings()->popupSystemHealth();
 
-    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
+    for (auto messageType: nx::vms::common::system_health::allVisibleMessageTypes())
     {
         const bool checked = messageTypes.contains(messageType);
         m_systemHealthCheckBoxes[messageType]->setChecked(checked);
@@ -138,12 +138,12 @@ void QnPopupSettingsWidget::applyChanges()
         systemContext()->resourcePropertyDictionary()->saveParamsAsync(context()->user()->getId());
     }
 
-    qnSettings->setPopupSystemHealth(watchedSystemHealth());
+    appContext()->localSettings()->popupSystemHealth = storedSystemHealth();
 }
 
 bool QnPopupSettingsWidget::hasChanges() const
 {
-    return qnSettings->popupSystemHealth() != watchedSystemHealth()
+    return appContext()->localSettings()->popupSystemHealth() != storedSystemHealth()
         || (context()->user() && m_adaptor->watchedEvents() != watchedEvents());
 }
 
@@ -161,14 +161,19 @@ QList<EventType> QnPopupSettingsWidget::watchedEvents() const
     return result;
 }
 
-QSet<QnSystemHealth::MessageType> QnPopupSettingsWidget::watchedSystemHealth() const
+std::set<nx::vms::common::system_health::MessageType>
+    QnPopupSettingsWidget::storedSystemHealth() const
 {
-    QSet<QnSystemHealth::MessageType> result;
+    std::set<nx::vms::common::system_health::MessageType> result;
 
-    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
+    for (auto messageType: nx::vms::common::system_health::allVisibleMessageTypes())
     {
-        if (m_systemHealthCheckBoxes[messageType]->isChecked() || ui->showAllCheckBox->isChecked())
+        if (nx::vms::common::system_health::isMessageVisibleInSettings(messageType)
+            && (m_systemHealthCheckBoxes[messageType]->isChecked()
+                || ui->showAllCheckBox->isChecked()))
+        {
             result.insert(messageType);
+        }
     }
 
     return result;

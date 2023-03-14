@@ -5,17 +5,16 @@
 
 #include <QtCore/QFileInfo>
 
-#include <client/client_settings.h>
-
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/help/help_topics.h>
-#include <ui/help/help_topic_accessor.h>
-
-#include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <utils/media/audio_player.h>
 
 using namespace nx::vms::client::desktop;
@@ -80,11 +79,13 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked()
         new QnSessionAwareFileDialog(
             this,
             tr("Select File..."),
-            qnSettings->mediaFolders().isEmpty() ? QString() : qnSettings->mediaFolders().first(),
+            appContext()->localSettings()->mediaFolders().isEmpty()
+                ? QString()
+                : appContext()->localSettings()->mediaFolders().first(),
             supportedFormats));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
-    const int maxValueSec = qnSettings->maxMp3FileDurationSec();
+    const int maxValueSec = appContext()->localSettings()->maxMp3FileDurationSec();
     int cropSoundSecs = maxValueSec / 2;
     QString title;
 

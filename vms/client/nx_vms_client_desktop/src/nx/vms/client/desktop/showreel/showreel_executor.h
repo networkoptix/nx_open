@@ -6,9 +6,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
-#include <client/client_model_types.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/workbench/state/workbench_state.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::api {
@@ -99,7 +99,7 @@ private:
         QElapsedTimer elapsed;
     } m_showreel;
 
-    QnWorkbenchState m_lastState;
+    WorkbenchState m_lastState;
     QPointer<nx::vms::client::desktop::SceneBanner> m_hintLabel;
 };
 

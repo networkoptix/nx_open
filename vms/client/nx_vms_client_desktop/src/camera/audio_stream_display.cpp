@@ -2,15 +2,16 @@
 
 #include "audio_stream_display.h"
 
+#include <nx/audio/audiodevice.h>
+#include <nx/audio/processor.h>
+#include <nx/streaming/config.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 
 #include "decoders/audio/abstract_audio_decoder.h"
 
-#include "client/client_settings.h"
-#include <nx/streaming/config.h>
-
-#include <nx/audio/processor.h>
-#include <nx/audio/audiodevice.h>
+using namespace nx::vms::client::desktop;
 
 namespace {
 static const int AVCODEC_MAX_AUDIO_FRAME_SIZE = 192 * 1000;
@@ -22,7 +23,7 @@ QnAudioStreamDisplay::QnAudioStreamDisplay(int bufferMs, int prebufferMs):
     m_tooFewDataDetected(true),
     m_isFormatSupported(true),
     m_downmixing(false),
-    m_forceDownmix(qnSettings->isAudioDownmixed()),
+    m_forceDownmix(appContext()->localSettings()->downmixAudio()),
     m_sampleConvertMethod(SampleConvertMethod::none),
     m_isConvertMethodInitialized(false),
     m_decodedAudioBuffer(

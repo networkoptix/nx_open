@@ -5,17 +5,18 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QApplication>
 
-#include <client/client_settings.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/indents.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
-#include <nx/vms/client/desktop/style/skin.h>
 
 namespace {
 
@@ -154,7 +155,8 @@ void ResourceDialogItemDelegate::paintItemText(
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget)
         .adjusted(textPadding, 0, -textPadding, 0);
 
-    const auto showExtraInfo = qnSettings->resourceInfoLevel() == Qn::RI_FullInfo;
+    const auto showExtraInfo =
+        appContext()->localSettings()->resourceInfoLevel() == Qn::RI_FullInfo;
 
     // Draw background.
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);

@@ -7,7 +7,6 @@
 #include <qt_graphics_items/graphics_label.h>
 
 #include <api/server_rest_connection.h>
-#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -19,6 +18,7 @@
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/accessor.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -314,7 +314,7 @@ void QnTwoWayAudioWidget::Private::startStreaming()
         {
             if (success)
             {
-                if (qnSettings->muteOnAudioTransmit()
+                if (appContext()->localSettings()->muteOnAudioTransmit()
                     && !nx::audio::AudioDevice::instance()->isMute())
                 {
                     m_unmuteAudioOnStreamingStop = true;

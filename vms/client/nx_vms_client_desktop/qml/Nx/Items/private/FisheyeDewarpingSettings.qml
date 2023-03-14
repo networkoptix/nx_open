@@ -191,10 +191,8 @@ Item
                 text: qsTr("Show grid")
                 visible: calibrationEllipse.visible
 
-                checked: ClientSettings.value(ClientSettings.SHOW_FISHEYE_CALIBRATION_GRID)
-
-                onToggled:
-                    ClientSettings.setValue(ClientSettings.SHOW_FISHEYE_CALIBRATION_GRID, checked)
+                checked: LocalSettings.value("showFisheyeCalibrationGrid")
+                onToggled: LocalSettings.setValue("showFisheyeCalibrationGrid", checked)
             }
 
             Button

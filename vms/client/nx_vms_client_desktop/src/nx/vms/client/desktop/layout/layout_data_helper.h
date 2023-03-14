@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 
-struct QnLayoutItemData;
+namespace nx::vms::common { struct LayoutItemData; }
 
 namespace nx::vms::client::desktop {
 
@@ -13,7 +13,8 @@ namespace nx::vms::client::desktop {
  * Create layout item from resource.
  * @param forceCloud Generates cloud path even for resources from the current system.
  */
-QnLayoutItemData layoutItemFromResource(const QnResourcePtr& resource, bool forceCloud = false);
+nx::vms::common::LayoutItemData layoutItemFromResource(
+    const QnResourcePtr& resource, bool forceCloud = false);
 
 /** Create a new layout resource with a given resource on it. */
 LayoutResourcePtr layoutFromResource(const QnResourcePtr& resource);

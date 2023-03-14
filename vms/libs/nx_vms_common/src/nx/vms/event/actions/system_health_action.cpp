@@ -2,25 +2,22 @@
 
 #include "system_health_action.h"
 
-#include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/action_parameters.h>
-
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/events/abstract_event.h>
 #include <utils/common/synctime.h>
 
-namespace nx {
-namespace vms {
-namespace event {
+namespace nx::vms::event {
 
 SystemHealthAction::SystemHealthAction(
-    QnSystemHealth::MessageType message,
+    common::system_health::MessageType message,
     const QnUuid& eventResourceId,
     const nx::common::metadata::Attributes& attributes)
     :
     base_type(ActionType::showPopupAction, EventParameters())
 {
     EventParameters runtimeParams;
-    runtimeParams.eventType = EventType(EventType::systemHealthEvent + message);
+    runtimeParams.eventType = EventType(EventType::systemHealthEvent + (int) message);
     runtimeParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
     runtimeParams.eventResourceId = eventResourceId;
     runtimeParams.attributes = attributes;
@@ -32,6 +29,4 @@ SystemHealthAction::SystemHealthAction(
     setParams(actionParams);
 }
 
-} // namespace event
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::event

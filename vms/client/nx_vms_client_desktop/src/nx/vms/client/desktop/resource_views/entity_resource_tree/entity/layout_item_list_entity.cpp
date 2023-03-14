@@ -2,8 +2,8 @@
 
 #include "layout_item_list_entity.h"
 
-#include <core/resource/layout_resource.h>
 #include <client/client_globals.h>
+#include <core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item_order/resource_tree_item_order.h>
 
 namespace nx::vms::client::desktop {
@@ -18,13 +18,13 @@ LayoutItemListEntity::LayoutItemListEntity(
     setItems(layout->getItems().keys().toVector());
 
     m_connectionsGuard.add(layout->connect(layout.get(), &QnLayoutResource::itemAdded,
-        [this](const QnLayoutResourcePtr&, const QnLayoutItemData& item)
+        [this](const QnLayoutResourcePtr&, const common::LayoutItemData& item)
         {
             addItem(item.uuid);
         }));
 
     m_connectionsGuard.add(layout->connect(layout.get(), &QnLayoutResource::itemRemoved,
-        [this](const QnLayoutResourcePtr&, const QnLayoutItemData& item)
+        [this](const QnLayoutResourcePtr&, const common::LayoutItemData& item)
         {
             removeItem(item.uuid);
         }));

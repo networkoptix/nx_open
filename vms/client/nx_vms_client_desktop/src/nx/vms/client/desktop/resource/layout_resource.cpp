@@ -2,11 +2,11 @@
 
 #include "layout_resource.h"
 
+#include <core/resource/client_camera.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/qset.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/common/intercom/utils.h>
-#include <core/resource/client_camera.h>
-#include <core/resource_management/resource_pool.h>
 
 namespace nx::vms::client::desktop {
 
@@ -42,7 +42,7 @@ void LayoutResource::setPredefinedCellSpacing(Qn::CellSpacing spacing)
 
 void LayoutResource::cloneItems(LayoutResourcePtr target, ItemsRemapHash* remapHash) const
 {
-    QnLayoutItemDataList items = m_items->getItems().values();
+    common::LayoutItemDataList items = m_items->getItems().values();
     ItemsRemapHash newUuidByOldUuid;
     for (int i = 0; i < items.size(); i++)
     {

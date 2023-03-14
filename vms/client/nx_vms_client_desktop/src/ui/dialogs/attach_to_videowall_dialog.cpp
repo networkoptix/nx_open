@@ -3,22 +3,18 @@
 #include "attach_to_videowall_dialog.h"
 #include "ui_attach_to_videowall_dialog.h"
 
-#include <QtWidgets/QPushButton>
-
 #include <boost/range/algorithm/count_if.hpp>
 
-#include <client/client_settings.h>
+#include <QtWidgets/QPushButton>
 
 #include <core/resource/videowall_resource.h>
-
-#include <nx/vms/client/desktop/style/custom_style.h>
-
-#include <ui/help/help_topics.h>
-#include <ui/help/help_topic_accessor.h>
-
-#include <nx/vms/license/usage_helper.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
-
+#include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/license/usage_helper.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <utils/screen_utils.h>
 
 using namespace nx::vms::client::desktop;
@@ -66,7 +62,7 @@ void QnAttachToVideowallDialog::submitToResource(const QnVideoWallResourcePtr& v
 void QnAttachToVideowallDialog::updateLicencesUsage()
 {
     /* Calculate how many screens are proposed to be added or removed on local PC. */
-    QnUuid pcUuid = qnSettings->pcUuid();
+    QnUuid pcUuid = appContext()->localSettings()->pcUuid();
     int used = pcUuid.isNull() || m_videowall.isNull()
         ? 0
         : boost::count_if(

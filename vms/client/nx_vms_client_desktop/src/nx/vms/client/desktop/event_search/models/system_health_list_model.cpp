@@ -23,6 +23,8 @@ constexpr int kMaxInvalidScheduleTooltipWidth = 320;
 
 } // namespace
 
+using MessageType = nx::vms::common::system_health::MessageType;
+
 SystemHealthListModel::SystemHealthListModel(QnWorkbenchContext* context, QObject* parent):
     base_type(context, parent),
     d(new Private(this))
@@ -87,7 +89,7 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
                 : QVariant::fromValue(kDisplayTimeout);
 
         case Qn::MaximumTooltipSizeRole:
-            if (d->messageType(index.row()) == QnSystemHealth::cameraRecordingScheduleIsInvalid)
+            if (d->messageType(index.row()) == MessageType::cameraRecordingScheduleIsInvalid)
             {
                 return QSize(
                     kMaxInvalidScheduleTooltipWidth, mainWindowWidget()->height() - kPaddings);
@@ -95,7 +97,7 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
             break;
 
         case Qn::PreviewTimeRole:
-            if (d->messageType(index.row()) == QnSystemHealth::cameraRecordingScheduleIsInvalid)
+            if (d->messageType(index.row()) == MessageType::cameraRecordingScheduleIsInvalid)
                 return QVariant(); //< No preview
 
             break;
@@ -114,7 +116,7 @@ bool SystemHealthListModel::defaultAction(const QModelIndex& index)
 
     menu()->triggerIfPossible(action, d->parameters(index.row()));
 
-    if (d->message(index.row()) == QnSystemHealth::CloudPromo)
+    if (d->message(index.row()) == MessageType::cloudPromo)
         menu()->trigger(ui::action::HideCloudPromoAction);
 
     return true;
@@ -127,7 +129,7 @@ bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& pa
 
     for (int i = 0; i < count; ++i)
     {
-        if (d->message(row + i) == QnSystemHealth::CloudPromo)
+        if (d->message(row + i) == MessageType::cloudPromo)
         {
             executeLater([this]() { menu()->trigger(ui::action::HideCloudPromoAction); }, this);
             break;

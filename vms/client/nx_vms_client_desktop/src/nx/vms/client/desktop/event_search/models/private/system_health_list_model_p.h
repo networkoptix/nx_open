@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "../system_health_list_model.h"
-
 #include <deque>
 
 #include <QtCore/QScopedPointer>
@@ -11,11 +9,12 @@
 #include <QtGui/QAction>
 
 #include <core/resource/resource_fwd.h>
-#include <health/system_health.h>
-
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/common/system_health/message_type.h>
+
+#include "../system_health_list_model.h"
 
 namespace nx::vms::client::desktop {
 
@@ -27,12 +26,14 @@ class SystemHealthListModel::Private:
     using base_type = QObject;
 
 public:
+    using MessageType = common::system_health::MessageType;
+
     explicit Private(SystemHealthListModel* q);
     virtual ~Private() override;
 
     int count() const;
 
-    QnSystemHealth::MessageType message(int index) const;
+    MessageType message(int index) const;
     QnResourcePtr resource(int index) const;
 
     QString text(int index) const;
@@ -48,37 +49,37 @@ public:
     CommandActionPtr commandAction(int index) const; //< Additional button action with parameters.
     ui::action::IDType action(int index) const; //< Click-on-tile action id.
     ui::action::Parameters parameters(int index) const; // Click-on-tile action parameters.
-    QnSystemHealth::MessageType messageType(int index) const;
+    MessageType messageType(int index) const;
 
     void remove(int first, int count);
 
 private:
-    void doAddItem(QnSystemHealth::MessageType message, const QVariant& params, bool initial);
-    void addItem(QnSystemHealth::MessageType message, const QVariant& params);
-    void removeItem(QnSystemHealth::MessageType message, const QVariant& params);
-    void removeItemForResource(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
-    void toggleItem(QnSystemHealth::MessageType message, bool isOn);
-    void updateItem(QnSystemHealth::MessageType message);
+    void doAddItem(MessageType message, const QVariant& params, bool initial);
+    void addItem(MessageType message, const QVariant& params);
+    void removeItem(MessageType message, const QVariant& params);
+    void removeItemForResource(MessageType message, const QnResourcePtr& resource);
+    void toggleItem(MessageType message, bool isOn);
+    void updateItem(MessageType message);
     void clear();
 
-    QSet<QnResourcePtr> getResourceSet(QnSystemHealth::MessageType message) const;
-    QnResourceList getSortedResourceList(QnSystemHealth::MessageType message) const;
+    QSet<QnResourcePtr> getResourceSet(MessageType message) const;
+    QnResourceList getSortedResourceList(MessageType message) const;
 
-    static int priority(QnSystemHealth::MessageType message);
-    static QString decorationPath(QnSystemHealth::MessageType message);
+    static int priority(MessageType message);
+    static QString decorationPath(MessageType message);
 
 private:
     struct Item
     {
         Item() = default;
-        Item(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
+        Item(MessageType message, const QnResourcePtr& resource);
 
-        operator QnSystemHealth::MessageType() const; //< Implicit by design.
+        operator MessageType() const { return message; } //< Implicit by design.
         bool operator==(const Item& other) const;
         bool operator!=(const Item& other) const;
         bool operator<(const Item& other) const;
 
-        QnSystemHealth::MessageType message = QnSystemHealth::MessageType::Count;
+        MessageType message = MessageType::count;
         QnResourcePtr resource;
         vms::event::AbstractActionPtr serverData;
     };
@@ -87,7 +88,7 @@ private:
     SystemHealthListModel* const q = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
     std::deque<Item> m_items; //< Kept sorted.
-    QSet<QnSystemHealth::MessageType> m_popupSystemHealthFilter;
+    std::set<MessageType> m_popupSystemHealthFilter;
 };
 
 } // namespace nx::vms::client::desktop

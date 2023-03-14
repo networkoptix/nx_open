@@ -5,16 +5,15 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 
-#include <client/client_settings.h>
 #include <client/client_installations_manager.h>
-
+#include <nx/branding.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/utils/platform/autorun.h>
 
-#include <nx/branding.h>
+using namespace nx::vms::client::desktop;
 
 namespace {
-
-const int kSettingsKey = QnClientSettings::AUTO_START;
 
 QString toWindowsRegistryFormat(const QString& path)
 {
@@ -23,11 +22,12 @@ QString toWindowsRegistryFormat(const QString& path)
 
 } // namespace
 
-QnClientAutoRunWatcher::QnClientAutoRunWatcher(QObject* parent)
+QnClientAutoRunWatcher::QnClientAutoRunWatcher(QObject* parent):
+    QObject(parent)
 {
     // Write out the setting first, then listen to changes.
     bool autoRunEnabled = isAutoRun();
-    qnSettings->setAutoStart(autoRunEnabled);
+    appContext()->localSettings()->autoStart = autoRunEnabled;
 
     if (autoRunEnabled)
     {
@@ -37,11 +37,10 @@ QnClientAutoRunWatcher::QnClientAutoRunWatcher(QObject* parent)
             nx::vms::utils::setAutoRunEnabled(autoRunKey(), autoRunPath(), true);
     }
 
-    connect(qnSettings->notifier(kSettingsKey), &QnPropertyNotifier::valueChanged, this,
-        [this]()
-        {
-            setAutoRun(qnSettings->autoStart());
-        });
+    connect(&appContext()->localSettings()->autoStart,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        [this]() { setAutoRun(appContext()->localSettings()->autoStart()); });
 }
 
 bool QnClientAutoRunWatcher::isAutoRun() const

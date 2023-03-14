@@ -3,7 +3,6 @@
 #include "workbench_state_manager.h"
 
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
@@ -20,12 +19,6 @@
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
-
-namespace {
-
-static const int kSavedStatesLimit = 20;
-
-} // namespace
 
 QnWorkbenchStateManager::QnWorkbenchStateManager(QObject *parent /* = nullptr*/) :
     QObject(parent),

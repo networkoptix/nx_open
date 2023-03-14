@@ -8,6 +8,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/property_storage/filesystem_backend.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/api/data/os_information.h>
 #include <nx/vms/common/application_context.h>
@@ -63,13 +64,20 @@ static QFileInfoList readCrashes([[maybe_unused]] const QString& prefix = QStrin
 
 namespace ec2 {
 
+CrashReporter::Settings::Settings(const QString& settingsDir):
+    Storage(new nx::utils::property_storage::FileSystemBackend(settingsDir))
+{
+}
+
 CrashReporter::CrashReporter(
     nx::vms::common::SystemContext* systemContext,
-    nx::utils::TimerManager* timerManager)
+    nx::utils::TimerManager* timerManager,
+    const QString& settingsDir)
     :
     nx::vms::common::SystemContextAware(systemContext),
     m_timerManager(timerManager),
-    m_terminated(false)
+    m_terminated(false),
+    m_settings(new Settings(settingsDir))
 {
 }
 
@@ -99,7 +107,7 @@ CrashReporter::~CrashReporter()
         httpClient->pleaseStopSync();
 }
 
-bool CrashReporter::scanAndReport(QSettings* settings)
+bool CrashReporter::scanAndReport()
 {
     if (nx::build_info::publicationType() == nx::build_info::PublicationType::local)
     {
@@ -130,8 +138,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     }
 
     const auto now = qnSyncTime->currentDateTime().toUTC();
-    const auto lastTime = QDateTime::fromString(
-            settings->value(LAST_CRASH, "").toString(), Qt::ISODate);
+    const auto lastTime = QDateTime::fromString(m_settings->lastCrashDate(), Qt::ISODate);
 
     if (now < lastTime.addSecs(SENDING_MIN_INTERVAL) &&
         lastTime < now.addSecs(SENDING_MIN_INTERVAL)) // avoid possible long resync problem
@@ -157,9 +164,8 @@ bool CrashReporter::scanAndReport(QSettings* settings)
             QFile::remove(crash.absoluteFilePath());
             NX_VERBOSE(this, "Remove not informative crash: %1", crash.absolutePath());
         }
-        else
-        if (crash.size() < SENDING_MAX_SIZE)
-            return CrashReporter::send(url, crash, settings);
+        else if (crash.size() < SENDING_MAX_SIZE)
+            return CrashReporter::send(url, crash);
 
         crashes.pop_front();
     }
@@ -167,7 +173,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     return false;
 }
 
-void CrashReporter::scanAndReportAsync(QSettings* settings)
+void CrashReporter::scanAndReportAsync()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -183,24 +189,24 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
         // \class nx::utils::concurrent posts a job to \class Ec2ThreadPool rather than create new
         // real thread, we need to reverve a thread to avoid possible deadlock
         QnScopedThreadRollback reservedThread( 1, Ec2ThreadPool::instance() );
-        return scanAndReport(settings);
+        return scanAndReport();
     });
 }
 
-void CrashReporter::scanAndReportByTimer(QSettings* settings)
+void CrashReporter::scanAndReportByTimer()
 {
-    scanAndReportAsync(settings);
+    scanAndReportAsync();
 
     NX_MUTEX_LOCKER lk(&m_mutex);
     if (!m_terminated)
     {
         m_timerId = m_timerManager->addTimer(
-            std::bind(&CrashReporter::scanAndReportByTimer, this, settings),
+            std::bind(&CrashReporter::scanAndReportByTimer, this),
             std::chrono::milliseconds(SCAN_TIMER_CYCLE));
     }
 }
 
-bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash, QSettings* settings)
+bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash)
 {
     auto filePath = crash.absoluteFilePath();
     QFile file(filePath);
@@ -213,7 +219,7 @@ bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash
     }
 
     auto httpClient = nx::network::http::AsyncHttpClient::create(nx::network::ssl::kDefaultCertificateCheck);
-    auto report = new ReportData(crash, settings, *this, httpClient.get());
+    auto report = new ReportData(crash, *this, httpClient.get());
     QObject::connect(httpClient.get(), &nx::network::http::AsyncHttpClient::done,
                     report, &ReportData::finishReport, Qt::DirectConnection);
 
@@ -236,38 +242,38 @@ bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash
     return true;
 }
 
-ReportData::ReportData(const QFileInfo& crashFile, QSettings* settings,
-                       CrashReporter& host, QObject* parent)
-    : QObject(parent)
-    , m_crashFile(crashFile)
-    , m_settings(settings)
-    , m_host(host)
+CrashReporter::Settings* CrashReporter::settings() const
+{
+    return m_settings.get();
+}
+
+ReportData::ReportData(const QFileInfo& crashFile, CrashReporter& host, QObject* parent):
+    QObject(parent),
+    m_crashFile(crashFile),
+    m_host(host)
 {
 }
 
 void ReportData::finishReport(nx::network::http::AsyncHttpClientPtr httpClient)
 {
+    const auto now = qnSyncTime->currentDateTime().toUTC();
+
     if (!httpClient->hasRequestSucceeded())
     {
         NX_WARNING(this, "Sending %1 to %2 has failed",
-                m_crashFile.absoluteFilePath(),
-                httpClient->url().toString());
+            m_crashFile.absoluteFilePath(), httpClient->url().toString());
     }
     else
     {
-        NX_DEBUG(this, "Report %1 has been sent successfully",
-                m_crashFile.absoluteFilePath());
+        NX_DEBUG(this, "Report %1 has been sent successfully", m_crashFile.absoluteFilePath());
 
-        const auto now = qnSyncTime->currentDateTime().toUTC();
-        m_settings->setValue(LAST_CRASH, now.toString(Qt::ISODate));
-        m_settings->sync();
-
-        QFile::rename(m_crashFile.absoluteFilePath(),
-                      m_crashFile.absoluteDir().absoluteFilePath(
-                          SENT_PREFIX + m_crashFile.fileName()));
+        QFile::rename(
+            m_crashFile.absoluteFilePath(),
+            m_crashFile.absoluteDir().absoluteFilePath(SENT_PREFIX + m_crashFile.fileName()));
     }
 
     NX_MUTEX_LOCKER lock(&m_host.m_mutex);
+    m_host.settings()->lastCrashDate = now.toString(Qt::ISODate);
     NX_ASSERT(!m_host.m_activeHttpClient || m_host.m_activeHttpClient == httpClient);
     m_host.m_activeHttpClient.reset();
 }

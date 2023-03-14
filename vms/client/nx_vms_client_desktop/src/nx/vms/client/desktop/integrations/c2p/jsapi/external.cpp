@@ -80,7 +80,7 @@ void External::Private::resetC2pLayout(
 
     auto existingItems = currentLayout->getItems();
 
-    QnLayoutItemDataList items;
+    common::LayoutItemDataList items;
 
     const int size = std::max((int) cameras.size(), 1);
 
@@ -91,7 +91,7 @@ void External::Private::resetC2pLayout(
     int y = 0;
     for (const auto& camera: cameras)
     {
-        QnLayoutItemData item = layoutItemFromResource(camera);
+        common::LayoutItemData item = layoutItemFromResource(camera);
 
         for (const auto& existingItem: existingItems)
         {

@@ -42,8 +42,8 @@ signals:
     void itemRemoved(const QnUuid& resourceId);
 
 private:
-    void handleItemAdded(const QnLayoutItemData& item);
-    void handleItemRemoved(const QnLayoutItemData& item);
+    void handleItemAdded(const nx::vms::common::LayoutItemData& item);
+    void handleItemRemoved(const nx::vms::common::LayoutItemData& item);
 
 private:
     mutable nx::Mutex m_mutex;

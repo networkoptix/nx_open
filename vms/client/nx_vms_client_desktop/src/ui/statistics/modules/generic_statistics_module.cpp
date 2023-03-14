@@ -2,9 +2,10 @@
 
 #include "generic_statistics_module.h"
 
-#include <client/client_settings.h>
 #include <nx/reflect/to_string.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 
 namespace {
 
@@ -19,7 +20,7 @@ QnGenericStatisticsModule::QnGenericStatisticsModule(QObject* parent):
 
 QnStatisticValuesHash QnGenericStatisticsModule::values() const
 {
-    const auto settingsLocale = qnSettings->locale();
+    const auto settingsLocale = nx::vms::client::desktop::appContext()->localSettings()->locale();
     const auto locale = settingsLocale.isEmpty() ? QLocale::system().name() : settingsLocale;
     const QString certificateValidation =
         QString::fromStdString(

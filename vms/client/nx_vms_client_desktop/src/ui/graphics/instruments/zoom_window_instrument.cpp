@@ -1067,8 +1067,8 @@ void ZoomWindowInstrument::at_resizing(
 
     QRectF zoomRect = widget->zoomRect();
     NX_ASSERT(oldTargetWidget);
-    QnLayoutItemData oldLayoutData = oldTargetWidget->item()->data();
-    QnLayoutItemData newLayoutData = newTargetWidget->item()->data();
+    nx::vms::common::LayoutItemData oldLayoutData = oldTargetWidget->item()->data();
+    nx::vms::common::LayoutItemData newLayoutData = newTargetWidget->item()->data();
     auto oldAbsoluteSize = oldTargetWidget->rect();
     auto newAbsoluteSize = newTargetWidget->rect();
 

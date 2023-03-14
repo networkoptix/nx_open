@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "user_list_widget.h"
 #include "ui_user_list_widget.h"
+#include "user_list_widget.h"
 
 #include <algorithm>
 
@@ -12,7 +12,6 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyledItemDelegate>
 
-#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>

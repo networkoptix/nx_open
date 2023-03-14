@@ -15,11 +15,11 @@
 #include <api/model/audit/audit_record.h>
 #include <api/server_rest_connection.h>
 #include <camera/camera_data_manager.h>
-#include <client/client_model_types.h>
-#include <client/client_settings.h>
+#include <client/client_globals.h>
 #include <common/common_module.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/rest/result.h>
 #include <nx/network/ssl/certificate.h>

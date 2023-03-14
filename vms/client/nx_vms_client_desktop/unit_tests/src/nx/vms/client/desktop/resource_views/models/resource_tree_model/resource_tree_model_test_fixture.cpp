@@ -408,7 +408,7 @@ void ResourceTreeModelTest::addToLayout(
 {
     for (const auto& resource: resources)
     {
-        QnLayoutItemData layoutItemData;
+        common::LayoutItemData layoutItemData;
         layoutItemData.resource.id = resource->getId();
         layoutItemData.uuid = QnUuid::createUuid();
         layout->addItem(layoutItemData);

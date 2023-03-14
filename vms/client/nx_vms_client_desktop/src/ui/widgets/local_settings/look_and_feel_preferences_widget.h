@@ -6,8 +6,7 @@
 #include <QtWidgets/QWidget>
 
 #include <common/common_globals.h>
-#include <client/client_model_types.h>
-
+#include <nx/vms/client/desktop/settings/types/background_image.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -53,5 +52,5 @@ private:
     QScopedPointer<Ui::LookAndFeelPreferencesWidget> ui;
     bool m_updating = false;
 
-    QnBackgroundImage m_oldBackground;
+    nx::vms::client::desktop::BackgroundImage m_oldBackground;
 };

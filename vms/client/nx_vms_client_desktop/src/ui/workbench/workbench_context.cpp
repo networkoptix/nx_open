@@ -6,7 +6,6 @@
 
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_settings.h>
 #include <client/client_startup_parameters.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/log/log.h>
@@ -48,7 +47,7 @@
 #include <ui/workbench/workbench_navigator.h>
 
 #if defined(Q_OS_LINUX)
-    #include <ui/workaround/x11_launcher_workaround.h>
+#include <ui/workaround/x11_launcher_workaround.h>
 #endif
 
 using namespace nx::vms::client::desktop;

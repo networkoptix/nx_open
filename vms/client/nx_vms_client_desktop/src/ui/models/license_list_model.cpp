@@ -4,11 +4,12 @@
 
 #include <QtGui/QBrush>
 
-#include <client/client_settings.h>
+#include <client/client_globals.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/branding.h>
 #include <nx/utils/qset.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>

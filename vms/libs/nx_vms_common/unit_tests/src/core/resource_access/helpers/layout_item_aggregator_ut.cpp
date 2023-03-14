@@ -2,9 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <core/resource_access/helpers/layout_item_aggregator.h>
-
 #include <core/resource/layout_resource.h>
+#include <core/resource_access/helpers/layout_item_aggregator.h>
 
 class QnLayoutItemAggregatorTest: public testing::Test
 {
@@ -54,7 +53,7 @@ protected:
 
     QnUuid addItem(const QnLayoutResourcePtr& layout, const QnUuid& resourceId = QnUuid::createUuid())
     {
-        QnLayoutItemData item;
+        nx::vms::common::LayoutItemData item;
         item.uuid = QnUuid::createUuid();
         item.resource.id = resourceId;
         layout->addItem(item);
@@ -125,7 +124,7 @@ TEST_F(QnLayoutItemAggregatorTest, checkLayoutItemRemoved)
     auto targetId = QnUuid::createUuid();
     auto layout = createLayout();
 
-    QnLayoutItemData item;
+    nx::vms::common::LayoutItemData item;
     item.uuid = QnUuid::createUuid();
     item.resource.id = targetId;
     layout->addItem(item);
@@ -233,7 +232,7 @@ TEST_F(QnLayoutItemAggregatorTest, awaitItemRemoved)
     aggregator->addWatchedLayout(layout);
 
     awaitItemRemoved(targetId);
-    layout->setItems(QnLayoutItemDataList());
+    layout->setItems(nx::vms::common::LayoutItemDataList{});
 }
 
 TEST_F(QnLayoutItemAggregatorTest, ignoreNullIdItemRemoved)
@@ -242,7 +241,7 @@ TEST_F(QnLayoutItemAggregatorTest, ignoreNullIdItemRemoved)
     addItem(layout, QnUuid());
     aggregator->addWatchedLayout(layout);
     setAwaiting(true);
-    layout->setItems(QnLayoutItemDataList());
+    layout->setItems(nx::vms::common::LayoutItemDataList{});
 }
 
 TEST_F(QnLayoutItemAggregatorTest, awaitItemRemovedOnRemovingLayout)

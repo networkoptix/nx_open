@@ -12,7 +12,6 @@
 
 #include <api/model/camera_list_reply.h>
 #include <client/client_globals.h>
-#include <client/client_settings.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/network/http/async_http_client_reply.h>
 #include <nx/vms/api/data/dewarping_data.h>
@@ -21,6 +20,7 @@
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <recording/time_period.h>
 #include <ui/dialogs/audit_log_dialog.h>
 #include <ui/dialogs/camera_list_dialog.h>
 #include <ui/dialogs/event_log_dialog.h>

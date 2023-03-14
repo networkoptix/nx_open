@@ -432,7 +432,7 @@ void ShowreelReviewController::resetReviewLayout(
     const nx::vms::api::ShowreelItemDataList& items)
 {
     layout->cleanupItemData();
-    layout->setItems(QnLayoutItemDataList());
+    layout->setItems(common::LayoutItemDataList());
 
     const int gridSize = std::min((int)items.size(), qnRuntime->maxSceneItems());
 
@@ -458,7 +458,7 @@ void ShowreelReviewController::addItemToReviewLayout(
     if (layout->getItems().size() >= qnRuntime->maxSceneItems())
         return;
 
-    QnLayoutItemData itemData;
+    common::LayoutItemData itemData;
     itemData.uuid = QnUuid::createUuid();
     itemData.combinedGeometry = QRectF(position, kCellSize);
     if (pinItem)

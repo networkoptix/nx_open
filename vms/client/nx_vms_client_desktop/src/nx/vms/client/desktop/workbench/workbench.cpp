@@ -126,7 +126,7 @@ public:
     void updateWorkbench() { m_workbench->update(m_state); }
 
 private:
-    QnWorkbenchState m_state;
+    WorkbenchState m_state;
     QPointer<Workbench> m_workbench;
 
     const QString kCurrentLayoutId = "currentLayoutId";
@@ -718,7 +718,7 @@ void Workbench::updateCentralRoleItem()
     setItem(Qn::CentralRole, bestItemForRole(d->itemByRole, Qn::CentralRole));
 }
 
-void Workbench::update(const QnWorkbenchState& state)
+void Workbench::update(const WorkbenchState& state)
 {
     QScopedValueRollback<bool> rollback(d->inSessionRestoreProcess, true);
     clear();
@@ -755,7 +755,7 @@ void Workbench::update(const QnWorkbenchState& state)
     if (ini().enableMultiSystemTabBar && context()->user())
     {
         auto initialFillLayoutFromState =
-            [](const LayoutResourcePtr& layout, const QnWorkbenchState::UnsavedLayout& state)
+            [](const LayoutResourcePtr& layout, const WorkbenchState::UnsavedLayout& state)
             {
                 layout->addFlags(Qn::local);
                 layout->setParentId(state.parentId);
@@ -798,7 +798,7 @@ void Workbench::update(const QnWorkbenchState& state)
             layoutResource->setBackgroundOpacity(stateLayout.backgroundOpacity);
             layoutResource->setBackgroundSize(stateLayout.backgroundSize);
 
-            QnLayoutItemDataList items;
+            common::LayoutItemDataList items;
             for (const auto& itemData: stateLayout.items)
             {
                 items.append(itemData);
@@ -848,7 +848,7 @@ void Workbench::update(const QnWorkbenchState& state)
     }
 }
 
-void Workbench::submit(QnWorkbenchState& state)
+void Workbench::submit(WorkbenchState& state)
 {
     auto isLayoutSupported = [](const LayoutResourcePtr& layout, bool allowLocals)
     {
@@ -898,7 +898,7 @@ void Workbench::submit(QnWorkbenchState& state)
 
             if (ini().enableMultiSystemTabBar && resource->hasFlags(Qn::local))
             {
-                QnWorkbenchState::UnsavedLayout unsavedLayout;
+                WorkbenchState::UnsavedLayout unsavedLayout;
                 unsavedLayout.id = resource->getId();
                 unsavedLayout.parentId = resource->getParentId();
                 unsavedLayout.name = layout->name();

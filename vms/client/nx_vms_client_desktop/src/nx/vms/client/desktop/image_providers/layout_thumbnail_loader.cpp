@@ -502,9 +502,9 @@ void LayoutThumbnailLoader::doLoadAsync()
     const bool hasBackground = !d->layout->backgroundImageFilename().isEmpty();
     const auto backgroundRect = d->layout->backgroundRect();
 
-    const QnLayoutItemDataMap& layoutItems = d->layout->getItems();
+    const common::LayoutItemDataMap& layoutItems = d->layout->getItems();
 
-    std::vector<std::pair<QnLayoutItemData, QnResourcePtr>> validItems;
+    std::vector<std::pair<common::LayoutItemData, QnResourcePtr>> validItems;
     validItems.reserve(layoutItems.size());
 
     // This is initial bounding box. This calculation uses cell sizes, instead of a pixels.
@@ -512,7 +512,7 @@ void LayoutThumbnailLoader::doLoadAsync()
     // Pixel-accurate calculations will be done in Private::finalizeOutputImage.
     for (auto iter = layoutItems.constBegin(); iter != layoutItems.constEnd(); ++iter)
     {
-        const QnLayoutItemData& item = iter.value();
+        const common::LayoutItemData& item = iter.value();
         const auto& itemRect = item.combinedGeometry;
         if (!itemRect.isValid()) // TODO: #sivanov Some items can be not placed yet.
             continue;
