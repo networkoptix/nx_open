@@ -3,8 +3,6 @@
 set(customCloudHost "" CACHE STRING
     "Cloud host. Leave empty to use cloud host from the customization package.")
 
-include(${CMAKE_CURRENT_LIST_DIR}/customization_package.cmake)
-
 function(set_cloud_host)
     if(NOT customCloudHost STREQUAL "")
         message(STATUS "Using the provided cloud host ${customCloudHost}")
