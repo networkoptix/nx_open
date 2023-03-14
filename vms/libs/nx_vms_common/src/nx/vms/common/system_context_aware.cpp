@@ -32,7 +32,8 @@ SystemContextAware::SystemContextAware(std::unique_ptr<SystemContextInitializer>
 SystemContextAware::~SystemContextAware()
 {
     // Make sure context was not ever initialized or still exists.
-    NX_ASSERT(d->delayedInitializer || d->systemContext);
+    if (!d->delayedInitializer && !d->systemContext)
+        NX_WARNING(this, "Context-aware object is destroyed after the Context itself.");
 }
 
 SystemContext* SystemContextAware::systemContext() const
