@@ -8,6 +8,8 @@ include(cmake/find_python.cmake)
 find_package(PythonInterp)
 
 include(cmake/open_source/defaults.cmake)
+include(cmake/customization_package.cmake)
+
 include(cmake/default_target.cmake)
 set(targetDevice ${default_target_device} CACHE STRING
     "Target device. For the list see cmake/toolchains.")
@@ -88,7 +90,7 @@ include(process_target_debug_symbols)
 include(find_sources)
 include(compiler_options)
 include(linker_options)
-include(customization_package)
+nx_load_customization_package()
 include(distribution_names)
 include(cmake/properties.cmake)
 include(cmake/cloud_host.cmake)
