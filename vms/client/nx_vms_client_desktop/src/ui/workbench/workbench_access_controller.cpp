@@ -409,12 +409,14 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     connect(resource.get(), &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
 
-    connect(resource.get(), &QnResource::statusChanged, this,
-        &QnWorkbenchAccessController::updatePermissions);
-
     if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
         connect(camera.get(), &QnVirtualCameraResource::scheduleEnabledChanged, this,
+            &QnWorkbenchAccessController::updatePermissions);
+
+        connect(camera.get(),
+            &QnVirtualCameraResource::licenseTypeChanged,
+            this,
             &QnWorkbenchAccessController::updatePermissions);
     }
 
