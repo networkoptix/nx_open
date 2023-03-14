@@ -693,16 +693,9 @@ bool ClientUpdateTool::shouldRestartTo(const nx::utils::SoftwareVersion& version
 
 QString ClientUpdateTool::getServerAuthString() const
 {
-    const auto connection = this->connection();
-    if (!connection)
-        return {};
-
-    return QnStartupParameters::createAuthenticationString(
-        {
-            connection->address(),
-            connection->credentials()
-        },
-        connection->moduleInformation().version);
+    if (const auto connection = this->connection())
+        return QnStartupParameters::createAuthenticationString(connection->createLogonData());
+    return {};
 }
 
 bool ClientUpdateTool::restartClient()
