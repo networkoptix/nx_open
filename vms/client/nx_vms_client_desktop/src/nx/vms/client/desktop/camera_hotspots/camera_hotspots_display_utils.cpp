@@ -45,6 +45,12 @@ QPointF hotspotOrigin(const CameraHotspotData& hotspot, const QRectF& rect)
     return Geometry::bounded(origin, Geometry::eroded(rect, kHotspotRadius + kHotspotBoundsOffset));
 }
 
+QPointF hotspotOrigin(const QPointF& hotspotRelativePos, const QRectF& rect)
+{
+    const auto origin = Geometry::subPoint(rect, hotspotRelativePos);
+    return Geometry::bounded(origin, Geometry::eroded(rect, kHotspotRadius + kHotspotBoundsOffset));
+}
+
 void setHotspotPositionFromPointInRect(
     const QRectF& sourceRect,
     const QPointF& sourcePoint,
@@ -98,7 +104,8 @@ QPainterPath makeHotspotOutline(
 
 void paintHotspot(
     QPainter* painter,
-    const nx::vms::common::CameraHotspotData& hotspot,
+    const common::CameraHotspotData& hotspot,
+    const QPointF& origin,
     const CameraHotspotDisplayOption& option)
 {
     using namespace nx::vms::client::core;
@@ -106,7 +113,7 @@ void paintHotspot(
     static const auto kInvalidColor = colorTheme()->color("camera.hotspots.invalid");
 
     // Paint hotspot body.
-    const auto hotspotOutline = makeHotspotOutline(hotspot, option.rect);
+    const auto hotspotOutline = makeHotspotOutline(origin, hotspot.direction);
 
     const QBrush brush(
         option.cameraState == CameraHotspotDisplayOption::CameraState::invalid
@@ -162,9 +169,8 @@ void paintHotspot(
         QnScopedPainterFontRollback fontRollback(painter, font);
         QnScopedPainterPenRollback penRollback(painter, kTextColor);
 
-        const auto hotspotCenter = hotspotOrigin(hotspot, option.rect);
         QSize size(kHotspotRadius * 2, kHotspotRadius * 2);
-        QRect rect(hotspotCenter.toPoint() - QPoint(kHotspotRadius, kHotspotRadius), size);
+        QRect rect(origin.toPoint() - QPoint(kHotspotRadius, kHotspotRadius), size);
 
         QTextOption textOption;
         textOption.setAlignment(Qt::AlignCenter);
@@ -188,7 +194,6 @@ void paintHotspot(
             pixmap = qnSkin->colorize(pixmap, kInvalidColor);
 
         const auto iconOffset = -Geometry::toPoint(kHotspotItemIconSize) / 2.0 - QPoint(0, -1);
-        const auto origin = hotspotOrigin(hotspot, option.rect);
         painter->drawPixmap(origin + iconOffset, pixmap);
     }
 }

@@ -340,7 +340,6 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
         const auto hotspot = d->hotspots.at(i);
 
         CameraHotspotDisplayOption option;
-        option.rect = d->thumbnailRect();
 
         const auto displayedHotspotIndex = QString::number(i + 1);
         option.decoration = displayedHotspotIndex;
@@ -364,7 +363,7 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
         if (!isEnabled())
             option.state = CameraHotspotDisplayOption::State::disabled;
 
-        paintHotspot(&painter, hotspot, option);
+        paintHotspot(&painter, hotspot, hotspotOrigin(hotspot, d->thumbnailRect()), option);
     }
 }
 

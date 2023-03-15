@@ -6,6 +6,7 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/camera_hotspots/camera_hotspots_display_utils.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/ui/graphics/items/camera_hotspot_item.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -33,7 +34,8 @@ struct CameraHotspotsOverlayWidget::Private
     QnVirtualCameraResourcePtr resourceWidgetCamera() const;
     QnUuidSet resourceWidgetCameraHotspotsIds() const;
 
-    void initHotspots();
+    void initHotspotItems();
+    void updateHotspotItem(CameraHotspotItem* hotspotItem) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -68,7 +70,7 @@ QnUuidSet CameraHotspotsOverlayWidget::Private::resourceWidgetCameraHotspotsIds(
     return hospotsCamerasIds;
 }
 
-void CameraHotspotsOverlayWidget::Private::initHotspots()
+void CameraHotspotsOverlayWidget::Private::initHotspotItems()
 {
     qDeleteAll(hotspotItems);
     hotspotItems.clear();
@@ -90,10 +92,25 @@ void CameraHotspotsOverlayWidget::Private::initHotspots()
                 continue;
 
             CameraHotspotItem* item(new CameraHotspotItem(hotspotData, workbenchContext(), q));
-            item->setPos(Geometry::subPoint(q->rect(), hotspotData.pos));
+            updateHotspotItem(item);
             hotspotItems.push_back(item);
         }
     }
+}
+
+void CameraHotspotsOverlayWidget::Private::updateHotspotItem(CameraHotspotItem* hotspotItem) const
+{
+    if (q->rect().isNull())
+        return;
+
+    const auto unitRect = QRectF(0.0, 0.0, 1.0, 1.0);
+    auto relativePos = hotspotItem->hotspotData().pos;
+
+    if (const auto zoomRect = parentMediaResourceWidget->zoomRect(); zoomRect.isValid())
+        relativePos = Geometry::subPoint(Geometry::unsubRect(unitRect, zoomRect), relativePos);
+
+    hotspotItem->setVisible(unitRect.contains(relativePos));
+    hotspotItem->setPos(camera_hotspots::hotspotOrigin(relativePos, q->rect()));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -109,10 +126,10 @@ CameraHotspotsOverlayWidget::CameraHotspotsOverlayWidget(QnMediaResourceWidget* 
         return;
 
     connect(camera.get(), &QnVirtualCameraResource::cameraHotspotsEnabledChanged, this,
-        [this] { d->initHotspots(); });
+        [this] { d->initHotspotItems(); });
 
     connect(camera.get(), &QnVirtualCameraResource::cameraHotspotsChanged, this,
-        [this] { d->initHotspots(); });
+        [this] { d->initHotspotItems(); });
 
     const auto initHotspotsOnResourcePoolChange =
         [this](const QnResourceList& resources)
@@ -120,7 +137,7 @@ CameraHotspotsOverlayWidget::CameraHotspotsOverlayWidget(QnMediaResourceWidget* 
             const auto resourcesIds = resources.ids();
             QnUuidSet resourcesIdsSet(resourcesIds.cbegin(), resourcesIds.cend());
             if (resourcesIdsSet.intersects(d->resourceWidgetCameraHotspotsIds()))
-                d->initHotspots();
+                d->initHotspotItems();
         };
 
     connect(camera->resourcePool(), &QnResourcePool::resourcesAdded,
@@ -136,13 +153,20 @@ CameraHotspotsOverlayWidget::CameraHotspotsOverlayWidget(QnMediaResourceWidget* 
         [this](const QnResourcePtr& resource)
         {
             if (d->resourceWidgetCameraHotspotsIds().contains(resource->getId()))
-                d->initHotspots();
+                d->initHotspotItems();
         });
 
     connect(accessController, &QnWorkbenchAccessController::permissionsReset, this,
-        [this] { d->initHotspots(); });
+        [this] { d->initHotspotItems(); });
 
-    d->initHotspots();
+    connect(d->parentMediaResourceWidget, &QnMediaResourceWidget::zoomRectChanged, this,
+        [this]
+        {
+            for (auto hotspotItem: d->hotspotItems)
+                d->updateHotspotItem(hotspotItem);
+        });
+
+    d->initHotspotItems();
 }
 
 CameraHotspotsOverlayWidget::~CameraHotspotsOverlayWidget()
@@ -150,10 +174,10 @@ CameraHotspotsOverlayWidget::~CameraHotspotsOverlayWidget()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-void CameraHotspotsOverlayWidget::resizeEvent(QGraphicsSceneResizeEvent* event)
+void CameraHotspotsOverlayWidget::resizeEvent(QGraphicsSceneResizeEvent*)
 {
     for (auto hotspotItem: d->hotspotItems)
-        hotspotItem->setPos(Geometry::subPoint(rect(), hotspotItem->hotspotData().pos));
+        d->updateHotspotItem(hotspotItem);
 }
 
 } // namespace nx::vms::client::desktop
