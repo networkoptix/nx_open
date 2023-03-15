@@ -34,6 +34,7 @@ public:
         isParent = Qt::UserRole + 1,
         isLdap,
         isPredefined,
+        isRemovable,
     };
 
 public:
