@@ -24,8 +24,8 @@ public:
     ~QnByteArray();
 
     QnByteArray() = default;
-    QnByteArray(QnByteArray&& other) = delete;
-    QnByteArray(const QnByteArray&) = delete;
+    QnByteArray(QnByteArray&& other);
+    QnByteArray(const QnByteArray& other);
     QnByteArray& operator=(const QnByteArray& right);
     QnByteArray& operator=(QnByteArray&& source);
 

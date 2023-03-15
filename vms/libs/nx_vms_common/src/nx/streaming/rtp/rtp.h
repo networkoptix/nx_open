@@ -54,8 +54,16 @@ struct RtpHeader
     uint16_t getSequence() const { return ntohs(sequence); }
     bool isRtcp() const
     {
-        // TODO #lbusygin: Incorrect check.
-        return payloadType >= 72 && payloadType <= 76;
+        // https://www.rfc-editor.org/rfc/rfc5761.html#section-4
+        // New RTCP packet types may be registered in the future and will
+        // further reduce the RTP payload types that are available when
+        // multiplexing RTP and RTCP onto a single port.  To allow this
+        // multiplexing, future RTCP packet type assignments SHOULD be made
+        // after the current assignments in the range 209-223, then in the range
+        // 194-199, so that only the RTP payload types in the range 64-95 are
+        // blocked.  RTCP packet types in the ranges 1-191 and 224-254 SHOULD
+        // only be used when other values have been exhausted.
+        return payloadType >= 64 && payloadType <= 95;
     }
 
     static std::optional<int> getPayloadType(const uint8_t* data, int size)

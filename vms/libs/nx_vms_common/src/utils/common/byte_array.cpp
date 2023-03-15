@@ -122,6 +122,16 @@ void QnByteArray::removeTrailingZeros(int maxBytesToRemove)
     }
 }
 
+QnByteArray::QnByteArray(const QnByteArray& other)
+{
+    *this = other;
+}
+
+QnByteArray::QnByteArray(QnByteArray&& other)
+{
+    *this = std::move(other);
+}
+
 QnByteArray& QnByteArray::operator=(const QnByteArray& right)
 {
     if (&right == this)

@@ -8,10 +8,33 @@
 
 namespace nx::streaming::rtp {
 
-
 constexpr uint8_t kRtpVersion = 2;
 constexpr std::chrono::microseconds kRtcpInterval(5000000);
 constexpr std::chrono::microseconds kRtcpDiscontinuityThreshold(1000000);
+
+NX_VMS_COMMON_API uint32_t getRtcpSsrc(const uint8_t* data, int size)
+{
+    if (data == nullptr || size < kRtcpHeaderSize)
+        return 0;
+    uint8_t messageType = data[1];
+    uint32_t ssrc = 0;
+    switch (messageType)
+    {
+        case kRtcpGenericFeedback:
+        case kRtcpPayloadSpecificFeedback:
+        case kRtcpReceiverReport:
+            if (size < kRtcpFeedbackHeaderSize)
+                break;
+            memcpy(&ssrc, &data[8], sizeof(ssrc));
+            break;
+        case kRtcpSenderReport:
+        case kRtcpSourceDesciption:
+        default:
+            memcpy(&ssrc, &data[4], sizeof(ssrc));
+            break;
+    }
+    return ntohl(ssrc);
+}
 
 int buildReceiverReport(
     uint8_t* dstBuffer,
@@ -81,8 +104,8 @@ int buildSourceDescriptionReport(
 }
 
 int buildClientRtcpReport(
-    uint8_t* dstBuffer, 
-    int bufferLen, 
+    uint8_t* dstBuffer,
+    int bufferLen,
     const std::optional<std::string>& cname)
 {
     const std::string esDescr = cname.value_or("nx");
