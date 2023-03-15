@@ -12,6 +12,7 @@
 namespace nx::vms::client::desktop {
 namespace camera_hotspots {
 
+QPointF hotspotOrigin(const QPointF& hotspotRelativePos, const QRectF& rect);
 QPointF hotspotOrigin(const nx::vms::common::CameraHotspotData& hotspot, const QRectF& rect);
 
 void setHotspotPositionFromPointInRect(
@@ -47,11 +48,6 @@ struct CameraHotspotDisplayOption
     CameraState cameraState = CameraState::noCamera;
 
     /**
-     * A rectangle representing the geometry of the frame on which the hotspot marks are displayed.
-     */
-    QRectF rect;
-
-    /**
      * Decoration element painted in the center of the hotspot mark. Expected data types are QIcon
      * or any type that can be converted to string. Due to the compact size of the hotspot mark, it
      * makes sense to display short string values only, such as an ordinal index or some special
@@ -63,6 +59,7 @@ struct CameraHotspotDisplayOption
 void paintHotspot(
     QPainter* painter,
     const nx::vms::common::CameraHotspotData& hotspot,
+    const QPointF& origin,
     const CameraHotspotDisplayOption& option);
 
 } // namespace camera_hotspots

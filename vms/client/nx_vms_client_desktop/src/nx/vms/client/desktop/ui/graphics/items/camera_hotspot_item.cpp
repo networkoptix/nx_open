@@ -167,7 +167,6 @@ void CameraHotspotItem::paint(
     painter->setRenderHint(QPainter::Antialiasing);
 
     CameraHotspotDisplayOption hotspotOption;
-    hotspotOption.rect = parentItem()->boundingRect().translated(-pos());
 
     if (option->state.testFlag(QStyle::State_MouseOver))
         hotspotOption.state = camera_hotspots::CameraHotspotDisplayOption::State::hovered;
@@ -176,15 +175,18 @@ void CameraHotspotItem::paint(
     hotspotOption.decoration = qnResIconCache->icon(d->cameraResource());
 
     auto paintedHotspotData = d->hotspotData;
-    if (!qFuzzyIsNull(nx::vms::client::core::Geometry::length(paintedHotspotData.direction)))
+    if (paintedHotspotData.hasDirection())
     {
-        const auto directionLine = QLineF(QPointF(), d->hotspotData.direction);
-        const auto rotatedDirectionLine = painter->transform().map(directionLine).unitVector();
-        paintedHotspotData.direction =
-            rotatedDirectionLine.translated(-rotatedDirectionLine.p1()).p2();
+        const auto hotspotsOverlayWidget = parentItem();
+        const auto mediaResourceWidget = hotspotsOverlayWidget->parentItem();
+
+        QTransform rotationMatrix;
+        rotationMatrix.rotate(mediaResourceWidget->rotation());
+
+        paintedHotspotData.direction = rotationMatrix.map(d->hotspotData.direction);
     }
 
-    camera_hotspots::paintHotspot(painter, paintedHotspotData, hotspotOption);
+    camera_hotspots::paintHotspot(painter, paintedHotspotData, option->rect.center(), hotspotOption);
 }
 
 void CameraHotspotItem::hoverEnterEvent(QGraphicsSceneHoverEvent*)
@@ -194,6 +196,7 @@ void CameraHotspotItem::hoverEnterEvent(QGraphicsSceneHoverEvent*)
 
     const auto hotspotsOverlayWidget = parentItem();
     const auto mediaResourceWidget = hotspotsOverlayWidget->parentItem();
+
     QTransform rotationMatrix;
     rotationMatrix.rotate(-mediaResourceWidget->rotation());
 
