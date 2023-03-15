@@ -341,12 +341,25 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
 
     nx::vms::api::UserModelV3 userData;
 
-    userData.id = state.userId;
-    userData.name = state.login;
-    if (!state.password.isEmpty())
+    userData.type = (nx::vms::api::UserType) state.userType;
+
+    const bool createCloudUser = d->dialogType == CreateUser
+        && userData.type == nx::vms::api::UserType::cloud;
+
+    if (createCloudUser)
+    {
+        userData.id = QnUuid::fromArbitraryData(state.email);
+        userData.name = state.email;
+    }
+    else
+    {
+        userData.id = state.userId;
+        userData.name = state.login;
+    }
+
+    if (!state.password.isEmpty() && !createCloudUser)
         userData.password = state.password;
     userData.email = state.email;
-    userData.type = (nx::vms::api::UserType) state.userType;
     userData.fullName = state.fullName;
     userData.permissions = state.globalPermissions;
     userData.isEnabled = state.userEnabled;
