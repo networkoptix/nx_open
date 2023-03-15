@@ -9,9 +9,22 @@
 
 namespace nx::streaming::rtp {
 
+constexpr int kRtcpHeaderSize = 8;
+constexpr int kRtcpFeedbackHeaderSize = 12;
+
 constexpr uint8_t kRtcpSenderReport = 200;
 constexpr uint8_t kRtcpReceiverReport = 201;
 constexpr uint8_t kRtcpSourceDesciption = 202;
+
+constexpr uint8_t kRtcpGenericFeedback = 205;
+constexpr uint8_t kRtcpPayloadSpecificFeedback = 206;
+
+// https://www.rfc-editor.org/rfc/rfc4585.html
+constexpr uint8_t kRtcpFeedbackFormatNack = 1;
+constexpr uint8_t kRtcpFeedbackFormatNackPli = 1;
+constexpr uint8_t kRtcpFeedbackFormatNackSli = 2;
+constexpr uint8_t kRtcpFeedbackFormatNackRpsi = 3;
+constexpr uint8_t kRtcpFeedbackFormatNackAfb = 15;
 
 struct NX_VMS_COMMON_API RtcpSenderReport
 {
@@ -46,5 +59,7 @@ private:
     std::chrono::microseconds m_lastReportTimestamp = std::chrono::microseconds::zero();
     std::chrono::microseconds m_lastTimestamp = std::chrono::microseconds::zero();
 };
+
+NX_VMS_COMMON_API uint32_t getRtcpSsrc(const uint8_t* data, int size);
 
 } // namespace nx::streaming::rtp
