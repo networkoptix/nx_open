@@ -6,8 +6,6 @@
 
 #include <nx/vms/api/rules/common.h>
 
-class QJsonValue;
-
 namespace nx::vms::rules {
 
 class Field;
@@ -37,7 +35,7 @@ using ActionPtr = QSharedPointer<BasicAction>;
 
 using AggregatedEventPtr = QSharedPointer<AggregatedEvent>;
 
-using EventData = QMap<QString, QJsonValue>; // TODO: #spanasenko Move to separate class?
+using EventData = nx::vms::api::rules::PropertyMap;
 
 using State = nx::vms::api::rules::State;
 
