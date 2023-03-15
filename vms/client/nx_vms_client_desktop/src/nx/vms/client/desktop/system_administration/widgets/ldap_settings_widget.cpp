@@ -63,6 +63,8 @@ struct LdapSettingsWidget::Private
 
     QmlProperty<bool> checkingStatus;
     QmlProperty<bool> online;
+    QmlProperty<bool> syncIsRunning;
+    QmlProperty<bool> syncRequested;
 
     QmlProperty<bool> modified;
 
@@ -86,6 +88,8 @@ struct LdapSettingsWidget::Private
         groupCount(quickWidget, "groupCount"),
         checkingStatus(quickWidget, "checkingStatus"),
         online(quickWidget, "online"),
+        syncIsRunning(quickWidget, "syncIsRunning"),
+        syncRequested(quickWidget, "syncRequested"),
         modified(quickWidget, "modified"),
         hasConfig(quickWidget, "hasConfig")
     {
@@ -135,8 +139,8 @@ struct LdapSettingsWidget::Private
         q->connect(&statusUpdateTimer, &QTimer::timeout,
             [this]
             {
-                if (hasConfig && !modified)
-                    q->checkStatus();
+                if (currentHandle <= 0)
+                    q->loadSettings(/*force*/ false);
             });
     }
 
@@ -157,7 +161,7 @@ struct LdapSettingsWidget::Private
             });
         }
         state.continuousSync =
-            settings.continuousSync != nx::vms::api::LdapSettings::Sync::disabled;
+            settings.continuousSync == nx::vms::api::LdapSettings::Sync::usersAndGroups;
 
         state.loginAttribute = settings.loginAttribute;
         state.groupObjectClass = settings.groupObjectClass;
@@ -190,7 +194,7 @@ struct LdapSettingsWidget::Private
 
         settings.continuousSync = state.continuousSync
             ? nx::vms::api::LdapSettings::Sync::usersAndGroups
-            : nx::vms::api::LdapSettings::Sync::disabled;
+            : nx::vms::api::LdapSettings::Sync::groupsOnly;
 
         settings.loginAttribute = state.loginAttribute;
         settings.groupObjectClass = state.groupObjectClass;
@@ -269,9 +273,6 @@ void LdapSettingsWidget::discardChanges()
 
 void LdapSettingsWidget::checkStatus()
 {
-    if (!d->isAdmin())
-        return;
-
     const auto statusCallback = nx::utils::guarded(this,
         [this](
             bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapStatus> errorOrData)
@@ -303,6 +304,8 @@ void LdapSettingsWidget::checkStatus()
                     d->lastSync = "";
                 }
 
+                d->syncIsRunning = status->isRunning;
+
                 d->updateUserAndGroupCount();
             }
             else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
@@ -321,8 +324,16 @@ void LdapSettingsWidget::checkStatus()
 
 void LdapSettingsWidget::loadDataToUi()
 {
+    loadSettings();
+}
+
+void LdapSettingsWidget::loadSettings(bool forceUpdate)
+{
+    if (!d->isAdmin())
+        return;
+
     const auto loadSettingsCallback = nx::utils::guarded(this,
-        [this](
+        [this, forceUpdate](
             bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapSettings> errorOrData)
         {
             if (handle == d->currentHandle)
@@ -331,20 +342,49 @@ void LdapSettingsWidget::loadDataToUi()
             if (auto settings = std::get_if<nx::vms::api::LdapSettings>(&errorOrData))
             {
                 NX_ASSERT(success);
-                d->initialSettings = *settings;
-                d->setState(d->initialSettings);
-                d->modified = false;
 
-                if (settings->isValid(/*checkPassword=*/ false))
-                    checkStatus();
-            }
-            else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-            {
-                showError(error->errorString);
+                if (forceUpdate || !d->modified)
+                {
+                    d->initialSettings = *settings;
+                    d->setState(d->initialSettings);
+                    d->modified = false;
+                }
+                else
+                {
+                    d->initialSettings = *settings;
+                    d->modified = d->getState() != d->initialSettings;
+                }
+
+                const auto state = d->getState();
+
+                const bool serverChanged = d->initialSettings.uri != state.uri;
+                if (serverChanged)
+                {
+                    d->userCount = -1;
+                    d->groupCount = -1;
+                    d->lastSync = "";
+                    testOnline(
+                        state.uri.toString(),
+                        state.adminDn,
+                        state.adminPassword.value_or(""));
+                }
+                else if (settings->isValid(/*checkPassword=*/ false))
+                {
+                    // Status request only shows results for settings already saved on the server.
+                    if (!d->modified)
+                        checkStatus();
+                }
             }
             else
             {
-                showError(tr("Connection failed"));
+                // This callback is triggered periodically, so avoid showing a messagebox with
+                // the error. Most likely the server is disconnected.
+                if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                    NX_ERROR(this, "Unable to load LDAP settings: %1", error);
+                else
+                    NX_ERROR(this, "Unable to load LDAP settings");
+
+                d->online = false;
             }
         });
 
@@ -420,8 +460,8 @@ void LdapSettingsWidget::applyChanges()
     bool removeExisting = false;
 
     const bool firstImport = d->initialSettings.uri.isEmpty()
-        && d->getLdapUserCount() == 0
-        && d->getLdapGroupCount() == 0;
+        && d->getLdapUserCount() <= 0
+        && d->getLdapGroupCount() <= 0;
 
     if (d->initialSettings.uri.host() != d->getState().uri.host() && !firstImport)
     {
@@ -510,6 +550,8 @@ void LdapSettingsWidget::requestSync()
     if (d->currentHandle)
         connectedServerApi()->cancelRequest(d->currentHandle);
 
+    d->syncRequested = true;
+
     d->currentHandle = connectedServerApi()->syncLdapAsync(
         sessionTokenHelper,
         nx::utils::guarded(this,
@@ -517,6 +559,8 @@ void LdapSettingsWidget::requestSync()
             {
                 if (handle == d->currentHandle)
                     d->currentHandle = 0;
+
+                d->syncRequested = false;
 
                 if (success)
                     checkStatus();
@@ -631,6 +675,9 @@ void LdapSettingsWidget::showError(const QString& errorMessage)
         QDialogButtonBox::Ok,
         QDialogButtonBox::Ok,
         this);
+
+    messageBox.setWindowTitle(tr("LDAP"));
+
     messageBox.exec();
 }
 
