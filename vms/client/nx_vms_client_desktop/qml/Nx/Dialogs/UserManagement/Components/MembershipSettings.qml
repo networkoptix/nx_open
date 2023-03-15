@@ -125,7 +125,9 @@ Item
                         if (model.groupSection == "B")
                             return "image://svg/skin/user_settings/group_built_in.svg"
                         else
-                            return "image://svg/skin/user_settings/group_custom.svg"
+                            return model.isLdap
+                                ? "image://svg/skin/user_settings/group_ldap.svg"
+                                : "image://svg/skin/user_settings/group_custom.svg"
                     }
 
                     sourceSize: Qt.size(width, height)
