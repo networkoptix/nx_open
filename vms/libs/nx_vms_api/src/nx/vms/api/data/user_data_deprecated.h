@@ -33,7 +33,6 @@ struct NX_VMS_API UserDataDeprecated: ResourceData
     bool isEnabled = true;
     bool isCloud = false;
     QString fullName;
-    UserExternalId externalId;
 };
 #define UserDataDeprecated_Fields \
     ResourceData_Fields \
@@ -49,8 +48,7 @@ struct NX_VMS_API UserDataDeprecated: ResourceData
     (userRoleId)  \
     (isCloud)  \
     (fullName) \
-    (userRoleIds) \
-    (externalId)
+    (userRoleIds)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserDataDeprecated)
 NX_REFLECTION_INSTRUMENT(UserDataDeprecated, UserDataDeprecated_Fields)
 
