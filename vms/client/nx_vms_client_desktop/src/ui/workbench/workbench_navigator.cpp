@@ -30,6 +30,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
@@ -67,6 +68,7 @@
 #include <utils/math/math.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
+#include "nx/vms/client/desktop/ui/actions/actions.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
 #include "workbench_context.h"
 #include "workbench_display.h"
@@ -223,6 +225,11 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
             resetSyncedPeriods();
             updateSyncedPeriods();
         });
+
+    connect(action(ui::action::FastForwardAction), &QAction::triggered, this,
+        &QnWorkbenchNavigator::fastForward);
+    connect(action(ui::action::RewindAction), &QAction::triggered, this,
+        &QnWorkbenchNavigator::rewind);
 }
 
 QnWorkbenchNavigator::~QnWorkbenchNavigator()
@@ -1054,6 +1061,104 @@ void QnWorkbenchNavigator::jumpForward()
         {
             pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000;
         }
+    }
+
+    reader->jumpTo(pos, pos);
+    updateSliderFromReader();
+    emit positionChanged();
+}
+
+void QnWorkbenchNavigator::fastForward()
+{
+    if (!m_currentMediaWidget)
+        return;
+
+    const auto reader = m_currentMediaWidget->display()->archiveReader();
+    if (!reader)
+        return;
+
+    m_pausedOverride = false;
+
+    /* Default value should never be used, adding just in case of black magic. */
+    qint64 pos = DATETIME_NOW;
+    if (!(m_currentWidgetFlags & WidgetSupportsPeriods))
+    {
+        pos = reader->endTime();
+    }
+    else if (auto loader = loaderByWidget(m_currentMediaWidget))
+    {
+        QnTimePeriodList periods = loader->periods(Qn::RecordingContent);
+        periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
+
+        const auto currentTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(reader->currentTime());
+        auto curPeriod = periods.findNearestPeriod(currentTimeMs.count(), false);
+
+        std::chrono::milliseconds posMs;
+        if (curPeriod->contains(currentTimeMs + 10s))
+            posMs = currentTimeMs + 10s;
+        else if (auto next = curPeriod + 1; next != periods.end())
+            posMs = (curPeriod+1)->startTime();
+        else
+            posMs = m_timeSlider->maximum();
+
+        pos = posMs.count() * 1000;
+    }
+
+    if (pos >= m_timeSlider->maximum().count() * 1000)
+    {
+        if (!setLive(true) && m_timeSlider)
+            m_timeSlider->setValue(m_timeSlider->maximum() - 1ms, false);
+        return;
+    }
+
+    reader->jumpTo(pos, pos);
+    updateSliderFromReader();
+    emit positionChanged();
+}
+
+void QnWorkbenchNavigator::rewind()
+{
+    if (!m_currentMediaWidget)
+        return;
+
+    const auto reader = m_currentMediaWidget->display()->archiveReader();
+    if (!reader)
+        return;
+
+    m_pausedOverride = false;
+
+    /* Default value should never be used, adding just in case of black magic. */
+    qint64 pos = DATETIME_NOW;
+    if (!(m_currentWidgetFlags & WidgetSupportsPeriods))
+    {
+        pos = reader->endTime();
+    }
+    else if (auto loader = loaderByWidget(m_currentMediaWidget))
+    {
+        QnTimePeriodList periods = loader->periods(Qn::RecordingContent);
+        periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
+
+        /* We want to jump relatively to current reader position. */
+        const auto currentTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(reader->currentTime());
+        auto curPeriod = periods.findNearestPeriod(currentTimeMs.count(), false);
+
+        std::chrono::milliseconds posMs;
+        if (!curPeriod->contains(currentTimeMs - 1s))
+        {
+            posMs = curPeriod == periods.begin()
+                ? curPeriod->startTime()
+                : std::max((curPeriod-1)->startTime(), (curPeriod-1)->endTime() - 10s);
+        }
+        else if (!curPeriod->contains(currentTimeMs - 10s))
+        {
+            posMs = curPeriod->startTime();
+        }
+        else
+        {
+            posMs = currentTimeMs - 10s;
+        }
+
+        pos = posMs.count() * 1000;
     }
 
     reader->jumpTo(pos, pos);

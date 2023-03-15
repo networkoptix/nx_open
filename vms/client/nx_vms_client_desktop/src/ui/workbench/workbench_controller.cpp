@@ -2,6 +2,7 @@
 
 #include "workbench_controller.h"
 
+#include <algorithm>
 #include <limits>
 
 #include <QtCore/QFileInfo>
@@ -16,6 +17,7 @@
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
+#include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_directory_browser.h>
@@ -35,11 +37,13 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_widget.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -75,6 +79,7 @@
 #include <ui/graphics/instruments/wheel_zoom_instrument.h>
 #include <ui/graphics/instruments/zoom_window_instrument.h>
 #include <ui/graphics/items/grid/grid_item.h>
+#include <ui/graphics/items/overlays/overlayed.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -83,6 +88,7 @@
 #include <ui/help/help_handler.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
 #include <utils/common/delete_later.h>
@@ -139,14 +145,15 @@ bool inViewportPtzMode(QnResourceWidget* resourceWidget, Qt::KeyboardModifiers k
 
 } // namespace
 
-QnWorkbenchController::QnWorkbenchController(QObject *parent):
+QnWorkbenchController::QnWorkbenchController(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_manager(display()->instrumentManager()),
     m_cursorPos(invalidCursorPos()),
     m_resizedWidget(nullptr),
     m_dragDelta(invalidDragDelta()),
-    m_menuEnabled(true)
+    m_menuEnabled(true),
+    m_rewindTimer(new QTimer(this))
 {
     QEvent::Type mouseEventTypeArray[] = {
         QEvent::GraphicsSceneMousePress,
@@ -459,6 +466,15 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(action::ToggleCurrentItemMaximizationStateAction), &QAction::triggered, this,
         &QnWorkbenchController::toggleCurrentItemMaximizationState);
 
+    connect(m_rewindTimer, &QTimer::timeout,
+        [this]()
+        {
+            if (m_rewindDirection == ShiftDirection::fastForward)
+                menu()->trigger(ui::action::FastForwardAction);
+            else if (m_rewindDirection == ShiftDirection::rewind)
+                menu()->trigger(ui::action::RewindAction);
+        });
+
     updateCurrentLayoutInstruments();
 }
 
@@ -675,6 +691,21 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
             return true;
         };
 
+    const auto shift =
+        [this](ShiftDirection direction)
+        {
+            // If two arrow keys are pressed simultaneously, only first one is counted.
+            if (m_rewindTimer->isActive())
+                return; 
+
+            m_rewindTimer->start(500);
+            m_rewindDirection = direction;
+            if (direction == ShiftDirection::fastForward)
+                menu()->trigger(ui::action::FastForwardAction);
+            if (direction == ShiftDirection::rewind)
+                menu()->trigger(ui::action::RewindAction);
+        };
+
     // AZERTY keyboard passes non-numeric keycodes when caps lock is pressed.
     int key = e->key();
     bool isNumKey = false;
@@ -722,6 +753,8 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 moveCursor(QPoint(-1, 0), QPoint(0, -1));
             else if (e->isAutoRepeat())
                 break;
+            else if (e->modifiers() & Qt::KeypadModifier)
+                shift(ShiftDirection::rewind);
             else if (!tryStartPtz(PtzInstrument::DirectionFlag::panLeft))
                 showNavigationMessage();
             break;
@@ -734,6 +767,8 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 moveCursor(QPoint(1, 0), QPoint(0, 1));
             else if (e->isAutoRepeat())
                 break;
+            else if (e->modifiers() & Qt::KeypadModifier)
+                shift(ShiftDirection::fastForward);
             else if (!tryStartPtz(PtzInstrument::DirectionFlag::panRight))
                 showNavigationMessage();
             break;
@@ -825,6 +860,12 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
 
             m_ptzInstrument->toggleContinuousPtz(widget, direction, false);
         };
+    
+    const auto stopShift =
+        [this]()
+        {
+            m_rewindTimer->stop();
+        };
 
     switch (e->key())
     {
@@ -838,10 +879,12 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
 
         case Qt::Key_Left:
             tryStopPtz(PtzInstrument::DirectionFlag::panLeft);
+            stopShift();
             break;
 
         case Qt::Key_Right:
             tryStopPtz(PtzInstrument::DirectionFlag::panRight);
+            stopShift();
             break;
 
         case Qt::Key_Plus:

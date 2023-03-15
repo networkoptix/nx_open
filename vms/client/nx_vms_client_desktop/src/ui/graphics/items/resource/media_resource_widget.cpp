@@ -70,6 +70,7 @@
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/scene/resource_widget/dialogs/encrypted_archive_password_dialog.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
+#include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/camera_button_controller.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/object_tracking_button_controller.h>
@@ -1367,9 +1368,10 @@ void QnMediaResourceWidget::setupHud()
     // During the widget destruction the following scenario occurs: m_hudOverlay is destroyed, then
     // triggers container resizes, and we've got a crash in updateTriggersMinHeight().
     QPointer<QnViewportBoundWidget> content(m_hudOverlay->content());
+    QPointer<QnViewportBoundWidget> rewindContent(m_rewindOverlay->content());
     QPointer<QnScrollableItemsWidget> triggersContainer(m_triggersContainer);
     const auto updateTriggersMinHeight =
-        [content, triggersContainer]()
+        [content, triggersContainer, rewindContent]()
         {
             if (!content || !triggersContainer)
                 return;
@@ -1381,12 +1383,17 @@ void QnMediaResourceWidget::setupHud()
             const qreal extra = content->size().height() - triggersContainer->size().height();
             const qreal min = qMin(desired, available * kMaxDownscaleFactor - extra);
             triggersContainer->setMinimumHeight(min);
+
+            rewindContent->setScale(content->sceneScale());
         };
 
     connect(m_hudOverlay->content(), &QnViewportBoundWidget::scaleChanged,
         this, updateTriggersMinHeight);
 
     connect(m_triggersContainer, &QnScrollableItemsWidget::contentHeightChanged,
+        this, updateTriggersMinHeight);
+
+    connect(m_rewindOverlay->content(), &QnViewportBoundWidget::scaleChanged,
         this, updateTriggersMinHeight);
 }
 

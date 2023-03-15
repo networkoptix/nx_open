@@ -28,6 +28,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
+#include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -138,6 +139,7 @@ QnResourceWidget::QnResourceWidget(
     base_type(parent),
     SystemContextAware(systemContext),
     WindowContextAware(windowContext),
+    m_rewindOverlay(new RewindOverlay(windowContext, this)),
     m_hudOverlay(new QnHudOverlayWidget(windowContext, this)),
     m_statusOverlay(new QnStatusOverlayWidget(this)),
     d(new Private(item)),
@@ -282,7 +284,6 @@ void QnResourceWidget::setupOverlayButtonsHandlers()
             setOverlayWidgetVisibility(m_statusOverlay, visibility, animated);
             updateButtons();
         });
-
 }
 
 // TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
@@ -294,6 +295,10 @@ void QnResourceWidget::setupHud()
     setOverlayWidgetVisible(m_hudOverlay, true, /*animate=*/false);
     setOverlayWidgetVisible(m_hudOverlay->details(), false, /*animate*/ false);
     setOverlayWidgetVisible(m_hudOverlay->playbackPositionItem(), true, /*animate*/ false);
+
+    addOverlayWidget(m_rewindOverlay, {UserVisible, OverlayFlag::autoRotate, RewindLayer});
+    m_rewindOverlay->setContentsMargins(0, 0, 0, 0);
+    setOverlayWidgetVisible(m_rewindOverlay, true, false);
 }
 
 void QnResourceWidget::setupSelectionOverlay()

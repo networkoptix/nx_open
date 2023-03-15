@@ -1245,6 +1245,9 @@ enum IDType
     ToggleSyncAction,
     JumpToTimeAction,
 
+    FastForwardAction,
+    RewindAction,
+
     /* Debug actions. */
 
     /**

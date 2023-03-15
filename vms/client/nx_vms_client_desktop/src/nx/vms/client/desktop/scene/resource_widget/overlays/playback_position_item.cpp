@@ -157,7 +157,7 @@ void PlaybackPositionItem::tick(int deltaMs)
 
     if (m_totalMs >= 3700)
     {
-        m_totalMs = -1;
+        m_totalMs = kStopped;
         animator->setTimeLimit(300);
         animator->animateTo(0.0);
         m_pauseButton->options().backgroundColor.setAlpha(kPauseOpacity);

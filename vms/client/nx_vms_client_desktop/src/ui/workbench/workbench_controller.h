@@ -25,6 +25,7 @@ class QGraphicsWidget;
 class QMenu;
 class QLabel;
 class QPropertyAnimation;
+class QTimer;
 
 class Instrument;
 class InstrumentManager;
@@ -278,4 +279,13 @@ private:
     bool m_menuEnabled;
 
     nx::vms::client::desktop::VolatileUniquePtr<QObject> m_cameraSwitchKeysMessageBox;
+
+    enum class ShiftDirection
+    {
+        noShift,
+        rewind,
+        fastForward
+    };
+    ShiftDirection m_rewindDirection = ShiftDirection::noShift;
+    QTimer* const m_rewindTimer;
 };

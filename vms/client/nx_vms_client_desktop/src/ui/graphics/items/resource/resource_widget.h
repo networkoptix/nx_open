@@ -40,6 +40,8 @@ class GraphicsLabel;
 class QnStatusOverlayWidget;
 class QnHudOverlayWidget;
 
+namespace nx::vms::client::desktop { class RewindOverlay; }
+
 class QnResourceWidget:
     public Overlayed<Animated<Instrumented<GraphicsWidget>>>,
     public nx::vms::client::desktop::SystemContextAware,
@@ -418,6 +420,7 @@ private:
     void updateFullscreenButton();
 
 protected:
+    nx::vms::client::desktop::RewindOverlay* const m_rewindOverlay;
     QnHudOverlayWidget* m_hudOverlay;
     QnStatusOverlayWidget* m_statusOverlay;
 
