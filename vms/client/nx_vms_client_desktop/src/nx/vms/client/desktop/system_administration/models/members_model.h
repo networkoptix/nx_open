@@ -106,6 +106,7 @@ public:
         MemberSectionRole, //< IsUserRole ? "U" : "G"
         GroupSectionRole, // Built-in? "B" : "C"
         Cycle,
+        IsRemovable,
     };
 
     MembersModel();
@@ -148,6 +149,8 @@ public:
     void sortSubjects(QList<QnUuid>& subjects) const;
 
     MembersCache* membersCache() const { return m_cache.get(); }
+
+    bool isRemovable(const QnUuid& id) const;
 
 signals:
     void groupIdChanged();

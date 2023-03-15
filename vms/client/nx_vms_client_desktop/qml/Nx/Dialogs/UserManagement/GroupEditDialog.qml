@@ -120,7 +120,6 @@ DialogWithState
                 anchors.fill: parent
 
                 model: membersModel
-                enabled: !dialog.isLdap
 
                 onAddGroupClicked: dialog.groupClicked(null)
             }
@@ -178,6 +177,7 @@ DialogWithState
                 anchors.fill: parent
 
                 model: membersModel
+                enabled: !dialog.isLdap
             }
         }
     }

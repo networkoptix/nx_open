@@ -75,6 +75,9 @@ QVariant ParentGroupsProvider::data(const QModelIndex& index, int role) const
         case isPredefined:
             return MembersCache::isPredefined(m_groups.at(index.row()));
 
+        case isRemovable:
+            return m_membersModel->isRemovable(m_groups.at(index.row()));
+
         default:
             return {};
     }
@@ -115,6 +118,7 @@ QHash<int, QByteArray> ParentGroupsProvider::roleNames() const
     names.insert(isParent, "isParent");
     names.insert(isLdap, "isLdap");
     names.insert(isPredefined, "isPredefined");
+    names.insert(isRemovable, "isRemovable");
     names[Qt::DisplayRole] = "text";
 
     return names;

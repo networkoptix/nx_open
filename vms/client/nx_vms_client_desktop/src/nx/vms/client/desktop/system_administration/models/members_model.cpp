@@ -560,6 +560,7 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     roles[GroupSectionRole] = "groupSection";
     roles[IsLdap] = "isLdap";
     roles[Cycle] = "cycle";
+    roles[IsRemovable] = "isRemovable";
     return roles;
 }
 
@@ -582,14 +583,42 @@ bool MembersModel::isAllowedParent(const QnUuid& groupId) const
     if (MembersCache::isPredefined(m_subjectId))
         return false;
 
-    if (const auto user = systemContext()->accessController()->user(); user && !user->isOwner())
-    {
-        static const auto kOwnerId = QnPredefinedUserRoles::id(Qn::UserRole::owner);
-        if (groupId == kOwnerId)
-            return false;
-    }
-
     return !m_subjectContext->subjectHierarchy()->recursiveParents({groupId}).contains(m_subjectId);
+}
+
+bool MembersModel::isRemovable(const QnUuid& id) const
+{
+    // TODO: Special types of users/groups should not be editable/removable at all.
+
+    if (m_cache->info(m_subjectId).isLdap && m_cache->info(id).isLdap)
+        return false;
+
+    const auto user = systemContext()->accessController()->user();
+    if (!user)
+        return false;
+
+    const auto hierarchy = m_subjectContext->subjectHierarchy();
+
+    // Owner (Administrators in 5.2+) can edit everyone.
+    const bool selfIsOwner = hierarchy->isRecursiveMember(
+        user->getId(), {QnPredefinedUserRoles::id(Qn::UserRole::owner)});
+
+    if (selfIsOwner)
+        return true;
+
+    // Administrator (PowerUsers in 5.2+) can edit non-owners and non-admins.
+    const bool selfIsAdmin = hierarchy->isRecursiveMember(
+        user->getId(), {QnPredefinedUserRoles::id(Qn::UserRole::administrator)});
+
+    static const QSet<QnUuid> ownerOrAdmin = {
+        QnPredefinedUserRoles::id(Qn::UserRole::owner),
+        QnPredefinedUserRoles::id(Qn::UserRole::administrator),
+    };
+
+    const bool idIsOwnerOrAdmin = ownerOrAdmin.contains(id)
+        || hierarchy->isRecursiveMember(id, ownerOrAdmin);
+
+    return selfIsAdmin && !idIsOwnerOrAdmin;
 }
 
 QVariant MembersModel::data(const QModelIndex& index, int role) const
@@ -653,6 +682,9 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
 
         case Cycle:
             return m_groupsWithCycles.contains(id);
+
+        case IsRemovable:
+            return isRemovable(id);
 
         default:
             return {};
@@ -788,7 +820,8 @@ public:
 
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
         return (sourceModel()->data(sourceIndex, MembersModel::IsAllowedMember).toBool()
-            || sourceModel()->data(sourceIndex, MembersModel::IsMemberRole).toBool())
+                || (sourceModel()->data(sourceIndex, MembersModel::IsMemberRole).toBool()))
+            && sourceModel()->data(sourceIndex, MembersModel::IsRemovable).toBool()
             && base_type::filterAcceptsRow(sourceRow, sourceParent);
     }
 };
@@ -822,7 +855,8 @@ public:
 
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
         return (sourceModel()->data(sourceIndex, MembersModel::IsAllowedParent).toBool()
-            || sourceModel()->data(sourceIndex, MembersModel::IsParentRole).toBool())
+                || sourceModel()->data(sourceIndex, MembersModel::IsParentRole).toBool())
+            && sourceModel()->data(sourceIndex, MembersModel::IsRemovable).toBool()
             && base_type::filterAcceptsRow(sourceRow, sourceParent);
     }
 };
@@ -842,7 +876,6 @@ void MembersModel::registerQmlType()
     qmlRegisterType<MembersSummaryModel>("nx.vms.client.desktop", 1, 0, "MembersSummaryModel");
 
     qRegisterMetaType<nx::core::access::ResourceAccessMap>();
-
 }
 
 } // namespace nx::vms::client::desktop
