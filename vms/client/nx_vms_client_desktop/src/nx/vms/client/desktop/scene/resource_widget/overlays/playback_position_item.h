@@ -13,6 +13,7 @@ class QnImageButtonWidget;
 class QnHtmlTextItem;
 class PlaybackPositionIconTextWidget;
 
+
 namespace nx::vms::client::desktop {
 
 class WindowContext;
@@ -21,6 +22,8 @@ class PlaybackPositionItem: public Animated<QGraphicsWidget>, WindowContextAware
 {
     Q_OBJECT
     using base_type = Animated<QGraphicsWidget>;
+
+    static constexpr int kStopped = -1;
 
 public:
     PlaybackPositionItem(WindowContext* windowContext, QGraphicsItem* parent = nullptr);
@@ -40,7 +43,7 @@ private:
 
     bool m_isLive = false;
     AnimationTimerListenerPtr m_animationTimerListener = AnimationTimerListener::create();
-    int m_totalMs = -1;
+    int m_totalMs = kStopped;
 };
 
 }; // namespace nx::vms::client::desktop

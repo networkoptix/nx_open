@@ -35,6 +35,7 @@ namespace detail {
             BaseLayer = 0,
             StatusLayer,
             SelectionLayer,
+            RewindLayer,
             InfoLayer,
             TopControlsLayer,
         };

@@ -131,11 +131,14 @@ public:
     QnResourcePtr currentResource() const;
     bool currentResourceIsVmax() const;
 
-    Q_SLOT void jumpBackward();
-    Q_SLOT void jumpForward();
+    void jumpBackward();
+    void jumpForward();
 
-    Q_SLOT void stepBackward();
-    Q_SLOT void stepForward();
+    void stepBackward();
+    void stepForward();
+
+    void fastForward();
+    void rewind();
 
     virtual nx::vms::client::desktop::ui::action::ActionScope currentScope() const override;
     virtual nx::vms::client::desktop::ui::action::Parameters currentParameters(

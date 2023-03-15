@@ -1961,6 +1961,14 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .condition(new TimelineVisibleCondition());
 
+    factory(FastForwardAction)
+        .flags(NoTarget)
+        .condition(new TimelineVisibleCondition());
+    
+    factory(RewindAction)
+        .flags(NoTarget)
+        .condition(new TimelineVisibleCondition());
+
     factory()
         .flags(Slider | TitleBar | Tree)
         .separator();

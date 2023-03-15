@@ -140,6 +140,9 @@ struct Metrics
 
     /** Maximum size of single square cell in the schedule grid. */
     static constexpr int kScheduleGridMaximumCellSize = 32;
+
+    /** Default size for one of rewind arrows */
+    static constexpr QSize kRewindArrowSize{24, 32};
 };
 
 struct Hints
