@@ -45,7 +45,7 @@ void QnRecentLocalSystemsFinder::updateSystems()
             continue;
 
         const auto system = QnLocalSystemDescription::create(
-            it.key().toString(), it.key(), connection.systemName);
+            it.key().toSimpleString(), it.key(), connection.systemName);
 
         static const int kVeryFarPriority = 100000;
 
