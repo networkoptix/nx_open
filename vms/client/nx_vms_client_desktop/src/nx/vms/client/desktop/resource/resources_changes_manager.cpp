@@ -345,13 +345,13 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
         };
 
     QString action;
-    if (const auto camera = resource.dynamicCast<QnMediaServerResource>())
+    if (resource.dynamicCast<QnMediaServerResource>())
     {
         action = QString("/rest/v3/servers/%1").arg(resource->getId().toString());
     }
     else if (resource.dynamicCast<QnVirtualCameraResource>())
     {
-        action = QString("/rest/v3/camera/%1").arg(resource->getId().toString());
+        action = QString("/rest/v3/devices/%1").arg(resource->getId().toString());
     }
     else if (resource.dynamicCast<QnStorageResource>())
     {
