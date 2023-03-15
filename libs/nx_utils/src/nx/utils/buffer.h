@@ -429,6 +429,9 @@ BasicBuffer<CharType>& BasicBuffer<CharType>::operator=(BasicBuffer&& other)
     else
         m_data = m_buf;
 
+    // Ensure that the state of other is reset to expected values.
+    other.clear();
+
     return *this;
 }
 
