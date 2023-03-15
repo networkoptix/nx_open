@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QJsonValue>
 #include <QtCore/QObject>
 
 #include <nx/utils/uuid.h>

@@ -1,14 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <thread>
 
+#include <gtest/gtest.h>
+
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/keywords_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/event_filter_fields/text_field.h>
-#include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/generic_event.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/field.h>

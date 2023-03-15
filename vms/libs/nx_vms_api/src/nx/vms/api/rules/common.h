@@ -2,7 +2,11 @@
 
 #pragma once
 
+#include <QtCore/QMap>
+
 #include <nx/reflect/enum_instrument.h>
+
+class QJsonValue;
 
 namespace nx::vms::api::rules {
 
@@ -12,5 +16,7 @@ NX_REFLECTION_ENUM_CLASS(State,
     stopped,
     instant
 )
+
+using PropertyMap = QMap<QString, QJsonValue>;
 
 } // namespace nx::vms::api::rules
