@@ -25,7 +25,7 @@ public:
         headers(std::move(headers)),
         msgBody(std::move(msgBody))
     {
-        chunked = headers.find("Transfer-Encoding: chunked") != headers.npos;
+        chunked = this->headers.find("Transfer-Encoding: chunked") != this->headers.npos;
     }
 };
 

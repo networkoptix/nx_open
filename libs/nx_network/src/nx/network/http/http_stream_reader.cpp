@@ -8,6 +8,7 @@
 #include <nx/utils/gzip/gzip_uncompressor.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/log/log_main.h>
 
 namespace nx::network::http {
 
@@ -305,6 +306,7 @@ bool HttpStreamReader::parseLine(const ConstBufferRefType& data)
                     {
                         // Cannot read (decode) message body.
                         m_state = ReadState::parseError;
+                        NX_WARNING(this, "Failed to prepare for reading HTTP message body");
                     }
                     return true;
                 }
@@ -338,6 +340,7 @@ bool HttpStreamReader::prepareToReadMessageBody()
     m_contentDecoder.reset();
     auto contentEncodingIter = m_httpMessage.headers().find("Content-Encoding");
     if (contentEncodingIter != m_httpMessage.headers().end() &&
+        !contentEncodingIter->second.empty() && //< Buggy servers (AWS S3) may send the header with no value.
         contentEncodingIter->second != "identity")
     {
         auto contentDecoder = createContentDecoder(contentEncodingIter->second);

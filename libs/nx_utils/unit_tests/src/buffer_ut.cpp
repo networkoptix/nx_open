@@ -40,10 +40,13 @@ TEST(Buffer, copying)
     ASSERT_EQ("Bye, cruel world", buf);
 }
 
-TEST(Buffer, moving)
+TEST(Buffer, move)
 {
     Buffer buf("Hello, world");
     Buffer buf2(std::move(buf));
+
+    ASSERT_EQ(0, buf.size());
+
     buf = Buffer("Bye, cruel world");
 
     ASSERT_EQ("Hello, world", buf2);
@@ -206,6 +209,17 @@ TEST(Buffer, base64_encoding_is_invertible)
 {
     nx::Buffer buf("Hello, world");
     ASSERT_EQ(buf, nx::Buffer::fromBase64(buf.toBase64()));
+}
+
+TEST(Buffer, append_after_move)
+{
+    Buffer buf = std::string{"123456789012345678901234567890123456789012345678901234567890"};
+
+    Buffer buf2{std::move(buf)};
+
+    buf += "1234567890";
+
+    ASSERT_EQ(10, buf.size());
 }
 
 } // namespace nx::test

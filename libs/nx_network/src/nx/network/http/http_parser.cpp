@@ -2,6 +2,8 @@
 
 #include "http_parser.h"
 
+#include <nx/utils/log/log_main.h>
+
 namespace nx::network::http {
 
 MessageParser::MessageParser()
@@ -37,8 +39,15 @@ nx::network::server::ParserState MessageParser::parse(
         }
     }
 
-    if (!m_httpStreamReader.parseBytes(buffer, bytesProcessed))
+    const auto stateBeforeParse = m_httpStreamReader.state();
+
+    if (!m_httpStreamReader.parseBytes(buffer, bytesProcessed)
+        || m_httpStreamReader.state() == HttpStreamReader::ReadState::parseError)
+    {
+        NX_WARNING(this, "Failed to parse HTTP stream: state before parsing: %1",
+            stateBeforeParse);
         return nx::network::server::ParserState::failed;
+    }
 
     switch (m_httpStreamReader.state())
     {
