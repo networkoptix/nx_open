@@ -9,6 +9,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
@@ -17,6 +18,7 @@
 #include <network/system_description.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/base_notification_observer.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/flattening_group_entity.h>
@@ -33,13 +35,13 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/cloud_cross_system_camera_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/health_monitor_resource_item_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/main_tree_resource_item_decorator.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/web_page_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item_order/resource_tree_item_order.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/user_layout_resource_index.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/recorder_item_data_helper.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_tree_item_key_source_pool.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_item_factory.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/user_layout_resource_index.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 using namespace nx::vms::client::desktop;
@@ -164,6 +166,19 @@ LayoutItemCreator layoutItemCreator(
                 permissionsSummary(user, itemResource),
                 NodeType::layoutItem,
                 itemData.uuid);
+        };
+}
+
+ResourceItemCreator webPageItemCreator(
+    ResourceTreeItemFactory* factory,
+    bool userHasAdminPersmission)
+{
+    return
+        [=](const QnResourcePtr& resource) -> AbstractItemPtr
+        {
+            return std::make_unique<WebPageDecorator>(
+                factory->createResourceItem(resource),
+                userHasAdminPersmission);
         };
 }
 
@@ -630,8 +645,16 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServerCamerasEntity(
         serverResourcesOrder(),
         groupingRuleStack);
 
-    camerasGroupingEntity->installItemSource(
-        m_itemKeySourcePool->devicesAndProxiedWebPagesSource(server, user()));
+    if (ini().webPagesAndIntegrations)
+    {
+        camerasGroupingEntity->installItemSource(
+            m_itemKeySourcePool->devicesSource(user(), server, /*resourceFilter*/ {}));
+    }
+    else
+    {
+        camerasGroupingEntity->installItemSource(
+            m_itemKeySourcePool->devicesAndProxiedWebPagesSource(server, user()));
+    }
 
     return camerasGroupingEntity;
 }
@@ -716,16 +739,46 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createShowreelsGroupEntity() const
         FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 
-AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
+AbstractEntityPtr ResourceTreeEntityBuilder::createIntegrationsGroupEntity() const
 {
-    auto webPagesList = makeKeyList<QnResourcePtr>(
-        resourceItemCreator(m_itemFactory.get(), user()),
+    auto integrationList = makeKeyList<QnResourcePtr>(
+        webPageItemCreator(m_itemFactory.get(), userHasAdminPermissions()),
         numericOrder());
 
-    webPagesList->installItemSource(m_itemKeySourcePool->webPagesSource(
-        user(), /*includeProxiedWebPages*/ false));
+    integrationList->installItemSource(m_itemKeySourcePool->integrationsSource(
+        user(), /*includeProxiedIntegrations*/ true));
 
     Qt::ItemFlags flags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
+
+    if (userHasAdminPermissions())
+        flags |= Qt::ItemIsDropEnabled;
+
+    return makeFlatteningGroup(
+        m_itemFactory->createIntegrationsItem(flags),
+        std::move(integrationList),
+        FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
+}
+
+AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
+{
+    ResourceItemCreator itemCreator = ini().webPagesAndIntegrations
+        ? webPageItemCreator(m_itemFactory.get(), userHasAdminPermissions())
+        : resourceItemCreator(m_itemFactory.get(), user());
+
+    auto webPagesList = makeKeyList<QnResourcePtr>(itemCreator, numericOrder());
+
+    Qt::ItemFlags flags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
+
+    if (ini().webPagesAndIntegrations)
+    {
+        webPagesList->installItemSource(m_itemKeySourcePool->webPagesSource(
+            user(), /*includeProxiedWebPages*/ true));
+    }
+    else
+    {
+        webPagesList->installItemSource(m_itemKeySourcePool->webPagesAndIntegrationsSource(
+            user(), /*includeProxied*/ false));
+    }
 
     if (userHasAdminPermissions())
         flags |= Qt::ItemIsDropEnabled;
@@ -921,14 +974,42 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
             FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
     }
 
+    if (resourceTypes.testFlag(ResourceTree::ResourceFilter::integrations)
+        && ini().webPagesAndIntegrations)
+    {
+        auto integrationList = makeKeyList<QnResourcePtr>(
+            simpleResourceItemCreator(m_itemFactory.get()),
+            numericOrder());
+
+        integrationList->installItemSource(
+            m_itemKeySourcePool->integrationsSource(user(), /*includeProxied*/ true));
+
+        if (resourceTypes == (int) ResourceTree::ResourceFilter::integrations)
+            return integrationList; //< Only web pages, return without a group element.
+
+        entities.push_back(makeFlatteningGroup(
+            m_itemFactory->createIntegrationsItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+            std::move(integrationList),
+            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+    }
+
     if (resourceTypes.testFlag(ResourceTree::ResourceFilter::webPages))
     {
         auto webPagesList = makeKeyList<QnResourcePtr>(
             simpleResourceItemCreator(m_itemFactory.get()),
             numericOrder());
 
-        webPagesList->installItemSource(
-            m_itemKeySourcePool->webPagesSource(user(), /*includeProxiedWebPages*/ true));
+        if (ini().webPagesAndIntegrations)
+        {
+            webPagesList->installItemSource(
+                m_itemKeySourcePool->webPagesSource(user(), /*includeProxiedWebPages*/ true));
+        }
+        else
+        {
+            webPagesList->installItemSource(
+                m_itemKeySourcePool->webPagesAndIntegrationsSource(
+                    user(), /*includeProxied*/ true));
+        }
 
         if (resourceTypes == (int) ResourceTree::ResourceFilter::webPages)
             return webPagesList; //< Only web pages, return without a group element.

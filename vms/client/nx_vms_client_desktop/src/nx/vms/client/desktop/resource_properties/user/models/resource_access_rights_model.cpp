@@ -190,6 +190,7 @@ QnUuid ResourceAccessRightsModel::groupId() const
         case ResourceTree::NodeType::videoWalls:
             return nx::vms::api::kAllVideoWallsGroupId;
 
+        case ResourceTree::NodeType::integrations:
         case ResourceTree::NodeType::webPages:
             return nx::vms::api::kAllWebPagesGroupId;
 
@@ -343,6 +344,7 @@ QnResourceList ResourceAccessRightsModel::Private::getResources() const
         case ResourceTree::NodeType::camerasAndDevices:
             return resourcePool->getAllCameras(QnUuid{}, /*ignoreDesktopCameras*/ true);
 
+        case ResourceTree::NodeType::integrations:
         case ResourceTree::NodeType::webPages:
             return resourcePool->getResources<QnWebPageResource>();
 

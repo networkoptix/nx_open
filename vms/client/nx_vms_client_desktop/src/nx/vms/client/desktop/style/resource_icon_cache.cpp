@@ -19,6 +19,7 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -179,6 +180,11 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(VideoWallItem | Offline, loadIcon("tree/screen_offline.png"));
     m_cache.insert(VideoWallMatrix, loadIcon("tree/matrix.png"));
 
+    // Integrations.
+    m_cache.insert(Integrations, loadIcon("tree/integrations.svg"));
+    m_cache.insert(Integration, loadIcon("tree/integration.svg"));
+    m_cache.insert(IntegrationProxied, loadIcon("tree/integration_proxied.svg"));
+
     // Web Pages.
     m_cache.insert(WebPages, loadIcon("tree/webpages.svg"));
     m_cache.insert(WebPage, loadIcon("tree/webpage.svg"));
@@ -307,8 +313,24 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     else if (flags.testFlag(Qn::web_page))
     {
         const auto webPage = resource.dynamicCast<QnWebPageResource>();
-        NX_ASSERT(webPage);
-        return webPage && !webPage->getProxyId().isNull() ? Key(WebPageProxied) : Key(WebPage);
+        if (!NX_ASSERT(webPage))
+            return Key(WebPage);
+
+        QnWebPageResource::Options options = webPage->getOptions();
+
+        if (!ini().webPagesAndIntegrations)
+            options.setFlag(QnWebPageResource::Integration, false); //< Use regular Web Page icon.
+
+        switch (options)
+        {
+            case QnWebPageResource::WebPage: return Key(WebPage);
+            case QnWebPageResource::ProxiedWebPage: return Key(WebPageProxied);
+            case QnWebPageResource::Integration: return Key(Integration);
+            case QnWebPageResource::ProxiedIntegration: return Key(IntegrationProxied);
+        }
+
+        NX_ASSERT(false, "Unexpected value (%1)", options);
+        return Key(WebPage);
     }
 
     Key status = calculateStatus(key, resource);

@@ -11,6 +11,7 @@
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qset.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
@@ -277,7 +278,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         return true;
     }
 
-    else if (hasNodeType(index, NodeType::webPages))
+    else if (hasNodeType(index, NodeType::webPages) && !ini().webPagesAndIntegrations)
     {
         // Setting empty parent ID for web pages forces them not to be proxied.
         const auto webPages = data.resources().filtered<QnWebPageResource>();
@@ -296,11 +297,15 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
     if (hasNodeType(index, NodeType::camerasAndDevices))
     {
         const auto cameras = data.resources().filtered<QnVirtualCameraResource>();
-        const auto webPages = data.resources().filtered<QnWebPageResource>();
 
         QnResourceList sourceResources;
         std::copy(cameras.cbegin(), cameras.cend(), std::back_inserter(sourceResources));
-        std::copy(webPages.cbegin(), webPages.cend(), std::back_inserter(sourceResources));
+
+        if (!ini().webPagesAndIntegrations)
+        {
+            const auto webPages = data.resources().filtered<QnWebPageResource>();
+            std::copy(webPages.cbegin(), webPages.cend(), std::back_inserter(sourceResources));
+        }
 
         if (sourceResources.empty())
             return true;
@@ -325,7 +330,6 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
     {
         const auto dropGroupId = index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
         const auto cameras = data.resources().filtered<QnVirtualCameraResource>();
-        const auto webPages = data.resources().filtered<QnWebPageResource>();
 
         // Parent server as displayed, i.e it will be null if server nodes aren't displayed in the
         // resource tree.
@@ -334,7 +338,12 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
 
         QnResourceList sourceResources;
         std::copy(cameras.cbegin(), cameras.cend(), std::back_inserter(sourceResources));
-        std::copy(webPages.cbegin(), webPages.cend(), std::back_inserter(sourceResources));
+
+        if (!ini().webPagesAndIntegrations)
+        {
+            const auto webPages = data.resources().filtered<QnWebPageResource>();
+            std::copy(webPages.cbegin(), webPages.cend(), std::back_inserter(sourceResources));
+        }
 
         if (sourceResources.empty())
             return true;
@@ -392,13 +401,18 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
 
         const auto serverId = server->getId();
 
-        // Setting parent server ID for web pages forces them to be proxied through that server.
-        const auto webPages = data.resources().filtered<QnWebPageResource>();
         const auto cameras = data.resources().filtered<QnVirtualCameraResource>();
 
         QnResourceList sourceResources;
         std::copy(cameras.begin(), cameras.end(), std::back_inserter(sourceResources));
-        std::copy(webPages.begin(), webPages.end(), std::back_inserter(sourceResources));
+
+        if (!ini().webPagesAndIntegrations)
+        {
+            // Setting parent server ID for web pages forces them to be proxied through that
+            // server.
+            const auto webPages = data.resources().filtered<QnWebPageResource>();
+            std::copy(webPages.begin(), webPages.end(), std::back_inserter(sourceResources));
+        }
 
         if (sourceResources.empty())
             return true;
@@ -494,7 +508,8 @@ QModelIndex ResourceTreeDragDropDecoratorModel::targetDropIndex(const QModelInde
     // Dropping into an web page within 'Web Pages' group is the same as dropping into 'Web Pages'
     // node itself.
     if (hasResourceFlags(dropIndex, Qn::web_page)
-        && hasNodeType(dropIndex.parent(), NodeType::webPages))
+        && (hasNodeType(dropIndex.parent(), NodeType::webPages)
+            || hasNodeType(dropIndex.parent(), NodeType::integrations)))
     {
         return dropIndex.parent();
     }

@@ -6,6 +6,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+namespace nx::vms::api { enum class WebPageSubtype; }
 
 class QnWorkbenchWebPageHandler:
     public QObject,
@@ -19,6 +20,6 @@ public:
     virtual ~QnWorkbenchWebPageHandler();
 
 private:
-    void at_newWebPageAction_triggered();
-    void at_editWebPageAction_triggered();
+    void addNewWebPage(nx::vms::api::WebPageSubtype subtype);
+    void editWebPage();
 };

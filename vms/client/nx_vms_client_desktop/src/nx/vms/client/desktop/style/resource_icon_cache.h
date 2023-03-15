@@ -60,6 +60,8 @@ public:
         OtherSystem,
         OtherSystems,
         IOModule,
+        Integration,
+        Integrations,
         WebPage,
         WebPages,
         AnalyticsEngine,
@@ -69,6 +71,7 @@ public:
 
         CloudSystem,
 
+        IntegrationProxied,
         WebPageProxied,
 
         TypeMask        = 0xFF,

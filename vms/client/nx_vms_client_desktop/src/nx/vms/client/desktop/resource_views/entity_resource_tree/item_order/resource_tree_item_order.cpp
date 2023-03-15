@@ -2,9 +2,10 @@
 
 #include "resource_tree_item_order.h"
 
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
-#include <common/common_globals.h>
 #include <client/client_globals.h>
+#include <common/common_globals.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 namespace nx::vms::client::desktop {
@@ -68,7 +69,22 @@ ItemOrder layoutItemsOrder()
         [](const Qn::ResourceFlags& flags, int iconKey)
         {
             if (flags.testFlag(Qn::web_page))
+            {
+                if (ini().webPagesAndIntegrations)
+                {
+                    switch (iconKey)
+                    {
+                        case QnResourceIconCache::IntegrationProxied: return 2;
+                        case QnResourceIconCache::Integration: return 3;
+                        case QnResourceIconCache::WebPageProxied: return 4;
+                        case QnResourceIconCache::WebPage: return 5;
+                    }
+
+                    NX_ASSERT(false, "Unexpected value (%1)", iconKey);
+                }
+
                 return iconKey == QnResourceIconCache::WebPageProxied ? 2 : 3;
+            }
 
             if (flags.testFlag(Qn::server))
                 return 1;

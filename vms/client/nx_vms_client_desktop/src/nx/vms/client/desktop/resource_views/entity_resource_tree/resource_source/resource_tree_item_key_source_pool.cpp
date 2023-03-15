@@ -3,12 +3,14 @@
 #include "resource_tree_item_key_source_pool.h"
 
 #include <core/resource/user_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/resource_tree/cloud_layouts_source.h>
 #include <nx/vms/client/desktop/cross_system/resource_tree/cloud_system_cameras_source.h>
 #include <nx/vms/client/desktop/cross_system/resource_tree/cloud_systems_source.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 #include "../camera_resource_index.h"
@@ -176,6 +178,20 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::roleUsersSource(const QnU
         resourcePool(), QnUserResourcePtr(), roleId));
 }
 
+UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::integrationsSource(
+    const QnResourceAccessSubject& subject,
+    bool includeProxiedIntegrations)
+{
+    return std::make_shared<ResourceSourceAdapter>(
+        std::make_unique<AccessibleResourceProxySource>(
+            systemContext(),
+            subject,
+            std::make_unique<WebpageResourceSource>(
+                m_webPageResourceIndex.get(),
+                nx::vms::api::WebPageSubtype::clientApi,
+                includeProxiedIntegrations)));
+}
+
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::webPagesSource(
     const QnResourceAccessSubject& subject,
     bool includeProxiedWebPages)
@@ -186,7 +202,22 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::webPagesSource(
             subject,
             std::make_unique<WebpageResourceSource>(
                 m_webPageResourceIndex.get(),
+                nx::vms::api::WebPageSubtype::none,
                 includeProxiedWebPages)));
+}
+
+UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::webPagesAndIntegrationsSource(
+    const QnResourceAccessSubject& subject,
+    bool includeProxied)
+{
+    return std::make_shared<ResourceSourceAdapter>(
+        std::make_unique<AccessibleResourceProxySource>(
+            systemContext(),
+            subject,
+            std::make_unique<WebpageResourceSource>(
+                m_webPageResourceIndex.get(),
+                /*subtype*/ std::nullopt,
+                includeProxied)));
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::videoWallsSource(

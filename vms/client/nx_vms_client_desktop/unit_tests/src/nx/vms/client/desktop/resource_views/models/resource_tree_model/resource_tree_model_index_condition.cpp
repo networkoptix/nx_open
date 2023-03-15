@@ -123,6 +123,16 @@ Condition displayEmpty()
         };
 }
 
+Condition extraInfoEmpty()
+{
+    return
+        [](const QModelIndex& index)
+        {
+            return index.isValid()
+                && index.data(Qn::ExtraInfoRole).toString().isEmpty();
+        };
+}
+
 Condition iconFullMatch(QnResourceIconCache::Key paramIconKey)
 {
     return
@@ -305,6 +315,14 @@ Condition layoutsNodeCondition()
     return allOf(
         displayFullMatch("Layouts"),
         iconFullMatch(QnResourceIconCache::Layouts),
+        topLevelNode());
+}
+
+Condition integrationsNodeCondition()
+{
+    return allOf(
+        displayFullMatch("Integrations"),
+        iconFullMatch(QnResourceIconCache::Integrations),
         topLevelNode());
 }
 

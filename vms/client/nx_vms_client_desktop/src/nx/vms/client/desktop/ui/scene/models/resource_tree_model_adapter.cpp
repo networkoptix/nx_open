@@ -70,6 +70,9 @@ ResourceTree::NodeType filterNodeType(ResourceTree::FilterType filterType)
         case FilterType::videowalls:
             return NodeType::videoWalls;
 
+        case FilterType::integrations:
+            return NodeType::integrations;
+
         case FilterType::webPages:
             return NodeType::webPages;
 
@@ -219,6 +222,7 @@ struct ResourceTreeModelAdapter::Private
                 return {};
 
             case FilterType::cameras:
+            case FilterType::integrations:
             case FilterType::webPages:
                 return kResourceHints;
 

@@ -212,6 +212,7 @@ TreeView
 
             showExtraInfo: resourceTreeModel.extraInfoRequired
                 || resourceTreeModel.isExtraInfoForced(resource)
+                || (!!model && !!model.forceExtraInfo)
 
             implicitHeight: isSeparator ? kSeparatorRowHeight : kRowHeight
 

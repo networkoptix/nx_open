@@ -733,6 +733,21 @@ ConditionWrapper allOpenedCamerasAllowExport();
  */
 ConditionWrapper hasPermissionsForResources(Qn::Permissions permissions);
 
+/**
+ * Checks whether a resource is Web Page.
+ */
+ConditionWrapper isWebPage();
+
+/**
+ * Checks whether a resource is Integration.
+ */
+ConditionWrapper isIntegration();
+
+/**
+ * Check whether a resource is Web Page or Integration.
+ */
+ConditionWrapper isWebPageOrIntegration();
+
 } // namespace condition
 
 } // namespace action

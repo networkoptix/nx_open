@@ -31,6 +31,8 @@ signals:
     void webPageAddedToServer(const QnResourcePtr& webPage, const QnResourcePtr& server);
     void webPageRemovedFromServer(const QnResourcePtr& webPage, const QnResourcePtr& server);
 
+    void webPageSubtypeChanged(const QnResourcePtr& webPage);
+
 private:
     void onResourceAdded(const QnResourcePtr& resource);
     void onResourceRemoved(const QnResourcePtr& resource);

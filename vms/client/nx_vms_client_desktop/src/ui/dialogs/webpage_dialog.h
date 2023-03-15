@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <core/resource/webpage_resource.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/private/current_system_servers.h>
 #include <ui/dialogs/common/button_box_dialog.h>
@@ -27,7 +28,10 @@ public:
     };
 
 public:
-    explicit QnWebpageDialog(QWidget* parent, EditMode editMode);
+    explicit QnWebpageDialog(
+        QWidget* parent,
+        EditMode editMode);
+
     virtual ~QnWebpageDialog();
 
     QString name() const;
@@ -54,9 +58,11 @@ public:
 private:
     void updateTitle();
     void updateWarningLabel();
+    static QString getTypeTitle(QnWebPageResource::Options flags);
 
 private:
     CurrentSystemServers m_serversWatcher;
+    nx::vms::api::WebPageSubtype m_subtype = nx::vms::api::WebPageSubtype::none;
     EditMode m_editMode = AddPage;
 
     QScopedPointer<Ui::WebpageDialog> ui;

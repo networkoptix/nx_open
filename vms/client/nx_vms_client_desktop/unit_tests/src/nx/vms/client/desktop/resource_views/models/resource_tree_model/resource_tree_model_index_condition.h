@@ -29,6 +29,7 @@ Condition displayContains(const QString& string, Qt::CaseSensitivity cs = Qt::Ca
 Condition displayStartsWith(const QString& string, Qt::CaseSensitivity cs = Qt::CaseSensitive);
 Condition displayEndsWith(const QString& string, Qt::CaseSensitivity cs = Qt::CaseSensitive);
 Condition displayEmpty();
+Condition extraInfoEmpty();
 
 // Icon conditions.
 Condition iconFullMatch(QnResourceIconCache::Key paramIconKey);
@@ -59,6 +60,7 @@ Condition localFilesNodeCondition();
 Condition videoWallNodeCondition();
 Condition showreelsNodeCondition();
 Condition layoutsNodeCondition();
+Condition integrationsNodeCondition();
 Condition webPagesNodeCondition();
 Condition serversNodeCondition();
 

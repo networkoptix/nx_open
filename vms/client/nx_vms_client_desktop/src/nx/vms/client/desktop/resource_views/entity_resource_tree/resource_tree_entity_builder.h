@@ -50,6 +50,7 @@ public:
     AbstractEntityPtr createLayoutsGroupEntity() const;
 
     AbstractEntityPtr createShowreelsGroupEntity() const;
+    AbstractEntityPtr createIntegrationsGroupEntity() const;
     AbstractEntityPtr createWebPagesGroupEntity() const;
     AbstractEntityPtr createLocalFilesGroupEntity() const;
     AbstractEntityPtr createLocalOtherSystemsEntity() const;

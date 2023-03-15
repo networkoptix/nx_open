@@ -139,6 +139,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         NodeType::layouts,
         NodeType::showreels,
         NodeType::videoWalls,
+        NodeType::integrations,
         NodeType::webPages,
         NodeType::analyticsEngines,
         NodeType::users,

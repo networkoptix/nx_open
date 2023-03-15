@@ -2,16 +2,16 @@
 
 #include "resource_tree_model_test_fixture.h"
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/media_server_resource.h>
+#include <api/runtime_info_manager.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
-#include <core/resource/videowall_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_item.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-
-#include <api/runtime_info_manager.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -69,6 +69,30 @@ TEST_F(ResourceTreeModelTest, localFilesNodeVisibility)
 
     // There is no "Local Files" group node found in the tree.
     ASSERT_TRUE(noneMatches(localFilesNodeCondition()));
+}
+
+TEST_F(ResourceTreeModelTest, emptyIntegrationsNodeIsHiddenIfLoggedIn)
+{
+    if (!ini().webPagesAndIntegrations)
+        return;
+
+    // When user with administrator permissions is logged in.
+    loginAsAdmin("admin");
+
+    // Then there is no "Integrations" node in the tree.
+    ASSERT_TRUE(noneMatches(integrationsNodeCondition()));
+
+    // When user with live viewer permissions is logged in.
+    loginAsLiveViewer("live_viewer");
+
+    // Then there is no "Integrations" node in the tree.
+    ASSERT_TRUE(noneMatches(integrationsNodeCondition()));
+
+    // When no one is logged in.
+    logout();
+
+    // Then there is no "Integrations" node in the tree.
+    ASSERT_TRUE(noneMatches(integrationsNodeCondition()));
 }
 
 TEST_F(ResourceTreeModelTest, webPagesNodeAreAlwaysDisplayedIfLoggedIn)

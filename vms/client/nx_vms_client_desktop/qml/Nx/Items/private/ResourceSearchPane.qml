@@ -86,6 +86,12 @@ FocusScope
                 MenuAction { text: qsTr("Layouts"); data: ResourceTree.FilterType.layouts }
                 MenuAction { text: qsTr("Showreels"); data: ResourceTree.FilterType.showreels }
                 MenuAction { text: qsTr("Video Walls"); data: ResourceTree.FilterType.videowalls }
+                MenuAction
+                {
+                    text: qsTr("Integrations")
+                    data: ResourceTree.FilterType.integrations
+                    visible: ClientSettings.iniConfigValue("webPagesAndIntegrations")
+                }
                 MenuAction { text: qsTr("Web Pages"); data: ResourceTree.FilterType.webPages }
                 MenuAction { text: qsTr("Users"); data: ResourceTree.FilterType.users }
                 MenuAction { text: qsTr("Local Files"); data: ResourceTree.FilterType.localFiles }
