@@ -28,6 +28,8 @@ Rectangle
     property string groupObjectClass
     property string memberAttribute
     property int syncTimeoutS
+    property bool syncIsRunning
+    property bool syncRequested
 
     property bool modified
 
@@ -357,7 +359,7 @@ Rectangle
 
                         Spinner
                         {
-                            running: control.checkingStatus
+                            running: control.syncRequested
                         }
 
                         ImageButton
@@ -370,8 +372,8 @@ Rectangle
                             hoverEnabled: true
                             visible: !modified
                                 && control.online
-                                && !control.checkingStatus
-                                && !control.continuousSync
+                                && !control.syncRequested
+                                && !control.syncIsRunning
 
                             icon.source: "image://svg/skin/user_settings/sync_ldap.svg"
                             icon.width: width

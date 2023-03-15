@@ -56,6 +56,7 @@ protected:
 
 private:
     void checkStatus();
+    void loadSettings(bool forceUpdate = true);
     void showError(const QString& errorMessage);
 
 signals:
