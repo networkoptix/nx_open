@@ -2235,7 +2235,9 @@ void Style::drawControl(ControlElement element,
                     }
 
                     QRect iconRect = textRect;
-                    iconRect.setWidth(qMax(iconWithPadding, iconRect.width()));
+                    if (!tab->text.isEmpty())
+                        iconRect.setWidth(iconWithPadding);
+
                     iconRect = Geometry::aligned(iconSize, iconRect);
                     tab->icon.paint(painter, iconRect);
                 }
