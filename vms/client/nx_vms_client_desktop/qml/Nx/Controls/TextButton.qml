@@ -18,7 +18,7 @@ AbstractButton
     property alias truncated: buttonText.truncated
 
     font.pixelSize: 13
-    hoverEnabled: true
+    hoverEnabled: enabled
     background: null
     spacing: text ? 2 : 0
 
