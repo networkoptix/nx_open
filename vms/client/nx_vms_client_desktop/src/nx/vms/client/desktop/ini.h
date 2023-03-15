@@ -269,6 +269,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, enableMetadataApi,
         "[Feature] Enables MetadataApi feature.");
 
+    // VMS-36874
+    NX_INI_FLAG(false, webPagesAndIntegrations, "[Feature] Separates Web Pages and Integrations");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move

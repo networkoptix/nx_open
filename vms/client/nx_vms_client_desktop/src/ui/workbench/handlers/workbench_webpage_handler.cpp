@@ -11,6 +11,7 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/webpage_dialog.h>
@@ -32,20 +33,32 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
         });
 
     connect(action(action::AddProxiedWebPageAction), &QAction::triggered,
-        this, &QnWorkbenchWebPageHandler::at_newWebPageAction_triggered);
+        this, [this] { addNewWebPage(nx::vms::api::WebPageSubtype::none); });
 
     connect(action(action::NewWebPageAction), &QAction::triggered,
-        this, &QnWorkbenchWebPageHandler::at_newWebPageAction_triggered);
+        this, [this] { addNewWebPage(nx::vms::api::WebPageSubtype::none); });
 
     connect(action(action::WebPageSettingsAction), &QAction::triggered,
-        this, &QnWorkbenchWebPageHandler::at_editWebPageAction_triggered);
+        this, &QnWorkbenchWebPageHandler::editWebPage);
+
+    if (ini().webPagesAndIntegrations)
+    {
+        connect(action(action::IntegrationSettingsAction), &QAction::triggered,
+            this, &QnWorkbenchWebPageHandler::editWebPage);
+
+        connect(action(action::AddProxiedIntegrationAction), &QAction::triggered,
+            this, [this] { addNewWebPage(nx::vms::api::WebPageSubtype::clientApi); });
+
+        connect(action(action::NewIntegrationAction), &QAction::triggered,
+            this, [this] { addNewWebPage(nx::vms::api::WebPageSubtype::clientApi); });
+    }
 }
 
 QnWorkbenchWebPageHandler::~QnWorkbenchWebPageHandler()
 {
 }
 
-void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
+void QnWorkbenchWebPageHandler::addNewWebPage(nx::vms::api::WebPageSubtype subtype)
 {
     QScopedPointer<QnWebpageDialog> dialog(
         new QnWebpageDialog(mainWindowWidget(), QnWebpageDialog::AddPage));
@@ -53,6 +66,8 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
     const auto params = menu()->currentParameters(sender());
     if (const auto server = params.resource().dynamicCast<QnMediaServerResource>())
         dialog->setProxyId(server->getId());
+
+    dialog->setSubtype(subtype);
 
     if (!dialog->exec())
         return;
@@ -74,7 +89,7 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
     menu()->trigger(action::DropResourcesAction, webPage);
 }
 
-void QnWorkbenchWebPageHandler::at_editWebPageAction_triggered()
+void QnWorkbenchWebPageHandler::editWebPage()
 {
     auto parameters = menu()->currentParameters(sender());
 

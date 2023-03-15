@@ -68,6 +68,7 @@ private:
         layoutsGroup,
         showreelsGroup,
         videowallsList,
+        integrationsGroup,
         webPagesGroup,
         usersGroup,
         otherSystemsGroup,

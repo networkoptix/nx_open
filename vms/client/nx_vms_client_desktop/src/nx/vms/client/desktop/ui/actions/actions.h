@@ -988,6 +988,11 @@ enum IDType
     NewUserAction,
 
     /**
+     * Opens an integration creation dialog.
+     */
+    NewIntegrationAction,
+
+    /**
      * Opens a webpage creation dialog.
      */
     NewWebPageAction,
@@ -1352,6 +1357,11 @@ enum IDType
     ToggleCurrentItemMaximizationStateAction,
 
     /**
+     * Opens Integration settings dialog.
+     */
+    IntegrationSettingsAction,
+
+    /**
      * Opens Web Page settings dialog.
      */
     WebPageSettingsAction,
@@ -1412,6 +1422,11 @@ enum IDType
      * Watermark check result.
      */
     WatermarkCheckedEvent,
+
+    /**
+     * Opens a dialog for adding Proxied Integration to the server.
+     */
+    AddProxiedIntegrationAction,
 
     /**
      * Opens a dialog for adding Proxied Web Page to the server.

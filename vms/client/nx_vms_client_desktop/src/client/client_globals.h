@@ -271,6 +271,7 @@ namespace Qn
         SelectOnOpeningRole,                        /**< Role for single-selecting an item (or first of multiple items) added to current layout (bool). */
 
         ExtraInfoRole,                              /**< Role for extra resource information in the tree (QString). */
+        ForceExtraInfoRole,                         /**< Role for forcing extra resource information in the tree (bool). */
 
         AutoExpandRole,                             /**< Role for automatic expanding of tree nodes on first show (bool). */
 

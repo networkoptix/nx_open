@@ -177,17 +177,24 @@ LayoutResourcePtr ResourceTreeModelTest::addLayout(
     return layout;
 }
 
-QnWebPageResourcePtr ResourceTreeModelTest::addWebPage(const QString& name) const
+QnWebPageResourcePtr ResourceTreeModelTest::addWebPage(
+    const QString& name,
+    WebPageSubtype subtype) const
 {
     QnWebPageResourcePtr webPage(new QnWebPageResource());
     webPage->setName(name);
     webPage->setIdUnsafe(QnUuid::createUuid());
     resourcePool()->addResource(webPage);
+
+    // Properties can be set only after Resource is added to the Resource Pool.
+    webPage->setSubtype(subtype);
+
     return webPage;
 }
 
-QnWebPageResourcePtr ResourceTreeModelTest::addProxiedWebResource(
+QnWebPageResourcePtr ResourceTreeModelTest::addProxiedWebPage(
     const QString& name,
+    WebPageSubtype subtype,
     const QnUuid& serverId) const
 {
     QnWebPageResourcePtr webPage(new QnWebPageResource());
@@ -195,6 +202,10 @@ QnWebPageResourcePtr ResourceTreeModelTest::addProxiedWebResource(
     webPage->setIdUnsafe(QnUuid::createUuid());
     webPage->setProxyId(serverId);
     resourcePool()->addResource(webPage);
+
+    // Properties can be set only after Resource is added to the Resource Pool.
+    webPage->setSubtype(subtype);
+
     return webPage;
 }
 
@@ -631,6 +642,11 @@ std::vector<QString> ResourceTreeModelTest::transformToDisplayStrings(
         [](const QModelIndex& index) { return index.data(Qt::DisplayRole).toString(); });
     return result;
 }
+
+INSTANTIATE_TEST_SUITE_P(
+    WebPageSubtype,
+    ResourceTreeModelTest,
+    ::testing::Values(WebPageSubtype::none, WebPageSubtype::clientApi));
 
 } // namespace test
 } // namespace nx::vms::client::desktop

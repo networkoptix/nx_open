@@ -430,6 +430,16 @@ AbstractItemPtr ResourceTreeItemFactory::createShowreelsItem() const
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::Showreel_Help));
 }
 
+AbstractItemPtr ResourceTreeItemFactory::createIntegrationsItem(Qt::ItemFlags flags) const
+{
+    return GenericItemBuilder()
+        .withRole(Qt::DisplayRole, tr("Integrations"))
+        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Integrations))
+        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::integrations))
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MainWindow_Tree_WebPage_Help))
+        .withFlags(flags);
+}
+
 AbstractItemPtr ResourceTreeItemFactory::createWebPagesItem(Qt::ItemFlags flags) const
 {
     return GenericItemBuilder()

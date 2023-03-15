@@ -35,6 +35,19 @@ class NX_VMS_COMMON_API QnWebPageResource: public QnResource
     using base_type = QnResource;
 
 public:
+    enum Option
+    {
+        ClientApiEnabled = 1 << 0,
+        Proxied = 1 << 1,
+
+        WebPage = 0,
+        Integration = ClientApiEnabled,
+        ProxiedWebPage = Proxied,
+        ProxiedIntegration = ClientApiEnabled | Proxied
+    };
+    Q_DECLARE_FLAGS(Options, Option);
+
+public:
     QnWebPageResource();
 
     virtual ~QnWebPageResource();
@@ -64,6 +77,8 @@ public:
     bool isCertificateCheckEnabled() const;
     void setCertificateCheckEnabled(bool value);
 
+    Options getOptions() const;
+
 signals:
     void subtypeChanged(const QnWebPageResourcePtr& webPage);
     void proxyDomainAllowListChanged(const QnWebPageResourcePtr& webPage);
@@ -72,4 +87,3 @@ private:
     // This class must not store its status on server side
     nx::vms::api::ResourceStatus m_status = nx::vms::api::ResourceStatus::undefined;
 };
-

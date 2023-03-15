@@ -4,9 +4,11 @@
 
 #include <QtCore/QCollator>
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/ini.h>
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::test;
 using namespace nx::vms::client::desktop::test::index_condition;
 
@@ -26,8 +28,11 @@ static const auto kIncompatibleServerCondition =
         iconStatusMatch(QnResourceIconCache::Incompatible));
 
 static const auto kWebPageCondition = iconTypeMatch(QnResourceIconCache::WebPage);
+static const auto kIntegrationCondition = iconTypeMatch(QnResourceIconCache::Integration);
 
 static const auto kProxiedWebResourceCondition = iconTypeMatch(QnResourceIconCache::WebPageProxied);
+static const auto kProxiedIntegrationCondition =
+    iconTypeMatch(QnResourceIconCache::IntegrationProxied);
 
 static const auto kLocalVideoCondition =
     allOf(
@@ -111,6 +116,17 @@ TEST_F(ResourceTreeModelSortingGroupingTest, webPagesSorting)
 
     // Children of "Web Pages" node should be sorted alphanumerically and case-insensitive.
     ASSERT_TRUE(sortingIsAlphanumericCaseInsensitive(directChildOf(webPagesNodeCondition())));
+}
+
+TEST_F(ResourceTreeModelSortingGroupingTest, integrationsSorting)
+{
+    if (!ini().webPagesAndIntegrations)
+        return;
+
+    // When user with administrator permissions is logged in.
+
+    // Children of "Web Pages" node should be sorted alphanumerically and case-insensitive.
+    ASSERT_TRUE(sortingIsAlphanumericCaseInsensitive(directChildOf(integrationsNodeCondition())));
 }
 
 TEST_F(ResourceTreeModelSortingGroupingTest, showreelsSorting)
@@ -289,6 +305,9 @@ TEST_F(ResourceTreeModelSortingGroupingTest, serverRecordersMultisensorCamerasSo
 
 TEST_F(ResourceTreeModelSortingGroupingTest, proxiedWebResourcesSorting)
 {
+    if (ini().webPagesAndIntegrations)
+        return;
+
     // When user with administrator permissions is logged in.
 
     // Get index of some non-empty Server.
@@ -321,19 +340,31 @@ TEST_F(ResourceTreeModelSortingGroupingTest, serverChildrenGrouping)
             directChildOf(serverIndex),
             kCameraOrIoModuleOrVirtualCameraCondition);
 
-    const auto proxiedWebResourcesCondition =
-        allOf(
-            directChildOf(serverIndex),
-            kProxiedWebResourceCondition);
+    if (ini().webPagesAndIntegrations)
+    {
+        // Check that Server children are grouped exactly in the following order:
+        // 1. Recorders and Multisensor Cameras
+        // 2. Cameras, IO Modules and Virtual Cameras
+        ASSERT_TRUE(checkGrouping(
+            {recorderMulisensorCondition,
+            cameraIoModuleVirtualCameraCondition}));
+    }
+    else
+    {
+        const auto proxiedWebResourcesCondition =
+            allOf(
+                directChildOf(serverIndex),
+                kProxiedWebResourceCondition);
 
-    // Check that Server children are grouped exactly in the following order:
-    // 1. Recorders and Multisensor Cameras
-    // 2. Cameras, IO Modules and Virtual Cameras
-    // 3. Proxied web resources.
-    ASSERT_TRUE(checkGrouping(
-        {recorderMulisensorCondition,
-        cameraIoModuleVirtualCameraCondition,
-        proxiedWebResourcesCondition}));
+        // Check that Server children are grouped exactly in the following order:
+        // 1. Recorders and Multisensor Cameras
+        // 2. Cameras, IO Modules and Virtual Cameras
+        // 3. Proxied web resources.
+        ASSERT_TRUE(checkGrouping(
+            {recorderMulisensorCondition,
+            cameraIoModuleVirtualCameraCondition,
+            proxiedWebResourcesCondition}));
+    }
 }
 
 TEST_F(ResourceTreeModelSortingGroupingTest, layoutItemsSorting)
@@ -349,7 +380,9 @@ TEST_F(ResourceTreeModelSortingGroupingTest, layoutItemsSorting)
             directChildOf(layoutIndex),
             non(kServerMonitorCondition),
             non(kWebPageCondition),
-            non(kProxiedWebResourceCondition)));
+            non(kIntegrationCondition),
+            non(kProxiedWebResourceCondition),
+            non(kProxiedIntegrationCondition)));
 
     // All non Server Monitor, non Web Page items should be sorted alphanumerically and
     // case-insensitive.
@@ -390,6 +423,26 @@ TEST_F(ResourceTreeModelSortingGroupingTest, layoutWebPagesSorting)
     ASSERT_TRUE(sortingIsAlphanumericCaseInsensitive(layoutWebPagesIndexes));
 }
 
+TEST_F(ResourceTreeModelSortingGroupingTest, layoutIntegrationsSorting)
+{
+    if (!ini().webPagesAndIntegrations)
+        return;
+
+    // When user with administrator permissions is logged in.
+
+    // Get index of some non-empty Layout.
+    const auto layoutIndex = firstMatchingIndex(allOf(kLayoutCondition, hasChildren()));
+
+    // Get indexes of all Integrations on given Layout.
+    const auto layoutIntegrationsIndexes = allMatchingIndexes(
+        allOf(
+            directChildOf(layoutIndex),
+            kIntegrationCondition));
+
+    // Server Monitors should be sorted alphanumerically and case-insensitive.
+    ASSERT_TRUE(sortingIsAlphanumericCaseInsensitive(layoutIntegrationsIndexes));
+}
+
 TEST_F(ResourceTreeModelSortingGroupingTest, layoutChildrenGrouping)
 {
     // When user with administrator permissions is logged in.
@@ -402,7 +455,9 @@ TEST_F(ResourceTreeModelSortingGroupingTest, layoutChildrenGrouping)
             directChildOf(layoutIndex),
             non(kServerMonitorCondition),
             non(kWebPageCondition),
-            non(kProxiedWebResourceCondition));
+            non(kIntegrationCondition),
+            non(kProxiedWebResourceCondition),
+            non(kProxiedIntegrationCondition));
 
     const auto layoutServerMonitorCondition =
         allOf(
@@ -414,21 +469,51 @@ TEST_F(ResourceTreeModelSortingGroupingTest, layoutChildrenGrouping)
             directChildOf(layoutIndex),
             kProxiedWebResourceCondition);
 
+    const auto layoutProxiedIntegrationCondition =
+        allOf(
+            directChildOf(layoutIndex),
+            kProxiedIntegrationCondition);
+
     const auto layoutWebPageCondition =
         allOf(
             directChildOf(layoutIndex),
             kWebPageCondition);
 
-    // Check that Server children are grouped exactly in the following order:
-    // 1. Any items except Server Monitors and Web Pages
-    // 2. Server Monitors
-    // 3. Proxied Web Resources
-    // 4. Web Pages
-    ASSERT_TRUE(checkGrouping(
-        {layoutCamrasAndMediaCondition,
-        layoutServerMonitorCondition,
-        layoutProxiedWebResourceCondition,
-        layoutWebPageCondition}));
+    const auto layoutIntegrationCondition =
+        allOf(
+            directChildOf(layoutIndex),
+            kIntegrationCondition);
+
+    if (ini().webPagesAndIntegrations)
+    {
+        // Check that Server children are grouped exactly in the following order:
+        // 1. Any items except Server Monitors and Web Pages
+        // 2. Server Monitors
+        // 4. Proxied Integrations
+        // 5. Integrations
+        // 6. Proxied Web Resources
+        // 7. Web Pages
+        ASSERT_TRUE(checkGrouping(
+            {layoutCamrasAndMediaCondition,
+            layoutServerMonitorCondition,
+            layoutProxiedIntegrationCondition,
+            layoutIntegrationCondition,
+            layoutProxiedWebResourceCondition,
+            layoutWebPageCondition}));
+    }
+    else
+    {
+        // Check that Server children are grouped exactly in the following order:
+        // 1. Any items except Server Monitors and Web Pages
+        // 2. Server Monitors
+        // 3. Proxied Web Resources
+        // 4. Web Pages
+        ASSERT_TRUE(checkGrouping(
+            {layoutCamrasAndMediaCondition,
+            layoutServerMonitorCondition,
+            layoutProxiedWebResourceCondition,
+            layoutWebPageCondition}));
+    }
 }
 
 TEST_F(ResourceTreeModelSortingGroupingTest, multisensorCameraChildrenSorting)

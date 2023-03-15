@@ -241,6 +241,13 @@
     </widget>
    </item>
    <item>
+    <widget class="nx::vms::client::desktop::AlertLabel" name="integrationAlertLabel" native="true">
+     <property name="visible">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -269,6 +276,12 @@
    <class>nx::vms::client::desktop::AlertLabel</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/alert_label.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::AlertBar</class>
+   <extends>QWidget</extends>
+   <header>nx/vms/client/desktop/common/widgets/control_bars.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

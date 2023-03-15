@@ -111,3 +111,11 @@ void QnWebPageResource::setCertificateCheckEnabled(bool value)
     // Default value is treated as `true`.
     setProperty(kCertificateCheckPropertyName, value ? "" : "0");
 }
+
+QnWebPageResource::Options QnWebPageResource::getOptions() const
+{
+    Options result;
+    result.setFlag(Option::ClientApiEnabled, subtype() == nx::vms::api::WebPageSubtype::clientApi);
+    result.setFlag(Option::Proxied, !getProxyId().isNull());
+    return result;
+}

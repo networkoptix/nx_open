@@ -102,6 +102,9 @@ void WebPageResourceIndex::indexWebPage(const QnWebPageResourcePtr& webPage)
     connect(webPage.get(), &QnResource::parentIdChanged,
         this, &WebPageResourceIndex::onWebPageParentIdChanged);
 
+    connect(webPage.get(), &QnWebPageResource::subtypeChanged,
+        this, &WebPageResourceIndex::webPageSubtypeChanged);
+
     emit webPageAdded(webPage);
     emit webPageAddedToServer(webPage, webPage->getParentResource());
 }

@@ -17,6 +17,8 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 
+using namespace nx::vms::api;
+
 namespace {
 
 bool isValidUrl(const QUrl& url)
@@ -30,8 +32,6 @@ bool isValidUrl(const QUrl& url)
 static constexpr auto kAnyDomain = "*";
 
 } // namespace
-
-using namespace nx::vms::api;
 
 namespace nx::vms::client::desktop {
 
@@ -77,8 +77,11 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent, EditMode editMode):
         "Proxying all contents exposes any service or device on the server's network to the users"
         " of this webpage"));
 
-    ui->clientApiAlertLabel->setText(tr(
-        "The web page can interact with the Desktop Client and request access to the user session"));
+    ui->integrationAlertLabel->setText(tr("This resource may interact with the Desktop Client and"
+        " request access to the user session"));
+
+    ui->clientApiAlertLabel->setText(tr("The web page can interact with the Desktop Client and"
+        " request access to the user session"));
 
     auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
@@ -128,8 +131,13 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent, EditMode editMode):
     connect(ui->proxyAllContentsCheckBox, &QCheckBox::stateChanged,
         this, &QnWebpageDialog::updateWarningLabel);
 
-    connect(ui->clientApiCheckBox, &QCheckBox::toggled,
-        ui->clientApiAlertLabel, &AlertLabel::setVisible);
+    ui->clientApiCheckBox->setVisible(!ini().webPagesAndIntegrations);
+
+    connect(ui->clientApiCheckBox, &QCheckBox::clicked, this,
+        [this](bool checked)
+        {
+            setSubtype(checked ? WebPageSubtype::clientApi : WebPageSubtype::none);
+        });
 
     updateTitle();
     updateSelectServerMenuButtonVisibility();
@@ -141,17 +149,46 @@ QnWebpageDialog::~QnWebpageDialog()
 
 void QnWebpageDialog::updateTitle()
 {
-    const auto hasProxy = ui->proxyViaServerCheckBox->isChecked();
+    using Option = QnWebPageResource::Option;
+
+    QnWebPageResource::Options titleOptions;
+    titleOptions.setFlag(Option::Proxied, ui->proxyViaServerCheckBox->isChecked());
+
+    if (ini().webPagesAndIntegrations)
+    {
+        titleOptions.setFlag(
+            Option::Integration, subtype() == nx::vms::api::WebPageSubtype::clientApi);
+    }
+
+    const QString type = getTypeTitle(titleOptions);
 
     switch (m_editMode)
     {
         case AddPage:
-            setWindowTitle(hasProxy ? tr("Add Proxied Web Page") : tr("Add Web Page"));
-            break;
+        {
+            return setWindowTitle(tr(
+                "Add %1", /*comment*/ "%1 is a Web Page type (like Proxied Web Page)").arg(type));
+        }
         case EditPage:
-            setWindowTitle(hasProxy ? tr("Edit Proxied Web Page") : tr("Edit Web Page"));
-            break;
+        {
+            return setWindowTitle(tr(
+                "Edit %1", /*comment*/ "%1 is a Web Page type (like Proxied Web Page)").arg(type));
+        }
     }
+}
+
+QString QnWebpageDialog::getTypeTitle(QnWebPageResource::Options options)
+{
+    switch (options)
+    {
+        case QnWebPageResource::WebPage: return tr("Web Page");
+        case QnWebPageResource::ProxiedWebPage: return tr("Proxied Web Page");
+        case QnWebPageResource::Integration: return tr("Integration");
+        case QnWebPageResource::ProxiedIntegration: return tr("Proxied Integration");
+    }
+
+    NX_ASSERT(false, "Unexpected value (%1)", options);
+    return {};
 }
 
 void QnWebpageDialog::updateWarningLabel()
@@ -221,14 +258,25 @@ void QnWebpageDialog::setProxyId(QnUuid id)
 
 WebPageSubtype QnWebpageDialog::subtype() const
 {
-    return ui->clientApiCheckBox->isChecked()
-        ? WebPageSubtype::clientApi
-        : WebPageSubtype::none;
+    return m_subtype;
 }
 
 void QnWebpageDialog::setSubtype(WebPageSubtype value)
 {
-    ui->clientApiCheckBox->setChecked(value == WebPageSubtype::clientApi);
+    const bool isIntegration = value == nx::vms::api::WebPageSubtype::clientApi;
+
+    if (ini().webPagesAndIntegrations)
+    {
+        ui->integrationAlertLabel->setVisible(isIntegration);
+    }
+    else
+    {
+        ui->clientApiCheckBox->setChecked(isIntegration);
+        ui->clientApiAlertLabel->setVisible(isIntegration);
+    }
+
+    m_subtype = value;
+    updateTitle();
 }
 
 QStringList QnWebpageDialog::proxyDomainAllowList() const

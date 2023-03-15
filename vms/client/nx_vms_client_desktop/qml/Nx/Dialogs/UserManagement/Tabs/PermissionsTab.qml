@@ -29,6 +29,7 @@ Item
         ResourceTree.NodeType.videoWalls,
         ResourceTree.NodeType.layouts,
         ResourceTree.NodeType.camerasAndDevices,
+        ResourceTree.NodeType.integrations,
         ResourceTree.NodeType.webPages,
         ResourceTree.NodeType.servers]
 
@@ -139,6 +140,7 @@ Item
         topMargin: 0
 
         resourceTypes: ResourceTree.ResourceFilter.camerasAndDevices
+            | ResourceTree.ResourceFilter.integrations
             | ResourceTree.ResourceFilter.webPages
             | ResourceTree.ResourceFilter.layouts
             | ResourceTree.ResourceFilter.healthMonitors

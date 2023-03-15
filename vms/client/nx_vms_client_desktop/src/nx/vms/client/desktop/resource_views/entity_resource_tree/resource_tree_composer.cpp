@@ -105,6 +105,13 @@ void ResourceTreeComposer::rebuildEntity()
         composition->setSubEntity(layoutsGroup, m_entityBuilder->createLayoutsGroupEntity());
         composition->setSubEntity(showreelsGroup, m_entityBuilder->createShowreelsGroupEntity());
         composition->setSubEntity(videowallsList, m_entityBuilder->createVideowallsEntity());
+
+        if (ini().webPagesAndIntegrations)
+        {
+            composition->setSubEntity(
+                integrationsGroup, m_entityBuilder->createIntegrationsGroupEntity());
+        }
+
         composition->setSubEntity(webPagesGroup, m_entityBuilder->createWebPagesGroupEntity());
 
         composition->setSubEntity(

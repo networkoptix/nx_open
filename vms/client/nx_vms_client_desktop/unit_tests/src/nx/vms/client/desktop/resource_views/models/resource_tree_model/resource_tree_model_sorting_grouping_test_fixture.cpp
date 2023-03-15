@@ -101,6 +101,7 @@ void ResourceTreeModelSortingGroupingTest::createAllKindsOfResources(
     createFileLayouts();
     createVideoWallsWithScreensAndMatrices();
     const auto webPages = createWebPages();
+    const auto integrations = createIntegrations();
     const auto localImages = createLocalImages();
     const auto localVideos = createLocalVideos();
 
@@ -118,9 +119,11 @@ void ResourceTreeModelSortingGroupingTest::createAllKindsOfResources(
     const auto ioModules = createIoModules(firstCompatibleServer->getId());
     const auto virtualCameras = createVirtualCameras(firstCompatibleServer->getId());
     const auto proxiedWebResources = createProxiedWebResources(firstCompatibleServer->getId());
+    const auto proxiedIntegrations = createProxiedIntegrations(firstCompatibleServer->getId());
 
     addToLayout(firstLayout, compatibleServers + incompatibleServers + localImages + webPages
-        + localVideos + cameras + virtualCameras + ioModules + proxiedWebResources);
+        + integrations + localVideos + cameras + virtualCameras + ioModules + proxiedWebResources
+        + proxiedIntegrations);
 }
 
 void ResourceTreeModelSortingGroupingTest::createShowreels(const QnUuid& parentUserId) const
@@ -202,7 +205,15 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createWebPages() const
 {
     QnResourceList result;
     for (const auto webPageName: sortingSignificantStrings())
-        result.append(addWebPage(webPageName));
+        result.append(addWebPage(webPageName, WebPageSubtype::none));
+    return result;
+}
+
+QnResourceList ResourceTreeModelSortingGroupingTest::createIntegrations() const
+{
+    QnResourceList result;
+    for (const auto integrationName: sortingSignificantStrings())
+        result.append(addWebPage(integrationName, WebPageSubtype::clientApi));
     return result;
 }
 
@@ -211,7 +222,22 @@ QnResourceList ResourceTreeModelSortingGroupingTest::createProxiedWebResources(
 {
     QnResourceList result;
     for (const auto proxiedWebResourceName: sortingSignificantStrings())
-        result.append(addProxiedWebResource(proxiedWebResourceName, parentServerId));
+    {
+        result.append(
+            addProxiedWebPage(proxiedWebResourceName, WebPageSubtype::none, parentServerId));
+    }
+    return result;
+}
+
+QnResourceList ResourceTreeModelSortingGroupingTest::createProxiedIntegrations(
+    const QnUuid& parentServerId) const
+{
+    QnResourceList result;
+    for (const auto proxiedIntegrationName: sortingSignificantStrings())
+    {
+        result.append(
+            addProxiedWebPage(proxiedIntegrationName, WebPageSubtype::clientApi, parentServerId));
+    }
     return result;
 }
 

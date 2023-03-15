@@ -676,7 +676,9 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Main | Tree)
-        .text(ContextMenu::tr("Add"));
+        .text(ini().webPagesAndIntegrations
+            ? ContextMenu::tr("New")
+            : ContextMenu::tr("Add"));
 
     factory.beginSubMenu();
     {
@@ -699,11 +701,22 @@ void initialize(Manager* manager, Action* root)
             .requiredAdminPermissions()
             .text(ContextMenu::tr("Video Wall..."));
 
+        factory(NewIntegrationAction)
+            .flags(Main | Tree)
+            .requiredAdminPermissions()
+            .text(ContextMenu::tr("Integration..."))
+            .pulledText(ContextMenu::tr("New Integration..."))
+            .condition(
+                condition::treeNodeType(ResourceTree::NodeType::integrations)
+            );
+
         factory(NewWebPageAction)
             .flags(Main | Tree)
             .requiredAdminPermissions()
             .text(ContextMenu::tr("Web Page..."))
-            .pulledText(ContextMenu::tr("Add Web Page..."))
+            .pulledText(ini().webPagesAndIntegrations
+                ? ContextMenu::tr("New Web Page...")
+                : ContextMenu::tr("Add Web Page..."))
             .condition(
                 condition::treeNodeType(ResourceTree::NodeType::webPages)
             );
@@ -1406,11 +1419,23 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | Table)
         .separator();
 
+    if (ini().webPagesAndIntegrations)
+    {
+        factory(IntegrationSettingsAction)
+            .flags(Scene | Tree | SingleTarget | ResourceTarget)
+            .requiredAdminPermissions()
+            .text(ContextMenu::tr("Integration Settings..."))
+            .condition(condition::isIntegration() && !condition::showreelIsRunning());
+    }
+
     factory(WebPageSettingsAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredAdminPermissions()
         .text(ContextMenu::tr("Web Page Settings..."))
-        .condition(condition::hasFlags(Qn::web_page, MatchMode::exactlyOne)
+        .condition(
+            (ini().webPagesAndIntegrations
+                ? condition::isWebPage()
+                : condition::isWebPageOrIntegration())
             && !condition::showreelIsRunning());
 
     factory(DeleteFromDiskAction)
@@ -1583,7 +1608,9 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Main | Tree | SingleTarget | ResourceTarget)
-        .text(ContextMenu::tr("Add"))
+        .text(ini().webPagesAndIntegrations
+            ? ContextMenu::tr("New")
+            : ContextMenu::tr("Add"))
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true)));
@@ -1594,6 +1621,14 @@ void initialize(Manager* manager, Action* root)
             .flags(Tree | SingleTarget | ResourceTarget)
             .text(ContextMenu::tr("Device...")) //< Intentionally hardcode devices here.
             .requiredAdminPermissions();
+
+        if (ini().webPagesAndIntegrations)
+        {
+            factory(AddProxiedIntegrationAction)
+                .flags(Tree | SingleTarget | ResourceTarget)
+                .text(ContextMenu::tr("Proxied Integration..."))
+                .requiredAdminPermissions();
+        }
 
         factory(AddProxiedWebPageAction)
             .flags(Tree | SingleTarget | ResourceTarget)

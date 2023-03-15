@@ -18,6 +18,8 @@ class QnWorkbenchAccessController;
 class QnResourceAccessManager;
 class QnRuntimeInfoManager;
 
+namespace nx::vms::api { enum class WebPageSubtype; }
+
 namespace nx::vms::client::desktop {
 
 class SystemContext;
@@ -28,10 +30,13 @@ namespace entity_resource_tree { class ResourceTreeComposer; };
 
 namespace test {
 
-class ResourceTreeModelTest: public nx::vms::client::desktop::test::ContextBasedTest
+class ResourceTreeModelTest:
+    public nx::vms::client::desktop::test::ContextBasedTest,
+    public ::testing::WithParamInterface<nx::vms::api::WebPageSubtype>
 {
 protected:
     using NodeType = ResourceTree::NodeType;
+    using WebPageSubtype = nx::vms::api::WebPageSubtype;
 
     virtual void SetUp() override;
     virtual void TearDown() override;
@@ -53,9 +58,11 @@ protected:
         bool isEncrypted = false) const;
     LayoutResourcePtr addLayout(const QString& name,
         const QnUuid& parentId = QnUuid()) const;
-    QnWebPageResourcePtr addWebPage(const QString& name) const;
-    QnWebPageResourcePtr addProxiedWebResource(
+
+    QnWebPageResourcePtr addWebPage(const QString& name, WebPageSubtype subtype) const;
+    QnWebPageResourcePtr addProxiedWebPage(
         const QString& name,
+        WebPageSubtype subtype,
         const QnUuid& serverId) const;
 
     QnVideoWallResourcePtr addVideoWall(const QString& name) const;

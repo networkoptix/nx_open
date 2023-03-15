@@ -89,11 +89,25 @@ public:
     UniqueResourceSourcePtr roleUsersSource(const QnUuid& roleId);
 
     /**
+     * Provides integration resources stored in the resource pool.
+     */
+    UniqueResourceSourcePtr integrationsSource(
+        const QnResourceAccessSubject& subject,
+        bool includeProxiedIntegrations);
+
+    /**
      * Provides web page resources stored in the resource pool.
      */
     UniqueResourceSourcePtr webPagesSource(
         const QnResourceAccessSubject& subject,
         bool includeProxiedWebPages);
+
+    /**
+     * Provides web page resources stored in the resource pool.
+     */
+    UniqueResourceSourcePtr webPagesAndIntegrationsSource(
+        const QnResourceAccessSubject& subject,
+        bool includeProxied);
 
     /**
      * Provides all video walls resources stored in the resource pool.

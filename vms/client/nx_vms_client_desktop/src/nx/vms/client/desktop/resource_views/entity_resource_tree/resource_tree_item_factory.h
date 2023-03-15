@@ -38,6 +38,7 @@ public:
     AbstractItemPtr createCamerasAndDevicesItem(Qt::ItemFlags itemFlags) const;
     AbstractItemPtr createLayoutsItem() const;
     AbstractItemPtr createShowreelsItem() const;
+    AbstractItemPtr createIntegrationsItem(Qt::ItemFlags flags) const;
     AbstractItemPtr createWebPagesItem(Qt::ItemFlags flags) const;
     AbstractItemPtr createUsersItem() const;
     AbstractItemPtr createOtherSystemsItem() const;

@@ -30,12 +30,14 @@ protected:
     QnResourceList createIncompatibleServers() const;
     QnResourceList createCompatibleServers() const;
     QnResourceList createWebPages() const;
+    QnResourceList createIntegrations() const;
     QnResourceList createLocalImages() const;
     QnResourceList createLocalVideos() const;
     QnResourceList createCameras(const QnUuid& parentServerId) const;
     QnResourceList createIoModules(const QnUuid& parentServerId) const;
     QnResourceList createVirtualCameras(const QnUuid& parentServerId) const;
     QnResourceList createProxiedWebResources(const QnUuid& parentServerId) const;
+    QnResourceList createProxiedIntegrations(const QnUuid& parentServerId) const;
     QnLayoutResourceList createLayouts(const QnUuid& parentUserId) const;
 };
 

@@ -34,6 +34,7 @@ NX_REFLECTION_ENUM_CLASS(NodeType,
     layouts, //< Root node for current user's layouts and shared layouts.
     showreels, //< Root node for the Showreels.
     videoWalls, //< Never visible root node which represents videowalls group.
+    integrations, //< Root node for integrations.
     webPages, //< Root node for web pages.
     users, //< Root node for user resources.
     analyticsEngines, //< Root node for analytics engines.
@@ -105,6 +106,7 @@ enum class FilterType
     layouts,
     showreels,
     videowalls,
+    integrations,
     webPages,
     users,
     localFiles
@@ -132,9 +134,10 @@ enum class ResourceFilter
 {
     camerasAndDevices = 0x01,
     layouts = 0x02,
-    webPages = 0x04,
-    healthMonitors = 0x08,
-    videoWalls = 0x10
+    integrations = 0x04,
+    webPages = 0x08,
+    healthMonitors = 0x10,
+    videoWalls = 0x20
 };
 Q_DECLARE_FLAGS(ResourceFilters, ResourceFilter)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFilters)

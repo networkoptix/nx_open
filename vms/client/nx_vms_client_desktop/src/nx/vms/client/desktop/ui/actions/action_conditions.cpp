@@ -2424,6 +2424,32 @@ ConditionWrapper hasPermissionsForResources(Qn::Permissions permissions)
         });
 }
 
+ConditionWrapper hasWebPageSubtype(const std::optional<nx::vms::api::WebPageSubtype>& subtype)
+{
+    return new ResourceCondition(
+        [=](const QnResourcePtr& resource)
+        {
+            const auto webPage = resource.dynamicCast<QnWebPageResource>();
+            return webPage && (!subtype || webPage->subtype() == subtype);
+        },
+        MatchMode::exactlyOne);
+}
+
+ConditionWrapper isIntegration()
+{
+    return hasWebPageSubtype(nx::vms::api::WebPageSubtype::clientApi);
+}
+
+ConditionWrapper isWebPage()
+{
+    return hasWebPageSubtype(nx::vms::api::WebPageSubtype::none);
+}
+
+ConditionWrapper isWebPageOrIntegration()
+{
+    return hasWebPageSubtype(std::nullopt);
+}
+
 } // namespace condition
 } // namespace action
 } // namespace ui
