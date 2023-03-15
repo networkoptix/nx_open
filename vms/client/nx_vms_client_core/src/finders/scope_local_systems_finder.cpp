@@ -33,7 +33,7 @@ void ScopeLocalSystemsFinder::updateSystems()
             continue;
 
         const auto system = QnLocalSystemDescription::create(
-            iter.key().toString(), iter.key(), iter->name);
+            iter.key().toSimpleString(), iter.key(), iter->name);
 
         static const int kVeryFarPriority = 100000;
 
