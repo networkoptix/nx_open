@@ -36,10 +36,10 @@ function(_configure_conan)
         set(conan_installed_config_list_file "$ENV{CONAN_USER_HOME}/.conan/config_install.json")
         file(REMOVE ${conan_installed_config_list_file})
 
-        set(download_cache_dir None)
+        set(download_cache_parameter_string "")
         if(DEFINED "ENV{NX_CONAN_DOWNLOAD_CACHE}")
             message(STATUS "Conan download cache: $ENV{NX_CONAN_DOWNLOAD_CACHE}")
-            set(download_cache_dir $ENV{NX_CONAN_DOWNLOAD_CACHE})
+            set(download_cache_parameter_string "download_cache = $ENV{NX_CONAN_DOWNLOAD_CACHE}")
         endif()
 
         set(conan_config_dir_src "${open_source_root}/conan_config")
