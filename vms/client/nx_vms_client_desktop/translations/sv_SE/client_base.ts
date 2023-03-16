@@ -12157,6 +12157,10 @@ om du vill visa fler bokmärken</translation>
       <source>To End</source>
       <translation>Till slut</translation>
     </message>
+    <message>
+      <source>Rewind is not available for VMAX</source>
+      <translation>Spola tillbaka är inte tillgängligt för VMAX</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::SpeedSlider</name>

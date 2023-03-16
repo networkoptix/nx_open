@@ -12485,6 +12485,10 @@ to view more bookmarks</source>
       <source>To End</source>
       <translation>Na konec</translation>
     </message>
+    <message>
+      <source>Rewind is not available for VMAX</source>
+      <translation type="unfinished">Rewind is not available for VMAX</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::SpeedSlider</name>
