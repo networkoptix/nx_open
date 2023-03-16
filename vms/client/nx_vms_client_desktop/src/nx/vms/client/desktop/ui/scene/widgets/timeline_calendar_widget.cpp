@@ -56,7 +56,7 @@ TimelineCalendarWidget::TimelineCalendarWidget(QWidget* parent):
         &d->periodStorage);
     QmlProperty<core::AbstractTimePeriodStorage*>{this, "allCamerasPeriodStorage"}.setValue(
         &d->allCamerasPeriodStorage);
-    QmlProperty<QLocale>{this, "locale"}.setValue(QLocale::system());
+    QmlProperty<QLocale>{this, "regionLocale"}.setValue(QLocale::system());
 }
 
 TimelineCalendarWidget::~TimelineCalendarWidget()
