@@ -248,7 +248,6 @@ bool QuickSyncVideoDecoderImpl::buildQVideoFrame(
     QAbstractVideoBuffer* buffer = nullptr;
     if (m_config.useVideoMemory)
         buffer = new QtVideoBuffer(QuickSyncSurface{surface, weak_from_this()});
-
     else
         buffer = new MfxQtVideoBuffer(surface, m_allocator);
 

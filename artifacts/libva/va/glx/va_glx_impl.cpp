@@ -8,11 +8,11 @@
  * distribute, sub license, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
  * of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
@@ -360,7 +360,7 @@ gl_create_context(VADriverContextP ctx, OpenGLContextStateP parent)
         GLX_RENDER_TYPE,   GLX_RGBA_BIT,
         GLX_DOUBLEBUFFER,  True,
         GLX_RED_SIZE,      8,
-        GLX_GREEN_SIZE,    8, 
+        GLX_GREEN_SIZE,    8,
         GLX_BLUE_SIZE,     8,
         None
     };
@@ -508,15 +508,14 @@ static int create_tfp_surface(VADriverContextP ctx, VASurfaceGLXP pSurfaceGLX)
     int                   n_fbconfig_attrs;
 
     root_window = RootWindow(ctx->native_dpy, ctx->x11_screen);
-    XGetWindowAttributes((Display*)ctx->native_dpy, root_window, &wattr);
-    if (wattr.depth != 24 && wattr.depth != 32)
-        return 0;
+    int depth = 32; // NX client use 32 bit textures only.
+
     pixmap = XCreatePixmap(
         (Display*)ctx->native_dpy,
         root_window,
         width,
         height,
-        wattr.depth
+        depth
     );
     if (!pixmap)
         return 0;
@@ -544,12 +543,12 @@ static int create_tfp_surface(VADriverContextP ctx, VASurfaceGLXP pSurfaceGLX)
     };
     for (attrib = fbconfig_attrs; *attrib != GL_NONE; attrib += 2)
         ;
-    if (wattr.depth == 32) {
-    *attrib++ = GLX_ALPHA_SIZE;                 *attrib++ = 8;
-    *attrib++ = GLX_BIND_TO_TEXTURE_RGBA_EXT;   *attrib++ = GL_TRUE;
+    if (depth == 32) {
+        *attrib++ = GLX_ALPHA_SIZE;                 *attrib++ = 8;
+        *attrib++ = GLX_BIND_TO_TEXTURE_RGBA_EXT;   *attrib++ = GL_TRUE;
     }
     else {
-    *attrib++ = GLX_BIND_TO_TEXTURE_RGB_EXT;    *attrib++ = GL_TRUE;
+        *attrib++ = GLX_BIND_TO_TEXTURE_RGB_EXT;    *attrib++ = GL_TRUE;
     }
     *attrib++ = GL_NONE;
 
@@ -567,13 +566,14 @@ static int create_tfp_surface(VADriverContextP ctx, VASurfaceGLXP pSurfaceGLX)
         GLX_MIPMAP_TEXTURE_EXT, GL_FALSE,
         GL_NONE,
     };
-    for (attrib = pixmap_attrs; *attrib != GL_NONE; attrib += 2)
-        ;
+    for (attrib = pixmap_attrs; *attrib != GL_NONE; attrib += 2);
+
     *attrib++ = GLX_TEXTURE_FORMAT_EXT;
-    if (wattr.depth == 32)
-    *attrib++ = GLX_TEXTURE_FORMAT_RGBA_EXT;
+
+    if (depth == 32)
+        *attrib++ = GLX_TEXTURE_FORMAT_RGBA_EXT;
     else
-    *attrib++ = GLX_TEXTURE_FORMAT_RGB_EXT;
+        *attrib++ = GLX_TEXTURE_FORMAT_RGB_EXT;
     *attrib++ = GL_NONE;
 
     x11_trap_errors();
@@ -1014,7 +1014,7 @@ error:
     if (new_cs)
         gl_destroy_context(new_cs);
 
-    return VA_STATUS_ERROR_ALLOCATION_FAILED;    
+    return VA_STATUS_ERROR_ALLOCATION_FAILED;
 }
 
 static VAStatus
