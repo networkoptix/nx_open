@@ -22,6 +22,10 @@ Control
     property alias periodsVisible: daysSelector.periodsVisible
     property alias displayOffset: daysSelector.displayOffset
 
+    // We use different locales to get the region settings (like first day of week) and to get the
+    // translated names (days of week, months).
+    property var regionLocale: locale
+
     property bool monthPickerVisible: false
 
     implicitWidth: 324
@@ -153,11 +157,11 @@ Control
                 width: parent.width - 2 * x
                 height: 20
 
-                locale: control.locale
+                locale: control.regionLocale
 
                 delegate: Text
                 {
-                    text: model.shortName
+                    text: control.locale.standaloneDayName(model.day, Locale.ShortFormat)
                     font.pixelSize: 10
                     font.weight: Font.Medium
                     font.capitalization: Font.AllUppercase
@@ -179,7 +183,7 @@ Control
                 x: 8
                 width: parent.width - 2 * x
 
-                locale: control.locale
+                locale: control.regionLocale
 
                 visibleYear: selection.start.getFullYear()
                 visibleMonth: selection.start.getMonth()
@@ -201,7 +205,7 @@ Control
                 x: 21
                 width: parent.width - 2 * x
 
-                locale: control.locale
+                locale: control.regionLocale
                 date: control.selection.start
 
                 minimumHour: DateUtils.areDatesEqual(selection.start, range.start)
