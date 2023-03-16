@@ -974,7 +974,7 @@ om PTZ te activeren</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation>Voorvetoning is verouderd</translation>
+      <translation>Voorvertoning is verouderd</translation>
     </message>
   </context>
   <context>
