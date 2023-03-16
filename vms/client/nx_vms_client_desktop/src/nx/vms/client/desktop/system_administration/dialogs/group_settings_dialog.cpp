@@ -391,11 +391,12 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
             {
                 QnMessageBox messageBox(
                     QnMessageBoxIcon::Critical,
+                    tr("Failed to apply changes"),
                     errorString,
-                    {},
                     QDialogButtonBox::Ok,
                     QDialogButtonBox::Ok,
-                    nullptr);
+                    d->parentWidget);
+                messageBox.setWindowTitle(qApp->applicationDisplayName());
                 messageBox.exec();
             }
 

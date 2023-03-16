@@ -397,11 +397,12 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                     {
                         QnMessageBox messageBox(
                             QnMessageBoxIcon::Critical,
+                            tr("Failed to apply changes"),
                             error->errorString,
-                            {},
                             QDialogButtonBox::Ok,
                             QDialogButtonBox::Ok,
-                            nullptr);
+                            d->parentWidget);
+                        messageBox.setWindowTitle(qApp->applicationDisplayName());
                         messageBox.exec();
                     }
                     return;
