@@ -177,11 +177,15 @@ QnWorkbenchLayout* QnWorkbenchLayout::instance(const LayoutResourcePtr& resource
 
 QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnVideoWallResourcePtr& videoWall)
 {
-    auto resourcePool = videoWall->resourcePool();
-    for (const auto& layout: resourcePool->getResources<LayoutResource>())
+    const auto& layouts =
+        appContext()->mainWindowContext()->workbenchContext()->workbench()->layouts();
+    for (const auto& layout: layouts)
     {
-        if (layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>() == videoWall)
-            return instance(layout);
+        if (layout->resource()->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>()
+            == videoWall)
+        {
+            return layout.get();
+        }
     }
     return nullptr;
 }
