@@ -104,7 +104,7 @@ class NxOpenConan(ConanFile):
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
-                self.requires("libva/2.6" "#55e3df61de15ccd0bed0848ee65e2e72")
+                self.requires("libva/2.16" "#65762acd637b7ab1d359128aca9e5119")
                 self.requires("intel-media-sdk/19.4" "#860f17b9422f0baaa3c7a31163d408eb")
 
                 self.requires("libmysqlclient/8.0.17" "#87d0d0dca416ff91ff910c66b57eab1a")
