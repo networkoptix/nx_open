@@ -12155,6 +12155,10 @@ to view more bookmarks</source>
       <source>To End</source>
       <translation>Til Enden</translation>
     </message>
+    <message>
+      <source>Rewind is not available for VMAX</source>
+      <translation>Tilbakespoling er ikke tilgjengelig for VMAX</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::SpeedSlider</name>

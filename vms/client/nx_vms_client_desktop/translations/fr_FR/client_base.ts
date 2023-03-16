@@ -12159,6 +12159,10 @@ pour afficher plus de signets</translation>
       <source>To End</source>
       <translation>Pour Terminer</translation>
     </message>
+    <message>
+      <source>Rewind is not available for VMAX</source>
+      <translation type="unfinished">Rewind is not available for VMAX</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::SpeedSlider</name>

@@ -11988,6 +11988,10 @@ to view more bookmarks</source>
       <source>To End</source>
       <translation>終了</translation>
     </message>
+    <message>
+      <source>Rewind is not available for VMAX</source>
+      <translation>VMAX では巻き戻しはできません</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::SpeedSlider</name>
