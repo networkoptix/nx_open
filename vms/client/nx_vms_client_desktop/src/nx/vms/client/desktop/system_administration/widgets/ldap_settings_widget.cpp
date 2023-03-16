@@ -670,8 +670,8 @@ void LdapSettingsWidget::showError(const QString& errorMessage)
 
     QnMessageBox messageBox(
         QnMessageBoxIcon::Critical,
+        tr("Failed to apply changes"),
         errorMessage,
-        {},
         QDialogButtonBox::Ok,
         QDialogButtonBox::Ok,
         this);
