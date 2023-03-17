@@ -4,10 +4,6 @@
 
 #include "field.h"
 
-#include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/uuid.h>
-#include <chrono>
-
 namespace nx::vms::api::rules {
 
 struct NX_VMS_API ActionBuilder
@@ -16,13 +12,14 @@ struct NX_VMS_API ActionBuilder
 
 public:
     QnUuid id;
-    QString actionType;
-    QList<Field> fields;
+    QString type;
+
+    std::map<QString, Field> fields;
 };
 
 #define nx_vms_api_rules_ActionBuilder_Fields \
-    (id)(actionType)(fields)
+    (id)(type)(fields)
 
-QN_FUSION_DECLARE_FUNCTIONS(ActionBuilder, (json)(ubjson)(xml), NX_VMS_API)
+NX_VMS_API_DECLARE_STRUCT_EX(ActionBuilder, (json)(ubjson)(xml))
 
 } // namespace nx::vms::api::rules

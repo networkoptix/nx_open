@@ -650,7 +650,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
                 if (camera->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
                     maxFps = QnSecurityCamResource::kDefaultMaxFps;
 
-                setSchedule(defaultSchedule(maxFps), {camera});
+                setSchedule(nx::vms::common::defaultSchedule(maxFps), {camera});
             }
         }
     }

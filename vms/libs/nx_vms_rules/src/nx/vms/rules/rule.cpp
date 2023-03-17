@@ -5,6 +5,8 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QScopedValueRollback>
 
+#include <core/misc/schedule_task.h>
+
 #include "action_builder.h"
 #include "event_filter.h"
 
@@ -146,19 +148,7 @@ QByteArray Rule::schedule() const
 
 bool Rule::timeInSchedule(QDateTime datetime) const
 {
-    if (m_schedule.isEmpty())
-        return true;
-
-    int currentWeekHour = (datetime.date().dayOfWeek()-1)*24 + datetime.time().hour();
-
-    int byteOffset = currentWeekHour / 8;
-    if (byteOffset >= m_schedule.size())
-        return false;
-
-    int bitNum = 7 - (currentWeekHour % 8);
-    quint8 mask = 1 << bitNum;
-
-    return (m_schedule.at(byteOffset) & mask);
+    return nx::vms::common::timeInSchedule(datetime, m_schedule);
 }
 
 void Rule::connectSignals()

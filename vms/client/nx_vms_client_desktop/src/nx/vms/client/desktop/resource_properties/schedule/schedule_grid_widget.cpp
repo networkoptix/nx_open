@@ -15,12 +15,13 @@
 #include <nx/vms/client/desktop/resource_properties/schedule/schedule_cell_painter.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/common/utils/schedule.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
 
-static constexpr auto kRowCount = nx::vms::client::desktop::ScheduleGridWidget::kDaysInWeek;
-static constexpr auto kColumnCount = nx::vms::client::desktop::ScheduleGridWidget::kHoursInDay;
+static constexpr auto kRowCount = nx::vms::common::kDaysInWeek;
+static constexpr auto kColumnCount = nx::vms::common::kHoursInDay;
 
 static constexpr int kHeaderFontPixelSize = 13;
 static constexpr auto kHeaderFontWeight = QFont::Medium;
@@ -74,8 +75,8 @@ struct ScheduleGridWidget::Private
     ScheduleGridWidget* const q;
 
     // User data.
-    using RowData = std::array<QVariant, kDaysInWeek>;
-    using GridData = std::array<RowData, kHoursInDay>;
+    using ColumnData = std::array<QVariant, kRowCount>;
+    using GridData = std::array<ColumnData, kColumnCount>;
     GridData gridData;
     QVariant brush;
 
@@ -83,15 +84,15 @@ struct ScheduleGridWidget::Private
     ScheduleCellPainter* cellPainter = nullptr;
 
     // Starts from the first day of week according to the system locale.
-    std::array<Qt::DayOfWeek, kDaysInWeek> daysOfWeek;
+    std::array<Qt::DayOfWeek, nx::vms::common::kDaysInWeek> daysOfWeek;
 
     // Weekdays according to the system locale.
     QList<Qt::DayOfWeek> weekDays;
 
     // Headers strings.
     QString cornerText = ScheduleGridWidget::tr("All");
-    std::array<QString, kDaysInWeek> daysStrings;
-    std::array<QString, kHoursInDay> hoursStrings;
+    std::array<QString, nx::vms::common::kDaysInWeek> daysStrings;
+    std::array<QString, nx::vms::common::kHoursInDay> hoursStrings;
 
     // Size and alignment parameters.
     int cellSize = nx::style::Metrics::kScheduleGridMinimumCellSize;
@@ -280,7 +281,7 @@ ScheduleGridWidget::ScheduleGridWidget(QWidget* parent):
 {
     const auto locale = QLocale::system();
 
-    d->daysOfWeek = daysOfWeek();
+    d->daysOfWeek = nx::vms::common::daysOfWeek();
     d->weekDays = locale.weekdays();
 
     std::rotate(
@@ -313,7 +314,7 @@ ScheduleGridWidget::ScheduleGridWidget(QWidget* parent):
         .replace("A", "a", Qt::CaseSensitive)
         .replace("P", "p", Qt::CaseSensitive);
 
-    for (int hour = 0; hour < kHoursInDay; ++hour)
+    for (int hour = 0; hour < nx::vms::common::kHoursInDay; ++hour)
         d->hoursStrings[hour] = QTime(hour, 0).toString(timeFormat);
 
     setMouseTracking(true);

@@ -24,11 +24,11 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
-#include <ui/dialogs/week_time_schedule_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/business/aggregation_widget.h>
@@ -679,7 +679,7 @@ void QnBusinessRuleWidget::at_scheduleButton_clicked()
     if (!m_model)
         return;
 
-    QScopedPointer<QnWeekTimeScheduleDialog> dialog(new QnWeekTimeScheduleDialog(this));
+    QScopedPointer<WeekTimeScheduleDialog> dialog(new WeekTimeScheduleDialog(this));
     dialog->setScheduleTasks(m_model->schedule());
     if (!dialog->exec())
         return;

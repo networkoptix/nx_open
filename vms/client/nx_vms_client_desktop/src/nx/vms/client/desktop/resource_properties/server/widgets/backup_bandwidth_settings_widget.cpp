@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/backup_bandwidth_schedule_cell_painter.h>
+#include <nx/vms/common/utils/schedule.h>
 #include <utils/common/event_processors.h>
 
 namespace {
@@ -45,9 +46,9 @@ nx::vms::api::BackupBitrateBytesPerSecond getBackupBitrateLimitsFromGrid(
     const ScheduleGridWidget* scheduleGrid)
 {
     nx::vms::api::BackupBitrateBytesPerSecond backupBitrateLimits;
-    for (const auto dayOfWeek: ScheduleGridWidget::daysOfWeek())
+    for (const auto dayOfWeek: nx::vms::common::daysOfWeek())
     {
-        for (int hour = 0; hour < ScheduleGridWidget::kHoursInDay; ++hour)
+        for (int hour = 0; hour < nx::vms::common::kHoursInDay; ++hour)
         {
             const auto cellData = scheduleGrid->cellData(dayOfWeek, hour);
             if (cellData.isNull())
@@ -71,9 +72,9 @@ void setBackupBitrateLimitsToGrid(
         return;
     }
 
-    for (const auto dayOfWeek: ScheduleGridWidget::daysOfWeek())
+    for (const auto dayOfWeek: nx::vms::common::daysOfWeek())
     {
-        for (int hour = 0; hour < ScheduleGridWidget::kHoursInDay; ++hour)
+        for (int hour = 0; hour < nx::vms::common::kHoursInDay; ++hour)
         {
             const nx::vms::api::BackupBitrateKey key = {nx::vms::api::dayOfWeek(dayOfWeek), hour};
             grid->setCellData(dayOfWeek, hour, bitrateLimits.contains(key)
@@ -89,7 +90,7 @@ BandwidthLimitType getBandwithLimitTypeFromBitrateLimits(
     if (bitrateLimits.isEmpty())
         return NoLimit;
 
-    if (bitrateLimits.size() != ScheduleGridWidget::kDaysInWeek * ScheduleGridWidget::kHoursInDay)
+    if (bitrateLimits.size() != nx::vms::common::kDaysInWeek * nx::vms::common::kHoursInDay)
         return ScheduledLimit;
 
     const auto values = bitrateLimits.values();

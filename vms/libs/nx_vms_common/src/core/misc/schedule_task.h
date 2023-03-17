@@ -2,11 +2,7 @@
 
 #pragma once
 
-#include <vector>
+#include <nx/vms/common/utils/schedule.h>
 
-#include <nx/vms/api/data/camera_attributes_data.h>
-
-using QnScheduleTask = nx::vms::api::ScheduleTaskData;
-using QnScheduleTaskList = std::vector<QnScheduleTask>;
-
-NX_VMS_COMMON_API QnScheduleTaskList defaultSchedule(int fps);
+using QnScheduleTask = nx::vms::api::CameraScheduleTaskData;
+using QnScheduleTaskList = nx::vms::api::CameraScheduleTaskDataList;

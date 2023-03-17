@@ -5,8 +5,9 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QMap>
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+
+#include "../data/data_macros.h"
 
 namespace nx::vms::api::rules {
 
@@ -15,14 +16,14 @@ struct NX_VMS_API Field
     Q_GADGET
 
 public:
-    QString name;
-    QString metatype;
+    QString type;
+
     QMap<QString, QJsonValue> props;
 };
 
 #define nx_vms_api_rules_Field_Fields \
-    (name)(metatype)(props)
+    (type)(props)
 
-QN_FUSION_DECLARE_FUNCTIONS(Field, (json)(ubjson)(xml), NX_VMS_API)
+NX_VMS_API_DECLARE_STRUCT_EX(Field, (json)(ubjson)(xml))
 
 } // namespace nx::vms::api::rules
