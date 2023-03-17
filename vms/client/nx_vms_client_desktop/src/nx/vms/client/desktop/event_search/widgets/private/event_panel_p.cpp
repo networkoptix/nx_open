@@ -617,9 +617,10 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
     if (previewTimeData.isNull())
         return {};
 
-    const auto previewTime = previewTimeData.value<microseconds>();
+    const auto previewTimeMs =
+        duration_cast<milliseconds>(previewTimeData.value<microseconds>());
 
-    const auto requiredPermission = previewTime > 0ms
+    const auto requiredPermission = previewTimeMs > 0ms
         ? Qn::ViewFootagePermission
         : Qn::ViewLivePermission;
 
@@ -651,8 +652,8 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
     request.format = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.aspectRatio = nx::api::ImageRequest::AspectRatio::auto_;
     request.streamSelectionMode = streamSelectionMode;
-    request.timestampUs =
-        previewTime.count() > 0 ? previewTime : nx::api::ImageRequest::kLatestThumbnail;
+    request.timestampMs =
+        previewTimeMs.count() > 0 ? previewTimeMs : nx::api::ImageRequest::kLatestThumbnail;
     request.roundMethod = precisePreview
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
