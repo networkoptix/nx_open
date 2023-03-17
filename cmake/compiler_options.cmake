@@ -403,6 +403,7 @@ if(NOT compilerMsvc)
     if(compilerGcc)
         add_compile_options(
             -Wno-error=maybe-uninitialized
+            -Wno-missing-field-initializers
             -Wno-psabi
         )
         if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
