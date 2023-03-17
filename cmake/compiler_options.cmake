@@ -292,6 +292,7 @@ if(UNIX)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         add_compile_options(
             -Wno-error=maybe-uninitialized
+            -Wno-missing-field-initializers
             -Wno-psabi
         )
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
