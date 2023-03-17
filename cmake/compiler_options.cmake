@@ -286,6 +286,15 @@ if(compilerMsvc)
 
         # Wrong initialization order.
         /we5038
+
+        # Conversion from 'size_t' to 'int', possible loss of data.
+        /wd4267
+
+        # 'type': class 'type1' needs to have dll-interface to be used by clients of class 'type2'.
+        /wd4251
+
+        # non - DLL-interface class 'class_1' used as base for DLL-interface class 'class_2'
+        /wd4275
     )
     add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
     add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)

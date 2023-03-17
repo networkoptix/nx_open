@@ -4,7 +4,6 @@ option(enablePrecompiledHeaders "Enable precompiled headers support" ON)
 mark_as_advanced(enablePrecompiledHeaders)
 
 set(nx_enable_werror OFF)
-set(nx_werror_condition CMAKE_COMPILER_IS_GNUCXX)
 
 include(${PROJECT_SOURCE_DIR}/cmake/windows_signing.cmake)
 
@@ -21,11 +20,15 @@ endfunction()
 
 function(nx_target_enable_werror target werror_condition)
     if(werror_condition STREQUAL "")
-        set(werror_condition ${nx_werror_condition})
+        set(werror_condition TRUE)
     endif()
 
     if(${werror_condition})
-        target_compile_options(${target} PRIVATE -Werror)
+        if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+            target_compile_options(${target} PRIVATE /WX)
+        else()
+            target_compile_options(${target} PRIVATE -Werror)
+        endif()
     endif()
 endfunction()
 
