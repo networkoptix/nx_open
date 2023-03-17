@@ -21,6 +21,8 @@ struct UserSettingsDialogState
     // Subject ID should go first for correct AccessSubjectEditingContext initialization.
     Q_PROPERTY(QnUuid userId MEMBER userId)
 
+    Q_PROPERTY(bool editable MEMBER editable)
+
     Q_PROPERTY(nx::vms::client::desktop::UserSettingsGlobal::UserType userType MEMBER userType)
     Q_PROPERTY(bool isSelf MEMBER isSelf)
 
@@ -48,6 +50,8 @@ struct UserSettingsDialogState
 
 public:
     bool operator==(const UserSettingsDialogState& other) const = default;
+
+    bool editable = true;
 
     UserSettingsGlobal::UserType userType = UserSettingsGlobal::LocalUser;
     bool isSelf = false;

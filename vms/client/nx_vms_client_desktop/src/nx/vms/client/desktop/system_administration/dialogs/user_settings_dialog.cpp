@@ -15,6 +15,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/branding.h>
@@ -22,6 +23,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/user_data.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
@@ -298,10 +300,11 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         return state;
     }
 
+    const auto currentUser = systemContext()->userWatcher()->user();
     const Qn::Permissions permissions = accessController()->permissions(user);
 
     state.userType = (UserSettingsGlobal::UserType) user->userType();
-    state.isSelf = systemContext()->accessController()->user()->getId() == user->getId();
+    state.isSelf = currentUser->getId() == user->getId();
     state.userId = user->getId();
 
     state.login = user->getName();
@@ -330,6 +333,13 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
     state.globalPermissions =
         user->getRawPermissions() & nx::vms::api::kNonDeprecatedGlobalPermissions;
+
+    state.editable =
+        state.userId == currentUser->getId()
+        || MembersModel::isEditable(
+            systemContext()->accessSubjectHierarchy(),
+            currentUser->getId(),
+            state.userId);
 
     return state;
 }

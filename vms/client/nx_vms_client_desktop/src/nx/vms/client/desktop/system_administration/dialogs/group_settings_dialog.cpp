@@ -11,6 +11,7 @@
 #include <nx/utils/algorithm/diff_sorted_lists.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -261,6 +262,12 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
                 state.groups.insert(group.id);
             }
         }
+
+        const auto currentUser = systemContext()->userWatcher()->user();
+        state.editable = MembersModel::isEditable(
+            systemContext()->accessSubjectHierarchy(),
+            currentUser->getId(),
+            state.groupId);
     }
 
     return state;

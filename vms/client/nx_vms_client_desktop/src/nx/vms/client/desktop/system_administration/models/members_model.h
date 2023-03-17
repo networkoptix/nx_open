@@ -152,6 +152,11 @@ public:
 
     bool isRemovable(const QnUuid& id) const;
 
+    static bool isEditable(
+        const nx::core::access::SubjectHierarchy* hierarchy,
+        const QnUuid& currentUserId,
+        const QnUuid& id);
+
 signals:
     void groupIdChanged();
     void userIdChanged();
