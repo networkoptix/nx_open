@@ -74,7 +74,7 @@ void CameraHotspotItem::Private::initTooltip()
     request.camera = camera;
     request.format = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.aspectRatio = nx::api::ImageRequest::AspectRatio::auto_;
-    request.timestampUs = nx::api::ImageRequest::kLatestThumbnail;
+    request.timestampMs = nx::api::ImageRequest::kLatestThumbnail;
     request.roundMethod = nx::api::ImageRequest::RoundMethod::precise;
 
     thumbnailProvider = std::make_unique<CameraThumbnailProvider>(request);

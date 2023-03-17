@@ -398,7 +398,8 @@ void EventRibbon::Private::updateTilePreview(int index)
         ? kDefaultThumbnailWidth
         : kAlternativeThumbnailWidth;
 
-    const auto previewTime = modelIndex.data(Qn::PreviewTimeRole).value<microseconds>();
+    const auto previewTimeMs = duration_cast<milliseconds>(
+        modelIndex.data(Qn::PreviewTimeRole).value<microseconds>());
 
     const auto rotation = mediaResource->forcedRotation().value_or(0);
     const auto previewCropRect = nx::vms::client::core::Geometry::rotatedRelativeRectangle(
@@ -415,8 +416,8 @@ void EventRibbon::Private::updateTilePreview(int index)
 
     nx::api::ResourceImageRequest request;
     request.resource = previewResource;
-    request.timestampUs =
-        previewTime.count() > 0 ? previewTime : nx::api::ImageRequest::kLatestThumbnail;
+    request.timestampMs =
+        previewTimeMs.count() > 0 ? previewTimeMs : nx::api::ImageRequest::kLatestThumbnail;
     request.rotation = rotation;
     request.size = QSize(thumbnailWidth, 0);
     request.format = nx::api::ImageRequest::ThumbnailFormat::jpg;
@@ -444,7 +445,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     else
     {
         const auto oldRequest = previewProvider->requestData();
-        forceUpdate = oldRequest.timestampUs != request.timestampUs
+        forceUpdate = oldRequest.timestampMs != request.timestampMs
             || oldRequest.streamSelectionMode != request.streamSelectionMode;
 
         previewProvider->setRequestData(request);
@@ -1611,7 +1612,7 @@ void EventRibbon::Private::loadNextPreview()
             if (tile->preview->tryLoad())
             {
                 NX_VERBOSE(this, "Loaded preview from videocache (timestamp=%1, objectTrackId=%2",
-                    tile->preview->requestData().timestampUs,
+                    tile->preview->requestData().timestampMs,
                     tile->preview->requestData().objectTrackId);
 
                 continue;
@@ -1621,7 +1622,7 @@ void EventRibbon::Private::loadNextPreview()
         if (isNextPreviewLoadAllowed(tile->preview.get()))
         {
             NX_VERBOSE(this, "Requesting preview from server (timestamp=%1, objectTrackId=%2",
-                tile->preview->requestData().timestampUs,
+                tile->preview->requestData().timestampMs,
                 tile->preview->requestData().objectTrackId);
 
             tile->preview->loadAsync();

@@ -142,7 +142,7 @@ struct ResourceThumbnailProvider::Private
             case ProviderType::ffmpeg:
             {
                 baseProvider.reset(new FfmpegImageProvider(value.resource,
-                    request.timestampUs, request.size));
+                    request.timestampMs, request.size));
                 break;
             }
 
@@ -284,7 +284,7 @@ std::chrono::microseconds ResourceThumbnailProvider::timestamp() const
     if (const auto cameraProvider = qobject_cast<CameraThumbnailProvider*>(d->baseProvider.get()))
         return std::chrono::microseconds(cameraProvider->timestampUs());
 
-    return d->request.timestampUs;
+    return d->request.timestampMs;
 }
 
 } // namespace nx::vms::client::desktop

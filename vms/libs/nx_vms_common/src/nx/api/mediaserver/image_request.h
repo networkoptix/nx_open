@@ -38,7 +38,7 @@ struct NX_VMS_COMMON_API CameraImageRequest: ImageRequest
     }
 
     /** Check if value is "special" - DATETIME_NOW or negative. */
-    static bool isSpecialTimeValue(std::chrono::microseconds value);
+    static bool isSpecialTimeValue(std::chrono::milliseconds value);
 };
 
 } // namespace nx::api

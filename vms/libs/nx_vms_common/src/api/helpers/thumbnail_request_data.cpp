@@ -53,9 +53,9 @@ void QnThumbnailRequestData::loadFromParams(
     {
         QString timeValue = params.value(kTimeParam);
         if (timeValue.toLower() == kLatestTimeValue)
-            request.timestampUs = nx::api::ImageRequest::kLatestThumbnail;
+            request.timestampMs = nx::api::ImageRequest::kLatestThumbnail;
         else
-            request.timestampUs = std::chrono::microseconds(nx::utils::parseDateTimeUsec(timeValue));
+            request.timestampMs = std::chrono::milliseconds(nx::utils::parseDateTimeMsec(timeValue));
 
         if (params.contains(kIgnoreExternalArchiveParam))
             request.ignoreExternalArchive = true;
@@ -93,10 +93,9 @@ nx::network::rest::Params QnThumbnailRequestData::toParams() const
 
     result.insert(kCameraIdParam, request.camera ? request.camera->getId().toString() : QString());
     result.insert(kTimeParam,
-        nx::api::CameraImageRequest::isSpecialTimeValue(request.timestampUs)
+        nx::api::CameraImageRequest::isSpecialTimeValue(request.timestampMs)
             ? kLatestTimeValue
-            : QString::number(std::chrono::duration_cast<std::chrono::milliseconds>(
-                request.timestampUs).count()));
+            : QString::number(request.timestampMs.count()));
     if (request.ignoreExternalArchive)
         result.insert(kIgnoreExternalArchiveParam, "");
     if (request.tolerant)
@@ -120,14 +119,14 @@ std::optional<QString> QnThumbnailRequestData::getError() const
         return lit("No camera avaliable");
 
     // Check invalid time.
-    if (request.timestampUs.count() < 0
-        && request.timestampUs != nx::api::ImageRequest::kLatestThumbnail)
+    if (request.timestampMs.count() < 0
+        && request.timestampMs != nx::api::ImageRequest::kLatestThumbnail)
     {
         return lit("Invalid time");
     }
     if (request.ignoreExternalArchive
-        && request.timestampUs != nx::api::ImageRequest::kLatestThumbnail
-        && request.timestampUs.count() != DATETIME_NOW)
+        && request.timestampMs != nx::api::ImageRequest::kLatestThumbnail
+        && request.timestampMs.count() != DATETIME_NOW)
     {
         return QString("'%1' applies only for \"latest\" timestamp")
             .arg(kIgnoreExternalArchiveParam);

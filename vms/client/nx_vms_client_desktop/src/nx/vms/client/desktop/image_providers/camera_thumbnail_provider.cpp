@@ -115,10 +115,10 @@ bool CameraThumbnailProvider::tryLoad()
 
     auto systemContext = SystemContext::fromResource(m_request.camera);
     auto cache = systemContext->videoCache();
-    if (!cache || nx::api::CameraImageRequest::isSpecialTimeValue(m_request.timestampUs))
+    if (!cache || nx::api::CameraImageRequest::isSpecialTimeValue(m_request.timestampMs))
         return false;
 
-    std::chrono::microseconds requiredTime(m_request.timestampUs);
+    std::chrono::microseconds requiredTime(m_request.timestampMs);
     std::chrono::microseconds actualTime{};
 
     const auto image = cache->image(m_request.camera->getId(), requiredTime, &actualTime);
@@ -156,7 +156,7 @@ void CameraThumbnailProvider::doLoadAsync()
     }
 
     const bool isLiveRequest =
-        nx::api::CameraImageRequest::isSpecialTimeValue(m_request.timestampUs);
+        nx::api::CameraImageRequest::isSpecialTimeValue(m_request.timestampMs);
 
     if (isLiveRequest && !m_request.camera->isOnline())
     {

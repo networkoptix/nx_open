@@ -1348,7 +1348,8 @@ void RightPanelModelsAdapter::Private::updatePreviewProvider(int row)
         return;
     }
 
-    const auto previewTime = index.data(Qn::PreviewTimeRole).value<microseconds>();
+    const auto previewTimeMs =
+        duration_cast<milliseconds>(index.data(Qn::PreviewTimeRole).value<microseconds>());
 
     const auto rotation = mediaResource->forcedRotation().value_or(0);
     const auto highlightRect = nx::vms::client::core::Geometry::rotatedRelativeRectangle(
@@ -1361,8 +1362,8 @@ void RightPanelModelsAdapter::Private::updatePreviewProvider(int row)
 
     nx::api::ResourceImageRequest request;
     request.resource = previewResource->toSharedPointer();
-    request.timestampUs =
-        previewTime.count() > 0 ? previewTime : nx::api::ImageRequest::kLatestThumbnail;
+    request.timestampMs =
+        previewTimeMs.count() > 0 ? previewTimeMs : nx::api::ImageRequest::kLatestThumbnail;
     request.rotation = rotation;
     request.size = QSize(kDefaultThumbnailWidth, 0);
     request.format = nx::api::ImageRequest::ThumbnailFormat::jpg;
@@ -1420,7 +1421,7 @@ void RightPanelModelsAdapter::Private::updatePreviewProvider(int row)
     else
     {
         const auto oldRequest = previewProvider->requestData();
-        const bool forceUpdate = oldRequest.timestampUs != request.timestampUs
+        const bool forceUpdate = oldRequest.timestampMs != request.timestampMs
             || oldRequest.streamSelectionMode != request.streamSelectionMode;
 
         previewProvider->setRequestData(request, forceUpdate);
@@ -1565,7 +1566,7 @@ void RightPanelModelsAdapter::Private::loadNextPreview()
             if (provider->tryLoad())
             {
                 NX_VERBOSE(q, "Loaded preview from videocache (timestamp=%1, objectTrackId=%2",
-                    provider->requestData().timestampUs,
+                    provider->requestData().timestampMs,
                     provider->requestData().objectTrackId);
 
                 ++loadedFromCache;
@@ -1577,7 +1578,7 @@ void RightPanelModelsAdapter::Private::loadNextPreview()
             continue;
 
         NX_VERBOSE(q, "Requesting preview from server (timestamp=%1, objectTrackId=%2",
-            provider->requestData().timestampUs,
+            provider->requestData().timestampMs,
             provider->requestData().objectTrackId);
 
         requestPreview(row);

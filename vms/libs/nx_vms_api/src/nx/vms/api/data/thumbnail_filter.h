@@ -83,7 +83,7 @@ struct NX_VMS_API ThumbnailFilter
         sameAsAnalytics
     );
 
-    static constexpr std::chrono::microseconds kLatestThumbnail{-1};
+    static constexpr std::chrono::milliseconds kLatestThumbnail{-1};
     static constexpr int kDefaultRotation = -1;
     static constexpr int kMinimumSize = 32;
     static constexpr int kMaximumSize = 4096;
@@ -94,7 +94,7 @@ struct NX_VMS_API ThumbnailFilter
     /**%apidoc[opt] Timestamp of the image. A negative value means "latest".
      * %example 1000
      */
-    std::chrono::microseconds timestampUs{kLatestThumbnail};
+    std::chrono::milliseconds timestampMs{kLatestThumbnail};
 
     /**%apidoc[opt]
      * If enabled, images requested with "Latest" option will not be tried to download from an
@@ -138,7 +138,7 @@ struct NX_VMS_API ThumbnailFilter
     StreamSelectionMode streamSelectionMode = StreamSelectionMode::auto_;
 };
 
-#define ThumbnailFilter_Fields (id)(timestampUs)(ignoreExternalArchive)(rotation)(size)\
+#define ThumbnailFilter_Fields (id)(timestampMs)(ignoreExternalArchive)(rotation)(size)\
     (format)(roundMethod)(aspectRatio)(tolerant)(crop)(streamSelectionMode)
 QN_FUSION_DECLARE_FUNCTIONS(ThumbnailFilter, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ThumbnailFilter, ThumbnailFilter_Fields)
