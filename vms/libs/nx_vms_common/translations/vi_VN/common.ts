@@ -1587,7 +1587,7 @@
     </message>
     <message>
       <source>Update releases.json file URL</source>
-      <translation type="unfinished">Update releases.json file URL</translation>
+      <translation>URL cập nhật tệp phát hành .json</translation>
     </message>
   </context>
   <context>
