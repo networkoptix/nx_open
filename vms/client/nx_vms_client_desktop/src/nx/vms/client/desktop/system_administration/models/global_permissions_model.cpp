@@ -170,6 +170,8 @@ void GlobalPermissionsModel::updateInfo()
             permissions = user->getRawPermissions();
     }
 
+    permissions &= nx::vms::api::kNonDeprecatedGlobalPermissions;
+
     if (permissions != m_ownPermissions)
     {
         m_ownPermissions = permissions;
