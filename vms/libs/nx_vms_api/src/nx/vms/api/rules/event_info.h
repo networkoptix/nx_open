@@ -6,9 +6,8 @@
 #include <QtCore/QMap>
 
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/data_macros.h>
 
-#include "common.h"
+#include "../data/data_macros.h"
 
 namespace nx::vms::api::rules {
 
@@ -21,8 +20,7 @@ struct NX_VMS_API EventInfo
 
 #define nx_vms_api_rules_EventInfo_Fields \
     (ruleId)(props)
-NX_VMS_API_DECLARE_STRUCT(EventInfo)
 
-QN_FUSION_DECLARE_FUNCTIONS(EventInfo, (json)(ubjson), NX_VMS_API)
+NX_VMS_API_DECLARE_STRUCT_EX(EventInfo, (json)(ubjson))
 
 } // namespace nx::vms::api::rules

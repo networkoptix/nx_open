@@ -45,8 +45,8 @@ QnScheduleTaskList makeSchedule(
         result.push_back({
             /*startTime*/ 0,
             /*endTime*/ seconds(24h).count(),
-            /*recordingType*/ recordingType,
             /*dayOfWeek*/ day,
+            /*recordingType*/ recordingType,
             /*streamQuality*/ streamQuality,
             /*fps*/ fps,
             /*bitrateKbps*/ bitrateKbps,

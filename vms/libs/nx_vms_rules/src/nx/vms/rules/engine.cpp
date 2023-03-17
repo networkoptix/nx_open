@@ -8,6 +8,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/rule.h>
+#include <nx/vms/common/utils/schedule.h>
 #include <nx/vms/rules/ini.h>
 #include <nx/vms/utils/translation/scoped_locale.h>
 #include <utils/common/synctime.h>
@@ -413,7 +414,7 @@ std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized) const
 
     rule->setComment(serialized.comment);
     rule->setEnabled(serialized.enabled);
-    rule->setSchedule(serialized.schedule);
+    rule->setSchedule(nx::vms::common::scheduleToByteArray(serialized.schedule));
 
     return rule;
 }
@@ -436,7 +437,7 @@ api::Rule Engine::serialize(const Rule* rule) const
     }
     result.comment = rule->comment();
     result.enabled = rule->enabled();
-    result.schedule = rule->schedule();
+    result.schedule = nx::vms::common::scheduleFromByteArray(rule->schedule());
 
     return result;
 }
@@ -493,18 +494,18 @@ ActionPtr Engine::cloneAction(const ActionPtr& action) const
 
 std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& serialized) const
 {
-    if (serialized.eventType.isEmpty())
+    if (serialized.type.isEmpty())
         return nullptr;
 
-    std::unique_ptr<EventFilter> filter(new EventFilter(serialized.id, serialized.eventType));
+    std::unique_ptr<EventFilter> filter(new EventFilter(serialized.id, serialized.type));
 
-    for (const auto& fieldInfo: serialized.fields)
+    for (const auto& [name, fieldInfo]: serialized.fields)
     {
         auto field = buildEventField(fieldInfo);
         if (!field)
             return nullptr;
 
-        filter->addField(fieldInfo.name, std::move(field));
+        filter->addField(name, std::move(field));
     }
 
     return filter;
@@ -565,35 +566,34 @@ api::EventFilter Engine::serialize(const EventFilter *filter) const
         const auto field = it.value();
 
         api::Field serialized;
-        serialized.name = name;
-        serialized.metatype = field->metatype();
+        serialized.type = field->metatype();
         serialized.props = field->serializedProperties();
 
-        result.fields += serialized;
+        result.fields.emplace(name, std::move(serialized));
     }
     result.id = filter->id();
-    result.eventType = filter->eventType();
+    result.type = filter->eventType();
 
     return result;
 }
 
 std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuilder& serialized) const
 {
-    ActionConstructor ctor = m_actionTypes.value(serialized.actionType);
+    ActionConstructor ctor = m_actionTypes.value(serialized.type);
     //if (!ctor)
     //    return nullptr;
 
     std::unique_ptr<ActionBuilder> builder(
-        new ActionBuilder(serialized.id, serialized.actionType, ctor));
+        new ActionBuilder(serialized.id, serialized.type, ctor));
     connect(builder.get(), &ActionBuilder::action, this, &Engine::processAction);
 
-    for (const auto& fieldInfo: serialized.fields)
+    for (const auto& [name, fieldInfo]: serialized.fields)
     {
         auto field = buildActionField(fieldInfo);
         if (!field)
             return nullptr;
 
-        builder->addField(fieldInfo.name, std::move(field));
+        builder->addField(name, std::move(field));
     }
 
     return builder;
@@ -612,14 +612,13 @@ api::ActionBuilder Engine::serialize(const ActionBuilder *builder) const
         const auto field = it.value();
 
         api::Field serialized;
-        serialized.name = name;
-        serialized.metatype = field->metatype();
+        serialized.type = field->metatype();
         serialized.props = field->serializedProperties();
 
-        result.fields += serialized;
+        result.fields.emplace(name, std::move(serialized));
     }
     result.id = builder->id();
-    result.actionType = builder->actionType();
+    result.type = builder->actionType();
 
     return result;
 }
@@ -671,7 +670,7 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& 
 
 std::unique_ptr<EventFilterField> Engine::buildEventField(const api::Field& serialized) const
 {
-    auto field = buildEventField(serialized.metatype);
+    auto field = buildEventField(serialized.type);
     if (!field)
         return nullptr;
 
@@ -702,7 +701,7 @@ std::unique_ptr<EventFilterField> Engine::buildEventField(const QString& fieldTy
 
 std::unique_ptr<ActionBuilderField> Engine::buildActionField(const api::Field& serialized) const
 {
-    auto field = buildActionField(serialized.metatype);
+    auto field = buildActionField(serialized.type);
     deserializeProperties(serialized.props, field.get());
 
     return field;

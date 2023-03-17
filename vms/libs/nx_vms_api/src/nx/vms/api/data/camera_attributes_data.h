@@ -13,31 +13,15 @@
 
 #include "check_resource_exists.h"
 #include "data_macros.h"
+#include "schedule_task_data.h"
 
 namespace nx {
 namespace vms {
 namespace api {
 
-struct NX_VMS_API ScheduleTaskData
+struct NX_VMS_API CameraScheduleTaskData: public ScheduleTaskData
 {
-    /**%apidoc[opt] Time of day when the backup starts (in seconds passed from 00:00:00). */
-    int startTime = 0;
-
-    /**%apidoc[opt] Time of day when the backup ends (in seconds passed from 00:00:00). */
-    int endTime = 0;
-
     RecordingType recordingType = RecordingType::always;
-
-    /**%apidoc[opt] Weekday for the recording task.
-     *     %value 1 Monday
-     *     %value 2 Tuesday
-     *     %value 3 Wednesday
-     *     %value 4 Thursday
-     *     %value 5 Friday
-     *     %value 6 Saturday
-     *     %value 7 Sunday
-     */
-    qint8 dayOfWeek = 1;
 
     /**%apidoc[opt] Quality of the recording. */
     StreamQuality streamQuality = StreamQuality::undefined;
@@ -53,19 +37,18 @@ struct NX_VMS_API ScheduleTaskData
      */
     RecordingMetadataTypes metadataTypes;
 
-    bool operator==(const ScheduleTaskData& other) const = default;
+    bool operator==(const CameraScheduleTaskData& other) const = default;
 };
-#define ScheduleTaskData_Fields \
-    (startTime) \
-    (endTime) \
+#define CameraScheduleTaskData_Fields \
+    ScheduleTaskData_Fields \
     (recordingType) \
-    (dayOfWeek) \
     (streamQuality) \
     (fps) \
     (bitrateKbps) \
     (metadataTypes)
 
-NX_REFLECTION_INSTRUMENT(ScheduleTaskData, ScheduleTaskData_Fields)
+NX_REFLECTION_INSTRUMENT(CameraScheduleTaskData, CameraScheduleTaskData_Fields)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraScheduleTaskData)
 
 //-------------------------------------------------------------------------------------------------
 
@@ -122,7 +105,7 @@ struct NX_VMS_API CameraAttributesData
     QnLatin1Array motionMask;
 
     /**%apidoc[opt] List of scheduleTask objects which define the device recording schedule. */
-    std::vector<ScheduleTaskData> scheduleTasks;
+    std::vector<CameraScheduleTaskData> scheduleTasks;
 
     /**%apidoc[opt] Whether audio is enabled on the device. */
     bool audioEnabled = false;
@@ -199,7 +182,6 @@ struct NX_VMS_API CameraAttributesData
 
 #define CameraAttributesData_Fields (cameraId)(cameraName) CameraAttributesData_Fields_Short
 
-NX_VMS_API_DECLARE_STRUCT(ScheduleTaskData)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraAttributesData)
 
 NX_VMS_API void serialize(
@@ -210,4 +192,3 @@ NX_VMS_API bool deserialize(
 } // namespace api
 } // namespace vms
 } // namespace nx
-

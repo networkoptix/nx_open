@@ -10,6 +10,6 @@
 # ATTENTION: You must change the comment below to make sure it will generate a merge conflict if
 # somebody concurrently updates the Protocol version. Prefer to use the Jira Issue id and title as
 # a comment.
-set(_vmsInVersionProtocolNumber 07) #< VMS-38298: VMS Server API: Normalize User and Group API to the spec
+set(_vmsInVersionProtocolNumber 08) #< VMS-19715: Implement CRUD api for the new rules engine
 set(vmsProtocolVersion "${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}${_vmsInVersionProtocolNumber}")
 unset(_vmsInVersionProtocolNumber)

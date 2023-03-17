@@ -310,11 +310,11 @@ QnScheduleTaskList CameraScheduleWidget::calculateScheduleTasks() const
 {
     QnScheduleTaskList tasks;
 
-    for (const auto dayOfWeek: ScheduleGridWidget::daysOfWeek())
+    for (const auto dayOfWeek: nx::vms::common::daysOfWeek())
     {
         QnScheduleTask task;
 
-        for (int hour = 0; hour < ScheduleGridWidget::kHoursInDay;)
+        for (int hour = 0; hour < nx::vms::common::kHoursInDay;)
         {
             const auto cellDataRaw = ui->gridWidget->cellData(dayOfWeek, hour);
             const auto cellData = cellDataRaw.isValid()

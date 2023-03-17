@@ -358,7 +358,7 @@ QnScheduleTaskList calculateRecordingSchedule(const Camera& camera)
         if (camera->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
             maxFps = QnSecurityCamResource::kDefaultMaxFps;
 
-        schedule = defaultSchedule(maxFps);
+        schedule = nx::vms::common::defaultSchedule(maxFps);
     }
     else if (camera->isOnline()) //< Fix FPS if we perfectly sure it is calculated correctly.
     {
@@ -1393,7 +1393,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     if (state.recording.brush.streamQuality == nx::vms::api::StreamQuality::undefined)
     {
-        const auto schedule = defaultSchedule(state.recording.brush.fps);
+        const auto schedule = nx::vms::common::defaultSchedule(state.recording.brush.fps);
         state.recording.brush.streamQuality = schedule[0].streamQuality;
     }
 

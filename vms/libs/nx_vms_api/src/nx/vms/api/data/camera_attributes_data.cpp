@@ -18,7 +18,7 @@ DeprecatedFieldNames* CameraAttributesData::getDeprecatedFieldNames()
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    ScheduleTaskData, (ubjson)(xml)(json)(sql_record)(csv_record), ScheduleTaskData_Fields)
+    CameraScheduleTaskData, (ubjson)(xml)(json)(sql_record)(csv_record), CameraScheduleTaskData_Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraAttributesData,
     (ubjson)(xml)(sql_record)(csv_record), CameraAttributesData_Fields)

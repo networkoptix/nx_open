@@ -2,13 +2,13 @@
 
 #include "footer_widget.h"
 
-#include "ui_footer_widget.h"
-
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
 #include <ui/common/palette.h>
-#include <ui/dialogs/week_time_schedule_dialog.h>
 #include <utils/common/event_processors.h>
+
+#include "ui_footer_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -52,12 +52,12 @@ FooterWidget::FooterWidget(QWidget* parent):
             if (!rule)
                 return;
 
-            QnWeekTimeScheduleDialog dialog(this);
-            dialog.setScheduleTasks(rule->schedule());
+            WeekTimeScheduleDialog dialog(this);
+            dialog.setSchedule(rule->schedule());
             if (!dialog.exec())
                 return;
 
-            rule->setSchedule(dialog.scheduleTasks().toUtf8());
+            rule->setSchedule(dialog.schedule());
         });
 }
 

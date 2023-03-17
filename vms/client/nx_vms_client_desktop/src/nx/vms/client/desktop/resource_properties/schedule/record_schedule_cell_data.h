@@ -11,16 +11,16 @@ struct NX_VMS_CLIENT_DESKTOP_API RecordScheduleCellData
 {
     static constexpr auto kAutoBitrateValue = 0.0;
 
-    // Must be in sync with nx::vms::api::ScheduleTaskData default value.
+    // Must be in sync with nx::vms::api::CameraScheduleTaskData default value.
     int fps = 0;
 
-    // Must be in sync with nx::vms::api::ScheduleTaskData default value.
+    // Must be in sync with nx::vms::api::CameraScheduleTaskData default value.
     nx::vms::api::StreamQuality streamQuality = nx::vms::api::StreamQuality::undefined;
 
-    // Must be in sync with nx::vms::api::ScheduleTaskData default value.
+    // Must be in sync with nx::vms::api::CameraScheduleTaskData default value.
     nx::vms::api::RecordingType recordingType = nx::vms::api::RecordingType::always;
 
-    // Must be in sync with nx::vms::api::ScheduleTaskData default value.
+    // Must be in sync with nx::vms::api::CameraScheduleTaskData default value.
     nx::vms::api::RecordingMetadataTypes metadataTypes{};
 
     double bitrateMbitPerSec = kAutoBitrateValue; //< TODO: Replace with 'int bitrateKbitPerSec'.

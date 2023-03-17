@@ -10,7 +10,7 @@
 
 namespace nx::vms::api::dewarping {
 
-void PrintTo(const ScheduleTaskData& val, ::std::ostream* os)
+void PrintTo(const CameraScheduleTaskData& val, ::std::ostream* os)
 {
     *os << QJson::serialized(val).toStdString();
 }
@@ -38,7 +38,7 @@ TEST(Json, structSerialization)
     const std::string kSerializedStruct =
         R"({"bitrateKbps":0,"dayOfWeek":1,"endTime":0,"fps":0,"metadataTypes":"none","recordingType":"always","startTime":0,"streamQuality":"undefined"})";
 
-    const ScheduleTaskData data;
+    const CameraScheduleTaskData data;
     ASSERT_EQ(kSerializedStruct, QJson::serialized(data).toStdString());
 }
 
@@ -56,8 +56,8 @@ TEST(Json, structDeserializationLexical)
         "streamQuality": "undefined"
     })";
 
-    const ScheduleTaskData data;
-    ASSERT_EQ(data, QJson::deserialized<ScheduleTaskData>(kSerializedStruct));
+    const CameraScheduleTaskData data;
+    ASSERT_EQ(data, QJson::deserialized<CameraScheduleTaskData>(kSerializedStruct));
 }
 
 TEST(Json, structDeserializationDefaults)
@@ -65,9 +65,9 @@ TEST(Json, structDeserializationDefaults)
     const auto kSerializedStructEmpty = R"({})";
     const auto kSerializedStructQualityEmpty = R"({"streamQuality":""})";
 
-    const ScheduleTaskData data;
-    ASSERT_EQ(data, QJson::deserialized<ScheduleTaskData>(kSerializedStructEmpty));
-    ASSERT_EQ(data, QJson::deserialized<ScheduleTaskData>(kSerializedStructQualityEmpty));
+    const CameraScheduleTaskData data;
+    ASSERT_EQ(data, QJson::deserialized<CameraScheduleTaskData>(kSerializedStructEmpty));
+    ASSERT_EQ(data, QJson::deserialized<CameraScheduleTaskData>(kSerializedStructQualityEmpty));
 }
 
 TEST(Json, structDeserializationNumeric)
@@ -75,12 +75,12 @@ TEST(Json, structDeserializationNumeric)
     const auto kSerializedStructWithStrings = R"({"recordingType":"3","streamQuality":"5"})";
     const auto kSerializedStructWithNumbers = R"({"recordingType":3,"streamQuality":5})";
 
-    ScheduleTaskData data;
+    CameraScheduleTaskData data;
     data.recordingType = RecordingType::metadataAndLowQuality;
     data.streamQuality = StreamQuality::preset;
 
-    ASSERT_EQ(data, QJson::deserialized<ScheduleTaskData>(kSerializedStructWithStrings));
-    ASSERT_EQ(data, QJson::deserialized<ScheduleTaskData>(kSerializedStructWithNumbers));
+    ASSERT_EQ(data, QJson::deserialized<CameraScheduleTaskData>(kSerializedStructWithStrings));
+    ASSERT_EQ(data, QJson::deserialized<CameraScheduleTaskData>(kSerializedStructWithNumbers));
 }
 
 TEST(Json, dewarpingEnumsLexicalSerialization)

@@ -4,9 +4,6 @@
 
 #include "field.h"
 
-#include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/uuid.h>
-
 namespace nx::vms::api::rules {
 
 struct NX_VMS_API EventFilter
@@ -15,15 +12,15 @@ struct NX_VMS_API EventFilter
 
 public:
     QnUuid id;
-    QString eventType;
-    // TODO: #spanasenko EventState.
-    QList<Field> fields;
+    QString type;
+
+    std::map<QString, Field> fields;
     // TODO: #spanasenko Custom Field blocks.
 };
 
 #define nx_vms_api_rules_EventFilter_Fields \
-    (id)(eventType)(fields)
+    (id)(type)(fields)
 
-QN_FUSION_DECLARE_FUNCTIONS(EventFilter, (json)(ubjson)(xml), NX_VMS_API)
+NX_VMS_API_DECLARE_STRUCT_EX(EventFilter, (json)(ubjson)(xml))
 
 } // namespace nx::vms::api::rules

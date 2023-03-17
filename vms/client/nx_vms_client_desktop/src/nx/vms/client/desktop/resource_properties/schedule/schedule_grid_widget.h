@@ -28,20 +28,6 @@ class ScheduleGridWidget: public QWidget
     using base_type = QWidget;
 
 public:
-    static constexpr int kDaysInWeek = 7;
-    static constexpr int kHoursInDay = 24;
-
-    /**
-     * @return Array with all Qt::DayOfWeek enumeration values to be able iterate over them without
-     *     type casting. No other purposes implied.
-     */
-    static constexpr inline std::array<Qt::DayOfWeek, kDaysInWeek> daysOfWeek()
-    {
-        return {Qt::Monday, Qt::Tuesday, Qt::Wednesday, Qt::Thursday, Qt::Friday,
-            Qt::Saturday, Qt::Sunday};
-    }
-
-public:
     explicit ScheduleGridWidget(QWidget* parent = nullptr);
     virtual ~ScheduleGridWidget() override;
 

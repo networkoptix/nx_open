@@ -129,7 +129,7 @@ NX_REFLECTION_INSTRUMENT(DeviceOptions, DeviceOptions_Fields);
 struct DeviceScheduleSettings
 {
     bool isEnabled = false;
-    std::vector<ScheduleTaskData> tasks;
+    std::vector<CameraScheduleTaskData> tasks;
 
     /**%apidoc Minimum number of days to keep the archive for.
      * %deprecated This fields is deprecated and used for backward compatibility only. Use
