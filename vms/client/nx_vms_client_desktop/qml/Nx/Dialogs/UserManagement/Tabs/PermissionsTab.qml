@@ -130,7 +130,7 @@ Item
         readonly property real scrollBarWidth: scrollBarVisible ? scrollBar.width : 0
 
         anchors.fill: parent
-        anchors.topMargin: accessRightsHeader.height
+        anchors.topMargin: accessRightsHeader.height - 4
         anchors.rightMargin: 8 - scrollBarWidth
         anchors.leftMargin: 16
 
