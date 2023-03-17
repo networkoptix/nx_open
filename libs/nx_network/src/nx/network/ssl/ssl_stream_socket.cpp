@@ -27,7 +27,7 @@ const std::function<
                 return true;
             }
 
-            NX_VERBOSE(socket,
+            NX_WARNING(socket,
                 "Default certificate verification for server `%1` is failed: %2",
                 serverName, message);
             return false;
