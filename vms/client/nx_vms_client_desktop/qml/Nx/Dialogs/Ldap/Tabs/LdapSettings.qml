@@ -287,7 +287,8 @@ Rectangle
 
                         Spinner
                         {
-                            running: control.checkingStatus
+                            running: (control.syncIsRunning || control.syncRequested)
+                                && control.continuousSync
                         }
                     }
 
@@ -320,7 +321,7 @@ Rectangle
 
                         Spinner
                         {
-                            running: control.checkingStatus
+                            running: control.syncIsRunning || control.syncRequested
                         }
                     }
 
@@ -359,7 +360,7 @@ Rectangle
 
                         Spinner
                         {
-                            running: control.syncRequested
+                            running: control.syncIsRunning || control.syncRequested
                         }
 
                         ImageButton
