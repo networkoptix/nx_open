@@ -40,9 +40,10 @@ void LayoutResource::setPredefinedCellSpacing(Qn::CellSpacing spacing)
     setCellSpacing(cellSpacingValue(spacing));
 }
 
-void LayoutResource::cloneItems(LayoutResourcePtr target, ItemsRemapHash* remapHash) const
+common::LayoutItemDataList LayoutResource::cloneItems(
+    common::LayoutItemDataList items,
+    ItemsRemapHash* remapHash)
 {
-    common::LayoutItemDataList items = m_items->getItems().values();
     ItemsRemapHash newUuidByOldUuid;
     for (int i = 0; i < items.size(); i++)
     {
@@ -54,8 +55,12 @@ void LayoutResource::cloneItems(LayoutResourcePtr target, ItemsRemapHash* remapH
         items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QnUuid());
     if (remapHash)
         *remapHash = newUuidByOldUuid;
+    return items;
+}
 
-    target->setItems(items);
+void LayoutResource::cloneItems(LayoutResourcePtr target, ItemsRemapHash* remapHash) const
+{
+    target->setItems(cloneItems(m_items->getItems().values(), remapHash));
 }
 
 void LayoutResource::cloneTo(LayoutResourcePtr target, ItemsRemapHash* remapHash) const
