@@ -309,8 +309,9 @@ void PdhMonitor::readDiskCounterValues()
     {
         const auto handle = getDriveHandle(driveName);
 
-        // We do not really use this variable, but it cannot be NULL - see the documentation for
-        // the DeviceIoControl() function for details.
+        // We do not really use the value of this variable, but we have to pass a non-null
+        // lpBytesReturned parameter to DeviceIoControl(); see the function documentation for the
+        // details.
         DWORD bytesReturned = 0;
 
         STORAGE_DEVICE_NUMBER sdn;

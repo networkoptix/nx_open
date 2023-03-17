@@ -73,7 +73,7 @@ qreal LinuxMonitor::totalCpuUsage()
     int64_t cpuTimeTotal = 0;
     int64_t cpuTimeIdle = d->prevCPUTimeIdle;
     char line[MAX_LINE_LENGTH];
-    for( int i = 0; fgets(line, MAX_LINE_LENGTH, file.get()) != nullptr; ++i )
+    while (fgets(line, MAX_LINE_LENGTH, file.get()) != nullptr)
     {
         QByteArray lineStr( line );
         const QList<QByteArray>& tokens = lineStr.split( ' ' );
@@ -124,7 +124,7 @@ quint64 LinuxMonitor::totalRamUsageBytes()
     std::optional<uint64_t> memTotalKB;
     std::optional<uint64_t> memFreeKB;
     std::optional<uint64_t> memCachedKB;
-    for (int i = 0; fgets(line, MAX_LINE_LENGTH, file.get()) != nullptr; ++i)
+    while (fgets(line, MAX_LINE_LENGTH, file.get()))
     {
         const size_t length = strlen(line);
 
