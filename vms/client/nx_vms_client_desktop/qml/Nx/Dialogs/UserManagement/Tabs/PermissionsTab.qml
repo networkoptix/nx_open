@@ -16,6 +16,8 @@ Item
 {
     id: control
 
+    property bool enabled: true
+
     required property AccessSubjectEditingContext editingContext
 
     readonly property int columnCount: availableAccessRightDescriptors.length
@@ -23,7 +25,7 @@ Item
 
     property var buttonBox
 
-    property alias editingEnabled: editingEnabledSwitch.checked
+    readonly property bool editingEnabled: editingEnabledSwitch.checked && control.enabled
 
     readonly property var kAllNodes: [
         ResourceTree.NodeType.videoWalls,
@@ -236,6 +238,8 @@ Item
             anchors.left: parent.left
             anchors.leftMargin: 16
             anchors.verticalCenter: parent.verticalCenter
+
+            enabled: control.enabled
 
             text: editingEnabledSwitch.checked ? qsTr("Editing enabled") : qsTr("Editing disabled")
         }

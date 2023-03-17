@@ -43,7 +43,7 @@ Item
 
     property var groups: []
 
-    property bool editable: false
+    property bool editable: true
     property int userType: UserSettingsGlobal.LocalUser
 
     property var self
@@ -114,7 +114,7 @@ Item
                 {
                     id: userLoginText
 
-                    enabled: control.loginEditable
+                    enabled: control.loginEditable && control.editable
 
                     anchors.left: userTypeIcon.right
                     anchors.leftMargin: 24
@@ -130,7 +130,7 @@ Item
                 {
                     id: enabledUserSwitch
 
-                    enabled: control.userEnabledEditable
+                    enabled: control.userEnabledEditable && control.editable
 
                     anchors.top: userLoginText.bottom
                     anchors.topMargin: 14
@@ -208,6 +208,7 @@ Item
                             id: userFullNameTextField
                             width: parent.width
                             enabled: control.fullNameEditable
+                                && control.editable
                                 && control.userType != UserSettingsGlobal.CloudUser
                         }
                     }
@@ -280,7 +281,7 @@ Item
                         {
                             id: userEmailTextField
                             width: parent.width
-                            enabled: control.emailEditable
+                            enabled: control.emailEditable && control.editable
                             validateFunc: (text) =>
                             {
                                 return control.self && enabled
@@ -297,6 +298,7 @@ Item
 
                         visible: control.passwordEditable
                             && control.userType == UserSettingsGlobal.LocalUser
+                            && control.editable
 
                         Item
                         {
@@ -374,7 +376,7 @@ Item
                         {
                             id: allowInsecureCheckBox
                             text: qsTr("Allow insecure (digest) authentication")
-                            enabled: allowInsecureEditable
+                            enabled: control.allowInsecureEditable && control.editable
 
                             nextCheckState: () =>
                             {

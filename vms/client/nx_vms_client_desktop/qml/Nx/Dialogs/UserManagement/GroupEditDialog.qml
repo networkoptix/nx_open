@@ -42,6 +42,7 @@ DialogWithState
     property alias users: membersModel.users
     property alias globalPermissions: globalPermissionsModel.globalPermissions
     property alias sharedResources: membersModel.sharedResources
+    property bool editable: true
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
@@ -90,12 +91,12 @@ DialogWithState
 
                 self: dialog.self
 
-                nameEditable: !dialog.isLdap && !dialog.isPredefined
+                nameEditable: !dialog.isLdap && !dialog.isPredefined && dialog.editable
                 isLdap: dialog.isLdap
                 groups: dialog.parentGroups
                 userCount: membersModel.users.length
                 groupCount: membersModel.groups.length
-                deleteAvailable: !dialog.isLdap && !dialog.isPredefined
+                deleteAvailable: !dialog.isLdap && !dialog.isPredefined && dialog.editable
                 editingContext: membersModel.editingContext
                 globalPermissions: dialog.globalPermissions
                 sharedResources: dialog.sharedResources
@@ -120,6 +121,7 @@ DialogWithState
                 anchors.fill: parent
 
                 model: membersModel
+                enabled: dialog.editable
 
                 onAddGroupClicked: dialog.groupClicked(null)
             }
@@ -136,6 +138,8 @@ DialogWithState
             {
                 id: permissionSettings
                 anchors.fill: parent
+
+                enabled: !dialog.isPredefined && dialog.editable
 
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext
@@ -154,7 +158,7 @@ DialogWithState
                 id: globalPermissionSettings
                 anchors.fill: parent
 
-                editable: !dialog.isPredefined
+                editable: !dialog.isPredefined && dialog.editable
 
                 model: GlobalPermissionsModel
                 {
@@ -177,7 +181,7 @@ DialogWithState
                 anchors.fill: parent
 
                 model: membersModel
-                enabled: !dialog.isLdap
+                enabled: !dialog.isLdap && dialog.editable
             }
         }
     }

@@ -586,6 +586,33 @@ bool MembersModel::isAllowedParent(const QnUuid& groupId) const
     return !m_subjectContext->subjectHierarchy()->recursiveParents({groupId}).contains(m_subjectId);
 }
 
+bool MembersModel::isEditable(
+    const nx::core::access::SubjectHierarchy* hierarchy,
+    const QnUuid& currentUserId,
+    const QnUuid& id)
+{
+    // Owner (Administrators in 5.2+) can edit everyone.
+    const bool selfIsOwner = hierarchy->isRecursiveMember(
+        currentUserId, {QnPredefinedUserRoles::id(Qn::UserRole::owner)});
+
+    if (selfIsOwner)
+        return true;
+
+    // Administrator (PowerUsers in 5.2+) can edit non-owners and non-admins.
+    const bool selfIsAdmin = hierarchy->isRecursiveMember(
+        currentUserId, {QnPredefinedUserRoles::id(Qn::UserRole::administrator)});
+
+    static const QSet<QnUuid> ownerOrAdmin = {
+        QnPredefinedUserRoles::id(Qn::UserRole::owner),
+        QnPredefinedUserRoles::id(Qn::UserRole::administrator),
+    };
+
+    const bool idIsOwnerOrAdmin = ownerOrAdmin.contains(id)
+        || hierarchy->isRecursiveMember(id, ownerOrAdmin);
+
+    return selfIsAdmin && !idIsOwnerOrAdmin;
+}
+
 bool MembersModel::isRemovable(const QnUuid& id) const
 {
     // TODO: Special types of users/groups should not be editable/removable at all.
@@ -597,28 +624,7 @@ bool MembersModel::isRemovable(const QnUuid& id) const
     if (!user)
         return false;
 
-    const auto hierarchy = m_subjectContext->subjectHierarchy();
-
-    // Owner (Administrators in 5.2+) can edit everyone.
-    const bool selfIsOwner = hierarchy->isRecursiveMember(
-        user->getId(), {QnPredefinedUserRoles::id(Qn::UserRole::owner)});
-
-    if (selfIsOwner)
-        return true;
-
-    // Administrator (PowerUsers in 5.2+) can edit non-owners and non-admins.
-    const bool selfIsAdmin = hierarchy->isRecursiveMember(
-        user->getId(), {QnPredefinedUserRoles::id(Qn::UserRole::administrator)});
-
-    static const QSet<QnUuid> ownerOrAdmin = {
-        QnPredefinedUserRoles::id(Qn::UserRole::owner),
-        QnPredefinedUserRoles::id(Qn::UserRole::administrator),
-    };
-
-    const bool idIsOwnerOrAdmin = ownerOrAdmin.contains(id)
-        || hierarchy->isRecursiveMember(id, ownerOrAdmin);
-
-    return selfIsAdmin && !idIsOwnerOrAdmin;
+    return isEditable(m_subjectContext->subjectHierarchy(), user->getId(), id);
 }
 
 QVariant MembersModel::data(const QModelIndex& index, int role) const

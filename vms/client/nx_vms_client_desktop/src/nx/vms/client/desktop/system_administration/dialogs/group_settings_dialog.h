@@ -21,6 +21,7 @@ struct GroupSettingsDialogState
     // Subject ID should go first for correct AccessSubjectEditingContext initialization.
     Q_PROPERTY(QnUuid groupId MEMBER groupId)
 
+    Q_PROPERTY(bool editable MEMBER editable)
     Q_PROPERTY(QString name MEMBER name)
     Q_PROPERTY(QString description MEMBER description)
     Q_PROPERTY(bool isLdap MEMBER isLdap)
@@ -38,6 +39,7 @@ public:
 
     QnUuid groupId;
 
+    bool editable = true;
     QString name;
     QString description;
 
