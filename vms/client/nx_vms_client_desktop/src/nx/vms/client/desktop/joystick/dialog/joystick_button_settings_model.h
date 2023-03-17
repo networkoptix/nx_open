@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QtCore/QAbstractItemModel>
+#include <QtCore/QAbstractTableModel>
 
 #include <nx/utils/impl_ptr.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -17,7 +17,7 @@ namespace joystick {
 
 struct JoystickDescriptor;
 
-class JoystickButtonSettingsModel: public QAbstractItemModel, public QnWorkbenchContextAware
+class JoystickButtonSettingsModel: public QAbstractTableModel, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -32,7 +32,7 @@ class JoystickButtonSettingsModel: public QAbstractItemModel, public QnWorkbench
         WRITE setZoomSensitivity
         NOTIFY zoomSensitivityChanged)
 
-    using base_type = QAbstractItemModel;
+    using base_type = QAbstractTableModel;
 
 public:
     enum Roles
