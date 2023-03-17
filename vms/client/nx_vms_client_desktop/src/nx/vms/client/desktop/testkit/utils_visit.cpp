@@ -18,14 +18,18 @@ void visitModel(
     QModelIndex parent,
     std::function<bool(QModelIndex)> onVisited)
 {
-    if (!model || !model->hasChildren(parent))
+    if (!model || parent.flags().testFlag(Qt::ItemNeverHasChildren) || !model->hasChildren(parent))
         return;
 
     for (int r = 0; r < model->rowCount(parent); ++r)
     {
         for (int c = 0; c < model->columnCount(parent); ++c)
         {
-            QModelIndex index = model->index(r, c, parent);
+            const QModelIndex index = model->index(r, c, parent);
+
+            if (!index.isValid())
+                continue;
+
             if (onVisited(index))
                 visitModel(model, index, onVisited);
         }

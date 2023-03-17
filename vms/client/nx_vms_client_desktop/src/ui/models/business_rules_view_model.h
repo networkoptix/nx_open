@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QtCore/QAbstractItemModel>
+#include <QtCore/QAbstractTableModel>
 #include <QtCore/QList>
 #include <QtCore/QModelIndex>
 #include <QtCore/QVariant>
@@ -12,10 +12,10 @@
 #include <ui/models/business_rule_view_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnBusinessRulesViewModel : public QAbstractItemModel, public QnWorkbenchContextAware
+class QnBusinessRulesViewModel : public QAbstractTableModel, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef QAbstractItemModel base_type;
+    using base_type = QAbstractTableModel;
 
 public:
     using Field = QnBusinessRuleViewModel::Field;
