@@ -18,7 +18,7 @@ namespace event {
  * Additional information associated with the Event.
  * <br/><br/>
  * ATTENTION: This field is an enquoted JSON string containing a JSON object. Example:
- * <code>"{\\"field1\\": \\"value1\\", \\"field2\\": \\"value2\\",]"</code>
+ * <code>"{\\"field1\\": \\"value1\\", \\"field2\\": \\"value2\\"}"</code>
  * <br/><br/>
  * Currently supported fields (others can be added in the future):
  * <ul>
