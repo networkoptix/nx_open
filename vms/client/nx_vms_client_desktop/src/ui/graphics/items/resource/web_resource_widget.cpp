@@ -2,8 +2,8 @@
 
 #include "web_resource_widget.h"
 
-#include <QtWidgets/QLabel>
 #include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 
 #include <core/resource/webpage_resource.h>
@@ -28,6 +28,7 @@
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
+#include <utils/common/delayed.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -58,11 +59,12 @@ QnWebResourceWidget::QnWebResourceWidget(
             bool result = verifyCertificate(pemString, url);
             if (!result)
             {
-                // Stay on current page, if it was loaded, close widget otherwise.
+                // Stay on current page, if it was loaded, close widget asynchronously otherwise
+                // to avoid destroying while in the QML handler.
                 if (m_pageLoaded)
                     m_webEngineView->controller()->stop();
                 else
-                    close();
+                    executeLater([this](){ close(); }, this);
             }
             return result;
         });
