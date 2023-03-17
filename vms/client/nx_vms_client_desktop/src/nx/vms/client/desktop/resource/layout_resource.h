@@ -28,6 +28,14 @@ public:
     void setPredefinedCellSpacing(Qn::CellSpacing spacing);
 
     /**
+     * Clone provided items list. Ids will be re-generated, zoom links correspondingly fixed.
+     * @param items Source layout items.
+     * @param remapHash If passed, filled with map of new items ids by old items ids.
+     */
+    static QnLayoutItemDataList cloneItems(
+        QnLayoutItemDataList items, ItemsRemapHash* remapHash = nullptr);
+
+    /**
      * Clone items of the current layout to the target layout. Ids of the layout items will be
      *     re-generated, zoom links correspondingly fixed.
      * @param target Target layout. Existing items will be removed (if any).

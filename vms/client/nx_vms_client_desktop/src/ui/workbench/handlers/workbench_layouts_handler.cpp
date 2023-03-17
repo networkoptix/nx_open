@@ -1267,6 +1267,14 @@ void LayoutsHandler::at_openInNewTabAction_triggered()
         ? qobject_cast<QnMediaResourceWidget*>(parameters.widgets().first())
         : navigator()->currentMediaWidget();
 
+    QnLayoutItemDataList items;
+    if (calledFromScene)
+    {
+        for (const auto& widget: parameters.widgets())
+            items.push_back(widget->item()->data());
+        items = LayoutResource::cloneItems(items);
+    }
+
     const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
 
     // Update state depending on how the action was called.
@@ -1342,11 +1350,19 @@ void LayoutsHandler::at_openInNewTabAction_triggered()
             tr("New Layout %1")));
     }
 
-    // Remove layouts from the list of resources (if there were any).
-    parameters.setResources(openable);
-    parameters.setArgument(Qn::LayoutSyncStateRole, currentState);
-    openLayouts({layout}, currentState);
-    menu()->trigger(action::DropResourcesAction, parameters);
+    if (calledFromScene)
+    {
+        layout->setItems(items);
+        openLayouts({layout}, currentState);
+    }
+    else
+    {
+        openLayouts({layout}, currentState);
+        // Remove layouts from the list of resources (if there were any).
+        parameters.setResources(openable);
+        parameters.setArgument(Qn::LayoutSyncStateRole, currentState);
+        menu()->trigger(action::DropResourcesAction, parameters);
+    }
 }
 
 void LayoutsHandler::at_openIntercomLayoutAction_triggered()
