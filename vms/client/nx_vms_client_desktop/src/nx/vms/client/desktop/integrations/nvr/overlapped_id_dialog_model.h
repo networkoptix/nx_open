@@ -4,15 +4,15 @@
 
 #include <vector>
 
-#include <QtCore/QAbstractItemModel>
+#include <QtCore/QAbstractTableModel>
 
 namespace nx::vms::client::desktop::integrations {
 
-class OverlappedIdDialogModel: public QAbstractItemModel
+class OverlappedIdDialogModel: public QAbstractTableModel
 {
     Q_OBJECT
 
-    using base_type = QAbstractItemModel;
+    using base_type = QAbstractTableModel;
 
 public:
     enum Roles
