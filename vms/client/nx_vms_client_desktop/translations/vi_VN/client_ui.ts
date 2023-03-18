@@ -667,11 +667,11 @@
     </message>
     <message>
       <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
+      <translation>Nhập từ thiết bị</translation>
     </message>
     <message>
       <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
+      <translation>Nhập video tự động</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -679,7 +679,7 @@
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation type="unfinished">Web Page Port</translation>
+      <translation>Cổng trang web</translation>
     </message>
   </context>
   <context>
@@ -2002,11 +2002,11 @@
     </message>
     <message>
       <source>Get Update File</source>
-      <translation type="unfinished">Get Update File</translation>
+      <translation>Nhận tệp cập nhật</translation>
     </message>
     <message>
       <source>Check Again</source>
-      <translation type="unfinished">Check Again</translation>
+      <translation>Kiểm tra lại</translation>
     </message>
     <message>
       <source>Try Again</source>

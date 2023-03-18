@@ -131,7 +131,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation>Bất kỳ plugin nào</translation>
+      <translation>Tất cả Plugin</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -148,7 +148,7 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>Phân tích camera sẽ chỉ hoạt động khi camera đang được xem. Cho phép ghi âm để làm cho nó hoạt động tất cả các thời gian.</translation>
+      <translation>Phân tích trên camera sẽ chỉ hoạt động khi camera đang được mở xem. Kích hoạt ghi âm để làm cho nó hoạt động mọi lúc.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -171,14 +171,14 @@
     <name>AnalyticsToolTipPreview</name>
     <message>
       <source>NO DATA</source>
-      <translation>Không có sẵn</translation>
+      <translation>KHÔNG CÓ DỮ LIỆU</translation>
     </message>
   </context>
   <context>
     <name>BooleanRadioGroup</name>
     <message>
       <source>Yes</source>
-      <translation>Có</translation>
+      <translation>Đồng ý</translation>
     </message>
     <message>
       <source>No</source>
@@ -196,15 +196,15 @@
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
-      <translation>Bất kỳ thiết bị</translation>
+      <translation>Tất cả thiết bị</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation>Bất kỳ camera</translation>
+      <translation>Tất cả camera</translation>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation>Các thiết trên bố cục</translation>
+      <translation>Thiết bị trên bố cục</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
@@ -476,11 +476,11 @@
     </message>
     <message>
       <source>Y Offset</source>
-      <translation>Y Offset</translation>
+      <translation>Độ lệch Y</translation>
     </message>
     <message>
       <source>Ellipticity</source>
-      <translation>Xem kiểu elip</translation>
+      <translation>Ellipticity</translation>
     </message>
   </context>
   <context>
@@ -517,7 +517,7 @@
     </message>
     <message>
       <source>Camera stream</source>
-      <translation>Luồng máy ảnh</translation>
+      <translation>Luồng camera</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
@@ -525,11 +525,11 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation>Làm tươi</translation>
+      <translation>Làm mới</translation>
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation>Làm mới...</translation>
+      <translation>Đang làm mới...</translation>
     </message>
   </context>
   <context>
@@ -544,11 +544,11 @@
     </message>
     <message>
       <source>Pause</source>
-      <translation>Giờ nghĩ giảo lao</translation>
+      <translation>Tạm ngừng</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation>Broadcast</translation>
+      <translation>Phát</translation>
     </message>
     <message>
       <source>Next Object</source>
@@ -571,7 +571,7 @@
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation>Các thao tác cơ bản</translation>
+      <translation>Hành động cơ bản</translation>
     </message>
     <message>
       <source>With Modifier</source>
@@ -616,11 +616,11 @@
     <name>LeftPanel</name>
     <message>
       <source>Local Files</source>
-      <translation>Tập tin có sẵn</translation>
+      <translation>Tệp cục bộ</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Máy ảnh</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -628,11 +628,11 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Bookmarks</translation>
+      <translation>Dấu trang</translation>
     </message>
     <message>
       <source>Events</source>
@@ -640,7 +640,7 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation>Các đối tượng</translation>
+      <translation>Đối tượng</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -648,7 +648,7 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation>Chọn một máy ảnh để xem các sự kiện chuyển động</translation>
+      <translation>Chọn một camera để xem các sự kiện chuyển động</translation>
     </message>
     <message>
       <source>No motion detected</source>
@@ -664,7 +664,7 @@
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation>Không có bookmark nào</translation>
+      <translation>Không có dấu trang</translation>
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
@@ -675,7 +675,7 @@
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation>Vẽ đường kẻ không hợp lệ. Xóa phần sai để tiếp tục.</translation>
+      <translation>Vẽ đường kẻ không hợp lệ. Xóa phần tự giao nhau để tiếp tục.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
@@ -713,11 +713,11 @@
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation>Trình bày</translation>
+      <translation>Có</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation>Vắng mặt</translation>
+      <translation>Không</translation>
     </message>
   </context>
   <context>
@@ -1106,7 +1106,7 @@ to activate PTZ</source>
     <name>StatusOverlay</name>
     <message>
       <source>Diagnostics</source>
-      <translation>Chuẩn đoán</translation>
+      <translation>Phân tích</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -1114,7 +1114,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Bắt đầu Authorization</translation>
+      <translation>Kích hoạt giấy phép</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -1122,7 +1122,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>I/O Module Cài đặt</translation>
+      <translation>Cài đặt mô-đun I/O</translation>
     </message>
     <message>
       <source>Device Settings</source>
@@ -1130,7 +1130,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation>Đặt cho Máy ảnh này</translation>
+      <translation>Đặt cho camera này</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
@@ -1144,7 +1144,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation>Chưa được xác thực</translation>
+      <translation>Không được phép</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -1160,15 +1160,15 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation>Máy chủ không có sẵn</translation>
+      <translation>Máy chủ không khả dụng</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation>Không truy cập</translation>
+      <translation>Không có quyền truy cập</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation>Thiết bị bị vô hiệu hóa</translation>
+      <translation>Đã tắt thiết bị</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1180,7 +1180,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Password required</source>
-      <translation>Mật khẩu bắt buộc</translation>
+      <translation>Yêu cầu mật khẩu</translation>
     </message>
     <message>
       <source>No live stream</source>
@@ -1188,7 +1188,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation>Không Hỗ Trợ Firmware Cho Phiên Bản Này</translation>
+      <translation>Phiên bản firmware không được hỗ trợ</translation>
     </message>
     <message>
       <source>Access denied</source>
@@ -1206,7 +1206,7 @@ to activate PTZ</source>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
-      <translation>Không tìm thấy kết quả nào</translation>
+      <translation>Không tìm thấy kết quả</translation>
     </message>
     <message>
       <source>No Favorite Systems</source>
@@ -1218,11 +1218,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>You can add system to the favorites from the context menu</source>
-      <translation>Bạn có thể thêm hệ thống vào danh sách yêu thích từ trình đơn ngữ cảnh</translation>
+      <translation>Bạn có thể thêm hệ thống vào danh sách yêu thích từ menu</translation>
     </message>
     <message>
       <source>You can hide systems from the main list from the context menu</source>
-      <translation>Bạn có thể ẩn các hệ thống khỏi danh sách chính từ trình đơn ngữ cảnh</translation>
+      <translation>Bạn có thể ẩn các hệ thống khỏi danh sách chính từ menu</translation>
     </message>
   </context>
   <context>
@@ -1237,11 +1237,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Show</source>
-      <translation>Buổi diễn</translation>
+      <translation>Hiện</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
@@ -1280,7 +1280,7 @@ to activate PTZ</source>
     <message numerus="yes">
       <source>... and %n more</source>
       <translation>
-        <numerusform>... và %n nhiều hơn nữa</numerusform>
+        <numerusform>... và %n hơn nữa</numerusform>
       </translation>
     </message>
   </context>
