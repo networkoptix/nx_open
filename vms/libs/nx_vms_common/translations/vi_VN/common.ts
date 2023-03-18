@@ -170,7 +170,7 @@
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation>Kiểm tra Máy chủ đó có đang chạy hay không.</translation>
+      <translation>Kiểm tra Máy chủ có đang hoạt động.</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
@@ -294,15 +294,15 @@
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation>Nếu nó không giúp đỡ, khôi phục các giá trị mặc định của nhà sản xuất trên trang web của thiết bị.</translation>
+      <translation>Nếu không được, hãy khôi phục cài đặt gốc trên trang web của thiết bị.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation>Nếu nó không giúp đỡ, khôi phục các giá trị mặc định của camera trên trang web.</translation>
+      <translation>Nếu không được, hãy khôi phục cài đặt gốc trên trang web của camera.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation>Nếu cách này không hiệu quả, hãy khôi phục cài đặt gốc trên trang web mô-đun I/O.</translation>
+      <translation>Nếu không được, hãy khôi phục cài đặt gốc trên trang web mô-đun I/O.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
@@ -310,7 +310,7 @@
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation>Không thể mở phương tiện truyền thông URL %1. Kết nối đến cổng %2 đã tình cờ bị đóng.</translation>
+      <translation>Không thể mở phương tiện truyền thông URL %1. Kết nối đến cổng %2 đã bị đóng đột ngột.</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
@@ -326,15 +326,15 @@
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation>Không hỗ trợ phương tiện truyền thông theo dõi tại URL %1.</translation>
+      <translation>Không có trình theo dõi đa phương tiện nào được hỗ trợ tại URL %1.</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation>Không được phép. URL %1.</translation>
+      <translation>Không được ủy quyền. URL %1.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation>Không thể mở media URL %1. Phương tiện truyền thông không hỗ trợ giao thức %2.</translation>
+      <translation>Không thể mở phương tiện URL %1. Giao thức phương tiện không được hỗ trợ %2.</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
@@ -738,7 +738,7 @@
     </message>
     <message>
       <source>camera</source>
-      <translation>máy chụp hình</translation>
+      <translation>camera</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -825,7 +825,7 @@
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation>Hình mờ: %1</translation>
+      <translation>Hình nền mờ: %1</translation>
     </message>
     <message>
       <source>Hardware ID: %1</source>
@@ -1092,7 +1092,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation>Chuyển mã video là cần thiết.</translation>
+      <translation>Yêu cầu chuyển mã video.</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
@@ -1276,11 +1276,11 @@
     </message>
     <message>
       <source>Input on %1</source>
-      <translation>%1 vào</translation>
+      <translation>Nhập vào %1</translation>
     </message>
     <message>
       <source>Motion on %1</source>
-      <translation>%1 phát hiện chuyển động</translation>
+      <translation>Chuyển động trên %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>

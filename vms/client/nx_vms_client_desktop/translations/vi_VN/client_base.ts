@@ -242,7 +242,7 @@
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Giảm thiểu</translation>
+      <translation>Thu nhỏ</translation>
     </message>
     <message>
       <source>Maximize</source>
@@ -1171,7 +1171,7 @@
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation>Tệp đa phương tiện %1 có thể thực thi</translation>
+      <translation>Tệp đa phương tiện có thể thực thi %1</translation>
     </message>
   </context>
   <context>
@@ -1239,7 +1239,7 @@
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation>Dữ liệu không hợp lệ nhận được.</translation>
+      <translation>Đã nhận được dữ liệu không hợp lệ.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1365,7 +1365,7 @@
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation>Nếu vấn đề vẫn còn, vui lòng liên hệ %1.</translation>
+      <translation>Nếu sự cố vẫn tiếp diễn, vui lòng liên hệ %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
@@ -1435,7 +1435,7 @@
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
-        <numerusform>Mật khẩu phải chứa %n các kết hợp khác nhau của một trong hai ký tự, ký hiệu, hoặc chữ số</numerusform>
+        <numerusform>Mật khẩu phải chứa %n các kết hợp khác nhau với ký tự, ký hiệu, hoặc chữ số</numerusform>
       </translation>
     </message>
     <message>
@@ -1597,7 +1597,7 @@
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation>Thay đổi chế độ dewarping</translation>
+      <translation>Thay đổi chế độ Làm phẳng</translation>
     </message>
   </context>
   <context>
@@ -3892,7 +3892,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation>Thu phóng diện tích</translation>
+      <translation>Thu phóng khu vực</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -4402,7 +4402,7 @@ to %1</source>
     </message>
     <message>
       <source>All types</source>
-      <translation>Các loại</translation>
+      <translation>Tất cả các loại</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -4418,7 +4418,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation>Video Walls</translation>
+      <translation>Tường video</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -5033,7 +5033,7 @@ to %1</source>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
+      <translation>NGOẠI TUYẾN</translation>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
@@ -5361,7 +5361,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Security</source>
-      <translation>An ninh</translation>
+      <translation>Bảo mật</translation>
     </message>
   </context>
   <context>
@@ -5537,7 +5537,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation>Nếu Failover được bật, máy chủ vẫn có thể yêu cầu cập nhật trạng thái camera bất kể cài đặt này.</translation>
+      <translation>Nếu Chuyển đổi dự phòng được bật, máy chủ vẫn có thể yêu cầu cập nhật trạng thái camera.</translation>
     </message>
   </context>
   <context>
@@ -6714,32 +6714,32 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Short cho thấp nhất Ls</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Short cho Low L</translation>
+      <translation>Lo</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Short cho vừa M</translation>
+      <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Short cho cao H</translation>
+      <translation>Hi</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Short cho tốt nhất Hs</translation>
+      <translation>Bst</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Short cho đặt trước</translation>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>
@@ -6750,7 +6750,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation>Phiên bản HĐH này không còn được hỗ trợ</translation>
+      <translation>Phiên bản hệ điều hành này không còn được hỗ trợ</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
@@ -6826,7 +6826,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Any time</source>
-      <translation>Bất cứ lúc nào</translation>
+      <translation>Mọi lúc</translation>
     </message>
     <message>
       <source>none</source>
@@ -6843,11 +6843,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Any device</source>
-      <translation>Bất kỳ thiết bị</translation>
+      <translation>Mọi thiết bị</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation>Bất kỳ camera</translation>
+      <translation>Tất cả camera</translation>
     </message>
     <message>
       <source>Selected device</source>
@@ -7272,11 +7272,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>Giúp sửa các vấn đề về chất lượng hình ảnh trên một số camera; cho những người khác sẽ làm tăng đáng kể tốc độ bitrate.</translation>
+      <translation>Giúp khắc phục các vấn đề về chất lượng hình ảnh trên camera; sẽ làm tăng tốc độ bit đáng kể.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation>Số tuỳ chỉnh mà có thể được gán cho một máy ảnh để nhanh chóng xác định và truy cập</translation>
+      <translation>Số tuỳ chỉnh mà có thể được gán cho một camera để nhanh chóng xác định và truy cập</translation>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
@@ -7333,11 +7333,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation>Quy định thiết bị</translation>
+      <translation>Quy tắc thiết bị</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation>Nội quy Camera</translation>
+      <translation>Quy tắc camera</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
@@ -7357,7 +7357,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message numerus="yes">
       <source>Use License</source>
       <translation>
-        <numerusform>Giấy phép sử dụng</numerusform>
+        <numerusform>Sử dụng giấy phép</numerusform>
       </translation>
     </message>
   </context>
@@ -7428,15 +7428,15 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên các thiết bị khác.</translation>
+      <translation>Giá trị tối thiểu cao có thể dẫn đến giảm thời lượng lưu trữ trên các thiết bị khác.</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên camera.</translation>
+      <translation>Giá trị tối thiểu cao có thể dẫn đến giảm thời lượng lưu trữ trên các camera khác.</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>Thời gian ghi trước dài sẽ tăng mức sử dụng RAM trên máy chủ</translation>
+      <translation>Thời gian ghi trước cao sẽ tăng mức sử dụng RAM trên máy chủ</translation>
     </message>
   </context>
   <context>
@@ -7498,7 +7498,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Expert</source>
-      <translation>Xuất khẩu</translation>
+      <translation>Chế độ Expert</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
@@ -10504,7 +10504,7 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Giảm thiểu</translation>
+      <translation>Thu nhỏ</translation>
     </message>
     <message>
       <source>Cannot write file</source>

@@ -205,12 +205,12 @@
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Bạn có thể bật xác thực hai yếu tố trong %1 của mình.</translation>
+      <translation>Bạn có thể bật xác thực hai yếu tố tại %1.</translation>
     </message>
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Để đăng nhập vào Hệ thống này, hãy tắt “Yêu cầu mã xác minh trên mỗi lần đăng nhập bằng tài khoản %1” trong %2 của bạn.</translation>
+      <translation>Để đăng nhập vào Hệ thống này, hãy tắt “Yêu cầu mã xác minh trên mỗi lần đăng nhập bằng tài khoản %1” trong %2.</translation>
     </message>
   </context>
 </TS>
