@@ -84,15 +84,12 @@ bool Context::setDefaultCertificate(const std::string& pemStr)
     return setDefaultCertificate(pem);
 }
 
-bool Context::setDefaultCertificate(const Pem& pem)
+bool Context::setDefaultCertificate(const Pem& pem, std::string* errorMessage)
 {
     auto newDefaultContext = createServerContext();
 
-    if (!pem.bindToContext(newDefaultContext.get()))
-    {
-        NX_WARNING(this, "Failed to set new default certificate %1", pem);
+    if (!pem.bindToContext(newDefaultContext.get(), errorMessage))
         return false;
-    }
 
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
@@ -151,10 +148,7 @@ bool Context::configureVirtualHosts(const std::string& certDataPem)
     }
 
     if (!x509.bindToContext(sslContext.get()))
-    {
-        NX_DEBUG(this, "Unable to assign X.509 certificate to SSL context");
         return false;
-    }
 
     if (!pKeyLoad(sslContext.get(), certDataPem))
         return false;
@@ -343,10 +337,7 @@ bool Context::x509load(
     }
 
     if (!x509.bindToContext(sslContext))
-    {
-        NX_DEBUG(this, "Unable to assign X.509 certificate to SSL context");
         return false;
-    }
 
     NX_INFO(this, "X.509 is loaded: %1", x509.toString());
 

@@ -57,7 +57,7 @@ public:
      */
     bool setDefaultCertificate(const std::string& pem);
 
-    bool setDefaultCertificate(const Pem& pem);
+    bool setDefaultCertificate(const Pem& pem, std::string* errorMessage = nullptr);
 
     /**
      * Set certificate to be used for connections with a SNI server name satisfying hostnameRegex.

@@ -170,7 +170,8 @@ public:
      */
     bool parsePem(
         const std::string& buf,
-        std::optional<int> maxChainLength = std::nullopt);
+        std::optional<int> maxChainLength = std::nullopt,
+        std::string* errorMessage = nullptr);
 
     /**
      * Validates the certificate against the current local time.
@@ -185,7 +186,7 @@ public:
 
     bool isSignedBy(const X509Name& issuer) const;
 
-    bool bindToContext(SSL_CTX* sslContext) const;
+    bool bindToContext(SSL_CTX* sslContext, std::string* errorMessage = nullptr) const;
 
     std::string toString() const;
     std::string idForToStringFromPtr() const;
@@ -216,9 +217,9 @@ class NX_NETWORK_API Pem
 public:
     Pem();
 
-    bool parse(const std::string& str);
+    bool parse(const std::string& str, std::string* errorMessage = nullptr);
 
-    bool bindToContext(SSL_CTX* sslContext) const;
+    bool bindToContext(SSL_CTX* sslContext, std::string* errorMessage = nullptr) const;
 
     std::string toString() const;
 
@@ -228,7 +229,7 @@ public:
     const PKeyPtr& privateKey() const { return m_pkey; }
 
 private:
-    bool loadPrivateKey(const std::string& pem);
+    bool loadPrivateKey(const std::string& pem, std::string* errorMessage = nullptr);
 
 private:
     X509Certificate m_certificate;

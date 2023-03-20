@@ -4,6 +4,7 @@
 
 #ifdef ENABLE_SSL
 
+#include <openssl/err.h>
 #include <openssl/x509v3.h>
 
 #include <QtCore/QDir>
@@ -53,6 +54,20 @@ X509_STORE* caStore()
     return s_caStore.get();
 }
 
+
+std::string lastError()
+{
+    char message[1024];
+    std::string result;
+    while (int error = ERR_get_error())
+    {
+        ERR_error_string_n(error, message, sizeof(message));
+        if (!result.empty())
+            result += "; ";
+        result += message;
+    }
+    return result;
+}
 
 } // namespace
 
@@ -369,8 +384,7 @@ X509Certificate::X509Certificate(X509* x509):
 }
 
 bool X509Certificate::parsePem(
-    const std::string& pem,
-    std::optional<int> maxChainLength)
+    const std::string& pem, std::optional<int> maxChainLength, std::string* errorMessage)
 {
     auto bio = utils::wrapUnique(
         BIO_new_mem_buf(const_cast<void*>((const void*)pem.data()), pem.size()),
@@ -380,7 +394,9 @@ bool X509Certificate::parsePem(
     auto certSize = i2d_X509(x509.get(), 0);
     if (!x509 || certSize <= 0)
     {
-        NX_DEBUG(this, "Unable to read certificate");
+        if (errorMessage)
+            nx::utils::buildString(errorMessage, lastError(), " on read of certificate ", pem);
+        NX_DEBUG(this, "%1 on read of certificate %2", lastError(), pem);
         return false;
     }
 
@@ -459,16 +475,29 @@ bool X509Certificate::isSignedBy(const X509Name& alleged) const
     return alleged == X509_get_issuer_name(m_x509.get());
 }
 
-bool X509Certificate::bindToContext(SSL_CTX* sslContext) const
+bool X509Certificate::bindToContext(SSL_CTX* sslContext, std::string* errorMessage) const
 {
     if (!SSL_CTX_use_certificate(sslContext, m_x509.get()))
+    {
+        if (errorMessage)
+        {
+            nx::utils::buildString(errorMessage,
+                lastError(), " on binding to SSL context of certificate ", toString());
+        }
+        NX_DEBUG(this, "%1 on binding to SSL context of certificate %2", lastError(), *this);
         return false;
+    }
 
     for (auto& x509: m_extraChainCerts)
     {
         if (!SSL_CTX_add_extra_chain_cert(sslContext, x509.get()))
         {
-            NX_DEBUG(this, "Unable to load chained X.509: %1");
+            if (errorMessage)
+            {
+                nx::utils::buildString(errorMessage,
+                    lastError(), " on loading of chained X.509: ", toString(x509.get()));
+            }
+            NX_DEBUG(this, "%1 on loading of chained X.509: %2", lastError(), toString(x509.get()));
             return false;
         }
 
@@ -558,23 +587,25 @@ Pem::Pem():
 {
 }
 
-bool Pem::parse(const std::string& str)
+bool Pem::parse(const std::string& str, std::string* errorMessage)
 {
-    return m_certificate.parsePem(str) && loadPrivateKey(str);
+    return m_certificate.parsePem(str, /*maxChainLength*/ std::nullopt, errorMessage)
+        && loadPrivateKey(str, errorMessage);
 }
 
-bool Pem::bindToContext(SSL_CTX* sslContext) const
+bool Pem::bindToContext(SSL_CTX* sslContext, std::string* errorMessage) const
 {
-    if (!m_certificate.bindToContext(sslContext))
-    {
-        NX_DEBUG(this, "Certificate %1. Unable to bind to SSL context",
-            m_certificate.toString());
+    if (!m_certificate.bindToContext(sslContext, errorMessage))
         return false;
-    }
 
     if (!SSL_CTX_use_PrivateKey(sslContext, m_pkey.get()))
     {
-        NX_DEBUG(this, "Certificate %1. Unable to use PKEY", m_certificate.toString());
+        if (errorMessage)
+        {
+            nx::utils::buildString(errorMessage,
+                lastError(), " on using of private key of certificate ", m_certificate.toString());
+        }
+        NX_DEBUG(this, "%1 on using of private key of certificate %2", lastError(), m_certificate);
         return false;
     }
 
@@ -596,7 +627,7 @@ const X509Certificate& Pem::certificate() const
     return m_certificate;
 }
 
-bool Pem::loadPrivateKey(const std::string& pem)
+bool Pem::loadPrivateKey(const std::string& pem, std::string* errorMessage)
 {
     auto bio = utils::wrapUnique(
         BIO_new_mem_buf(const_cast<void*>((const void*)pem.data()), pem.size()),
@@ -605,7 +636,12 @@ bool Pem::loadPrivateKey(const std::string& pem)
     m_pkey.reset(PEM_read_bio_PrivateKey(bio.get(), 0, 0, 0));
     if (!m_pkey)
     {
-        NX_DEBUG(this, "Unable to read PKEY");
+        if (errorMessage)
+        {
+            nx::utils::buildString(
+                errorMessage, lastError(), " on reading private key from pem ", pem);
+        }
+        NX_DEBUG(this, "%1 on reading private key from pem %2", lastError(), pem);
         return false;
     }
 
