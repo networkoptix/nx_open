@@ -1,8 +1,10 @@
 #pragma once
 
-#if !defined(_WIN32)
-#   include <arpa/inet.h>
-#endif
+#if defined(_WIN32)
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h>
+#endif // _WIN32
 
 #include <chrono>
 

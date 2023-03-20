@@ -308,7 +308,11 @@ void PdhMonitor::readDiskCounterValues()
     for (const auto& driveName: getDriveNames())
     {
         const auto handle = getDriveHandle(driveName);
-        DWORD bytesReturned = -1;
+
+        // We do not really use this variable, but it cannot be NULL - see the documentation for
+        // the DeviceIoControl() function for details.
+        DWORD bytesReturned = 0;
+
         STORAGE_DEVICE_NUMBER sdn;
         const auto driveType = GetDriveType(reinterpret_cast<LPCWSTR>(driveName.constData()));
         if (*handle != INVALID_HANDLE_VALUE
@@ -360,9 +364,11 @@ void PdhMonitor::readDiskCounterValues()
     }
 }
 
-qreal PdhMonitor::diskCounterValue(const PDH_RAW_COUNTER& last, const PDH_RAW_COUNTER& current)
+qreal PdhMonitor::diskCounterValue(
+    const PDH_RAW_COUNTER& last_counter_value,
+    const PDH_RAW_COUNTER& current)
 {
-    if (last.FirstValue == current.FirstValue)
+    if (last_counter_value.FirstValue == current.FirstValue)
         return 0.0;
 
     PDH_FMT_COUNTERVALUE result;
@@ -370,7 +376,7 @@ qreal PdhMonitor::diskCounterValue(const PDH_RAW_COUNTER& last, const PDH_RAW_CO
         m_diskTimeCounter,
         PDH_FMT_DOUBLE /*| PDH_FMT_NOCAP100*/,  //TODO #akolesnikov disk usage can be greater then 100% somehow. Maybe, disk can do some I/O concurrently
         const_cast<PDH_RAW_COUNTER*>(&current),
-        const_cast<PDH_RAW_COUNTER*>(&last),
+        const_cast<PDH_RAW_COUNTER*>(&last_counter_value),
         &result);
     if (status != PDH_CSTATUS_NEW_DATA && status != ERROR_SUCCESS)
     {
