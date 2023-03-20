@@ -57,7 +57,7 @@ public:
      */
     bool setDefaultCertificate(const std::string& pem);
 
-    bool setDefaultCertificate(Pem pem);
+    bool setDefaultCertificate(Pem pem, std::string* errorMessage = nullptr);
 
     Pem getDefaultCertificate() const;
 
