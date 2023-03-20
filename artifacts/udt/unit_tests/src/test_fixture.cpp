@@ -143,7 +143,7 @@ void BasicFixture::givenListeningServerSocket()
     if (m_ipVersion == AF_INET)
     {
         localAddress.setFamily(m_ipVersion);
-        localAddress.v4().sin_addr.s_addr = inet_addr("127.0.0.1");
+        inet_pton(AF_INET, "127.0.0.1", &(localAddress.v4().sin_addr.s_addr));
     }
     else
     {
@@ -183,7 +183,7 @@ void BasicFixture::thenServerReceives(const std::string& expected)
 {
     std::string received;
     received.resize(expected.size());
-    int bytesRead = UDT::recv(m_acceptedConnection, received.data(), received.size(), 0);
+    int bytesRead = UDT::recv(m_acceptedConnection, received.data(), (int) received.size(), 0);
     ASSERT_GT(bytesRead, 0);
     received.resize(bytesRead);
 

@@ -307,7 +307,8 @@ bool deserialize(QnJsonContext* ctx, const QByteArray& value, T* outTarget)
 
     QJsonValue jsonValue;
 
-    if (HasDirectObjectKeySerializer<T>::value && ctx->isMapKeyDeserializationMode())
+    bool hasDirectSerializer = HasDirectObjectKeySerializer<T>::value;
+    if (hasDirectSerializer && ctx->isMapKeyDeserializationMode())
     {
         jsonValue = QString::fromUtf8(value);
     }

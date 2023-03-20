@@ -202,9 +202,9 @@ std::tuple<T, bool> deserialize(
     if (!tokenizedSuccess)
         return {T(), false};
     T data;
-    for (const auto& str: strValues)
+    for (const auto& value: strValues)
     {
-        const auto& [element, success] = tryDeserialize<typename T::value_type>(str);
+        const auto& [element, success] = tryDeserialize<typename T::value_type>(value);
         if (!success)
             return {T(), false};
         std::inserter(data, data.end()) = std::move(element);
@@ -293,8 +293,8 @@ inline UrlencodedDeserializer<Data>::UrlencodedDeserializer(
     const std::string_view& request, Data& data):
     m_data(data)
 {
-    const auto& [requestTokenized, success] = tokenizeRequest(request, '&');
-    if (!success)
+    const auto& [requestTokenized, tokenizeSuccess] = tokenizeRequest(request, '&');
+    if (!tokenizeSuccess)
     {
         m_deserializationFailed = true;
         return;
@@ -313,8 +313,8 @@ inline UrlencodedDeserializer<Data>::UrlencodedDeserializer(
             continue;
         }
 
-        const auto& [fieldName, success] = decode(token.substr(0, pos));
-        if (!success)
+        const auto& [fieldName, decodeSuccess] = decode(token.substr(0, pos));
+        if (!decodeSuccess)
         {
             m_deserializationFailed = true;
             return;
