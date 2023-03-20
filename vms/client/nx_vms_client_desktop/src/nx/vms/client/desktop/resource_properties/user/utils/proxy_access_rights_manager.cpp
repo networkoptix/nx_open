@@ -93,6 +93,9 @@ void ProxyAccessRightsManager::setOwnResourceAccessMap(const ResourceAccessMap& 
     if (!NX_ASSERT(!d->currentSubjectId.isNull()))
         return;
 
+    if (value == ownResourceAccessMap(d->currentSubjectId))
+        return;
+
     d->accessMapOverride = value;
     emit ownAccessRightsChanged({d->currentSubjectId});
 }
