@@ -41,6 +41,9 @@ public:
     /** Returns direct and indirect parents of specified subjects. */
     QSet<QnUuid> recursiveParents(const QSet<QnUuid>& subjects) const;
 
+    /** Returns direct and indirect members of specified subjects. */
+    QSet<QnUuid> recursiveMembers(const QSet<QnUuid>& subjects) const;
+
     /** Checks whether the specified subject is a direct member of the specified group. */
     bool isDirectMember(const QnUuid& subject, const QnUuid& group) const;
 

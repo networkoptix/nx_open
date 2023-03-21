@@ -6,7 +6,7 @@
 
 #include <QtGui/QValidator>
 
-#include <core/resource_access/resource_access_subjects_cache.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/models/column_remap_proxy_model.h>
@@ -45,7 +45,7 @@ public:
     QSet<QnUuid> checkedUsers() const;
 
     QValidator::State validateRole(const QnUuid& roleId) const;
-    QValidator::State validateUsers(const std::unordered_set<QnResourceAccessSubject>& subjects) const;
+    QValidator::State validateUsers(std::vector<QnResourceAccessSubject> subjects) const;
 
     bool allUsers() const;
     void setAllUsers(bool value);

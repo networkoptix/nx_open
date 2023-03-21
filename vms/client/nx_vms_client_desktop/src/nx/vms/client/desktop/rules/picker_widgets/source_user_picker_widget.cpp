@@ -30,7 +30,6 @@ void SourceUserPicker::onDescriptorSet()
         == parentParamsWidget()->descriptor().id)
     {
         m_validationPolicy = std::make_unique<QnRequiredPermissionSubjectPolicy>(
-            systemContext(),
             Qn::SoftTriggerPermission,
             tr("Soft trigger"));
     }

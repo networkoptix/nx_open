@@ -11,7 +11,6 @@
 #include "system_context_aware.h" //< Forward declarations.
 
 class QnLicensePool;
-class QnResourceAccessSubjectsCache;
 class QnResourceDataPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
@@ -230,9 +229,8 @@ public:
     QnGlobalPermissionsManager* globalPermissionsManager() const;
 
     /**
-     * Cache of Users by Roles.
+     * Manages relations between Users and Groups.
      */
-    QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
     nx::core::access::ResourceAccessSubjectHierarchy* accessSubjectHierarchy() const;
 
     /**

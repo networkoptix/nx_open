@@ -16,11 +16,12 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/branding.h>
 #include <nx/network/app_info.h>
+#include <nx/utils/qset.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -355,18 +356,9 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
         return false;
     }
 
-    for (const auto& roleId: roles)
-    {
-        const auto isValidSubject =
-            [isValid = &isValidUser](const QnResourceAccessSubject& subject)
-            {
-                return isValid(subject.user());
-            };
-
-        const auto usersInRole = context->resourceAccessSubjectsCache()->allUsersInRole(roleId);
-        if (!std::all_of(usersInRole.cbegin(), usersInRole.cend(), isValidSubject))
-            return false;
-    }
+    const auto groupUsers = context->accessSubjectHierarchy()->usersInGroups(nx::utils::toQSet(roles));
+    if (!std::all_of(groupUsers.cbegin(), groupUsers.cend(), isValidUser))
+        return false;
 
     return countEnabledUsers(users) != 0 || !roles.empty() || !additionalRecipients.empty();
 }
@@ -417,18 +409,16 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     int total = users.size();
 
     for (const auto& roleId: roles)
-    {
         receivers << module->userRolesManager()->userRoleName(roleId);
-        for (const auto& subject: module->resourceAccessSubjectsCache()->allUsersInRole(roleId))
-        {
-            const auto& user = subject.user();
-            if (!user || !user->isEnabled())
-                continue;
 
-            ++total;
-            if (!isValidUser(user))
-                invalidUsers << user;
-        }
+    for (const auto& user: module->accessSubjectHierarchy()->usersInGroups(nx::utils::toQSet(roles)))
+    {
+        if (!user || !user->isEnabled())
+            continue;
+
+        ++total;
+        if (!isValidUser(user))
+            invalidUsers << user;
     }
 
     int invalid = invalidUsers.size();
@@ -673,7 +663,6 @@ bool QnDefaultSubjectValidationPolicy::userValidity(const QnUserResourcePtr& /*u
 // QnRequiredPermissionSubjectPolicy
 
 QnRequiredPermissionSubjectPolicy::QnRequiredPermissionSubjectPolicy(
-    nx::vms::common::SystemContext* systemContext,
     Qn::Permission requiredPermission,
     const QString& permissionName,
     bool allowEmptySelection)
@@ -839,13 +828,9 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const QnUuid& rol
                 return QValidator::Acceptable;
             }
 
-            auto usersInRole = resourceAccessSubjectsCache()->allUsersInRole(roleId);
-            if (std::any_of(usersInRole.begin(), usersInRole.end(),
-                [this](const auto& subject)
-                {
-                    const auto& user = resourcePool()->getResourceById<QnUserResource>(subject.id());
-                    return user->isEnabled() && userValidity(user);
-                }))
+            const auto groupUsers = accessSubjectHierarchy()->usersInGroups({roleId});
+            if (std::any_of(groupUsers.cbegin(), groupUsers.cend(),
+                [this](const auto& user) { return user->isEnabled() && userValidity(user); }))
             {
                 return QValidator::Intermediate;
             }
@@ -880,16 +865,12 @@ void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout
 
 QValidator::State QnCloudUsersValidationPolicy::roleValidity(const QnUuid& roleId) const
 {
-    const auto& users = resourceAccessSubjectsCache()->allUsersInRole(roleId);
+    const auto& users = accessSubjectHierarchy()->usersInGroups({roleId});
     bool hasCloud = false;
     bool hasNonCloud = false;
 
-    for (const auto& subject: users)
+    for (const auto& user: users)
     {
-        if (!subject.isUser())
-            continue;
-        const auto& user = subject.user();
-
         if (!user->isEnabled())
             continue;
 
@@ -916,22 +897,15 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
             QnUuidList roles;
             userRolesManager()->usersAndRoles(subjects, users, roles);
 
-            for (const auto& roleId: roles)
+            for (const auto& user: accessSubjectHierarchy()->usersInGroups(nx::utils::toQSet(roles)))
             {
-                const auto& inRole = resourceAccessSubjectsCache()->allUsersInRole(roleId);
-                for (const auto& subject: inRole)
-                {
-                    if (!subject.isUser())
-                        continue;
-
-                    if (std::find_if(users.begin(), users.end(),
-                        [subject](const QnUserResourcePtr& existing)
-                        {
-                            return subject.user()->getId() == existing->getId();
-                        }) == users.end())
+                if (std::find_if(users.begin(), users.end(),
+                    [user](const QnUserResourcePtr& existing)
                     {
-                        users << subject.user();
-                    }
+                        return user->getId() == existing->getId();
+                    }) == users.end())
+                {
+                    users << user;
                 }
             }
 
@@ -972,20 +946,13 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
 //-------------------------------------------------------------------------------------------------
 // QnUserWithEmailValidationPolicy
 
-QnUserWithEmailValidationPolicy::QnUserWithEmailValidationPolicy(
-    nx::vms::client::desktop::SystemContext* systemContext)
-    :
-    m_resourceAccessSubjectsCache(systemContext->resourceAccessSubjectsCache())
-{
-}
-
 QValidator::State QnUserWithEmailValidationPolicy::roleValidity(const QnUuid& roleId) const
 {
     bool hasValid{false};
     bool hasInvalid{false};
-    for (const auto& subject: systemContext()->resourceAccessSubjectsCache()->allUsersInRole(roleId))
+    for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups({roleId}))
     {
-        if (userValidity(subject.user()))
+        if (userValidity(user))
         {
             hasValid = true;
         }

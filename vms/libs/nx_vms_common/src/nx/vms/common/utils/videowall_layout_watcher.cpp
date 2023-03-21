@@ -44,7 +44,7 @@ public:
     mutable nx::Mutex mutex;
 
 public:
-    class InstanceRegistry
+    class InstanceRegistry: public QObject
     {
     public:
         std::shared_ptr<VideowallLayoutWatcher> instance(QnResourcePool* resourcePool);
@@ -250,8 +250,15 @@ std::shared_ptr<VideowallLayoutWatcher>
     auto result = m_instances.value(resourcePool).lock();
     if (!result)
     {
+        connect(resourcePool, &QObject::destroyed, this,
+            [this]()
+            {
+                NX_MUTEX_LOCKER lk(&m_mutex);
+                m_instances.remove(static_cast<QnResourcePool*>(sender()));
+            });
+
         result.reset(new VideowallLayoutWatcher(resourcePool));
-        m_instances[resourcePool] = result;
+        m_instances.emplace(resourcePool, result);
     }
 
     return result;

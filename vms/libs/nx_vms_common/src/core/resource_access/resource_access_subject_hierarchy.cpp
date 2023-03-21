@@ -113,4 +113,12 @@ QnResourceAccessSubject ResourceAccessSubjectHierarchy::subjectById(const QnUuid
     return {d->userGroupsManager->userRole(id)};
 }
 
+QnUserResourceList ResourceAccessSubjectHierarchy::usersInGroups(const QSet<QnUuid>& groupIds) const
+{
+    if (!NX_ASSERT(d->resourcePool))
+        return {};
+
+    return d->resourcePool->getResourcesByIds<QnUserResource>(recursiveMembers(groupIds));
+}
+
 } // namespace nx::core::access

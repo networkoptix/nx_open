@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+#include <vector>
 
 #include <QtCore/QScopedPointer>
 #include <QtGui/QValidator>
@@ -14,6 +15,7 @@
 
 class QnUserRolesModel;
 class QnUuid;
+class QnResourceAccessSubject;
 
 namespace Ui {
 class SubjectSelectionDialog;
@@ -88,6 +90,7 @@ signals:
 private:
     void showAllUsersChanged(bool value);
     void validateAllUsers();
+    std::vector<QnResourceAccessSubject> allSubjects() const;
 
 private:
     QScopedPointer<Ui::SubjectSelectionDialog> ui;

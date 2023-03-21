@@ -10,9 +10,10 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/utils/qset.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -228,21 +229,13 @@ std::pair<QnUserResourceList, QList<QnUuid>> OpenLayoutActionWidget::getSelected
     {
         const auto params = model()->actionParams();
         if (params.allUsers)
-            return {users, roles};
+            return {{}, {}};
 
         userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
-
-        for (const auto& roleId: roles)
-        {
-            for (const auto& subject:
-                systemContext()->resourceAccessSubjectsCache()->allUsersInRole(roleId))
-            {
-                users.append(subject.user());
-            }
-        }
-
+        users.append(systemContext()->accessSubjectHierarchy()->usersInGroups(nx::utils::toQSet(roles)));
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
     }
+
     return std::pair(users, roles);
 }
 

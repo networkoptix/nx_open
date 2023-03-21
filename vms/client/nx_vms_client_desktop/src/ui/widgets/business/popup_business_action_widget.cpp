@@ -127,7 +127,6 @@ void QnPopupBusinessActionWidget::updateValidationPolicy()
     if (forceAcknowledgement)
     {
         auto validationPolicy = new QnRequiredPermissionSubjectPolicy(
-            systemContext(),
             Qn::ManageBookmarksPermission,
             tr("Manage Bookmarks"));
         validationPolicy->setCameras(

@@ -13,7 +13,6 @@
 #include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -57,7 +56,6 @@ struct SystemContext::Private
     std::unique_ptr<GlobalPermissionsWatcher> globalPermissionsWatcher;
     std::unique_ptr<AccessRightsManager> accessRightsManager;
     std::unique_ptr<QnGlobalPermissionsManager> globalPermissionsManager;
-    std::unique_ptr<QnResourceAccessSubjectsCache> resourceAccessSubjectCache;
     std::unique_ptr<QnResourceAccessManager> resourceAccessManager;
     std::unique_ptr<ShowreelManager> showreelManager;
     std::unique_ptr<nx::vms::event::RuleManager> eventRuleManager;
@@ -111,9 +109,6 @@ SystemContext::SystemContext(
     // Depends on resource pool and roles.
     d->globalPermissionsManager =
         std::make_unique<QnGlobalPermissionsManager>(resourceAccessMode, this);
-
-    // Depends on resource pool, roles and global permissions.
-    d->resourceAccessSubjectCache = std::make_unique<QnResourceAccessSubjectsCache>(this);
 
     // Depends on access provider.
     d->resourceAccessManager = std::make_unique<QnResourceAccessManager>(this);
@@ -289,11 +284,6 @@ QnResourceAccessManager* SystemContext::resourceAccessManager() const
 QnGlobalPermissionsManager* SystemContext::globalPermissionsManager() const
 {
     return d->globalPermissionsManager.get();
-}
-
-QnResourceAccessSubjectsCache* SystemContext::resourceAccessSubjectsCache() const
-{
-    return d->resourceAccessSubjectCache.get();
 }
 
 ResourceAccessSubjectHierarchy* SystemContext::accessSubjectHierarchy() const

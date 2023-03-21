@@ -58,7 +58,6 @@ public:
     QnRuntimeInfoManager* runtimeInfoManager() const;
     QnResourcePool* resourcePool() const;
     QnResourceAccessManager* resourceAccessManager() const;
-    QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
     QnGlobalPermissionsManager* globalPermissionsManager() const;
     QnUserRolesManager* userRolesManager() const;
     QnCameraHistoryPool* cameraHistoryPool() const;

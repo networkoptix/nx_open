@@ -14,7 +14,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/network/http/http_types.h>
@@ -1221,7 +1220,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 {
                     static const QnDefaultSubjectValidationPolicy defaultPolicy;
                     QnRequiredPermissionSubjectPolicy acknowledgePolicy(
-                        systemContext(), Qn::ManageBookmarksPermission, QString());
+                        Qn::ManageBookmarksPermission, QString());
                     acknowledgePolicy.setCameras(
                         resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                             filterEventResources(m_eventResources, m_eventType)));

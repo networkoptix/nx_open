@@ -6,6 +6,8 @@
 #include <QtGui/QStandardItemModel>
 
 #include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_subject.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/branding.h>
 #include <nx/network/app_info.h>
@@ -318,8 +320,7 @@ void SubjectSelectionDialog::setValidationPolicy(QnSubjectValidationPolicy* poli
 
 void SubjectSelectionDialog::validateAllUsers()
 {
-    const auto validationState = m_roles->validateUsers(
-        systemContext()->resourceAccessSubjectsCache()->allSubjects());
+    const auto validationState = m_roles->validateUsers(std::move(allSubjects()));
 
     QIcon icon = (validationState == QValidator::Acceptable
         ? qnSkin->icon(lit("tree/users.svg"))
@@ -329,6 +330,18 @@ void SubjectSelectionDialog::validateAllUsers()
 
     ui->allUsersCheckableLine->setData(QVariant::fromValue(validationState),
         Qn::ValidationStateRole);
+}
+
+std::vector<QnResourceAccessSubject> SubjectSelectionDialog::allSubjects() const
+{
+    const auto users = resourcePool()->getResources<QnUserResource>();
+    const auto groups = userRolesManager()->userRoles();
+
+    std::vector<QnResourceAccessSubject> result;
+    result.reserve(users.size() + groups.size());
+    result.insert(result.end(), users.begin(), users.end());
+    result.insert(result.end(), groups.begin(), groups.end());
+    return result;
 }
 
 void SubjectSelectionDialog::setCheckedSubjects(const QSet<QnUuid>& ids)
@@ -364,7 +377,7 @@ QSet<QnUuid> SubjectSelectionDialog::totalCheckedUsers() const
         return m_users->checkedUsers().unite(m_roles->checkedUsers());
 
     QSet<QnUuid> allUserIds;
-    for (const auto& subject: systemContext()->resourceAccessSubjectsCache()->allSubjects())
+    for (const auto& subject: allSubjects())
     {
         if (const auto& user = subject.user())
             allUserIds.insert(user->getId());

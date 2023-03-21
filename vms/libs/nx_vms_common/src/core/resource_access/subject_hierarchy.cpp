@@ -19,10 +19,12 @@ struct SubjectHierarchy::Private
     bool exists(const QnUuid& subject) const { return directParents.contains(subject); }
 
     QSet<QnUuid> recursiveParents(const QSet<QnUuid>& subjects) const;
+    QSet<QnUuid> recursiveMembers(const QSet<QnUuid>& subjects) const;
     bool isRecursiveMember(const QnUuid& subject, const QSet<QnUuid>& groups) const;
 
 private:
     void calculateRecursiveParents(const QnUuid& group, QSet<QnUuid>& result) const;
+    void calculateRecursiveMembers(const QnUuid& group, QSet<QnUuid>& result) const;
 
     bool isRecursiveMember(
         const QnUuid& subject, const QSet<QnUuid>& groups, QSet<QnUuid>& alreadyVisited) const;
@@ -57,7 +59,7 @@ QSet<QnUuid> SubjectHierarchy::recursiveParents(const QSet<QnUuid>& subjects) co
     return d->recursiveParents(subjects);
 }
 
-QSet<QnUuid> SubjectHierarchy::Private::recursiveParents(const QSet<QnUuid>&subjects) const
+QSet<QnUuid> SubjectHierarchy::Private::recursiveParents(const QSet<QnUuid>& subjects) const
 {
     QSet<QnUuid> result;
     for (const auto subject: subjects)
@@ -76,6 +78,34 @@ void SubjectHierarchy::Private::calculateRecursiveParents(
 
         result.insert(parent);
         calculateRecursiveParents(parent, result);
+    }
+}
+
+QSet<QnUuid> SubjectHierarchy::recursiveMembers(const QSet<QnUuid>& subjects) const
+{
+    NX_MUTEX_LOCKER lk(&d->mutex);
+    return d->recursiveMembers(subjects);
+}
+
+QSet<QnUuid> SubjectHierarchy::Private::recursiveMembers(const QSet<QnUuid>& subjects) const
+{
+    QSet<QnUuid> result;
+    for (const auto subject: subjects)
+        calculateRecursiveMembers(subject, result);
+
+    return result;
+}
+
+void SubjectHierarchy::Private::calculateRecursiveMembers(
+    const QnUuid& group, QSet<QnUuid>& result) const
+{
+    for (const auto member: directMembers.value(group))
+    {
+        if (result.contains(member))
+            continue;
+
+        result.insert(member);
+        calculateRecursiveMembers(member, result);
     }
 }
 
