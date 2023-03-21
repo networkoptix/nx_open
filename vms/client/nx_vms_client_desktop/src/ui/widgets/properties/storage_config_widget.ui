@@ -197,7 +197,7 @@
    <item>
     <widget class="nx::vms::client::desktop::AlertBar" name="analyticsOnDisabledStorageWarningLabel" native="true">
      <property name="text" stdset="0">
-      <string>Analytics data will continue to be stored on the disabled storage.</string>
+      <string>Analytics and motion data will continue to be stored on the disabled storage.</string>
      </property>
     </widget>
    </item>
