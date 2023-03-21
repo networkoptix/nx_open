@@ -6,7 +6,7 @@
 
 #include <nx/vms/common/system_health/message_type.h>
 
-class QnSystemHealthStringsHelper: public QObject
+class NX_VMS_CLIENT_DESKTOP_API QnSystemHealthStringsHelper: public QObject
 {
     Q_OBJECT
 public:

@@ -12,7 +12,8 @@ bool isMessageVisible(MessageType message)
             return false;
 
         default:
-            return true;
+            return nx::reflect::enumeration::isValidEnumValue(message);
+;
     }
 }
 
@@ -26,10 +27,14 @@ bool isMessageVisibleInSettings(MessageType message)
     {
         case MessageType::cloudPromo:
         case MessageType::defaultCameraPasswords:
+        case MessageType::remoteArchiveSyncAvailable:
 
         // TODO: Remove in VMS-7724.
+        case MessageType::remoteArchiveSyncFinished:
+        case MessageType::remoteArchiveSyncProgress:
         case MessageType::remoteArchiveSyncError:
-
+        case MessageType::remoteArchiveSyncStopSchedule:
+        case MessageType::remoteArchiveSyncStopAutoMode:
         case MessageType::replacedDeviceDiscovered:
             return false;
 
