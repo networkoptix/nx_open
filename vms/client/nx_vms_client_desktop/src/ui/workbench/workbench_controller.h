@@ -12,8 +12,9 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/common/utils/volatile_unique_ptr.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <ui/graphics/instruments/click_info.h>
+#include <utils/color_space/image_correction.h>
 
-#include "utils/color_space/image_correction.h"
 #include "workbench_context_aware.h"
 
 Q_MOC_INCLUDE("QtWidgets/QGraphicsItem")
@@ -41,7 +42,6 @@ class RotationInstrument;
 class MotionSelectionInstrument;
 class ForwardingInstrument;
 class ClickInstrument;
-class ClickInfo;
 class ResizingInfo;
 class ZoomWindowInstrument;
 class ObjectTrackingInstrument;
@@ -121,17 +121,15 @@ protected slots:
     void at_motionRegionCleared(QGraphicsView *view, QnMediaResourceWidget *widget);
     void at_motionRegionSelected(QGraphicsView *view, QnMediaResourceWidget *widget, const QRect &region);
 
-    void at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
-    void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
-    void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
-    void at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
-    void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
+    void at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, ClickInfo info);
+    void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, ClickInfo info);
+    void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, ClickInfo info);
+    void at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, ClickInfo info);
+    void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item, ClickInfo info);
     void at_resourceWidget_doubleClicked(QnResourceWidget *widget);
 
-    void at_scene_clicked(QGraphicsView *view, const ClickInfo &info);
-    void at_scene_leftClicked(QGraphicsView *view, const ClickInfo &info);
-    void at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info);
-    void at_scene_doubleClicked(QGraphicsView *view, const ClickInfo &info);
+    void at_scene_clicked(QGraphicsView *view, ClickInfo info);
+    void at_scene_doubleClicked(QGraphicsView *view, ClickInfo info);
     void at_scene_keyPressedOrReleased(QGraphicsScene *scene, QEvent *event);
     void at_scene_keyPressed(QGraphicsScene *scene, QEvent *event);
     void at_scene_keyReleased(QGraphicsScene *scene, QEvent *event);

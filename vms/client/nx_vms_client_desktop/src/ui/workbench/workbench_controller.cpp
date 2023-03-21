@@ -287,17 +287,49 @@ QnWorkbenchController::QnWorkbenchController(QObject* parent):
 
     display()->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::BackLayer);
 
-    connect(m_itemLeftClickInstrument,  SIGNAL(pressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftPressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    // Handle all clicks queued to avoid crash in the instument scene items enumeration code if
+    // clicked item is destroyed in the handler (e.g. because of layout switching).
+    connect(m_itemLeftClickInstrument,
+        &ClickInstrument::itemPressed,
+        this,
+        &QnWorkbenchController::at_item_leftPressed,
+        Qt::QueuedConnection);
+    connect(m_itemLeftClickInstrument,
+        &ClickInstrument::itemClicked,
+        this,
+        &QnWorkbenchController::at_item_leftClicked,
+        Qt::QueuedConnection);
+    connect(m_itemLeftClickInstrument,
+        &ClickInstrument::itemDoubleClicked,
+        this,
+        &QnWorkbenchController::at_item_doubleClicked,
+        Qt::QueuedConnection);
     connect(m_ptzInstrument,
         &PtzInstrument::doubleClicked,
         this,
-        &QnWorkbenchController::at_resourceWidget_doubleClicked);
-    connect(m_itemRightClickInstrument, SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(itemMiddleClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_middleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(m_sceneClickInstrument,     SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
-    connect(m_sceneClickInstrument,     SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
+        &QnWorkbenchController::at_resourceWidget_doubleClicked,
+        Qt::QueuedConnection);
+    connect(m_itemRightClickInstrument,
+        &ClickInstrument::itemClicked,
+        this,
+        &QnWorkbenchController::at_item_rightClicked,
+        Qt::QueuedConnection);
+    connect(itemMiddleClickInstrument,
+        &ClickInstrument::itemClicked,
+        this,
+        &QnWorkbenchController::at_item_middleClicked,
+        Qt::QueuedConnection);
+    connect(m_sceneClickInstrument,
+        &ClickInstrument::sceneClicked,
+        this,
+        &QnWorkbenchController::at_scene_clicked,
+        Qt::QueuedConnection);
+    connect(m_sceneClickInstrument,
+        &ClickInstrument::sceneDoubleClicked,
+        this,
+        &QnWorkbenchController::at_scene_doubleClicked,
+        Qt::QueuedConnection);
+
     connect(m_moveInstrument,           SIGNAL(moveStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               this,                           SLOT(at_moveStarted(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_moveInstrument,           SIGNAL(move(QGraphicsView *, const QPointF &)),                                             this,                           SLOT(at_move(QGraphicsView *, const QPointF &)));
     connect(m_moveInstrument,           SIGNAL(moveFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              this,                           SLOT(at_moveFinished(QGraphicsView *, QList<QGraphicsItem *>)));
@@ -1289,11 +1321,11 @@ void QnWorkbenchController::at_motionRegionSelected(
     widget->addToMotionSelection(region);
 }
 
-void QnWorkbenchController::at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info)
+void QnWorkbenchController::at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, ClickInfo info)
 {
     Q_UNUSED(view)
 
-    if (info.modifiers() != 0)
+    if (info.modifiers != 0)
         return;
 
     if (workbench()->item(Qn::ZoomedRole))
@@ -1314,9 +1346,9 @@ void QnWorkbenchController::at_item_leftPressed(QGraphicsView *view, QGraphicsIt
 void QnWorkbenchController::at_item_leftClicked(
     QGraphicsView*,
     QGraphicsItem* item,
-    const ClickInfo& info)
+    ClickInfo info)
 {
-    if (info.modifiers() != Qt::NoModifier)
+    if (info.modifiers != Qt::NoModifier)
         return;
 
     const auto resourceWidget = qobject_cast<QnResourceWidget*>(item->toGraphicsObject());
@@ -1324,7 +1356,7 @@ void QnWorkbenchController::at_item_leftClicked(
         return;
 
     // PTZ panning is performed, other modifications of resource widget are blocked.
-    if (inViewportPtzMode(resourceWidget, info.modifiers()))
+    if (inViewportPtzMode(resourceWidget, info.modifiers))
         return;
 
     toggleRaisedState(resourceWidget);
@@ -1333,7 +1365,7 @@ void QnWorkbenchController::at_item_leftClicked(
 void QnWorkbenchController::at_item_rightClicked(
     QGraphicsView* /*view*/,
     QGraphicsItem* item,
-    const ClickInfo& /*info*/)
+    ClickInfo /*info*/)
 {
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : nullptr;
     if(widget == nullptr)
@@ -1348,7 +1380,10 @@ void QnWorkbenchController::at_item_rightClicked(
     showContextMenuAt(QCursor::pos());
 }
 
-void QnWorkbenchController::at_item_middleClicked(QGraphicsView* /*view*/, QGraphicsItem* item, const ClickInfo& /*info*/)
+void QnWorkbenchController::at_item_middleClicked(
+    QGraphicsView* /*view*/,
+    QGraphicsItem* item,
+    ClickInfo /*info*/)
 {
     if (tourIsRunning(context()))
         return;
@@ -1367,9 +1402,9 @@ void QnWorkbenchController::at_item_middleClicked(QGraphicsView* /*view*/, QGrap
 void QnWorkbenchController::at_item_doubleClicked(
     QGraphicsView*,
     QGraphicsItem* item,
-    const ClickInfo& info)
+    ClickInfo info)
 {
-    if (info.modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
+    if (info.modifiers.testFlag(Qt::KeyboardModifier::ShiftModifier))
         return;
 
     const auto resourceWidget = qobject_cast<QnResourceWidget*>(item->toGraphicsObject());
@@ -1377,7 +1412,7 @@ void QnWorkbenchController::at_item_doubleClicked(
         return;
 
     // PTZ zoom out is performed, other modifications of resource widget are blocked.
-    if (inViewportPtzMode(resourceWidget, info.modifiers()))
+    if (inViewportPtzMode(resourceWidget, info.modifiers))
         return;
 
     at_resourceWidget_doubleClicked(resourceWidget);
@@ -1391,7 +1426,7 @@ void QnWorkbenchController::at_resourceWidget_doubleClicked(QnResourceWidget *wi
     if (workbench()->currentLayout()->isShowreelReviewLayout())
     {
         if (auto resource = widget->resource())
-            menu()->trigger(action::OpenInNewTabAction, resource);
+            menu()->triggerIfPossible(action::OpenInNewTabAction, resource);
         return;
     }
 
@@ -1429,31 +1464,23 @@ void QnWorkbenchController::at_resourceWidget_doubleClicked(QnResourceWidget *wi
     }
 }
 
-void QnWorkbenchController::at_scene_clicked(QGraphicsView* view, const ClickInfo& info)
+void QnWorkbenchController::at_scene_clicked(QGraphicsView* view, ClickInfo info)
 {
-    if(info.button() == Qt::LeftButton) {
-        at_scene_leftClicked(view, info);
-    } else {
-        at_scene_rightClicked(view, info);
+    if (!NX_ASSERT(workbench()))
+        return;
+
+    if (info.button == Qt::LeftButton)
+    {
+        workbench()->setItem(Qn::RaisedRole, nullptr);
+    }
+    else
+    {
+        view->scene()->clearSelection(); //< Just to feel safe.
+        showContextMenuAt(QCursor::pos());
     }
 }
 
-void QnWorkbenchController::at_scene_leftClicked(QGraphicsView* /*view*/, const ClickInfo& /*info*/)
-{
-    if(workbench() == nullptr)
-        return;
-
-    workbench()->setItem(Qn::RaisedRole, nullptr);
-}
-
-void QnWorkbenchController::at_scene_rightClicked(QGraphicsView* view, const ClickInfo& /*info*/)
-{
-    view->scene()->clearSelection(); /* Just to feel safe. */
-
-    showContextMenuAt(QCursor::pos());
-}
-
-void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView* /*view*/, const ClickInfo& /*info*/)
+void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView* /*view*/, ClickInfo /*info*/)
 {
     if(workbench() == nullptr)
         return;

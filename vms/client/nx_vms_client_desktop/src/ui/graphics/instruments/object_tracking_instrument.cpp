@@ -42,11 +42,11 @@ ObjectTrackingInstrument::ObjectTrackingInstrument(QObject* parent):
 {
     connect(
         this,
-        qOverload<QGraphicsView*, QGraphicsItem*, const ClickInfo&>(&ClickInstrument::clicked),
+        &ClickInstrument::itemClicked,
         this,
-        [this](QGraphicsView* /*view*/, QGraphicsItem* item, const ClickInfo& info)
+        [this](QGraphicsView* /*view*/, QGraphicsItem* item, ClickInfo info)
         {
-            if (info.modifiers() != Qt::AltModifier)
+            if (info.modifiers != Qt::AltModifier)
                 return;
 
             auto widget = qobject_cast<QnMediaResourceWidget*>(item->toGraphicsObject());
@@ -82,7 +82,7 @@ ObjectTrackingInstrument::ObjectTrackingInstrument(QObject* parent):
                 return;
             }
 
-            QPointF relatedPos = calculateRelativePosition(info.scenePos(), item);
+            QPointF relatedPos = calculateRelativePosition(info.scenePos, item);
             Coordinates coords{relatedPos.x(), relatedPos.y()};
             actionParameters.text = QString::fromStdString(nx::reflect::json::serialize(coords));
 
