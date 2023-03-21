@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 
 #include "resource_access_subject.h"
@@ -32,6 +33,11 @@ public:
      * or a user group in the system user groups manager.
      */
     QnResourceAccessSubject subjectById(const QnUuid& id) const;
+
+    /**
+     * List of users belonging to a given set of groups or any of their child groups, recursively.
+     */
+    QnUserResourceList usersInGroups(const QSet<QnUuid>& groupIds) const;
 
 private:
     class Private;

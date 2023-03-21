@@ -86,13 +86,6 @@ QnResourceAccessManager* QnCommonModule::resourceAccessManager() const
         : nullptr;
 }
 
-QnResourceAccessSubjectsCache* QnCommonModule::resourceAccessSubjectsCache() const
-{
-    return NX_ASSERT(d->systemContext)
-        ? d->systemContext->resourceAccessSubjectsCache()
-        : nullptr;
-}
-
 QnGlobalPermissionsManager* QnCommonModule::globalPermissionsManager() const
 {
     return NX_ASSERT(d->systemContext)

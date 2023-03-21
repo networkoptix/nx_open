@@ -4,7 +4,7 @@
 
 #include <common/common_module.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/user_resource.h>
@@ -35,6 +35,9 @@ QnGlobalPermissionsManager::QnGlobalPermissionsManager(
             &QnGlobalPermissionsManager::handleRoleAddedOrUpdated, Qt::DirectConnection);
         connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
             &QnGlobalPermissionsManager::handleRoleRemoved, Qt::DirectConnection);
+
+        connect(m_context->accessSubjectHierarchy(), &SubjectHierarchy::changed, this,
+            &QnGlobalPermissionsManager::handleHierarchyChanged, Qt::DirectConnection);
     }
 }
 
@@ -65,8 +68,11 @@ GlobalPermissions QnGlobalPermissionsManager::globalPermissions(
         GlobalPermissions result;
         bool haveUnknownValues = false;
         NX_MUTEX_LOCKER lk(&m_mutex);
-        for (const auto& effectiveId:
-            m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+
+        QSet<QnUuid> subjects{{subject.id()}};
+        subjects += systemContext()->accessSubjectHierarchy()->recursiveParents(subjects);
+
+        for (const auto& effectiveId: subjects)
         {
             auto iter = m_cache.find(effectiveId);
             if (iter == m_cache.cend())
@@ -239,15 +245,11 @@ void QnGlobalPermissionsManager::handleResourceRemoved(const QnResourcePtr& reso
 void QnGlobalPermissionsManager::handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole)
 {
     updateGlobalPermissions(userRole);
-    for (auto subject: m_context->resourceAccessSubjectsCache()->allSubjectsInRole(userRole.id))
-        updateGlobalPermissions(subject);
 }
 
 void QnGlobalPermissionsManager::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject: m_context->resourceAccessSubjectsCache()->allSubjectsInRole(userRole.id))
-        updateGlobalPermissions(subject);
 }
 
 void QnGlobalPermissionsManager::handleSubjectRemoved(const QnResourceAccessSubject& subject)
@@ -259,4 +261,17 @@ void QnGlobalPermissionsManager::handleSubjectRemoved(const QnResourceAccessSubj
         m_cache.remove(id);
     }
     emit globalPermissionsChanged(subject, {});
+}
+
+void QnGlobalPermissionsManager::handleHierarchyChanged(
+    const QSet<QnUuid>& /*added*/,
+    const QSet<QnUuid>& /*removed*/,
+    const QSet<QnUuid>& /*groupsWithChangedMembers*/,
+    const QSet<QnUuid>& subjectsWithChangedParents)
+{
+    const auto recursivelyChanged = m_context->accessSubjectHierarchy()->recursiveMembers(
+        subjectsWithChangedParents) + subjectsWithChangedParents;
+
+    for (const auto& id: recursivelyChanged)
+        updateGlobalPermissions(m_context->accessSubjectHierarchy()->subjectById(id));
 }

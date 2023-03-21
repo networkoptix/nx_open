@@ -4,7 +4,6 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -62,7 +61,7 @@ void TargetUserPicker::createPolicy()
     const auto actionId = parentParamsWidget()->descriptor().id;
     if (actionId == vms::rules::utils::type<vms::rules::SendEmailAction>())
     {
-        m_policy = std::make_unique<QnUserWithEmailValidationPolicy>(systemContext());
+        m_policy = std::make_unique<QnUserWithEmailValidationPolicy>();
     }
     else if (actionId == vms::rules::utils::type<vms::rules::NotificationAction>())
     {
@@ -72,7 +71,7 @@ void TargetUserPicker::createPolicy()
         if (acknowledgeField->value() == true)
         {
             m_policy = std::make_unique<QnRequiredPermissionSubjectPolicy>(
-                systemContext(), Qn::ManageBookmarksPermission);
+                Qn::ManageBookmarksPermission);
         }
         else
         {

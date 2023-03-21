@@ -363,7 +363,7 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
         if (model->actionParams().needConfirmation)
         {
             auto validator = new QnRequiredPermissionSubjectPolicy(
-                systemContext(), Qn::ManageBookmarksPermission, tr("Manage Bookmarks"));
+                Qn::ManageBookmarksPermission, tr("Manage Bookmarks"));
             validator->setCameras({
                 resourcePool()->getResourceById<QnVirtualCameraResource>(
                     model->eventParams().eventResourceId)});

@@ -11,7 +11,6 @@ class QnGlobalPermissionsManager;
 class QnLicensePool;
 class QnResourcePool;
 class QnResourceAccessManager;
-class QnResourceAccessSubjectsCache;
 class QnRuntimeInfoManager;
 class QnUserRolesManager;
 class QnCameraHistoryPool;
@@ -20,6 +19,7 @@ class QnResourceStatusDictionary;
 class QnResourceDataPool;
 class QnCommonMessageProcessor;
 
+namespace nx::core::access { class ResourceAccessSubjectHierarchy; }
 namespace nx::vms::common { class SystemSettings; }
 namespace nx::vms::common { class SystemContext; }
 namespace nx::vms::event { class RuleManager; }
@@ -45,7 +45,7 @@ public:
     QnRuntimeInfoManager* runtimeInfoManager() const;
     QnResourcePool* resourcePool() const;
     QnResourceAccessManager* resourceAccessManager() const;
-    QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
+    nx::core::access::ResourceAccessSubjectHierarchy* accessSubjectHierarchy() const;
     QnGlobalPermissionsManager* globalPermissionsManager() const;
     QnUserRolesManager* userRolesManager() const;
     QnCameraHistoryPool* cameraHistoryPool() const;

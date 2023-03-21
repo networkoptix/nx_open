@@ -3,7 +3,7 @@
 #include "target_user_field.h"
 
 #include <core/resource/user_resource.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/qset.h>
@@ -32,14 +32,11 @@ QnUserResourceSet TargetUserField::users() const
 
         result = nx::utils::toQSet(users);
 
-        for (const auto& role: roles)
-        {
-            for (const auto& subject:
-                systemContext()->resourceAccessSubjectsCache()->allUsersInRole(role))
-            {
-                result.insert(subject.user());
-            }
-        }
+        const auto groupUsers = systemContext()->accessSubjectHierarchy()->usersInGroups(
+            nx::utils::toQSet(roles));
+
+        for (const auto& user: groupUsers)
+            result.insert(user);
     }
 
     erase_if(result, [](const auto& user) { return !user || !user->isEnabled(); });

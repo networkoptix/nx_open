@@ -7,6 +7,7 @@
 #include <client/client_globals.h>
 #include <client/client_meta_types.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/uuid.h>
@@ -15,7 +16,7 @@
 
 namespace {
 
-int countEnabledUsers(const std::unordered_set<QnResourceAccessSubject>& subjects)
+int countEnabledUsers(const auto& subjects)
 {
     return std::count_if(subjects.cbegin(), subjects.cend(),
         [](const QnResourceAccessSubject& subject) -> bool
@@ -98,13 +99,16 @@ QValidator::State RoleListModel::validateRole(const QnUuid& roleId) const
     if (m_roleValidator)
         return m_roleValidator(roleId);
 
+    const auto users = accessSubjectHierarchy()->usersInGroups({roleId});
+    std::vector<QnResourceAccessSubject> subjects{users.cbegin(), users.cend()};
+
     return m_userValidator
-        ? validateUsers(resourceAccessSubjectsCache()->allUsersInRole(roleId))
+        ? validateUsers(std::move(subjects))
         : QValidator::Acceptable;
 }
 
 QValidator::State RoleListModel::validateUsers(
-    const std::unordered_set<QnResourceAccessSubject>& subjects) const
+    std::vector<QnResourceAccessSubject> subjects) const
 {
     if (!m_userValidator)
         return QValidator::Acceptable;
@@ -145,15 +149,8 @@ QValidator::State RoleListModel::validateUsers(
 QSet<QnUuid> RoleListModel::checkedUsers() const
 {
     QSet<QnUuid> checkedUsers;
-    for (const auto& roleId: checkedRoles())
-    {
-        for (const auto& subject: resourceAccessSubjectsCache()->allUsersInRole(roleId))
-        {
-            NX_ASSERT(subject.isUser());
-            if (const auto& user = subject.user())
-                checkedUsers.insert(user->getId());
-        }
-    }
+    for (const auto& user: accessSubjectHierarchy()->usersInGroups(checkedRoles()))
+        checkedUsers.insert(user->getId());
 
     return checkedUsers;
 }
@@ -249,8 +246,13 @@ void UserListModel::setCustomUsersOnly(bool value)
 
 bool UserListModel::systemHasCustomUsers() const
 {
-    const auto id = QnPredefinedUserRoles::id(Qn::UserRole::customPermissions);
-    return countEnabledUsers(resourceAccessSubjectsCache()->allUsersInRole(id)) > 0;
+    // TODO: #vkutin Rethink the meaning of custom users in this model.
+    // Is it still viable? Or we need to detect users with customized access rights?
+
+    const auto customUsers = resourcePool()->getResources<QnUserResource>(
+        [](const QnUserResourcePtr& user) { return user->userRoleIds().empty(); });
+
+    return !customUsers.empty();
 }
 
 Qt::ItemFlags UserListModel::flags(const QModelIndex& index) const
@@ -400,7 +402,7 @@ void RoleListDelegate::getDisplayInfo(const QModelIndex& index,
 {
     static const auto kExtraInfoTemplate = QString::fromWCharArray(L"\x2013 %1"); //< "- %1"
     const auto roleId = index.data(Qn::UuidRole).value<QnUuid>();
-    const int usersInRole = countEnabledUsers(resourceAccessSubjectsCache()->allUsersInRole(roleId));
+    const int usersInRole = countEnabledUsers(accessSubjectHierarchy()->usersInGroups({roleId}));
     baseName = userRolesManager()->userRoleName(roleId);
     extInfo = kExtraInfoTemplate.arg(tr("%n Users", "", usersInRole));
 }

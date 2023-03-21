@@ -78,6 +78,12 @@ private:
     void handleRoleRemoved(const nx::vms::api::UserRoleData& userRole);
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
+    void handleHierarchyChanged(
+        const QSet<QnUuid>& /*added*/,
+        const QSet<QnUuid>& /*removed*/,
+        const QSet<QnUuid>& /*groupsWithChangedMembers*/,
+        const QSet<QnUuid>& subjectsWithChangedParents);
+
 private:
     const nx::core::access::Mode m_mode;
     mutable nx::Mutex m_mutex;

@@ -234,7 +234,6 @@ class QnRequiredPermissionSubjectPolicy: public QnSubjectValidationPolicy
 
 public:
     explicit QnRequiredPermissionSubjectPolicy(
-        nx::vms::common::SystemContext* systemContext,
         Qn::Permission requiredPermission,
         const QString& permissionName = QString(),
         bool allowEmptySelection = false);
@@ -290,13 +289,8 @@ class QnUserWithEmailValidationPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
-    QnUserWithEmailValidationPolicy(nx::vms::client::desktop::SystemContext* systemContext);
-
     virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
-
-private:
-    QnResourceAccessSubjectsCache* m_resourceAccessSubjectsCache{nullptr};
 };
 
 class QnBuzzerPolicy

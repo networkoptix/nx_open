@@ -37,7 +37,6 @@ QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(
     ui(new Ui::SoftwareTriggerBusinessEventWidget),
     m_helper(new vms::event::StringsHelper(systemContext)),
     m_validationPolicy(new QnRequiredPermissionSubjectPolicy(
-        this->systemContext(),
         Qn::SoftTriggerPermission,
         tr("User Input")))
 {

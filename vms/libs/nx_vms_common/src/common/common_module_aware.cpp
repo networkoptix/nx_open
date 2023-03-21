@@ -6,6 +6,7 @@
 
 #include "common_module.h"
 
+using namespace nx::core::access;
 using namespace nx::vms::common;
 
 QnCommonModuleAware::QnCommonModuleAware(QnCommonModule* commonModule):
@@ -58,10 +59,10 @@ QnResourceAccessManager* QnCommonModuleAware::resourceAccessManager() const
         : nullptr;
 }
 
-QnResourceAccessSubjectsCache* QnCommonModuleAware::resourceAccessSubjectsCache() const
+ResourceAccessSubjectHierarchy* QnCommonModuleAware::accessSubjectHierarchy() const
 {
     return m_commonModule
-        ? m_commonModule->systemContext()->resourceAccessSubjectsCache()
+        ? m_commonModule->systemContext()->accessSubjectHierarchy()
         : nullptr;
 }
 

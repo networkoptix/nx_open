@@ -17,7 +17,6 @@
 #include <core/resource_access/permissions_cache.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/core/access/access_types.h>
