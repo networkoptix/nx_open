@@ -42,8 +42,12 @@ void assignParent(Map* inOutMap, QObject* parent)
         item->setParent(parent);
 }
 
-State::State(InternalState state):
-    m_internalState(std::move(state))
+State::State(
+    InternalState state,
+    std::unique_ptr<AbstractResourceSupportProxy> resourceSupportProxy)
+    :
+    m_internalState(std::move(state)),
+    m_resourceSupportProxy(std::move(resourceSupportProxy))
 {
     assignParent(&m_internalState.pluginById, this);
     assignParent(&m_internalState.engineById, this);

@@ -44,29 +44,27 @@ AttributeType toDescriptorAttributeType(AbstractAttribute::Type attributeType)
     }
 }
 
-std::map<QnUuid, std::set<QnUuid>> propagateOwnSupport(
-    AttributeSupportInfoTree* inOutAttributeSupportInfoTree)
+std::set<QnUuid> propagateOwnSupport(AttributeSupportInfoTree* inOutAttributeSupportInfoTree)
 {
     if (inOutAttributeSupportInfoTree->nestedAttributeSupportInfo.empty())
-        return inOutAttributeSupportInfoTree->ownSupportInfo;
+        return inOutAttributeSupportInfoTree->supportByEngine;
 
     for (auto& [nestedAttributeName, nestedAttributeSupportInfoTree]:
         inOutAttributeSupportInfoTree->nestedAttributeSupportInfo)
     {
-        for (auto& [engineId, deviceIds]:
-            propagateOwnSupport(&nestedAttributeSupportInfoTree))
-        {
-            inOutAttributeSupportInfoTree->ownSupportInfo[engineId]
-                .insert(deviceIds.begin(), deviceIds.end());
-        }
+        const std::set<QnUuid> descendantSupportByEngine =
+            propagateOwnSupport(&nestedAttributeSupportInfoTree);
+
+        inOutAttributeSupportInfoTree->supportByEngine.insert(
+            descendantSupportByEngine.begin(), descendantSupportByEngine.end());
     }
 
-    return inOutAttributeSupportInfoTree->ownSupportInfo;
+    return inOutAttributeSupportInfoTree->supportByEngine;
 }
 
 std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::map<QnUuid, std::set<QnUuid>>> supportInfo)
+    std::map<QString, std::set<QnUuid /*engineId*/>> supportInfo)
 {
     std::map<QString, AttributeSupportInfoTree> result;
 
@@ -76,7 +74,7 @@ std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
         const QString& attributeName = attribute->name();
         if (auto it = supportInfo.find(attributeName); it != supportInfo.cend())
         {
-            result[attributeName].ownSupportInfo = std::move(it->second);
+            result[attributeName].supportByEngine = std::move(it->second);
             supportInfo.erase(it);
         }
 
@@ -95,7 +93,7 @@ std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
         const QString prefix = objectTypeAttribute->name() + ".";
         auto lowerBoundIt = supportInfo.lower_bound(prefix);
 
-        std::map<QString, std::map<QnUuid, std::set<QnUuid>>> nestedSupportInfo;
+        std::map<QString, std::set<QnUuid>> nestedSupportInfo;
         while (lowerBoundIt != supportInfo.cend() && lowerBoundIt->first.startsWith(prefix))
         {
             nestedSupportInfo[lowerBoundIt->first.mid(prefix.length())] =
@@ -118,7 +116,10 @@ std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
 
 std::vector<AbstractAttribute*> makeSupportedAttributes(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::map<QnUuid, std::set<QnUuid>>> supportInfo)
+    std::map<QString, std::set<QnUuid /*engineId*/>> supportInfo,
+    AbstractResourceSupportProxy* resourceSupportProxy,
+    QString rootParentTypeId,
+    EntityType rootEntityType)
 {
     std::map<QString, AttributeSupportInfoTree> supportInfoTree =
         buildAttributeSupportInfoTree(attributes, std::move(supportInfo));
@@ -127,7 +128,12 @@ std::vector<AbstractAttribute*> makeSupportedAttributes(
     for (AbstractAttribute* attribute: attributes)
     {
         result.push_back(new ProxyAttribute(
-            attribute, std::move(supportInfoTree[attribute->name()])));
+            attribute,
+            std::move(supportInfoTree[attribute->name()]),
+            resourceSupportProxy,
+            /*prefix*/ QString(),
+            rootParentTypeId,
+            rootEntityType));
     }
 
     return result;

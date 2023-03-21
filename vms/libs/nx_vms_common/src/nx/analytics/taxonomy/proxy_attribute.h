@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/analytics/taxonomy/abstract_attribute.h>
+#include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/utils.h>
 
 namespace nx::analytics::taxonomy {
@@ -18,7 +19,11 @@ class ProxyAttribute: public AbstractAttribute
 public:
     ProxyAttribute(
         AbstractAttribute* attribute,
-        AttributeSupportInfoTree attributeSupportInfoTree);
+        AttributeSupportInfoTree attributeSupportInfoTree,
+        AbstractResourceSupportProxy* resourceSupportProxy,
+        QString prefix,
+        QString rootParentTypeId,
+        EntityType rootEntityType);
 
     virtual ~ProxyAttribute() override;
 
@@ -45,7 +50,11 @@ public:
 private:
     AbstractAttribute* m_proxiedAttribute = nullptr;
     AbstractObjectType* m_proxyObjectType = nullptr;
-    std::map<QnUuid, std::set<QnUuid>> m_ownSupportInfo;
+    std::set<QnUuid> m_supportByEngine;
+    QString m_prefix;
+    QString m_rootParentTypeId;
+    EntityType m_rootEntityType;
+    AbstractResourceSupportProxy* m_resourceSupportProxy = nullptr;
 };
 
 } // namespace nx::analytics::taxonomy

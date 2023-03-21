@@ -6,6 +6,7 @@
 
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/internal_state.h>
+#include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
 
 #include <nx/utils/thread/mutex.h>
 
@@ -17,7 +18,9 @@ class State: public AbstractState
 {
 public:
     State() = default;
-    State(InternalState internalState);
+    State(
+        InternalState internalState,
+        std::unique_ptr<AbstractResourceSupportProxy> resourceSupportProxy);
 
     virtual std::vector<AbstractPlugin*> plugins() const override;
 
@@ -73,6 +76,8 @@ private:
 
     mutable std::vector<AbstractEnumType*> m_cachedEnumTypes;
     mutable std::vector<AbstractColorType*> m_cachedColorTypes;
+
+    std::unique_ptr<AbstractResourceSupportProxy> m_resourceSupportProxy;
 };
 
 } // namespace nx::analytics::taxonomy

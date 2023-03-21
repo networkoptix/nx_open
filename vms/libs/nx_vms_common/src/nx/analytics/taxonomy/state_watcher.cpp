@@ -6,6 +6,7 @@
 
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/analytics/taxonomy/state_compiler.h>
+#include <nx/analytics/taxonomy/resource_support_proxy.h>
 #include <nx/analytics/taxonomy/state.h>
 
 using namespace nx::vms::api::analytics;
@@ -14,10 +15,12 @@ namespace nx::analytics::taxonomy {
 
 StateWatcher::StateWatcher(
     DescriptorContainer* taxonomyDescriptorContainer,
+    QnResourcePool* resourcePool,
     QObject* parent)
     :
     AbstractStateWatcher(parent),
     m_taxonomyDescriptorContainer(taxonomyDescriptorContainer),
+    m_resourcePool(resourcePool),
     m_state(std::make_shared<State>())
 {
     connect(m_taxonomyDescriptorContainer, &DescriptorContainer::descriptorsUpdated,
@@ -51,7 +54,9 @@ Descriptors StateWatcher::currentDescriptors() const
 
 void StateWatcher::at_descriptorsUpdated()
 {
-    StateCompiler::Result result = StateCompiler::compile(currentDescriptors());
+    StateCompiler::Result result = StateCompiler::compile(
+        currentDescriptors(),
+        std::make_unique<ResourceSupportProxy>(m_resourcePool));
 
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
