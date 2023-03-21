@@ -7,6 +7,7 @@
 #include <QtCore/QFile>
 
 #include <nx/analytics/taxonomy/support/utils.h>
+#include <nx/analytics/taxonomy/support/test_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/state_compiler.h>
 #include <nx/analytics/taxonomy/helpers.h>
 
@@ -102,7 +103,9 @@ protected:
 
     void afterDescriptorsCompilation()
     {
-        m_result = StateCompiler::compile(m_testData.descriptors);
+        m_result = StateCompiler::compile(
+            m_testData.descriptors,
+            std::make_unique<TestResourceSupportProxy>());
     }
 
     void makeSureSupportedAttributesAreCorrect()

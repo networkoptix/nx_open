@@ -78,6 +78,8 @@ public:
      */
     virtual bool hasEverBeenSupported() const = 0;
 
+    Q_INVOKABLE virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const = 0;
+
     /**
      * @return Whether the Type is not a hidden derived Type and has ever been supported by any
      *     Device Agent or is a direct or indirect base for any supported Type.

@@ -27,9 +27,9 @@ QString Scope::provider() const
     return m_provider;
 }
 
-std::vector<QnUuid> Scope::deviceIds() const
+bool Scope::hasTypeEverBeenSupportedInThisScope() const
 {
-    return m_deviceIds;
+    return m_hasTypeEverBeenSupportedInThisScope;
 }
 
 bool Scope::isEmpty() const
@@ -52,9 +52,9 @@ void Scope::setProvider(const QString& provider)
     m_provider = provider;
 }
 
-void Scope::setDeviceIds(std::vector<QnUuid> deviceIds)
+void Scope::setHasTypeEverBeenSupportedInThisScope(bool hasTypeEverBeenSupportedInThisScope)
 {
-    m_deviceIds = std::move(deviceIds);
+    m_hasTypeEverBeenSupportedInThisScope = hasTypeEverBeenSupportedInThisScope;
 }
 
 } // namespace nx::analytics::taxonomy

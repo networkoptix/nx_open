@@ -9,6 +9,7 @@ namespace nx::analytics::taxonomy {
 
 struct InternalState;
 class ErrorHandler;
+class AbstractResourceSupportProxy;
 
 class NX_VMS_COMMON_API StateCompiler
 {
@@ -20,7 +21,9 @@ public:
     };
 
 public:
-    static Result compile(nx::vms::api::analytics::Descriptors descriptors);
+    static Result compile(
+        nx::vms::api::analytics::Descriptors descriptors,
+        std::unique_ptr<AbstractResourceSupportProxy> resourceSupportProxy);
 };
 
 } // namespace nx::analytics::taxonomy

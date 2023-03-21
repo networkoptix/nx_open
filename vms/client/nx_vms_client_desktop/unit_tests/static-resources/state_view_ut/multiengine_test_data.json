@@ -29,7 +29,7 @@
             "scopes": [
                 {
                     "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -46,7 +46,7 @@
             "scopes": [
                 {
                     "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -63,7 +63,7 @@
             "scopes": [
                 {
                     "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -80,11 +80,11 @@
             "scopes": [
                 {
                     "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 },
                 {
                     "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -102,7 +102,7 @@
             "scopes": [
                 {
                     "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -120,7 +120,7 @@
             "scopes": [
                 {
                     "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
 
@@ -139,7 +139,7 @@
             "scopes": [
                 {
                     "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -157,7 +157,7 @@
             "scopes": [
                 {
                     "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -175,7 +175,7 @@
             "scopes": [
                 {
                     "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -193,7 +193,7 @@
             "scopes": [
                 {
                     "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -211,7 +211,7 @@
             "scopes": [
                 {
                     "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -229,7 +229,7 @@
             "scopes": [
                 {
                     "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -247,7 +247,7 @@
             "scopes": [
                 {
                     "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -265,7 +265,7 @@
             "scopes": [
                 {
                     "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -283,7 +283,7 @@
             "scopes": [
                 {
                     "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -301,7 +301,7 @@
             "scopes": [
                 {
                     "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         },
@@ -319,11 +319,11 @@
             "scopes": [
                 {
                     "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 },
                 {
                     "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
-                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                    "hasTypeEverBeenSupportedInThisScope": true
                 }
             ]
         }

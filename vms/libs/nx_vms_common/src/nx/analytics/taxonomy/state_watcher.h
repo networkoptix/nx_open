@@ -16,6 +16,7 @@ class StateWatcher: public AbstractStateWatcher
 public:
     StateWatcher(
         DescriptorContainer* taxonomyDescriptorContainer,
+        QnResourcePool* resourcePool,
         QObject* parent = nullptr);
 
     virtual std::shared_ptr<AbstractState> state() const override;
@@ -34,6 +35,7 @@ private:
 
 private:
     DescriptorContainer* const m_taxonomyDescriptorContainer;
+    QnResourcePool* const m_resourcePool;
     mutable nx::Mutex m_mutex;
     mutable std::shared_ptr<AbstractState> m_state;
 };
