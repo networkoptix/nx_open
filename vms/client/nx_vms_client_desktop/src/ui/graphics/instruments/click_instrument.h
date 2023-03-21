@@ -1,72 +1,53 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_CLICK_INSTRUMENT_H
-#define QN_CLICK_INSTRUMENT_H
+#pragma once
 
-#include <QtCore/QPoint>
+#include "click_info.h"
 #include "drag_processing_instrument.h"
-
-class ClickInfoPrivate;
-
-class ClickInfo {
-public:
-    Qt::MouseButton button() const;
-    Qt::MouseButtons buttons() const;
-    QPointF scenePos() const;
-    QPoint screenPos() const;
-    Qt::KeyboardModifiers modifiers() const;
-
-protected:
-    friend class ClickInstrument;
-
-    ClickInfo(ClickInfoPrivate *dd): d(dd) {}
-
-private:
-    ClickInfoPrivate *d;
-};
 
 /**
  * This instrument listens to click events and emits corresponding signals
  * when the mouse button is released. Note that it uses application's
  * start drag distance to distinguish click from a drag.
  */
-class ClickInstrument: public DragProcessingInstrument {
-    Q_OBJECT;
-
-    typedef DragProcessingInstrument base_type;
+class ClickInstrument: public DragProcessingInstrument
+{
+    Q_OBJECT
+    using base_type = DragProcessingInstrument;
 
 public:
     /**
-     * \param buttons                   Mouse buttons to handle.
-     * \param clickDelayMSec            Delay in milliseconds to wait for the
-     *                                  double click before emitting the click signal.
-     *                                  If the double click arrives before the
-     *                                  delay times out, click signal won't be
-     *                                  emitted at all.
-     * \param watchedType               Type of click events that this instrument will watch.
-     *                                  Note that only SCENE and ITEM types are supported.
-     * \param parent                    Parent object for this instrument.
+     * @param buttons Mouse buttons to handle.
+     * @param clickDelayMSec Delay in milliseconds to wait for the double click before emitting the
+     *     click signal. If the double click arrives before the delay times out, click signal won't
+     *     be emitted at all.
+     * @param watchedType Type of click events that this instrument will watch. Note that only
+     *     SCENE and ITEM types are supported.
+     * @param parent Parent object for this instrument.
      */
-    ClickInstrument(Qt::MouseButtons buttons, int clickDelayMSec, WatchedType watchedType, QObject *parent = nullptr);
+    ClickInstrument(
+        Qt::MouseButtons buttons,
+        int clickDelayMSec,
+        WatchedType watchedType,
+        QObject* parent = nullptr);
     virtual ~ClickInstrument();
 
 signals:
     /**
-     * This signal is emitted when the mouse is pressed over an item.
-     * After that <tt>clicked</tt>, <tt>doubleClicked</tt> or both may be emitted,
-     * depending on the click delay.
+     * This signal is emitted when the mouse is pressed over an item. After that itemClicked,
+     * itemDoubleClicked or both may be emitted, depending on the click delay.
      *
-     * \param view                      View where the click originated.
-     * \param item                      Item that was clicked.
-     * \param info                      Additional click information.
+     * @param view View where the click originated.
+     * @param item Item that was clicked.
+     * @param info Additional click information.
      */
-    void pressed(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
-    void clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
-    void doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
+    void itemPressed(QGraphicsView* view, QGraphicsItem *item, ClickInfo info);
+    void itemClicked(QGraphicsView* view, QGraphicsItem *item, ClickInfo info);
+    void itemDoubleClicked(QGraphicsView* view, QGraphicsItem *item, ClickInfo info);
 
-    void pressed(QGraphicsView *view, const ClickInfo &info);
-    void clicked(QGraphicsView *view, const ClickInfo &info);
-    void doubleClicked(QGraphicsView *view, const ClickInfo &info);
+    void scenePressed(QGraphicsView* view, ClickInfo info);
+    void sceneClicked(QGraphicsView* view, ClickInfo info);
+    void sceneDoubleClicked(QGraphicsView* view, ClickInfo info);
 
 protected:
     virtual void timerEvent(QTimerEvent *event) override;
@@ -106,11 +87,11 @@ private:
     template<class T>
     bool mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEvent *event);
 
-    void emitSignals(QGraphicsView *view, QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
-    void emitSignals(QGraphicsView *view, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
+    void emitSignals(QGraphicsView* view, QGraphicsItem* item, ClickInfo info);
+    void emitSignals(QGraphicsView* view, QGraphicsScene* scene, ClickInfo info);
 
-    void emitInitialSignal(QGraphicsView *view, QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
-    void emitInitialSignal(QGraphicsView *view, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
+    void emitInitialSignal(QGraphicsView* view, QGraphicsItem* item, ClickInfo info);
+    void emitInitialSignal(QGraphicsView* view, QGraphicsScene* scene, ClickInfo info);
 
 private:
     struct ClickData;
@@ -123,5 +104,3 @@ private:
     bool m_isDoubleClick;
     bool m_nextDoubleClickIsClick;
 };
-
-#endif // QN_CLICK_INSTRUMENT_H
