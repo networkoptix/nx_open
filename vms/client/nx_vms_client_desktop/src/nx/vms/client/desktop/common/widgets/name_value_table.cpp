@@ -250,7 +250,7 @@ struct NameValueTable::Private
         ? (SharedOffscreenRenderer*) nullptr
         : SharedOffscreenRenderer::instance();
 
-    GroupedValues content;
+    analytics::AttributeList content;
     QSize size;
 
     QStringList flatItems;
@@ -266,7 +266,7 @@ struct NameValueTable::Private
         updateOp.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
     }
 
-    void setContent(const GroupedValues& value)
+    void setContent(const analytics::AttributeList& value)
     {
         if (content == value)
             return;
@@ -303,12 +303,12 @@ NameValueTable::~NameValueTable()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-NameValueTable::GroupedValues NameValueTable::content() const
+analytics::AttributeList NameValueTable::content() const
 {
     return d->content;
 }
 
-void NameValueTable::setContent(const GroupedValues& value)
+void NameValueTable::setContent(const analytics::AttributeList& value)
 {
     d->setContent(value);
 }

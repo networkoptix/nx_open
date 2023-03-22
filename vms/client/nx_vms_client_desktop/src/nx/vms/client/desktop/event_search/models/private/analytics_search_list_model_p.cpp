@@ -287,7 +287,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qn::DescriptionTextRole:
             return description(track);
 
-        case Qn::GroupedAttributesRole:
+        case Qn::AnalyticsAttributesRole:
             return QVariant::fromValue(qnClientModule->analyticsAttributeHelper()->
                 preprocessAttributes(track.objectTypeId, track.attributes));
 
