@@ -10,7 +10,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 
-#include <client/client_show_once_settings.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -20,6 +19,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -72,9 +72,6 @@ const qreal itemUnzoomThreshold = 0.975;
 
 // Key to store if we already displayed ptz redirect warning on the current layout.
 static const char* kPtzRedirectLockedLayoutWarningKey = "__ptz_redirect_locked_warning";
-
-static const QString kPtzPromoShowOnceKey = "NewPtzMechanicPromoBlock";
-static const QString kAutoTrackingPromoShowOnceKey = "AutoTrackingPromoBlock";
 
 Vector truncate(const Vector& value)
 {
@@ -326,10 +323,10 @@ PtzInstrument::PtzInstrument(QObject *parent):
             }
         });
 
-    connect(qnClientShowOnce, &nx::settings::ShowOnce::changed, this,
-        [this](const QString& key, bool value)
+    const auto updatePromoOnWidgets =
+        [this](nx::utils::property_storage::BaseProperty* property)
         {
-            if (!(key == kPtzPromoShowOnceKey || key == kAutoTrackingPromoShowOnceKey) || value)
+            if (property->variantValue().toBool())
                 return;
 
             for (auto iter = m_dataByWidget.begin(); iter != m_dataByWidget.end(); ++iter)
@@ -337,7 +334,16 @@ PtzInstrument::PtzInstrument(QObject *parent):
                 if (iter->overlayWidget)
                     updatePromo(qobject_cast<QnMediaResourceWidget*>(iter.key()));
             }
-        });
+        };
+
+    connect(&showOnceSettings()->newPtzMechanicPromo,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        updatePromoOnWidgets);
+    connect(&showOnceSettings()->autoTrackingPromo,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        updatePromoOnWidgets);
 
     connect(context()->instance<KeyboardModifiersWatcher>(),
         &KeyboardModifiersWatcher::modifiersChanged,
@@ -473,11 +479,8 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
 
 void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
 {
-    if (qnClientShowOnce->testFlag(kPtzPromoShowOnceKey)
-        && qnClientShowOnce->testFlag(kAutoTrackingPromoShowOnceKey))
-    {
+    if (showOnceSettings()->newPtzMechanicPromo() && showOnceSettings()->autoTrackingPromo())
         return;
-    }
 
     PtzData& data = m_dataByWidget[widget];
     if (data.isFisheye())
@@ -490,14 +493,14 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
 
         data.promoOverlay = new PtzPromoOverlay();
         data.promoOverlay->setPagesVisibility(
-            !qnClientShowOnce->testFlag(kPtzPromoShowOnceKey),
-            !qnClientShowOnce->testFlag(kAutoTrackingPromoShowOnceKey));
+            !showOnceSettings()->newPtzMechanicPromo(),
+            !showOnceSettings()->autoTrackingPromo());
 
         connect(data.promoOverlay.data(), &PtzPromoOverlay::closeRequested, this,
             [widget, overlay = data.promoOverlay.data()]()
             {
-                qnClientShowOnce->setFlag(kPtzPromoShowOnceKey);
-                qnClientShowOnce->setFlag(kAutoTrackingPromoShowOnceKey);
+                showOnceSettings()->newPtzMechanicPromo = true;
+                showOnceSettings()->autoTrackingPromo = true;
                 widget->removeOverlayWidget(overlay);
                 overlay->deleteLater();
             });

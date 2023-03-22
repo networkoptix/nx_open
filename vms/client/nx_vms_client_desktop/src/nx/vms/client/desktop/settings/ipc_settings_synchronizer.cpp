@@ -4,16 +4,16 @@
 
 #include <QtCore/QObject>
 
-#include <client/client_show_once_settings.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 
 namespace nx::vms::client::desktop {
 
 void IpcSettingsSynchronizer::setup(
     LocalSettings* localSettings,
-    QnClientShowOnceSettings* showOnceSettings,
+    ShowOnceSettings* showOnceSettings,
     SharedMemoryManager* sharedMemoryManager)
 {
     NX_CRITICAL(localSettings);
@@ -33,12 +33,12 @@ void IpcSettingsSynchronizer::setup(
         [showOnceSettings](SharedMemoryData::Command command)
         {
             if (command == SharedMemoryData::Command::reloadSettings)
-                showOnceSettings->sync();
+                showOnceSettings->reload();
         });
 
     QObject::connect(localSettings, &LocalSettings::changed,
         sharedMemoryManager, &SharedMemoryManager::requestSettingsReload);
-    QObject::connect(showOnceSettings, &nx::settings::ShowOnce::changed,
+    QObject::connect(showOnceSettings, &ShowOnceSettings::changed,
         sharedMemoryManager, &SharedMemoryManager::requestSettingsReload);
 }
 

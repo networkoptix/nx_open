@@ -31,6 +31,7 @@ class ResourceFactory;
 class ResourcesChangesManager;
 class RunningInstancesManager;
 class SharedMemoryManager;
+class ShowOnceSettings;
 class SystemContext;
 class UnifiedResourcePool;
 class UploadManager;
@@ -157,6 +158,8 @@ public:
      * Local Client settings.
      */
     LocalSettings* localSettings() const;
+
+    ShowOnceSettings* showOnceSettings() const;
 
     /**
      * Map of analytics objects colors by object type. Persistently stored on a PC.

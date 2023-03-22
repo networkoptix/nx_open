@@ -5,9 +5,9 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <client/client_show_once_settings.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -17,13 +17,6 @@
 #include <ui/help/help_handler.h>
 
 namespace nx::vms::client::desktop {
-
-namespace {
-
-/** Promo dialog for Cloud Layouts. */
-static const QString kCloudLayoutsPromoShowOnceKey("CloudLayoutsPromo");
-
-} // namespace
 
 CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
     Mode mode,
@@ -79,7 +72,7 @@ bool CloudLayoutsIntroDialog::doNotShowAgainChecked() const
 
 bool CloudLayoutsIntroDialog::confirm()
 {
-    if (qnClientShowOnce->testFlag(kCloudLayoutsPromoShowOnceKey))
+    if (showOnceSettings()->cloudLayoutsPromo())
         return true;
 
     CloudLayoutsIntroDialog introDialog(
@@ -88,7 +81,7 @@ bool CloudLayoutsIntroDialog::confirm()
     const bool result = (introDialog.exec() == QDialog::Accepted);
 
     if (result && introDialog.doNotShowAgainChecked())
-        qnClientShowOnce->setFlag(kCloudLayoutsPromoShowOnceKey);
+        showOnceSettings()->cloudLayoutsPromo = true;
 
     return result;
 }
