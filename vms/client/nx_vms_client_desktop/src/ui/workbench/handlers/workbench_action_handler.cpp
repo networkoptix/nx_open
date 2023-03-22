@@ -25,7 +25,6 @@
 #include <camera/resource_display.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_show_once_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
 #include <client_core/client_core_module.h>
@@ -94,6 +93,7 @@
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
 #include <nx/vms/client/desktop/rules/rules_dialog.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
@@ -183,9 +183,6 @@ using nx::vms::client::core::MotionSelection;
 using namespace nx::vms::common;
 
 namespace {
-
-/* Asking for update all outdated servers to the last version. */
-static const QString kVersionMismatchShowOnceKey("VersionMismatch");
 
 const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 
@@ -2818,7 +2815,7 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     if (!qnRuntime->isDesktopMode())
         return;
 
-    if (qnClientShowOnce->testFlag(kVersionMismatchShowOnceKey))
+    if (showOnceSettings()->versionMismatch())
         return;
 
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
@@ -2893,7 +2890,7 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     messageBox->exec();
 
     if (messageBox->isChecked())
-        qnClientShowOnce->setFlag(kVersionMismatchShowOnceKey);
+        showOnceSettings()->versionMismatch = true;
 
     if (messageBox->clickedButton() == updateButton)
         menu()->trigger(action::SystemUpdateAction);

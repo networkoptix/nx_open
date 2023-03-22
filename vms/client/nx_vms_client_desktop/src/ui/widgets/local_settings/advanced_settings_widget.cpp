@@ -11,7 +11,6 @@
 
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_show_once_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/resource_directory_browser.h>
@@ -26,6 +25,7 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -404,7 +404,7 @@ void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
 
 void QnAdvancedSettingsWidget::at_resetAllWarningsButton_clicked()
 {
-    qnClientShowOnce->reset();
+    showOnceSettings()->reset();
 }
 
 bool QnAdvancedSettingsWidget::isAudioDownmixed() const

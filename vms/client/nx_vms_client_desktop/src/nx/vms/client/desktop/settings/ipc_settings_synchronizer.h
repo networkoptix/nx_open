@@ -2,12 +2,11 @@
 
 #pragma once
 
-class QnClientShowOnceSettings;
-
 namespace nx::vms::client::desktop {
 
 class LocalSettings;
 class SharedMemoryManager;
+class ShowOnceSettings;
 
 /**
  * Syncronizes local client settings between running client instances using provided IPC.
@@ -17,7 +16,7 @@ class IpcSettingsSynchronizer
 public:
     static void setup(
         LocalSettings* localSettings,
-        QnClientShowOnceSettings* showOnceSettings,
+        ShowOnceSettings* showOnceSettings,
         SharedMemoryManager* sharedMemoryManager);
 };
 

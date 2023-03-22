@@ -4,15 +4,9 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <client/client_show_once_settings.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 
 namespace nx::vms::client::desktop {
-
-namespace {
-
-const QString kDigestDisableShowOnceKey = "DigestDisableNotification";
-
-} // namespace
 
 ForceSecureAuthDialog::ForceSecureAuthDialog(QWidget* parent):
     base_type(parent)
@@ -31,7 +25,7 @@ ForceSecureAuthDialog::ForceSecureAuthDialog(QWidget* parent):
 
 bool ForceSecureAuthDialog::isConfirmed(QWidget* parent)
 {
-    if (qnClientShowOnce->testFlag(kDigestDisableShowOnceKey))
+    if (showOnceSettings()->digestDisableNotification())
         return true;
 
     ForceSecureAuthDialog dialog(parent);
@@ -39,7 +33,7 @@ bool ForceSecureAuthDialog::isConfirmed(QWidget* parent)
         return false;
 
     if (dialog.isChecked())
-        qnClientShowOnce->setFlag(kDigestDisableShowOnceKey, true);
+        showOnceSettings()->digestDisableNotification = true;
 
     return true;
 }

@@ -2,50 +2,24 @@
 
 #include "resources_messages.h"
 
-#include <QtWidgets/QLabel>
-
 #include <boost/algorithm/cxx11/all_of.hpp>
 
-#include <common/common_module.h>
+#include <QtWidgets/QLabel>
 
 #include <client_core/client_core_module.h>
-
-#include <client/client_show_once_settings.h>
-
-#include <core/resource/resource.h>
+#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource/resource.h>
 #include <core/resource/webpage_resource.h>
-
+#include <nx/branding.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
 
-#include <nx/branding.h>
-
 namespace {
-
-/* Edit shared layout. */
-static const QString kSharedLayoutEditShowOnceKey("SharedLayoutEdit");
-
-/* Removing multiple items from layout. */
-static const QString kRemoveItemsFromLayoutShowOnceKey("RemoveItemsFromLayout");
-
-/** Remove multiple items from Showreel. */
-static const QString kRemoveItemsFromShowreelShowOnceKey("RemoveItemsFromShowreel");
-
-/*  Batch delete resources. */
-static const QString kDeleteResourcesShowOnceKey("DeleteResources");
-
-/*  Merge resource groups. */
-static const QString kMergeResourceGroupsShowOnceKey("MergeResourceGroups");
-
-/* Move proxied webpages to another server. */
-static const QString kMoveProxiedWebpageWarningShowOnceKey("MoveProxiedWebpageWarning");
-
-/* Delete personal (not shared) layout. */
-static const QString kDeleteLocalLayoutsShowOnceKey("DeleteLocalLayouts");
 
 static const QnResourceListView::Options kSimpleOptions(QnResourceListView::HideStatusOption
     | QnResourceListView::ServerAsHealthMonitorOption
@@ -53,7 +27,7 @@ static const QnResourceListView::Options kSimpleOptions(QnResourceListView::Hide
 
 bool showCompositeDialog(
     QWidget* parent,
-    const QString& showOnceFlag,
+    nx::utils::property_storage::Property<bool>* showOnceFlag,
     const QString& text,
     const QString& extras,
     const QnResourceList& resources,
@@ -63,7 +37,7 @@ bool showCompositeDialog(
         return true;
 
     /* Check if user have already silenced this warning. */
-    if (!showOnceFlag.isEmpty() && qnClientShowOnce->testFlag(showOnceFlag))
+    if (showOnceFlag && showOnceFlag->value())
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
@@ -74,15 +48,15 @@ bool showCompositeDialog(
         messageBox.addCustomWidget(new QnResourceListView(resources, kSimpleOptions, &messageBox));
 
     messageBox.setInformativeText(extras);
-    messageBox.setCheckBoxEnabled(!showOnceFlag.isEmpty());
+    messageBox.setCheckBoxEnabled(showOnceFlag != nullptr);
 
     messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
 
     const auto result = messageBox.exec();
 
-    if (!showOnceFlag.isEmpty() && messageBox.isChecked())
-        qnClientShowOnce->setFlag(showOnceFlag);
+    if (showOnceFlag && messageBox.isChecked())
+        showOnceFlag->setValue(true);
 
     return result == QDialogButtonBox::Ok;
 }
@@ -126,7 +100,7 @@ bool Resources::overrideShowreel(QWidget* parent)
 
 bool Resources::sharedLayoutEdit(QWidget* parent)
 {
-    return showCompositeDialog(parent, kSharedLayoutEditShowOnceKey,
+    return showCompositeDialog(parent, &showOnceSettings()->sharedLayoutEdit,
         tr("Changes will affect other users"),
         tr("This layout is shared with other users, so you change it for them too."),
         QnResourceList(), /*useResources*/ false);
@@ -136,7 +110,7 @@ bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayou
     const QnResourceList& personalLayouts)
 {
     if (sharedLayouts.empty()
-        && (personalLayouts.empty() || qnClientShowOnce->testFlag(kDeleteLocalLayoutsShowOnceKey)))
+        && (personalLayouts.empty() || showOnceSettings()->deleteLocalLayouts()))
     {
         return true;
     }
@@ -176,7 +150,7 @@ bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayou
     const auto result = messageBox.exec();
 
     if (messageBox.isChecked())
-        qnClientShowOnce->setFlag(kDeleteLocalLayoutsShowOnceKey);
+        showOnceSettings()->deleteLocalLayouts = true;
 
     return (result != QDialogButtonBox::Cancel);
 }
@@ -185,7 +159,7 @@ bool Resources::removeItemsFromLayout(QWidget* parent,
     const QnResourceList& resources)
 {
     /* Check if user have already silenced this warning. */
-    if (qnClientShowOnce->testFlag(kRemoveItemsFromLayoutShowOnceKey))
+    if (showOnceSettings()->removeItemsFromLayout())
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
@@ -197,7 +171,7 @@ bool Resources::removeItemsFromLayout(QWidget* parent,
     messageBox.setCheckBoxEnabled();
     const auto result = messageBox.exec();
     if (messageBox.isChecked())
-        qnClientShowOnce->setFlag(kRemoveItemsFromLayoutShowOnceKey);
+        showOnceSettings()->removeItemsFromLayout = true;
 
     return result != QDialogButtonBox::Cancel;
 }
@@ -205,7 +179,7 @@ bool Resources::removeItemsFromLayout(QWidget* parent,
 bool Resources::removeItemsFromShowreel(QWidget* parent, const QnResourceList& resources)
 {
     /* Check if user have already silenced this warning. */
-    if (qnClientShowOnce->testFlag(kRemoveItemsFromShowreelShowOnceKey))
+    if (showOnceSettings()->removeItemsFromShowreel())
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
@@ -217,7 +191,7 @@ bool Resources::removeItemsFromShowreel(QWidget* parent, const QnResourceList& r
     messageBox.setCheckBoxEnabled();
     const auto result = messageBox.exec();
     if (messageBox.isChecked())
-        qnClientShowOnce->setFlag(kRemoveItemsFromShowreelShowOnceKey);
+        showOnceSettings()->removeItemsFromShowreel = true;
 
     return result != QDialogButtonBox::Cancel;
 }
@@ -229,7 +203,7 @@ bool Resources::changeVideoWallLayout(QWidget* parent,
         "access from Video Wall only. You will not see them in your resource list after it and "
         "will not be able to add them to Video Wall again.");
 
-    return showCompositeDialog(parent, QString(),
+    return showCompositeDialog(parent, nullptr,
         tr("You will lose access to following resources:"),
         extras, inaccessible);
 }
@@ -237,7 +211,7 @@ bool Resources::changeVideoWallLayout(QWidget* parent,
 bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources)
 {
     /* Check if user have already silenced this warning. */
-    if (qnClientShowOnce->testFlag(kDeleteResourcesShowOnceKey))
+    if (showOnceSettings()->deleteResources())
         return true;
 
     if (resources.isEmpty())
@@ -309,7 +283,7 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
 
     const auto result = messageBox.exec();
     if (messageBox.isChecked())
-        qnClientShowOnce->setFlag(kDeleteResourcesShowOnceKey);
+        showOnceSettings()->deleteResources = true;
 
     return result != QDialogButtonBox::Cancel;
 }
@@ -349,7 +323,7 @@ bool Resources::stopVirtualCameraUploads(QWidget* parent, const QnResourceList& 
 
 bool Resources::mergeResourceGroups(QWidget* parent, const QString& groupName)
 {
-    if (qnClientShowOnce->testFlag(kMergeResourceGroupsShowOnceKey))
+    if (showOnceSettings()->mergeResourceGroups())
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
@@ -365,7 +339,7 @@ bool Resources::mergeResourceGroups(QWidget* parent, const QString& groupName)
         return false;
 
     if (messageBox.isChecked())
-        qnClientShowOnce->setFlag(kMergeResourceGroupsShowOnceKey);
+        showOnceSettings()->mergeResourceGroups = true;
 
     return true;
 }
@@ -375,9 +349,7 @@ bool Resources::moveProxiedWebPages(QWidget* parent, const QnResourceList& resou
 {
     static constexpr auto kAnyDomain = "*";
 
-    const QString showOnceFlag = kMoveProxiedWebpageWarningShowOnceKey;
-
-    if (qnClientShowOnce->testFlag(showOnceFlag))
+    if (showOnceSettings()->moveProxiedWebpageWarning())
         return true;
 
     const auto webPages = resources.filtered<QnWebPageResource>();
@@ -435,7 +407,7 @@ bool Resources::moveProxiedWebPages(QWidget* parent, const QnResourceList& resou
     const auto result = messageBox.exec();
 
     if (messageBox.isChecked())
-        qnClientShowOnce->setFlag(showOnceFlag);
+        showOnceSettings()->moveProxiedWebpageWarning = true;
 
     return result == QDialogButtonBox::AcceptRole;
 }

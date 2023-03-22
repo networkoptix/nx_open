@@ -12,7 +12,6 @@
 #include <client/client_autorun_watcher.h>
 #include <client/client_meta_types.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_show_once_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
 #include <client/forgotten_systems_manager.h>
@@ -53,6 +52,7 @@
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/ipc_settings_synchronizer.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/fallback_shared_memory.h>
@@ -277,7 +277,7 @@ struct ApplicationContext::Private
         #endif
 
         objectDisplaySettings = std::make_unique<ObjectDisplaySettings>();
-        showOnceSettings = std::make_unique<QnClientShowOnceSettings>();
+        showOnceSettings = std::make_unique<ShowOnceSettings>();
     }
 
     void initializeStateModules()
@@ -529,7 +529,7 @@ struct ApplicationContext::Private
     std::unique_ptr<LocalSettings> localSettings;
     std::unique_ptr<QnClientRuntimeSettings> runtimeSettings;
     std::unique_ptr<ObjectDisplaySettings> objectDisplaySettings;
-    std::unique_ptr<QnClientShowOnceSettings> showOnceSettings;
+    std::unique_ptr<ShowOnceSettings> showOnceSettings;
 
     // State modules.
     std::unique_ptr<ClientStateHandler> clientStateHandler;
@@ -770,6 +770,11 @@ UnifiedResourcePool* ApplicationContext::unifiedResourcePool() const
 LocalSettings* ApplicationContext::localSettings() const
 {
     return d->localSettings.get();
+}
+
+ShowOnceSettings* ApplicationContext::showOnceSettings() const
+{
+    return d->showOnceSettings.get();
 }
 
 ObjectDisplaySettings* ApplicationContext::objectDisplaySettings() const

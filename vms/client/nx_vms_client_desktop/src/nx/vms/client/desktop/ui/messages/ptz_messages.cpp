@@ -2,15 +2,8 @@
 
 #include "ptz_messages.h"
 
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <ui/dialogs/common/message_box.h>
-#include <client/client_show_once_settings.h>
-
-namespace {
-
-/* Delete ptz preset which is used in the tour. */
-static const QString kPtzPresetShowOnceKey("PtzPresetInUse");
-
-} //namespace
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -34,7 +27,7 @@ void Ptz::failedToSetPosition(QWidget* parent, const QString& cameraName)
 
 bool Ptz::deletePresetInUse(QWidget* parent)
 {
-    if (qnClientShowOnce->testFlag(kPtzPresetShowOnceKey))
+    if (showOnceSettings()->ptzPresetInUse())
         return true;
 
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
@@ -48,7 +41,7 @@ bool Ptz::deletePresetInUse(QWidget* parent)
 
     const auto result = (dialog.exec() != QDialogButtonBox::Cancel);
     if (dialog.isChecked())
-        qnClientShowOnce->setFlag(kPtzPresetShowOnceKey);
+        showOnceSettings()->ptzPresetInUse = true;
 
     return result;
 }

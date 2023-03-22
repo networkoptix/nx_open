@@ -10,7 +10,6 @@
 
 #include <api/runtime_info_manager.h>
 #include <client/client_message_processor.h>
-#include <client/client_show_once_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
@@ -22,6 +21,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/system_health/invalid_recording_schedule_watcher.h>
@@ -38,12 +38,6 @@
 using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
-
-namespace {
-
-static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
-
-} // namespace
 
 // ------------------------------------------------------------------------------------------------
 // SystemHealthState::Private declaration.
@@ -212,7 +206,7 @@ SystemHealthState::Private::Private(SystemHealthState* q):
     connect(q->action(ui::action::HideCloudPromoAction), &QAction::triggered, q,
         [this]
         {
-            qnClientShowOnce->setFlag(kCloudPromoShowOnceKey);
+            showOnceSettings()->cloudPromo = true;
             update(cloudPromo)();
         });
 
@@ -398,7 +392,7 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
             return q->context()->user()
                 && q->context()->user()->isOwner()
                 && q->systemSettings()->cloudSystemId().isEmpty()
-                && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
+                && !showOnceSettings()->cloudPromo();
 
         case SystemHealthIndex::storagesNotConfigured:
             return hasAdminPermissions() && hasResourcesForMessageType(index);
