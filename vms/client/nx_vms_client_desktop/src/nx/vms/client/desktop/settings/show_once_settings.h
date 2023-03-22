@@ -42,6 +42,9 @@ public:
     /** Asking for update all outdated servers to the last version. */
     Property<bool> versionMismatch{this, "versionMismatch"};
 
+    /** Delete groups. */
+    Property<bool> deleteUserGroups{this, "deleteUserGroups"};
+
 private:
     Property<bool> migrationDone{this, "migrationDone"};
 
