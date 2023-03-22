@@ -97,7 +97,7 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::ObjectTrackIdRole:
             return QVariant::fromValue(event.objectTrackId);
 
-        case Qn::GroupedAttributesRole:
+        case Qn::AnalyticsAttributesRole:
             return QVariant::fromValue(event.attributes);
 
         case Qn::CloudSystemIdRole:

@@ -26,7 +26,7 @@ Rectangle
     signal nextClicked()
     signal showOnLayoutClicked()
 
-    signal searchRequested(string text)
+    signal searchRequested(int attributeRow)
 
     color: ColorTheme.colors.dark8
 
@@ -316,8 +316,8 @@ Rectangle
                 nameFont { pixelSize: 13; weight: Font.Normal }
                 valueFont { pixelSize: 13; weight: Font.Normal }
 
-                onSearchRequested:
-                    previewPanel.searchRequested(text)
+                onSearchRequested: (row) =>
+                    previewPanel.searchRequested(row)
             }
         }
     }

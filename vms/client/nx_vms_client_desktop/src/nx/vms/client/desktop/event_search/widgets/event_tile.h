@@ -7,6 +7,7 @@
 #include <analytics/common/object_metadata.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 
 namespace Ui { class EventTile; }
@@ -20,7 +21,6 @@ class EventTile: public QWidget
 {
     Q_OBJECT
     using base_type = QWidget;
-    using GroupedAttributes = nx::common::metadata::GroupedAttributes;
 
 public:
     explicit EventTile(QWidget* parent = nullptr);
@@ -42,8 +42,8 @@ public:
     QString footerText() const;
     void setFooterText(const QString& value);
 
-    GroupedAttributes attributeList() const;
-    void setAttributeList(const GroupedAttributes& value);
+    analytics::AttributeList attributeList() const;
+    void setAttributeList(const analytics::AttributeList& value);
 
     QString timestamp() const;
     void setTimestamp(const QString& value);

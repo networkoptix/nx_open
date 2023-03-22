@@ -38,7 +38,7 @@ struct ThumbnailTooltip::Private
     const QmlProperty<QStringList> attributes{q->widget(), "attributes"};
 
     QString previewImageId;
-    GroupedAttributes groupedAttributes;
+    analytics::AttributeList sourceAttributes;
     QRectF desiredHighlightRect;
     bool forceNoHighlight = false;
 
@@ -202,18 +202,18 @@ void ThumbnailTooltip::setHighlightRect(const QRectF& rect)
     d->updateHighlightRect();
 }
 
-const ThumbnailTooltip::GroupedAttributes& ThumbnailTooltip::attributes() const
+const analytics::AttributeList& ThumbnailTooltip::attributes() const
 {
-    return d->groupedAttributes;
+    return d->sourceAttributes;
 }
 
-void ThumbnailTooltip::setAttributes(const GroupedAttributes& value)
+void ThumbnailTooltip::setAttributes(const analytics::AttributeList& value)
 {
-    if (d->groupedAttributes == value)
+    if (d->sourceAttributes == value)
         return;
 
-    d->groupedAttributes = value;
-    d->attributes = RightPanelModelsAdapter::flattenAttributeList(d->groupedAttributes);
+    d->sourceAttributes = value;
+    d->attributes = RightPanelModelsAdapter::flattenAttributeList(d->sourceAttributes);
 }
 
 } // namespace nx::vms::client::desktop

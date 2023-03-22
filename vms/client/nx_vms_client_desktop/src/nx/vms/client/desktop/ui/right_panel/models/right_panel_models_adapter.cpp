@@ -230,8 +230,7 @@ public:
         PreviewHighlightRectRole,
         FlatAttributeListRole,
         ItemIsVisibleRole,
-        HighlightedRole,
-        RawAttributeListRole
+        HighlightedRole
     };
 
 private:
@@ -428,25 +427,10 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
 
         case Private::FlatAttributeListRole:
         {
-            const auto groupedAttributes = data(index, Qn::GroupedAttributesRole)
-                .value<nx::common::metadata::GroupedAttributes>();
+            const auto attributes = data(index, Qn::AnalyticsAttributesRole)
+                .value<analytics::AttributeList>();
 
-            return flattenAttributeList(groupedAttributes);
-        }
-
-        case Private::RawAttributeListRole:
-        {
-            const auto groupedAttributes = data(index, Qn::GroupedAttributesRole)
-                .value<nx::common::metadata::GroupedAttributes>();
-
-            QVariantList result;
-
-            result.reserve(groupedAttributes.size() * 2);
-
-            for (const auto& group: groupedAttributes)
-                result << group.name << group.values;
-
-            return result;
+            return flattenAttributeList(attributes);
         }
 
         case Private::ItemIsVisibleRole:
@@ -527,6 +511,7 @@ QHash<int, QByteArray> RightPanelModelsAdapter::roleNames() const
     roles[Qn::ProgressValueRole] = "progressValue";
     roles[Qn::HelpTopicIdRole] = "helpTopicId";
     roles[Qn::AnalyticsEngineNameRole] = "analyticsEngineName";
+    roles[Qn::AnalyticsAttributesRole] = "rawAttributes";
     roles[Private::FlatAttributeListRole] = "attributes";
     roles[Private::ItemIsVisibleRole] = "visible";
     roles[Private::HighlightedRole] = "highlighted";
@@ -535,7 +520,6 @@ QHash<int, QByteArray> RightPanelModelsAdapter::roleNames() const
     roles[Private::PreviewAspectRatioRole] = "previewAspectRatio";
     roles[Private::PreviewTimeMsRole] = "previewTimestampMs";
     roles[Private::PreviewHighlightRectRole] = "previewHighlightRect";
-    roles[Private::RawAttributeListRole] = "rawAttributes";
     return roles;
 }
 
@@ -754,14 +738,13 @@ QAbstractItemModel* RightPanelModelsAdapter::analyticsEvents() const
     return d->analyticsEvents();
 }
 
-QStringList RightPanelModelsAdapter::flattenAttributeList(
-    const nx::common::metadata::GroupedAttributes& source)
+QStringList RightPanelModelsAdapter::flattenAttributeList(const analytics::AttributeList& source)
 {
     QStringList result;
     result.reserve(source.size() * 2);
 
-    for (const auto& group: source)
-        result << QString(group.name).replace('.', ' ') << Private::valuesText(group.values);
+    for (const auto& attribute: source)
+        result << attribute.displayedName << Private::valuesText(attribute.displayedValues);
 
     return result;
 }

@@ -209,7 +209,7 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(TimestampTextRole),
         IDR_ITEM(DescriptionTextRole),
         IDR_ITEM(AdditionalTextRole),
-        IDR_ITEM(GroupedAttributesRole),
+        IDR_ITEM(AnalyticsAttributesRole),
         IDR_ITEM(RemovableRole),
         IDR_ITEM(CommandActionRole),
         IDR_ITEM(ResourceListRole),

@@ -586,12 +586,12 @@ void EventTile::setFooterText(const QString& value)
     ui->footerLabel->setHidden(!d->footerEnabled || value.isEmpty());
 }
 
-EventTile::GroupedAttributes EventTile::attributeList() const
+analytics::AttributeList EventTile::attributeList() const
 {
     return ui->attributeTable->content();
 }
 
-void EventTile::setAttributeList(const GroupedAttributes& value)
+void EventTile::setAttributeList(const analytics::AttributeList& value)
 {
     ui->attributeTable->setContent(value);
     ui->attributeTable->setHidden(!d->footerEnabled || value.empty());

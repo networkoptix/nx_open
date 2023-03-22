@@ -14,6 +14,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
@@ -57,7 +58,7 @@ public:
 
         // Analytics data.
         QnUuid objectTrackId;
-        nx::common::metadata::GroupedAttributes attributes;
+        analytics::AttributeList attributes;
     };
 
 public:
