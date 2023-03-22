@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
@@ -191,6 +192,9 @@ void GroupSettingsDialog::onGroupClicked(const QVariant& idVariant)
 
 void GroupSettingsDialog::onDeleteRequested()
 {
+    if (!ui::messages::UserGroups::removeGroups(d->parentWidget, {d->groupId}))
+        return;
+
     const auto handleRemove = nx::utils::guarded(this,
         [this](bool success)
         {
