@@ -179,7 +179,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         case Qn::DescriptionTextRole:
             return description(eventParams);
 
-        case Qn::GroupedAttributesRole:
+        case Qn::AnalyticsAttributesRole:
             return QVariant::fromValue(
                 qnClientModule->analyticsAttributeHelper()->preprocessAttributes(
                     eventParams.getAnalyticsObjectTypeId(), eventParams.attributes));
