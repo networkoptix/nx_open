@@ -300,6 +300,9 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
         ? nx::vms::api::UserType::ldap
         : nx::vms::api::UserType::local;
 
+    const auto sharedResources = state.sharedResources.asKeyValueRange();
+    updateData.groupData.resourceAccessRights = {sharedResources.begin(), sharedResources.end()};
+
     const auto usersDiff = differences(originalState().users.list(), state.users.list());
     const auto groupsDiff = differences(originalState().groups, state.groups);
 
