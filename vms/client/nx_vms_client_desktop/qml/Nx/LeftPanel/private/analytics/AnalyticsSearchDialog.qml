@@ -579,8 +579,13 @@ Window
             onShowOnLayoutClicked:
                 d.showSelectionOnLayout()
 
-            onSearchRequested:
-                header.searchText = text
+            onSearchRequested: (attributeRow) =>
+            {
+                const rawAttributes = accessor.getData(selection.index, "rawAttributes")
+                const attribute = rawAttributes[attributeRow]
+                if (attribute)
+                    header.searchText = createSearchRequestText(attribute.id, attribute.values)
+            }
 
             selectedItem:
             {
@@ -601,9 +606,23 @@ Window
                     "description": getData("description") || "",
                     "additionalText": getData("additionalText") || "",
                     "attributes": getData("attributes") || [],
-                    "rawAttributes": getData("rawAttributes") || [],
                     "resourceList": getData("resourceList") || []
                 }
+            }
+
+            function createSearchRequestText(key, values)
+            {
+                const escape =
+                    (str) =>
+                    {
+                        str = str.replace(/([\"\\\:\$])/g, '\\$1');
+                        return str.includes(" ") ? `"${str}"` : str
+                    }
+
+                const escapedKeyValuePairs =
+                    Array.prototype.map.call(values, v => `${escape(key)}=${escape(v)}`)
+
+                return escapedKeyValuePairs.join(" ")
             }
 
             function setWidth(requestedWidth)

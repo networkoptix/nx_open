@@ -74,6 +74,16 @@ public:
 
         return attributeLookup.insert(objectTypeId, attributePathByName).value();
     }
+
+    static QStringList processBooleanValues(
+        const QStringList& sourceValues, const QString& trueValue, const QString& falseValue)
+    {
+        QStringList result;
+        result.reserve(sourceValues.size());
+        for (const auto& value: sourceValues)
+            result.push_back(QnLexical::deserialized<bool>(value) ? trueValue : falseValue);
+        return result;
+    };
 };
 
 AttributeHelper::AttributeHelper(AbstractStateWatcher* taxonomyStateWatcher):
@@ -92,50 +102,65 @@ QVector<AbstractAttribute*> AttributeHelper::attributePath(
     return d->ensureAttributeLookup(objectTypeId.trimmed()).value(attributeName.trimmed());
 }
 
-GroupedAttributes AttributeHelper::preprocessAttributes(
+AttributeList AttributeHelper::preprocessAttributes(
     const QString& objectTypeId, const Attributes& sourceAttributes) const
 {
+    // humanReadableNames here means only normalization of "True" and "False" spelling.
+    const auto grouped = groupAttributes(sourceAttributes, /*humanReadableNames*/ true);
+
+    QList<Attribute> result;
+
     if (objectTypeId.isEmpty())
-        return groupAttributes(sourceAttributes, /*humanReadableNames*/ true);
-
-    Attributes preprocessed;
-    Attributes unknown;
-
-    for (auto& nameValuePair: sourceAttributes)
     {
-        if (nameValuePair.name.isEmpty())
+        result.reserve(grouped.size());
+        for (const auto& attr: grouped)
+        {
+            if (NX_ASSERT(!attr.name.isEmpty()))
+                result.push_back({attr.name, attr.values, attr.name, attr.values});
+        }
+        return result;
+    }
+
+    AttributeList known;
+    AttributeList unknown;
+
+    for (const auto& attr: grouped)
+    {
+        if (!NX_ASSERT(!attr.name.isEmpty()))
             continue;
 
-        const auto path = attributePath(objectTypeId, nameValuePair.name);
+        const auto path = attributePath(objectTypeId, attr.name);
         if (path.isEmpty()) //< An attribute unknown to the current taxonomy.
         {
-            addAttributeIfNotExists(&unknown, nameValuePair);
+            unknown.push_back({attr.name, attr.values, attr.name, attr.values});
             continue;
         }
 
-        QStringList name;
+        QStringList nameParts;
         for (const auto attribute: path)
-            name.push_back(attribute->name());
+            nameParts.push_back(attribute->name());
 
-        QString value = nameValuePair.value;
+        const QString name = nameParts.join(' ');
+
         switch (path.last()->type())
         {
             case AbstractAttribute::Type::boolean:
-                value = QnLexical::deserialized<bool>(value) ? "Yes" : "No";
+                known.push_back({attr.name, attr.values, name, Private::processBooleanValues(
+                    attr.values, "Yes", "No")});
                 break;
 
             case AbstractAttribute::Type::object:
-                value = QnLexical::deserialized<bool>(value) ? "Present" : "Absent";
+                known.push_back({attr.name, attr.values, name, Private::processBooleanValues(
+                    attr.values, "Present", "Absent")});
                 break;
 
             default:
+                known.push_back({attr.name, attr.values, name, attr.values});
                 break;
         }
-        addAttributeIfNotExists(&preprocessed, { name.join(' '), value });
     }
 
-    return groupAttributes(preprocessed, /*humanReadableNames*/ false)
-        + groupAttributes(unknown, /*humanReadableNames*/ true);
+    return known + unknown;
 }
 
 } // namespace nx::vms::client::desktop::analytics

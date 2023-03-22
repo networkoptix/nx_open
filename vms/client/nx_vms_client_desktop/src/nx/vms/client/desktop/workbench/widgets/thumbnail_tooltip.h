@@ -4,9 +4,8 @@
 
 #include <QtCore/QStringList>
 
-#include <analytics/common/object_metadata.h>
-
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 
 #include "bubble_tooltip.h"
@@ -29,9 +28,8 @@ public:
     void setImageProvider(nx::vms::client::desktop::ImageProvider* value);
     void setHighlightRect(const QRectF& rect);
 
-    using GroupedAttributes = nx::common::metadata::GroupedAttributes;
-    const GroupedAttributes& attributes() const;
-    void setAttributes(const GroupedAttributes& value);
+    const analytics::AttributeList& attributes() const;
+    void setAttributes(const analytics::AttributeList& value);
 
     void setMaximumContentSize(const QSize& size);
     void adjustMaximumContentSize(const QModelIndex &index);

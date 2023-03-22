@@ -212,15 +212,15 @@ struct Track
     }
 };
 
-QString objectDescription(const GroupedAttributes& attributes)
+QString objectDescription(const analytics::AttributeList& attributes)
 {
     QString result;
 
     for (const auto& group: attributes)
     {
-        result += group.name;
+        result += group.displayedName;
         result += '\t';
-        result += group.values.join(", ");
+        result += group.displayedValues.join(", ");
         result += '\n';
     }
 

@@ -10,6 +10,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 
 class QnWorkbenchContext;
@@ -136,7 +137,7 @@ public:
     void setHighlightedTimestamp(std::chrono::microseconds value);
     void setHighlightedResources(const QSet<QnResourcePtr>& value);
 
-    static QStringList flattenAttributeList(const nx::common::metadata::GroupedAttributes& source);
+    static QStringList flattenAttributeList(const analytics::AttributeList& source);
 
     static void registerQmlTypes();
 
@@ -163,9 +164,9 @@ signals:
     void dragStarted(const QModelIndex& index, const QPoint& pos, const QSize& size);
     void linkActivated(const QModelIndex& index, const QString& link);
     void contextMenuRequested(
-        const QModelIndex& index, 
+        const QModelIndex& index,
         const QPoint& globalPos,
-        bool withStandardInteraction, 
+        bool withStandardInteraction,
         QWidget* parent);
     void pluginActionRequested(const QnUuid& engineId, const QString& actionTypeId,
         const nx::analytics::db::ObjectTrack& track, const QnVirtualCameraResourcePtr& camera);

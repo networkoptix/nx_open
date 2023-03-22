@@ -29,7 +29,7 @@ Item
     readonly property int kCopyWidth: 34
     readonly property int kHighlightLeftPadding: 8
 
-    signal searchRequested(string text)
+    signal searchRequested(int row)
 
     implicitWidth: 400
     implicitHeight: grid.implicitHeight
@@ -49,8 +49,7 @@ Item
     {
         id: highlight
 
-        property string textToCopy: ""
-        property int itemIndex: -1
+        property int rowIndex: -1
 
         color: ColorTheme.colors.dark12
         width: kHighlightLeftPadding + grid.width + kCopyWidth
@@ -225,7 +224,8 @@ Item
 
             // For the last item in the array, compute its height using Y coordinate
             // of the provided next item.
-            const computeHeightOfLastItem = (array, nextItem) =>
+            const computeHeightOfLastItem =
+                (array, nextItem) =>
                 {
                     if (array.length <= 0)
                         return
@@ -246,14 +246,10 @@ Item
                         {
                             computeHeightOfLastItem(result, child)
 
-                            result.push(
-                                {
-                                    y: child.y,
-                                    height: 0,
-                                    key: child.text,
-                                    value: array[index + 1].text,
-                                    index: index
-                                })
+                            result.push({
+                                y: child.y,
+                                height: 0,
+                                index: index / 2})
                         }
                         return result
                     }, [])
@@ -298,8 +294,7 @@ Item
 
             highlight.y = row.y
             highlight.height = row.height
-            highlight.textToCopy = row.value
-            highlight.itemIndex = row.index
+            highlight.rowIndex = row.index
         }
 
         onClicked:
@@ -307,32 +302,9 @@ Item
             if (gridMouseArea.mouseX <= gridMouseArea.width - kCopyWidth)
                 return
 
-            // Just copy the value if rawItems are unavailable.
-            if (highlight.itemIndex < 0 || highlight.itemIndex + 1 >= control.rawItems.length)
-            {
-                control.searchRequested(highlight.textToCopy)
-                return;
-            }
-
-            const key = control.rawItems[highlight.itemIndex]
-            const values = control.rawItems[highlight.itemIndex + 1]
-
-            control.searchRequested(control.createSearchRequestText(key, values))
+            if (highlight.rowIndex >= 0)
+                control.searchRequested(highlight.rowIndex)
         }
-    }
-
-    function createSearchRequestText(key, values)
-    {
-        const escape = str =>
-            {
-                str = str.replace(/([\"\\\:\$])/g, '\\$1');
-                return str.includes(" ") ? `"${str}"` : str
-            }
-
-        const escapedKeyValuePairs =
-            Array.prototype.map.call(values, v => `${escape(key)}=${escape(v)}`)
-
-        return escapedKeyValuePairs.join(" ")
     }
 
     FontMetrics

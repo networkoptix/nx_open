@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QVector>
+#include <QtCore/QVariantList>
 
 #include <analytics/common/object_metadata.h>
 #include <nx/utils/impl_ptr.h>
@@ -14,6 +15,36 @@ class AbstractStateWatcher;
 
 namespace nx::vms::client::desktop::analytics {
 
+struct Attribute
+{
+    QString id;
+    QStringList values;
+    QString displayedName;
+    QStringList displayedValues;
+
+    Q_GADGET
+    Q_PROPERTY(QString id MEMBER id CONSTANT)
+    Q_PROPERTY(QStringList values MEMBER values CONSTANT)
+    Q_PROPERTY(QString displayedName MEMBER displayedName CONSTANT)
+    Q_PROPERTY(QStringList displayedValues MEMBER displayedValues CONSTANT)
+
+public:
+    bool operator==(const Attribute& other) const
+    {
+        return id == other.id
+            && displayedName == other.displayedName
+            && values == other.values
+            && displayedValues == other.displayedValues;
+    };
+
+    bool operator!=(const Attribute& other) const
+    {
+        return !(*this == other);
+    }
+};
+
+using AttributeList = QList<Attribute>;
+
 class AttributeHelper
 {
 public:
@@ -24,7 +55,7 @@ public:
     using AttributePath = QVector<nx::analytics::taxonomy::AbstractAttribute*>;
     AttributePath attributePath(const QString& objectTypeId, const QString& attributeName) const;
 
-    nx::common::metadata::GroupedAttributes preprocessAttributes(const QString& objectTypeId,
+    AttributeList preprocessAttributes(const QString& objectTypeId,
         const nx::common::metadata::Attributes& sourceAttributes) const;
 
 private:
