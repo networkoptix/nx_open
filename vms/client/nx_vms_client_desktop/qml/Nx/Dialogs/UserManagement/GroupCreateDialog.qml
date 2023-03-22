@@ -123,7 +123,6 @@ DialogWithState
 
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext
-                editingEnabled: true
             }
         }
 
