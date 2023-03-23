@@ -6,6 +6,7 @@
 #include <optional>
 
 #include <QtGui/QGuiApplication>
+#include <QtWidgets/QPushButton>
 
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
@@ -465,6 +466,36 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
 {
     if (d->user && *d->user == user)
         return; //< Do not reset state upon setting the same user.
+
+    if (d->user.has_value() && user && isModified())
+    {
+        const QString mainText = tr("Apply changes?");
+
+        QnSessionAwareMessageBox messageBox(d->parentWidget);
+
+        messageBox.setIcon(QnMessageBoxIcon::Question);
+        messageBox.setText(mainText);
+        messageBox.setStandardButtons(
+            QDialogButtonBox::Discard
+            | QDialogButtonBox::Apply
+            | QDialogButtonBox::Cancel);
+        messageBox.setDefaultButton(QDialogButtonBox::Apply);
+
+        // Default text is "Don't save", but spec says it should be "Discard" here.
+        messageBox.button(QDialogButtonBox::Discard)->setText(tr("Discard"));
+
+        switch (messageBox.exec())
+        {
+            case QDialogButtonBox::Apply:
+                QMetaObject::invokeMethod(window(), "apply", Qt::DirectConnection);
+                // Calling apply is async, so we can not continue here.
+                return;
+            case QDialogButtonBox::Discard:
+                break;
+            case QDialogButtonBox::Cancel:
+                return;
+        }
+    }
 
     d->tabIndex = 0;
 
