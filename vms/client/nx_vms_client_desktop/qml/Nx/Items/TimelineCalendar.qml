@@ -82,6 +82,7 @@ Control
                 bottomPadding: 13
                 icon.width: 10
                 icon.height: 10
+                focusPolicy: Qt.NoFocus
 
                 flat: true
                 backgroundColor: "transparent"
