@@ -123,6 +123,7 @@ DialogWithState
 
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext
+                currentMode: PermissionsTab.EditMode
             }
         }
 
