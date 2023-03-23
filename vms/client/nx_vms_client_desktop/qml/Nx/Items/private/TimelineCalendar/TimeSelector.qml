@@ -79,6 +79,8 @@ Item
                 width: grid.cellWidth
                 height: 32
 
+                enabled: hourItem.hour >= minimumHour && hourItem.hour <= maximumHour
+
                 SelectionMarker
                 {
                     id: selectionMarker
@@ -127,8 +129,6 @@ Item
                 MouseArea
                 {
                     id: mouseArea
-
-                    enabled: hourItem.hour >= minimumHour && hourItem.hour <= maximumHour
 
                     anchors.fill: parent
                     hoverEnabled: true
