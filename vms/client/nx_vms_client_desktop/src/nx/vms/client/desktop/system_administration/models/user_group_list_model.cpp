@@ -232,7 +232,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                 case GroupTypeColumn:
                 {
                     if (group.type == nx::vms::api::UserType::ldap)
-                        return {};
+                        return QString("user_settings/group_ldap.svg");
 
                     return Private::isBuiltIn(group)
                         ? QString("user_settings/group_built_in.svg")
