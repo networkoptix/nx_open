@@ -286,6 +286,7 @@ Control
             {
                 selection = NxGlobals.dateRange(
                     new Date(range.end.getTime() - interval), range.end)
+                visibleYear = range.end.getFullYear()
                 visibleMonth = range.end.getMonth()
             }
         }
