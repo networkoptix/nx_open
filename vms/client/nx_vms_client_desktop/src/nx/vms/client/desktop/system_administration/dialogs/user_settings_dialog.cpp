@@ -254,6 +254,8 @@ void UserSettingsDialog::onDeleteRequested()
             {
                 if (success)
                     reject();
+                else
+                    ui::messages::Resources::deleteResourcesFailed(d->parentWidget, {*d->user});
             });
 
         qnResourcesChangesManager->deleteResource(*d->user, callback);
