@@ -420,6 +420,9 @@ bool UserGroupListModel::removeGroup(const QnUuid& groupId)
     if (it == d->orderedGroups.end())
         return false;
 
+    if (it->isPredefined || it->type != api::UserType::local)
+        return false;
+
     const int row = it - d->orderedGroups.begin();
 
     const ScopedRemoveRows removeRows(this, row, row);

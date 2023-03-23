@@ -11,7 +11,9 @@
 #include <QtWidgets/QStyledItemDelegate>
 
 #include <client/client_globals.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/customizable_sort_filter_proxy_model.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
@@ -25,6 +27,7 @@
 #include <nx/vms/client/desktop/system_administration/models/user_group_list_model.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -164,6 +167,8 @@ public:
 
     nx::vms::api::UserRoleDataList userRoles() const;
 
+    bool canDeleteGroup(const QnUuid& group);
+
 private:
     void createGroup();
     void deleteSelected();
@@ -185,8 +190,8 @@ UserGroupsWidget::UserGroupsWidget(QnUserRolesManager* manager, QWidget* parent)
     if (!NX_ASSERT(manager))
         return;
 
-    d->groupsModel->reset(d->userRoles());
     d->setupUi();
+    d->groupsModel->reset(d->userRoles());
 
     connect(manager, &QnUserRolesManager::userRoleAddedOrUpdated, d.get(),
         [this](const nx::vms::api::UserRoleData& group)
@@ -217,11 +222,17 @@ void UserGroupsWidget::loadDataToUi()
 
 void UserGroupsWidget::applyChanges()
 {
+    if (d->deletedGroupIds.empty())
+        return;
+
+    if (!ui::messages::UserGroups::removeGroups(this, d->deletedGroupIds))
+    {
+        loadDataToUi(); //< Restore groups table.
+        return;
+    }
+
     const auto deletedGroupIds = d->deletedGroupIds;
     d->deletedGroupIds = {};
-
-    if (deletedGroupIds.empty())
-        return;
 
     GroupSettingsDialog::removeGroups(systemContext(), deletedGroupIds);
 }
@@ -259,6 +270,7 @@ UserGroupsWidget::Private::Private(UserGroupsWidget* q, QnUserRolesManager* mana
     connect(sortModel, &QAbstractItemModel::rowsInserted, this, &Private::handleModelChanged);
     connect(sortModel, &QAbstractItemModel::rowsRemoved, this, &Private::handleModelChanged);
     connect(sortModel, &QAbstractItemModel::dataChanged, this, &Private::handleSelectionChanged);
+    connect(sortModel, &QAbstractItemModel::modelReset, this, &Private::handleModelChanged);
 }
 
 void UserGroupsWidget::Private::setupUi()
@@ -362,6 +374,18 @@ void UserGroupsWidget::Private::handleModelChanged()
     handleSelectionChanged();
 }
 
+bool UserGroupsWidget::Private::canDeleteGroup(const QnUuid &groupId)
+{
+    const auto groupData = q->userRolesManager()->userRole(groupId);
+    return !groupData.id.isNull()
+        && !groupData.isPredefined
+        && groupData.type == api::UserType::local
+        && MembersModel::isEditable(
+            q->systemContext()->accessSubjectHierarchy(),
+            q->systemContext()->userWatcher()->user()->getId(),
+            groupId);
+}
+
 void UserGroupsWidget::Private::handleSelectionChanged()
 {
     const auto checkedGroupIds = groupsModel->checkedGroupIds() & visibleGroupIds();
@@ -375,7 +399,7 @@ void UserGroupsWidget::Private::handleSelectionChanged()
     const bool canDelete = std::any_of(checkedGroupIds.cbegin(), checkedGroupIds.cend(),
         [this](const QnUuid& groupId)
         {
-            return QnPredefinedUserRoles::enumValue(groupId) == Qn::UserRole::customUserRole;
+            return canDeleteGroup(groupId);
         });
 
     deleteSelectedButton->setVisible(canDelete);
@@ -406,6 +430,9 @@ void UserGroupsWidget::Private::deleteSelected()
 
     for (const auto& groupId: toDelete)
     {
+        if (!canDeleteGroup(groupId))
+            continue;
+
         if (NX_ASSERT(groupsModel->removeGroup(groupId)))
             deletedGroupIds.insert(groupId);
     }
