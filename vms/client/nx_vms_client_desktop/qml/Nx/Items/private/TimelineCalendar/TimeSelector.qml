@@ -145,7 +145,7 @@ Item
                         if (hour < selectionStart)
                         {
                             selectionStart = hour
-                            selectionedited(hour, selectionEnd)
+                            selectionEdited(hour, selectionEnd)
                         }
                         else
                         {
