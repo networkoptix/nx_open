@@ -93,24 +93,44 @@ Control
             {
                 x: 10
                 iconUrl: "image://svg/skin/misc/corner_arrow_back.svg"
+
+                readonly property int kMinYear: 1970
+
+                enabled: monthPickerVisible
+                    ? visibleYear > kMinYear
+                    : visibleYear > kMinYear || visibleMonth > 1
+
                 onReleased:
                 {
                     if (monthPickerVisible)
-                        visibleYear = Math.max(1970, visibleYear - 1)
+                    {
+                        visibleYear = Math.max(kMinYear, visibleYear - 1)
+                    }
                     else
-                        visibleMonth = new Date(visibleYear, visibleMonth - 1, 1).getMonth()
+                    {
+                        visibleMonth = (visibleMonth + 12 - 1) % 12
+                        if (visibleMonth === 11)
+                            --visibleYear
+                    }
                 }
             }
             ArrowButton
             {
                 x: parent.width - width - 10
                 iconUrl: "image://svg/skin/misc/corner_arrow_forward.svg"
+
                 onReleased:
                 {
                     if (monthPickerVisible)
+                    {
                         ++visibleYear
+                    }
                     else
-                        visibleMonth = new Date(visibleYear, visibleMonth + 1, 1).getMonth()
+                    {
+                        visibleMonth = (visibleMonth + 1) % 12
+                        if (visibleMonth === 0)
+                            ++visibleYear
+                    }
                 }
             }
 
