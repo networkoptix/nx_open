@@ -2,6 +2,8 @@
 
 #include "group_settings_dialog.h"
 
+#include <QtWidgets/QPushButton>
+
 #include <client/client_globals.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
@@ -17,7 +19,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
-#include <ui/dialogs/common/message_box.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../globals/session_notifier.h"
@@ -207,6 +209,39 @@ void GroupSettingsDialog::onDeleteRequested()
 
 void GroupSettingsDialog::setGroup(const QnUuid& groupId)
 {
+    if (!d->groupId.isNull() && d->groupId == groupId)
+        return; //< Do not reset state upon setting the same group.
+
+    if (!d->groupId.isNull() && !groupId.isNull() && isModified())
+    {
+        const QString mainText = tr("Apply changes?");
+
+        QnSessionAwareMessageBox messageBox(d->parentWidget);
+
+        messageBox.setIcon(QnMessageBoxIcon::Question);
+        messageBox.setText(mainText);
+        messageBox.setStandardButtons(
+            QDialogButtonBox::Discard
+            | QDialogButtonBox::Apply
+            | QDialogButtonBox::Cancel);
+        messageBox.setDefaultButton(QDialogButtonBox::Apply);
+
+        // Default text is "Don't save", but spec says it should be "Discard" here.
+        messageBox.button(QDialogButtonBox::Discard)->setText(tr("Discard"));
+
+        switch (messageBox.exec())
+        {
+            case QDialogButtonBox::Apply:
+                QMetaObject::invokeMethod(window(), "apply", Qt::DirectConnection);
+                // Calling apply is async, so we can not continue here.
+                return;
+            case QDialogButtonBox::Discard:
+                break;
+            case QDialogButtonBox::Cancel:
+                return;
+        }
+    }
+
     d->groupId = groupId;
     d->tabIndex = 0;
     createStateFrom(groupId);
