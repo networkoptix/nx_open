@@ -52,6 +52,7 @@ struct NX_VMS_COMMON_API UserAccessData
     Duration expiresIn(TimePoint now = nx::utils::monotonicTime()) const;
     TimePoint issued() const;
 
+    void setDuration(Duration duration);
     void setToken(
         Token token, Duration duration,
         std::optional<TimePoint> issued = nx::utils::monotonicTime());

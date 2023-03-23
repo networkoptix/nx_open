@@ -48,6 +48,11 @@ UserAccessData::TimePoint UserAccessData::issued() const
     return m_issued ? *m_issued : (nx::utils::monotonicTime() - kDefaultDuration);
 }
 
+void UserAccessData::setDuration(Duration duration)
+{
+    m_duration = std::move(duration);
+}
+
 void UserAccessData::setToken(Token token, Duration duration, std::optional<TimePoint> issued)
 {
     m_token = std::move(token);
