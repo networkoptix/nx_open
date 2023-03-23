@@ -25,7 +25,15 @@ Item
 
     property var buttonBox
 
-    readonly property bool editingEnabled: editingEnabledSwitch.checked && control.enabled
+    enum Mode
+    {
+        ViewMode,
+        EditMode
+    }
+
+    property int currentMode: PermissionsTab.ViewMode
+
+    readonly property bool editingEnabled: enabled && currentMode == PermissionsTab.EditMode
 
     readonly property var kAllNodes: [
         ResourceTree.NodeType.videoWalls,
@@ -205,9 +213,12 @@ Item
             anchors.verticalCenterOffset: - (searchField.y + searchField.height)
 
             imageSource: "image://svg/skin/user_settings/no_resources.svg"
+
             text: qsTr("No resources")
-            additionalText:
-                qsTr("Try changing search criteria or enable showing all permissions and resources")
+
+            additionalText: currentMode == PermissionsTab.ViewMode
+                ? qsTr("Try changing search criteria or enable editing to see available resources")
+                : qsTr("Try changing search criteria")
         }
     }
 
@@ -239,9 +250,15 @@ Item
             anchors.leftMargin: 16
             anchors.verticalCenter: parent.verticalCenter
 
-            enabled: control.enabled
+            visible: control.enabled
 
-            text: editingEnabledSwitch.checked ? qsTr("Editing enabled") : qsTr("Editing disabled")
+            text: checked ? qsTr("Editing enabled") : qsTr("Editing disabled")
+
+            onCheckedChanged:
+                control.currentMode = checked ? PermissionsTab.EditMode : PermissionsTab.ViewMode
         }
     }
+
+    onCurrentModeChanged:
+        editingEnabledSwitch.checked = currentMode == PermissionsTab.EditMode
 }
