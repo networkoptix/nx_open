@@ -16,19 +16,13 @@ const ItemDescriptor& SendEmailAction::manifest()
         .id = utils::type<SendEmailAction>(),
         .displayName = tr("Send email"),
         .description = "",
+        .flags = {ItemFlag::aggregationByTypeSupported, ItemFlag::omitLogging},
         .fields = {
             makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("to")),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<ActionTextField>(
                 utils::kEmailsFieldName, tr("Additional recipients")),
-            makeFieldDescriptor<EmailMessageField>(
-                "message",
-                tr("Email Message"),
-                {},
-                {
-                    {"caption", "{@EventCaption}"},
-                    {"description", "{@EventDescription}"}
-                })
+            makeFieldDescriptor<EmailMessageField>("message", tr("Email Message"))
         }
     };
     return kDescriptor;

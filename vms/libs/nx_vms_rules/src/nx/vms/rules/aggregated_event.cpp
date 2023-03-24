@@ -2,6 +2,8 @@
 
 #include "aggregated_event.h"
 
+#include <unordered_map>
+
 #include <QtCore/QVariant>
 
 #include <nx/utils/log/assert.h>
@@ -10,98 +12,109 @@
 
 namespace nx::vms::rules {
 
-AggregatedEvent::AggregatedEvent(const EventPtr& event)
+AggregatedEvent::AggregatedEvent(const EventPtr& event):
+    m_aggregatedEvents{event}
 {
-    m_aggregationInfoList.push_back(AggregationInfo{event, 1});
 }
 
-AggregatedEvent::AggregatedEvent(const AggregationInfo& aggregationInfo)
+AggregatedEvent::AggregatedEvent(std::vector<EventPtr>&& eventList):
+    m_aggregatedEvents{std::move(eventList)}
 {
-    m_aggregationInfoList.push_back(aggregationInfo);
-}
-
-AggregatedEvent::AggregatedEvent(const AggregationInfoList& aggregationInfoList):
-    m_aggregationInfoList{aggregationInfoList}
-{
-    NX_ASSERT(uniqueCount() != 0);
 }
 
 QString AggregatedEvent::type() const
 {
-    return uniqueCount() > 0 ? initialEvent()->type() : QString{};
+    return m_aggregatedEvents.empty() ? QString{} : initialEvent()->type();
 }
 
 QVariant AggregatedEvent::property(const char* name) const
 {
-    return uniqueCount() > 0 ? initialEvent()->property(name) : QVariant{};
+    return m_aggregatedEvents.empty() ? QVariant{} : initialEvent()->property(name);
 }
 
 std::chrono::microseconds AggregatedEvent::timestamp() const
 {
-    return uniqueCount() > 0 ? initialEvent()->timestamp() : std::chrono::microseconds::zero();
+    return m_aggregatedEvents.empty()
+        ? std::chrono::microseconds::zero()
+        : initialEvent()->timestamp();
 }
 
 State AggregatedEvent::state() const
 {
-    return NX_ASSERT(uniqueCount() > 0) ? initialEvent()->state() : State::none;
+    return NX_ASSERT(!m_aggregatedEvents.empty()) ? initialEvent()->state() : State::none;
 }
 
 QVariantMap AggregatedEvent::details(common::SystemContext* context) const
 {
-    if(uniqueCount() == 0)
+    if (m_aggregatedEvents.empty())
         return {};
 
     auto eventDetails = initialEvent()->details(context);
 
-    const auto totalEventCount = totalCount();
-    if (totalEventCount > 1)
+    const auto eventCount = m_aggregatedEvents.size();
+    if (eventCount > 1)
     {
         const auto eventName = initialEvent()->name(context);
         eventDetails[utils::kExtendedCaptionDetailName] =
             tr("Multiple %1 events have occurred").arg(eventName);
     }
 
-    eventDetails[utils::kCountDetailName] = QVariant::fromValue(totalEventCount);
+    eventDetails[utils::kCountDetailName] = QVariant::fromValue(eventCount);
 
     return eventDetails;
 }
 
 AggregatedEventPtr AggregatedEvent::filtered(const Filter& filter) const
 {
-    if(uniqueCount() == 0)
+    if (m_aggregatedEvents.empty())
         return {};
 
-    AggregationInfoList filteredList;
-    for (const auto& aggregationInfo: m_aggregationInfoList)
+    std::vector<EventPtr> filteredList;
+    for (const auto& aggregatedEvent: m_aggregatedEvents)
     {
-        if (auto event = filter(aggregationInfo.event))
-            filteredList.push_back(AggregationInfo{event, aggregationInfo.count});
+        if (auto event = filter(aggregatedEvent))
+            filteredList.emplace_back(std::move(event));
     }
 
     if (filteredList.empty())
         return {};
 
-    return AggregatedEventPtr::create(filteredList);
+    return AggregatedEventPtr::create(std::move(filteredList));
 }
 
-size_t AggregatedEvent::totalCount() const
+std::vector<AggregatedEventPtr> AggregatedEvent::split(const SplitKeyFunction& splitKeyFunction) const
 {
-    size_t result{0};
+    if (m_aggregatedEvents.empty())
+        return {};
 
-    for (const auto& aggregationInfo: m_aggregationInfoList)
-        result += aggregationInfo.count;
+    std::unordered_map<QString, std::vector<EventPtr>> splitMap;
+    for (const auto& aggregatedEvent: m_aggregatedEvents)
+        splitMap[splitKeyFunction(aggregatedEvent)].push_back(aggregatedEvent);
+
+    std::vector<AggregatedEventPtr> result;
+    result.reserve(splitMap.size());
+    for (auto& [_, list]: splitMap)
+        result.push_back(AggregatedEventPtr::create(std::move(list)));
+
+    std::sort(
+        result.begin(),
+        result.end(),
+        [](const AggregatedEventPtr& l, const AggregatedEventPtr& r)
+        {
+            return l->timestamp() < r->timestamp();
+        });
 
     return result;
 }
 
-size_t AggregatedEvent::uniqueCount() const
+size_t AggregatedEvent::count() const
 {
-    return m_aggregationInfoList.size();
+    return m_aggregatedEvents.size();
 }
 
 EventPtr AggregatedEvent::initialEvent() const
 {
-    return m_aggregationInfoList.size() > 0 ? m_aggregationInfoList.front().event : EventPtr{};
+    return m_aggregatedEvents.empty() ? EventPtr{} : m_aggregatedEvents.front();
 }
 
 QnUuid AggregatedEvent::id() const

@@ -143,6 +143,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new CustomizableTextPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::CustomizableIconField>())
         pickerWidget = new CustomizableIconPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::EventFlagField>())
+        pickerWidget = new FlagPicker<nx::vms::rules::EventFlagField>(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::EventTextField>())
         pickerWidget = new EventTextPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::InputPortField>())
@@ -160,12 +162,12 @@ PickerWidget* PickerFactory::createWidget(
     else if (descriptor.id == fieldMetatype<nx::vms::rules::StateField>())
         pickerWidget = new StatePicker(context, parent);
     // Action field based pickers.
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::ActionFlagField>())
+        pickerWidget = new FlagPicker<nx::vms::rules::ActionFlagField>(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::ActionTextField>())
         pickerWidget = new ActionTextPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::ContentTypeField>())
         pickerWidget = new HttpContentTypePicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::FlagField>())
-        pickerWidget = new FlagPicker<nx::vms::rules::FlagField>(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::FpsField>())
         pickerWidget = new FpsPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::HttpMethodField>())

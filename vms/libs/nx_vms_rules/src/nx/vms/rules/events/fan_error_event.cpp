@@ -15,11 +15,6 @@ FanErrorEvent::FanErrorEvent(QnUuid serverId, std::chrono::microseconds timestam
 {
 }
 
-QString FanErrorEvent::uniqueName() const
-{
-    return utils::makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
-}
-
 QString FanErrorEvent::resourceKey() const
 {
     return m_serverId.toSimpleString();

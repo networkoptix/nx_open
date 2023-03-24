@@ -37,11 +37,6 @@ PoeOverBudgetEvent::PoeOverBudgetEvent(
 {
 }
 
-QString PoeOverBudgetEvent::uniqueName() const
-{
-    return utils::makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
-}
-
 QString PoeOverBudgetEvent::resourceKey() const
 {
     return m_serverId.toSimpleString();

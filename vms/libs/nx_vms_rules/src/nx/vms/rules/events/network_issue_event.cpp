@@ -141,6 +141,7 @@ const ItemDescriptor& NetworkIssueEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<NetworkIssueEvent>(),
         .displayName = tr("Network Issue"),
+        .flags = {ItemFlag::aggregationByTypeSupported},
         .permissions = {
             .resourcePermissions = {{utils::kCameraIdFieldName, Qn::ViewContentPermission}}
         },

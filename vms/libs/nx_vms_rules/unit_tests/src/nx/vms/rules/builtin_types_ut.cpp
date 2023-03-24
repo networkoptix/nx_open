@@ -205,6 +205,7 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventFieldRegistration<CustomizableIconField>();
     testEventFieldRegistration<CustomizableTextField>();
     testEventFieldRegistration<DummyField>();
+    testEventFieldRegistration<EventFlagField>();
     testEventFieldRegistration<InputPortField>();
     testEventFieldRegistration<StateField>();
     testEventFieldRegistration<EventTextField>();
@@ -248,7 +249,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<EventIdField>();
     testActionFieldRegistration<EventDevicesField>();
     testActionFieldRegistration<ExtractDetailField>(systemContext());
-    testActionFieldRegistration<FlagField>();
+    testActionFieldRegistration<ActionFlagField>();
     testActionFieldRegistration<FpsField>();
     testActionFieldRegistration<HttpAuthTypeField>();
     testActionFieldRegistration<HttpMethodField>();

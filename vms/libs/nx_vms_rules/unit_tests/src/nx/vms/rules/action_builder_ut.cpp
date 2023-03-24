@@ -352,13 +352,13 @@ TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
     EXPECT_CALL(mock, targetedUsers(expectedSelection2)).Times(1);
     EXPECT_CALL(mock, targetedCameraId(cameraOfUser2->getId())).Times(1);
 
-    AggregationInfoList aggregationInfoList;
-    aggregationInfoList.push_back({makeEventWithCameraId(cameraOfUser1->getId()), 1});
-    aggregationInfoList.push_back({makeEventWithCameraId(cameraOfUser2->getId()), 1});
+    std::vector<EventPtr> aggregationInfoList{
+        makeEventWithCameraId(cameraOfUser1->getId()),
+        makeEventWithCameraId(cameraOfUser2->getId())};
 
-    auto eventAggregator = AggregatedEventPtr::create(aggregationInfoList);
+    auto eventAggregator = AggregatedEventPtr::create(std::move(aggregationInfoList));
 
-    EXPECT_EQ(eventAggregator->uniqueCount(), 2);
+    EXPECT_EQ(eventAggregator->count(), 2);
 
     builder->process(eventAggregator);
 }
@@ -398,7 +398,7 @@ TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
     auto eventAggregator = AggregatedEventPtr::create(
         makeEventWithDeviceIds({cameraOfUser1->getId(), cameraOfUser2->getId()}));
 
-    EXPECT_EQ(eventAggregator->uniqueCount(), 1);
+    EXPECT_EQ(eventAggregator->count(), 1);
 
     builder->process(eventAggregator);
 }
@@ -420,7 +420,7 @@ TEST_F(ActionBuilderTest, eventWithoutDevicesIsProcessed)
 
     auto eventAggregator = AggregatedEventPtr::create(makeSimpleEvent());
 
-    EXPECT_EQ(eventAggregator->uniqueCount(), 1);
+    EXPECT_EQ(eventAggregator->count(), 1);
 
     builder->process(eventAggregator);
 }

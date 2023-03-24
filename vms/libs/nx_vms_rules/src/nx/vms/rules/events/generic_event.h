@@ -18,6 +18,7 @@ class NX_VMS_RULES_API GenericEvent: public DescribedEvent
     FIELD(QString, source, setSource)
     FIELD(QnUuid, serverId, setServerId)
     FIELD(QnUuidList, deviceIds, setDeviceIds)
+    FIELD(bool, omitLogging, setOmitLogging)
 
 public:
     GenericEvent() = default;

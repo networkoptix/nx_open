@@ -43,7 +43,7 @@ void testSimpleTypeField(const std::initializer_list<T>& values)
 
 TEST(SimpleTypeActionFieldTest, SimpleTypes)
 {
-    testSimpleTypeField<FlagField>({true, false});
+    testSimpleTypeField<ActionFlagField>({true, false});
     testSimpleTypeField<OptionalTimeField>({-1, 0, 60, 300, 86400});
     testSimpleTypeField<ActionTextField>({ "", "Hello", "\\/!@#$%^&*()_+" });
 }

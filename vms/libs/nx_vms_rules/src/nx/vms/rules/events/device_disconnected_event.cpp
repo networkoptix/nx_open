@@ -90,6 +90,7 @@ const ItemDescriptor& DeviceDisconnectedEvent::manifest()
         .id = utils::type<DeviceDisconnectedEvent>(),
         .displayName = tr("Device Disconnected"),
         .description = "",
+        .flags = {ItemFlag::aggregationByTypeSupported},
         .fields = {
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,

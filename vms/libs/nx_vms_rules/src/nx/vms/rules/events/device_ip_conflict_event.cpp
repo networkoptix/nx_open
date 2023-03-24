@@ -31,11 +31,6 @@ DeviceIpConflictEvent::DeviceIpConflictEvent(
 {
 }
 
-QString DeviceIpConflictEvent::uniqueName() const
-{
-    return utils::makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
-}
-
 QString DeviceIpConflictEvent::resourceKey() const
 {
     return m_serverId.toSimpleString();

@@ -19,11 +19,6 @@ CameraEvent::CameraEvent(std::chrono::microseconds timestamp, State state, QnUui
 {
 }
 
-QString CameraEvent::uniqueName() const
-{
-    return utils::makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
-}
-
 QString CameraEvent::resourceKey() const
 {
     return m_cameraId.toSimpleString();

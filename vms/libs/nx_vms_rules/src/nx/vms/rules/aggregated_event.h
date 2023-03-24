@@ -4,7 +4,6 @@
 
 #include <functional>
 
-#include "aggregator.h"
 #include "basic_event.h"
 
 namespace nx::vms::rules {
@@ -15,13 +14,9 @@ class NX_VMS_RULES_API AggregatedEvent: public QObject
     Q_OBJECT
 
 public:
-    using Filter = std::function<EventPtr(const EventPtr&)>;
-
-public:
     explicit AggregatedEvent(const EventPtr& event);
-    explicit AggregatedEvent(const AggregationInfo& aggregationInfo);
-    explicit AggregatedEvent(const AggregationInfoList& aggregationInfoList);
-    ~AggregatedEvent() = default;
+    explicit AggregatedEvent(std::vector<EventPtr>&& eventList);
+    ~AggregatedEvent() override = default;
 
     /** Returns property with the given name of the initial event. */
     QVariant property(const char* name) const;
@@ -41,20 +36,27 @@ public:
     /** Returns initial event details plus aggregated details. */
     QVariantMap details(common::SystemContext* context) const;
 
+    using Filter = std::function<EventPtr(const EventPtr&)>;
     /**
      * Filters aggregated events by the given filter condition. If there is no appropriate events
      * nullptr returned.
      */
     AggregatedEventPtr filtered(const Filter& filter) const;
 
-    size_t totalCount() const;
-    size_t uniqueCount() const;
+    using SplitKeyFunction = std::function<QString(const EventPtr&)>;
+    /**
+     * Split all the aggregated events to a list of AggregatedEventPtr using a key from the given
+     * function. All the aggregated events are sorted by a timestamp.
+     */
+    std::vector<AggregatedEventPtr> split(const SplitKeyFunction& splitKeyFunction) const;
+
+    size_t count() const;
 
     EventPtr initialEvent() const;
 
 private:
     QnUuid m_id = QnUuid::createUuid(); //< TODO: #amalov Get from initial event if needed.
-    AggregationInfoList m_aggregationInfoList;
+    std::vector<EventPtr> m_aggregatedEvents;
 
     AggregatedEvent() = default;
 };

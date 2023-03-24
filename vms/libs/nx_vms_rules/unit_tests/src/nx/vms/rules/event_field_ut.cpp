@@ -79,6 +79,7 @@ TEST_F(EventFieldContextTest, SourceUserField)
 
 TEST(EventFieldTest, SimpleTypes)
 {
+    testSimpleTypeField<EventFlagField>({true, false});
     testSimpleTypeField<ExpectedUuidField>({QnUuid(), QnUuid::createUuid()});
     testSimpleTypeField<IntField>({-1, 0, 60, 300, 86400});
     testSimpleTypeField<EventTextField>({ "", "Hello", "\\/!@#$%^&*()_+" }, true);

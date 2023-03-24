@@ -118,7 +118,7 @@ private:
     std::map<QString, std::unique_ptr<ActionBuilderField>> m_fields;
 
     std::chrono::microseconds m_interval = std::chrono::microseconds::zero();
-    QTimer m_timer;
+    QScopedPointer<QTimer> m_timer;
     QSharedPointer<Aggregator> m_aggregator;
 
     // Running flag for prolonged actions.

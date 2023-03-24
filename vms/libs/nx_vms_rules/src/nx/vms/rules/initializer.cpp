@@ -81,6 +81,7 @@ void Initializer::registerFields() const
     registerEventField<CustomizableIconField>();
     registerEventField<CustomizableTextField>();
     registerEventField<DummyField>();
+    registerEventField<EventFlagField>();
     registerEventField<EventTextField>();
     registerEventField<ExpectedUuidField>();
     registerEventField<InputPortField>();
@@ -96,7 +97,7 @@ void Initializer::registerFields() const
 
     registerActionField<ActionIntField>();
     registerActionField<ActionTextField>();
-    registerActionField<FlagField>();
+    registerActionField<ActionFlagField>();
     registerActionField<FpsField>();
     registerActionField<ContentTypeField>();
     m_engine->registerActionField(
