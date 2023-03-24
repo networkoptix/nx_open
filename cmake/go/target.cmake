@@ -152,7 +152,7 @@ function(nx_go_build target working_dir package_path)
     endif()
 endfunction()
 
-function(nx_go_openapi_gen_command source_yaml target_go working_dir)
+function(nx_go_openapi_gen_command source_yaml target_go working_dir package gen_targets)
     set(multi_value_args DEPENDS)
     cmake_parse_arguments(GO_OAPI_GEN "" "" "${multi_value_args}" ${ARGN})
 
@@ -164,9 +164,26 @@ function(nx_go_openapi_gen_command source_yaml target_go working_dir)
             "${source_yaml}"
             ${GO_OAPI_GEN_DEPENDS}
         WORKING_DIRECTORY "${working_dir}"
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${target_dir}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${target_dir}" .
         COMMAND ${CMAKE_COMMAND} -E env GOBIN=${gobin} ${NX_GO_COMPILER} install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.9.0
-        COMMAND ${gobin}/oapi-codegen -package handlers -generate server,types -o "${target_go}" "${source_yaml}")
+        COMMAND ${gobin}/oapi-codegen -package "${package}" -generate "${gen_targets}" -o "${target_go}" "${source_yaml}")
+    set_source_files_properties("${target_go}" PROPERTIES GENERATED TRUE)
+endfunction()
+
+function(nx_go_gen_mock source_go target_go working_dir package)
+    set(multi_value_args DEPENDS)
+    cmake_parse_arguments(GO_OAPI_GEN "" "" "${multi_value_args}" ${ARGN})
+
+    set(gobin ${CMAKE_CURRENT_BINARY_DIR})
+    get_filename_component(target_dir "${target_go}" DIRECTORY)
+    add_custom_command(
+        OUTPUT "${target_go}"
+        DEPENDS
+            "${source_go}"
+        WORKING_DIRECTORY "${working_dir}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${target_dir}" .
+        COMMAND ${CMAKE_COMMAND} -E env GOBIN=${gobin} ${NX_GO_COMPILER} install github.com/golang/mock/mockgen@v1.6.0
+        COMMAND ${gobin}/mockgen -package "${package}" -source "${source_go}" -destination "${target_go}")
     set_source_files_properties("${target_go}" PROPERTIES GENERATED TRUE)
 endfunction()
 
@@ -194,6 +211,8 @@ function(nx_go_add_rest_api_service name working_dir)
             "${yaml}"
             "${go_file}"
             "${working_dir}"
+            "handlers"
+            "server,types"
         )
     endforeach()
 
@@ -207,4 +226,25 @@ function(nx_go_add_rest_api_service name working_dir)
                 ${GO_REST_SERVICE_DEPENDS}
         )
     endif()
+endfunction()
+
+function(nx_go_add_api_client target yaml)
+    set(full_target_name ${target}_api_client)
+    add_custom_target(${full_target_name} ALL DEPENDS
+        "${CMAKE_CURRENT_LIST_DIR}/generated_client.go"
+        "${CMAKE_CURRENT_LIST_DIR}/generated_client_mock.go"
+    )
+    nx_go_openapi_gen_command(
+        "${yaml}"
+        "${CMAKE_CURRENT_LIST_DIR}/generated_client.go"
+        "${CMAKE_CURRENT_LIST_DIR}"
+        "${target}"
+        "client,types"
+    )
+    nx_go_gen_mock(
+        generated_client.go
+        "${CMAKE_CURRENT_LIST_DIR}/generated_client_mock.go"
+        "${CMAKE_CURRENT_LIST_DIR}"
+        "${target}"
+    )
 endfunction()
