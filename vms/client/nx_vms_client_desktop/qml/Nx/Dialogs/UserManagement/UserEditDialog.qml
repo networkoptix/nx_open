@@ -15,6 +15,7 @@ import nx.vms.client.desktop 1.0
 
 import ".."
 import "Tabs"
+import "Components"
 
 DialogWithState
 {
@@ -57,6 +58,7 @@ DialogWithState
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
+    property bool isSaving: false
     property var self
 
     signal deleteRequested()
@@ -97,7 +99,7 @@ DialogWithState
                 groups: dialog.parentGroups
                 globalPermissions: dialog.globalPermissions
                 sharedResources: dialog.sharedResources
-                editable: dialog.editable
+                enabled: dialog.editable && !dialog.isSaving
 
                 onDeleteRequested: dialog.deleteRequested()
                 onAuditTrailRequested: dialog.auditTrailRequested()
@@ -120,7 +122,8 @@ DialogWithState
                 anchors.fill: parent
 
                 model: membersModel
-                enabled: dialog.parentGroupsEditable && dialog.editable
+                enabled: !dialog.isSaving
+                editable: dialog.parentGroupsEditable && dialog.editable
 
                 onAddGroupClicked: dialog.groupClicked(null)
             }
@@ -138,7 +141,7 @@ DialogWithState
                 id: permissionSettings
                 anchors.fill: parent
 
-                enabled: dialog.editable
+                enabled: dialog.editable && !dialog.isSaving
 
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext
@@ -157,7 +160,7 @@ DialogWithState
                 id: globalPermissionSettings
                 anchors.fill: parent
 
-                editable: dialog.editable
+                editable: dialog.editable && !dialog.isSaving
 
                 model: GlobalPermissionsModel
                 {
@@ -166,13 +169,6 @@ DialogWithState
                 }
             }
         }
-    }
-
-    onModifiedChanged:
-    {
-        const applyButton = buttonBox.standardButton(DialogButtonBox.Apply)
-        if (applyButton)
-            applyButton.enabled = modified
     }
 
     validateFunc: () =>
@@ -184,11 +180,15 @@ DialogWithState
         return false
     }
 
-    buttonBox: DialogButtonBox
+    buttonBox: DialogButtonBoxWithPreloader
     {
         id: buttonBox
-        buttonLayout: DialogButtonBox.KdeLayout
 
-        standardButtons: DialogButtonBox.Ok | DialogButtonBox.Apply | DialogButtonBox.Cancel
+        modified: dialog.modified
+        preloaderButton: dialog.isSaving
+            ? (dialog.self.isOkClicked()
+                ? DialogButtonBox.Ok
+                : DialogButtonBox.Apply)
+            : undefined
     }
 }

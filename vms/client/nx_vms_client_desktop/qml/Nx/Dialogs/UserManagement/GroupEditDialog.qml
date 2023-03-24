@@ -15,6 +15,7 @@ import nx.vms.client.desktop 1.0
 
 import ".."
 import "Tabs"
+import "Components"
 
 DialogWithState
 {
@@ -46,6 +47,7 @@ DialogWithState
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
+    property bool isSaving: false
     property var self
 
     signal deleteRequested()
@@ -91,6 +93,8 @@ DialogWithState
 
                 self: dialog.self
 
+                enabled: !dialog.isSaving
+
                 nameEditable: !dialog.isLdap && !dialog.isPredefined && dialog.editable
                 isLdap: dialog.isLdap
                 groups: dialog.parentGroups
@@ -121,7 +125,8 @@ DialogWithState
                 anchors.fill: parent
 
                 model: membersModel
-                enabled: dialog.editable
+                editable: dialog.editable
+                enabled: !dialog.isSaving
 
                 onAddGroupClicked: dialog.groupClicked(null)
             }
@@ -139,7 +144,7 @@ DialogWithState
                 id: permissionSettings
                 anchors.fill: parent
 
-                enabled: !dialog.isPredefined && dialog.editable
+                enabled: !dialog.isPredefined && dialog.editable && !dialog.isSaving
 
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext
@@ -158,7 +163,7 @@ DialogWithState
                 id: globalPermissionSettings
                 anchors.fill: parent
 
-                editable: !dialog.isPredefined && dialog.editable
+                enabled: !dialog.isPredefined && dialog.editable && !dialog.isSaving
 
                 model: GlobalPermissionsModel
                 {
@@ -181,23 +186,21 @@ DialogWithState
                 anchors.fill: parent
 
                 model: membersModel
-                enabled: !dialog.isLdap && dialog.editable
+                editable: !dialog.isLdap && dialog.editable
+                enabled: !dialog.isSaving
             }
         }
     }
 
-    onModifiedChanged:
-    {
-        const applyButton = buttonBox.standardButton(DialogButtonBox.Apply)
-        if (applyButton)
-            applyButton.enabled = modified
-    }
-
-    buttonBox: DialogButtonBox
+    buttonBox: DialogButtonBoxWithPreloader
     {
         id: buttonBox
-        buttonLayout: DialogButtonBox.KdeLayout
 
-        standardButtons: DialogButtonBox.Ok | DialogButtonBox.Apply | DialogButtonBox.Cancel
+        modified: dialog.modified
+        preloaderButton: dialog.isSaving
+            ? (dialog.self.isOkClicked()
+                ? DialogButtonBox.Ok
+                : DialogButtonBox.Apply)
+            : undefined
     }
 }

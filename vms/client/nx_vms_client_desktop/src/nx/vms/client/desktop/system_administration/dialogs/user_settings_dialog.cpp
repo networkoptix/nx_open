@@ -74,6 +74,7 @@ struct UserSettingsDialog::Private
     QPointer<SessionNotifier> sessionNotifier;
     DialogType dialogType;
     QmlProperty<int> tabIndex;
+    QmlProperty<bool> isSaving;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
     std::optional<QnUserResourcePtr> user;
     rest::Handle m_currentRequest = -1;
@@ -82,6 +83,7 @@ struct UserSettingsDialog::Private
         q(parent),
         dialogType(dialogType),
         tabIndex(q->rootObjectHolder(), "tabIndex"),
+        isSaving(q->rootObjectHolder(), "isSaving"),
         self(q->rootObjectHolder(), "self")
     {
     }
@@ -248,11 +250,15 @@ void UserSettingsDialog::onDeleteRequested()
         return;
     }
 
+    d->isSaving = true;
+
     if (systemContext()->restApiHelper()->restApiEnabled())
     {
         auto callback = nx::utils::guarded(this,
             [this](bool success, const QnResourcePtr& /*resource*/)
             {
+                d->isSaving = false;
+
                 if (success)
                     reject();
                 else
@@ -266,6 +272,8 @@ void UserSettingsDialog::onDeleteRequested()
         auto callback = nx::utils::guarded(this,
             [this](bool success)
             {
+                d->isSaving = false;
+
                 if (success)
                     reject();
             });
@@ -393,6 +401,8 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
     if (d->m_currentRequest != -1)
         connectedServerApi()->cancelRequest(d->m_currentRequest);
 
+    d->isSaving = true;
+
     d->m_currentRequest = connectedServerApi()->saveUserAsync(
         d->dialogType == CreateUser,
         userData,
@@ -403,6 +413,8 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
             {
                 if (NX_ASSERT(handle == d->m_currentRequest))
                     d->m_currentRequest = -1;
+
+                d->isSaving = false;
 
                 if (!success)
                 {
@@ -514,6 +526,7 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
         connect(user.get(), &QnUserResource::nameChanged, this, updateState);
     }
 
+    d->isSaving = false;
     createStateFrom(user);
 }
 

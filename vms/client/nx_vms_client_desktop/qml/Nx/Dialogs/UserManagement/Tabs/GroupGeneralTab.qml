@@ -70,7 +70,7 @@ Item
             {
                 id: groupNameTextField
 
-                enabled: control.nameEditable
+                enabled: control.nameEditable && control.enabled
                 validateFunc: self ? self.validateName : null
 
                 anchors.left: groupTypeIcon.right
