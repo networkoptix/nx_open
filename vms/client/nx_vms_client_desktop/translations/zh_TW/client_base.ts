@@ -825,7 +825,7 @@
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation>不顯示縮圖</translation>
+      <translation>隱藏縮圖</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
@@ -9904,11 +9904,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Auto-generated certificate</source>
-      <translation>Nx 自動建立的自簽憑證</translation>
+      <translation>伺服器自動產生的憑證</translation>
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation>此憑證為Nx自動建立、且綁定至%1的自簽憑證</translation>
+      <translation>此為伺服器自動產生、並綁定至%1的憑證</translation>
     </message>
   </context>
   <context>
@@ -9934,7 +9934,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
 Read this %2 to learn more about certificate validation.</source>
       <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
       <translation>請檢視憑證 %1 內容，確認此伺服器為可信任伺服器。
-若需了解更多Nx憑證驗證資訊，請詳閱 %2 文件。</translation>
+若想了解更多憑證驗證內容，請詳閱 %2 文件。</translation>
     </message>
     <message>
       <source>certificate details</source>
