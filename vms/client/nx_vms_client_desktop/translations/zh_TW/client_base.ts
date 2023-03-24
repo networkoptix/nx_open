@@ -809,7 +809,7 @@
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation>不顯示縮圖</translation>
+      <translation>隱藏縮圖</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
@@ -4975,7 +4975,7 @@ to %1</source>
     </message>
     <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
-      <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
+      <translation>伺服器所提供的憑證與目前綁定的憑證並不相同</translation>
     </message>
   </context>
   <context>
@@ -10271,11 +10271,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation>此憑證為Nx自動建立、且綁定至%1的自簽憑證</translation>
+      <translation>此為伺服器自動產生、並綁定至%1的憑證</translation>
     </message>
     <message>
       <source>Server ID: %1</source>
-      <translation type="unfinished">Server ID: %1</translation>
+      <translation>伺服器ID: %1</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
@@ -10285,15 +10285,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Custom Certificate</source>
-      <translation type="unfinished">Custom Certificate</translation>
+      <translation>自定義憑證</translation>
     </message>
     <message>
       <source>Auto-generated Certificate</source>
-      <translation type="unfinished">Auto-generated Certificate</translation>
+      <translation>伺服器自動產生的憑證</translation>
     </message>
     <message>
       <source>Unknown Certificate</source>
-      <translation type="unfinished">Unknown Certificate</translation>
+      <translation>未知的憑證</translation>
     </message>
   </context>
   <context>
