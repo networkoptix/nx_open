@@ -7,6 +7,8 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 
+using namespace nx::vms::client::desktop;
+
 namespace {
 
 static const QString kLocaleTag("locale");
@@ -20,12 +22,11 @@ QnGenericStatisticsModule::QnGenericStatisticsModule(QObject* parent):
 
 QnStatisticValuesHash QnGenericStatisticsModule::values() const
 {
-    const auto settingsLocale = nx::vms::client::desktop::appContext()->localSettings()->locale();
+    const auto settingsLocale = appContext()->localSettings()->locale();
     const auto locale = settingsLocale.isEmpty() ? QLocale::system().name() : settingsLocale;
     const QString certificateValidation =
-        QString::fromStdString(
-            nx::reflect::enumeration::toString(
-                nx::vms::client::core::settings()->certificateValidationLevel()));
+        QString::fromStdString(nx::reflect::enumeration::toString(
+            appContext()->coreSettings()->certificateValidationLevel()));
 
     return {
         {kLocaleTag, locale},

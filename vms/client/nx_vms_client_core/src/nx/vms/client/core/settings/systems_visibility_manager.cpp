@@ -2,8 +2,9 @@
 
 #include "systems_visibility_manager.h"
 
-#include <client_core/client_core_settings.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 
 namespace {
 
@@ -18,9 +19,7 @@ static SystemsVisibilityManager* s_instance = nullptr;
 SystemsVisibilityManager::SystemsVisibilityManager(QObject* parent):
     base_type(parent)
 {
-    NX_CRITICAL(qnClientCoreSettings, "Client core settings is not initialized yet");
-
-    m_visibilityScopes = qnClientCoreSettings->tileScopeInfo();
+    m_visibilityScopes = appContext()->coreSettings()->tileScopeInfo();
 
     if (s_instance)
         NX_ERROR(this, "Singleton is created more than once.");
@@ -42,33 +41,30 @@ SystemsVisibilityManager* SystemsVisibilityManager::instance()
 void SystemsVisibilityManager::removeSystemData(const QnUuid& localId)
 {
     m_visibilityScopes.remove(localId);
-    qnClientCoreSettings->setTileScopeInfo(m_visibilityScopes);
-    qnClientCoreSettings->save();
+    appContext()->coreSettings()->tileScopeInfo = m_visibilityScopes;
 }
 
 welcome_screen::TileVisibilityScope SystemsVisibilityManager::cloudTileScope() const
 {
-    return static_cast<welcome_screen::TileVisibilityScope>(
-        qnClientCoreSettings->cloudTileScope());
+    return appContext()->coreSettings()->cloudTileScope();
 }
 
 void SystemsVisibilityManager::setCloudTileScope(welcome_screen::TileVisibilityScope visibilityScope)
 {
-    qnClientCoreSettings->setCloudTileScope(visibilityScope);
-    qnClientCoreSettings->save();
+    appContext()->coreSettings()->cloudTileScope = visibilityScope;
 }
 
 QString SystemsVisibilityManager::systemName(const QnUuid& localId) const
 {
     auto it = m_visibilityScopes.find(localId);
-    return it != m_visibilityScopes.end() ? it->name : "";
+    return it != m_visibilityScopes.end() ? it->name : QString();
 }
 
 welcome_screen::TileVisibilityScope SystemsVisibilityManager::scope(const QnUuid& localId) const
 {
     auto it = m_visibilityScopes.find(localId);
     return it != m_visibilityScopes.end()
-        ? static_cast<welcome_screen::TileVisibilityScope>(it->visibilityScope)
+        ? it->visibilityScope
         : welcome_screen::TileVisibilityScope::DefaultTileVisibilityScope;
 }
 
@@ -99,8 +95,7 @@ bool SystemsVisibilityManager::setScopeInfo(
         }
     }
 
-    qnClientCoreSettings->setTileScopeInfo(m_visibilityScopes);
-    qnClientCoreSettings->save();
+    appContext()->coreSettings()->tileScopeInfo = m_visibilityScopes;
 
     return true;
 }

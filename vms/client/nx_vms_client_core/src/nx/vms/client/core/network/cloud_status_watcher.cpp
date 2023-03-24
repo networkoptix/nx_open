@@ -4,12 +4,11 @@
 
 #include <algorithm>
 
-#include <QtCore/QUrl>
 #include <QtCore/QPointer>
 #include <QtCore/QSettings>
 #include <QtCore/QTimer>
+#include <QtCore/QUrl>
 
-#include <client_core/client_core_settings.h>
 #include <network/cloud_system_data.h>
 #include <nx/branding.h>
 #include <nx/cloud/db/client/oauth_manager.h>
@@ -22,6 +21,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/cloud_system_data.h>
 #include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_token_remover.h>
@@ -197,8 +197,7 @@ CloudStatusWatcher::CloudStatusWatcher(QObject* parent):
     connect(this, &CloudStatusWatcher::recentCloudSystemsChanged, this,
         [this]()
         {
-            qnClientCoreSettings->setRecentCloudSystems(recentCloudSystems());
-            qnClientCoreSettings->save();
+            appContext()->coreSettings()->recentCloudSystems = recentCloudSystems();
         });
 }
 
@@ -247,7 +246,7 @@ void CloudStatusWatcher::logSession(const QString& cloudSystemId)
 void CloudStatusWatcher::resetAuthData()
 {
     setAuthData(CloudAuthData());
-    settings()->setCloudAuthData(CloudAuthData());
+    appContext()->coreSettings()->setCloudAuthData(CloudAuthData());
 }
 
 bool CloudStatusWatcher::setAuthData(const CloudAuthData& authData)
@@ -336,7 +335,7 @@ QnCloudSystemList CloudStatusWatcher::recentCloudSystems() const
 CloudStatusWatcher::Private::Private(CloudStatusWatcher *parent):
     QObject(parent),
     q(parent),
-    recentCloudSystems(qnClientCoreSettings->recentCloudSystems())
+    recentCloudSystems(appContext()->coreSettings()->recentCloudSystems())
 {
     QTimer* systemUpdateTimer = new QTimer(this);
     systemUpdateTimer->setInterval(kSystemUpdateInterval);
@@ -680,7 +679,7 @@ void CloudStatusWatcher::Private::setStatus(
 
     if (isNewErrorCode && (errorCode != CloudStatusWatcher::NoError))
         emit q->errorChanged(errorCode);
-    
+
     if (isJustLoggedOut && errorCode != NoError)
         emit q->loggedOutWithError();
 }
@@ -795,7 +794,7 @@ void CloudStatusWatcher::Private::saveCredentials() const
     if (status == CloudStatusWatcher::LoggedOut)
         return;
 
-    settings()->setCloudAuthData(m_authData);
+    appContext()->coreSettings()->setCloudAuthData(m_authData);
 }
 
 const CloudAuthData& CloudStatusWatcher::Private::authData() const

@@ -86,7 +86,9 @@ void QnClientCoreModule::initializeNetworking(
         peerType,
         serializationFormat);
 
-    connect(&settings()->certificateValidationLevel, &Settings::BaseProperty::changed, this,
+    connect(&appContext()->coreSettings()->certificateValidationLevel,
+        &Settings::BaseProperty::changed,
+        this,
         [this](nx::utils::property_storage::BaseProperty* /*property*/)
         {
             d->networkModule->reinitializeCertificateStorage();

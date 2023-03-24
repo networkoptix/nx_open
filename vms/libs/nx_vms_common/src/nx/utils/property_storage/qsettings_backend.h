@@ -28,6 +28,8 @@ public:
     virtual bool exists(const QString& name) const override;
     virtual bool sync() override;
 
+    QSettings* qSettings() const;
+
 private:
     QScopedPointer<QSettings> m_settings;
 };

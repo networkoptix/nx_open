@@ -4,31 +4,45 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QSettings>
+#include <QtCore/QStandardPaths>
 
 #include <nx/branding.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/property_storage/filesystem_backend.h>
 #include <nx/utils/property_storage/qsettings_backend.h>
+#include <nx/utils/system_utils.h>
 
 #if defined(USE_QT_KEYCHAIN)
-    #include <nx/vms/client/core/settings/keychain_property_storage_backend.h>
+#include <nx/vms/client/core/settings/keychain_property_storage_backend.h>
 #endif
+
+using namespace std::chrono;
 
 namespace nx::vms::client::core {
 
 namespace {
 
-static const QString kGroupName("client_core");
 static const QString kSecureKeyPropertyName("key");
 
-QSettings* createSettings()
+nx::utils::property_storage::AbstractBackend* createBackend(bool useQSettings)
 {
-    return new QSettings(
-        QSettings::NativeFormat,
-        QSettings::UserScope,
-        QCoreApplication::organizationName(),
-        QCoreApplication::applicationName());
+    if (useQSettings)
+    {
+        return new nx::utils::property_storage::QSettingsBackend(
+            new QSettings(
+                QSettings::NativeFormat,
+                QSettings::UserScope,
+                QCoreApplication::organizationName(),
+                QCoreApplication::applicationName()),
+            "client_core");
+    }
+
+    return new nx::utils::property_storage::FileSystemBackend(
+        QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
+            + "/settings/client_core");
 }
 
 struct SerializableCredentials_v42
@@ -58,17 +72,15 @@ NX_REFLECTION_INSTRUMENT(SystemAuthenticationData_v42, (key)(value));
 
 } // namespace
 
-static Settings* s_instance = nullptr;
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LocalConnectionData, (json), (systemName)(urls))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemVisibilityScopeInfo, (json), (name)(visibilityScope))
 
-Settings::Settings(bool useKeyChain):
-    Storage(new utils::property_storage::QSettingsBackend(createSettings(), kGroupName))
+Settings::Settings(const InitializationOptions& options):
+    Storage(createBackend(options.useQSettingsBackend))
 {
-    if (s_instance)
-        NX_ERROR(this, "Singleton is created more than once.");
-    else
-        s_instance = this;
+    qRegisterMetaType<QSet<QString>>("QnStringSet");
 
-    if (useKeyChain)
+    if (options.useKeychain)
     {
         #if defined(USE_QT_KEYCHAIN)
             const QString serviceName = nx::branding::company() + " " + nx::branding::vmsName();
@@ -88,20 +100,22 @@ Settings::Settings(bool useKeyChain):
             setSecurityKey(key);
         #endif
     }
+    else
+    {
+        setSecurityKey(options.securityKey);
+    }
 
     load();
-    migrateSystemAuthenticationData();
+
+    if (!options.useQSettingsBackend)
+    {
+        migrateOldSettings();
+        clearInvalidKnownConnections();
+    }
 }
 
 Settings::~Settings()
 {
-    if (s_instance == this)
-        s_instance = nullptr;
-}
-
-Settings* Settings::instance()
-{
-    return s_instance;
 }
 
 CloudAuthData Settings::cloudAuthData() const
@@ -119,7 +133,7 @@ void Settings::setCloudAuthData(const CloudAuthData& authData)
 {
     // Save username so it can be restored for future connections to cloud.
     const std::string username = authData.credentials.username.empty()
-        ? settings()->cloudCredentials().user
+        ? cloudCredentials().user
         : authData.credentials.username;
 
     cloudCredentials = nx::network::http::Credentials(
@@ -161,7 +175,118 @@ void Settings::setPreferredCloudServer(const QString& systemId, const QnUuid& se
     preferredCloudServers = preferredServers;
 }
 
-void Settings::migrateSystemAuthenticationData()
+void Settings::storeRecentConnection(
+    const QnUuid& localSystemId, const QString& systemName, const nx::utils::Url& url)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "Storing recent system connection id: %1, url: %2",
+        localSystemId, url);
+
+    const auto cleanUrl = url.cleanUrl();
+
+    auto connections = recentLocalConnections();
+
+    auto& data = connections[localSystemId];
+    data.systemName = systemName;
+    data.urls.removeOne(cleanUrl);
+    data.urls.prepend(cleanUrl);
+
+    recentLocalConnections = connections;
+}
+
+void Settings::removeRecentConnection(const QnUuid& localSystemId)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "Removing recent system connection id: %1", localSystemId);
+
+    auto connections = recentLocalConnections();
+    connections.remove(localSystemId);
+    recentLocalConnections = connections;
+}
+
+void Settings::updateWeightData(const QnUuid& localId)
+{
+    auto weightData = localSystemWeightsData();
+    const auto itWeightData = std::find_if(weightData.begin(), weightData.end(),
+        [localId](const WeightData& data) { return data.localId == localId; });
+
+    auto currentWeightData = (itWeightData == weightData.end()
+        ? WeightData{localId, 0, QDateTime::currentMSecsSinceEpoch(), true}
+        : *itWeightData);
+
+    currentWeightData.weight = nx::utils::calculateSystemUsageFrequency(
+        time_point<system_clock>(milliseconds(currentWeightData.lastConnectedUtcMs)),
+        currentWeightData.weight) + 1;
+    currentWeightData.lastConnectedUtcMs = QDateTime::currentMSecsSinceEpoch();
+    currentWeightData.realConnection = true;
+
+    if (itWeightData == weightData.end())
+        weightData.append(currentWeightData);
+    else
+        *itWeightData = currentWeightData;
+
+    localSystemWeightsData = weightData;
+}
+
+void Settings::migrateOldSettings()
+{
+    auto oldSettings = std::make_unique<Settings>(
+        InitializationOptions{
+            .useKeychain = false,
+            .useQSettingsBackend = true,
+            .securityKey = securityKey()});
+    oldSettings->load();
+
+    migrateAllSettingsFrom_v51(oldSettings.get());
+    migrateSystemAuthenticationDataFrom_v42(oldSettings.get());
+}
+
+void Settings::migrateAllSettingsFrom_v51(Settings* oldSettings)
+{
+    using namespace utils::property_storage;
+
+    AbstractBackend* backend = this->backend();
+    AbstractBackend* oldBackend = oldSettings->backend();
+
+    const QHash<QString, QString> oldNames{
+        {"systemAuthenticationData", "secureSystemAuthenticationData_v50"},
+        {"preferredCloudServers", "PreferredCloudServers"},
+        {"cloudCredentials", "cloudCredentials_v50"},
+        {"cloudPasswordCredentials", "cloudCredentials"},
+        {"lastConnection", "LastConnection"},
+        {"digestCloudPassword", "DigestCloudPassword"},
+        {"certificateValidationLevel", "CertificateValidationLevel"},
+        {"enableHadrwareDecoding", "EnableHadrwareDecoding"},
+    };
+
+    // Will be processed another way.
+    const QSet<QString> propertiesToSkip{
+        forgottenSystems.name,
+        recentLocalConnections.name,
+        searchAddresses.name,
+        tileScopeInfo.name,
+    };
+
+    // Do a low-level transfer of properties.
+    for (BaseProperty* property: properties())
+    {
+        if (property->exists())
+            continue;
+
+        if (propertiesToSkip.contains(property->name))
+            continue;
+
+        const QString oldName = oldNames.value(property->name, property->name);
+
+        if (oldBackend->exists(oldName))
+            backend->writeValue(property->name, oldBackend->readValue(oldName));
+    }
+
+    // Since we used backend functions to transfer the properties, we need to re-read them.
+    load();
+
+    migrateWelcomeScreenSettingsFrom_v51(oldSettings);
+}
+
+void Settings::migrateSystemAuthenticationDataFrom_v42(Settings* oldSettings)
 {
     // Check if data is already migrated.
     SystemAuthenticationData migratedData = systemAuthenticationData();
@@ -169,9 +294,9 @@ void Settings::migrateSystemAuthenticationData()
         return;
 
     SecureProperty<std::vector<SystemAuthenticationData_v42>> systemAuthenticationData_v42{
-        this, "secureSystemAuthenticationData"};
+        oldSettings, "secureSystemAuthenticationData"};
 
-    loadProperty(&systemAuthenticationData_v42);
+    oldSettings->loadProperty(&systemAuthenticationData_v42);
 
     const auto oldData = systemAuthenticationData_v42();
     for (const SystemAuthenticationData_v42& authData: oldData)
@@ -183,6 +308,65 @@ void Settings::migrateSystemAuthenticationData()
 
     systemAuthenticationData = migratedData;
     systemAuthenticationData_v42 = {};
+}
+
+void Settings::migrateWelcomeScreenSettingsFrom_v51(Settings* oldSettings)
+{
+    using namespace utils::property_storage;
+
+    AbstractBackend* oldBackend = oldSettings->backend();
+    auto oldQSettings = static_cast<QSettingsBackend*>(oldBackend)->qSettings();
+
+    if (!forgottenSystems.exists())
+    {
+        const auto oldForgottenSystems =
+            oldQSettings->value(forgottenSystems.name).value<QSet<QString>>();
+        forgottenSystems = {oldForgottenSystems.begin(), oldForgottenSystems.end()};
+    }
+
+    // nx_fusion has different format of associative containers serialization. Use it to read old
+    // values.
+    if (!recentLocalConnections.exists())
+    {
+        QHash<QnUuid, LocalConnectionData> value;
+        if (QJson::deserialize(
+            oldQSettings->value(recentLocalConnections.name).toString(), &value))
+        {
+            recentLocalConnections = value;
+        }
+    }
+
+    if (!searchAddresses.exists())
+    {
+        SystemSearchAddressesHash oldSearchAddresses;
+        if (QJson::deserialize(
+            oldQSettings->value(searchAddresses.name).toString(), &oldSearchAddresses))
+        {
+            searchAddresses = oldSearchAddresses;
+        }
+    }
+
+    if (!tileScopeInfo.exists())
+    {
+        SystemVisibilityScopeInfoHash oldScopeInfo;
+        if (QJson::deserialize(oldQSettings->value(tileScopeInfo.name).toString(), &oldScopeInfo))
+            tileScopeInfo = oldScopeInfo;
+    }
+}
+
+void Settings::clearInvalidKnownConnections()
+{
+    auto connections = knownServerConnections();
+
+    for (auto it = connections.begin(); it != connections.end(); /*no increment*/)
+    {
+        if (!it->url.isValid() || it->url.host().isEmpty())
+            it = connections.erase(it);
+        else
+            ++it;
+    }
+
+    knownServerConnections = connections;
 }
 
 } // namespace nx::vms::client::core

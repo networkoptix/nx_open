@@ -4,10 +4,10 @@
 
 #include <QtCore/QAbstractProxyModel>
 
+#include <nx/utils/impl_ptr.h>
+#include <nx/utils/scoped_model_operations.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
 #include <ui/models/systems_model.h>
-#include <nx/utils/scoped_model_operations.h>
-#include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop {
 
@@ -24,8 +24,8 @@ class NX_VMS_CLIENT_DESKTOP_API ConnectTilesProxyModel: public ScopedModelOperat
 {
     Q_OBJECT
     Q_PROPERTY(bool loggedToCloud READ loggedToCloud WRITE setLoggedToCloud)
-    Q_PROPERTY(QVariant visibilityFilter READ visibilityFilter WRITE setVisibilityFilter
-        NOTIFY visibilityFilterChanged)
+    Q_PROPERTY(nx::vms::client::core::welcome_screen::TileScopeFilter visibilityFilter
+        READ visibilityFilter WRITE setVisibilityFilter NOTIFY visibilityFilterChanged)
     /** Number of tiles, including connect tiles. */
     Q_PROPERTY(int systemsCount READ systemsCount NOTIFY systemsCountChanged)
     /** Total number of tiles, including filtered out systems and connect tiles. */
@@ -49,14 +49,14 @@ public:
     };
     Q_ENUM(TileType)
 
-    using TileVisibilityScope = nx::vms::client::core::welcome_screen::TileVisibilityScope;
-
 public:
     ConnectTilesProxyModel(QObject* parent = nullptr);
     virtual ~ConnectTilesProxyModel() override;
 
-    using CloudTileVisibilityScopeGetter = std::function<TileVisibilityScope()>;
-    using CloudTileVisibilityScopeSetter = std::function<void(TileVisibilityScope)>;
+    using CloudTileVisibilityScopeGetter =
+        std::function<core::welcome_screen::TileVisibilityScope()>;
+    using CloudTileVisibilityScopeSetter =
+        std::function<void(core::welcome_screen::TileVisibilityScope)>;
     void setCloudVisibilityScopeCallbacks(
         CloudTileVisibilityScopeGetter getter, CloudTileVisibilityScopeSetter setter);
 
@@ -69,8 +69,8 @@ public:
     virtual bool setData(const QModelIndex& index, const QVariant& value,
         int role = Qt::EditRole) override;
 
-    QVariant visibilityFilter() const;
-    void setVisibilityFilter(QVariant filter);
+    core::welcome_screen::TileScopeFilter visibilityFilter() const;
+    void setVisibilityFilter(core::welcome_screen::TileScopeFilter filter);
 
     int systemsCount() const;
     int totalSystemsCount() const;

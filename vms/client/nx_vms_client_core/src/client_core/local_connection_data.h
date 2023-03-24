@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
-#include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::core {
 
@@ -13,8 +12,10 @@ struct LocalConnectionData
 {
     QString systemName;
     QList<nx::utils::Url> urls;
+
+    bool operator==(const LocalConnectionData&) const = default;
 };
-#define LocalConnectionData_Fields (systemName)(urls)
+NX_REFLECTION_INSTRUMENT(LocalConnectionData, (systemName)(urls))
 
 struct NX_VMS_CLIENT_CORE_API WeightData
 {
@@ -25,10 +26,6 @@ struct NX_VMS_CLIENT_CORE_API WeightData
 
     bool operator==(const WeightData& other) const;
 };
-#define WeightData_Fields (localId)(weight)(lastConnectedUtcMs)(realConnection)
-NX_REFLECTION_INSTRUMENT(WeightData, WeightData_Fields)
-
-QN_FUSION_DECLARE_FUNCTIONS(LocalConnectionData, (json))
-QN_FUSION_DECLARE_FUNCTIONS(WeightData, (json))
+NX_REFLECTION_INSTRUMENT(WeightData, (localId)(weight)(lastConnectedUtcMs)(realConnection))
 
 } // namespace nx::vms::client::core

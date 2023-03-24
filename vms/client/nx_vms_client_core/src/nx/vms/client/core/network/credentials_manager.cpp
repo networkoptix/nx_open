@@ -4,6 +4,7 @@
 
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 
 namespace nx::vms::client::core {
@@ -40,7 +41,7 @@ auto findUser(const SerializableCredentialsList& credentialsList, const std::str
 CredentialsManager::CredentialsManager(QObject* parent):
     QObject(parent)
 {
-    connect(&settings()->systemAuthenticationData,
+    connect(&appContext()->coreSettings()->systemAuthenticationData,
         &Settings::BaseProperty::changed,
         this,
         &CredentialsManager::storedCredentialsChanged);
@@ -58,7 +59,7 @@ void CredentialsManager::storeCredentials(
         serialized.user,
         localSystemId);
 
-    auto credentialsHash = settings()->systemAuthenticationData();
+    auto credentialsHash = appContext()->coreSettings()->systemAuthenticationData();
     auto& credentialsList = credentialsHash[localSystemId];
 
     auto it = findUser(credentialsList, serialized.user);
@@ -67,14 +68,14 @@ void CredentialsManager::storeCredentials(
 
     credentialsList.insert(credentialsList.begin(), serialized);
 
-    settings()->systemAuthenticationData = credentialsHash;
+    appContext()->coreSettings()->systemAuthenticationData = credentialsHash;
 }
 
 void CredentialsManager::removeCredentials(const QnUuid& localSystemId, const std::string& user)
 {
     NX_DEBUG(NX_SCOPE_TAG, "Removing credentials of %1 to the system %2", user, localSystemId);
 
-    auto systemAuthenticationData = settings()->systemAuthenticationData();
+    auto systemAuthenticationData = appContext()->coreSettings()->systemAuthenticationData();
     auto credentialsIter = systemAuthenticationData.find(localSystemId);
     if (credentialsIter == systemAuthenticationData.end())
         return;
@@ -88,7 +89,7 @@ void CredentialsManager::removeCredentials(const QnUuid& localSystemId, const st
         if (credentialsList.empty())
             systemAuthenticationData.erase(credentialsIter);
 
-        settings()->systemAuthenticationData = systemAuthenticationData;
+        appContext()->coreSettings()->systemAuthenticationData = systemAuthenticationData;
     }
 }
 
@@ -96,27 +97,27 @@ void CredentialsManager::removeCredentials(const QnUuid& localSystemId)
 {
     NX_DEBUG(NX_SCOPE_TAG, "Removing all credentials for the system %1", localSystemId);
 
-    auto systemAuthenticationData = settings()->systemAuthenticationData();
+    auto systemAuthenticationData = appContext()->coreSettings()->systemAuthenticationData();
     auto credentialsIter = systemAuthenticationData.find(localSystemId);
     if (credentialsIter == systemAuthenticationData.end())
         return;
 
     systemAuthenticationData.erase(credentialsIter);
-    settings()->systemAuthenticationData = systemAuthenticationData;
+    appContext()->coreSettings()->systemAuthenticationData = systemAuthenticationData;
 }
 
 void CredentialsManager::forgetStoredPassword(const QnUuid& localSystemId, const std::string& user)
 {
     NX_DEBUG(NX_SCOPE_TAG, "Forget password of %1 to the system %2", user, localSystemId);
 
-    auto systemAuthenticationData = settings()->systemAuthenticationData();
+    auto systemAuthenticationData = appContext()->coreSettings()->systemAuthenticationData();
     SerializableCredentialsList& credentialsList = systemAuthenticationData[localSystemId];
     auto it = findUser(credentialsList, user);
     if (it == credentialsList.end())
         return;
 
     *it = {user};
-    settings()->systemAuthenticationData = systemAuthenticationData;
+    appContext()->coreSettings()->systemAuthenticationData = systemAuthenticationData;
 }
 
 void CredentialsManager::forgetStoredPasswords()
@@ -124,7 +125,7 @@ void CredentialsManager::forgetStoredPasswords()
     NX_DEBUG(NX_SCOPE_TAG, "Forget all passwords");
 
     Settings::SystemAuthenticationData cleanData;
-    const auto systemAuthenticationData = settings()->systemAuthenticationData();
+    const auto systemAuthenticationData = appContext()->coreSettings()->systemAuthenticationData();
     for (auto [localSystemId, credentialsList]: systemAuthenticationData)
     {
         SerializableCredentialsList cleanCredentials;
@@ -133,12 +134,12 @@ void CredentialsManager::forgetStoredPasswords()
         cleanData.emplace(localSystemId, std::move(cleanCredentials));
     }
 
-    settings()->systemAuthenticationData = cleanData;
+    appContext()->coreSettings()->systemAuthenticationData = cleanData;
 }
 
 std::vector<Credentials> CredentialsManager::credentials(const QnUuid& localSystemId)
 {
-    const auto systemAuthenticationData = settings()->systemAuthenticationData();
+    const auto systemAuthenticationData = appContext()->coreSettings()->systemAuthenticationData();
     const auto credentialsIter = systemAuthenticationData.find(localSystemId);
     if (credentialsIter == systemAuthenticationData.cend())
         return {};
@@ -156,7 +157,7 @@ std::optional<Credentials> CredentialsManager::credentials(
     const QnUuid& localSystemId,
     const std::string& user)
 {
-    const auto systemAuthenticationData = settings()->systemAuthenticationData();
+    const auto systemAuthenticationData = appContext()->coreSettings()->systemAuthenticationData();
     const auto credentialsIter = systemAuthenticationData.find(localSystemId);
     if (credentialsIter == systemAuthenticationData.cend())
         return {};

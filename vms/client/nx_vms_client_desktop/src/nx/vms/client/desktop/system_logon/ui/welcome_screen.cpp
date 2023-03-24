@@ -13,7 +13,6 @@
 #include <client/client_runtime_settings.h>
 #include <client/forgotten_systems_manager.h>
 #include <client_core/client_core_module.h>
-#include <client_core/client_core_settings.h>
 #include <common/common_module.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/resource.h>
@@ -474,19 +473,16 @@ static SystemsVisibilitySortFilterModel* createVisibilityModel(QObject* parent)
 
     NX_CRITICAL(forgottenSystemsManager,
         "Client forgotten systems manager is not initialized yet");
-    NX_CRITICAL(qnClientCoreSettings,
-        "Client core settings is not initialized yet");
 
     visibilityModel->setVisibilityScopeFilterCallbacks(
         []()
         {
             return static_cast<TileScopeFilter>(
-                qnClientCoreSettings->tileVisibilityScopeFilter());
+                appContext()->coreSettings()->tileVisibilityScopeFilter());
         },
         [](TileScopeFilter filter)
         {
-            qnClientCoreSettings->setTileVisibilityScopeFilter(filter);
-            qnClientCoreSettings->save();
+            appContext()->coreSettings()->tileVisibilityScopeFilter = filter;
         }
     );
 
@@ -774,12 +770,12 @@ void WelcomeScreen::deleteSystem(const QString& systemId, const QString& localSy
     forgottenSystemsManager->forgetSystem(localSystemId);
 
     CredentialsManager::removeCredentials(localSystemUuid);
-    qnClientCoreSettings->removeRecentConnection(localSystemUuid);
+    appContext()->coreSettings()->removeRecentConnection(localSystemUuid);
     qnSystemsVisibilityManager->removeSystemData(localSystemUuid);
 
     if (const auto system = qnSystemsFinder->getSystem(systemId))
     {
-        auto knownConnections = qnClientCoreSettings->knownServerConnections();
+        auto knownConnections = appContext()->coreSettings()->knownServerConnections();
         const auto moduleManager = appContext()->moduleDiscoveryManager();
         const auto servers = system->servers();
         for (const auto& info: servers)
@@ -788,16 +784,14 @@ void WelcomeScreen::deleteSystem(const QString& systemId, const QString& localSy
             moduleManager->forgetModule(moduleId);
 
             const auto itEnd = std::remove_if(knownConnections.begin(), knownConnections.end(),
-                [moduleId](const QnClientCoreSettings::KnownServerConnection& connection)
+                [moduleId](const auto& connection)
                 {
                     return moduleId == connection.serverId;
                 });
             knownConnections.erase(itEnd, knownConnections.end());
         }
-        qnClientCoreSettings->setKnownServerConnections(knownConnections);
+        appContext()->coreSettings()->knownServerConnections = knownConnections;
     }
-
-    qnClientCoreSettings->save();
 }
 
 bool WelcomeScreen::saveCredentialsAllowed() const

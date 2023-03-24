@@ -2,14 +2,14 @@
 
 #include "connect_tiles_proxy_model.h"
 
-#include "systems_visibility_sort_filter_model.h"
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
 #include <ui/models/systems_model.h>
-#include <client_core/client_core_settings.h>
-#include <nx/utils/scoped_connections.h>
 
-using namespace nx::vms::client::core;
+#include "systems_visibility_sort_filter_model.h"
+
+using namespace nx::vms::client::core::welcome_screen;
 
 namespace nx::vms::client::desktop {
 
@@ -195,7 +195,7 @@ void ConnectTilesProxyModel::setSourceModel(QAbstractItemModel* sourceModel)
 
     if (!d->loggedToCloud && !isCloudTileVisibilityScopeHidden())
         setCloudTileEnabled(true);
-    if (d->visibilityModel->visibilityFilter() == welcome_screen::AllSystemsTileScopeFilter)
+    if (d->visibilityModel->visibilityFilter() == TileScopeFilter::AllSystemsTileScopeFilter)
         setConnectTileEnabled(true);
 }
 
@@ -228,9 +228,9 @@ QVariant ConnectTilesProxyModel::data(const QModelIndex& index, int role) const
         {
             if (cloudTileIsVisible() && isFirstIndex(index))
             {
-                return isCloudTileVisibilityScopeHidden()
-                    ? welcome_screen::HiddenTileVisibilityScope
-                    : welcome_screen::DefaultTileVisibilityScope;
+                return QVariant::fromValue(isCloudTileVisibilityScopeHidden()
+                    ? TileVisibilityScope::HiddenTileVisibilityScope
+                    : TileVisibilityScope::DefaultTileVisibilityScope);
             }
         }
         default:
@@ -255,8 +255,7 @@ bool ConnectTilesProxyModel::setData(const QModelIndex& index, const QVariant& v
     {
         if (cloudTileIsVisible() && isFirstIndex(index))
         {
-            d->cloudTileScopeSetter(
-                static_cast<welcome_screen::TileVisibilityScope>(value.toInt()));
+            d->cloudTileScopeSetter(value.value<TileVisibilityScope>());
 
             setCloudTileEnabled(!d->loggedToCloud && cloudTileIsAcceptedByFilter());
             return true;
@@ -266,15 +265,15 @@ bool ConnectTilesProxyModel::setData(const QModelIndex& index, const QVariant& v
     return sourceModel()->setData(mapToSource(index), value, role);
 }
 
-QVariant ConnectTilesProxyModel::visibilityFilter() const
+TileScopeFilter ConnectTilesProxyModel::visibilityFilter() const
 {
     if (!d->visibilityModel)
-        return SystemsVisibilitySortFilterModel::Filter::AllSystemsTileScopeFilter;
+        return TileScopeFilter::AllSystemsTileScopeFilter;
 
     return d->visibilityModel->visibilityFilter();
 }
 
-void ConnectTilesProxyModel::setVisibilityFilter(QVariant filter)
+void ConnectTilesProxyModel::setVisibilityFilter(TileScopeFilter filter)
 {
     if (!d->visibilityModel)
         return;
@@ -282,28 +281,25 @@ void ConnectTilesProxyModel::setVisibilityFilter(QVariant filter)
     if (visibilityFilter() == filter)
         return;
 
-    const welcome_screen::TileScopeFilter filterValue =
-        static_cast<SystemsVisibilitySortFilterModel::Filter>(filter.toInt());
-
-    if (filterValue == welcome_screen::AllSystemsTileScopeFilter)
+    if (filter == TileScopeFilter::AllSystemsTileScopeFilter)
     {
         setConnectTileEnabled(true);
         if (!d->loggedToCloud)
             setCloudTileEnabled(!isCloudTileVisibilityScopeHidden());
     }
-    else if (filterValue == welcome_screen::FavoritesTileScopeFilter)
+    else if (filter == TileScopeFilter::FavoritesTileScopeFilter)
     {
         setConnectTileEnabled(false);
         setCloudTileEnabled(false);
     }
-    else if (filterValue == welcome_screen::HiddenTileScopeFilter)
+    else if (filter == TileScopeFilter::HiddenTileScopeFilter)
     {
         setConnectTileEnabled(false);
         if (!d->loggedToCloud)
             setCloudTileEnabled(isCloudTileVisibilityScopeHidden());
     }
 
-    d->visibilityModel->setVisibilityFilter(filterValue);
+    d->visibilityModel->setVisibilityFilter(filter);
 }
 
 int ConnectTilesProxyModel::systemsCount() const
@@ -425,7 +421,7 @@ void ConnectTilesProxyModel::setFilterWildcard(const QString& filterWildcard)
     }
     else
     {
-        setConnectTileEnabled(visibilityFilter() == welcome_screen::AllSystemsTileScopeFilter);
+        setConnectTileEnabled(visibilityFilter() == TileScopeFilter::AllSystemsTileScopeFilter);
         setCloudTileEnabled(!d->loggedToCloud && cloudTileIsAcceptedByFilter());
     }
 }
@@ -437,15 +433,15 @@ bool ConnectTilesProxyModel::cloudTileIsVisible() const
 
 bool ConnectTilesProxyModel::cloudTileIsAcceptedByFilter() const
 {
-    return (visibilityFilter() == welcome_screen::AllSystemsTileScopeFilter
+    return (visibilityFilter() == TileScopeFilter::AllSystemsTileScopeFilter
             && !isCloudTileVisibilityScopeHidden())
-        || (visibilityFilter() == welcome_screen::HiddenTileScopeFilter
+        || (visibilityFilter() == TileScopeFilter::HiddenTileScopeFilter
             && isCloudTileVisibilityScopeHidden());
 }
 
 bool ConnectTilesProxyModel::isCloudTileVisibilityScopeHidden() const
 {
-    return d->cloudTileScopeGetter() == welcome_screen::HiddenTileVisibilityScope;
+    return d->cloudTileScopeGetter() == TileVisibilityScope::HiddenTileVisibilityScope;
 }
 
 void ConnectTilesProxyModel::setCloudTileEnabled(bool enabled)

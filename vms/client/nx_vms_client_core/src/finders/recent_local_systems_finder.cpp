@@ -2,24 +2,26 @@
 
 #include "recent_local_systems_finder.h"
 
-#include <nx/network/app_info.h>
+#include <network/local_system_description.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
-#include <network/local_system_description.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 
-#include <client_core/client_core_settings.h>
-#include <client_core/local_connection_data.h>
+using namespace nx::vms::client::core;
 
 QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent): base_type(parent)
 {
-    connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
-        [this](int valueId)
-        {
-            if (valueId == QnClientCoreSettings::RecentLocalConnections ||
-                valueId == QnClientCoreSettings::SearchAddresses)
-                updateSystems();
-        });
+    connect(&appContext()->coreSettings()->recentLocalConnections,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        &QnRecentLocalSystemsFinder::updateSystems);
+    connect(&appContext()->coreSettings()->searchAddresses,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        &QnRecentLocalSystemsFinder::updateSystems);
 
     updateSystems();
 }
@@ -27,13 +29,11 @@ QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent): base_ty
 void QnRecentLocalSystemsFinder::updateSystems()
 {
     SystemsHash newSystems;
-    const auto connections = qnClientCoreSettings->recentLocalConnections();
-    for (auto it = connections.begin(); it != connections.end(); ++it)
+    const auto connections = appContext()->coreSettings()->recentLocalConnections();
+    for (const auto& [id, connection]: connections.asKeyValueRange())
     {
-        if (it.key().isNull() || it->urls.isEmpty())
+        if (id.isNull() || connection.urls.isEmpty())
             continue;
-
-        const auto connection = it.value();
 
         const bool hasOnlyCloudUrls = std::all_of(connection.urls.cbegin(), connection.urls.cend(),
             [](const nx::utils::Url& url)
@@ -44,8 +44,8 @@ void QnRecentLocalSystemsFinder::updateSystems()
         if (hasOnlyCloudUrls)
             continue;
 
-        const auto system = QnLocalSystemDescription::create(
-            it.key().toSimpleString(), it.key(), connection.systemName);
+        const auto system =
+            QnLocalSystemDescription::create(id.toSimpleString(), id, connection.systemName);
 
         static const int kVeryFarPriority = 100000;
 
@@ -55,12 +55,12 @@ void QnRecentLocalSystemsFinder::updateSystems()
         fakeServerInfo.realm = QString::fromStdString(nx::network::AppInfo::realm());
         fakeServerInfo.cloudHost =
             QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
-        const auto searchAddresses = qnClientCoreSettings->searchAddresses();
-        const auto iter = searchAddresses.find(it.key());
-        if (iter != searchAddresses.end())
+        const auto searchAddresses = appContext()->coreSettings()->searchAddresses();
+        const auto it = searchAddresses.find(id);
+        if (it != searchAddresses.end())
         {
-            for (const auto& serverAddressesList: searchAddresses[it.key()])
-                fakeServerInfo.remoteAddresses += serverAddressesList;
+            for (const QSet<QString>& serverAddresses: it.value())
+                fakeServerInfo.remoteAddresses += serverAddresses;
         }
         system->addServer(fakeServerInfo, kVeryFarPriority, false);
         system->setServerHost(fakeServerInfo.id, connection.urls.first());

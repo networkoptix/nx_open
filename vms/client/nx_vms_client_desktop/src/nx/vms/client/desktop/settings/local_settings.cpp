@@ -13,6 +13,7 @@
 #include <nx/utils/file_system.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/property_storage/filesystem_backend.h>
+#include <nx/utils/property_storage/qsettings_migration_utils.h>
 #include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
@@ -106,65 +107,21 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
         [oldSettings]<typename T>(
             nx::utils::property_storage::Property<T>& property, const QString& customName = {})
         {
-            if (property.exists())
-                return;
-
-            auto name = customName.isNull() ? property.name : customName;
-            if (oldSettings->contains(name))
-                property = oldSettings->value(name).template value<T>();
+            nx::utils::property_storage::migrateValue(oldSettings, property, customName);
         };
 
     const auto migrateJsonValue =
         [oldSettings]<typename T>(
             nx::utils::property_storage::Property<T>& property, const QString& customName = {})
         {
-            if (property.exists())
-                return;
-
-            auto name = customName.isNull() ? property.name : customName;
-            if (!oldSettings->contains(name))
-                return;
-
-            const auto serializedValue = oldSettings->value(name).toString();
-            const auto [value, result] = nx::reflect::json::deserialize<T>(
-                serializedValue.toStdString());
-
-            if (result)
-            {
-                property = value;
-            }
-            else
-            {
-                NX_WARNING(NX_SCOPE_TAG,
-                    "Cannot deserialize JSON value from old settings: %1: %2. Error: %3",
-                    name, serializedValue, result.errorDescription);
-            }
+            nx::utils::property_storage::migrateJsonValue(oldSettings, property, customName);
         };
 
         const auto migrateEnumValue =
         [oldSettings]<typename T>(
             nx::utils::property_storage::Property<T>& property, const QString& customName = {})
         {
-            if (property.exists())
-                return;
-
-            auto name = customName.isNull() ? property.name : customName;
-            if (!oldSettings->contains(name))
-                return;
-
-            const auto serializedValue = oldSettings->value(name).toString();
-            bool ok = false;
-            const T value = nx::reflect::fromString<T>(serializedValue.toStdString(), &ok);
-
-            if (ok)
-            {
-                property = value;
-            }
-            else
-            {
-                NX_WARNING(NX_SCOPE_TAG, "Cannot deserialize enum value from old settings: %1: %2",
-                    name, serializedValue);
-            }
+            nx::utils::property_storage::migrateEnumValue(oldSettings, property, customName);
         };
 
     migrateValue(settings->maxSceneVideoItems);

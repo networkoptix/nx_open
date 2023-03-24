@@ -4,8 +4,8 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/core/settings/search_addresses_info.h>
 
 /**
@@ -34,5 +34,5 @@ private:
     void update();
 
 private:
-    SystemSearchAddressesHash m_searchAddressesInfo;
+    nx::vms::client::core::SystemSearchAddressesHash m_searchAddressesInfo;
 };

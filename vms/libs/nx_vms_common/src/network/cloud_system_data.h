@@ -2,10 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QString>
-
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
-#include <nx/fusion/model_functions_fwd.h>
 
 struct NX_VMS_COMMON_API QnCloudSystem
 {
@@ -28,8 +26,8 @@ struct NX_VMS_COMMON_API QnCloudSystem
     bool visuallyEqual(const QnCloudSystem& other) const;
 };
 
-#define QnCloudSystem_Fields (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight) \
-    (lastLoginTimeUtcMs)(authKey)(online)(system2faEnabled)(version)
-QN_FUSION_DECLARE_FUNCTIONS(QnCloudSystem, (json), NX_VMS_COMMON_API)
+NX_REFLECTION_INSTRUMENT(QnCloudSystem,
+    (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight)(lastLoginTimeUtcMs)
+    (authKey)(online)(system2faEnabled)(version))
 
 typedef QList<QnCloudSystem> QnCloudSystemList;

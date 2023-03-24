@@ -2,9 +2,14 @@
 
 #pragma once
 
-#include <QtCore/QSet>
 #include <QtCore/QHash>
+#include <QtCore/QSet>
+
 #include <nx/utils/uuid.h>
+
+namespace nx::vms::client::core {
 
 using ServerSearchAddressesHash = QHash<QnUuid, QSet<QString>>;
 using SystemSearchAddressesHash = QHash<QnUuid, ServerSearchAddressesHash>;
+
+} // namespace nx::vms::client::core
