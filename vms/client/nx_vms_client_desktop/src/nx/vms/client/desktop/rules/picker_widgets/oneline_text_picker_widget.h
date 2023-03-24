@@ -73,6 +73,9 @@ protected:
 
     void updateUi() override
     {
+        if (m_lineEdit->text() == theField()->value())
+            return;
+
         const QSignalBlocker blocker{m_lineEdit};
         m_lineEdit->setText(theField()->value());
     }

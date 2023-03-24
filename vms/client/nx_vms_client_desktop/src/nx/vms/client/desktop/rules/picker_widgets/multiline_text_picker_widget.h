@@ -57,8 +57,11 @@ private:
 
     void updateUi() override
     {
+        if (m_textEdit->toPlainText() == theField()->text())
+            return;
+
         const QSignalBlocker blocker{m_textEdit};
-        m_textEdit->setText(theField()->text());
+        m_textEdit->setPlainText(theField()->text());
     }
 
     void onTextChanged()
