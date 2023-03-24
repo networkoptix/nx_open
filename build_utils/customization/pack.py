@@ -1,12 +1,12 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import argparse
 import json
 import logging
-import os
 import sys
+from typing import Dict, Generator, Tuple, Union
 import yaml
 import zipfile
 
@@ -16,91 +16,86 @@ from shutil import copy2, rmtree
 
 FILEMAP_NAME = 'filemap.yaml'
 
+FileMap = Dict[str, Union[str, 'FileMap']]
+FileMapElement = Tuple[Path, str]
 
-def find_filemap():
+
+def find_filemap() -> FileMap:
     config_path = Path(__file__).parent / FILEMAP_NAME
     if not config_path.exists():
         logging.error('Config file %s cannot be found', config_path)
         sys.exit(1)
 
-    with open(config_path.as_posix(), 'r') as f:
+    with open(config_path, 'r') as f:
         return yaml.load(f, Loader=yaml.SafeLoader)
 
 
-def iterate_over_dict(dictionary, path):
+def iterate_over_dict(dictionary: FileMap, path: Path) -> Generator[FileMapElement, None, None]:
     for key, value in dictionary.items():
         if type(value) is dict:
-            for nested_key, nested_value in iterate_over_dict(value, path / key):
-                yield (nested_key, nested_value)
+            yield from iterate_over_dict(value, path / key)
         else:
             yield (path / key, value)
 
 
-def make_dirs(path):
-    try:
-        os.makedirs(path.as_posix())
-    except Exception:
-        pass
+def copy_if_different(source: Path, target: Path):
+    target.parent.mkdir(exist_ok=True, parents=True)
 
-
-def copy_if_different(source, target):
-    make_dirs(target.parent)
-
-    if target.exists() and cmp(source.as_posix(), target.as_posix()):
+    if target.exists() and cmp(source, target):
         logging.info('Copying %s to %s - SKIPPED', source, target)
     else:
         logging.info('Copying %s to %s', source, target)
-        copy2(source.as_posix(), target.as_posix())
+        copy2(source, target)
     if not target.exists():
         logging.critical('File %s cannot be written', target)
         sys.exit(1)
-    if not cmp(source.as_posix(), target.as_posix()):
+    if not cmp(source, target):
         logging.critical('File %s integrity check failed', target)
         sys.exit(1)
 
 
-def pack(customization_path, output_path):
+def pack(customization_path: Path, output_path: Path):
     filemap = find_filemap()
-    with zipfile.ZipFile(output_path.as_posix(), "w", zipfile.ZIP_DEFLATED) as zip:
+    with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zip:
         relative_path = Path()
         for source, target in iterate_over_dict(filemap, relative_path):
             existing_file = customization_path / target
             if not existing_file.exists():
                 logging.warning('File %s not found', existing_file)
                 continue
-            logging.info('Packing %s to %s', existing_file, source.as_posix())
-            zip.write(existing_file.as_posix(), source.as_posix())
+            logging.info('Packing %s to %s', existing_file, source)
+            zip.write(existing_file, source)
 
 
-def unpack(package_path, output_path, clean_package):
+def unpack(package_path: Path, output_path: Path, clean_package: bool):
     filemap = find_filemap()
 
     unpacked_package_path = output_path / '_package_'
-    make_dirs(unpacked_package_path)
+    unpacked_package_path.mkdir(exist_ok=True, parents=True)
 
-    with zipfile.ZipFile(package_path.as_posix(), "r") as zip:
-        zip.extractall(unpacked_package_path.as_posix())
+    with zipfile.ZipFile(package_path, "r") as zip:
+        zip.extractall(unpacked_package_path)
 
     for source, target in iterate_over_dict(filemap, unpacked_package_path):
         if not source.exists():
-            logging.warning('File {} not found'.format(source))
+            logging.warning(f'File {source} not found')
             continue
         copy_if_different(source, output_path / target)
 
     if clean_package:
-        rmtree(unpacked_package_path.as_posix())
+        rmtree(unpacked_package_path)
 
 
-def list_files(output_path):
+def list_files(output_path: Path):
     filemap = find_filemap()
 
     unpacked_package_path = output_path / '_package_'
-    for source, target in iterate_over_dict(filemap, unpacked_package_path):
+    for _, target in iterate_over_dict(filemap, unpacked_package_path):
         print(output_path / target)
 
 
 def get_value(package_path: Path, query: str) -> str:
-    with zipfile.ZipFile(package_path.as_posix(), "r") as archive:
+    with zipfile.ZipFile(package_path, "r") as archive:
         description_bytes = archive.read("description.json")
 
     current_object = json.loads(description_bytes.decode("utf-8"))
@@ -118,6 +113,7 @@ def get_value(package_path: Path, query: str) -> str:
         return f'Bad query {query!r}: index {item!r} is out of list {current_object!r} boundary.'
 
     return str(current_object)
+
 
 def _add_pack_command(subparsers):
 
@@ -189,7 +185,7 @@ def main():
     log_level = logging.INFO if args.verbose else logging.WARNING
 
     if args.log:
-        make_dirs(Path(args.log).parent)
+        Path(args.log).parent.mkdir(exist_ok=True, parents=True)
         logging.basicConfig(
             level=logging.DEBUG,
             format='%(asctime)s %(levelname)-8s %(message)s',
