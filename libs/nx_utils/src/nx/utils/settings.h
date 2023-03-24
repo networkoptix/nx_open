@@ -112,6 +112,9 @@ public:
  * define an option, declare a struct member with type Option<>. To access an option value, use
  * operator().
  *
+ * ATTENTION: Values in the .conf file can be enquoted and then can include a semicolon, otherwise
+ * the semicolon is treated as a comment start. The value is then returned without the quotes.
+ *
  * Usage example:
  * <pre><code>
  *
