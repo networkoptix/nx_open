@@ -189,6 +189,25 @@ void LocalNotificationsManager::setAction(const QnUuid& notificationId, CommandA
     emit actionChanged(notificationId, value);
 }
 
+CommandActionPtr LocalNotificationsManager::additionalAction(const QnUuid& notificationId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_lookup.value(notificationId).additionalAction;
+}
+
+void LocalNotificationsManager::setAdditionalAction(const QnUuid& notificationId, CommandActionPtr value)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    auto iter = m_lookup.find(notificationId);
+    if (iter == m_lookup.end() || iter->additionalAction == value)
+        return;
+
+    iter->additionalAction = value;
+
+    lock.unlock();
+    emit additionalActionChanged(notificationId, value);
+}
+
 QnNotificationLevel::Value LocalNotificationsManager::level(const QnUuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);

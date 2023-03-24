@@ -109,9 +109,7 @@ QnWorkbenchContext::QnWorkbenchContext(SystemContext* systemContext, QObject* pa
     store(new AnalyticsEventsSearchTreeBuilder(systemContext));
     instance<SystemHealthState>();
     instance<QnGLCheckerInstrument>();
-
     instance<workbench::LocalNotificationsManager>();
-
     instance<Director>();
     store(new ServerUpdateTool(systemContext));
     instance<WorkbenchUpdateWatcher>();

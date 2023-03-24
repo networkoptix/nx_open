@@ -250,6 +250,7 @@ namespace Qn
         GroupedAttributesRole,                      /**< Role for grouped attribute lists (nx::common::metadata::GroupedAttributes). */
         RemovableRole,                              /**< An item is removable (bool). */
         CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
+        AdditionalActionRole,                       /**< Additional action (QSharedPointer<QAction>). */
         ResourceListRole,                           /**< Resource list (QnResourceList). */
         DisplayedResourceListRole,                  /**< Resource list displayed in a Right Panel tile (QnResourceList or QStringList). */
         PreviewTimeRole,                            /**< Role for camera preview time in microseconds since epoch (std::chrono::microseconds). */

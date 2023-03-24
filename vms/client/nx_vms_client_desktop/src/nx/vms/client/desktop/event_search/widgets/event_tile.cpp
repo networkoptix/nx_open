@@ -133,6 +133,7 @@ struct EventTile::Private
     WidgetAnchor* const closeButtonAnchor;
     bool closeable = false;
     CommandActionPtr action; //< Button action.
+    CommandActionPtr additionalAction;
     QnElidedLabel* const progressLabel;
     const QScopedPointer<QTimer> loadPreviewTimer;
     bool automaticPreviewLoad = true;
@@ -719,6 +720,19 @@ void EventTile::setAction(const CommandActionPtr& value)
     d->action = value;
     ui->actionButton->setAction(d->action.data());
     ui->actionHolder->setHidden(d->action.isNull());
+}
+
+CommandActionPtr EventTile::additionalAction() const
+{
+    return d->additionalAction;
+}
+
+void EventTile::setAdditionalAction(const CommandActionPtr& value)
+{
+    d->additionalAction = value;
+    ui->additionalActionButton->setAction(d->additionalAction.data());
+    ui->additionalActionButton->setHidden(d->additionalAction.isNull());
+    ui->additionalActionButton->setFlat(true);
 }
 
 void EventTile::paintEvent(QPaintEvent* /*event*/)

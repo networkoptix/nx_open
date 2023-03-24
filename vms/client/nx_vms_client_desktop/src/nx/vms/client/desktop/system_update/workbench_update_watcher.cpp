@@ -10,22 +10,27 @@
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/webview_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx/vms/update/update_check.h>
+#include <ui/common/notification_levels.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/util.h>
 
@@ -61,8 +66,13 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
     m_updateStateTimer(this),
     m_checkLatestUpdateTimer(this),
     m_notifiedVersion(),
+    m_notificationsManager(
+        context()->findInstance<workbench::LocalNotificationsManager>()),
+    m_updateAction(new QAction(tr("Updates"))),
+    m_skipAction(new QAction(qnSkin->pixmap("events/skip.svg"), "Skip version")),
     m_private(new Private())
 {
+    NX_CRITICAL(m_notificationsManager);
     m_private->serverUpdateTool = context()->findInstance<ServerUpdateTool>();
     NX_ASSERT(m_private->serverUpdateTool);
 
@@ -105,6 +115,35 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
                     m_private->serverUpdateTool->onDisconnectFromSystem();
                 }
             }
+        });
+    
+    connect(m_notificationsManager,
+        &workbench::LocalNotificationsManager::cancelRequested,
+        this,
+        [this]()
+        {
+            m_notificationsManager->remove(updateNotificationId);
+            updateNotificationId = {};
+        });
+    
+    connect(m_updateAction.data(),
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            m_notificationsManager->remove(updateNotificationId);
+            updateNotificationId = {};
+            menu()->trigger(action::SystemUpdateAction);
+        });
+    
+    connect(m_skipAction.data(),
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            systemContext()->localSettings()->ignoredUpdateVersion = m_notifiedVersion;
+            m_notificationsManager->remove(updateNotificationId);
+            updateNotificationId = {};
         });
 }
 
@@ -248,14 +287,22 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
     if (updateDeliveryDate > currentTimeFromEpoch)
         return;
 
-    showUpdateNotification(targetVersion, contents.info.releaseNotesUrl, contents.info.description);
+    notifyUserAboutWorkbenchUpdate(targetVersion, contents.info.releaseNotesUrl, contents.info.description);
 }
 
-void WorkbenchUpdateWatcher::showUpdateNotification(
+void WorkbenchUpdateWatcher::notifyUserAboutWorkbenchUpdate(
     const nx::utils::SoftwareVersion& targetVersion,
     const nx::utils::Url& releaseNotesUrl,
     const QString& description)
 {
+    if (!updateNotificationId.isNull())
+        return;
+
+    if (!accessController()->hasAdminPermissions())
+        return;
+    
+    NX_VERBOSE(this, "Showing a notification about Workbench update feature.");
+
     m_notifiedVersion = targetVersion;
 
     const auto current = appContext()->version();
@@ -263,8 +310,8 @@ void WorkbenchUpdateWatcher::showUpdateNotification(
         || (targetVersion.minor > current.minor)) && !description.isEmpty();
 
     const auto text = tr("%1 version available").arg(targetVersion.toString());
-    const auto releaseNotesLink = common::html::link(tr("Release Notes"), releaseNotesUrl);
 
+    const auto releaseNotesLink = common::html::link(tr("Release Notes..."), releaseNotesUrl);
     QStringList extras;
     if (majorVersionChange)
         extras.push_back(tr("Major issues have been fixed. Update is strongly recommended."));
@@ -272,51 +319,31 @@ void WorkbenchUpdateWatcher::showUpdateNotification(
         extras.push_back(description);
     extras.push_back(releaseNotesLink);
 
-    QnMessageBox messageBox(QnMessageBoxIcon::Information,
-        text, "",
-        QDialogButtonBox::Cancel,
-        QDialogButtonBox::NoButton,
-        mainWindowWidget());
-
-    QString cssStyle = generateCssStyle();
-    QString htmlBody= extras.join(common::html::kLineBreak);
     QString html = QString::fromLatin1(R"(
         <html>
-        <head>
-            <style media="screen" type="text/css">%1</style>
-        </head>
-        <body>%2</body>
+        <body>%1</body>
         </html>
-        )").arg(cssStyle, htmlBody);
+        )").arg(extras.join(common::html::kLineBreak));
 
-    auto view = new WebViewWidget(&messageBox);
-    // Setting up a policy for link redirection. We should not open release notes right here.
-    view->controller()->setRedirectLinksToDesktop(true);
-    view->controller()->setMenuNavigation(false);
+    updateNotificationId = m_notificationsManager->add(
+        tr("%1 Version is available").arg(toString(targetVersion)),
+        tr("%1").arg(html),
+        true);
 
-    view->controller()->setHtml(html, QUrl("qrc://"));
+    m_notificationsManager->setLevel(
+        updateNotificationId, 
+        majorVersionChange
+            ? QnNotificationLevel::Value::ImportantNotification
+            : QnNotificationLevel::Value::CommonNotification);
 
-    // We should manually adjust WebEngineView size to make it look good.
-    view->setFixedWidth(360);
-    if (description.isEmpty())
-        view->setFixedHeight(20);
-    else
-        view->setFixedHeight(320);
-    view->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
+    m_notificationsManager->setIcon(
+        updateNotificationId,
+        majorVersionChange
+            ? qnSkin->pixmap("events/update_auto_1_major.svg")
+            : qnSkin->pixmap("events/update_auto_1.svg"));
 
-    messageBox.addCustomWidget(view, QnMessageBox::Layout::AfterMainLabel);
-    messageBox.addButton(tr("Update..."), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-    messageBox.setCustomCheckBoxText(tr("Do not notify again about this update"));
-
-    const auto result = messageBox.exec();
-
-    if (messageBox.isChecked())
-    {
-        systemContext()->localSettings()->ignoredUpdateVersion = targetVersion;
-    }
-
-    if (result != QDialogButtonBox::Cancel)
-        menu()->trigger(action::SystemUpdateAction);
+    m_notificationsManager->setAction(updateNotificationId, m_updateAction);
+    m_notificationsManager->setAdditionalAction(updateNotificationId, m_skipAction);
 }
 
 const UpdateContents& WorkbenchUpdateWatcher::getUpdateContents() const
