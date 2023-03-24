@@ -95,6 +95,8 @@ public:
 
     Q_INVOKABLE QString validateName(const QString& text);
 
+    Q_INVOKABLE bool isOkClicked() const { return acceptOnSuccess(); }
+
     static void removeGroups(
         nx::vms::client::desktop::SystemContext* context,
         const QSet<QnUuid>& idsToRemove,

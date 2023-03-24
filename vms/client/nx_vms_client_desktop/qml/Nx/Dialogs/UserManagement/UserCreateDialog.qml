@@ -57,6 +57,7 @@ DialogWithState
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
+    property bool isSaving: false
     property var self
 
     signal groupClicked(var id)
@@ -99,6 +100,7 @@ DialogWithState
                 id: generalSettings
                 anchors.fill: parent
                 self: dialog.self
+                enabled: !dialog.isSaving
             }
         }
         Tab
@@ -115,6 +117,8 @@ DialogWithState
 
                 model: membersModel
 
+                enabled: !dialog.isSaving
+
                 onAddGroupClicked: dialog.groupClicked(null)
             }
         }
@@ -129,6 +133,8 @@ DialogWithState
             {
                 id: permissionSettings
                 anchors.fill: parent
+
+                enabled: !dialog.isSaving
 
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext
@@ -148,6 +154,8 @@ DialogWithState
                 id: globalPermissionSettings
                 anchors.fill: parent
 
+                enabled: !dialog.isSaving
+
                 model: GlobalPermissionsModel
                 {
                     id: globalPermissionsModel
@@ -166,9 +174,16 @@ DialogWithState
 
         Button
         {
-            text: qsTr("Add User")
+            text: dialog.isSaving ? "" : qsTr("Add User")
+            width: Math.max(implicitWidth, 80)
             isAccentButton: true
             DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
+
+            NxDotPreloader
+            {
+                anchors.centerIn: parent
+                running:  dialog.isSaving
+            }
         }
     }
 }

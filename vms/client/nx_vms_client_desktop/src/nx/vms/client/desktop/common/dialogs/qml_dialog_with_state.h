@@ -273,6 +273,11 @@ protected:
      */
     S currentState() const { return objectToState(rootObjectHolder()->object()); }
 
+    /**
+     * Returns true if the dialog is going to be closed on successful state save.
+     */
+    bool acceptOnSuccess() const { return m_acceptOnSuccess; }
+
 private:
     S m_originalState;
     bool m_acceptOnSuccess = false;

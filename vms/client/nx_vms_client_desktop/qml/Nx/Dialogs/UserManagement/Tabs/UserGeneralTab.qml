@@ -43,7 +43,7 @@ Item
 
     property var groups: []
 
-    property bool editable: true
+    property bool enabled: true
     property int userType: UserSettingsGlobal.LocalUser
 
     property var self
@@ -114,7 +114,7 @@ Item
                 {
                     id: userLoginText
 
-                    enabled: control.loginEditable && control.editable
+                    enabled: control.loginEditable && control.enabled
 
                     anchors.left: userTypeIcon.right
                     anchors.leftMargin: 24
@@ -130,7 +130,7 @@ Item
                 {
                     id: enabledUserSwitch
 
-                    enabled: control.userEnabledEditable && control.editable
+                    enabled: control.userEnabledEditable && control.enabled
 
                     anchors.top: userLoginText.bottom
                     anchors.topMargin: 14
@@ -161,6 +161,7 @@ Item
                     {
                         id: deleteButton
                         visible: control.deleteAvailable
+                        enabled: control.enabled
                         icon.source: "image://svg/skin/user_settings/user_delete.svg"
                         icon.width: 12
                         icon.height: 14
@@ -208,7 +209,7 @@ Item
                             id: userFullNameTextField
                             width: parent.width
                             enabled: control.fullNameEditable
-                                && control.editable
+                                && control.enabled
                                 && control.userType != UserSettingsGlobal.CloudUser
                         }
                     }
@@ -281,7 +282,7 @@ Item
                         {
                             id: userEmailTextField
                             width: parent.width
-                            enabled: control.emailEditable && control.editable
+                            enabled: control.emailEditable && control.enabled
                             validateFunc: (text) =>
                             {
                                 return control.self && enabled
@@ -298,7 +299,6 @@ Item
 
                         visible: control.passwordEditable
                             && control.userType == UserSettingsGlobal.LocalUser
-                            && control.editable
 
                         Item
                         {
@@ -331,6 +331,7 @@ Item
                                 y: 4
                                 id: changePasswordButton
                                 text: qsTr("Change password")
+                                enabled: control.enabled
 
                                 onClicked:
                                 {
@@ -376,7 +377,7 @@ Item
                         {
                             id: allowInsecureCheckBox
                             text: qsTr("Allow insecure (digest) authentication")
-                            enabled: control.allowInsecureEditable && control.editable
+                            enabled: control.allowInsecureEditable && control.enabled
 
                             nextCheckState: () =>
                             {
@@ -411,6 +412,7 @@ Item
 
                         rowLimit: 2
                         items: control.groups
+                        enabled: control.enabled
 
                         onGroupClicked: (id) => { control.groupClicked(id) }
                         onMoreClicked: control.moreGroupsClicked()

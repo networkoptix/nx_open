@@ -65,6 +65,7 @@ struct GroupSettingsDialog::Private
     QPointer<SessionNotifier> sessionNotifier;
     DialogType dialogType;
     QmlProperty<int> tabIndex;
+    QmlProperty<bool> isSaving;
     QmlProperty<GroupSettingsDialog*> self; //< Used to call validate functions from QML.
 
     QnUuid groupId;
@@ -74,6 +75,7 @@ struct GroupSettingsDialog::Private
         q(parent),
         dialogType(dialogType),
         tabIndex(q->rootObjectHolder(), "tabIndex"),
+        isSaving(q->rootObjectHolder(), "isSaving"),
         self(q->rootObjectHolder(), "self")
     {
     }
@@ -197,9 +199,12 @@ void GroupSettingsDialog::onDeleteRequested()
     if (!ui::messages::UserGroups::removeGroups(d->parentWidget, {d->groupId}))
         return;
 
+    d->isSaving = true;
+
     const auto handleRemove = nx::utils::guarded(this,
         [this](bool success)
         {
+            d->isSaving = false;
             if (success)
                 reject();
         });
@@ -244,6 +249,7 @@ void GroupSettingsDialog::setGroup(const QnUuid& groupId)
 
     d->groupId = groupId;
     d->tabIndex = 0;
+    d->isSaving = false;
     createStateFrom(groupId);
 }
 
@@ -427,11 +433,15 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
         tr("Save"),
         FreshSessionTokenHelper::ActionType::updateSettings));
 
+    d->isSaving = true;
+
     chain->start(nx::utils::guarded(this,
         [chain, state, this](
             bool success,
             const QString& errorString)
         {
+            d->isSaving = false;
+
             if (success)
             {
                 saveStateComplete(state);

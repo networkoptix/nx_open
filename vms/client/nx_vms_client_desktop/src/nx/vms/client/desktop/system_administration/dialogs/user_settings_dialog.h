@@ -133,6 +133,8 @@ public:
 
     Q_INVOKABLE bool isConnectedToCloud() const;
 
+    Q_INVOKABLE bool isOkClicked() const { return acceptOnSuccess(); }
+
 public slots:
     void onDeleteRequested();
     void onAuditTrailRequested();

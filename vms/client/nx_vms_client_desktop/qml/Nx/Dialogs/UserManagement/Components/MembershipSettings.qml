@@ -21,6 +21,7 @@ Item
 
     property string editableProperty: "checked"
 
+    property bool editable: true
     property bool enabled: true
 
     property alias editableModel: allGroupsListView.model
@@ -189,12 +190,14 @@ Item
         anchors.leftMargin: 16
         width: 0.4 * parent.width
         clip: true
-        visible: control.enabled
+        visible: control.editable
 
         ListView
         {
             id: allGroupsListView
             anchors.fill: parent
+
+            enabled: control.enabled
 
             header: Item
             {
@@ -293,6 +296,8 @@ Item
             visible: count > 0
             clip: true
             hoverHighlightColor: "transparent"
+
+            enabled: control.enabled
 
             header: Item
             {
