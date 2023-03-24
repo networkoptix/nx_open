@@ -18,6 +18,7 @@ namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::client::core {
 
 class CloudStatusWatcher;
+class Settings;
 
 /**
  * Main context of the desktop client application. Exists through all application lifetime and is
@@ -62,7 +63,7 @@ public:
 
     QnVoiceSpectrumAnalyzer* voiceSpectrumAnalyzer() const;
 
-    QnClientCoreSettings* deprecatedSettings() const;
+    Settings* coreSettings() const;
 
 private:
     struct Private;

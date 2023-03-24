@@ -649,7 +649,7 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
 
     if (authData.empty())
     {
-        authData = core::settings()->cloudAuthData();
+        authData = appContext()->coreSettings()->cloudAuthData();
         NX_DEBUG(
             this, "Loaded auth data, refresh token length: %1", authData.refreshToken.length());
     }

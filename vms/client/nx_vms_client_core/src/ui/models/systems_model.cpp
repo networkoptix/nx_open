@@ -263,7 +263,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return !version.isNull() ? QVariant::fromValue(version) : QVariant();
         }
         case VisibilityScopeRoleId:
-            return d->controller->visibilityScope(system->localId());
+            return QVariant::fromValue(d->controller->visibilityScope(system->localId()));
         case IsCloudOauthSupportedRoleId:
             return system->isOauthSupported();
         case Is2FaEnabledForSystem:

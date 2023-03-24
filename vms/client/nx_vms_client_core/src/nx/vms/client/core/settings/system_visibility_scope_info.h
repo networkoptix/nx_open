@@ -5,16 +5,21 @@
 #include <QtCore/QHash>
 #include <QtCore/QString>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
-#include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/client/core/settings/welcome_screen_info.h>
+
+namespace nx::vms::client::core {
 
 struct SystemVisibilityScopeInfo
 {
     QString name;
-    int visibilityScope;
+    welcome_screen::TileVisibilityScope visibilityScope;
+
+    bool operator==(const SystemVisibilityScopeInfo&) const = default;
 };
-#define SystemVisibilityScopeInfo_Fields (name)(visibilityScope)
+NX_REFLECTION_INSTRUMENT(SystemVisibilityScopeInfo, (name)(visibilityScope))
 
-QN_FUSION_DECLARE_FUNCTIONS(SystemVisibilityScopeInfo, (json))
+using SystemVisibilityScopeInfoHash = QHash<QnUuid, SystemVisibilityScopeInfo>;
 
-typedef QHash<QnUuid, SystemVisibilityScopeInfo> SystemVisibilityScopeInfoHash;
+} // namespace nx::vms::client::core

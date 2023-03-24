@@ -2,7 +2,6 @@
 
 #include "systems_finder.h"
 
-#include <client_core/client_core_settings.h>
 #include <finders/cloud_systems_finder.h>
 #include <finders/direct_systems_finder.h>
 #include <finders/recent_local_systems_finder.h>
@@ -10,6 +9,7 @@
 #include <network/system_description_aggregator.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <utils/common/instance_storage.h>
 
@@ -159,10 +159,9 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
 
 void QnSystemsFinder::updateRecentConnections(const QnUuid& localSystemId, const QString& name)
 {
-    auto connections = qnClientCoreSettings->recentLocalConnections();
+    auto connections = appContext()->coreSettings()->recentLocalConnections();
 
     auto it = connections.find(localSystemId);
-
     if (it == connections.end())
         return;
 
@@ -171,8 +170,7 @@ void QnSystemsFinder::updateRecentConnections(const QnUuid& localSystemId, const
 
     it->systemName = name;
 
-    qnClientCoreSettings->setRecentLocalConnections(connections);
-    qnClientCoreSettings->save();
+    appContext()->coreSettings()->recentLocalConnections = connections;
 }
 
 void QnSystemsFinder::onSystemLost(const QString& systemId, int priority)

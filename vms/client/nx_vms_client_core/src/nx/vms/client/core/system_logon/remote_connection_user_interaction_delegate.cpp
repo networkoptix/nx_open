@@ -4,6 +4,7 @@
 
 #include <client_core/client_core_module.h>
 #include <nx/network/ssl/certificate.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -20,7 +21,7 @@ struct RemoteConnectionUserInteractionDelegate::Private
 
     CertificateValidationLevel validationLevel()
     {
-        return settings()->certificateValidationLevel();
+        return appContext()->coreSettings()->certificateValidationLevel();
     }
 
     Private(

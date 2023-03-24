@@ -6,7 +6,6 @@
 #include <QtQml/QQmlEngine>
 
 #include <client_core/client_core_meta_types.h>
-#include <client_core/client_core_settings.h>
 #include <common/static_common_module.h>
 #include <finders/systems_finder.h>
 #include <nx/branding_proxy.h>
@@ -36,10 +35,10 @@ struct ApplicationContext::Private
         NX_ASSERT(!QCoreApplication::applicationName().isEmpty());
         NX_ASSERT(!QCoreApplication::organizationName().isEmpty());
 
-        deprecatedSettings = std::make_unique<QnClientCoreSettings>();
         // Disable secure settings in unit tests.
-        settings = std::make_unique<Settings>(/*useKeyChain*/ mode != Mode::unitTests);
-    }
+        settings = std::make_unique<Settings>(
+            Settings::InitializationOptions{.useKeychain = (mode != Mode::unitTests)});
+}
 
     void initializeQmlEngine()
     {
@@ -81,7 +80,6 @@ struct ApplicationContext::Private
 
     ApplicationContext* const q;
     QQmlEngine* qmlEngine = nullptr;
-    std::unique_ptr<QnClientCoreSettings> deprecatedSettings;
     std::unique_ptr<Settings> settings;
     std::unique_ptr<CloudStatusWatcher> cloudStatusWatcher;
     std::unique_ptr<QnSystemsFinder> systemsFinder;
@@ -163,9 +161,9 @@ QnVoiceSpectrumAnalyzer* ApplicationContext::voiceSpectrumAnalyzer() const
     return d->voiceSpectrumAnalyzer.get();
 }
 
-QnClientCoreSettings* ApplicationContext::deprecatedSettings() const
+Settings* ApplicationContext::coreSettings() const
 {
-    return d->deprecatedSettings.get();
+    return d->settings.get();
 }
 
 } // namespace nx::vms::client::core

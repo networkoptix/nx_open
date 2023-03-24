@@ -3,11 +3,7 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QString>
 #include <QtCore/QSet>
-
-#include <client_core/client_core_meta_types.h>
-#include <nx/utils/uuid.h>
 
 class NX_VMS_CLIENT_CORE_API QnForgottenSystemsManager: public QObject
 {
@@ -23,8 +19,6 @@ public:
 
     bool isForgotten(const QString& id) const;
 
-    QStringList forgottenSystems() const;
-
 signals:
     void forgottenSystemAdded(const QString& id);
 
@@ -34,5 +28,5 @@ private:
     void rememberSystem(const QString& id);
 
 private:
-    QnStringSet m_systems;
+    QSet<QString> m_systems;
 };

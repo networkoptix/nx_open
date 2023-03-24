@@ -2,13 +2,9 @@
 
 #include "local_connection_data.h"
 
-#include <nx/fusion/model_functions.h>
 #include <nx/reflect/compare.h>
 
 namespace nx::vms::client::core {
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LocalConnectionData, (json), LocalConnectionData_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(WeightData, (json), WeightData_Fields)
 
 bool WeightData::operator==(const WeightData& other) const
 {

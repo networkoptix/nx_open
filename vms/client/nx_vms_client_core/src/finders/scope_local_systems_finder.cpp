@@ -2,38 +2,38 @@
 
 #include "scope_local_systems_finder.h"
 
+#include <network/local_system_description.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
-#include <network/local_system_description.h>
-
-#include <client_core/client_core_settings.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
 
-using TileVisibilityScope = nx::vms::client::core::welcome_screen::TileVisibilityScope;
+using namespace nx::vms::client::core;
 
-ScopeLocalSystemsFinder::ScopeLocalSystemsFinder(QObject* parent): base_type(parent)
+using TileVisibilityScope = welcome_screen::TileVisibilityScope;
+
+ScopeLocalSystemsFinder::ScopeLocalSystemsFinder(QObject* parent):
+    base_type(parent)
 {
-    connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
-        [this](int valueId)
-    {
-        if (valueId == QnClientCoreSettings::TileScopeInfo)
-            updateSystems();
-    });
+    connect(&appContext()->coreSettings()->tileScopeInfo,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        &ScopeLocalSystemsFinder::updateSystems);
     updateSystems();
 }
 
 void ScopeLocalSystemsFinder::updateSystems()
 {
     SystemsHash newSystems;
-    const auto systemScopes = qnClientCoreSettings->tileScopeInfo();
-    for (auto iter = systemScopes.begin(); iter != systemScopes.end(); ++iter)
+    const auto systemScopes = appContext()->coreSettings()->tileScopeInfo();
+    for (const auto& [id, info]: systemScopes.asKeyValueRange())
     {
-        if (iter->visibilityScope == TileVisibilityScope::DefaultTileVisibilityScope)
+        if (info.visibilityScope == TileVisibilityScope::DefaultTileVisibilityScope)
             continue;
 
-        const auto system = QnLocalSystemDescription::create(
-            iter.key().toSimpleString(), iter.key(), iter->name);
+        const auto system = QnLocalSystemDescription::create(id.toSimpleString(), id, info.name);
 
         static const int kVeryFarPriority = 100000;
 
@@ -41,7 +41,8 @@ void ScopeLocalSystemsFinder::updateSystems()
         fakeServerInfo.id = QnUuid::createUuid(); // It must be new unique id.
         fakeServerInfo.systemName = system->name();
         fakeServerInfo.realm = QString::fromStdString(nx::network::AppInfo::realm());
-        fakeServerInfo.cloudHost = QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
+        fakeServerInfo.cloudHost =
+            QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
         system->addServer(fakeServerInfo, kVeryFarPriority, false);
         newSystems.insert(system->id(), system);
     }

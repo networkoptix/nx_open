@@ -241,7 +241,7 @@ void QnAdvancedSettingsWidget::applyChanges()
     appContext()->localSettings()->hardwareDecodingEnabledProperty = isHardwareDecodingEnabled();
 
     const auto oldCertificateValidationLevel =
-        nx::vms::client::core::settings()->certificateValidationLevel();
+        appContext()->coreSettings()->certificateValidationLevel();
     const auto newCertificateValidationLevel = certificateValidationLevel();
 
     if (oldCertificateValidationLevel != newCertificateValidationLevel)
@@ -263,7 +263,7 @@ void QnAdvancedSettingsWidget::applyChanges()
         const auto updateSecurityLevel =
             [level=newCertificateValidationLevel]()
             {
-                nx::vms::client::core::settings()->certificateValidationLevel.setValue(level);
+                appContext()->coreSettings()->certificateValidationLevel.setValue(level);
                 // Certificate Verifier and related classes are updated by QnClientCoreModule.
             };
 
@@ -342,7 +342,7 @@ void QnAdvancedSettingsWidget::loadDataToUi()
     setMaximumLiveBufferMs(appContext()->localSettings()->maximumLiveBufferMs());
     setBlurEnabled(appContext()->localSettings()->glBlurEnabled());
     setHardwareDecodingEnabled(appContext()->localSettings()->hardwareDecodingEnabled());
-    setCertificateValidationLevel(nx::vms::client::core::settings()->certificateValidationLevel());
+    setCertificateValidationLevel(appContext()->coreSettings()->certificateValidationLevel());
     updateCertificateValidationLevelDescription();
     updateNvidiaHardwareAccelerationWarning();
 }
@@ -355,7 +355,7 @@ bool QnAdvancedSettingsWidget::hasChanges() const
         || appContext()->localSettings()->maximumLiveBufferMs() != maximumLiveBufferMs()
         || appContext()->localSettings()->glBlurEnabled() != isBlurEnabled()
         || appContext()->localSettings()->hardwareDecodingEnabled() != isHardwareDecodingEnabled()
-        || nx::vms::client::core::settings()->certificateValidationLevel()
+        || appContext()->coreSettings()->certificateValidationLevel()
             != certificateValidationLevel();
 }
 

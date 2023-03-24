@@ -2,24 +2,23 @@
 
 #include "forgotten_systems_manager.h"
 
-#include <client_core/client_core_settings.h>
 #include <finders/systems_finder.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 
-using nx::vms::client::core::WeightData;
+using namespace nx::vms::client::core;
+
 using nx::vms::common::ServerCompatibilityValidator;
 
-QnForgottenSystemsManager::QnForgottenSystemsManager():
-    base_type(),
-    m_systems()
+QnForgottenSystemsManager::QnForgottenSystemsManager()
 {
     NX_ASSERT(qnSystemsFinder, "Systems finder is not initialized yet");
-    NX_ASSERT(qnClientCoreSettings, "Client core settings is not initialized yet");
-    if (!qnSystemsFinder || !qnClientCoreSettings)
+    if (!qnSystemsFinder)
         return;
 
-    m_systems = qnClientCoreSettings->forgottenSystems();
+    m_systems = appContext()->coreSettings()->forgottenSystems();
 
     const auto processSystemDiscovered =
         [this](const QnSystemDescriptionPtr& system)
@@ -57,8 +56,7 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
     const auto storeSystems =
         [this]()
         {
-            qnClientCoreSettings->setForgottenSystems(m_systems);
-            qnClientCoreSettings->save();
+            appContext()->coreSettings()->forgottenSystems = m_systems;
         };
 
     connect(this, &QnForgottenSystemsManager::forgottenSystemAdded, this, storeSystems);
@@ -84,11 +82,6 @@ void QnForgottenSystemsManager::forgetSystem(const QString& id)
 bool QnForgottenSystemsManager::isForgotten(const QString& id) const
 {
     return m_systems.contains(id);
-}
-
-QStringList QnForgottenSystemsManager::forgottenSystems() const
-{
-    return m_systems.values();
 }
 
 void QnForgottenSystemsManager::rememberSystem(const QString& id)

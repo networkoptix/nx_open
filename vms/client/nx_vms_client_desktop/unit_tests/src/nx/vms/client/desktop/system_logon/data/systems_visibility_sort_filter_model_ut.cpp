@@ -1,16 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
 #include <QtCore/QSet>
-#include <memory>
 
 #include <nx/utils/uuid.h>
-#include <utils/math/math.h>
-#include <ui/models/systems_model.h>
-
-#include <nx/vms/client/desktop/system_logon/data/systems_visibility_sort_filter_model.h>
 #include <nx/vms/client/desktop/system_logon/data/connect_tiles_proxy_model.h>
+#include <nx/vms/client/desktop/system_logon/data/systems_visibility_sort_filter_model.h>
+#include <ui/models/systems_model.h>
+#include <utils/math/math.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -86,7 +86,7 @@ public:
             case QnSystemsModel::IsCompatibleToDesktopClient:
                 return m_systems[row].isCompatible;
             case QnSystemsModel::VisibilityScopeRoleId:
-                return m_systems[row].scope;
+                return QVariant::fromValue(m_systems[row].scope);
             default:
                 return QVariant();
         }

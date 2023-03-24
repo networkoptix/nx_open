@@ -11,6 +11,7 @@
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/keychain_property_storage_backend.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../utils/debug_custom_actions.h"
@@ -38,7 +39,7 @@ struct CredentialsStoreDialog::Private
     void rebuildModel()
     {
         model->clear();
-        const auto& data = core::settings()->systemAuthenticationData();
+        const auto& data = appContext()->coreSettings()->systemAuthenticationData();
         for (auto [systemId, credentialsList]: data)
         {
             const auto system = qnSystemsFinder->getSystem(systemId.toString());

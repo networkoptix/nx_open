@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <ui/models/systems_model.h>
 #include <network/local_system_description.h>
+#include <ui/models/systems_model.h>
 
 #include "test_systems_controller.h"
 
@@ -49,7 +49,8 @@ protected:
 
     void setVisibilityScope(TileVisibilityScope scope)
     {
-        model->setData(model->index(0, 0), scope, QnSystemsModel::VisibilityScopeRoleId);
+        model->setData(
+            model->index(0, 0), QVariant::fromValue(scope), QnSystemsModel::VisibilityScopeRoleId);
     }
 
     void thenSystemVisibilityScope(TileVisibilityScope scope)

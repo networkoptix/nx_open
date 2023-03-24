@@ -52,4 +52,9 @@ bool QSettingsBackend::sync()
     return true;
 }
 
+QSettings* QSettingsBackend::qSettings() const
+{
+    return m_settings.get();
+}
+
 } // namespace nx::utils::property_storage

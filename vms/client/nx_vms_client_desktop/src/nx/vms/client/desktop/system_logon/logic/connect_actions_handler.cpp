@@ -13,7 +13,6 @@
 #include <client/client_runtime_settings.h>
 #include <client/desktop_client_message_processor.h>
 #include <client_core/client_core_module.h>
-#include <client_core/client_core_settings.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_resource.h>
@@ -646,10 +645,7 @@ void ConnectActionsHandler::storeConnectionRecord(
     const auto localId = ::helpers::getLocalSystemId(info);
 
     if (options.testFlag(UpdateSystemWeight))
-    {
-        qnClientCoreSettings->updateWeightData(localId);
-        qnClientCoreSettings->save();
-    }
+        appContext()->coreSettings()->updateWeightData(localId);
 
     const nx::network::http::Credentials& credentials = connectionInfo.credentials;
 
@@ -673,7 +669,6 @@ void ConnectActionsHandler::storeConnectionRecord(
             storedCredentials.authToken = {};
 
         CredentialsManager::storeCredentials(localId, storedCredentials);
-        qnClientCoreSettings->save();
     }
 
     if (cloudConnection)
@@ -706,7 +701,7 @@ void ConnectActionsHandler::storeConnectionRecord(
     }
 
     if (options.testFlag(StorePreferredCloudServer) && cloudConnection)
-        core::settings()->setPreferredCloudServer(info.cloudSystemId, info.id);
+        appContext()->coreSettings()->setPreferredCloudServer(info.cloudSystemId, info.id);
 
     if (cloudConnection)
     {
@@ -721,8 +716,7 @@ void ConnectActionsHandler::storeConnectionRecord(
         builder.setEndpoint(connectionInfo.address);
 
         // Stores connection if it is local.
-        qnClientCoreSettings->storeRecentConnection(localId, info.systemName, builder.toUrl());
-        qnClientCoreSettings->save();
+        appContext()->coreSettings()->storeRecentConnection(localId, info.systemName, builder.toUrl());
     }
 }
 

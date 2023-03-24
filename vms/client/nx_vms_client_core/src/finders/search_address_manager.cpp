@@ -2,19 +2,20 @@
 
 #include "search_address_manager.h"
 
-#include <client_core/client_core_settings.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
+
+using namespace nx::vms::client::core;
 
 SearchAddressManager::SearchAddressManager(QObject* parent):
     QObject(parent)
 {
-    connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged,
-        [this](int valueId)
-        {
-            if (valueId == QnClientCoreSettings::RecentLocalConnections)
-                update();
-        });
+    connect(&appContext()->coreSettings()->recentLocalConnections,
+        &nx::utils::property_storage::BaseProperty::changed,
+        this,
+        &SearchAddressManager::update);
 
-    m_searchAddressesInfo = qnClientCoreSettings->searchAddresses();
+    m_searchAddressesInfo = appContext()->coreSettings()->searchAddresses();
 
     update();
 }
@@ -26,39 +27,29 @@ void SearchAddressManager::updateServerRemoteAddresses(
 {
     m_searchAddressesInfo[localSystemId][serverId] = remoteAddresses;
 
-    const auto connections = qnClientCoreSettings->recentLocalConnections();
+    const auto connections = appContext()->coreSettings()->recentLocalConnections();
     if (connections.contains(localSystemId))
     {
-        auto searchAddressesInfo = qnClientCoreSettings->searchAddresses();
+        auto searchAddressesInfo = appContext()->coreSettings()->searchAddresses();
         searchAddressesInfo[localSystemId][serverId] = remoteAddresses;
-        qnClientCoreSettings->setSearchAddresses(searchAddressesInfo);
-        qnClientCoreSettings->save();
+        appContext()->coreSettings()->searchAddresses = searchAddressesInfo;
     }
 }
 
 void SearchAddressManager::update()
 {
-    const auto connections = qnClientCoreSettings->recentLocalConnections();
-    const QList<QnUuid> tmpSavedSystemIdsList =
-        qnClientCoreSettings->recentLocalConnections().keys();
-    const QSet<QnUuid> savedSystemIds(tmpSavedSystemIdsList.begin(), tmpSavedSystemIdsList.end());
+    const auto connections = appContext()->coreSettings()->recentLocalConnections();
 
-    auto searchAddresses = qnClientCoreSettings->searchAddresses();
-    const QList<QnUuid> searchSystemIds = searchAddresses.keys();
+    auto searchAddresses = appContext()->coreSettings()->searchAddresses();
 
-    bool hasChanges = false;
-    for (const auto& searchSystemId: searchSystemIds)
+    for (const QnUuid& searchSystemId: searchAddresses.keys())
     {
-        if (!savedSystemIds.contains(searchSystemId))
-        {
+        if (!connections.contains(searchSystemId))
             searchAddresses.remove(searchSystemId);
-            hasChanges = true;
-        }
     }
 
-    for (const auto& savedSystemId: savedSystemIds)
+    for (const auto& savedSystemId: connections.keys())
         searchAddresses[savedSystemId] = m_searchAddressesInfo[savedSystemId];
 
-    qnClientCoreSettings->setSearchAddresses(searchAddresses);
-    qnClientCoreSettings->save();
+    appContext()->coreSettings()->searchAddresses = searchAddresses;
 }

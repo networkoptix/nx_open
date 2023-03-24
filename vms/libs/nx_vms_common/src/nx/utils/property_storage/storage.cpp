@@ -29,9 +29,19 @@ void Storage::sync()
     m_backend->sync();
 }
 
+QByteArray Storage::securityKey() const
+{
+    return m_securityKey;
+}
+
 void Storage::setSecurityKey(const QByteArray& value)
 {
     m_securityKey = value;
+}
+
+AbstractBackend* Storage::backend() const
+{
+    return m_backend.get();
 }
 
 void Storage::registerProperty(BaseProperty* property)
@@ -65,9 +75,9 @@ void Storage::setValue(const QString& name, const QVariant& value)
         property->setVariantValue(value);
 }
 
-QList<BaseProperty*> Storage::properties() const
+QHash<QString, BaseProperty*> Storage::properties() const
 {
-    return m_properties.values();
+    return m_properties;
 }
 
 void Storage::loadProperty(BaseProperty* property)

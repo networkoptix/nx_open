@@ -8,7 +8,6 @@
 
 #include <client/client_message_processor.h>
 #include <client_core/client_core_module.h>
-#include <client_core/client_core_settings.h>
 #include <common/common_module.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
@@ -21,6 +20,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx_ec/abstract_ec_connection.h>
 
@@ -69,12 +69,12 @@ KnownServerConnections::Private::Private(QnCommonModule* commonModule):
 
 void KnownServerConnections::Private::start()
 {
-    m_connections = qnClientCoreSettings->knownServerConnections();
+    m_connections = appContext()->coreSettings()->knownServerConnections();
     const int oldSize = m_connections.size();
     trimConnectionsList(m_connections);
 
     if (m_connections.size() != oldSize)
-        qnClientCoreSettings->setKnownServerConnections(m_connections);
+        appContext()->coreSettings()->knownServerConnections = m_connections;
 
     if (m_discoveryManager)
     {
@@ -113,7 +113,7 @@ void KnownServerConnections::Private::saveConnection(
 
     if (m_discoveryManager)
         m_discoveryManager->checkEndpoint(connection.url, connection.serverId);
-    qnClientCoreSettings->setKnownServerConnections(m_connections);
+    appContext()->coreSettings()->knownServerConnections = m_connections;
 }
 
 KnownServerConnections::KnownServerConnections(QnCommonModule* commonModule, QObject* parent):

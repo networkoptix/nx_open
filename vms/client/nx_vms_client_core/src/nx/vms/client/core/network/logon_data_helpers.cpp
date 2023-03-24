@@ -67,7 +67,7 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
         NX_DEBUG(NX_SCOPE_TAG, "Connecting to the cloud system which was not pinged yet: %1", url);
     }
 
-    result.expectedServerId = settings()->preferredCloudServer(system->id());
+    result.expectedServerId = appContext()->coreSettings()->preferredCloudServer(system->id());
     if (result.expectedServerId)
     {
         if (system->isReachableServer(result.expectedServerId.value()))

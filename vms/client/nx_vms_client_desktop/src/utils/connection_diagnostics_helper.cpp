@@ -20,6 +20,7 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_update/compatibility_version_installation_dialog.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -214,7 +215,8 @@ bool agreeToTryAgain(
 /** Try to load password cloud credentials from older versions, 4.2 and below.*/
 nx::network::http::Credentials loadCloudPasswordCredentials()
 {
-    const nx::network::http::Credentials credentials = core::settings()->cloudPasswordCredentials();
+    const nx::network::http::Credentials credentials =
+        desktop::appContext()->coreSettings()->cloudPasswordCredentials();
     const bool isValid = (!credentials.username.empty() && !credentials.authToken.empty()
         && credentials.authToken.isPassword());
 

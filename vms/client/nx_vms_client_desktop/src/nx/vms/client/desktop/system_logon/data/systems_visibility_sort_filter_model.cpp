@@ -8,7 +8,7 @@
 #include <nx/utils/scoped_connections.h>
 #include <ui/models/systems_model.h>
 
-using namespace nx::vms::client::core;
+using namespace nx::vms::client::core::welcome_screen;
 
 namespace nx::vms::client::desktop {
 
@@ -196,24 +196,28 @@ bool SystemsVisibilitySortFilterModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const auto leftIsFactorySystem = sourceLeft.data(QnSystemsModel::IsFactorySystemRoleId);
-    const auto rightIsFactorySystem = sourceRight.data(QnSystemsModel::IsFactorySystemRoleId);
+    const auto leftIsFactorySystem =
+        sourceLeft.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
+    const auto rightIsFactorySystem =
+        sourceRight.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
 
-    const auto leftVisibilityScope = sourceLeft.data(QnSystemsModel::VisibilityScopeRoleId);
-    const auto rightVisibilityScope = sourceRight.data(QnSystemsModel::VisibilityScopeRoleId);
+    const auto leftVisibilityScope =
+        sourceLeft.data(QnSystemsModel::VisibilityScopeRoleId).value<TileVisibilityScope>();
+    const auto rightVisibilityScope =
+        sourceRight.data(QnSystemsModel::VisibilityScopeRoleId).value<TileVisibilityScope>();
 
     if (leftIsFactorySystem != rightIsFactorySystem)
     {
         if (leftVisibilityScope == rightVisibilityScope)
-            return leftIsFactorySystem.toBool();
+            return leftIsFactorySystem;
 
-        return leftIsFactorySystem.toBool()
-            ? leftVisibilityScope.toInt() != welcome_screen::HiddenTileVisibilityScope
-            : rightVisibilityScope.toInt() == welcome_screen::HiddenTileVisibilityScope;
+        return leftIsFactorySystem
+            ? leftVisibilityScope != TileVisibilityScope::HiddenTileVisibilityScope
+            : rightVisibilityScope == TileVisibilityScope::HiddenTileVisibilityScope;
     }
 
     if (leftVisibilityScope != rightVisibilityScope)
-        return leftVisibilityScope.toInt() > rightVisibilityScope.toInt();
+        return leftVisibilityScope > rightVisibilityScope;
 
     if (sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId)
         != sourceRight.data(QnSystemsModel::IsCloudSystemRoleId))
@@ -248,22 +252,22 @@ bool SystemsVisibilitySortFilterModel::lessThan(
 
 bool SystemsVisibilitySortFilterModel::isHidden(const QModelIndex& sourceIndex) const
 {
-    const auto visibilityScope = static_cast<welcome_screen::TileVisibilityScope>(
-        sourceIndex.data(QnSystemsModel::VisibilityScopeRoleId).toInt());
+    const auto visibilityScope =
+        sourceIndex.data(QnSystemsModel::VisibilityScopeRoleId).value<TileVisibilityScope>();
 
     switch (visibilityFilter())
     {
         // When filter is set to 'Favorites', hide all which are not favorite.
-        case welcome_screen::FavoritesTileScopeFilter:
-            return visibilityScope != welcome_screen::FavoriteTileVisibilityScope;
+        case TileScopeFilter::FavoritesTileScopeFilter:
+            return visibilityScope != TileVisibilityScope::FavoriteTileVisibilityScope;
 
         // When filter is set to 'Hidden', hide all which are not hidden.
-        case welcome_screen::HiddenTileScopeFilter:
-            return visibilityScope != welcome_screen::HiddenTileVisibilityScope;
+        case TileScopeFilter::HiddenTileScopeFilter:
+            return visibilityScope != TileVisibilityScope::HiddenTileVisibilityScope;
 
         // Show all except hidden.
         default:
-            return visibilityScope == welcome_screen::HiddenTileVisibilityScope;
+            return visibilityScope == TileVisibilityScope::HiddenTileVisibilityScope;
     }
 }
 

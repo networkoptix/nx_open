@@ -4,16 +4,19 @@
 
 #include <limits>
 
-#include <client_core/client_core_settings.h>
 #include <finders/systems_finder.h>
 #include <network/system_description.h>
 #include <network/system_helpers.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <utils/math/math.h>
+
+using namespace nx::vms::client::core;
 
 namespace {
 
@@ -137,9 +140,9 @@ QnSystemHostsModel::HostsModel::HostsModel(QnSystemHostsModel* parent):
 
 void QnSystemHostsModel::HostsModel::forceResort()
 {
-    const auto connections = qnClientCoreSettings->recentLocalConnections();
+    const auto connections = appContext()->coreSettings()->recentLocalConnections();
     const auto it = connections.find(m_localSystemId);
-    const auto recentUrls = (it == connections.end() ? UrlsList() : it.value().urls);
+    const auto recentUrls = (it == connections.end() ? UrlsList() : it->urls);
 
     if (recentUrls == m_recentConnectionUrls)
         return;

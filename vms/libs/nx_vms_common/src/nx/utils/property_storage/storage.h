@@ -40,9 +40,12 @@ protected:
     void load();
     void sync();
 
+    QByteArray securityKey() const;
     void setSecurityKey(const QByteArray& value);
 
-    QList<BaseProperty*> properties() const;
+    AbstractBackend* backend() const;
+
+    QHash<QString, BaseProperty*> properties() const;
 
     void loadProperty(BaseProperty* property);
     void saveProperty(BaseProperty* property);
