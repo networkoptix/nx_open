@@ -3,6 +3,7 @@
 #include "generic_event.h"
 
 #include "../event_filter_fields/dummy_field.h"
+#include "../event_filter_fields/flag_field.h"
 #include "../event_filter_fields/keywords_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -75,6 +76,7 @@ const ItemDescriptor& GenericEvent::manifest()
             makeFieldDescriptor<KeywordsField>("description",
                 tr("Description"),
                 kKeywordFieldDescription),
+            makeFieldDescriptor<EventFlagField>(utils::kOmitLoggingFieldName, tr("Omit logging")),
 
             makeFieldDescriptor<DummyField>(utils::kDeviceIdsFieldName, utils::kDeviceIdsFieldName)
         },

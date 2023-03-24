@@ -19,4 +19,7 @@ inline bool isInstant(const EventPtr& event)
 
 NX_VMS_RULES_API bool hasSourceCamera(const vms::rules::ItemDescriptor& eventDescriptor);
 
+/** Returns whether logging is allowed for the given event. */
+NX_VMS_RULES_API bool isLoggingAllowed(const Engine* engine, const EventPtr& event);
+
 } // namespace nx::vms::rules

@@ -11,32 +11,8 @@
 namespace nx::vms::rules {
 
 EmailMessageField::EmailMessageField(common::SystemContext* context):
-    common::SystemContextAware(context),
-    m_caption(context),
-    m_description(context)
+    common::SystemContextAware(context)
 {
-    connect(&m_caption, &TextWithFields::textChanged, this, &EmailMessageField::captionChanged);
-    connect(&m_description, &TextWithFields::textChanged, this, &EmailMessageField::descriptionChanged);
-}
-
-QString EmailMessageField::caption() const
-{
-    return m_caption.text();
-}
-
-void EmailMessageField::setCaption(const QString& caption)
-{
-    m_caption.setText(caption);
-}
-
-QString EmailMessageField::description() const
-{
-    return m_description.text();
-}
-
-void EmailMessageField::setDescription(const QString& description)
-{
-    m_description.setText(description);
 }
 
 QVariant EmailMessageField::build(const AggregatedEventPtr& eventAggregator) const

@@ -21,11 +21,6 @@ ServerConflictEvent::ServerConflictEvent(
 {
 }
 
-QString ServerConflictEvent::uniqueName() const
-{
-    return utils::makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
-}
-
 QString ServerConflictEvent::resourceKey() const
 {
     return m_serverId.toSimpleString();

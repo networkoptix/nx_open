@@ -14,11 +14,6 @@ ServerStartedEvent::ServerStartedEvent(std::chrono::microseconds timestamp, QnUu
 {
 }
 
-QString ServerStartedEvent::uniqueName() const
-{
-    return utils::makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
-}
-
 QString ServerStartedEvent::resourceKey() const
 {
     return m_serverId.toSimpleString();

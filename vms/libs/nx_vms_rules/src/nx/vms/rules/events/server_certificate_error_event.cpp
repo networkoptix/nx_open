@@ -17,11 +17,6 @@ ServerCertificateErrorEvent::ServerCertificateErrorEvent(
 {
 }
 
-QString ServerCertificateErrorEvent::uniqueName() const
-{
-    return utils::makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
-}
-
 QString ServerCertificateErrorEvent::resourceKey() const
 {
     return m_serverId.toSimpleString();

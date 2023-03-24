@@ -40,11 +40,6 @@ void AnalyticsEngineEvent::setEngineId(QnUuid engineId)
     m_engineId = engineId;
 }
 
-QString AnalyticsEngineEvent::uniqueName() const
-{
-    return utils::makeName(DescribedEvent::uniqueName(), m_cameraId.toSimpleString());
-}
-
 QString AnalyticsEngineEvent::resourceKey() const
 {
     return m_cameraId.toSimpleString();

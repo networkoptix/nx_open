@@ -11,47 +11,38 @@
 
 namespace nx::vms::rules {
 
-struct AggregationInfo
-{
-    EventPtr event;
-    size_t count{};
-};
-
-using AggregationInfoList = std::vector<AggregationInfo>;
-
 /** Aggregates events by the aggregation key. */
 class NX_VMS_RULES_API Aggregator
 {
 public:
+    explicit Aggregator(std::chrono::microseconds interval);
+
     /** Returns a key the event will be aggregated by. */
     using AggregationKeyFunction = std::function<QString(const EventPtr&)>;
-
-    Aggregator(std::chrono::microseconds interval, AggregationKeyFunction aggregationKeyFunction);
-
     /** Aggregates the event by the key got from the corresponding function. */
-    bool aggregate(const EventPtr& event);
+    bool aggregate(const EventPtr& event, const AggregationKeyFunction& aggregationKeyFunction);
 
     /**
      * Pops aggregated events for whose aggregation period is elapsed. Aggregation period is
      * determined as elapsed if the difference between current time and first event occurrence time
      * is more than the interval parameter. Returned list is sorted by the event timestamp.
      */
-    AggregationInfoList popEvents();
+    std::vector<AggregatedEventPtr> popEvents();
 
     /** Returns whether the aggregator has aggregated events. */
     bool empty() const;
 
 private:
-    struct AggregationInfoExt: AggregationInfo
+    struct AggregationData
     {
         // The time relative to which the aggregator checks if the event aggregation time is
         // elapsed. At the moment it is got from the initial event timestamp.
         std::chrono::microseconds firstOccurrenceTimestamp;
+        std::vector<EventPtr> eventList;
     };
 
     std::chrono::microseconds m_interval;
-    AggregationKeyFunction m_aggregationKeyFunction;
-    std::unordered_map<QString, AggregationInfoExt> m_aggregatedEvents;
+    std::unordered_map<QString, AggregationData> m_aggregatedEvents;
 };
 
 } // namespace nx::vms::rules

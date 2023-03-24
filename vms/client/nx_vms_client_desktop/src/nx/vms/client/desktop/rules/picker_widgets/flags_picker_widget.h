@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QCheckBox>
+#include <QtWidgets/QHBoxLayout>
 
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/rules/event_filter_fields/analytics_event_level_field.h>

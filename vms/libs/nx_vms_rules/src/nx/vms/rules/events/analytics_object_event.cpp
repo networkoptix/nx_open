@@ -37,11 +37,6 @@ QString AnalyticsObjectEvent::subtype() const
     return objectTypeId();
 }
 
-QString AnalyticsObjectEvent::uniqueName() const
-{
-    return utils::makeName(AnalyticsEngineEvent::uniqueName(), m_objectTrackId.toSimpleString());
-}
-
 QString AnalyticsObjectEvent::resourceKey() const
 {
     return utils::makeName(AnalyticsEngineEvent::resourceKey(), m_objectTrackId.toSimpleString());

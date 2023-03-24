@@ -66,7 +66,7 @@ void TargetUserPicker::createPolicy()
     else if (actionId == vms::rules::utils::type<vms::rules::NotificationAction>())
     {
         auto acknowledgeField =
-            getActionField<vms::rules::FlagField>(vms::rules::utils::kAcknowledgeFieldName);
+            getActionField<vms::rules::ActionFlagField>(vms::rules::utils::kAcknowledgeFieldName);
 
         if (acknowledgeField->value() == true)
         {

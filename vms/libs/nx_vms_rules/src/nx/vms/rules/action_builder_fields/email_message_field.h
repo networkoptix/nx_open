@@ -2,13 +2,9 @@
 
 #pragma once
 
-#include <optional>
-
-#include <QtCore/QByteArray>
-
 #include <nx/vms/common/system_context_aware.h>
 
-#include "text_with_fields.h"
+#include "../action_builder_field.h"
 
 namespace nx::vms::rules {
 
@@ -20,26 +16,10 @@ class NX_VMS_RULES_API EmailMessageField:
 
     Q_CLASSINFO("metatype", "nx.actions.fields.emailMessage")
 
-    Q_PROPERTY(QString caption READ caption WRITE setCaption NOTIFY captionChanged)
-    Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged)
-
 public:
-    EmailMessageField(common::SystemContext* context);
-
-    QString caption() const;
-    void setCaption(const QString& caption);
-    QString description() const;
-    void setDescription(const QString& description);
+    explicit EmailMessageField(common::SystemContext* context);
 
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
-
-signals:
-    void captionChanged();
-    void descriptionChanged();
-
-protected:
-    TextWithFields m_caption;
-    TextWithFields m_description;
 };
 
 } // namespace nx::vms::rules

@@ -26,7 +26,15 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
     * containing all of the resources and no target users may be needed for server processing.
     * The flag marks actions requiring such separate copy.
     */
-    executeOnClientAndServer = 1 << 2
+    executeOnClientAndServer = 1 << 2,
+
+    /**
+     * The default way to aggregate events is to use the EventPtr::aggregationKey function.
+     * If both the event and the action have the flag, more generic aggregation
+     * must be used by the event type.
+     */
+    aggregationByTypeSupported = 1 << 3,
+    omitLogging = 1 << 4
 )
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)

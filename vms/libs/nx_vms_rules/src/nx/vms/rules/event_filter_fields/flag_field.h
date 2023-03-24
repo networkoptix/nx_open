@@ -7,15 +7,15 @@
 namespace nx::vms::rules {
 
 /** Stores boolean flag. Typically displayed as a checkbox. */
-class NX_VMS_RULES_API ActionFlagField: public SimpleTypeActionField<bool, ActionFlagField>
+class NX_VMS_RULES_API EventFlagField: public SimpleTypeEventField<bool, EventFlagField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.flag")
+    Q_CLASSINFO("metatype", "nx.events.fields.flag")
 
     Q_PROPERTY(bool value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    ActionFlagField() = default;
+    EventFlagField() = default;
 
 signals:
     void valueChanged();

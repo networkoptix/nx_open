@@ -164,12 +164,6 @@ ActionBuilder::ActionBuilder(const QnUuid& id, const QString& actionType, const 
     m_constructor(ctor)
 {
     // TODO: #spanasenko Build m_targetFields list.
-    m_timer.setSingleShot(true);
-    // The interval is how often does it required to check if aggregator has events with the elapsed
-    // aggregation time.
-    constexpr auto kPollAggregatorInterval = seconds(1);
-    m_timer.setInterval(kPollAggregatorInterval);
-    connect(&m_timer, &QTimer::timeout, this, &ActionBuilder::onTimeout);
 }
 
 ActionBuilder::~ActionBuilder()
@@ -291,15 +285,45 @@ QSet<QnUuid> ActionBuilder::affectedResources(const EventPtr& /*event*/) const
 
 void ActionBuilder::process(const EventPtr& event)
 {
-    if (m_aggregator && !m_timer.isActive())
-        m_timer.start();
+    if (m_aggregator)
+    {
+        if (!m_timer)
+        {
+            m_timer.reset(new QTimer);
+            m_timer->setSingleShot(true);
+            // The interval is how often does it required to check if aggregator has events with
+            // the elapsed aggregation time.
+            constexpr auto kPollAggregatorInterval = seconds(1);
+            m_timer->setInterval(kPollAggregatorInterval);
+            connect(m_timer.get(), &QTimer::timeout, this, &ActionBuilder::onTimeout);
+        }
+
+        if (!m_timer->isActive())
+            m_timer->start();
+    }
 
     processEvent(event);
 }
 
 void ActionBuilder::processEvent(const EventPtr& event)
 {
-    if (m_aggregator && m_aggregator->aggregate(event))
+    bool isAggregationByTypeSupported{false};
+    const auto actionDescriptor = engine()->actionDescriptor(m_actionType);
+    const auto eventDescriptor = engine()->actionDescriptor(event->type());
+
+    if (actionDescriptor && eventDescriptor
+        && actionDescriptor->flags.testFlag(ItemFlag::aggregationByTypeSupported)
+        && eventDescriptor->flags.testFlag(ItemFlag::aggregationByTypeSupported))
+    {
+        isAggregationByTypeSupported = true;
+    }
+
+    static const auto aggregationKey = [](const EventPtr& e) { return e->aggregationKey(); };
+    static const auto eventType = [](const EventPtr& e) { return e->type(); };
+
+    if (m_aggregator
+        && m_aggregator->aggregate(
+            event, (isAggregationByTypeSupported ? eventType : aggregationKey)))
     {
         NX_VERBOSE(this, "Event %1 occurred and was aggregated", event->type());
     }
@@ -314,13 +338,7 @@ void ActionBuilder::setAggregationInterval(microseconds interval)
 {
     m_interval = interval;
     if (m_interval != microseconds::zero())
-    {
-        // TODO: #mmalofeev move aggregation key function to the manifest or to some action
-        // dependent strategy class when another aggregation logic will be required.
-        m_aggregator = QSharedPointer<Aggregator>::create(
-            m_interval,
-            [](const EventPtr& e) { return e->aggregationKey(); });
-    }
+        m_aggregator = QSharedPointer<Aggregator>::create(m_interval);
 }
 
 microseconds ActionBuilder::aggregationInterval() const
@@ -347,10 +365,10 @@ void ActionBuilder::connectSignals()
 
 void ActionBuilder::onTimeout()
 {
-    if (!NX_ASSERT(m_aggregator) || m_aggregator->empty())
+    if (!NX_ASSERT(m_aggregator) || !NX_ASSERT(m_timer) || m_aggregator->empty())
         return;
 
-    m_timer.start();
+    m_timer->start();
 
     handleAggregatedEvents();
 }
@@ -530,8 +548,8 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
 
 void ActionBuilder::handleAggregatedEvents()
 {
-    for (const auto& aggregationInfo: m_aggregator->popEvents())
-        buildAndEmitAction(AggregatedEventPtr::create(aggregationInfo));
+    for (const auto& event: m_aggregator->popEvents())
+        buildAndEmitAction(event);
 }
 
 const Engine* ActionBuilder::engine() const

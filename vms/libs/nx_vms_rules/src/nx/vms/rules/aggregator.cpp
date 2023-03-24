@@ -5,59 +5,61 @@
 #include <nx/utils/log/assert.h>
 #include <utils/common/synctime.h>
 
+#include "aggregated_event.h"
 #include "basic_event.h"
 
 namespace nx::vms::rules {
 
-Aggregator::Aggregator(
-    std::chrono::microseconds interval,
-    AggregationKeyFunction aggregationKeyFunction)
-    :
-    m_interval(interval),
-    m_aggregationKeyFunction(aggregationKeyFunction)
+Aggregator::Aggregator(std::chrono::microseconds interval):
+    m_interval(interval)
 {
 }
 
-bool Aggregator::aggregate(const EventPtr& event)
+bool Aggregator::aggregate(
+    const EventPtr& event,
+    const AggregationKeyFunction& aggregationKeyFunction)
 {
     if (!NX_ASSERT(event))
         return false;
 
-    const auto key = m_aggregationKeyFunction(event);
+    const auto key = aggregationKeyFunction(event);
 
     if (auto it = m_aggregatedEvents.find(key); it != m_aggregatedEvents.end())
     {
         auto& aggregationInfo = it->second;
 
-        if (aggregationInfo.count == 0
+        if (aggregationInfo.eventList.empty()
             && qnSyncTime->currentTimePoint() - aggregationInfo.firstOccurrenceTimestamp >= m_interval)
         {
             aggregationInfo.firstOccurrenceTimestamp = event->timestamp();
             return false;
         }
 
-        if (!aggregationInfo.event)
-            aggregationInfo.event = event;
-
-        aggregationInfo.count++;
+        aggregationInfo.eventList.insert(
+            std::lower_bound(
+                aggregationInfo.eventList.begin(),
+                aggregationInfo.eventList.end(),
+                event->timestamp(),
+                [](const EventPtr& e, std::chrono::microseconds timestamp)
+                {
+                    return e->timestamp() < timestamp;
+                }),
+            event);
 
         return true;
     }
-    else
-    {
-        AggregationInfoExt aggregationInfo {
-            .firstOccurrenceTimestamp = event->timestamp()
-        };
-        m_aggregatedEvents.insert({key, aggregationInfo});
-        return false;
-    }
+
+    m_aggregatedEvents.insert(
+        {key, AggregationData{.firstOccurrenceTimestamp = event->timestamp()}});
+
+    return false;
 }
 
-AggregationInfoList Aggregator::popEvents()
+std::vector<AggregatedEventPtr> Aggregator::popEvents()
 {
     const auto now = qnSyncTime->currentTimePoint();
 
-    AggregationInfoList result;
+    std::vector<AggregatedEventPtr> result;
     for (auto it = m_aggregatedEvents.begin(); it != m_aggregatedEvents.end();)
     {
         auto& aggregationInfo = it->second;
@@ -65,13 +67,18 @@ AggregationInfoList Aggregator::popEvents()
 
         if (isTimeElapsed)
         {
-            if (aggregationInfo.count > 0)
+            if (!aggregationInfo.eventList.empty())
             {
-                NX_ASSERT(aggregationInfo.event, "If aggregation count > 0, event must exists");
-                result.push_back({aggregationInfo.event, aggregationInfo.count});
+                const auto lb = std::lower_bound(
+                    result.begin(),
+                    result.end(),
+                    aggregationInfo.eventList.front()->timestamp(),
+                    [](const AggregatedEventPtr& e, std::chrono::microseconds timestamp)
+                    {
+                        return e->timestamp() < timestamp;
+                    });
+                result.insert(lb, AggregatedEventPtr::create(std::move(aggregationInfo.eventList)));
 
-                aggregationInfo.event.reset();
-                aggregationInfo.count = 0;
                 // Store the time aggregated event is popped out to conform the logic that
                 // events should be processed not often than once per the installed interval.
                 aggregationInfo.firstOccurrenceTimestamp = now;
@@ -86,22 +93,14 @@ AggregationInfoList Aggregator::popEvents()
         ++it;
     }
 
-    std::sort(
-        result.begin(),
-        result.end(),
-        [](const AggregationInfo& l, const AggregationInfo& r)
-        {
-            return l.event->timestamp() < r.event->timestamp();
-        });
-
     return result;
 }
 
 bool Aggregator::empty() const
 {
-    for (const auto& [key, aggregationInfo]: m_aggregatedEvents)
+    for (const auto& [_, aggregationInfo]: m_aggregatedEvents)
     {
-        if (aggregationInfo.event)
+        if (!aggregationInfo.eventList.empty())
             return false;
     }
 

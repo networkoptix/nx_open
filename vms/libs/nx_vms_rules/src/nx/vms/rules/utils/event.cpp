@@ -2,7 +2,10 @@
 
 #include "event.h"
 
+#include "../basic_event.h"
+#include "../engine.h"
 #include "../manifest.h"
+#include "common.h"
 #include "field.h"
 
 namespace nx::vms::rules {
@@ -17,6 +20,15 @@ bool hasSourceCamera(const vms::rules::ItemDescriptor& eventDescriptor)
             return fieldDescriptor.fieldName == vms::rules::utils::kDeviceIdsFieldName
                 || fieldDescriptor.fieldName == vms::rules::utils::kCameraIdFieldName;
         });
+}
+
+bool isLoggingAllowed(const Engine* engine, const EventPtr& event)
+{
+    const auto descriptor = engine->eventDescriptor(event->type());
+    if (!NX_ASSERT(descriptor))
+        return false;
+
+    return utils::isLoggingAllowed(descriptor.value(), event);
 }
 
 } // namespace nx::vms::rules

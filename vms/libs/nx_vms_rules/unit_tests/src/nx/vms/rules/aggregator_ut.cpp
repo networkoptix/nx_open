@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/aggregator.h>
 #include <nx/vms/rules/basic_event.h>
 #include <nx/vms/time/abstract_time_sync_manager.h>
@@ -22,17 +23,17 @@ constexpr auto kDefaultAggregationInterval = 1ms;
 
 Aggregator makeAggregator(milliseconds aggregationInterval = kDefaultAggregationInterval)
 {
-    return Aggregator(
-        aggregationInterval,
-        [](const EventPtr& event) { return event->objectName(); });
+    return Aggregator{aggregationInterval};
 }
 
-EventPtr makeEvent(const QString& name = QString())
+EventPtr makeEvent(const QString& text = QString())
 {
     auto event = TestEventPtr::create(qnSyncTime->currentTimePoint());
-    event->setObjectName(name);
+    event->m_text = text;
     return event;
 }
+
+const auto aggregationKeyFunction = [](const EventPtr& e) { return e->property("text").toString(); };
 
 } // namespace
 
@@ -87,7 +88,7 @@ TEST_F(AggregatorTest, firstEventIsNotAggregated)
     auto aggregator = makeAggregator();
     auto event = makeEvent();
 
-    ASSERT_FALSE(aggregator.aggregate(event));
+    ASSERT_FALSE(aggregator.aggregate(event, aggregationKeyFunction));
 
     auto events = aggregator.popEvents();
     EXPECT_EQ(events.size(), 0);
@@ -106,17 +107,17 @@ TEST_F(AggregatorTest, aggregationIntervalWorks)
     auto aggregator = makeAggregator(kAggregationInterval);
     auto event1 = makeEvent("a");
 
-    aggregator.aggregate(event1);
+    aggregator.aggregate(event1, aggregationKeyFunction);
 
     constexpr auto kDelay1 = 20ms;
     adjustTime(kDelay1);
     auto event2 = makeEvent("a");
-    ASSERT_TRUE(aggregator.aggregate(event2));
+    ASSERT_TRUE(aggregator.aggregate(event2, aggregationKeyFunction));
 
     constexpr auto kDelay2 = 50ms;
     adjustTime(kDelay2);
     auto event3 = makeEvent("a");
-    ASSERT_TRUE(aggregator.aggregate(event3));
+    ASSERT_TRUE(aggregator.aggregate(event3, aggregationKeyFunction));
 
     // Just to be sure that aggregation time is not elapsed.
     ASSERT_TRUE(qnSyncTime->currentTimePoint() - event1->timestamp() < kAggregationInterval);
@@ -138,22 +139,22 @@ TEST_F(AggregatorTest, aggregationIntervalWorks)
     // considered as elapsed because they were aggregated based on the timestamp of the event1.
     events = aggregator.popEvents();
     ASSERT_EQ(events.size(), 1);
-    EXPECT_EQ(events.front().event, event2);
-    EXPECT_EQ(events.front().count, 2);
+    EXPECT_EQ(events.front()->initialEvent(), event2);
+    EXPECT_EQ(events.front()->count(), 2);
     EXPECT_TRUE(aggregator.empty());
 
     ASSERT_TRUE(qnSyncTime->currentTimePoint() - event3->timestamp() < kAggregationInterval);
     // Must be aggregated since the difference between current time and event3
     // timestamp(the last aggregated event) is less than the aggregation interval.
     auto event4 = makeEvent("a");
-    ASSERT_TRUE(aggregator.aggregate(event4));
+    ASSERT_TRUE(aggregator.aggregate(event4, aggregationKeyFunction));
     EXPECT_FALSE(aggregator.empty());
 
     adjustTime(kAggregationInterval);
     events = aggregator.popEvents();
     ASSERT_EQ(events.size(), 1);
-    EXPECT_EQ(events.front().event, event4);
-    EXPECT_EQ(events.front().count, 1);
+    EXPECT_EQ(events.front()->initialEvent(), event4);
+    EXPECT_EQ(events.size(), 1);
     EXPECT_TRUE(aggregator.empty());
 }
 
@@ -163,22 +164,22 @@ TEST_F(AggregatorTest, aggregatorHandlesDifferentEventsProperly)
     auto aggregator = makeAggregator(kAggregationInterval);
 
     auto eventA1 = makeEvent("a");
-    ASSERT_FALSE(aggregator.aggregate(eventA1));
+    ASSERT_FALSE(aggregator.aggregate(eventA1, aggregationKeyFunction));
 
     auto eventB1 = makeEvent("b");
-    ASSERT_FALSE(aggregator.aggregate(eventB1));
+    ASSERT_FALSE(aggregator.aggregate(eventB1, aggregationKeyFunction));
 
     auto eventA2 = makeEvent("a");
-    ASSERT_TRUE(aggregator.aggregate(eventA2));
+    ASSERT_TRUE(aggregator.aggregate(eventA2, aggregationKeyFunction));
     auto eventA3 = makeEvent("a");
-    ASSERT_TRUE(aggregator.aggregate(eventA3));
+    ASSERT_TRUE(aggregator.aggregate(eventA3, aggregationKeyFunction));
 
     adjustTime(20ms);
 
     auto eventB2 = makeEvent("b");
-    ASSERT_TRUE(aggregator.aggregate(eventB2));
+    ASSERT_TRUE(aggregator.aggregate(eventB2, aggregationKeyFunction));
     auto eventB3 = makeEvent("b");
-    ASSERT_TRUE(aggregator.aggregate(eventB3));
+    ASSERT_TRUE(aggregator.aggregate(eventB3, aggregationKeyFunction));
 
     adjustTime(kAggregationInterval);
 
@@ -186,13 +187,61 @@ TEST_F(AggregatorTest, aggregatorHandlesDifferentEventsProperly)
     ASSERT_EQ(events.size(), 2);
 
     auto iterator = events.begin();
-    EXPECT_EQ(iterator->event->objectName(), "a");
-    EXPECT_EQ(iterator->count, 2);
+    EXPECT_EQ((*iterator)->property("text").toString(), "a");
+    EXPECT_EQ((*iterator)->count(), 2);
     ++iterator;
-    EXPECT_EQ(iterator->event->objectName(), "b");
-    EXPECT_EQ(iterator->count, 2);
+    EXPECT_EQ((*iterator)->property("text").toString(), "b");
+    EXPECT_EQ((*iterator)->count(), 2);
 
     EXPECT_TRUE(aggregator.empty());
+}
+
+TEST_F(AggregatorTest, splitFunctionWorksProperly)
+{
+    constexpr auto kAggregationInterval = 100ms;
+    auto aggregator = makeAggregator(kAggregationInterval);
+
+    const auto eventType = [](const EventPtr& e) { return e->type(); };
+
+    ASSERT_FALSE(aggregator.aggregate(makeEvent("a"), eventType));
+    adjustTime(1ms);
+
+    auto firstAggregatedAEvent = makeEvent("a");
+    ASSERT_TRUE(aggregator.aggregate(firstAggregatedAEvent, eventType));
+    adjustTime(1ms);
+    ASSERT_TRUE(aggregator.aggregate(makeEvent("a"), eventType));
+
+    auto firstAggregatedBEvent = makeEvent("b");
+    ASSERT_TRUE(aggregator.aggregate(firstAggregatedBEvent, eventType));
+    adjustTime(1ms);
+    ASSERT_TRUE(aggregator.aggregate(makeEvent("b"), eventType));
+    adjustTime(1ms);
+    ASSERT_TRUE(aggregator.aggregate(makeEvent("b"), eventType));
+    adjustTime(1ms);
+    ASSERT_TRUE(aggregator.aggregate(makeEvent("b"), eventType));
+
+    adjustTime(kAggregationInterval);
+
+    const auto aggregatedEvents = aggregator.popEvents();
+    // As all the events are aggegated by the event type, expects only one aggregated event here.
+    ASSERT_EQ(aggregatedEvents.size(), 1);
+    // 2 "a" events and 4 "b" events were aggregated.
+    ASSERT_EQ(aggregatedEvents.front()->count(), 6);
+    // First aggregated "a" event must be the initial event.
+    ASSERT_EQ(aggregatedEvents.front()->initialEvent(), firstAggregatedAEvent);
+
+    // Split aggregated event by the "text" property.
+    const auto splitResult = aggregatedEvents.front()->split(
+        [](const EventPtr& e) { return e->property("text").toString(); });
+    // Expect slit made 2 aggregated events.
+    ASSERT_EQ(splitResult.size(), 2);
+
+    // One aggregated event consists of 2 "a" events.
+    ASSERT_EQ(splitResult.front()->initialEvent(), firstAggregatedAEvent);
+    ASSERT_EQ(splitResult.front()->count(), 2);
+    // Another one aggregated event consists of 4 "b" events.
+    ASSERT_EQ(splitResult.back()->initialEvent(), firstAggregatedBEvent);
+    ASSERT_EQ(splitResult.back()->count(), 4);
 }
 
 } // namespace nx::vms::rules::test

@@ -22,7 +22,7 @@ struct NX_VMS_COMMON_API Attachment
 using AttachmentPtr = QSharedPointer<Attachment>;
 using AttachmentList = QList<AttachmentPtr>;
 
-struct Message
+struct NX_VMS_COMMON_API Message
 {
     QString subject;
     QString body;
