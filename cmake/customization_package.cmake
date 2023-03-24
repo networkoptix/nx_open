@@ -8,7 +8,7 @@ function(_unpack_customization_package source_file target_directory log_file)
     message(STATUS "Unpacking customization package from ${source_file} to ${target_directory}")
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE}
-            ${open_build_utils_dir}/customization/pack2.py unpack
+            ${open_build_utils_dir}/customization/pack.py unpack
             ${source_file}
             ${target_directory}
             -l ${log_file}
@@ -27,7 +27,7 @@ function(_store_customization_package target_directory)
     set(listed_files)
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE}
-            ${open_build_utils_dir}/customization/pack2.py list
+            ${open_build_utils_dir}/customization/pack.py list
             ${target_directory}
         OUTPUT_VARIABLE listed_files
         RESULT_VARIABLE list_result
@@ -52,7 +52,7 @@ function(_set_customization_from_file)
     message(STATUS "Getting customization id from ${customizationPackageFile}")
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE}
-            ${open_build_utils_dir}/customization/pack2.py get_value
+            ${open_build_utils_dir}/customization/pack.py get_value
             ${customizationPackageFile}
             id
         OUTPUT_VARIABLE customization_id
