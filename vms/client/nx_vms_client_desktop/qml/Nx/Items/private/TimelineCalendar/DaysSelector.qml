@@ -126,7 +126,7 @@ Item
                     text: calendarDay.date.getDate()
                     color:
                     {
-                        return (model.date.getUTCMonth() === visibleMonth)
+                        return (model.date.getMonth() === visibleMonth)
                             ? ColorTheme.text : ColorTheme.colors.light16
                     }
 
