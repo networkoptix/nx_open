@@ -244,7 +244,7 @@
         </item>
         <item row="8" column="0" colspan="3">
          <widget class="QWidget" name="actionHolder" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <layout class="QHBoxLayout" name="verticalLayout_3">
            <property name="spacing">
             <number>0</number>
            </property>
@@ -262,6 +262,19 @@
            </property>
            <item>
             <widget class="nx::vms::client::desktop::ActionPushButton" name="actionButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string notr="true">&lt;Action&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2" alignment="Qt::AlignRight">
+            <widget class="nx::vms::client::desktop::ActionPushButton" name="additionalActionButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>

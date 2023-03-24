@@ -342,6 +342,7 @@ void EventRibbon::Private::updateTile(int index)
     widget->setToolTip(modelIndex.data(Qt::ToolTipRole).toString());
     widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
+    widget->setAdditionalAction(modelIndex.data(Qn::AdditionalActionRole).value<CommandActionPtr>());
     widget->setTitleColor(modelIndex.data(Qt::ForegroundRole).value<QColor>());
     widget->setFooterEnabled(m_footersEnabled);
     widget->setHeaderEnabled(m_headersEnabled);

@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/system_health/invalid_recording_schedule_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
 #include <nx/vms/client/desktop/system_health/user_emails_watcher.h>
+#include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <server/server_storage_manager.h>

@@ -116,6 +116,8 @@ LocalNotificationsListModel::LocalNotificationsListModel(QnWorkbenchContext* con
         this, changed({Qn::AdditionalTextRole}));
     connect(manager, &workbench::LocalNotificationsManager::tooltipChanged,
         this, changed({Qt::ToolTipRole}));
+    connect(manager, &workbench::LocalNotificationsManager::additionalActionChanged,
+        this, changed({Qn::AdditionalActionRole}));
 }
 
 int LocalNotificationsListModel::rowCount(const QModelIndex& parent) const
@@ -159,6 +161,15 @@ QVariant LocalNotificationsListModel::data(const QModelIndex& index, int role) c
             const auto action = manager->action(notificationId);
 
             if (action && (!progress || progress->isCompleted()))
+                return QVariant::fromValue(action);
+
+            return QVariant();
+        }
+
+        case Qn::AdditionalActionRole:
+        {
+            const auto action = manager->additionalAction(notificationId);
+            if (action)
                 return QVariant::fromValue(action);
 
             return QVariant();

@@ -8,11 +8,14 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx/utils/software_version.h>
 #include <nx/utils/url.h>
+#include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <future>
 
 class QTimer;
 
 namespace nx::vms::client::desktop {
+
+namespace workbench { class LocalNotificationsManager; }
 
 struct UpdateContents;
 class ServerUpdateTool;
@@ -31,10 +34,11 @@ public:
     std::future<UpdateContents> takeUpdateCheck();
 
 private:
-    void showUpdateNotification(
+    void notifyUserAboutWorkbenchUpdate(
         const nx::utils::SoftwareVersion& targetVersion,
         const nx::utils::Url& releaseNotesUrl,
         const QString& description);
+
     void atCheckerUpdateAvailable(const UpdateContents& info);
     /** Handler for starting update check. It is requested once an hour. */
     void atStartCheckUpdate();
@@ -52,6 +56,11 @@ private:
     /** Long timer for checking another update. Spins once per hour*/
     QTimer m_checkLatestUpdateTimer;
     nx::utils::SoftwareVersion m_notifiedVersion;
+
+    workbench::LocalNotificationsManager* m_notificationsManager = nullptr;
+    CommandActionPtr m_updateAction;
+    CommandActionPtr m_skipAction;
+    QnUuid updateNotificationId;
 
     struct Private;
     std::unique_ptr<Private> m_private;

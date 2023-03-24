@@ -23,6 +23,8 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
+#include <nx/vms/client/desktop/system_update/update_contents.h>
+#include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -427,7 +429,7 @@ action::IDType SystemHealthListModel::Private::action(int index) const
         case MessageType::metadataOnSystemStorage:
             return action::ServerSettingsAction;
 
-         case MessageType::noInternetForTimeSync:
+        case MessageType::noInternetForTimeSync:
             return action::SystemAdministrationAction;
 
         case MessageType::cloudPromo:

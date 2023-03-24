@@ -65,6 +65,9 @@ public:
     CommandActionPtr action() const;
     void setAction(const CommandActionPtr& value);
 
+    CommandActionPtr additionalAction() const;
+    void setAdditionalAction(const CommandActionPtr& value);
+
     bool busyIndicatorVisible() const;
     void setBusyIndicatorVisible(bool value);
 

@@ -57,6 +57,9 @@ public:
     CommandActionPtr action(const QnUuid& notificationId) const;
     void setAction(const QnUuid& notificationId, CommandActionPtr value);
 
+    CommandActionPtr additionalAction(const QnUuid& notificationId) const;
+    void setAdditionalAction(const QnUuid& notificationId, CommandActionPtr value);
+
     QnNotificationLevel::Value level(const QnUuid& notificationId) const;
     void setLevel(const QnUuid& notificationId, QnNotificationLevel::Value level);
 
@@ -89,6 +92,7 @@ signals:
     void levelChanged(const QnUuid& notificationId, QnNotificationLevel::Value level);
     void additionalTextChanged(const QnUuid& notificationId, const QString& additionalText);
     void tooltipChanged(const QnUuid& notificationId, const QString& tooltip);
+    void additionalActionChanged(const QnUuid& notificationId, CommandActionPtr action);
 
 private:
     struct State
@@ -98,6 +102,7 @@ private:
         bool cancellable = false;
         std::optional<ProgressState> progress;
         CommandActionPtr action = nullptr;
+        CommandActionPtr additionalAction = nullptr;
         QString format;
         QPixmap icon;
         QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
