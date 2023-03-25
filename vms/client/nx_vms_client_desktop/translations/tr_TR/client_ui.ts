@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation type="unfinished">Server certificate validation</translation>
+      <translation>Sunucu sertifikası doğrulaması</translation>
     </message>
   </context>
   <context>
@@ -152,7 +152,7 @@
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
+      <translation>Öznitellikler:</translation>
     </message>
     <message>
       <source>Object Type:</source>
@@ -268,7 +268,7 @@
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation type="unfinished">Fix bandwidth to</translation>
+      <translation>Bant genişliğini sabitle</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -276,11 +276,11 @@
     </message>
     <message>
       <source>Unlimited</source>
-      <translation type="unfinished">Unlimited</translation>
+      <translation>Sınırsız</translation>
     </message>
     <message>
       <source>Limited to</source>
-      <translation type="unfinished">Limited to</translation>
+      <translation>Sınırlı</translation>
     </message>
     <message>
       <source>No backup</source>
@@ -291,14 +291,14 @@
     <name>BackupSettingsWidget</name>
     <message>
       <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
+      <translation>Sunucu çevrimdışı. Yedekleme ayarları mevcut değil.</translation>
     </message>
   </context>
   <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
-      <translation type="unfinished">Backup is not configured yet.</translation>
+      <translation>Yedekleme henüz yapılandırılmadı.</translation>
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
@@ -310,7 +310,7 @@
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation type="unfinished">Skip Current Queue</translation>
+      <translation>Geçerli Kuyruğu Atla</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
@@ -588,7 +588,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Profilleri getirmek için Media2'yi kullanın</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
@@ -600,7 +600,7 @@
     </message>
     <message>
       <source>Media Port</source>
-      <translation type="unfinished">Media Port</translation>
+      <translation>Medya Bağlantı Noktası</translation>
     </message>
     <message>
       <source>Use system presets</source>
@@ -612,7 +612,7 @@
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>RTP Transport'u</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
@@ -732,7 +732,7 @@
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation type="unfinished">in</translation>
+      <translation>içinde</translation>
     </message>
   </context>
   <context>
@@ -766,7 +766,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
+      <translation>Hareket &amp;&amp; Nesne Kaydı</translation>
     </message>
   </context>
   <context>
@@ -804,7 +804,7 @@
     </message>
     <message>
       <source>Enable 2-way audio</source>
-      <translation type="unfinished">Enable 2-way audio</translation>
+      <translation>2 yönlü sesi etkinleştir</translation>
     </message>
   </context>
   <context>
@@ -818,7 +818,7 @@
     <name>CertificateSelectionDialog</name>
     <message>
       <source>Web site requires a certificate</source>
-      <translation type="unfinished">Web site requires a certificate</translation>
+      <translation>Web sitesi bir sertifika gerektirir</translation>
     </message>
   </context>
   <context>
@@ -958,7 +958,7 @@
     <name>EncryptedArchivePasswordDialog</name>
     <message>
       <source>Encrypted archive</source>
-      <translation type="unfinished">Encrypted archive</translation>
+      <translation>Şifreli arşiv</translation>
     </message>
     <message>
       <source>Enter your encryption password to view the archive</source>
@@ -1231,7 +1231,7 @@
     </message>
     <message>
       <source>Startup</source>
-      <translation type="unfinished">Startup</translation>
+      <translation>Başlangıç</translation>
     </message>
     <message>
       <source>Connect to the previous system on startup</source>
@@ -2297,7 +2297,7 @@
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation type="unfinished">Playback time :</translation>
+      <translation>Oynatma süresi:</translation>
     </message>
     <message>
       <source>rewind for</source>
@@ -2375,7 +2375,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
+      <translation>Hareket &amp;&amp; Nesneler</translation>
     </message>
   </context>
   <context>
@@ -2406,7 +2406,7 @@
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Kameralara bağlanmak için yalnızca HTTPS kullanın</translation>
     </message>
     <message>
       <source>User Activity</source>
@@ -2422,7 +2422,7 @@
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Arşiv şifreleme CPU kullanımını artırır</translation>
     </message>
     <message>
       <source>Change Password...</source>
