@@ -3312,7 +3312,7 @@ to %1</source>
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>Digest kimlik doğrulaması ile etkin</translation>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
@@ -5641,11 +5641,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>Yedek depolama yapılandırılmamış</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>Kamera kayıt programı geçersiz</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been stopped</source>
@@ -5772,7 +5772,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
+      <translation>Digest kimlik doğrulamasını etkinleştirmek için parola sıfırlama gereklidir</translation>
     </message>
   </context>
   <context>
@@ -6679,7 +6679,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+      <translation>Aynı ada sahip iki grup olamaz.</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -6719,7 +6719,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+      <translation>Sanal kameralar sunucular arasında taşınamaz</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
@@ -7017,16 +7017,16 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n seçili cihaz</numerusform>
+        <numerusform>%n seçili cihaz</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n seçilmiş kamera</numerusform>
+        <numerusform>%n seçilmiş kamera</numerusform>
       </translation>
     </message>
     <message>
@@ -7035,7 +7035,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Seçilen cihaz</translation>
     </message>
   </context>
   <context>
@@ -7155,7 +7155,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>Ses akışını başka bir kameraya iletin</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
@@ -7183,11 +7183,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
+      <translation>Bu cihazdan ses akışını kullan</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
+      <translation>Bu kameradan gelen ses akışını kullan</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
@@ -7221,7 +7221,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>Analiz eklentisi yok</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -7229,7 +7229,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Ne yedeklenmeli</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7237,15 +7237,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>Yeni eklenen kameralar için değiştirilemez</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>Bu cihaz yalnızca bir veri akışı sağlar</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>Akış ayarı bu cihaz türü için geçerli değil</translation>
     </message>
     <message>
       <source>Not supported</source>
@@ -7293,7 +7293,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
+      <translation>Bant genişliği sınırı</translation>
     </message>
     <message>
       <source>New added cameras</source>
@@ -8205,7 +8205,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter your account password to merge Server to the System</source>
-      <translation type="unfinished">Enter your account password to merge Server to the System</translation>
+      <translation>Sunucuyu Sistemle birleştirmek için hesap şifrenizi girin</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8461,7 +8461,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya bir Olay Kuralı oluşturun</translation>
     </message>
   </context>
   <context>
@@ -8644,7 +8644,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation type="unfinished">Exported: %1</translation>
+      <translation>Dışa aktarıldı: %1</translation>
     </message>
   </context>
   <context>
@@ -8689,7 +8689,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
+      <translation>Güvenli kimlik doğrulamayı zorla?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
@@ -10241,7 +10241,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>Seçilen cihazlardan bazıları için nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
@@ -10253,11 +10253,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
+      <translation>Seçilen cihazlardan bazıları için hareket ve nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>Bu kamera için hareket ve nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
@@ -12151,7 +12151,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
-      <translation type="unfinished">Rewind is not available for VMAX</translation>
+      <translation>Geri sarma VMAX için kullanılamaz</translation>
     </message>
   </context>
   <context>
@@ -12184,7 +12184,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Client update is installed</source>
-      <translation type="unfinished">Client update is installed</translation>
+      <translation>İstemci güncellemesi yüklendi</translation>
     </message>
     <message>
       <source>Client is updated to version %1. Restart %2 to finish update.</source>
@@ -12205,7 +12205,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Client update package is broken.</source>
-      <translation type="unfinished">Client update package is broken.</translation>
+      <translation>İstemci güncelleme paketi bozuk.</translation>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
