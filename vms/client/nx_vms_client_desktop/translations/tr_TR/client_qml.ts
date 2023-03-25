@@ -234,16 +234,16 @@
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n seçili cihaz</numerusform>
+        <numerusform>%n seçili cihaz</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n seçilmiş kamera</numerusform>
+        <numerusform>%n seçilmiş kamera</numerusform>
       </translation>
     </message>
     <message>
@@ -345,7 +345,7 @@
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360° Eşkenar</translation>
     </message>
   </context>
   <context>
