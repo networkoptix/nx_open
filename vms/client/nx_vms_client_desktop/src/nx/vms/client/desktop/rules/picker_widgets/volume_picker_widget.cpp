@@ -67,7 +67,7 @@ void VolumePicker::onVolumeChanged()
 void VolumePicker::onTestButtonClicked()
 {
     const auto linkedFields = descriptor()->linkedFields;
-    if (NX_ASSERT(!linkedFields.empty(), "Linked field is not declared"))
+    if (!NX_ASSERT(!linkedFields.empty(), "Linked field is not declared"))
         return;
 
     if (linkedFields.contains(vms::rules::utils::kTextFieldName))
