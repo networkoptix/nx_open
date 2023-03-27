@@ -78,7 +78,7 @@ private:
     std::vector<std::unique_ptr<ActionBuilder>> m_builders;
 
     QString m_comment;
-    bool m_enabled = false;
+    bool m_enabled = true;
     QByteArray m_schedule;
 
     bool m_updateInProgress = false;
