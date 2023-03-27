@@ -25,80 +25,79 @@ namespace nx::vms::client::desktop::rules {
 
 RulesDialog::RulesDialog(QWidget* parent):
     QnSessionAwareButtonBoxDialog(parent),
-    ui(new Ui::RulesDialog()),
-    rulesTableModel(
+    m_ui(new Ui::RulesDialog()),
+    m_rulesTableModel(
         new RulesTableModel(appContext()->currentSystemContext()->vmsRulesEngine(), this)),
-    rulesFilterModel(new QSortFilterProxyModel(this))
+    m_rulesFilterModel(new QSortFilterProxyModel(this))
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
     const auto buttonIconColor = QPalette().color(QPalette::BrightText);
 
-    ui->newRuleButton->setIcon(Skin::colorize(
+    m_ui->newRuleButton->setIcon(Skin::colorize(
         qnSkin->pixmap("text_buttons/arythmetic_plus.png"), buttonIconColor));
-    ui->deleteRuleButton->setIcon(Skin::colorize(
+    m_ui->deleteRuleButton->setIcon(Skin::colorize(
         qnSkin->pixmap("text_buttons/trash.png"), buttonIconColor));
-    ui->deleteRuleButton->setEnabled(false);
+    m_ui->deleteRuleButton->setEnabled(false);
 
-    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
+    m_ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
 
     const auto midlightColor = QPalette().color(QPalette::Midlight);
-    setPaletteColor(ui->searchLineEdit, QPalette::PlaceholderText, midlightColor);
+    setPaletteColor(m_ui->searchLineEdit, QPalette::PlaceholderText, midlightColor);
 
-    ui->actionTypePicker->init(appContext()->currentSystemContext()->vmsRulesEngine());
-    ui->eventTypePicker->init(appContext()->currentSystemContext()->vmsRulesEngine());
+    m_ui->actionTypePicker->init(appContext()->currentSystemContext()->vmsRulesEngine());
+    m_ui->eventTypePicker->init(appContext()->currentSystemContext()->vmsRulesEngine());
 
-    connect(rulesTableModel, &RulesTableModel::dataChanged, this, &RulesDialog::onModelDataChanged);
+    connect(m_rulesTableModel, &RulesTableModel::dataChanged, this, &RulesDialog::onModelDataChanged);
+    connect(m_rulesTableModel, &RulesTableModel::stateChanged, this, &RulesDialog::updateControlButtons);
 
-    connect(rulesTableModel, &RulesTableModel::stateChanged, this, &RulesDialog::updateControlButtons);
-
-    connect(ui->newRuleButton, &QPushButton::clicked, this,
+    connect(m_ui->newRuleButton, &QPushButton::clicked, this,
         [this]
         {
             resetFilter();
 
-            // Add a rule and select it.
-            auto newRuleIndex = rulesTableModel->addRule(
+            auto newRuleIndex = m_rulesTableModel->addRule(
                 vms::rules::GenericEvent::manifest().id,
                 vms::rules::NotificationAction::manifest().id);
-            auto selectionModel = ui->tableView->selectionModel();
-            selectionModel->setCurrentIndex(rulesFilterModel->mapFromSource(newRuleIndex),
+            m_ui->tableView->selectionModel()->setCurrentIndex(m_rulesFilterModel->mapFromSource(newRuleIndex),
                 QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
         });
 
-    connect(ui->deleteRuleButton, &QPushButton::clicked, this,
+    connect(m_ui->deleteRuleButton, &QPushButton::clicked, this,
         [this]
         {
-            rulesTableModel->removeRule(
-                rulesFilterModel->mapToSource(ui->tableView->selectionModel()->currentIndex()));
+            m_rulesTableModel->removeRule(
+                m_rulesFilterModel->mapToSource(m_ui->tableView->selectionModel()->currentIndex()));
+            m_displayedRule = m_rulesTableModel->rule(m_rulesFilterModel->mapToSource(m_ui->tableView->currentIndex()));
             updateControlButtons();
+            displayRule();
         });
 
-    connect(ui->eventTypePicker, &EventTypePickerWidget::eventTypePicked, this,
+    connect(m_ui->eventTypePicker, &EventTypePickerWidget::eventTypePicked, this,
         [this](const QString& eventType)
         {
-            if (auto rule = displayedRule.lock())
+            if (auto rule = m_displayedRule.lock())
                 rule->setEventType(eventType);
         });
 
-    connect(ui->actionTypePicker, &ActionTypePickerWidget::actionTypePicked, this,
+    connect(m_ui->actionTypePicker, &ActionTypePickerWidget::actionTypePicked, this,
         [this](const QString& actionType)
         {
-            if (auto rule = displayedRule.lock())
+            if (auto rule = m_displayedRule.lock())
                 rule->setActionType(actionType);
         });
 
-    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
+    connect(m_ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
         [this]
         {
             applyChanges();
         });
 
-    connect(ui->resetDefaultRulesButton, &QPushButton::clicked, this, &RulesDialog::resetToDefaults);
+    connect(m_ui->resetDefaultRulesButton, &QPushButton::clicked, this, &RulesDialog::resetToDefaults);
 
     setupRuleTableView();
 
-    readOnly = false; //< TODO: Get real readonly state.
+    m_readOnly = false; //< TODO: Get real readonly state.
     updateReadOnlyState();
 }
 
@@ -116,7 +115,7 @@ bool RulesDialog::tryClose(bool force)
         return true;
     }
 
-    if (!rulesTableModel->hasChanges())
+    if (!m_rulesTableModel->hasChanges())
         return true;
 
     const auto result = QnMessageBox::question(
@@ -147,7 +146,7 @@ void RulesDialog::showEvent(QShowEvent* event)
 
     resetFilter();
     resetSelection();
-    ui->searchLineEdit->setFocus();
+    m_ui->searchLineEdit->setFocus();
 }
 
 void RulesDialog::accept()
@@ -167,27 +166,27 @@ void RulesDialog::reject()
 
 void RulesDialog::setupRuleTableView()
 {
-    ui->tableView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(
+    m_ui->tableView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(
         QnIndents(style::Metrics::kStandardPadding, style::Metrics::kStandardPadding)));
 
-    auto scrollBar = new SnappedScrollBar(ui->tableHolder);
-    ui->tableView->setVerticalScrollBar(scrollBar->proxyScrollBar());
+    auto scrollBar = new SnappedScrollBar(m_ui->tableHolder);
+    m_ui->tableView->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseItemViewPaddingWhenVisible(true);
 
-    rulesFilterModel->setSourceModel(rulesTableModel);
-    rulesFilterModel->setFilterRole(RulesTableModel::FilterRole);
-    rulesFilterModel->setDynamicSortFilter(true);
-    rulesFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    rulesFilterModel->sort(RulesTableModel::EventColumn);
+    m_rulesFilterModel->setSourceModel(m_rulesTableModel);
+    m_rulesFilterModel->setFilterRole(RulesTableModel::FilterRole);
+    m_rulesFilterModel->setDynamicSortFilter(true);
+    m_rulesFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_rulesFilterModel->sort(RulesTableModel::EventColumn);
 
-    ui->tableView->setModel(rulesFilterModel);
-    ui->tableView->setItemDelegateForColumn(RulesTableModel::EditedStateColumn,
-        new ModificationMarkItemDelegate(ui->tableView));
-    ui->tableView->setItemDelegateForColumn(RulesTableModel::EnabledStateColumn,
-        new SwitchItemDelegate(ui->tableView));
-    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_ui->tableView->setModel(m_rulesFilterModel);
+    m_ui->tableView->setItemDelegateForColumn(RulesTableModel::EditedStateColumn,
+        new ModificationMarkItemDelegate(m_ui->tableView));
+    m_ui->tableView->setItemDelegateForColumn(RulesTableModel::EnabledStateColumn,
+        new SwitchItemDelegate(m_ui->tableView));
+    m_ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    auto horizontalHeader = ui->tableView->horizontalHeader();
+    auto horizontalHeader = m_ui->tableView->horizontalHeader();
     const int kDefaultHorizontalSectionSize = 72;
     horizontalHeader->setDefaultSectionSize(kDefaultHorizontalSectionSize);
     horizontalHeader->hideSection(RulesTableModel::IdColumn);
@@ -201,29 +200,31 @@ void RulesDialog::setupRuleTableView()
     horizontalHeader->moveSection(RulesTableModel::EditedStateColumn,
         RulesTableModel::EnabledStateColumn);
 
-    const auto selectionModel = ui->tableView->selectionModel();
-    connect(selectionModel, &QItemSelectionModel::currentChanged, this,
-        [this](const QModelIndex& current)
+    connect(m_ui->tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+        [this](const QItemSelection& selected)
         {
-            displayedRule = rulesTableModel->rule(rulesFilterModel->mapToSource(current));
+            m_displayedRule = selected.empty()
+                ? std::weak_ptr<SimplifiedRule>{}
+                : m_rulesTableModel->rule(m_rulesFilterModel->mapToSource(m_ui->tableView->currentIndex()));
+
             updateControlButtons();
             displayRule();
         });
 
-    connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
+    connect(m_ui->searchLineEdit, &SearchLineEdit::textChanged, this,
         [this](const QString& text)
         {
             resetSelection();
-            rulesFilterModel->setFilterRegularExpression(text);
+            m_rulesFilterModel->setFilterRegularExpression(text);
         });
 
-    connect(ui->tableView, &QAbstractItemView::clicked, this,
+    connect(m_ui->tableView, &QAbstractItemView::clicked, this,
         [this](const QModelIndex &index)
         {
             if (index.column() != RulesTableModel::EnabledStateColumn)
                 return;
 
-            auto clickedRule = rulesTableModel->rule(rulesFilterModel->mapToSource(index)).lock();
+            auto clickedRule = m_rulesTableModel->rule(m_rulesFilterModel->mapToSource(index)).lock();
             if (clickedRule)
                 clickedRule->setEnabled(!clickedRule->enabled());
         });
@@ -231,122 +232,131 @@ void RulesDialog::setupRuleTableView()
 
 void RulesDialog::updateReadOnlyState()
 {
-    ui->newRuleButton->setEnabled(!readOnly);
-
-    ui->actionTypePicker->setEnabled(!readOnly);
-    ui->eventTypePicker->setEnabled(!readOnly);
+    m_ui->newRuleButton->setEnabled(!m_readOnly);
+    m_ui->actionTypePicker->setEnabled(!m_readOnly);
+    m_ui->eventTypePicker->setEnabled(!m_readOnly);
 
     for (auto paramsWidget: findChildren<ParamsWidget*>())
-        paramsWidget->setReadOnly(readOnly);
+        paramsWidget->setReadOnly(m_readOnly);
 }
 
 void RulesDialog::updateControlButtons()
 {
-    const bool hasSelection = ui->tableView->currentIndex().isValid();
-    ui->deleteRuleButton->setEnabled(readOnly ? false : hasSelection);
+    m_ui->deleteRuleButton->setEnabled(m_readOnly ? false : !m_displayedRule.expired());
 
     const bool hasPermissions = accessController()->hasAdminPermissions();
-    const bool hasChanges = rulesTableModel->hasChanges();
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasPermissions);
-    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges && hasPermissions);
-    ui->resetDefaultRulesButton->setEnabled(hasPermissions);
+    const bool hasChanges = m_rulesTableModel->hasChanges();
+    m_ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasPermissions);
+    m_ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges && hasPermissions);
+    m_ui->resetDefaultRulesButton->setEnabled(hasPermissions);
 }
 
 void RulesDialog::updateRuleEditorPanel()
 {
-    const bool hasSelection = ui->tableView->currentIndex().isValid();
     // Show rule editor if a rule selected, tip panel otherwise.
-    ui->panelsStackedWidget->setCurrentIndex(!hasSelection ? 0 : 1);
+    constexpr auto kTipPanelIndex = 0;
+    constexpr auto kEditorPanelIndex = 1;
+    m_ui->panelsStackedWidget->setCurrentIndex(m_displayedRule.expired()
+        ? kTipPanelIndex
+        : kEditorPanelIndex);
 }
 
 void RulesDialog::createEventEditor(const vms::rules::ItemDescriptor& descriptor)
 {
-    if (eventEditorWidget)
-        eventEditorWidget->deleteLater();
+    if (m_eventEditorWidget)
+        m_eventEditorWidget->deleteLater();
 
-    eventEditorWidget = EventEditorFactory::createWidget(descriptor, context());
-    if (!NX_ASSERT(eventEditorWidget))
+    m_eventEditorWidget = EventEditorFactory::createWidget(descriptor, context());
+    if (!NX_ASSERT(m_eventEditorWidget))
         return;
 
-    eventEditorWidget->setReadOnly(readOnly);
+    m_eventEditorWidget->setReadOnly(m_readOnly);
 
-    ui->eventEditorContainerWidget->layout()->addWidget(eventEditorWidget);
+    m_ui->eventEditorContainerWidget->layout()->addWidget(m_eventEditorWidget);
 }
 
 void RulesDialog::createActionEditor(const vms::rules::ItemDescriptor& descriptor)
 {
-    if (actionEditorWidget)
-        actionEditorWidget->deleteLater();
+    if (m_actionEditorWidget)
+        m_actionEditorWidget->deleteLater();
 
-    actionEditorWidget = ActionEditorFactory::createWidget(descriptor, context());
-    if (!NX_ASSERT(actionEditorWidget))
+    m_actionEditorWidget = ActionEditorFactory::createWidget(descriptor, context());
+    if (!NX_ASSERT(m_actionEditorWidget))
         return;
 
-    actionEditorWidget->setReadOnly(readOnly);
+    m_actionEditorWidget->setReadOnly(m_readOnly);
 
-    ui->actionEditorContainerWidget->layout()->addWidget(actionEditorWidget);
+    m_ui->actionEditorContainerWidget->layout()->addWidget(m_actionEditorWidget);
 }
 
 void RulesDialog::displayRule()
 {
     updateRuleEditorPanel();
 
-    auto rule = displayedRule.lock();
+    auto rule = m_displayedRule.lock();
     if (!rule)
+    {
+        if (m_eventEditorWidget)
+            m_eventEditorWidget->deleteLater();
+
+        if (m_actionEditorWidget)
+            m_actionEditorWidget->deleteLater();
+
         return;
+    }
 
     displayEvent(rule);
     displayAction(rule);
 
-    ui->footerWidget->setRule(displayedRule);
+    m_ui->footerWidget->setRule(m_displayedRule);
 }
 
 void RulesDialog::displayEvent(const std::shared_ptr<SimplifiedRule>& rule)
 {
     {
-        const QSignalBlocker blocker(ui->eventTypePicker);
-        ui->eventTypePicker->setEventType(rule->eventType());
+        const QSignalBlocker blocker(m_ui->eventTypePicker);
+        m_ui->eventTypePicker->setEventType(rule->eventType());
     }
 
     auto eventDescriptor = rule->eventDescriptor();
     if (!NX_ASSERT(eventDescriptor))
         return;
 
-    if (!eventEditorWidget || eventEditorWidget->descriptor().id != eventDescriptor->id)
+    if (!m_eventEditorWidget || m_eventEditorWidget->descriptor().id != eventDescriptor->id)
         createEventEditor(*eventDescriptor);
 
-    if (eventEditorWidget)
-        eventEditorWidget->setRule(rule);
+    if (m_eventEditorWidget)
+        m_eventEditorWidget->setRule(rule);
 }
 
 void RulesDialog::displayAction(const std::shared_ptr<SimplifiedRule>& rule)
 {
     {
-        const QSignalBlocker blocker(ui->actionTypePicker);
-        ui->actionTypePicker->setActionType(rule->actionType());
+        const QSignalBlocker blocker(m_ui->actionTypePicker);
+        m_ui->actionTypePicker->setActionType(rule->actionType());
     }
 
     auto actionDescriptor = rule->actionDescriptor();
     if (!NX_ASSERT(actionDescriptor))
         return;
 
-    if (!actionEditorWidget || actionEditorWidget->descriptor().id != actionDescriptor->id)
+    if (!m_actionEditorWidget || m_actionEditorWidget->descriptor().id != actionDescriptor->id)
         createActionEditor(*actionDescriptor);
 
-    if (actionEditorWidget)
-        actionEditorWidget->setRule(rule);
+    if (m_actionEditorWidget)
+        m_actionEditorWidget->setRule(rule);
 }
 
 void RulesDialog::resetFilter()
 {
-    ui->searchLineEdit->clear();
-    rulesFilterModel->invalidate();
+    m_ui->searchLineEdit->clear();
+    m_rulesFilterModel->invalidate();
 }
 
 void RulesDialog::resetSelection()
 {
-    ui->tableView->clearSelection();
-    ui->tableView->setCurrentIndex(QModelIndex{});
+    m_ui->tableView->clearSelection();
+    m_ui->tableView->setCurrentIndex(QModelIndex{});
     displayRule();
 }
 
@@ -357,7 +367,7 @@ void RulesDialog::onModelDataChanged(
 {
     updateControlButtons();
 
-    auto rule = displayedRule.lock();
+    auto rule = m_displayedRule.lock();
     if (!rule)
         return;
 
@@ -371,10 +381,10 @@ void RulesDialog::onModelDataChanged(
     if (roles.contains(RulesTableModel::FieldRole))
         displayRule();
 
-    if (eventEditorWidget && actionEditorWidget)
+    if (m_eventEditorWidget && m_actionEditorWidget)
     {
-        eventEditorWidget->updateUi();
-        actionEditorWidget->updateUi();
+        m_eventEditorWidget->updateUi();
+        m_actionEditorWidget->updateUi();
     }
 }
 
@@ -386,12 +396,12 @@ void RulesDialog::applyChanges()
             QnMessageBox::critical(this, tr("Failed to apply changes."), error);
         };
 
-    rulesTableModel->applyChanges(errorHandler);
+    m_rulesTableModel->applyChanges(errorHandler);
 }
 
 void RulesDialog::rejectChanges()
 {
-    rulesTableModel->rejectChanges();
+    m_rulesTableModel->rejectChanges();
 }
 
 void RulesDialog::resetToDefaults()
@@ -421,7 +431,7 @@ void RulesDialog::resetToDefaults()
             QnMessageBox::critical(this, tr("Failed to restore rules."), error);
         };
 
-    rulesTableModel->resetToDefaults(errorHandler);
+    m_rulesTableModel->resetToDefaults(errorHandler);
 }
 
 } // namespace nx::vms::client::desktop::rules

@@ -52,14 +52,14 @@ private:
     void resetToDefaults();
 
 private:
-    std::unique_ptr<Ui::RulesDialog> ui;
+    std::unique_ptr<Ui::RulesDialog> m_ui;
 
-    bool readOnly{};
-    ParamsWidget* eventEditorWidget{};
-    ParamsWidget* actionEditorWidget{};
-    RulesTableModel* rulesTableModel{};
-    QSortFilterProxyModel* rulesFilterModel{};
-    std::weak_ptr<SimplifiedRule> displayedRule;
+    bool m_readOnly{false};
+    QPointer<ParamsWidget> m_eventEditorWidget;
+    QPointer<ParamsWidget> m_actionEditorWidget;
+    RulesTableModel* m_rulesTableModel{nullptr};
+    QSortFilterProxyModel* m_rulesFilterModel{nullptr};
+    std::weak_ptr<SimplifiedRule> m_displayedRule;
 };
 
 } // namespace nx::vms::client::desktop::rules
