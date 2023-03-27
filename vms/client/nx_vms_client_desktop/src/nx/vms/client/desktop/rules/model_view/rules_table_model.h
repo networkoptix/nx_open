@@ -144,12 +144,12 @@ signals:
     void stateChanged();
 
 private:
-    std::vector<std::shared_ptr<SimplifiedRule>> simplifiedRules;
-    nx::vms::rules::Engine* engine = nullptr;
+    std::vector<std::shared_ptr<SimplifiedRule>> m_simplifiedRules;
+    nx::vms::rules::Engine* m_engine = nullptr;
 
-    std::set<QnUuid> addedRules;
-    std::set<QnUuid> modifiedRules;
-    std::set<QnUuid> removedRules;
+    std::set<QnUuid> m_addedRules;
+    std::set<QnUuid> m_modifiedRules;
+    std::set<QnUuid> m_removedRules;
 
     void initialise();
     bool isIndexValid(const QModelIndex &index) const;
