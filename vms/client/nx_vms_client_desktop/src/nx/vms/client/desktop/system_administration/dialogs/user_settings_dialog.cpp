@@ -380,7 +380,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
 
     if (!state.password.isEmpty() && !createCloudUser)
         userData.password = state.password;
-    userData.email = state.email;
+    userData.email = userData.type == nx::vms::api::UserType::cloud ? userData.name : state.email;
     userData.fullName = state.fullName;
     userData.permissions = state.globalPermissions;
     userData.isEnabled = state.userEnabled;

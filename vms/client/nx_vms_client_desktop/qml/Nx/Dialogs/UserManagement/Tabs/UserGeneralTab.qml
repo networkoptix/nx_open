@@ -123,7 +123,10 @@ Item
                     anchors.right: parent.right
                     anchors.rightMargin: 16
 
-                    validateFunc: control.self ? control.self.validateLogin : null
+                    validateFunc: control.self
+                        ? (control.userType == UserSettingsGlobal.CloudUser
+                            ? control.self.validateEmail : control.self.validateLogin)
+                        : null
                 }
 
                 UserEnabledSwitch
