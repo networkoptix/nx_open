@@ -89,6 +89,7 @@
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
 #include <utils/common/delete_later.h>
@@ -724,11 +725,13 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
         };
 
     const auto shift =
-        [this](ShiftDirection direction)
+        [this](ShiftDirection direction) -> bool
         {
+            if (!navigator()->canJump())
+                return false;
             // If two arrow keys are pressed simultaneously, only first one is counted.
             if (m_rewindTimer->isActive())
-                return; 
+                return false; 
 
             m_rewindTimer->start(500);
             m_rewindDirection = direction;
@@ -736,6 +739,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 menu()->trigger(ui::action::FastForwardAction);
             if (direction == ShiftDirection::rewind)
                 menu()->trigger(ui::action::RewindAction);
+            return true;
         };
 
     // AZERTY keyboard passes non-numeric keycodes when caps lock is pressed.
@@ -785,9 +789,9 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 moveCursor(QPoint(-1, 0), QPoint(0, -1));
             else if (e->isAutoRepeat())
                 break;
-            else if (e->modifiers() & Qt::KeypadModifier)
-                shift(ShiftDirection::rewind);
-            else if (!tryStartPtz(PtzInstrument::DirectionFlag::panLeft))
+            else if (tryStartPtz(PtzInstrument::DirectionFlag::panLeft))
+                break;
+            else if (!shift(ShiftDirection::rewind))
                 showNavigationMessage();
             break;
         }
@@ -799,9 +803,9 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 moveCursor(QPoint(1, 0), QPoint(0, 1));
             else if (e->isAutoRepeat())
                 break;
-            else if (e->modifiers() & Qt::KeypadModifier)
-                shift(ShiftDirection::fastForward);
-            else if (!tryStartPtz(PtzInstrument::DirectionFlag::panRight))
+            else if (tryStartPtz(PtzInstrument::DirectionFlag::panRight))
+                break;
+            else if (!shift(ShiftDirection::fastForward))
                 showNavigationMessage();
             break;
         }
