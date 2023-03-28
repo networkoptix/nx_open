@@ -17,7 +17,7 @@ namespace log {
 static constexpr char kMaxLogVolumeSizeSymbolicName[] = "maxLogVolumeSizeB";
 static constexpr char kMaxLogFileSizeSymbolicName[] = "maxLogFileSizeB";
 static constexpr char kMaxLogFileTimePeriodSymbolicName[] = "maxLogFileTimePeriodS";
-static constexpr char kDisableLogArchivingSymbolicName[] = "disableLogArchiving";
+static constexpr char kLogArchivingEnabledSymbolicName[] = "logArchivingEnabled";
 
 /**
  * Specifies configuration of a logger.
@@ -65,7 +65,7 @@ public:
     qint64 maxVolumeSizeB = kDefaultMaxLogVolumeSizeB; //< 500 MB.
     qint64 maxFileSizeB = kDefaultMaxLogFileSizeB; //< 10 MB.
     std::chrono::seconds maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS; //< 0.
-    bool disableArchiving = kDefaultDisableLogArchiving;
+    bool archivingEnabled = kDefaultLogArchivingEnabled;
     QString logBaseName;
 
     bool parse(const QString& str);
