@@ -38,6 +38,8 @@ public:
     void tick(int deltaMs);
 
 private:
+    void cancelAnimation();
+
     PlaybackPositionIconTextWidget* m_pauseButton = nullptr;
     PlaybackPositionIconTextWidget* m_positionAndRecording = nullptr;
 

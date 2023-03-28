@@ -11,6 +11,8 @@
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_icon_text_widget.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
@@ -22,6 +24,7 @@
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop {
@@ -92,10 +95,30 @@ PlaybackPositionItem::PlaybackPositionItem(WindowContext* windowContext, QGraphi
 
     registerAnimation(m_animationTimerListener);
     m_animationTimerListener->startListening();
+
+    connect(navigator(), &QnWorkbenchNavigator::timelinePositionChanged,
+        this, &PlaybackPositionItem::cancelAnimation);
+    connect(action(ui::action::FastForwardAction), &QAction::triggered,
+        this, &PlaybackPositionItem::cancelAnimation);
+    connect(action(ui::action::RewindAction), &QAction::triggered,
+        this, &PlaybackPositionItem::cancelAnimation);
 }
 
 PlaybackPositionItem::~PlaybackPositionItem()
 {
+}
+
+void PlaybackPositionItem::cancelAnimation()
+{
+    // Animation is not running
+    if (m_totalMs == kStopped)
+        return;
+    
+    m_totalMs = kStopped;
+    auto animator = opacityAnimator(this);
+    if (animator && animator->isRunning())
+        animator->stop();
+    this->setOpacity(0.0);
 }
 
 /*
@@ -117,7 +140,7 @@ PlaybackPositionItem::~PlaybackPositionItem()
  */
 void PlaybackPositionItem::tick(int deltaMs)
 {
-    if (m_totalMs < 0)
+    if (m_totalMs == kStopped)
         return;
 
     auto animator = opacityAnimator(this);
