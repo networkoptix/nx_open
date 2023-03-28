@@ -62,6 +62,7 @@
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
+#include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
@@ -550,6 +551,7 @@ struct ApplicationContext::Private
     std::unique_ptr<UploadManager> uploadManager;
     std::unique_ptr<QnForgottenSystemsManager> forgottenSystemsManager;
     std::unique_ptr<ResourcesChangesManager> resourcesChangesManager;
+    std::unique_ptr<WebPageIconCache> webPageIconCache;
 
     // Network modules
     std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
@@ -627,6 +629,7 @@ ApplicationContext::ApplicationContext(
             d->uploadManager = std::make_unique<UploadManager>();
             d->forgottenSystemsManager = std::make_unique<QnForgottenSystemsManager>();
             d->resourcesChangesManager = std::make_unique<ResourcesChangesManager>();
+            d->webPageIconCache = std::make_unique<WebPageIconCache>();
             d->cloudGateway = std::make_unique<nx::cloud::gateway::VmsGatewayEmbeddable>();
             break;
         }
@@ -657,6 +660,9 @@ ApplicationContext::~ApplicationContext()
     // Remote session must be fully destroyed while application context still exists.
     d->mainSystemContext.reset();
     d->cloudLayoutsManager.reset();
+
+    // Web Page icon cache uses application context.
+    d->webPageIconCache.reset();
 
     if (NX_ASSERT(s_instance == this))
         s_instance = nullptr;
@@ -849,6 +855,11 @@ QnResourceDiscoveryManager* ApplicationContext::resourceDiscoveryManager() const
 ResourcesChangesManager* ApplicationContext::resourcesChangesManager() const
 {
     return d->resourcesChangesManager.get();
+}
+
+WebPageIconCache* ApplicationContext::webPageIconCache() const
+{
+    return d->webPageIconCache.get();
 }
 
 QnForgottenSystemsManager* ApplicationContext::forgottenSystemsManager() const

@@ -271,8 +271,9 @@ FocusScope
         if (!model)
             return ""
 
-        if (model.decorationPath)
-            return "qrc:/skin/" + model.decorationPath
+        const path = model.decorationPath
+        if (path)
+            return path.startsWith("file:") ? path : ("qrc:/skin/" + path)
 
         return (model.iconKey && model.iconKey !== 0
             && ("image://resource/" + model.iconKey + "/" + itemState)) || ""

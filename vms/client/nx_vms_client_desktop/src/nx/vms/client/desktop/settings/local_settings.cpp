@@ -177,6 +177,7 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateJsonValue(settings->detectedObjectSettings);
     migrateJsonValue(settings->authAllowedUrls);
     migrateValue(settings->maxMp3FileDurationSec);
+    migrateJsonValue(settings->webPageIcons);
 
     migratePopupSystemHealthFrom5_1(settings, oldSettings);
 }

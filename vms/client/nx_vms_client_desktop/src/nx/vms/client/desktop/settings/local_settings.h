@@ -154,6 +154,9 @@ public:
     Property<int> maxMp3FileDurationSec{this, "maxMp3FileDurationSec", 30,
         "Maximum file duration in seconds for sound notification actions."};
 
+    Property<std::map<QString, QString>> webPageIcons{this, "webPageIcons", {},
+        "Web Page icon paths."};
+
 public:
     void migrateOldSettings();
     void setDefaults();

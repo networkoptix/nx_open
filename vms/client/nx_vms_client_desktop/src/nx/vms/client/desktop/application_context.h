@@ -35,6 +35,7 @@ class ShowOnceSettings;
 class SystemContext;
 class UnifiedResourcePool;
 class UploadManager;
+class WebPageIconCache;
 class WindowContext;
 
 namespace session {
@@ -200,6 +201,8 @@ public:
     ResourcesChangesManager* resourcesChangesManager() const;
 
     QnForgottenSystemsManager* forgottenSystemsManager() const;
+
+    WebPageIconCache* webPageIconCache() const;
 
     nx::cloud::gateway::VmsGatewayEmbeddable* cloudGateway() const;
 
