@@ -6,10 +6,10 @@
 
 #include <QtCore/QQueue>
 
-#include <nx/streaming/abstract_archive_stream_reader.h>
 #include <core/resource/resource_media_layout.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/media_data_packet.h>
+#include <nx/media/codec_parameters.h>
+#include <nx/media/media_data_packet.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/vms/api/types/storage_location.h>
 #include <recording/playbackmask_helper.h>

@@ -2,18 +2,18 @@
 
 #pragma once
 
+#include <QSharedPointer>
 #include <deque>
 #include <memory>
 #include <set>
 #include <vector>
 
 #include <QtOpenGLWidgets/QOpenGLWidget>
-#include <nx/utils/thread/mutex.h>
-#include <QSharedPointer>
-#include <nx/utils/thread/wait_condition.h>
 
-#include <nx/streaming/media_data_packet.h> /* For QnMetaDataV1Ptr. */
+#include <nx/media/media_data_packet.h> /* For QnMetaDataV1Ptr. */
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/stoppable.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <nx/vms/api/data/image_correction_data.h>
 #include <utils/common/safepool.h>
 #include <utils/media/frame_info.h>

@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/streaming/video_data_packet.h>
 #include <media/filters/h264_mp4_to_annexb.h>
+#include <nx/media/video_data_packet.h>
 
 TEST(mediaFilters, H2645Mp4ToAnnexB)
 {
@@ -15,4 +15,3 @@ TEST(mediaFilters, H2645Mp4ToAnnexB)
     result->compressionType = AV_CODEC_ID_H264;
     filter.processData(result);
 }
-

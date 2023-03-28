@@ -12,6 +12,9 @@
             <Component><File Name="nx_fusion.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_reflect.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_vms_common.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_rtp.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_media_core.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_codec.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_vms_utils.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_network.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_kit.dll" KeyPath="yes" DiskId="2"/></Component>

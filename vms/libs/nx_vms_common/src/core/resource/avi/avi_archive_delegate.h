@@ -2,7 +2,8 @@
 
 #pragma once
 
-extern "C" {
+extern "C"
+{
 // For typedef struct AVIOContext.
 #include <libavformat/avio.h>
 };
@@ -11,9 +12,9 @@ extern "C" {
 
 #include <core/resource/avi/avi_archive_metadata.h>
 #include <core/resource/motion_window.h>
+#include <nx/media/audio_data_packet.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/streaming/abstract_archive_delegate.h>
-#include <nx/streaming/audio_data_packet.h>
-#include <nx/streaming/video_data_packet.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 

@@ -6,7 +6,7 @@
 #include <typeindex>
 
 #include <nx/media/media_fwd.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/video_data_packet.h>
 
 namespace nx {
 namespace media {

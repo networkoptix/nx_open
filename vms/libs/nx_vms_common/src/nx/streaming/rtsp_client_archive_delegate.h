@@ -193,7 +193,7 @@ private:
     int m_frameCnt = 0;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
 
-    QMap<int, QSharedPointer<nx::streaming::rtp::QnNxRtpParser>> m_parsers;
+    QMap<int, QSharedPointer<nx::rtp::QnNxRtpParser>> m_parsers;
 
     nx::network::http::Credentials m_credentials;
 

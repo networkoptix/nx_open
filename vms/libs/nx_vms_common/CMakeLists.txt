@@ -34,8 +34,11 @@ nx_add_target(nx_vms_common LIBRARY
         nx_sdk
         nx_fusion
         nx_sdk
+        nx_rtp
         cloud_db_client
         nx_vms_update
+        nx_media_core
+        nx_codec
     FOLDER common/libs
 )
 nx_make_target_translatable(nx_vms_common)
@@ -50,11 +53,6 @@ target_compile_definitions(nx_vms_common
 )
 if(LINUX)
     add_dependencies(nx_vms_common libgl_stub libegl_stub libglx_stub libx11_stub)
-endif()
-
-if("${arch}" STREQUAL "arm" OR "${arch}" STREQUAL "arm64")
-    find_package(sse2neon)
-    target_link_libraries(nx_vms_common PUBLIC sse2neon::sse2neon)
 endif()
 
 target_include_directories(nx_vms_common

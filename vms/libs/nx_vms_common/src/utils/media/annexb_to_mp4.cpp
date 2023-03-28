@@ -2,12 +2,11 @@
 
 #include "annexb_to_mp4.h"
 
+#include <nx/codec/hevc/extradata.h>
+#include <nx/codec/nal_units.h>
+#include <nx/media/h264_utils.h>
+#include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
-#include <utils/media/h264_utils.h>
-#include <utils/media/hevc/extradata.h>
-#include <utils/media/nalUnits.h>
-#include <utils/media/utils.h>
-
 
 namespace nx::media {
 

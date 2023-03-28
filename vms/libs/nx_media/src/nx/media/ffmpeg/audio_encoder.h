@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/audio_data_packet.h>
+#include <nx/media/audio_data_packet.h>
+#include <nx/media/codec_parameters.h>
 
 extern "C"
 {

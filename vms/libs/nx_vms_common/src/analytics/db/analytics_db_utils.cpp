@@ -4,7 +4,7 @@
 
 #include <cmath>
 
-#include <nx/streaming/media_data_packet.h>
+#include <nx/media/media_data_packet.h>
 
 namespace nx::analytics::db {
 

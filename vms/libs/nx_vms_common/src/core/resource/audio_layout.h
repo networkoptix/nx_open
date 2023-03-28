@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include <vector>
-#include <memory>
-
 #include <QString>
+#include <memory>
+#include <vector>
 
-#include <nx/streaming/av_codec_media_context.h>
+#include <nx/media/codec_parameters.h>
 
 class NX_VMS_COMMON_API AudioLayout
 {

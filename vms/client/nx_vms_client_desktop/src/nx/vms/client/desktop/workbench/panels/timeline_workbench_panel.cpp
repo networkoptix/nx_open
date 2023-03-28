@@ -8,6 +8,7 @@
 #include <QtWidgets/QMenu>
 
 #include <client/client_runtime_settings.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <nx/vms/client/desktop/workbench/timeline/control_widget.h>
@@ -31,9 +32,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_pane_settings.h>
-#include <utils/common/event_processors.h>
 #include <ui/workbench/workbench_ui_globals.h>
-#include <utils/math/math.h>
+#include <utils/common/event_processors.h>
 
 #include "../workbench_animations.h"
 #include "buttons.h"

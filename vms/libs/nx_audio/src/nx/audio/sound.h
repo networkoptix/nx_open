@@ -6,12 +6,10 @@
 #include <QtMultimedia/QAudio>
 #include <QtMultimedia/QAudioFormat>
 
-#include <nx/utils/thread/mutex.h>
-
-#include <utils/timer.h>
+#include <nx/media/audio/format.h>
 #include <nx/utils/safe_direct_connection.h>
-
-#include <nx/audio/format.h>
+#include <nx/utils/thread/mutex.h>
+#include <utils/timer.h>
 
 class AudioDevice;
 typedef struct ALCdevice_struct ALCdevice;
@@ -25,7 +23,7 @@ namespace audio {
 class Sound: public QObject, public Qn::EnableSafeDirectConnection
 {
 public:
-    Sound(ALCdevice* device, const Format& audioFormat);
+    Sound(ALCdevice* device, const nx::media::audio::Format& audioFormat);
     ~Sound();
 
     bool isValid() const { return m_isValid; }
@@ -58,7 +56,7 @@ public:
     /**
      * @return Audio format playing.
      */
-    Format format() const;
+    nx::media::audio::Format format() const;
 
     /**
      * @return Playback state.
@@ -77,12 +75,12 @@ public:
     /**
      * @return True if audio format is supported.
      */
-    static bool isFormatSupported(const Format& format);
+    static bool isFormatSupported(const nx::media::audio::Format& format);
 
 private:
     uint bufferTime() const;
     bool setup();
-    static int getOpenAlFormat(const Format& audioFormat);
+    static int getOpenAlFormat(const nx::media::audio::Format& audioFormat);
     uint bitRate() const;
     uint sampleSize() const;
     bool playImpl();
@@ -99,7 +97,7 @@ private:
 
 private:
     mutable nx::Mutex m_mtx;
-    Format m_audioFormat;
+    nx::media::audio::Format m_audioFormat;
 
     uint m_tmpBuffer[1024];
 

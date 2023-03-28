@@ -8,26 +8,22 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource_media_layout.h>
+#include <decoders/video/abstract_video_decoder.h>
+#include <nx/media/audio_data_packet.h>
+#include <nx/streaming/abstract_data_consumer.h>
 #include <utils/common/adaptive_sleep.h>
 #include <utils/media/externaltimesource.h>
-
-#include <core/resource/resource_fwd.h>
-#include <nx/streaming/abstract_data_consumer.h>
-#include <nx/streaming/audio_data_packet.h>
-#include <core/resource/resource_media_layout.h>
-
-#include <decoders/video/abstract_video_decoder.h>
 
 #include "video_stream_display.h"
 
 // TODO: #sivanov use forward declaration.
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
-
+#include <nx/media/audio/format.h>
+#include <nx/media/stream_event.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/vms/client/desktop/camera/abstract_video_display.h>
-#include <nx/vms/common/globals/media_stream_event.h>
-
-#include <nx/audio/format.h>
 
 class QnResourceWidgetRenderer;
 class QnVideoStreamDisplay;
@@ -137,7 +133,7 @@ public:
 
     QnMediaResourcePtr resource() const;
 
-    nx::vms::common::MediaStreamEventPacket lastMediaEvent() const;
+    nx::media::StreamEventPacket lastMediaEvent() const;
 
     virtual QString getName() const override;
     virtual bool isRadassSupported() const override;
@@ -241,7 +237,7 @@ protected:
     {
         bool operator==(const AudioFormat&) const = default;
 
-        nx::audio::Format format;
+        nx::media::audio::Format format;
         int bitsPerCodedSample = -1;
     };
 
@@ -273,7 +269,7 @@ protected:
     bool m_bofReceived;
     bool m_ignoringVideo;
     bool m_isRealTimeSource;
-    nx::audio::Format m_expectedAudioFormat;
+    nx::media::audio::Format m_expectedAudioFormat;
     mutable nx::Mutex m_audioChangeMutex;
     bool m_videoBufferOverflow;
     bool m_singleShotMode;
@@ -322,7 +318,7 @@ protected:
     int m_liveBufferSizeMkSec;
     bool m_liveMaxLenReached;
     bool m_hasVideo;
-    nx::vms::common::MediaStreamEventPacket m_lastMediaEvent;
+    nx::media::StreamEventPacket m_lastMediaEvent;
     mutable nx::Mutex m_lastMediaEventMutex;
     nx::utils::ElapsedTimer m_lastMediaEventTimeout;
 

@@ -14,6 +14,7 @@
 #include <core/resource_management/resource_properties.h>
 #include <licensing/license.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/media/stream_event.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/log.h>
@@ -21,7 +22,6 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/backup_settings.h>
-#include <nx/vms/common/globals/media_stream_event.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <recording/time_period_list.h>
@@ -1929,14 +1929,14 @@ bool QnSecurityCamResource::setCameraCredentialsSync(
     return false;
 }
 
-nx::vms::common::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
+nx::media::StreamEvent QnSecurityCamResource::checkForErrors() const
 {
     const auto capabilities = getCameraCapabilities();
     if (capabilities.testFlag(nx::vms::api::DeviceCapability::isDefaultPassword))
-        return nx::vms::common::MediaStreamEvent::forbiddenWithDefaultPassword;
+        return nx::media::StreamEvent::forbiddenWithDefaultPassword;
     if (capabilities.testFlag(nx::vms::api::DeviceCapability::isOldFirmware))
-        return nx::vms::common::MediaStreamEvent::oldFirmware;
-    return nx::vms::common::MediaStreamEvent::noEvent;
+        return nx::media::StreamEvent::oldFirmware;
+    return nx::media::StreamEvent::noEvent;
 }
 
 QnResourceData QnSecurityCamResource::resourceData() const

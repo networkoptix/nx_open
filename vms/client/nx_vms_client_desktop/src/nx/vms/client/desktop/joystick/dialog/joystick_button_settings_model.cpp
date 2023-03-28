@@ -8,6 +8,7 @@
 #include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -18,11 +19,9 @@
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/math/math.h>
-
-#include "layout_intermediate_model.h"
 #include "../settings/action_factory.h"
 #include "../settings/descriptors.h"
+#include "layout_intermediate_model.h"
 
 namespace nx::vms::client::desktop::joystick {
 

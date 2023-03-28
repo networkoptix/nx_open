@@ -6,17 +6,16 @@
 
 #include <QtCore/QLibrary>
 #include <QtCore/QtMath>
-
 #include <QtGui/QImage>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QPainter>
 #include <QtGui/QScreen>
-
 #include <QtWidgets/QApplication>
 
 #include <nx/utils/log/log.h>
-#include "utils/media/sse_helper.h"
+
+#include "nx/media/sse_helper.h"
 #include "utils/color_space/yuvconvert.h"
 
 extern "C" {

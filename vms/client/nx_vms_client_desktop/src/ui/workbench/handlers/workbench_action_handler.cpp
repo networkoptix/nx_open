@@ -58,6 +58,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/platform/process.h>
 #include <nx/utils/qset.h>
@@ -168,7 +169,6 @@
 #include <utils/common/synctime.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/email/email.h>
-#include <utils/math/math.h>
 #include <utils/unity_launcher_workaround.h>
 
 #if defined(Q_OS_MACX)

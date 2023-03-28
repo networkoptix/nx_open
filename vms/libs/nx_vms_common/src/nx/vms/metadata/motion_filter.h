@@ -4,7 +4,8 @@
 
 #include <QtGui/QRegion>
 
-#include <motion/motion_detection.h>
+#include <nx/media/motion_detection.h>
+
 #include "metadata_archive.h"
 
 namespace nx::vms::metadata {

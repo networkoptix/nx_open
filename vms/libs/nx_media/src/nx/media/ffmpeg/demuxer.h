@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/streaming/audio_data_packet.h>
-#include <nx/streaming/video_data_packet.h>
-#include <utils/media/ffmpeg_helper.h>
+#include <nx/media/audio_data_packet.h>
+#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/video_data_packet.h>
 #include <utils/media/io_context.h>
 
 namespace nx::media::ffmpeg {

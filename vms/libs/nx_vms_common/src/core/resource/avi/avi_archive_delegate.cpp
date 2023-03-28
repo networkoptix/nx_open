@@ -18,21 +18,22 @@
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <export/sign_helper.h>
 #include <motion/light_motion_archive_connection.h>
+#include <nx/codec/h263/h263_utils.h>
+#include <nx/codec/nal_units.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/config.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/av_codec_helper.h>
+#include <nx/media/codec_parameters.h>
+#include <nx/media/config.h>
+#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/application_context.h>
 #include <recording/helpers/recording_context_helpers.h>
 #include <utils/common/util.h>
-#include <utils/media/av_codec_helper.h>
-#include <utils/media/ffmpeg_helper.h>
-#include <utils/media/h263_utils.h>
-#include <utils/media/nalUnits.h>
+#include <utils/media/ffmpeg_io_context.h>
 
-extern "C" {
-
+extern "C"
+{
 #include <libavformat/avformat.h>
 
 } // extern "C"
@@ -466,7 +467,7 @@ bool QnAviArchiveDelegate::open(
         if (m_formatContext == nullptr)
             return false;
 
-        m_IOContext = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
+        m_IOContext = nx::utils::media::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
         if (!m_IOContext)
         {
             close();
@@ -500,7 +501,7 @@ void QnAviArchiveDelegate::close()
 {
     if (m_IOContext)
     {
-        QnFfmpegHelper::closeFfmpegIOContext(m_IOContext);
+        nx::utils::media::closeFfmpegIOContext(m_IOContext);
         if (m_formatContext)
             m_formatContext->pb = nullptr;
         m_IOContext = nullptr;

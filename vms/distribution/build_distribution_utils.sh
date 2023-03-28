@@ -383,6 +383,9 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         libnx_vms_api
         libnx_analytics_db
         libnx_vms_common
+        libnx_codec
+        libnx_rtp
+        libnx_media_core
         libnx_vms_rules
         libnx_vms_update
         libonvif

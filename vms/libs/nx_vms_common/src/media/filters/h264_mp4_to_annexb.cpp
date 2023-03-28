@@ -8,11 +8,11 @@
 
 #include <array>
 
-#include <utils/media/nalUnits.h>
-#include <utils/media/hevc/hevc_decoder_configuration_record.h>
-#include <nx/utils/log/log.h>
+#include <nx/codec/hevc/hevc_decoder_configuration_record.h>
+#include <nx/codec/nal_units.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/network/socket_common.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 

@@ -9,6 +9,8 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/bit_stream.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/qmetaobject_helper.h>
 #include <nx/utils/qset.h>
 #include <nx/utils/random.h>
@@ -23,8 +25,6 @@
 #include <transaction/ubjson_transaction_serializer.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
-#include <utils/math/math.h>
-#include <utils/media/bitStream.h>
 
 namespace nx {
 namespace p2p {
@@ -784,7 +784,7 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
     m_lastPeerInfoTimer.restart();
 
     std::set<PeerNumberType> numbersToResolve;
-    BitStreamReader reader((const quint8*)data.data(), data.size());
+    nx::utils::BitStreamReader reader((const quint8*)data.data(), data.size());
     for (const auto& peer: peers)
     {
         if (context(connection)->decode(peer.peerNumber).isNull())

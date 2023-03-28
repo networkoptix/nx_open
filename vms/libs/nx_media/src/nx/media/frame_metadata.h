@@ -2,11 +2,10 @@
 
 #pragma once
 
-
 #include <QtMultimedia/QVideoFrame>
 
+#include <nx/media/video_data_packet.h>
 #include <nx/reflect/instrument.h>
-#include <nx/streaming/video_data_packet.h>
 
 #include "media_fwd.h"
 

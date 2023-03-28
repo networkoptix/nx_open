@@ -6,13 +6,12 @@
 #include <cassert>
 #include <functional>
 
-#include <common/common_globals.h>
-
 #include <QtCore/QVector>
 
-#include "math.h"
-#include "linear_combination.h"
+#include <common/common_globals.h>
+#include <nx/utils/math/math.h>
 
+#include "linear_combination.h"
 
 template<class T>
 class QnInterpolator {

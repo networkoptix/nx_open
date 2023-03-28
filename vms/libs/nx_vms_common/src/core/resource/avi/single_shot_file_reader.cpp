@@ -5,8 +5,8 @@
 #include <common/common_module.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/storage_resource.h>
-#include <nx/streaming/config.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/config.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/vms/common/application_context.h>
 #include <utils/common/synctime.h>
 

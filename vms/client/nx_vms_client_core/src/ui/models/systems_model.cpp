@@ -7,13 +7,13 @@
 #include <network/system_description.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
-#include <utils/math/math.h>
 
 #include "abstract_systems_controller.h"
 #include "system_hosts_model.h"

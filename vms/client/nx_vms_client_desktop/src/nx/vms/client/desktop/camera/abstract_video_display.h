@@ -4,9 +4,8 @@
 
 #include <functional>
 
+#include <nx/media/media_data_packet.h>
 #include <nx/utils/uuid.h>
-#include <nx/streaming/media_data_packet.h>
-
 
 namespace nx::vms::client::desktop
 {

@@ -7,8 +7,8 @@
 #include <QtGui/QRegion>
 
 #include <core/resource/motion_window.h>
+#include <nx/media/motion_detection.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
-#include <motion/motion_detection.h>
 
 namespace nx::vms::client::desktop {
 

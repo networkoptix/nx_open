@@ -4,8 +4,8 @@
 
 #include <QtCore/QRectF>
 
-#include <utils/math/math.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
 
 namespace {
 

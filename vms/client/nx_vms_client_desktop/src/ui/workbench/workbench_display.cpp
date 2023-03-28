@@ -27,6 +27,7 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -81,7 +82,6 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/util.h>
 #include <utils/math/color_transformations.h>
-#include <utils/math/math.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "workbench_access_controller.h"

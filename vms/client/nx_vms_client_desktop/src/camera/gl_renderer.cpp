@@ -8,6 +8,7 @@
 #include <QtWidgets/QErrorMessage>
 
 #include <camera/client_video_camera.h>
+#include <nx/media/sse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -24,7 +25,6 @@
 #include <utils/color_space/image_correction.h>
 #include <utils/color_space/yuvconvert.h>
 #include <utils/common/util.h>
-#include <utils/media/sse_helper.h>
 
 using nx::vms::client::core::Geometry;
 using namespace nx::vms::client::desktop;

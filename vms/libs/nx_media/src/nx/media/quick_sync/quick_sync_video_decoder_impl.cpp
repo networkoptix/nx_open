@@ -1,22 +1,21 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "quick_sync_video_decoder_impl.h"
 
 #include <deque>
+#include <sysmem_allocator.h>
 #include <thread>
 
 #include <QtMultimedia/QVideoFrame>
 
-#include <utils/media/nalUnits.h>
+#include <media/filters/h264_mp4_to_annexb.h>
+#include <nx/codec/nal_units.h>
 #include <nx/utils/log/log.h>
 
-#include <sysmem_allocator.h>
+#include "compatibility_cache.h"
+#include "mfx_status_string.h"
 #include "mfx_sys_qt_video_buffer.h"
 #include "qt_video_buffer.h"
-#include "mfx_status_string.h"
-#include "compatibility_cache.h"
-#include <media/filters/h264_mp4_to_annexb.h>
 
 namespace nx::media::quick_sync {
 

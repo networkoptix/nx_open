@@ -5,7 +5,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/streaming/audio_data_packet.h>
+#include <nx/media/audio_data_packet.h>
 
 #include "abstract_audio_decoder.h"
 

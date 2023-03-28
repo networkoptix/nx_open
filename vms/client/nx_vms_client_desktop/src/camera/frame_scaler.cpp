@@ -2,9 +2,9 @@
 
 #include "frame_scaler.h"
 
-#include "utils/media/sse_helper.h"
-#include "utils/math/math.h"
+#include <nx/media/sse_helper.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/math/math.h>
 
 extern "C" {
 #include <libavutil/pixdesc.h>
@@ -242,8 +242,8 @@ void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOut
     {
         if (!dst->reallocate(scaledWidth, scaledHeight, src->format))
         {
-            NX_WARNING(NX_SCOPE_TAG, 
-                "Can't allocate image. Size: %1x%2, format: %3", 
+            NX_WARNING(NX_SCOPE_TAG,
+                "Can't allocate image. Size: %1x%2, format: %3",
                 scaledWidth, scaledHeight, src->format);
             return;
         }

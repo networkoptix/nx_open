@@ -4,15 +4,16 @@
 
 #include <deque>
 
-#include <QtMultimedia/QVideoFrame>
 #include <QtCore/QMutexLocker>
+#include <QtMultimedia/QVideoFrame>
+
+#include <nx/media/h264_utils.h>
+#include <nx/media/utils.h>
+#include <nx/utils/log/log.h>
 
 #include "abstract_video_decoder.h"
-#include "video_decoder_registry.h"
 #include "frame_metadata.h"
-#include <utils/media/utils.h>
-#include <utils/media/h264_utils.h>
-#include <nx/utils/log/log.h>
+#include "video_decoder_registry.h"
 
 namespace nx {
 namespace media {

@@ -5,14 +5,17 @@
 #include <atomic>
 #include <memory>
 
-extern "C" {
+#include <QtCore/QSharedPointer>
+#include <QtCore/QSize>
 
+extern "C"
+{
 #include <libavcodec/avcodec.h>
 
 } // extern "C"
 
-#include <nx/streaming/media_data_packet.h>
-#include <utils/media/ffmpeg_helper.h>
+#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/media_data_packet.h>
 
 enum class MemoryType
 {

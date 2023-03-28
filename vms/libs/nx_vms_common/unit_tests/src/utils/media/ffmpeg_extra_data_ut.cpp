@@ -2,9 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/media/h264_utils.h>
-#include <utils/media/hevc/hevc_decoder_configuration_record.h>
-
+#include <nx/codec/hevc/hevc_decoder_configuration_record.h>
+#include <nx/media/h264_utils.h>
 
 TEST(media, build_extradata_h264)
 {

@@ -378,17 +378,16 @@ void ExportStorageStreamRecorder::onFlush(StorageContext& /*context*/)
     }
 }
 
-nx::recording::Error::Code toRecordingError(nx::vms::common::MediaStreamEvent code)
+nx::recording::Error::Code toRecordingError(nx::media::StreamEvent code)
 {
-    using namespace nx::vms::common;
     switch (code)
     {
-        case MediaStreamEvent::tooManyOpenedConnections:
-        case MediaStreamEvent::forbiddenWithDefaultPassword:
-        case MediaStreamEvent::forbiddenWithNoLicense:
-        case MediaStreamEvent::oldFirmware:
+        case nx::media::StreamEvent::tooManyOpenedConnections:
+        case nx::media::StreamEvent::forbiddenWithDefaultPassword:
+        case nx::media::StreamEvent::forbiddenWithNoLicense:
+        case nx::media::StreamEvent::oldFirmware:
             return nx::recording::Error::Code::temporaryUnavailable;
-        case MediaStreamEvent::cannotDecryptMedia:
+        case nx::media::StreamEvent::cannotDecryptMedia:
             return nx::recording::Error::Code::encryptedArchive;
         default:
             return nx::recording::Error::Code::unknown;
@@ -431,7 +430,7 @@ bool ExportStorageStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md
         if (metadata->metadataType == MetadataType::MediaStreamEvent)
         {
             auto packet = metadata->toMediaEventPacket();
-            if (packet.code != nx::vms::common::MediaStreamEvent::noEvent)
+            if (packet.code != nx::media::StreamEvent::noEvent)
             {
                 setLastError(toRecordingError(packet.code));
                 return false;

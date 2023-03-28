@@ -2,6 +2,8 @@
 
 #include "desktop_data_provider_base.h"
 
+#include <nx/media/sse_helper.h>
+
 namespace nx::vms::client::core {
 
 DesktopDataProviderBase::DesktopDataProviderBase(const QnResourcePtr& ptr):

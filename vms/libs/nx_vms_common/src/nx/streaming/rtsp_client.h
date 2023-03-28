@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
 #include <chrono>
+#include <memory>
 #include <optional>
+#include <vector>
 
 #include <QtNetwork/QAuthenticator>
 
@@ -19,20 +19,18 @@ extern "C"
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrl>
 
-#include <nx/network/socket.h>
-#include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/streaming/rtp/rtcp.h>
-#include <nx/streaming/sdp.h>
+#include <nx/network/rtsp/rtsp_types.h>
+#include <nx/network/socket.h>
+#include <nx/rtp/rtcp.h>
+#include <nx/rtp/sdp.h>
 #include <nx/streaming/udp_socket_pair.h>
-#include <nx/utils/elapsed_timer.h>
-
 #include <nx/string.h>
-#include <utils/common/threadqueue.h>
-#include <utils/common/byte_array.h>
-#include <utils/camera/camera_diagnostics.h>
-
+#include <nx/utils/byte_array.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/vms/api/types/rtp_types.h>
+#include <utils/camera/camera_diagnostics.h>
+#include <utils/common/threadqueue.h>
 
 class QnRtspClient;
 
@@ -57,8 +55,8 @@ public:
 
     virtual ~QnRtspIoDevice();
     virtual qint64 read(char * data, qint64 maxSize );
-    const nx::streaming::rtp::RtcpSenderReport& getSenderReport() { return m_senderReport; }
-    void setSenderReport(const nx::streaming::rtp::RtcpSenderReport& value) { m_senderReport = value; }
+    const nx::rtp::RtcpSenderReport& getSenderReport() { return m_senderReport; }
+    void setSenderReport(const nx::rtp::RtcpSenderReport& value) { m_senderReport = value; }
     nx::network::AbstractCommunicatingSocket* getMediaSocket();
     nx::streaming::rtsp::UdpSocketPair& getUdpSockets() { return m_udpSockets; }
     void shutdown();
@@ -87,7 +85,7 @@ private:
     nx::vms::api::RtpTransportType m_transport = nx::vms::api::RtpTransportType::automatic;
 
     nx::streaming::rtsp::UdpSocketPair m_udpSockets;
-    nx::streaming::rtp::RtcpSenderReport m_senderReport;
+    nx::rtp::RtcpSenderReport m_senderReport;
 
     quint16 m_remoteMediaPort = 0;
     quint16 m_remoteRtcpPort = 0;
@@ -139,7 +137,7 @@ public:
     {
         SDPTrackInfo() = default;
         SDPTrackInfo(
-            const nx::streaming::Sdp::Media& sdpMedia,
+            const nx::rtp::Sdp::Media& sdpMedia,
             QnRtspClient* owner,
             nx::vms::api::RtpTransportType transport,
             int serverPort)
@@ -150,7 +148,7 @@ public:
             ioDevice->setHostAddress(nx::network::HostAddress(owner->getUrl().host().toStdString()));
         }
         bool setupSuccess = false;
-        nx::streaming::Sdp::Media sdpMedia;
+        nx::rtp::Sdp::Media sdpMedia;
         QPair<int, int> interleaved{ -1, -1 };
         std::shared_ptr<QnRtspIoDevice> ioDevice;
     };
@@ -201,7 +199,7 @@ public:
     // session timeout in ms
     unsigned int sessionTimeoutMs();
 
-    const nx::streaming::Sdp& getSdp() const;
+    const nx::rtp::Sdp& getSdp() const;
 
     void sendKeepAliveIfNeeded();
 
@@ -237,7 +235,7 @@ public:
 
     void setAdditionAttribute(const QByteArray& name, const QByteArray& value);
     void removeAdditionAttribute(const QByteArray& name);
-    void setPreferredMap(const nx::streaming::Sdp::RtpMap& map);
+    void setPreferredMap(const nx::rtp::Sdp::RtpMap& map);
 
     std::chrono::milliseconds getTCPTimeout() const;
 
@@ -262,12 +260,12 @@ public:
 
     void setProxyAddr(const nx::String& addr, int port);
 
-    QStringList getSdpByType(nx::streaming::Sdp::MediaType mediaType) const;
-    int getTrackCount(nx::streaming::Sdp::MediaType mediaType) const;
+    QStringList getSdpByType(nx::rtp::Sdp::MediaType mediaType) const;
+    int getTrackCount(nx::rtp::Sdp::MediaType mediaType) const;
 
     // Control what media streams will be opened during setup. All types enabled by default
-    void setMediaTypeEnabled(nx::streaming::Sdp::MediaType mediaType, bool enabled);
-    bool isMediaTypeEnabled(nx::streaming::Sdp::MediaType mediaType) const;
+    void setMediaTypeEnabled(nx::rtp::Sdp::MediaType mediaType, bool enabled);
+    bool isMediaTypeEnabled(nx::rtp::Sdp::MediaType mediaType) const;
 
     /*
     * Demuxe RTSP binary data
@@ -283,11 +281,11 @@ public:
     * @param channelNumber buffer number
     * @return amount of readed bytes
     */
-    int readBinaryResponse(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
+    int readBinaryResponse(std::vector<nx::utils::ByteArray*>& demuxedData, int& channelNumber);
 
     void sendBynaryResponse(const quint8* buffer, int size);
     void setPlayNowModeAllowed(bool value);
-    static quint8* prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve);
+    static quint8* prepareDemuxedData(std::vector<nx::utils::ByteArray*>& demuxedData, int channel, int reserve);
 
     QString getVideoLayout() const;
     nx::network::AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
@@ -361,11 +359,11 @@ private:
     bool m_playNowMode = false;
     // end of initialized fields
 
-    std::set<nx::streaming::Sdp::MediaType> m_disabledMediaTypes;
+    std::set<nx::rtp::Sdp::MediaType> m_disabledMediaTypes;
 
     quint8* m_responseBuffer;
     int m_responseBufferLen;
-    nx::streaming::Sdp m_sdp;
+    nx::rtp::Sdp m_sdp;
 
     std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
     nx::utils::Url m_url;

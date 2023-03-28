@@ -4,10 +4,10 @@
 
 #include <core/resource/avi/avi_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
-#include <nx/vms/client/core/motion/motion_grid.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
-#include <nx/streaming/config.h>
+#include <nx/media/config.h>
+#include <nx/vms/client/core/motion/motion_grid.h>
 #include <utils/common/delayed.h>
 
 namespace nx::vms::client::core {

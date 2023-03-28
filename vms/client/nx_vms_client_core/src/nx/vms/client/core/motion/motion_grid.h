@@ -5,8 +5,8 @@
 #include <array>
 #include <climits>
 
-#include <nx/streaming/config.h>
-#include <motion/motion_detection.h>
+#include <nx/media/config.h>
+#include <nx/media/motion_detection.h>
 
 class QPoint;
 class QRect;

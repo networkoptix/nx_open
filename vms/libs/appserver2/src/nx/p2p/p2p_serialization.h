@@ -1,22 +1,21 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#pragma  once
-
-#include "p2p_fwd.h"
-
-#include <utils/media/bitStream.h>
+#pragma once
 
 #include <nx/network/http/http_types.h>
+#include <nx/utils/bit_stream.h>
 #include <nx/vms/api/data/tran_state_data.h>
+
+#include "p2p_fwd.h"
 
 namespace nx {
 namespace p2p {
 
-void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNumber);
-PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader);
+void serializeCompressPeerNumber(nx::utils::BitStreamWriter& writer, PeerNumberType peerNumber);
+PeerNumberType deserializeCompressPeerNumber(nx::utils::BitStreamReader& reader);
 
-void serializeCompressedSize(BitStreamWriter& writer, quint32 size);
-quint32 deserializeCompressedSize(BitStreamReader& reader);
+void serializeCompressedSize(nx::utils::BitStreamWriter& writer, quint32 size);
+quint32 deserializeCompressedSize(nx::utils::BitStreamReader& reader);
 
 QByteArray serializePeersMessage(const std::vector<PeerDistanceRecord>& records, int reservedSpaceAtFront = 1);
 std::vector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success);

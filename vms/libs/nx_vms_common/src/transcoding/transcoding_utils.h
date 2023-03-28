@@ -4,13 +4,14 @@
 
 #include <stdint.h>
 
-#include <QtCore/QString>
 #include <QtCore/QIODevice>
+#include <QtCore/QString>
 
 #include <core/resource/resource_media_layout.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/video_data_packet.h>
 
-extern "C" {
+extern "C"
+{
 #include <libavformat/avio.h>
 }
 

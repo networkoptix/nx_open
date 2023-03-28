@@ -5,12 +5,10 @@
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 
-#include <utils/math/math.h>
 #include <core/ptz/ptz_limits.h>
-
-
-#include <nx/utils/math/fuzzy.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/math/fuzzy.h>
+#include <nx/utils/math/math.h>
 
 #include "component.h"
 #include "limits_type.h"

@@ -6,12 +6,13 @@
 
 #include <QtCore/QSize>
 
-#include <nx/streaming/media_data_packet.h>
-#include <nx/media/media_player.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
+#include <nx/media/media_data_packet.h>
+#include <nx/media/media_player.h>
 
-extern "C" {
+extern "C"
+{
 #include <libavcodec/avcodec.h>
 } // extern "C"
 

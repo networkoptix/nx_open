@@ -19,6 +19,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <finders/systems_finder.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/desktop/common/widgets/screen_recording_indicator.h>
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -41,7 +42,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
-#include <utils/math/math.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;

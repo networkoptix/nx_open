@@ -14,8 +14,8 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 #include <motion/abstract_motion_archive.h>
+#include <nx/media/abstract_data_packet.h>
 #include <nx/reflect/instrument.h>
-#include <nx/streaming/abstract_data_packet.h>
 #include <nx/string.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/resource_types.h>

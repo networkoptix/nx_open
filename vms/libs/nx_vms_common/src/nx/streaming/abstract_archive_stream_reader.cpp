@@ -4,7 +4,7 @@
 
 #include <core/resource/media_resource.h>
 #include <media/filters/abstract_media_data_filter.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/utils/log/log.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>

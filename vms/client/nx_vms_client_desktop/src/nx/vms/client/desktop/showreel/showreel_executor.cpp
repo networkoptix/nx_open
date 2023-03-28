@@ -5,6 +5,7 @@
 #include <QtCore/QTimerEvent>
 
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
@@ -19,7 +20,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <utils/math/math.h>
 
 namespace {
 

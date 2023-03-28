@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <QCoreApplication>
+#include <stdint.h>
 
-#include "transcoder.h"
+#include <nx/media/ffmpeg_helper.h>
+#include <nx/utils/byte_array.h>
+
 #include "ffmpeg_audio_resampler.h"
-#include <utils/common/byte_array.h>
-#include <utils/media/ffmpeg_helper.h>
+#include "transcoder.h"
 
 /**
  * Transcodes audio packets from one format to another.

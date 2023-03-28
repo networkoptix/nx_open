@@ -5,9 +5,10 @@
 ////////////////////////////////////////////////////////////
 #pragma once
 
+#include <nx/media/media_data_packet.h>
+#include <nx/media/video_data_packet.h>
+
 #include "abstract_media_data_filter.h"
-#include <nx/streaming/media_data_packet.h>
-#include <nx/streaming/video_data_packet.h>
 
 //!Converts h.264/h.265 stream from avc file format (mpeg4 part 15) to mpeg 4 annex b
 /*!

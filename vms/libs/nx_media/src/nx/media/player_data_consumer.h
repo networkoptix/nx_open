@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include <deque>
 #include <atomic>
+#include <deque>
 #include <functional>
 
-#include <utils/media/externaltimesource.h>
-#include <nx/streaming/abstract_data_consumer.h>
-#include <nx/streaming/video_data_packet.h>
-#include <nx/streaming/audio_data_packet.h>
-#include <nx/media/media_fwd.h>
+#include <nx/media/audio_data_packet.h>
 #include <nx/media/audio_output.h>
+#include <nx/media/media_fwd.h>
+#include <nx/media/video_data_packet.h>
+#include <nx/streaming/abstract_data_consumer.h>
+#include <utils/media/externaltimesource.h>
 
 class QnArchiveStreamReader;
 
@@ -93,7 +93,7 @@ public:
 
     void setPlaySpeed(double value);
 
-    nx::vms::common::MediaStreamEventPacket mediaEvent() const;
+    nx::media::StreamEventPacket mediaEvent() const;
 
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress. */
@@ -203,7 +203,7 @@ private:
     std::atomic<bool> m_allowOverlay;
     std::atomic<bool> m_allowHardwareAcceleration {false};
     std::atomic<double> m_speed;
-    nx::vms::common::MediaStreamEventPacket m_mediaEvent;
+    nx::media::StreamEventPacket m_mediaEvent;
     RenderContextSynchronizerPtr m_renderContextSynchronizer;
     const QnArchiveStreamReader* m_archiveReader = nullptr;
 };

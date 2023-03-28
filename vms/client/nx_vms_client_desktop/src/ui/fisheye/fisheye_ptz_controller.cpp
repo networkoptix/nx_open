@@ -7,20 +7,15 @@
 #include <QtCore/QThread>
 
 #include <common/common_meta_types.h>
-
-#include <utils/math/math.h>
-#include <utils/math/linear_combination.h>
-
-#include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
-
+#include <core/resource/media_resource.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
-
 #include <ui/workbench/workbench_item.h>
-
-#include <nx/utils/log/log.h>
-#include <nx/utils/log/assert.h>
+#include <utils/math/linear_combination.h>
 
 using namespace nx::core;
 using namespace nx::vms::api;
@@ -512,4 +507,3 @@ Vector QnFisheyePtzController::positionFromRect(
         0.0, //< Rotation is not implemented.
         qRadiansToDegrees(fov));
 }
-

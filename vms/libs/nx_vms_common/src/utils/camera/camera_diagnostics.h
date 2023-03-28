@@ -6,8 +6,8 @@
 #include <QString>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/media/stream_event.h>
 #include <nx/utils/url.h>
-#include <nx/vms/common/globals/media_stream_event.h>
 
 //!Holds types related to performing camera availability diagnostics
 namespace CameraDiagnostics {
@@ -113,7 +113,7 @@ public:
     explicit operator bool() const;
     QString toString(QnResourcePool* resourcePool) const;
     QString toString(QnResourcePool* resourcePool, const QnVirtualCameraResourcePtr& device) const;
-    nx::vms::common::MediaStreamEvent toMediaStreamEvent() const;
+    nx::media::StreamEvent toMediaStreamEvent() const;
 protected:
     QString urlToStr(const nx::utils::Url& value) const;
 };

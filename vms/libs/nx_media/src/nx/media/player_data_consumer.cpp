@@ -5,16 +5,16 @@
 #include <algorithm>
 
 #include <core/resource/media_resource.h>
-#include <nx/streaming/archive_stream_reader.h>
-#include <nx/streaming/media_data_packet.h>
-#include <nx/utils/log/log.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/media/media_data_packet.h>
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/utils/log/log.h>
 
-#include "seamless_video_decoder.h"
-#include "seamless_audio_decoder.h"
 #include "abstract_audio_decoder.h"
-#include "frame_metadata.h"
 #include "audio_output.h"
+#include "frame_metadata.h"
+#include "seamless_audio_decoder.h"
+#include "seamless_video_decoder.h"
 
 namespace nx {
 namespace media {
@@ -125,7 +125,7 @@ ConstAudioOutputPtr PlayerDataConsumer::audioOutput() const
     return m_audioOutput;
 }
 
-nx::vms::common::MediaStreamEventPacket PlayerDataConsumer::mediaEvent() const
+nx::media::StreamEventPacket PlayerDataConsumer::mediaEvent() const
 {
     return m_mediaEvent;
 }
@@ -135,14 +135,14 @@ void PlayerDataConsumer::updateMediaEvent(const QnAbstractMediaDataPtr& data)
     static const auto getMediaEvent =
         [](const QnAbstractMediaDataPtr& data)
         {
-            nx::vms::common::MediaStreamEventPacket mediaEvent;
+            nx::media::StreamEventPacket mediaEvent;
 
             const auto metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
             if (!metadata || metadata->metadataType != MetadataType::MediaStreamEvent)
                 return mediaEvent;
 
             const auto buffer = QByteArray::fromRawData(metadata->data(), int(metadata->dataSize()));
-            nx::vms::common::deserialize(buffer, &mediaEvent);
+            nx::media::deserialize(buffer, &mediaEvent);
             return mediaEvent;
         };
 

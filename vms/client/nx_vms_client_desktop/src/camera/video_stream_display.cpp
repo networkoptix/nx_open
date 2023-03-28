@@ -17,7 +17,9 @@ extern "C"
 #include <decoders/video/abstract_video_decoder.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/media/quick_sync/qsv_supported.h>
+#include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -27,8 +29,6 @@ extern "C"
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <utils/common/adaptive_sleep.h>
-#include <utils/math/math.h>
-#include <utils/media/utils.h>
 
 #ifdef __QSV_SUPPORTED__
 #include <nx/media/nvidia/nvidia_video_decoder_old_player.h>

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/streaming/video_data_packet.h>
-#include <nx/streaming/av_codec_media_context.h>
+#include <nx/media/codec_parameters.h>
+#include <nx/media/video_data_packet.h>
 
 namespace nx::media {
 

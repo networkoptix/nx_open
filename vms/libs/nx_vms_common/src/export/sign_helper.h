@@ -7,7 +7,7 @@
 #include <QtGui/QPainter>
 
 #include <licensing/license_fwd.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/utils/cryptographic_hash.h>
 
 static const char EXPORT_SIGN_MAGIC[] = "RhjrjLbkMxTujHI!";

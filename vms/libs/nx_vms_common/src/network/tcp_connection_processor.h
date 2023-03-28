@@ -10,9 +10,9 @@
 #include <nx/network/socket.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/string.h>
+#include <nx/utils/byte_array.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/common/byte_array.h>
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
@@ -65,7 +65,7 @@ public:
     int checkForBinaryProtocol(const QByteArray& message);
     bool isBinaryProtocol() const;
 
-    bool sendChunk(const QnByteArray& chunk);
+    bool sendChunk(const nx::utils::ByteArray& chunk);
     bool sendChunk(const QByteArray& chunk);
     bool sendChunk(const nx::Buffer& chunk);
     bool sendChunk(const char* data, int size);
@@ -76,7 +76,7 @@ public:
     nx::utils::Url getDecodedUrl() const;
 
     bool sendBuffer(
-        const QnByteArray& sendBuffer, std::optional<int64_t> timestampForLogging = std::nullopt);
+        const nx::utils::ByteArray& sendBuffer, std::optional<int64_t> timestampForLogging = std::nullopt);
 
     bool sendBuffer(
         const QByteArray& sendBuffer, std::optional<int64_t> timestampForLogging = std::nullopt);
@@ -122,7 +122,7 @@ protected:
     std::pair<nx::String, nx::String> generateErrorResponse(
         nx::network::http::StatusCode::Value errorCode, const nx::String& errorDetails = {}) const;
 
-    //QnByteArray& getSendBuffer();
+    //nx::utils::ByteArray& getSendBuffer();
     //void bufferData(const char* data, int size);
     //void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
     //void clearBuffer();

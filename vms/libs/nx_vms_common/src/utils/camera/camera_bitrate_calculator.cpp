@@ -2,11 +2,11 @@
 
 #include "camera_bitrate_calculator.h"
 
-#include <core/resource/camera_resource.h>
-#include <utils/math/math.h>
-
 #include <QtCore/QMap>
 #include <QtCore/QString>
+
+#include <core/resource/camera_resource.h>
+#include <nx/utils/math/math.h>
 
 namespace {
 

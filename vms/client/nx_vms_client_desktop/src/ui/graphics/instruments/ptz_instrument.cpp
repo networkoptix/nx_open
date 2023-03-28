@@ -14,6 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -40,7 +41,6 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
-#include <utils/math/math.h>
 
 #include "ptz_instrument_p.h"
 #include "ptz_overlay_widget.h"

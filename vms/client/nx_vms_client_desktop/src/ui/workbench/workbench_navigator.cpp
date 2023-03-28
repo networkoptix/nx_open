@@ -31,6 +31,7 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
@@ -65,7 +66,6 @@
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <utils/math/math.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "nx/vms/client/desktop/ui/actions/action_conditions.h"

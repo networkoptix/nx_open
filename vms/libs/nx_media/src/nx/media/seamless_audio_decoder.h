@@ -4,10 +4,10 @@
 
 #include <QtCore/QObject>
 
-#include <nx/streaming/audio_data_packet.h>
-#include "audio_decoder_registry.h"
-#include "abstract_audio_decoder.h"
+#include <nx/media/audio_data_packet.h>
 
+#include "abstract_audio_decoder.h"
+#include "audio_decoder_registry.h"
 #include "media_fwd.h"
 
 namespace nx {

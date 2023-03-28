@@ -4,7 +4,7 @@
 
 #include <camera/gl_renderer.h>
 #include <client/client_runtime_settings.h>
-#include <nx/streaming/config.h>
+#include <nx/media/config.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 

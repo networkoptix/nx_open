@@ -13,8 +13,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/media/media_data_packet.h>
 #include <nx/streaming/abstract_archive_delegate.h>
-#include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/network/remote_connection.h>

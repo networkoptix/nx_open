@@ -6,10 +6,10 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_media_layout.h>
-#include <nx/streaming/config.h>
-#include <nx/streaming/media_data_packet.h>
+#include <nx/media/config.h>
+#include <nx/media/media_data_packet.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/streaming/nx_streaming_ini.h>
-#include <nx/streaming/video_data_packet.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/time_helper.h>
 #include <utils/common/sleep.h>

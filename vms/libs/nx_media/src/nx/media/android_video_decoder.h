@@ -6,7 +6,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/video_data_packet.h>
 
 #include "abstract_video_decoder.h"
 

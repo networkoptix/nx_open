@@ -18,6 +18,7 @@
 #include <core/resource/motion_window.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/core/watermark/watermark.h>
+#include <nx/media/sse_helper.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/dewarping_data.h>
@@ -32,7 +33,6 @@
 #include <ui/common/speed_range.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/help/help_topics.h>
-#include <utils/media/sse_helper.h>
 
 #include "resource_widget.h"
 

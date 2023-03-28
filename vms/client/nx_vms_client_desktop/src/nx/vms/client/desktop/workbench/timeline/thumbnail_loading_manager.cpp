@@ -2,8 +2,8 @@
 
 #include "thumbnail_loading_manager.h"
 
-#include <utils/math/math.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/math/math.h>
 #include <recording/time_period_list.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>

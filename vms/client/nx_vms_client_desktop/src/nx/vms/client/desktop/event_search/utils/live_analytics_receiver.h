@@ -6,7 +6,7 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/streaming/media_data_packet.h>
+#include <nx/media/meta_data_packet.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 

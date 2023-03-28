@@ -3,8 +3,8 @@
 #include "audio_stream_display.h"
 
 #include <nx/audio/audiodevice.h>
-#include <nx/audio/processor.h>
-#include <nx/streaming/config.h>
+#include <nx/media/audio/processor.h>
+#include <nx/media/config.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -141,7 +141,7 @@ void QnAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 min
     //    m_audioQueue.dequeue()->releaseRef();
 }
 
-bool QnAudioStreamDisplay::initFormatConvertRule(nx::audio::Format format)
+bool QnAudioStreamDisplay::initFormatConvertRule(nx::media::audio::Format format)
 {
     // TODO: Almost the same code is located in the audio_output.cpp:getCompatibleFormat method.
 
@@ -158,9 +158,9 @@ bool QnAudioStreamDisplay::initFormatConvertRule(nx::audio::Format format)
     if (nx::audio::Sound::isFormatSupported(format))
         return true;
 
-    if (format.sampleType == nx::audio::Format::SampleType::floatingPoint)
+    if (format.sampleType == nx::media::audio::Format::SampleType::floatingPoint)
     {
-        format.sampleType = nx::audio::Format::SampleType::signedInt;
+        format.sampleType = nx::media::audio::Format::SampleType::signedInt;
         if (nx::audio::Sound::isFormatSupported(format))
         {
             m_sampleConvertMethod = SampleConvertMethod::float2Int32;
@@ -275,7 +275,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
             return;
 
         // convert format
-        nx::audio::Format audioFormat = nx::audio::formatFromMediaContext(data->context);
+        nx::media::audio::Format audioFormat = nx::media::audio::formatFromMediaContext(data->context);
         if (!m_isConvertMethodInitialized)
         {
             if (m_sound)
@@ -290,13 +290,13 @@ void QnAudioStreamDisplay::playCurrentBuffer()
                 return; //< can play audio
         }
         if (m_sampleConvertMethod == SampleConvertMethod::float2Int32)
-            audioFormat = nx::audio::Processor::float2int32(m_decodedAudioBuffer, audioFormat);
+            audioFormat = nx::media::audio::Processor::float2int32(m_decodedAudioBuffer, audioFormat);
         else if (m_sampleConvertMethod == SampleConvertMethod::float2Int16)
-            audioFormat = nx::audio::Processor::float2int16(m_decodedAudioBuffer, audioFormat);
+            audioFormat = nx::media::audio::Processor::float2int16(m_decodedAudioBuffer, audioFormat);
         else if (m_sampleConvertMethod == SampleConvertMethod::int32ToInt16)
-            audioFormat = nx::audio::Processor::int32Toint16(m_decodedAudioBuffer, audioFormat);
+            audioFormat = nx::media::audio::Processor::int32Toint16(m_decodedAudioBuffer, audioFormat);
         if (audioFormat.channelCount > 2 && m_downmixing)
-            audioFormat = nx::audio::Processor::downmix(m_decodedAudioBuffer, audioFormat);
+            audioFormat = nx::media::audio::Processor::downmix(m_decodedAudioBuffer, audioFormat);
 
         //resume(); //< does nothing if resumed already
 

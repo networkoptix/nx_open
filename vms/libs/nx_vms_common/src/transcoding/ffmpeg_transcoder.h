@@ -7,12 +7,12 @@ extern "C"
 #include <libavcodec/avcodec.h>
 }
 
+#include <export/signer.h>
 #include <nx/utils/cryptographic_hash.h>
+
+#include "decoders/video/ffmpeg_video_decoder.h"
 #include "transcoder.h"
 #include "utils/media/frame_info.h"
-#include "decoders/video/ffmpeg_video_decoder.h"
-#include "decoders/video/ffmpeg_video_decoder.h"
-#include <export/signer.h>
 
 class QnLicensePool;
 
@@ -65,7 +65,7 @@ public:
 
 protected:
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media) override;
-    virtual int finalizeInternal(QnByteArray* const result) override;
+    virtual int finalizeInternal(nx::utils::ByteArray* const result) override;
 
 private:
     //friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);

@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <nx/utils/thread/long_runnable.h>
 #include <common/common_globals.h>
-#include <nx/streaming/abstract_data_packet.h>
-#include <core/resource/resource_media_layout.h>
-#include <utils/common/from_this_to_shared.h>
-#include <nx/utils/lockable.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_media_layout.h>
+#include <nx/media/abstract_data_packet.h>
+#include <nx/utils/lockable.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <utils/common/from_this_to_shared.h>
 
 class QnAbstractStreamDataProvider;
 class QnResource;

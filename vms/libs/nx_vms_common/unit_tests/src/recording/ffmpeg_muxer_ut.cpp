@@ -2,11 +2,12 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/log/log.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
+#include <nx/utils/log/log.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
 
-extern "C" {
+extern "C"
+{
 #include <libavformat/avformat.h>
 } // extern "C"
 
@@ -126,7 +127,7 @@ TEST(FfmpegAudioDecoder, decodingG726)
     // Media player decoder.
     {
         QnCompressedAudioDataPtr audioDataPtr = audioData;
-        QnByteArray result;
+        nx::utils::ByteArray result;
         QnFfmpegAudioDecoder decoder(audioDataPtr);
         ASSERT_TRUE(decoder.isInitialized());
         for (int i = 0; i < 10; ++i)

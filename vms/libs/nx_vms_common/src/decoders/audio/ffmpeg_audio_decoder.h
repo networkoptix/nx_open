@@ -2,8 +2,9 @@
 
 #pragma once
 
+#include <nx/media/ffmpeg_helper.h>
+
 #include "abstract_audio_decoder.h"
-#include <utils/media/ffmpeg_helper.h>
 
 /**
  * Client of this class is responsible for encoded data buffer meet ffmpeg restrictions (see the
@@ -15,7 +16,7 @@ public:
     QnFfmpegAudioDecoder(const QnCompressedAudioDataPtr& data);
     virtual ~QnFfmpegAudioDecoder() override;
 
-    virtual bool decode(QnCompressedAudioDataPtr& data, QnByteArray& result) override;
+    virtual bool decode(QnCompressedAudioDataPtr& data, nx::utils::ByteArray& result) override;
 
     bool isInitialized() const;
 

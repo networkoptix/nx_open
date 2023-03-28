@@ -7,17 +7,14 @@
 #include <QtCore/QSharedPointer>
 #include <QtGui/QOpenGLFunctions>
 #include <QtOpenGL/QOpenGLBuffer>
-#include <QtOpenGL/QOpenGLVertexArrayObject>
 #include <QtOpenGL/QOpenGLFramebufferObject>
-
-#include <utils/media/frame_info.h>
-#include <nx/streaming/media_data_packet.h> //< For QnMetaDataV1Ptr.
+#include <QtOpenGL/QOpenGLVertexArrayObject>
 
 #include <client/client_globals.h>
-
-#include <ui/graphics/opengl/gl_functions.h>
-
+#include <nx/media/media_data_packet.h> //< For QnMetaDataV1Ptr.
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
+#include <ui/graphics/opengl/gl_functions.h>
+#include <utils/media/frame_info.h>
 
 class CLVideoDecoderOutput;
 class ScreenshotInterface;

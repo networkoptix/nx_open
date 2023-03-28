@@ -2,11 +2,11 @@
 
 #include "week_time_schedule_dialog.h"
 
+#include <nx/utils/bit_stream.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/schedule_cell_painter.h>
 #include <nx/vms/common/utils/schedule.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <utils/media/bitStream.h>
 
 #include "ui_week_time_schedule_dialog.h"
 
@@ -46,7 +46,7 @@ WeekTimeScheduleDialog::~WeekTimeScheduleDialog()
 QByteArray WeekTimeScheduleDialog::schedule() const
 {
     QByteArray buffer(24, 0); // qPower2Floor(24*7/8, 4)
-    BitStreamWriter writer;
+    nx::utils::BitStreamWriter writer;
     writer.setBuffer((uint8_t*) buffer.data(), buffer.size());
 
     for (const auto dayOfWeek: nx::vms::common::daysOfWeek())
@@ -69,7 +69,7 @@ void WeekTimeScheduleDialog::setSchedule(const QByteArray& schedule)
         return;
     }
 
-    BitStreamReader reader((uint8_t*)schedule.data(), schedule.size());
+    nx::utils::BitStreamReader reader((uint8_t*)schedule.data(), schedule.size());
 
     for (const auto dayOfWeek: nx::vms::common::daysOfWeek())
     {

@@ -2,16 +2,14 @@
 
 #include "time_period.h"
 
-#include <QtCore/QDebug>
 #include <QtCore/QDateTime>
+#include <QtCore/QDebug>
 #include <QtCore/QtEndian>
 
-#include <utils/math/math.h>
-#include <utils/common/util.h>
-
 #include <nx/fusion/model_functions.h>
-
 #include <nx/utils/datetime.h>
+#include <nx/utils/math/math.h>
+#include <utils/common/util.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTimePeriod,
     (ubjson)(xml)(csv_record), (startTimeMs)(durationMs))

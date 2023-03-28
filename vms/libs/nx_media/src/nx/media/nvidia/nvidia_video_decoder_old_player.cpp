@@ -2,9 +2,9 @@
 
 #include "nvidia_video_decoder_old_player.h"
 
-#include <utils/media/utils.h>
-#include <nx/utils/log/log.h>
 #include <nx/media/nvidia/nvidia_video_frame.h>
+#include <nx/media/utils.h>
+#include <nx/utils/log/log.h>
 
 #include "nvidia_video_decoder.h"
 

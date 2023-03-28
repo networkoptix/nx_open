@@ -4,7 +4,7 @@
 
 #include <nx/reflect/compare.h>
 #include <nx/utils/log/assert.h>
-#include <utils/math/math.h>
+#include <nx/utils/math/math.h>
 
 namespace {
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/streaming/media_data_packet.h>
+#include <nx/media/media_data_packet.h>
 #include <nx/utils/cryptographic_hash.h>
 
 class QnLicensePool;

@@ -4,9 +4,10 @@
 
 #include <QtCore/QMap>
 
-#include "abstract_rtsp_encoder.h"
-#include <transcoding/ffmpeg_video_transcoder.h>
 #include <nx/utils/software_version.h>
+#include <transcoding/ffmpeg_video_transcoder.h>
+
+#include "abstract_rtsp_encoder.h"
 
 class NX_VMS_COMMON_API QnRtspFfmpegEncoder: public AbstractRtspEncoder
 {
@@ -18,7 +19,7 @@ public:
     void setCodecContext(const CodecParametersConstPtr& codecParams);
 
     virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
-    virtual bool getNextPacket(QnByteArray& sendBuffer) override;
+    virtual bool getNextPacket(nx::utils::ByteArray& sendBuffer) override;
     virtual void init() override;
     virtual bool isEof() const override { return false; }
 

@@ -9,12 +9,13 @@ extern "C"
 
 #include <QtCore/QDebug>
 
+#include <nx/codec/jpeg/jpeg_utils.h>
+#include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
-#include <utils/media/jpeg_utils.h>
-#include <utils/media/utils.h>
+#include <utils/media/ffmpeg_io_context.h>
 
-#include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
+#include "ffmpeg_video_transcoder.h"
 
 static const int IO_BLOCK_SIZE = 1024*16;
 
@@ -105,7 +106,7 @@ void QnFfmpegTranscoder::closeFfmpegContext()
             av_write_trailer(m_formatCtx);
         if (m_formatCtx->pb)
             m_formatCtx->pb->opaque = 0;
-        QnFfmpegHelper::closeFfmpegIOContext(m_formatCtx->pb);
+        nx::utils::media::closeFfmpegIOContext(m_formatCtx->pb);
         m_formatCtx->pb = nullptr;
         avformat_close_input(&m_formatCtx);
     }
@@ -485,7 +486,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(
     return 0;
 }
 
-int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
+int QnFfmpegTranscoder::finalizeInternal(nx::utils::ByteArray* const /*result*/)
 {
     for (int streamIndex = 0; streamIndex < 2; ++streamIndex)
     {

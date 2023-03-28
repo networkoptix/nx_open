@@ -4,10 +4,10 @@
 
 #include <QtCore/QtMath>
 
-#include <nx/kit/utils.h>
 #include <nx/kit/debug.h>
+#include <nx/kit/utils.h>
 #include <nx/media/media_fwd.h> //< for kMediaAlignment
-#include <utils/math/math.h>
+#include <nx/utils/math/math.h>
 
 static const int kUpdatesPerSecond = 30;
 static const int kFreqStart = 50;

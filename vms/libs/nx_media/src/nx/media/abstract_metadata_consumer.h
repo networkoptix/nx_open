@@ -4,7 +4,7 @@
 
 #include <QtCore/QSharedPointer>
 
-#include <nx/streaming/media_data_packet.h>
+#include <nx/media/meta_data_packet.h>
 
 namespace nx {
 namespace media {

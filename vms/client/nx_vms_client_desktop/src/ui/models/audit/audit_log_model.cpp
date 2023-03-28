@@ -16,6 +16,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
@@ -31,7 +32,6 @@
 #include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
-#include <utils/math/math.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;

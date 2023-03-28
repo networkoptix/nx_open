@@ -2,9 +2,9 @@
 
 #include "ffmpeg_audio_decoder.h"
 
-#include <nx/streaming/audio_data_packet.h>
+#include <nx/media/audio_data_packet.h>
+#include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/log/log_main.h>
-#include <utils/media/ffmpeg_helper.h>
 
 struct AVCodecContext;
 
@@ -55,7 +55,7 @@ QnFfmpegAudioDecoder::~QnFfmpegAudioDecoder(void)
 // some optimized bit stream readers read 32 or 64 bits at once and could read over the end.
 // The end of the input buffer buf should be set to 0 to ensure that no over reading happens for
 // damaged MPEG streams.
-bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& result)
+bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, nx::utils::ByteArray& result)
 {
     result.clear();
 

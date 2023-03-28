@@ -7,16 +7,15 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QStyle>
 
-#include <ui/animation/widget_opacity_animator.h>
-#include <ui/animation/variant_animator.h>
-#include <ui/workbench/workbench_display.h>
-#include <ui/graphics/instruments/instrument_manager.h>
-#include <utils/common/event_processors.h>
-#include <utils/math/math.h>
-
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/desktop/style/style.h>
-#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/workbench/timeline/slider_tooltip.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
+#include <ui/animation/variant_animator.h>
+#include <ui/animation/widget_opacity_animator.h>
+#include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/workbench/workbench_display.h>
+#include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop::workbench::timeline {
 

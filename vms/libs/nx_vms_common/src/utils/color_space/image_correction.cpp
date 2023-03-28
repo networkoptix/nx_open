@@ -4,10 +4,8 @@
 
 #include <memory>
 
-#include <utils/math/math.h>
-
+#include <nx/utils/math/math.h>
 #include <nx/vms/api/data/image_correction_data.h>
-
 
 static const int MIN_GAMMA_RANGE = 6;
 static const float NORM_RANGE_START = 0.0; //16.0

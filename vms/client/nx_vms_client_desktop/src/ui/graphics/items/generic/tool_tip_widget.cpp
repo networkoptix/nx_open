@@ -5,18 +5,18 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
-#include <QtWidgets/QGraphicsSceneEvent>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QStyle>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsSceneEvent>
+#include <QtWidgets/QStyle>
 
-#include <utils/math/math.h>
-#include <utils/common/scoped_painter_rollback.h>
+#include <qt_graphics_items/graphics_label.h>
 
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <ui/common/palette.h>
-#include <qt_graphics_items/graphics_label.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 using nx::vms::client::core::Geometry;
 
@@ -298,4 +298,3 @@ void QnToolTipWidget::ensureShape() const {
     m_boundingRect = borderShape.boundingRect(); // TODO: add m_borderPen.widthF() / 2
     m_shapeValid = true;
 }
-

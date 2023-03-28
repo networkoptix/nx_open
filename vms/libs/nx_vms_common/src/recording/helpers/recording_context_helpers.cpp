@@ -5,14 +5,16 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QtEndian>
 
-#include <utils/media/h264_utils.h>
-#include <utils/media/utils.h>
-#include <utils/media/nalUnits.h>
-#include <utils/media/hevc_common.h>
-#include <utils/media/ffmpeg_helper.h>
+#include <nx/codec/hevc/hevc_common.h>
+#include <nx/codec/nal_units.h>
+#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/h264_utils.h>
+#include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/synctime.h>
 
-extern "C" {
+extern "C"
+{
 #include <libavformat/avformat.h>
 } // extern "C"
 
@@ -106,7 +108,7 @@ QnAbstractCompressedMetadataPtr deserializeMetaDataPacket(const QByteArray& data
             QnMetaDataV1Light motionData;
             memcpy(&motionData, payload.constData(), sizeof(motionData));
             motionData.doMarshalling();
-            return QnMetaDataV1::fromLightData(motionData);
+            return QnMetaDataV1::fromLightData(motionData, qnSyncTime->currentTimePoint());
         }
         break;
         case MetadataType::ObjectDetection:

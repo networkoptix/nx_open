@@ -7,9 +7,8 @@
 #include <QtGui/QRegion>
 
 #include <nx/fusion/serialization/json_functions.h>
-
+#include <nx/media/motion_detection.h>
 #include <utils/common/util.h>
-#include <motion/motion_detection.h>
 
 namespace nx::vms::metadata {
 

@@ -4,20 +4,18 @@
 
 #include <QtCore/QThread>
 
-extern "C" {
+extern "C"
+{
 #include <libavutil/imgutils.h>
 } // extern "C"
 
-#include <utils/media/nalUnits.h>
-
-#include <utils/math/math.h>
-#include <nx/utils/log/log.h>
-
-#include <utils/media/frame_type_extractor.h>
-
-#include <nx/streaming/av_codec_media_context.h>
-#include <utils/media/utils.h>
+#include <nx/codec/nal_units.h>
+#include <nx/media/codec_parameters.h>
+#include <nx/media/utils.h>
 #include <nx/metrics/metrics_storage.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
+#include <utils/media/frame_type_extractor.h>
 
 static const int LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
@@ -105,7 +103,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
             {
                 const auto nalType = NALUnit::decodeType(*curNal);
                 if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR) {
-                    BitStreamReader bitReader;
+                    nx::utils::BitStreamReader bitReader;
                     try {
                         bitReader.setBuffer(curNal + 1, end);
                         int first_mb_in_slice = bitReader.getGolomb();
@@ -321,7 +319,7 @@ bool QnFfmpegVideoDecoder::decode(
         // 2) The end of the input buffer buf should be set to 0 to ensure that
         // no overreading happens for damaged MPEG streams.
 
-        // 1 is already guaranteed by QnByteArray, let's apply 2 here...
+        // 1 is already guaranteed by nx::utils::ByteArray, let's apply 2 here...
         if (avpkt.data)
             memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 

@@ -44,9 +44,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/metadata_log_parser.h>
+#include <nx/media/media_data_packet.h>
+#include <nx/media/sse_helper.h>
 #include <nx/network/cloud/protocol_type.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
-#include <nx/streaming/media_data_packet.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/trace/trace.h>
@@ -132,7 +133,6 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
 #include <utils/math/color_transformations.h>
-#include <utils/media/sse_helper.h>
 
 using namespace std::chrono;
 
@@ -2109,7 +2109,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
     if (ptzChanged && options().testFlag(ControlPtz))
     {
         titleBar()->rightButtonsBar()->setButtonsChecked(
-            Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
+        Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
     }
 
     if (motionSearchChanged || ptzChanged)
@@ -2466,7 +2466,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     }
 
     const auto mediaEvent = d->display()->camDisplay()->lastMediaEvent();
-    if (mediaEvent.code == nx::vms::common::MediaStreamEvent::tooManyOpenedConnections)
+    if (mediaEvent.code == nx::media::StreamEvent::tooManyOpenedConnections)
         return Qn::TooManyOpenedConnectionsOverlay;
 
     if (d->display()->camDisplay()->isEOFReached())
@@ -2508,7 +2508,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         return Qn::NoDataOverlay;
     }
 
-    if (mediaEvent.code == nx::vms::common::MediaStreamEvent::cannotDecryptMedia
+    if (mediaEvent.code == nx::media::StreamEvent::cannotDecryptMedia
         && !d->display()->camDisplay()->isBuffering())
     {
         m_encryptedArchiveData = mediaEvent.extraData;

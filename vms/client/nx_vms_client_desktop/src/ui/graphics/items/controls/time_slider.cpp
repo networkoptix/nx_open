@@ -26,6 +26,7 @@
 #include <client/client_runtime_settings.h>
 #include <core/resource/camera_bookmark.h>
 #include <nx/utils/math/arithmetic.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/graphics_style.h>
@@ -58,7 +59,6 @@
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
-#include <utils/math/math.h>
 
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;

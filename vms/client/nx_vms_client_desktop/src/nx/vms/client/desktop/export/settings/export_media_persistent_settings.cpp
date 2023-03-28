@@ -11,9 +11,9 @@
 
 #include <client/client_meta_types.h>
 #include <nx/reflect/compare.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/string.h>
 #include <nx/vms/common/html/html.h>
-#include <utils/math/math.h>
 
 namespace {
 

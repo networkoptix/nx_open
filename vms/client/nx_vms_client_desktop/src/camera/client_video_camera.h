@@ -5,7 +5,7 @@
 #include <QtCore/QPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/streaming/config.h>
+#include <nx/media/config.h>
 #include <nx/vms/client/desktop/export/tools/export_storage_stream_recorder.h>
 #include <recording/time_period_list.h>
 
@@ -81,4 +81,3 @@ private:
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
     bool m_displayStarted;
 };
-

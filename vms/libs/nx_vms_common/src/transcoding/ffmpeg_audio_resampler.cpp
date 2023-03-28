@@ -2,13 +2,14 @@
 
 #include "ffmpeg_audio_resampler.h"
 
-extern "C" {
-#include <libswresample/swresample.h>
+extern "C"
+{
 #include <libavcodec/avcodec.h>
 #include <libavutil/opt.h>
+#include <libswresample/swresample.h>
 }
 
-#include <utils/media/ffmpeg_helper.h>
+#include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/log/log.h>
 
 FfmpegAudioResampler::FfmpegAudioResampler()

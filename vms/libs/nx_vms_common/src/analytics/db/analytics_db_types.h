@@ -11,11 +11,11 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/byte_array.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/serialization/qt_core_types.h>
 #include <nx/utils/url_query.h>
 #include <recording/time_period.h>
-#include <utils/common/byte_array.h>
 
 #include "abstract_object_type_dictionary.h"
 

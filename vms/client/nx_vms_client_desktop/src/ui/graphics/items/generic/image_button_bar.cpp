@@ -3,13 +3,12 @@
 #include "image_button_bar.h"
 
 #include <QtCore/QScopedValueRollback>
-#include <QtWidgets/QGraphicsLinearLayout>
 #include <QtGui/QAction>
+#include <QtWidgets/QGraphicsLinearLayout>
 
-#include <utils/math/math.h>
-#include <utils/common/checked_cast.h>
-
+#include <nx/utils/math/math.h>
 #include <nx/utils/range_adapters.h>
+#include <utils/common/checked_cast.h>
 
 #include "image_button_widget.h"
 

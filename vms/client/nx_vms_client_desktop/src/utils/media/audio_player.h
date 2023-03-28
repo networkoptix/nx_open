@@ -6,7 +6,7 @@
 #include <memory>
 
 #include <core/storage/memory/ext_iodevice_storage.h>
-#include <nx/streaming/abstract_data_packet.h>
+#include <nx/media/abstract_data_packet.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>

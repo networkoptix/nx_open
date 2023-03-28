@@ -6,7 +6,7 @@
 
 #include <QtCore/QDateTime>
 
-#include <utils/media/bitStream.h>
+#include <nx/utils/bit_stream.h>
 
 namespace nx::vms::common {
 
@@ -68,7 +68,7 @@ nx::vms::api::ScheduleTaskDataList scheduleFromByteArray(const QByteArray& sched
         return {};
 
     nx::vms::api::ScheduleTaskDataList tasks;
-    BitStreamReader reader((uint8_t*)schedule.data(), schedule.size());
+    nx::utils::BitStreamReader reader((uint8_t*)schedule.data(), schedule.size());
 
     for (const auto dayOfWeek: daysOfWeek())
     {

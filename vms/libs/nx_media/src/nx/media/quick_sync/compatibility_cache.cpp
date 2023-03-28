@@ -3,11 +3,10 @@
 #include "compatibility_cache.h"
 
 #include <mfx/mfxvideo++.h>
+#include <nx/media/utils.h>
 
-#include "utils.h"
 #include "quick_sync_video_decoder_impl.h"
-
-#include <utils/media/utils.h>
+#include "utils.h"
 
 #define MSDK_ALIGN16(value) (((value + 15) >> 4) << 4) // round up to a multiple of 16
 

@@ -2,15 +2,16 @@
 
 #include "sign_helper.h"
 
-extern "C" {
+extern "C"
+{
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 #ifdef WIN32
-    #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
 #ifdef WIN32
-    #undef AVPixFmtDescriptor
+#undef AVPixFmtDescriptor
 #endif
 };
 
@@ -18,14 +19,14 @@ extern "C" {
 #include <QtCore/QTemporaryFile>
 
 #include <licensing/license.h>
-#include <nx/streaming/config.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/codec/nal_units.h>
+#include <nx/media/config.h>
+#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/scope_guard.h>
 #include <utils/common/util.h>
-#include <utils/math/math.h>
-#include <utils/media/ffmpeg_helper.h>
-#include <utils/media/nalUnits.h>
 
 using namespace nx::utils;
 
@@ -165,7 +166,7 @@ QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
 
     int cOffs = SQUARE_SIZE/8;
     quint8 signArray[256/8];
-    BitStreamWriter writer;
+    nx::utils::BitStreamWriter writer;
     writer.setBuffer(signArray, signArray + sizeof(signArray));
     for (int y = 0; y < rowCnt; ++y)
     {

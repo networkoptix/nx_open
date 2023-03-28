@@ -1,11 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <utils/media/sse_helper.h>
-
 #include "contrast_image_filter.h"
 
+#include <nx/media/sse_helper.h>
+#include <nx/utils/math/math.h>
 #include <utils/media/frame_info.h>
-#include <utils/math/math.h>
 
 QnContrastImageFilter::QnContrastImageFilter(const nx::vms::api::ImageCorrectionData& params):
     m_params(params),
