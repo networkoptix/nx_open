@@ -12156,7 +12156,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
-      <translation type="unfinished">Rewind is not available for VMAX</translation>
+      <translation>El rebobinado no está disponible para VMAX</translation>
     </message>
   </context>
   <context>
