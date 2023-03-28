@@ -687,7 +687,7 @@ begin_label:
     // If of archive is reached for reverse mode it need to continue in two cases:
     //  1. it is right (but not left) edge, it need to generate next seek operation
     //  2. Cycle mode flag is set. It need to jump to the end of archive after begin of archive is reached.
-    const bool needContinueAfterEof = m_eof && (m_requiredJumpTime > startTime() || m_cycleMode);
+    const bool needContinueAfterEof = m_eof && (!m_bofReached || m_cycleMode);
     if (videoData || needContinueAfterEof)
     {
         if (reverseMode && !delegateForNegativeSpeed)
