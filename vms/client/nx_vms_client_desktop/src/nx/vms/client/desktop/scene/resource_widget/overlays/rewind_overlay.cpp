@@ -13,6 +13,13 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_context.h>
+
+#include <nx/vms/client/desktop/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
+
 
 namespace nx::vms::client::desktop {
 
@@ -81,17 +88,29 @@ RewindOverlay::RewindOverlay(WindowContext* windowContext, QGraphicsItem* parent
     const auto fastForward =
         [this]()
         {
-            d->updateLayout();
-            d->fastForward->blink();
-            d->rewind->setVisible(false);
+            if (const auto parentWidget = dynamic_cast<QnResourceWidget*>(this->parentObject()))
+            {
+                if (parentWidget == navigator()->currentWidget() || navigator()->syncEnabled())
+                {
+                    d->updateLayout();
+                    d->fastForward->blink();
+                    d->rewind->setVisible(false);
+                }
+            }
         };
 
     const auto rewind =
         [this]()
         {
-            d->updateLayout();
-            d->fastForward->setVisible(false);
-            d->rewind->blink();
+            if (const auto parentWidget = dynamic_cast<QnResourceWidget*>(this->parentObject()))
+            {
+                if (parentWidget == navigator()->currentWidget() || navigator()->syncEnabled())
+                {
+                    d->updateLayout();
+                    d->fastForward->setVisible(false);
+                    d->rewind->blink();
+                }
+            }
         };
 
     connect(action(ui::action::FastForwardAction), &QAction::triggered, this, fastForward);

@@ -111,6 +111,7 @@ public:
 
     /** Sync is forcedly enabled. */
     bool syncIsForced() const;
+    bool syncEnabled() const;
 
     qreal speed() const;
     Q_SLOT void setSpeed(qreal speed);
@@ -130,6 +131,8 @@ public:
 
     QnResourcePtr currentResource() const;
     bool currentResourceIsVmax() const;
+
+    bool canJump() const;
 
     void jumpBackward();
     void jumpForward();
@@ -283,7 +286,7 @@ private:
 
     nx::vms::client::core::CachingCameraDataLoaderPtr loaderByWidget(
         const QnMediaResourceWidget* widget,
-        bool createIfNotExists = true);
+        bool createIfNotExists = true) const;
 
     bool hasArchiveForCamera(const QnSecurityCamResourcePtr& camera) const;
     bool hasWidgetWithCamera(const QnSecurityCamResourcePtr& camera) const;

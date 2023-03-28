@@ -68,6 +68,7 @@
 #include <utils/math/math.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
+#include "nx/vms/client/desktop/ui/actions/action_conditions.h"
 #include "nx/vms/client/desktop/ui/actions/actions.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
 #include "workbench_context.h"
@@ -1068,6 +1069,14 @@ void QnWorkbenchNavigator::jumpForward()
     emit positionChanged();
 }
 
+bool QnWorkbenchNavigator::canJump() const
+{
+    if (const auto loader = loaderByWidget(m_currentMediaWidget))
+        return !loader->periods(Qn::RecordingContent).empty();
+            
+    return false;
+}
+
 void QnWorkbenchNavigator::fastForward()
 {
     if (!m_currentMediaWidget)
@@ -1092,6 +1101,8 @@ void QnWorkbenchNavigator::fastForward()
 
         const auto currentTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(reader->currentTime());
         auto curPeriod = periods.findNearestPeriod(currentTimeMs.count(), false);
+        if (curPeriod == periods.end())
+            return; //< Reader currently in some invalid state.
 
         std::chrono::milliseconds posMs;
         if (curPeriod->contains(currentTimeMs + 10s))
@@ -1141,6 +1152,8 @@ void QnWorkbenchNavigator::rewind()
         /* We want to jump relatively to current reader position. */
         const auto currentTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(reader->currentTime());
         auto curPeriod = periods.findNearestPeriod(currentTimeMs.count(), false);
+        if (curPeriod == periods.end())
+            return; //< Reader currently in some invalid state.
 
         std::chrono::milliseconds posMs;
         if (!curPeriod->contains(currentTimeMs - 1s))
@@ -1575,6 +1588,12 @@ void QnWorkbenchNavigator::connectToContext(SystemContext* systemContext)
             this,
             &QnWorkbenchNavigator::updatePeriods);
     }
+}
+
+bool QnWorkbenchNavigator::syncEnabled() const
+{
+    const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
+    return streamSynchronizer->state().isSyncOn;
 }
 
 void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
@@ -2465,7 +2484,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
 
 core::CachingCameraDataLoaderPtr QnWorkbenchNavigator::loaderByWidget(
     const QnMediaResourceWidget* widget,
-    bool createIfNotExists)
+    bool createIfNotExists) const
 {
     if (!widget || !widget->resource())
         return {};
