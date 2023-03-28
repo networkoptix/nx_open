@@ -96,7 +96,8 @@ void QnSmtpSettingsWidget::loadDataToUi()
 
     QnEmailSettings settings = qnGlobalSettings->emailSettings();
 
-    const bool isEmpty = settings.isEmpty();
+    const bool isEmpty =
+        settings.email.isEmpty() && settings.server.isEmpty() && settings.user.isEmpty();
     m_advancedSettingsWidget->setHasRemotePassword(!isEmpty);
     m_simpleSettingsWidget->setHasRemotePassword(!isEmpty);
 
