@@ -90,7 +90,7 @@ FocusScope
                 {
                     text: qsTr("Integrations")
                     data: ResourceTree.FilterType.integrations
-                    visible: ClientSettings.iniConfigValue("webPagesAndIntegrations")
+                    visible: LocalSettings.iniConfigValue("webPagesAndIntegrations")
                 }
                 MenuAction { text: qsTr("Web Pages"); data: ResourceTree.FilterType.webPages }
                 MenuAction { text: qsTr("Users"); data: ResourceTree.FilterType.users }

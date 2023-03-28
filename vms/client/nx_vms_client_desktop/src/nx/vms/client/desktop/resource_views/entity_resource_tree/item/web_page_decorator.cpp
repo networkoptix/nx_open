@@ -5,7 +5,9 @@
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
 #include <core/resource/webpage_resource.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
 
 namespace nx::vms::client::desktop::entity_resource_tree {
 
@@ -18,12 +20,29 @@ WebPageDecorator::WebPageDecorator(
 {
     m_sourceItem->setDataChangedCallback(
         [this](const QVector<int>& roles) { notifyDataChanged(roles); });
+
+    connect(appContext()->webPageIconCache(), &WebPageIconCache::iconChanged, this,
+        [this](const QUrl& webPageUrl)
+        {
+            if (const auto webPage = getWebPage(); webPage && webPage->getUrl() == webPageUrl)
+                notifyDataChanged({Qn::DecorationPathRole});
+        });
 }
 
 QVariant WebPageDecorator::data(int role) const
 {
     switch (role)
     {
+        case Qn::DecorationPathRole:
+        {
+            const auto webPage = getWebPage();
+            if (!NX_ASSERT(webPage))
+                return {};
+
+            const auto iconPath = appContext()->webPageIconCache()->findPath(webPage->getUrl());
+            return iconPath ? iconPath->toString() : QVariant{};
+        }
+
         case Qn::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::resource);
 
@@ -35,9 +54,7 @@ QVariant WebPageDecorator::data(int role) const
             if (!m_hasAdminPermissions)
                 return {};
 
-            const auto resource = m_sourceItem->data(Qn::ResourceRole).value<QnResourcePtr>();
-            const auto webPage = resource.dynamicCast<QnWebPageResource>();
-
+            const auto webPage = getWebPage();
             if (!NX_ASSERT(webPage))
                 return {};
 
@@ -62,6 +79,12 @@ Qt::ItemFlags WebPageDecorator::flags() const
     result.setFlag(Qt::ItemIsDropEnabled, false);
 
     return result;
+}
+
+QnWebPageResourcePtr WebPageDecorator::getWebPage() const
+{
+    const auto resource = m_sourceItem->data(Qn::ResourceRole).value<QnResourcePtr>();
+    return resource.dynamicCast<QnWebPageResource>();
 }
 
 } // namespace nx::vms::client::desktop::entity_resource_tree
