@@ -21,14 +21,18 @@ AbstractCertificateVerifier::AbstractCertificateVerifier(
     std::call_once(trustedCertificatesLoaded,
         [this, trustedCertificateFilterRegex]()
         {
-            const std::regex regex(trustedCertificateFilterRegex);
             constexpr auto kCaLogLevel = nx::utils::log::Level::verbose;
             if (nx::utils::log::isToBeLogged(kCaLogLevel))
             {
                 NX_UTILS_LOG(kCaLogLevel, this, "OS CA for now %1", nx::utils::utcTime());
+                NX_UTILS_LOG(kCaLogLevel, this, "Certificates:");
                 for (const auto& c: QSslConfiguration::defaultConfiguration().caCertificates())
                     NX_UTILS_LOG(kCaLogLevel, this, c);
+                NX_UTILS_LOG(kCaLogLevel, this, "System certificates:");
+                for (const auto& c: QSslConfiguration::defaultConfiguration().systemCaCertificates())
+                    NX_UTILS_LOG(kCaLogLevel, this, c);
             }
+            const std::regex regex(trustedCertificateFilterRegex);
             const QDir folder(":/trusted_certificates");
             for (const auto& fileInfo: folder.entryInfoList({"*.pem"}, QDir::Files))
             {
