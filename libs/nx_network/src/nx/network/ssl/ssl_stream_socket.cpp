@@ -21,7 +21,11 @@ const std::function<
             std::string message;
             const auto serverName = socket->serverName();
             if (verifyBySystemCertificates(chain, serverName, &message))
+            {
+                NX_VERBOSE(socket,
+                    "Default certificate verification for server `%1` succeeded", serverName);
                 return true;
+            }
 
             NX_WARNING(socket,
                 "Default certificate verification for server `%1` is failed: %2",
