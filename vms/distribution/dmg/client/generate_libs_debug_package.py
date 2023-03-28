@@ -13,6 +13,9 @@ def create_libs_debug_file(build_dir, output_filename):
     dsym_paths = [
         lib_dir / f'lib{name}.dylib.dSYM' for name in (
             'nx_vms_common',
+            'nx_media_core',
+            'nx_rtp',
+            'nx_codec',
             'nx_network',
             'nx_utils',
             'nx_kit',

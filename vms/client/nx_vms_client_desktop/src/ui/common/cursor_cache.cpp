@@ -2,18 +2,15 @@
 
 #include "cursor_cache.h"
 
+#include <QtGui/QGuiApplication>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
-#include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 
-#include <utils/math/math.h>
-
-#include <platform/platform_abstraction.h>
-
-#include <ui/common/frame_section.h>
-
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
+#include <platform/platform_abstraction.h>
+#include <ui/common/frame_section.h>
 
 class QnCursorCachePrivate
 {

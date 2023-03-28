@@ -4,8 +4,8 @@
 
 #include <algorithm>
 
-#include <QtMultimedia/QAudioSource>
 #include <QtMultimedia/QAudioDevice>
+#include <QtMultimedia/QAudioSource>
 
 extern "C" {
 #include <speex/speex_preprocess.h>
@@ -16,12 +16,12 @@ extern "C" {
 
 #include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <nx/build_info.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/config.h>
+#include <nx/media/codec_parameters.h>
+#include <nx/media/config.h>
+#include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
 #include <utils/common/synctime.h>
-#include <utils/media/ffmpeg_helper.h>
 
 #include "../audio_recorder_settings.h"
 

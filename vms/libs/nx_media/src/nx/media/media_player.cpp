@@ -26,12 +26,12 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/fuzzy.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/common/application_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
-#include <nx/utils/math/fuzzy.h>
 #include <utils/common/long_runable_cleanup.h>
-#include <utils/math/math.h>
 
 #include "audio_output.h"
 #include "frame_metadata.h"
@@ -154,8 +154,8 @@ public:
     // Either media is on live or archive position. Holds QT property value.
     bool liveMode = true;
 
-    nx::vms::common::MediaStreamEvent lastMediaEvent =
-        nx::vms::common::MediaStreamEvent::noEvent;
+    nx::media::StreamEvent lastMediaEvent =
+        nx::media::StreamEvent::noEvent;
 
     // Video aspect ratio
     double aspectRatio = 1.0;
@@ -1279,13 +1279,13 @@ void Player::setAudioEnabled(bool value)
 bool Player::tooManyConnectionsError() const
 {
     Q_D(const Player);
-    return d->lastMediaEvent == nx::vms::common::MediaStreamEvent::tooManyOpenedConnections;
+    return d->lastMediaEvent == nx::media::StreamEvent::tooManyOpenedConnections;
 }
 
 bool Player::cannotDecryptMediaError() const
 {
     Q_D(const Player);
-    return d->lastMediaEvent == nx::vms::common::MediaStreamEvent::cannotDecryptMedia;
+    return d->lastMediaEvent == nx::media::StreamEvent::cannotDecryptMedia;
 }
 
 QString Player::tag() const

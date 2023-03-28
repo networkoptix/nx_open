@@ -4,20 +4,17 @@
 
 #include <QtCore/QThread>
 
-#include <utils/math/math.h>
 #include <core/resource/media_resource.h>
-#include <utils/media/sse_helper.h>
-
+#include <nx/media/config.h>
+#include <nx/media/sse_helper.h>
+#include <nx/metrics/metrics_storage.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
+#include <transcoding/ffmpeg_audio_transcoder.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
-#include <transcoding/ffmpeg_audio_transcoder.h>
-
 #include <transcoding/filters/abstract_image_filter.h>
 #include <transcoding/filters/filter_helper.h>
-#include <nx/streaming/config.h>
-#include <nx/metrics/metrics_storage.h>
-
-#include <nx/utils/log/log.h>
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
@@ -384,7 +381,7 @@ int QnTranscoder::openAndTranscodeDelayedData()
 }
 
 
-int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
+int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, nx::utils::ByteArray* const result)
 {
     m_internalBuffer.clear();
     m_outputPacketSize.clear();
@@ -441,7 +438,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         return OperationResult::Success;
     }
 
-    if (doTranscoding) 
+    if (doTranscoding)
     {
         errCode = transcodePacketInternal(media);
         if (errCode != 0)
@@ -454,7 +451,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
     return OperationResult::Success;
 }
 
-int QnTranscoder::finalize(QnByteArray* const result)
+int QnTranscoder::finalize(nx::utils::ByteArray* const result)
 {
     m_internalBuffer.clear();
     if (!m_initialized)

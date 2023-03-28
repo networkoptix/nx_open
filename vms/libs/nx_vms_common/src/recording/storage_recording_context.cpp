@@ -1,21 +1,23 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "storage_recording_context.h"
-#include "stream_recorder.h"
-#include "helpers/recording_context_helpers.h"
 
-#include <utils/common/util.h>
-#include <utils/media/ffmpeg_helper.h>
-#include <utils/media/utils.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/url.h>
-#include <core/resource/media_resource.h>
-#include <core/resource/storage_resource.h>
-#include <nx/streaming/video_data_packet.h>
-
+#include <chrono>
 #include <string>
 #include <thread>
-#include <chrono>
+
+#include <core/resource/media_resource.h>
+#include <core/resource/storage_resource.h>
+#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/utils.h>
+#include <nx/media/video_data_packet.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/url.h>
+#include <utils/common/util.h>
+#include <utils/media/ffmpeg_io_context.h>
+
+#include "helpers/recording_context_helpers.h"
+#include "stream_recorder.h"
 
 namespace nx {
 
@@ -168,7 +170,7 @@ void StorageRecordingContext::cleanFfmpegContexts()
     if (m_recordingContext.isEmpty())
         return;
 
-    QnFfmpegHelper::closeFfmpegIOContext(m_recordingContext.formatCtx->pb);
+    nx::utils::media::closeFfmpegIOContext(m_recordingContext.formatCtx->pb);
     m_recordingContext.formatCtx->pb = 0;
     avformat_free_context(m_recordingContext.formatCtx);
     m_recordingContext.formatCtx = nullptr;
@@ -176,7 +178,7 @@ void StorageRecordingContext::cleanFfmpegContexts()
 
 void StorageRecordingContext::initIoContext(StorageContext& context)
 {
-    context.formatCtx->pb = QnFfmpegHelper::createFfmpegIOContext(
+    context.formatCtx->pb = nx::utils::media::createFfmpegIOContext(
         context.storage, context.fileName, QIODevice::WriteOnly);
 
     if (context.formatCtx->pb == nullptr)
@@ -331,7 +333,7 @@ void StorageRecordingContext::closeRecordingContext(std::chrono::milliseconds du
     qint64 fileSize = 0;
     if (m_recordingContext.formatCtx)
     {
-        QnFfmpegHelper::closeFfmpegIOContext(m_recordingContext.formatCtx->pb);
+        nx::utils::media::closeFfmpegIOContext(m_recordingContext.formatCtx->pb);
         if (startTimeUs() != qint64(AV_NOPTS_VALUE))
             fileSize =  m_recordingContext.storage->getFileSize(m_recordingContext.fileName);
         beforeIoClose(m_recordingContext);

@@ -10,11 +10,12 @@
 #include <AL/alc.h>
 #endif
 
-#include "utils/common/sleep.h"
-#include "audiodevice.h"
+#include <QDebug>
+
 #include <nx/utils/log/assert.h>
 
-#include <QDebug>
+#include "audiodevice.h"
+#include "utils/common/sleep.h"
 
 //#define SOFT_PLAYTIME_ELAPSED_DEBUG
 
@@ -25,7 +26,7 @@ namespace {
     static const qint64 kDefaultMaxAudioJitterUs = 64 * 1000;
 }
 
-Sound::Sound(ALCdevice *device, const Format& audioFormat):
+Sound::Sound(ALCdevice *device, const nx::media::audio::Format& audioFormat):
     QObject()
 {
     m_audioFormat = audioFormat;
@@ -118,7 +119,7 @@ void Sound::setVolumeLevel(float volumeLevel)
     alSourcef(m_source, AL_GAIN, volumeLevel);
 }
 
-int Sound::getOpenAlFormat(const Format &audioFormat)
+int Sound::getOpenAlFormat(const nx::media::audio::Format &audioFormat)
 {
     QByteArray requestFormat;
     int bitsPerSample = audioFormat.sampleSize;
@@ -179,7 +180,7 @@ uint Sound::bufferTime() const
 
 void Sound::clearBuffers()
 {
-    static constexpr auto kMaxUnqueueCount = 
+    static constexpr auto kMaxUnqueueCount =
         static_cast<ALint>(sizeof(m_tmpBuffer) / sizeof(m_tmpBuffer[0]));
 
     // We can unqueue only a limited number of buffers that can fit into m_tmpBuffer array, so
@@ -199,7 +200,7 @@ void Sound::clearBuffers()
         alGetError(); //< Clear error code.
         alSourceUnqueueBuffers(m_source, unqueueCount, m_tmpBuffer);
 
-        const auto err = alGetError(); 
+        const auto err = alGetError();
         if (err != AL_NO_ERROR)
             return;
 
@@ -313,7 +314,7 @@ bool Sound::playImpl()
     return true;
 }
 
-bool Sound::isFormatSupported(const Format& format)
+bool Sound::isFormatSupported(const nx::media::audio::Format& format)
 {
     return getOpenAlFormat(format) != 0;
 }
@@ -455,7 +456,7 @@ void Sound::internalClear()
     m_source = 0;
 }
 
-Format Sound::format() const
+nx::media::audio::Format Sound::format() const
 {
     return m_audioFormat;
 }

@@ -6,7 +6,7 @@
 #include <optional>
 
 #ifndef Q_OS_WIN
-    #include <netinet/tcp.h>
+#include <netinet/tcp.h>
 #endif
 
 #include <common/common_module.h>
@@ -216,7 +216,7 @@ void QnTCPConnectionProcessor::parseRequest()
 }
 
 bool QnTCPConnectionProcessor::sendBuffer(
-    const QnByteArray& sendBuffer, std::optional<int64_t> timestampForLogging)
+    const nx::utils::ByteArray& sendBuffer, std::optional<int64_t> timestampForLogging)
 {
     return sendBufferThreadSafe(
         sendBuffer.constData(), (int) sendBuffer.size(), timestampForLogging);
@@ -472,7 +472,7 @@ void QnTCPConnectionProcessor::sendResponse(
         isUndefinedContentLength));
 }
 
-bool QnTCPConnectionProcessor::sendChunk( const QnByteArray& chunk )
+bool QnTCPConnectionProcessor::sendChunk( const nx::utils::ByteArray& chunk )
 {
     return sendChunk( chunk.data(), chunk.size() );
 }

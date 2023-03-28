@@ -15,6 +15,7 @@
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/qset.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
@@ -22,7 +23,6 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <utils/common/util.h>
-#include <utils/math/math.h>
 
 #include "media_server_resource.h"
 #include "resource_data.h"

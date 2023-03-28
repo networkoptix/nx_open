@@ -2,22 +2,18 @@
 
 #include "async_image_widget.h"
 
-#include <QtCore/QtMath>
 #include <QtCore/QTimer>
+#include <QtCore/QtMath>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QStyle>
 
 #include <client/client_globals.h>
-#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/style/helper.h>
-#include <ui/common/palette.h>
-#include <ui/utils/blur_image.h>
-#include <utils/common/scoped_painter_rollback.h>
-
-#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/math/math.h>
+#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
@@ -25,8 +21,11 @@
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <utils/math/math.h>
+#include <ui/common/palette.h>
+#include <ui/utils/blur_image.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 namespace nx::vms::client::desktop {
 

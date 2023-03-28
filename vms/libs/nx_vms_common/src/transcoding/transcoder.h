@@ -6,15 +6,16 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 
-extern "C" {
+extern "C"
+{
 #include <libavcodec/avcodec.h>
 }
 
 #include <common/common_globals.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
-#include <nx/streaming/audio_data_packet.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/audio_data_packet.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/utils/move_only_func.h>
 
 #include "filters/abstract_image_filter.h"
@@ -160,16 +161,16 @@ public:
     virtual OperationResult setAudioCodec(AVCodecID codec, TranscodeMethod method);
 
     /*
-    * Transcode media data and write it to specified QnByteArray
+    * Transcode media data and write it to specified nx::utils::ByteArray
     * @param result transcoded data block. If NULL, only decoding is done
     * @return Returns OperationResult::Success if no error or error code otherwise
     */
-    int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result);
+    int transcodePacket(const QnConstAbstractMediaDataPtr& media, nx::utils::ByteArray* const result);
     //!Flushes codec buffer and finalizes stream. No \a QnTranscoder::transcodePacket is allowed after this call
     /*
     * @return Returns OperationResult::Success if no error or error code otherwise
     */
-    int finalize(QnByteArray* const result);
+    int finalize(nx::utils::ByteArray* const result);
     //!Adds tag to the file. Maximum langth of tags and allowed names are format dependent
     /*!
         This implementation always returns \a false
@@ -223,7 +224,7 @@ protected:
     virtual int open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio) = 0;
 
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media) = 0;
-    virtual int finalizeInternal(QnByteArray* const result) = 0;
+    virtual int finalizeInternal(nx::utils::ByteArray* const result) = 0;
 private:
     int openAndTranscodeDelayedData();
 
@@ -235,7 +236,7 @@ protected:
     AVCodecID m_audioCodec;
     bool m_videoStreamCopy;
     bool m_audioStreamCopy;
-    QnByteArray m_internalBuffer;
+    nx::utils::ByteArray m_internalBuffer;
     QVector<int> m_outputPacketSize;
 
 protected:

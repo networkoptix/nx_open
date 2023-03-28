@@ -2,12 +2,12 @@
 
 #pragma once
 #include <QtCore/QtGlobal>
-#if defined (Q_OS_IOS)
+#if defined(Q_OS_IOS)
 
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
 
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/video_data_packet.h>
 
 #include "abstract_video_decoder.h"
 

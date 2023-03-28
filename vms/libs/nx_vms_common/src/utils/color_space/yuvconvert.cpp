@@ -1,8 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <utils/media/sse_helper.h>
-
 #include "yuvconvert.h"
+
+#include <nx/media/sse_helper.h>
 
 #if defined(NX_SSE2_SUPPORTED)
 
@@ -11,7 +11,7 @@
 
 #include <QtCore/QtGlobal>
 
-#include <utils/math/math.h>
+#include <nx/utils/math/math.h>
 
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_0010_intrs  = _mm_setr_epi32(0x00100010, 0x00100010, 0x00100010, 0x00100010);

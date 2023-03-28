@@ -4,7 +4,7 @@
 
 #include <QtCore/QSharedPointer>
 
-#include <nx/streaming/media_data_packet.h>
+#include <nx/media/media_data_packet.h>
 
 /**
  * Abstract interface of class, accepting media data.

@@ -3,11 +3,11 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtMultimedia/QVideoFrame>
 #include <QtGui/QOpenGLContext>
+#include <QtMultimedia/QVideoFrame>
 
-#include <nx/streaming/audio_data_packet.h>
-#include <utils/common/byte_array.h>
+#include <nx/media/audio_data_packet.h>
+#include <nx/utils/byte_array.h>
 
 #include "media_fwd.h"
 
@@ -17,7 +17,7 @@ struct AudioFrame
 {
     AudioFrame();
 
-    QnByteArray data;               //< decoded audio data
+    nx::utils::ByteArray data;               //< decoded audio data
     qint64 timestampUsec;           //< UTC timestamp
     CodecParametersConstPtr context; //< Decoder context for the input data.
 };

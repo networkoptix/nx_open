@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/streaming/media_data_packet.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/media_data_packet.h>
+#include <nx/media/video_data_packet.h>
 #include <utils/media/frame_info.h>
 
 #include "decoder_types.h"

@@ -1,24 +1,24 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "p2p_serialization.h"
-#include "routing_helpers.h"
 
 #include <array>
 
 #include <QtCore/QBuffer>
 #include <QtCore/QUrlQuery>
 
-#include <utils/math/math.h>
-#include <utils/media/nalUnits.h>
-
+#include <nx/codec/nal_units.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/reflect/string_conversion.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/socket_global.h>
-#include <nx/vms/api/protocol_version.h>
+#include <nx/reflect/string_conversion.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/types/connection_types.h>
+
+#include "routing_helpers.h"
 
 namespace {
 
@@ -31,7 +31,7 @@ namespace nx {
 namespace p2p {
 
 template <std::size_t N>
-void serializeCompressedValue(BitStreamWriter& writer, quint32 value, const std::array<int, N>& bitsGroups)
+void serializeCompressedValue(nx::utils::BitStreamWriter& writer, quint32 value, const std::array<int, N>& bitsGroups)
 {
     for (std::size_t i = 0; i < bitsGroups.size(); ++i)
     {
@@ -50,7 +50,7 @@ void serializeCompressedValue(BitStreamWriter& writer, quint32 value, const std:
 }
 
 template <std::size_t N>
-quint32 deserializeCompressedValue(BitStreamReader& reader, const std::array<int, N>& bitsGroups)
+quint32 deserializeCompressedValue(nx::utils::BitStreamReader& reader, const std::array<int, N>& bitsGroups)
 {
     quint32 value = 0;
     int shift = 0;
@@ -66,24 +66,24 @@ quint32 deserializeCompressedValue(BitStreamReader& reader, const std::array<int
 
 const static std::array<int, 3> peerNumberbitsGroups = { 7, 3, 4 };
 
-void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNumber)
+void serializeCompressPeerNumber(nx::utils::BitStreamWriter& writer, PeerNumberType peerNumber)
 {
     serializeCompressedValue(writer, peerNumber, peerNumberbitsGroups);
 }
 
-PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader)
+PeerNumberType deserializeCompressPeerNumber(nx::utils::BitStreamReader& reader)
 {
     return deserializeCompressedValue(reader, peerNumberbitsGroups);
 }
 
 const static std::array<int, 4> compressedSizebitsGroups = { 7, 7, 7, 8 };
 
-void serializeCompressedSize(BitStreamWriter& writer, quint32 size)
+void serializeCompressedSize(nx::utils::BitStreamWriter& writer, quint32 size)
 {
     serializeCompressedValue(writer, size, compressedSizebitsGroups);
 }
 
-quint32 deserializeCompressedSize(BitStreamReader& reader)
+quint32 deserializeCompressedSize(nx::utils::BitStreamReader& reader)
 {
     return deserializeCompressedValue(reader, compressedSizebitsGroups);
 }
@@ -96,7 +96,7 @@ QByteArray serializePeersMessage(
     result.resize(qPower2Ceil(
         unsigned(records.size() * PeerDistanceRecord::kMaxRecordSize + reservedSpaceAtFront),
         kByteArrayAlignFactor));
-    BitStreamWriter writer;
+    nx::utils::BitStreamWriter writer;
     writer.setBuffer((quint8*) result.data(), result.size());
     try
     {
@@ -122,7 +122,7 @@ QByteArray serializePeersMessage(
         result.truncate(writer.getBytesCount());
         return result;
     }
-    catch (const BitStreamException&)
+    catch (const nx::utils::BitStreamException&)
     {
         return QByteArray();
     }
@@ -131,7 +131,7 @@ QByteArray serializePeersMessage(
 std::vector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success)
 {
     std::vector<PeerDistanceRecord> result;
-    BitStreamReader reader((const quint8*)data.data(), data.size());
+    nx::utils::BitStreamReader reader((const quint8*)data.data(), data.size());
     try
     {
         *success = true;
@@ -154,7 +154,7 @@ std::vector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, 
             result.emplace_back(PeerDistanceRecord{peerNumber, distance, firstVia});
         }
     }
-    catch (const BitStreamException&)
+    catch (const nx::utils::BitStreamException&)
     {
         *success = false;
     }
@@ -165,7 +165,7 @@ QByteArray serializeCompressedPeers(const QVector<PeerNumberType>& peers, int re
 {
     QByteArray result;
     result.resize(qPower2Ceil(unsigned(peers.size() * 2 + reservedSpaceAtFront), kByteArrayAlignFactor));
-    BitStreamWriter writer;
+    nx::utils::BitStreamWriter writer;
     writer.setBuffer((quint8*)result.data(), result.size());
     writer.putBits(reservedSpaceAtFront * 8, 0);
     for (const auto& peer : peers)
@@ -181,13 +181,13 @@ QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool*
     *success = true;
     if (data.isEmpty())
         return result;
-    BitStreamReader reader((const quint8*)data.data(), data.size());
+    nx::utils::BitStreamReader reader((const quint8*)data.data(), data.size());
     try
     {
         while (reader.bitsLeft() >= 8)
             result.push_back(deserializeCompressPeerNumber(reader));
     }
-    catch (const BitStreamException&)
+    catch (const nx::utils::BitStreamException&)
     {
         *success = false;
     }
@@ -199,7 +199,7 @@ QByteArray serializeSubscribeRequest(const QVector<SubscribeRecord>& request, in
     QByteArray result;
     result.resize(qPower2Ceil(unsigned(request.size() * PeerDistanceRecord::kMaxRecordSize +
         reservedSpaceAtFront), kByteArrayAlignFactor));
-    BitStreamWriter writer;
+    nx::utils::BitStreamWriter writer;
     writer.setBuffer((quint8*) result.data(), result.size());
     writer.putBits(reservedSpaceAtFront * 8, 0);
     for (const auto& record: request)
@@ -217,7 +217,7 @@ QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, boo
     QVector<SubscribeRecord> result;
     if (data.isEmpty())
         return result;
-    BitStreamReader reader((quint8*)data.data(), data.size());
+    nx::utils::BitStreamReader reader((quint8*)data.data(), data.size());
     try {
         while (reader.bitsLeft() > 0)
         {
@@ -227,7 +227,7 @@ QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, boo
         }
         *success = true;
     }
-    catch (const BitStreamException&)
+    catch (const nx::utils::BitStreamException&)
     {
         *success = false;
     }
@@ -295,7 +295,7 @@ QByteArray serializeTransactionList(const QList<QByteArray>& tranList, int reser
         expectedSize += kMaxHeaderSize + tran.size();
     QByteArray message;
     message.resize(qPower2Ceil(expectedSize, 4));
-    BitStreamWriter writer;
+    nx::utils::BitStreamWriter writer;
     writer.setBuffer((quint8*)message.data(), message.size());
     writer.putBits(8 * reservedSpaceAtFront, 0);
     for (const auto& tran : tranList)
@@ -311,7 +311,7 @@ QByteArray serializeTransactionList(const QList<QByteArray>& tranList, int reser
 QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* success)
 {
     QList<QByteArray> result;
-    BitStreamReader reader((const quint8*) tranList.data(), tranList.size());
+    nx::utils::BitStreamReader reader((const quint8*) tranList.data(), tranList.size());
     try
     {
         while (reader.bitsLeft() > 0)
@@ -328,7 +328,7 @@ QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* s
         }
         *success = true;
     }
-    catch (const BitStreamException&)
+    catch (const nx::utils::BitStreamException&)
     {
         *success = false;
     }

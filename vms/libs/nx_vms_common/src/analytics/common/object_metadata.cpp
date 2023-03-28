@@ -7,14 +7,12 @@
 
 #include <QtCore/QRegularExpression>
 
-#include <nx/kit/debug.h>
-
 #include <nx/analytics/analytics_attributes.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/streaming/media_data_packet.h>
+#include <nx/kit/debug.h>
+#include <nx/media/media_data_packet.h>
 #include <nx/utils/log/format.h>
-
-#include <utils/math/math.h>
+#include <nx/utils/math/math.h>
 
 namespace nx {
 namespace common {

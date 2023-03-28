@@ -13,11 +13,10 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/value_cache.h>
 #include <nx/vms/api/data/device_model.h>
-#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
 #include <nx/vms/common/resource/remote_archive_types.h>
+#include <nx/vms/event/event_fwd.h>
 #include <recording/time_period_list.h>
-
 
 class QnAbstractArchiveDelegate;
 class QnResourceData;
@@ -25,9 +24,8 @@ class QnMotionRegion;
 
 namespace nx::vms::rules { struct NetworkIssueInfo; }
 namespace nx::core::resource { class AbstractRemoteArchiveManager; }
-namespace nx::vms::common { enum class MediaStreamEvent; }
+namespace nx::media { enum class StreamEvent; }
 namespace nx::core::ptz { enum class PresetType; }
-
 
 class NX_VMS_COMMON_API QnSecurityCamResource:
     public QnNetworkResource,
@@ -499,7 +497,7 @@ public:
     /**
      * Return non zero media event error if camera resource has an issue.
      */
-    nx::vms::common::MediaStreamEvent checkForErrors() const;
+    nx::media::StreamEvent checkForErrors() const;
 
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
 

@@ -4,8 +4,9 @@
 
 #include <QtCore/QSharedPointer>
 
+#include <nx/media/config.h>
+#include <nx/media/media_data_packet.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
-#include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/media_stream_statistics.h>
 #include <nx/utils/value_cache.h>
 #include <utils/camera/camera_diagnostics.h>

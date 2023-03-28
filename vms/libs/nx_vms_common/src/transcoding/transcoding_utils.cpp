@@ -4,16 +4,15 @@
 
 #include <array>
 
-#include <nx/utils/log/log.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <utils/media/ffmpeg_helper.h>
-#include <utils/media/h263_utils.h>
-#include <utils/math/math.h>
-
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
+#include <nx/codec/h263/h263_utils.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/media/codec_parameters.h>
+#include <nx/media/ffmpeg_helper.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
 
 namespace nx {
 namespace transcoding {

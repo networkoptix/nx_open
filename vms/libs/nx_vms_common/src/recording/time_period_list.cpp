@@ -2,13 +2,13 @@
 
 #include "time_period_list.h"
 
-#include <utils/common/util.h>
-#include <utils/math/math.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/socket_common.h> //< For htonll().
 #include <nx/utils/datetime.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/common/recording/time_periods_utils.h>
+#include <utils/common/util.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MultiServerPeriodData,
     (json)(ubjson)(xml)(csv_record)(compressed_time), (guid)(periods))

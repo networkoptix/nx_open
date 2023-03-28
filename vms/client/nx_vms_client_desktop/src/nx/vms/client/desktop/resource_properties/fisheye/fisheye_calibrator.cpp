@@ -2,15 +2,15 @@
 
 #include "fisheye_calibrator.h"
 
-#include <QtCore/QMetaEnum>
-
 #include <algorithm>
 #include <array>
 #include <limits>
 #include <memory>
 #include <vector>
 
-#include <utils/math/math.h>
+#include <QtCore/QMetaEnum>
+
+#include <nx/utils/math/math.h>
 
 namespace {
 

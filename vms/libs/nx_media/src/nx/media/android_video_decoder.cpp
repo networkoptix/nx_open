@@ -15,18 +15,17 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
 #include <QtMultimedia/QVideoFrame>
 #include <QtMultimedia/QVideoFrameFormat>
+#include <QtMultimedia/private/qabstractvideobuffer_p.h>
 #include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtOpenGL/QOpenGLShaderProgram>
 
+#include <media/filters/h264_mp4_to_annexb.h>
+#include <nx/media/h264_utils.h>
+#include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/media/h264_utils.h>
-#include <utils/media/utils.h>
-
-#include <media/filters/h264_mp4_to_annexb.h>
 
 namespace nx {
 namespace media {

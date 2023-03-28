@@ -17,12 +17,13 @@ extern "C" {
 
 #include <core/resource/resource.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
+#include <nx/media/codec_parameters.h>
+#include <nx/media/config.h>
 #include <nx/media/ffmpeg/audio_encoder.h>
+#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/media_data_packet.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/streaming/abstract_data_consumer.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/config.h>
-#include <nx/streaming/media_data_packet.h>
-#include <nx/streaming/video_data_packet.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/resource/screen_recording/audio_device_info_win.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -30,7 +31,6 @@ extern "C" {
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/synctime.h>
 #include <utils/media/av_options.h>
-#include <utils/media/ffmpeg_helper.h>
 
 #include "audio_device_change_notifier.h"
 #include "buffered_screen_grabber.h"

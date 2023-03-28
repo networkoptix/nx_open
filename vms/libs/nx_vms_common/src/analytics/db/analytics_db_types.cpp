@@ -11,13 +11,13 @@
 #include <nx/network/rest/params.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/serialization/qt_core_types.h>
 #include <nx/utils/std/algorithm.h>
-#include <utils/math/math.h>
 
-#include "text_search_utils.h"
 #include "analytics_db_utils.h"
 #include "config.h"
+#include "text_search_utils.h"
 
 using namespace nx::common::metadata;
 

@@ -10,13 +10,13 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/tcp_connection_priv.h>
+#include <nx/media/config.h>
 #include <nx/network/buffered_stream_socket.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/ssl/helpers.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
-#include <nx/streaming/config.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
@@ -64,7 +64,7 @@ protected:
         if (m_needStop)
             return true;
 
-        QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64, AV_INPUT_BUFFER_PADDING_SIZE);
+        nx::utils::ByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64, AV_INPUT_BUFFER_PADDING_SIZE);
 
         QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(packet);
         if (!media)
@@ -209,7 +209,7 @@ bool DesktopCameraConnectionProcessor::isConnected() const
     return d->socket->isConnected();
 }
 
-void DesktopCameraConnectionProcessor::sendData(const QnByteArray& data)
+void DesktopCameraConnectionProcessor::sendData(const nx::utils::ByteArray& data)
 {
     int sent = d->socket->send(data.constData(), data.size());
     if (sent < (int)data.size())

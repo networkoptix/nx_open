@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/streaming/media_stream_statistics.h>
 
 namespace nx::streaming::test {

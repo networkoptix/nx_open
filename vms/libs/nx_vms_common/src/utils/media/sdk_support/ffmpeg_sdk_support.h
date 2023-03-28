@@ -2,25 +2,25 @@
 
 #pragma once
 
-#include <vector>
-#include <unordered_map>
-#include <string>
 #include <optional>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 #include <camera/camera_plugin_types.h>
+#include <nx/media/av_codec_helper.h>
+#include <nx/media/media_data_packet.h>
 #include <nx/sdk/cloud_storage/helpers/data.h>
 #include <nx/sdk/cloud_storage/i_codec_info.h>
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/streaming/media_data_packet.h>
 #include <plugins/plugin_tools.h>
-#include <utils/media/av_codec_helper.h>
 
-extern "C" {
+extern "C"
+{
 #include <libavcodec/avcodec.h>
-#include <libavutil/opt.h>
 #include <libavutil/imgutils.h>
+#include <libavutil/opt.h>
 } // extern "C"
-
 
 namespace nx::utils::media::sdk_support {
 

@@ -2,20 +2,19 @@
 
 #pragma once
 
-#include <mutex>
-#include <map>
-#include <vector>
-#include <deque>
-
 #include <QSize>
+#include <deque>
+#include <map>
+#include <mutex>
+#include <vector>
 
-extern "C" {
-
+extern "C"
+{
 #include <libavcodec/avcodec.h>
 
 } // extern "C"
 
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/video_data_packet.h>
 
 class CompatibilityCache
 {

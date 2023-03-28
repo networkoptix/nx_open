@@ -141,9 +141,12 @@ copyLibs()
         nx_kit
         nx_branding
         nx_build_info
+        nx_codec
         nx_monitoring
         nx_media
+        nx_media_core
         nx_network
+        nx_rtp
         nx_vms_api
         nx_vms_applauncher_api
         nx_vms_client_core

@@ -9,11 +9,11 @@
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <export/sign_helper.h>
-#include <nx/streaming/abstract_data_packet.h>
+#include <nx/media/abstract_data_packet.h>
+#include <nx/media/config.h>
+#include <nx/media/media_data_packet.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include <nx/streaming/config.h>
-#include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/util.h>

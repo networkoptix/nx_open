@@ -3,7 +3,7 @@
 #pragma once
 
 #include <decoders/video/abstract_video_decoder.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/video_data_packet.h>
 
 namespace nx::media::quick_sync {
     class QuickSyncVideoDecoderImpl;

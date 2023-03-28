@@ -2,13 +2,12 @@
 
 #include "ptz_mapper.h"
 
-#include <cassert>
 #include <array>
+#include <cassert>
 
-#include <utils/math/math.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/enum_instrument.h>
-
+#include <nx/utils/math/math.h>
 #include <nx/vms/common/ptz/space_mapper.h>
 
 #include "ptz_math.h"

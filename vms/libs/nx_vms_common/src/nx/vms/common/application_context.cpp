@@ -7,15 +7,15 @@
 #include <common/common_meta_types.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <network/cloud/cloud_media_server_endpoint_verificator.h>
+#include <nx/media/ffmpeg_helper.h>
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/socket_global.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
 #include <utils/media/ffmpeg_initializer.h>
-#include <utils/media/ffmpeg_helper.h>
 
 // Resources initialization must be located outside of the namespace.
 static void initializeResources()

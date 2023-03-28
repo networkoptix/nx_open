@@ -3,14 +3,14 @@
 #pragma once
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMap>
 #include <QtCore/QFile>
+#include <QtCore/QMap>
 
 #include <nx/analytics/metadata_logger.h>
-#include <nx/streaming/rtp/result.h>
+#include <nx/rtp/result.h>
 #include <nx/utils/software_version.h>
 
-namespace nx::streaming::rtp {
+namespace nx::rtp {
 
 class NX_VMS_COMMON_API QnNxRtpParser
 {
@@ -39,7 +39,7 @@ private:
     CodecParametersConstPtr m_context;
     QnAbstractMediaDataPtr m_mediaData;
     QnAbstractMediaDataPtr m_nextDataPacket;
-    QnByteArray* m_nextDataPacketBuffer;
+    nx::utils::ByteArray* m_nextDataPacketBuffer;
     qint64 m_position;
     bool m_isAudioEnabled;
     qint64 m_lastFramePtsUs; //< Intended for debug.
@@ -49,4 +49,4 @@ private:
 
 using QnNxRtpParserPtr = QSharedPointer<QnNxRtpParser>;
 
-} // namespace nx::streaming::rtp
+} // namespace nx::rtp

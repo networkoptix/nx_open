@@ -138,7 +138,7 @@ static bool textToWave(
     const QString& text,
     cst_voice* vox,
     QIODevice* const dest,
-    nx::audio::Format* outFormat)
+    nx::media::audio::Format* outFormat)
 {
     CustomUniquePtr<cst_wave, delete_wave> wave(
         flite_text_to_wave(text.toLatin1().constData(), vox));
@@ -155,7 +155,7 @@ static bool textToWave(
         const int sampleSize = sizeof(short) * 8;
 
         outFormat->sampleSize = sampleSize;
-        outFormat->sampleType = nx::audio::Format::SampleType::signedInt;
+        outFormat->sampleType = nx::media::audio::Format::SampleType::signedInt;
     }
 
     if (!wave)
@@ -190,7 +190,7 @@ struct FliteEngine
     };
 
     /** NOTE: Not declared static to emphasize the need for the initialized instance. */
-    bool textToWave(const QString& text, QIODevice* const dest, nx::audio::Format* outFormat) const
+    bool textToWave(const QString& text, QIODevice* const dest, nx::media::audio::Format* outFormat) const
     {
         return ::textToWave(text, vox.get(), dest, outFormat);
     }
@@ -216,7 +216,7 @@ struct FliteEngine
     };
 
     bool textToWave(
-        const QString& /*text*/, QIODevice* /*dest*/, nx::audio::Format* /*outFormat*/) const
+        const QString& /*text*/, QIODevice* /*dest*/, nx::media::audio::Format* /*outFormat*/) const
     {
         NX_ASSERT(false);
         return false;
@@ -272,7 +272,7 @@ int TextToWaveServer::generateSoundAsync(const QString& text, QIODevice* const d
 bool TextToWaveServer::generateSoundSync(
     const QString& text,
     QIODevice* const dest,
-    nx::audio::Format* outFormat)
+    nx::media::audio::Format* outFormat)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     const QSharedPointer<SynthesizeSpeechTask> task = addTaskToQueue(text, dest);

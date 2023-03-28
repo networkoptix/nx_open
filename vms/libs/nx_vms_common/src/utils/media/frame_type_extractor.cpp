@@ -2,8 +2,8 @@
 
 #include "frame_type_extractor.h"
 
-#include "vc1Parser.h"
-#include <utils/media/nalUnits.h>
+#include <nx/codec/nal_units.h>
+#include <nx/codec/vc1/vc1_parser.h>
 
 void FrameTypeExtractor::decodeWMVSequence(const quint8* data, int size)
 {
@@ -92,7 +92,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(
             if (nal_ref_idc)
                 return P_Frame;
 
-            BitStreamReader bitReader;
+            nx::utils::BitStreamReader bitReader;
             bitReader.setBuffer(data + 1, end);
             try {
                 /*int first_mb_in_slice =*/ bitReader.getGolomb();

@@ -3,8 +3,7 @@
 #include "layout_intermediate_model.h"
 
 #include <core/resource/resource.h>
-
-#include <utils/math/math.h>
+#include <nx/utils/math/math.h>
 
 namespace nx::vms::client::desktop::joystick {
 

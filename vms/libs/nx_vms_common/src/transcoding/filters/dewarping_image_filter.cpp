@@ -1,14 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <utils/media/sse_helper.h>
-
 #include "dewarping_image_filter.h"
 
 #include <QtCore/QtMath>
 
-#include <nx/streaming/config.h>
-
-#include <utils/math/math.h>
+#include <nx/media/config.h>
+#include <nx/media/sse_helper.h>
+#include <nx/utils/math/math.h>
 #include <utils/media/frame_info.h>
 
 using namespace nx::vms::api;
@@ -32,9 +30,10 @@ QVector2D operator*(const QMatrix3x3& m, const QVector2D& v)
 
 } // namespace
 
-extern "C" {
+extern "C"
+{
 #ifdef WIN32
-#   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
 #ifdef WIN32

@@ -14,6 +14,7 @@
 #include <core/resource/media_resource.h>
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
@@ -35,7 +36,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <utils/common/event_processors.h>
-#include <utils/math/math.h>
 
 #include "private/export_settings_dialog_p.h"
 

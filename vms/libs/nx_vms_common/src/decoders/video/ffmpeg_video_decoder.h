@@ -6,8 +6,8 @@
 
 #include <QtGui/QImage>
 
-#include <nx/streaming/video_data_packet.h>
-#include <utils/media/ffmpeg_helper.h>
+#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/video_data_packet.h>
 
 #include "abstract_video_decoder.h"
 

@@ -3,7 +3,8 @@
 #pragma once
 
 #include <QtMultimedia/QAudioOutput>
-#include <nx/streaming/audio_data_packet.h>
+
+#include <nx/media/audio_data_packet.h>
 
 #include "media_fwd.h"
 

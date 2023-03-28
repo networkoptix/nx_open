@@ -21,6 +21,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -36,7 +37,6 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
-#include <utils/math/math.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;

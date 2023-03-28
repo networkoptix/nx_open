@@ -2,8 +2,8 @@
 
 #pragma once
 
+#include <nx/media/codec_parameters.h>
 #include <nx/media/ffmpeg/audio_encoder.h>
-#include <nx/streaming/av_codec_media_context.h>
 
 #include "../desktop_data_provider_base.h"
 

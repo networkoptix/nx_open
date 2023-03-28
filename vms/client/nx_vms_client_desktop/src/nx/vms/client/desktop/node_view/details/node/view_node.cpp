@@ -2,10 +2,10 @@
 
 #include "view_node.h"
 
-#include "view_node_data.h"
-
 #include <nx/utils/log/log.h>
-#include <utils/math/math.h>
+#include <nx/utils/math/math.h>
+
+#include "view_node_data.h"
 
 namespace nx::vms::client::desktop {
 namespace node_view {
@@ -221,4 +221,3 @@ size_t qHash(const ViewNodePath& path)
 } // namespace details
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-

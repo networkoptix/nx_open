@@ -4,8 +4,8 @@
 
 #include <QtWidgets/QHeaderView>
 
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/details/resource_node_view_item_delegate.h>
-#include <utils/math/math.h>
 
 namespace {
 

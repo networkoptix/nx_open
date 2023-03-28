@@ -4,12 +4,10 @@
 
 #include <optional>
 
-#include <recording/stream_recorder_data.h>
-
-#include <nx/streaming/media_data_packet.h>
-
-#include <core/resource/resource_media_layout.h>
 #include <core/resource/avi/avi_archive_metadata.h>
+#include <core/resource/resource_media_layout.h>
+#include <nx/media/media_data_packet.h>
+#include <recording/stream_recorder_data.h>
 
 namespace nx {
 

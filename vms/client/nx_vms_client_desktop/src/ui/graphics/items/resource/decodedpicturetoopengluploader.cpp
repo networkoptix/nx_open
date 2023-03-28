@@ -12,10 +12,11 @@ extern "C" {
 #include <QtCore/QRunnable>
 #include <QtWidgets/QApplication>
 
+#include <nx/media/config.h>
 #include <nx/media/quick_sync/qsv_supported.h>
-#include <nx/streaming/config.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/random.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
@@ -24,7 +25,6 @@ extern "C" {
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <utils/color_space/yuvconvert.h>
 #include <utils/common/util.h> /* For random. */
-#include <utils/math/math.h>
 
 #ifdef __QSV_SUPPORTED__
 #include <nx/media/nvidia/nvidia_renderer.h>

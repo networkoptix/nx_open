@@ -4,9 +4,9 @@
 
 #include <memory>
 
-#include <nx/streaming/video_data_packet.h>
-#include <nx/streaming/media_data_packet.h>
 #include <core/resource/avi/avi_archive_metadata.h>
+#include <nx/media/media_data_packet.h>
+#include <nx/media/video_data_packet.h>
 
 namespace nx::recording::helpers {
 

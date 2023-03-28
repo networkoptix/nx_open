@@ -1,21 +1,17 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "bookmark_helpers.h"
 
 #include <chrono>
 
-#include <nx/utils/qset.h>
-
-#include <utils/math/math.h>
-#include <core/resource/user_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/event/strings_helper.h>
+#include <nx/utils/math/math.h>
+#include <nx/utils/qset.h>
 #include <nx/vms/event/actions/abstract_action.h>
-
+#include <nx/vms/event/strings_helper.h>
 #include <utils/common/synctime.h>
 
 using namespace std::chrono;

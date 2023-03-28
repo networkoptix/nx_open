@@ -8,6 +8,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/background_flasher.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
@@ -27,7 +28,6 @@
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/color_transformations.h>
-#include <utils/math/math.h>
 
 #include "../flux/camera_settings_dialog_state.h"
 #include "../flux/camera_settings_dialog_store.h"

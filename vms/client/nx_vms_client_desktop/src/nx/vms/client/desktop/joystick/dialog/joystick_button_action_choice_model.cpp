@@ -5,7 +5,7 @@
 #include <QtCore/qhashfunctions.h>
 #include <QtGui/QAction>
 
-#include <utils/math/math.h>
+#include <nx/utils/math/math.h>
 
 #include "../settings/descriptors.h"
 

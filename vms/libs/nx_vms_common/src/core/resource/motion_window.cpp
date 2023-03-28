@@ -2,9 +2,9 @@
 
 #include "motion_window.h"
 
-#include <motion/motion_detection.h>
+#include <nx/media/config.h>
+#include <nx/media/motion_detection.h>
 #include <nx/reflect/json/serializer.h>
-#include <nx/streaming/config.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -406,4 +406,3 @@ QString serializeMotionRegionList(const QList<QnMotionRegion>& regions)
     }
     return result;
 }
-

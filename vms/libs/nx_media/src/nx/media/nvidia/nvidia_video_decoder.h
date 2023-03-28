@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <vector>
-#include <memory>
 #include <deque>
+#include <memory>
+#include <vector>
 
-#include <nx/streaming/video_data_packet.h>
 #include <nx/media/abstract_video_decoder.h>
+#include <nx/media/video_data_packet.h>
 
 namespace nx::media::nvidia {
 

@@ -6,9 +6,8 @@
 #include <QtCore/QString>
 #include <QtCore/QVector>
 
+#include <nx/media/meta_data_packet.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/streaming/media_data_packet.h>
-
 #include <recording/time_period_list.h>
 
 namespace nx::vms::metadata {
@@ -39,7 +38,7 @@ static const int kGeometrySize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 
 
         // Base size of the each record in bytes.
         quint16 recordSize = 0;
-        
+
         quint8 flags = 0;
         char dummy[2];
 

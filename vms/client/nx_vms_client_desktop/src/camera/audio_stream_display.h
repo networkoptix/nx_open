@@ -4,11 +4,10 @@
 
 #include <QtCore/QQueue>
 
-#include <nx/utils/thread/mutex.h>
-
 #include <nx/audio/sound.h>
-#include <nx/audio/format.h>
-#include <nx/streaming/audio_data_packet.h>
+#include <nx/media/audio/format.h>
+#include <nx/media/audio_data_packet.h>
+#include <nx/utils/thread/mutex.h>
 
 class QnAbstractAudioDecoder;
 class QnCompressedAudioData;
@@ -62,7 +61,7 @@ public:
 private:
     int msInQueue() const;
 
-    bool initFormatConvertRule(nx::audio::Format format);
+    bool initFormatConvertRule(nx::media::audio::Format format);
     bool createDecoder(const QnCompressedAudioDataPtr& data);
 private:
     enum class SampleConvertMethod { none, float2Int32, float2Int16, int32ToInt16 };
@@ -82,7 +81,7 @@ private:
     bool m_isConvertMethodInitialized;
 
     QQueue<QnCompressedAudioDataPtr> m_audioQueue;
-    QnByteArray m_decodedAudioBuffer;
+    nx::utils::ByteArray m_decodedAudioBuffer;
     qint64 m_startBufferingTime;
     qint64 m_lastAudioTime;
     mutable nx::Mutex m_audioQueueMutex;

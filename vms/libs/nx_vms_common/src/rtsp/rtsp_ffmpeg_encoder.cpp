@@ -2,10 +2,10 @@
 
 #include "rtsp_ffmpeg_encoder.h"
 
+#include <nx/media/codec_parameters.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/network/socket.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/rtp/rtp.h>
-#include <nx/streaming/video_data_packet.h>
+#include <nx/rtp/rtp.h>
 #include <utils/common/util.h>
 
 namespace {
@@ -109,7 +109,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
     m_eofReached = false;
 }
 
-bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
+bool QnRtspFfmpegEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
 {
     if (m_eofReached || !m_media)
         return false;
@@ -119,8 +119,8 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     uint32_t ssrc = kNxBasicSsrc + (hasDataContext ? 1 : 0);
 
     int dataStartIndex = sendBuffer.size();
-    sendBuffer.resize(sendBuffer.size() + nx::streaming::rtp::RtpHeader::kSize);
-    nx::streaming::rtp::buildRtpHeader(
+    sendBuffer.resize(sendBuffer.size() + nx::rtp::RtpHeader::kSize);
+    nx::rtp::buildRtpHeader(
         sendBuffer.data() + dataStartIndex,
         ssrc,
         rtpMarker,
@@ -187,8 +187,8 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     m_curDataBuffer += sendLen;
 
     m_eofReached = m_curDataBuffer == dataEnd;
-    nx::streaming::rtp::RtpHeader* rtpHeader =
-        (nx::streaming::rtp::RtpHeader*)(sendBuffer.data() + dataStartIndex);
+    nx::rtp::RtpHeader* rtpHeader =
+        (nx::rtp::RtpHeader*)(sendBuffer.data() + dataStartIndex);
     rtpHeader->marker = m_eofReached;
 
     NX_VERBOSE(this, "Made RTP packet: isFirst %1, timestamp %2, sequence %3",

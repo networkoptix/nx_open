@@ -14,6 +14,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/common/widgets/scalable_image_widget.h>
@@ -27,7 +28,6 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
-#include <utils/math/math.h>
 
 using nx::vms::client::core::Geometry;
 

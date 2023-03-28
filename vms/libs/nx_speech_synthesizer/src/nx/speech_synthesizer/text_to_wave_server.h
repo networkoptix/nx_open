@@ -6,13 +6,12 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 
-#include <nx/audio/format.h>
-
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
+#include <nx/media/audio/format.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <utils/common/threadqueue.h>
 
 namespace nx::speech_synthesizer {
@@ -58,7 +57,7 @@ public slots:
     bool generateSoundSync(
         const QString& text,
         QIODevice* const dest,
-        nx::audio::Format* outFormat = nullptr);
+        nx::media::audio::Format* outFormat = nullptr);
 
 signals:
     /** Emitted in any case on text generation done (successful or not). */
@@ -73,7 +72,7 @@ private:
         int id = 0;
         QString text;
         QIODevice* dest = nullptr;
-        nx::audio::Format format;
+        nx::media::audio::Format format;
         bool result = false;
         bool done = false;
     };

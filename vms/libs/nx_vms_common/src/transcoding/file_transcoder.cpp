@@ -9,10 +9,9 @@
 
 #include <common/common_module.h>
 #include <core/resource/dummy_resource.h>
-
 #include <nx/utils/fs/file.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/random.h>
+#include <nx/utils/thread/mutex.h>
 
 FileTranscoder::FileTranscoder(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
@@ -184,7 +183,7 @@ static const qint64 USEC_IN_MSEC = 1000;
 
 void FileTranscoder::run()
 {
-    QnByteArray outPacket;
+    nx::utils::ByteArray outPacket;
 
     qint64 prevSrcPacketTimestamp = -1;
     qint64 srcUSecRead = 0;

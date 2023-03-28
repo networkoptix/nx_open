@@ -2,21 +2,20 @@
 
 #pragma once
 
-#include <set>
 #include <chrono>
 #include <memory>
 #include <ostream>
+#include <set>
 
 #include <QtCore/QRect>
 #include <QtCore/QVector>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/media/meta_data_packet.h>
 #include <nx/reflect/enum_instrument.h>
-#include <nx/streaming/media_data_packet_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/motion_types.h>
-#include <nx/reflect/instrument.h>
-#include <nx/streaming/media_data_packet.h>
 
 namespace nx {
 namespace common {
@@ -281,4 +280,3 @@ NX_VMS_COMMON_API ::std::ostream& operator<<(::std::ostream& os, const ObjectMet
 } // namespace metadata
 } // namespace common
 } // namespace nx
-

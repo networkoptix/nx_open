@@ -2,7 +2,7 @@
 
 #include "media_stream_statistics.h"
 
-#include <nx/streaming/media_data_packet.h>
+#include <nx/media/media_data_packet.h>
 
 void QnMediaStreamStatistics::onData(const QnAbstractMediaDataPtr& media)
 {

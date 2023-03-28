@@ -5,7 +5,7 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPalette>
 
-#include <utils/math/math.h>
+#include <nx/utils/math/math.h>
 
 namespace {
 

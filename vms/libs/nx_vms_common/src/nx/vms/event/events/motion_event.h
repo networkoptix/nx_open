@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <nx/vms/event/events/prolonged_event.h>
-
-#include <nx/streaming/abstract_data_packet.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/media/abstract_data_packet.h>
+#include <nx/vms/event/events/prolonged_event.h>
 
 namespace nx {
 namespace vms {

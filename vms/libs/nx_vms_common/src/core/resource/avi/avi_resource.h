@@ -4,9 +4,9 @@
 
 #include <optional>
 
+#include <nx/media/config.h>
+#include <nx/media/meta_data_packet.h>
 #include <nx/streaming/abstract_archive_resource.h>
-#include <nx/streaming/config.h>
-#include <nx/streaming/media_data_packet.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <utils/common/aspect_ratio.h>
 

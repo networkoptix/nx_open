@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/streaming/abstract_data_packet.h>
+#include <nx/media/abstract_data_packet.h>
 
 class AbstractMediaDataFilter
 {

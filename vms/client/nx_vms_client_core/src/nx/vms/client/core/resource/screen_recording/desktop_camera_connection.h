@@ -53,7 +53,7 @@ public:
         DesktopResourcePtr desktop);
     virtual ~DesktopCameraConnectionProcessor();
     void processRequest();
-    void sendData(const QnByteArray& data);
+    void sendData(const nx::utils::ByteArray& data);
     void sendData(const char* data, int len);
 
     void sendUnlock();

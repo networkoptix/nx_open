@@ -9,12 +9,12 @@
 #include <network/system_helpers.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/algorithm/index_of.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
-#include <utils/math/math.h>
 
 using namespace nx::vms::client::core;
 

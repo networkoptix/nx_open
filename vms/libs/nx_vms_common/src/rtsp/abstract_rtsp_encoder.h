@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/streaming/media_data_packet.h>
-#include <utils/common/byte_array.h>
+#include <nx/media/media_data_packet.h>
+#include <nx/utils/byte_array.h>
 
 /*
  * Base class for RTSP codec. Used for encode data only
@@ -26,7 +26,7 @@ public:
      * before function call (TCP RTSP header). So, function MUST add data only without clearing
      * buffer return true if some data are writed or false if no more data.
      */
-    virtual bool getNextPacket(QnByteArray& sendBuffer) = 0;
+    virtual bool getNextPacket(nx::utils::ByteArray& sendBuffer) = 0;
 
     virtual void init() = 0;
     virtual bool isEof() const = 0;

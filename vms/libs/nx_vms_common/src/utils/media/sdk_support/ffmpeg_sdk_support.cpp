@@ -2,12 +2,12 @@
 
 #include "ffmpeg_sdk_support.h"
 
+#include <nx/media/ffmpeg_helper.h>
 #include <nx/sdk/cloud_storage/helpers/algorithm.h>
 #include <nx/sdk/cloud_storage/helpers/media_data_packet.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scope_guard.h>
 #include <recording/helpers/recording_context_helpers.h>
-#include <utils/media/ffmpeg_helper.h>
 
 namespace nx::utils::media::sdk_support {
 

@@ -2,13 +2,12 @@
 
 #include "ffmpeg_audio_transcoder.h"
 
-#include <nx/streaming/audio_data_packet.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/config.h>
+#include <nx/media/audio_data_packet.h>
+#include <nx/media/codec_parameters.h>
+#include <nx/media/config.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
-
 #include <transcoding/transcoding_utils.h>
 
 namespace {

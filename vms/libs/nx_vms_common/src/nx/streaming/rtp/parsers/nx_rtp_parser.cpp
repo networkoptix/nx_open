@@ -2,26 +2,22 @@
 
 #include "nx_rtp_parser.h"
 
-#include <nx/kit/utils.h>
-#include <nx/utils/log/log.h>
-
 #include <analytics/common/object_metadata.h>
-
-#include <nx/streaming/rtp/rtp.h>
-#include <nx/streaming/audio_data_packet.h>
-#include <nx/streaming/video_data_packet.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/config.h>
-#include <nx/streaming/nx_streaming_ini.h>
-
 #include <nx/analytics/analytics_logging_ini.h>
-
-#include <utils/common/synctime.h>
-#include <utils/math/math.h>
-#include <motion/motion_detection.h>
+#include <nx/kit/utils.h>
+#include <nx/media/audio_data_packet.h>
+#include <nx/media/codec_parameters.h>
+#include <nx/media/config.h>
+#include <nx/media/motion_detection.h>
+#include <nx/media/video_data_packet.h>
+#include <nx/rtp/rtp.h>
+#include <nx/streaming/nx_streaming_ini.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/math/math.h>
+#include <utils/common/synctime.h>
 
-namespace nx::streaming::rtp {
+namespace nx::rtp {
 
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
@@ -299,4 +295,4 @@ void QnNxRtpParser::setAudioEnabled(bool value)
     m_isAudioEnabled = value;
 }
 
-} // namespace nx::streaming::rtp
+} // namespace nx::rtp

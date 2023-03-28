@@ -1,29 +1,30 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "ios_video_decoder.h"
-#if defined (Q_OS_IOS)
+#if defined(Q_OS_IOS)
 
-extern "C" {
-#include <libavformat/avformat.h>
+extern "C"
+{
 #include <libavcodec/videotoolbox.h>
+#include <libavformat/avformat.h>
+#include <libavutil/frame.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/pixdesc.h>
-#include <libavutil/frame.h>
 } // extern "C"
 
-#include <utils/media/annexb_to_mp4.h>
-#include <utils/media/ffmpeg_helper.h>
-#include <utils/media/ffmpeg_initializer.h>
-#include <utils/media/nalUnits.h>
-#include <utils/media/utils.h>
-#include <utils/media/h264_utils.h>
-#include <nx/utils/thread/mutex.h>
+#include <QtCore/QDebug>
+#include <QtCore/QFile>
+
+#include <nx/codec/nal_units.h>
+#include <nx/media/ffmpeg_helper.h>
+#include <nx/media/h264_utils.h>
+#include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
+#include <utils/media/annexb_to_mp4.h>
+#include <utils/media/ffmpeg_initializer.h>
 
 #include "aligned_mem_video_buffer.h"
-
-#include <QtCore/QFile>
-#include <QtCore/QDebug>
 
 #if defined(TARGET_OS_IPHONE)
 #include <CoreVideo/CoreVideo.h>
@@ -374,7 +375,7 @@ int IOSVideoDecoder::decode(
         if (compressedVideoData->flags & QnAbstractMediaData::MediaFlags_AVKey)
             avpkt.flags = AV_PKT_FLAG_KEY;
 
-        // It's already guaranteed by QnByteArray that there is an extra space reserved. We must
+        // It's already guaranteed by nx::utils::ByteArray that there is an extra space reserved. We must
         // fill the padding bytes according to ffmpeg documentation.
         if (avpkt.data)
             memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);

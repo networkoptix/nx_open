@@ -2,7 +2,7 @@
 
 #include "audio_encoder.h"
 
-#include <utils/media/ffmpeg_helper.h>
+#include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/log/log.h>
 
 namespace nx::media::ffmpeg {

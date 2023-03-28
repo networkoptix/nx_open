@@ -6,9 +6,9 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QListView>
 
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/desktop/common/utils/accessor.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <utils/math/math.h>
 
 namespace {
 
@@ -154,4 +154,3 @@ int ComboBoxField::currentIndex() const
 }
 
 } // namespace nx::vms::client::desktop
-

@@ -1,27 +1,27 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "audio_output.h"
-#include "abstract_audio_decoder.h"
 
-#include <deque>
 #include <atomic>
+#include <deque>
 
 #include <QtCore/QMutex>
 
-#include <nx/audio/sound.h>
 #include <nx/audio/audiodevice.h>
-#include <nx/audio/processor.h>
-
-#include <utils/math/math.h>
-
+#include <nx/audio/sound.h>
+#include <nx/media/audio/processor.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
+
+#include "abstract_audio_decoder.h"
 
 namespace nx {
 namespace media {
 
 using namespace nx::audio;
+using namespace nx::media::audio;
 
-using AudioFilter = std::function<Format(QnByteArray&, Format)>;
+using AudioFilter = std::function<Format(nx::utils::ByteArray&, Format)>;
 
 namespace {
 
@@ -136,7 +136,7 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
         d->audioOutput->state() == QAudio::ActiveState && //< and playing,
         d->audioOutput->isBufferUnderflow(); //< but no data in the buffer at all
 
-    Format codecAudioFormat = nx::audio::formatFromMediaContext(audioFrame->context);
+    Format codecAudioFormat = nx::media::audio::formatFromMediaContext(audioFrame->context);
     Format audioFormat(codecAudioFormat);
     audioFormat.codec = "audio/pcm";
     if (!d->audioOutput || //< first call

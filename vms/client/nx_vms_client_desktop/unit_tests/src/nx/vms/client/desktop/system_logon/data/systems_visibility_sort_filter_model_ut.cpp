@@ -6,11 +6,11 @@
 
 #include <QtCore/QSet>
 
+#include <nx/utils/math/math.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/system_logon/data/connect_tiles_proxy_model.h>
 #include <nx/vms/client/desktop/system_logon/data/systems_visibility_sort_filter_model.h>
 #include <ui/models/systems_model.h>
-#include <utils/math/math.h>
 
 namespace nx::vms::client::desktop {
 namespace test {

@@ -2,29 +2,29 @@
 
 #include "frame_info.h"
 
-#include <cstring>
-#include <cstdio>
 #include <array>
+#include <cstdio>
+#include <cstring>
 #include <memory>
 
 #include <QtGui/QImage>
 
-#include <nx/utils/switch.h>
+#include <nx/media/config.h>
+#include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
-#include <nx/streaming/config.h>
-
-#include <utils/math/math.h>
+#include <nx/utils/math/math.h>
+#include <nx/utils/switch.h>
 #include <utils/color_space/yuvconvert.h>
-#include <utils/media/ffmpeg_helper.h>
 
-extern "C" {
+extern "C"
+{
 #ifdef WIN32
-#   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
+#include <libavutil/imgutils.h>
 #include <libavutil/pixdesc.h>
 #include <libswscale/swscale.h>
-#include <libavutil/imgutils.h>
 #ifdef WIN32
 #   undef AVPixFmtDescriptor
 #endif

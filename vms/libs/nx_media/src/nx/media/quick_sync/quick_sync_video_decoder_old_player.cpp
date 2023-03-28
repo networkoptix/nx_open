@@ -2,7 +2,7 @@
 
 #include "quick_sync_video_decoder_old_player.h"
 
-#include <utils/media/utils.h>
+#include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
 
 #include "quick_sync_video_decoder_impl.h"

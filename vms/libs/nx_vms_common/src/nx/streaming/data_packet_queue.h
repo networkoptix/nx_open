@@ -3,8 +3,8 @@
 #ifndef DATA_PACKET_QUEUE_H
 #define DATA_PACKET_QUEUE_H
 
+#include <nx/media/abstract_data_packet.h>
 #include <utils/common/threadqueue.h>
-#include <nx/streaming/abstract_data_packet.h>
 
 typedef QnSafeQueue<QnAbstractDataPacketPtr> QnDataPacketQueue;
 typedef QnSafeQueue<QnConstAbstractDataPacketPtr> QnConstDataPacketQueue;

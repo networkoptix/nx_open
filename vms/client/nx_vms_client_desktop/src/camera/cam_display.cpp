@@ -9,17 +9,17 @@
 #include <core/resource/client_camera.h>
 #include <nx/branding.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/media/config.h>
+#include <nx/media/media_data_packet.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include <nx/streaming/config.h>
-#include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <utils/math/math.h>
 
 #include "audio_stream_display.h"
 #include "video_stream_display.h"
@@ -1310,10 +1310,10 @@ void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metada
 
         {
             NX_MUTEX_LOCKER locker(&m_lastMediaEventMutex);
-            nx::vms::common::deserialize(data, &m_lastMediaEvent);
+            nx::media::deserialize(data, &m_lastMediaEvent);
         }
 
-        if (m_lastMediaEvent.code == nx::vms::common::MediaStreamEvent::cannotDecryptMedia)
+        if (m_lastMediaEvent.code == nx::media::StreamEvent::cannotDecryptMedia)
         {
             // For 'cannotDecryptMedia' event just show 'cannotDecryptMedia' or 'no data' overlay.
             NX_MUTEX_LOCKER lock(&m_timeMutex);
@@ -1410,13 +1410,13 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         media->dataType == QnAbstractMediaData::AUDIO)
     {
         NX_MUTEX_LOCKER locker(&m_lastMediaEventMutex);
-        if (m_lastMediaEvent.code != nx::vms::common::MediaStreamEvent::noEvent && m_extTimeSrc)
+        if (m_lastMediaEvent.code != nx::media::StreamEvent::noEvent && m_extTimeSrc)
         {
             qint64 currentTime = m_extTimeSrc->getCurrentTime();
             if (currentTime != AV_NOPTS_VALUE)
                 m_archiveReader->jumpTo(currentTime, currentTime);
         }
-        m_lastMediaEvent = nx::vms::common::MediaStreamEventPacket();
+        m_lastMediaEvent = nx::media::StreamEventPacket();
     }
 
     if (media->dataType != QnAbstractMediaData::EMPTY_DATA)
@@ -1519,7 +1519,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     bool audioParamsChanged = false;
     if (ad)
     {
-        currentAudioFormat = { nx::audio::formatFromMediaContext(ad->context),
+        currentAudioFormat = { nx::media::audio::formatFromMediaContext(ad->context),
             ad->context->getBitsPerCodedSample() };
         audioParamsChanged = m_playingFormat != currentAudioFormat
             || m_audioDisplay->getAudioBufferSize() != expectedBufferSize;
@@ -2179,7 +2179,7 @@ qint64 QnCamDisplay::maximumLiveBufferMkSecs()
     return appContext()->localSettings()->maximumLiveBufferMs() * 1000ll;
 }
 
-nx::vms::common::MediaStreamEventPacket QnCamDisplay::lastMediaEvent() const
+nx::media::StreamEventPacket QnCamDisplay::lastMediaEvent() const
 {
     NX_MUTEX_LOCKER locker(&m_lastMediaEventMutex);
     return m_lastMediaEvent;

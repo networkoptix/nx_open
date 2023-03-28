@@ -2,20 +2,18 @@
 
 #include "text_image_filter.h"
 
+#include <QtGui/QAbstractTextDocumentLayout>
+#include <QtGui/QFontMetrics>
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
-#include <QtGui/QFontMetrics>
-#include <QtGui/QTextFrame>
 #include <QtGui/QTextDocument>
-#include <QtGui/QAbstractTextDocumentLayout>
+#include <QtGui/QTextFrame>
 
 #include <core/resource/resource_media_layout.h>
-
-#include <nx/streaming/config.h>
-
-#include <utils/math/math.h>
-#include <utils/media/frame_info.h>
+#include <nx/media/config.h>
+#include <nx/utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
+#include <utils/media/frame_info.h>
 
 namespace {
 

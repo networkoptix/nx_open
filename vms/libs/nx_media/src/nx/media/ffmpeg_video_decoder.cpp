@@ -4,16 +4,17 @@
 
 #include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
-extern "C" {
+extern "C"
+{
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/pixdesc.h>
 #include <libswscale/swscale.h>
 } // extern "C"
 
+#include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/media/ffmpeg_helper.h>
 
 #include "aligned_mem_video_buffer.h"
 #include "ini.h"
@@ -282,7 +283,7 @@ int FfmpegVideoDecoder::decode(
         if (compressedVideoData->flags & QnAbstractMediaData::MediaFlags_AVKey)
             avpkt.flags = AV_PKT_FLAG_KEY;
 
-        // It's already guaranteed by QnByteArray that there is an extra space reserved. We must
+        // It's already guaranteed by nx::utils::ByteArray that there is an extra space reserved. We must
         // fill the padding bytes according to ffmpeg documentation.
         if (avpkt.data)
             memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);

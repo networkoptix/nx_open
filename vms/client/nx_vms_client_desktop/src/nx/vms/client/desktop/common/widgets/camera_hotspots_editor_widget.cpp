@@ -10,6 +10,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/camera_hotspots/camera_hotspots_display_utils.h>
@@ -22,7 +23,6 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <utils/math/math.h>
 
 namespace {
 

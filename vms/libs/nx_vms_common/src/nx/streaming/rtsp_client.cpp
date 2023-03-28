@@ -3,25 +3,23 @@
 #include <QtCore/QtGlobal>
 
 #if defined(Q_OS_LINUX)
-    #include <sys/ioctl.h>
+#include <sys/ioctl.h>
 #endif
-
-#include <nx/streaming/rtsp_client.h>
-#include <nx/utils/datetime.h>
-#include <nx/network/http/custom_headers.h>
-#include <nx/network/http/http_client.h>
-#include <nx/network/rtsp/rtsp_types.h>
-#include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/std/algorithm.h>
-#include <nx/utils/uuid.h>
-
-#include <nx/vms/auth/time_based_nonce_provider.h>
 
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_connection_processor.h>
-#include <utils/common/sleep.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/nettools.h>
+#include <nx/network/rtsp/rtsp_types.h>
+#include <nx/network/url/url_parse_helper.h>
+#include <nx/streaming/rtsp_client.h>
+#include <nx/utils/datetime.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/algorithm.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/auth/time_based_nonce_provider.h>
+#include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 
 #define DEFAULT_RTP_PORT 554
@@ -190,10 +188,10 @@ void QnRtspIoDevice::processRtcpData()
                     qWarning() << "QnRtspIoDevice::processRtcpData(): setDestAddr() failed: " << SystemError::getLastOSErrorText().c_str();
                 }
             }
-            nx::streaming::rtp::RtcpSenderReport senderReport;
+            nx::rtp::RtcpSenderReport senderReport;
             if (senderReport.read(rtcpBuffer, bytesRead))
                 m_senderReport = senderReport;
-            int outBufSize = nx::streaming::rtp::buildClientRtcpReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+            int outBufSize = nx::rtp::buildClientRtcpReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
                 m_udpSockets.rtcpSocket->send(sendBuffer, outBufSize);
@@ -212,7 +210,7 @@ void QnRtspIoDevice::processRtcpData()
 
         if (m_reportTimer.elapsed() > 5000)
         {
-            int outBufSize = nx::streaming::rtp::buildClientRtcpReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+            int outBufSize = nx::rtp::buildClientRtcpReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
                 auto remoteEndpoint = nx::network::SocketAddress(m_hostAddress, m_remoteRtcpPort);
@@ -359,7 +357,7 @@ bool QnRtspClient::parseSDP(const QByteArray& response)
         m_sdpTracks.begin(), m_sdpTracks.end(),
         [this](const QnRtspClient::SDPTrackInfo& track)
         {
-            if (m_config.backChannelAudioOnly && track.sdpMedia.mediaType != nx::streaming::Sdp::MediaType::Audio)
+            if (m_config.backChannelAudioOnly && track.sdpMedia.mediaType != nx::rtp::Sdp::MediaType::Audio)
                 return true; //< Remove non audio tracks for back audio channel.
             return m_config.backChannelAudioOnly != track.sdpMedia.sendOnly;
         }),
@@ -560,12 +558,12 @@ unsigned int QnRtspClient::sessionTimeoutMs()
     return duration_cast<milliseconds>(m_keepAliveTimeOut).count();
 }
 
-const nx::streaming::Sdp& QnRtspClient::getSdp() const
+const nx::rtp::Sdp& QnRtspClient::getSdp() const
 {
     return m_sdp;
 }
 
-void QnRtspClient::setPreferredMap(const nx::streaming::Sdp::RtpMap& map)
+void QnRtspClient::setPreferredMap(const nx::rtp::Sdp::RtpMap& map)
 {
     m_sdp.preferredMap = map;
 }
@@ -718,7 +716,7 @@ CameraDiagnostics::Result QnRtspClient::sendOptions()
     return result;
 }
 
-int QnRtspClient::getTrackCount(nx::streaming::Sdp::MediaType mediaType) const
+int QnRtspClient::getTrackCount(nx::rtp::Sdp::MediaType mediaType) const
 {
     int result = 0;
     for (const auto& track: m_sdpTracks)
@@ -729,7 +727,7 @@ int QnRtspClient::getTrackCount(nx::streaming::Sdp::MediaType mediaType) const
     return result;
 }
 
-QStringList QnRtspClient::getSdpByType(nx::streaming::Sdp::MediaType mediaType) const
+QStringList QnRtspClient::getSdpByType(nx::rtp::Sdp::MediaType mediaType) const
 {
     for (const auto& track: m_sdpTracks)
     {
@@ -773,12 +771,12 @@ bool QnRtspClient::sendSetup()
         if (!isMediaTypeEnabled(track.sdpMedia.mediaType))
             continue;
 
-        if (track.sdpMedia.mediaType == Sdp::MediaType::Audio)
+        if (track.sdpMedia.mediaType == nx::rtp::Sdp::MediaType::Audio)
         {
             if (audioNum++ != m_selectedAudioChannel)
                 continue;
         }
-        else if (track.sdpMedia.mediaType != Sdp::MediaType::Video && !isAdditionalSupportedCodec)
+        else if (track.sdpMedia.mediaType != nx::rtp::Sdp::MediaType::Video && !isAdditionalSupportedCodec)
         {
             continue; // skip unknown metadata e.t.c
         }
@@ -1222,19 +1220,19 @@ int QnRtspClient::readBinaryResponse(quint8* data, int maxDataSize)
     return dataLen;
 }
 
-quint8* QnRtspClient::prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve)
+quint8* QnRtspClient::prepareDemuxedData(std::vector<nx::utils::ByteArray*>& demuxedData, int channel, int reserve)
 {
     if (channel >= 0 && demuxedData.size() <= (size_t)channel)
         demuxedData.resize(channel+1, nullptr);
     if (demuxedData[channel] == 0)
-        demuxedData[channel] = new QnByteArray(16, 32, /*AV_INPUT_BUFFER_PADDING_SIZE*/ 32);
-    QnByteArray* dataVect = demuxedData[channel];
+        demuxedData[channel] = new nx::utils::ByteArray(16, 32, /*AV_INPUT_BUFFER_PADDING_SIZE*/ 32);
+    nx::utils::ByteArray* dataVect = demuxedData[channel];
     //dataVect->resize(dataVect->size() + reserve);
     dataVect->reserve(dataVect->size() + reserve);
     return (quint8*) dataVect->data() + dataVect->size();
 }
 
-int QnRtspClient::readBinaryResponse(std::vector<QnByteArray*>& demuxedData, int& channelNumber)
+int QnRtspClient::readBinaryResponse(std::vector<nx::utils::ByteArray*>& demuxedData, int& channelNumber)
 {
     if (!m_tcpSock)
         return 0;
@@ -1288,7 +1286,7 @@ bool QnRtspClient::processTcpRtcpData(const quint8* data, int size)
     if (!ioDevice)
         return false;
 
-    nx::streaming::rtp::RtcpSenderReport senderReport;
+    nx::rtp::RtcpSenderReport senderReport;
     if (senderReport.read(data + 4, size - 4))
     {
         if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == senderReport.ssrc)
@@ -1540,7 +1538,7 @@ nx::utils::Url QnRtspClient::getUrl() const
     return m_url;
 }
 
-void QnRtspClient::setMediaTypeEnabled(nx::streaming::Sdp::MediaType mediaType, bool enabled)
+void QnRtspClient::setMediaTypeEnabled(nx::rtp::Sdp::MediaType mediaType, bool enabled)
 {
     if (enabled)
         m_disabledMediaTypes.erase(mediaType);
@@ -1548,7 +1546,7 @@ void QnRtspClient::setMediaTypeEnabled(nx::streaming::Sdp::MediaType mediaType, 
         m_disabledMediaTypes.insert(mediaType);
 }
 
-bool QnRtspClient::isMediaTypeEnabled(nx::streaming::Sdp::MediaType mediaType) const
+bool QnRtspClient::isMediaTypeEnabled(nx::rtp::Sdp::MediaType mediaType) const
 {
     return !m_disabledMediaTypes.contains(mediaType);
 }

@@ -11,6 +11,7 @@
 #include <client/client_runtime_settings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <nx/utils/math/math.h> /* For M_PI. */
 #include <nx/utils/string.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
@@ -39,7 +40,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
-#include <utils/math/math.h> /* For M_PI. */
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;

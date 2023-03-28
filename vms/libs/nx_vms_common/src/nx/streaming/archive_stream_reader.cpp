@@ -6,8 +6,8 @@
 
 #include <core/resource/media_resource.h>
 #include <core/resource/security_cam_resource.h>
+#include <nx/media/video_data_packet.h>
 #include <nx/streaming/abstract_data_consumer.h>
-#include <nx/streaming/video_data_packet.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>

@@ -2,15 +2,16 @@
 
 #include "ffmpeg_audio_decoder.h"
 
-extern "C" {
+extern "C"
+{
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
 } // extern "C"
 
 #include <nx/media/ffmpeg_audio_filter.h>
+#include <nx/media/ffmpeg_helper.h>
 #include <nx/media/ini.h>
 #include <nx/utils/log/log.h>
-#include <utils/media/ffmpeg_helper.h>
 
 namespace nx {
 namespace media {
@@ -114,7 +115,7 @@ bool FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, doub
         if (frame->flags & QnAbstractMediaData::MediaFlags_AVKey)
             avpkt.flags = AV_PKT_FLAG_KEY;
 
-        // It's already guaranteed by QnByteArray that there is an extra space reserved. We mus
+        // It's already guaranteed by nx::utils::ByteArray that there is an extra space reserved. We mus
         // fill the padding bytes according to ffmpeg documentation.
         if (avpkt.data)
             memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);

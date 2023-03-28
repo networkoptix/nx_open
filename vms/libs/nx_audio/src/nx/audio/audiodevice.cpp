@@ -15,22 +15,22 @@
 #endif
 #include <nx/utils/log/log.h>
 
-#if defined (Q_OS_IOS)
+#if defined(Q_OS_IOS)
 #include <nx/audio/ios_audio_utils.h>
 #endif
 
 #ifdef OPENAL_STATIC
-extern "C" {
+extern "C"
+{
 void alc_init(void);
 void alc_deinit(void);
 #pragma comment(lib, "winmm.lib")
 }
 #endif
 
-#include <nx/utils/software_version.h>
+#include <nx/media/audio/format.h>
 #include <nx/utils/ios_device_info.h>
-
-#include <nx/audio/format.h>
+#include <nx/utils/software_version.h>
 
 namespace nx {
 namespace audio {
@@ -212,7 +212,7 @@ void AudioDevice::setMute(bool mute)
     setVolume(!mute ? (m_volume < 0.0f ? -m_volume : m_volume) : 0.0f);
 }
 
-Sound* AudioDevice::createSound(const Format& format) const
+Sound* AudioDevice::createSound(const nx::media::audio::Format& format) const
 {
     if (!m_device || !m_context)
         return nullptr;

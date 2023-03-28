@@ -4,10 +4,9 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <core/resource/device_dependent_strings.h>
-
-#include <nx/utils/log/assert.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
+#include <nx/utils/log/assert.h>
 
 class QnCameraDiagnosticsErrorCodeStrings
 {
@@ -379,16 +378,16 @@ QString Result::toString(
     return ErrorCode::toString(errorCode, resourcePool, device, errorParams);
 }
 
-nx::vms::common::MediaStreamEvent Result::toMediaStreamEvent() const
+nx::media::StreamEvent Result::toMediaStreamEvent() const
 {
     switch (errorCode)
     {
         case ErrorCode::tooManyOpenedConnections:
-            return nx::vms::common::MediaStreamEvent::tooManyOpenedConnections;
+            return nx::media::StreamEvent::tooManyOpenedConnections;
         case ErrorCode::canNotDecryptMedia:
-            return nx::vms::common::MediaStreamEvent::cannotDecryptMedia;
+            return nx::media::StreamEvent::cannotDecryptMedia;
         default:
-            return nx::vms::common::MediaStreamEvent::noEvent;
+            return nx::media::StreamEvent::noEvent;
     }
 }
 

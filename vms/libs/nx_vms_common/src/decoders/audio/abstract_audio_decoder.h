@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/streaming/audio_data_packet.h>
-#include <nx/streaming/media_data_packet.h>
+#include <nx/media/audio_data_packet.h>
+#include <nx/media/media_data_packet.h>
 
 class QnAbstractAudioDecoder
 {
@@ -11,7 +11,7 @@ public:
     explicit QnAbstractAudioDecoder(){}
     virtual ~QnAbstractAudioDecoder(){};
 
-    virtual bool decode(QnCompressedAudioDataPtr& data, QnByteArray& result) = 0;
+    virtual bool decode(QnCompressedAudioDataPtr& data, nx::utils::ByteArray& result) = 0;
 
 private:
     QnAbstractAudioDecoder(const QnAbstractAudioDecoder&) {}

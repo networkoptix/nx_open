@@ -2,8 +2,8 @@
 
 #include "thumbnail_loader.h"
 
+#include <nx/utils/math/math.h>
 #include <recording/time_period.h>
-#include <utils/math/math.h>
 #include <utils/common/synctime.h>
 
 using namespace std::literals::chrono_literals;

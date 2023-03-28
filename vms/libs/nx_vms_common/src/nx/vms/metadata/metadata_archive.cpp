@@ -4,12 +4,12 @@
 
 #include <QtCore/QDir>
 
+#include <nx/media/sse_helper.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
 #include <utils/common/synctime.h>
-#include <utils/math/math.h>
-#include <utils/media/sse_helper.h>
 
 #include "metadata_helper.h"
 
@@ -233,13 +233,13 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
     int availableMediaRecords = m_detailedMetadataFile.size() / m_index.header.recordSize;
     if (m_noGeometryMetadataFile)
     {
-        availableMediaRecords = std::min(availableMediaRecords, 
+        availableMediaRecords = std::min(availableMediaRecords,
             (int) m_noGeometryMetadataFile->size() / m_index.header.noGeometryRecordSize());
     }
     int mediaRecords = m_index.truncateTo(availableMediaRecords);
     if (!resizeFile(&m_detailedIndexFile, m_index.indexFileSize()))
     {
-        NX_WARNING(this, "Failed to resize file %1 to size %2", 
+        NX_WARNING(this, "Failed to resize file %1 to size %2",
             m_detailedIndexFile.fileName(), m_index.indexFileSize());
         return false;
     }
@@ -284,7 +284,7 @@ bool MetadataArchive::saveToArchiveInternal(const QnConstAbstractCompressedMetad
 
     if (timestamp < m_lastRecordedTime)
     {
-        NX_WARNING(this, 
+        NX_WARNING(this,
             "Timestamp discontinuity %1 detected for metadata binary index, "
             "previous time=%2, camera=%3", timestamp, m_lastRecordedTime, m_physicalId);
         if (!(m_index.header.flags & IndexHeader::Flags::hasDiscontinue))
@@ -364,7 +364,7 @@ bool addToResultAsc(
     }
 
     QnTimePeriod& last = rez.back();
-    if (!rez.empty() && fullStartTimeMs <= last.startTimeMs 
+    if (!rez.empty() && fullStartTimeMs <= last.startTimeMs
         + last.durationMs + filter->detailLevel.count())
     {
         last.durationMs = qMax(last.durationMs, durationMs + fullStartTimeMs - last.startTimeMs);
@@ -391,7 +391,7 @@ bool addToResultAscUnordered(
     }
 
     QnTimePeriod& last = rez.back();
-    if (fullStartTimeMs >= last.startTimeMs 
+    if (fullStartTimeMs >= last.startTimeMs
         && fullStartTimeMs <= last.startTimeMs + last.durationMs + filter->detailLevel.count())
     {
         last.durationMs = qMax(last.durationMs, durationMs + fullStartTimeMs - last.startTimeMs);
@@ -446,7 +446,7 @@ bool addToResultDescUnordered(
 
     QnTimePeriod& last = rez.back();
     const auto detailLevel = filter->detailLevel.count();
-    if (fullStartTimeMs <= last.startTimeMs 
+    if (fullStartTimeMs <= last.startTimeMs
         && fullStartTimeMs + durationMs + detailLevel >= last.startTimeMs)
     {
         const auto endTimeMs = last.endTimeMs();
@@ -470,7 +470,7 @@ void MetadataArchive::loadDataFromIndex(
     const QVector<IndexRecord>::iterator endItr,
     QnTimePeriodList& rez) const
 {
-    QnByteArray buffer(kAlignment, 0, 0);
+    nx::utils::ByteArray buffer(kAlignment, 0, 0);
 
     int mediaRecordsLeft = 0;
     for (auto i = startItr; i < endItr; ++i)
@@ -560,7 +560,7 @@ void MetadataArchive::loadDataFromIndexDesc(
     const QVector<IndexRecord>::iterator endItr,
     QnTimePeriodList& rez) const
 {
-    QnByteArray buffer(kAlignment, 0, 0);
+    nx::utils::ByteArray buffer(kAlignment, 0, 0);
 
     const int recordSize = recordMatcher->isNoGeometryMode()
         ? index.header.noGeometryRecordSize() : index.header.recordSize;
@@ -574,7 +574,7 @@ void MetadataArchive::loadDataFromIndexDesc(
     const int maxRecordsInBuffer = kReadBufferSize / recordSize;
     const int recordsToRead = qMin(mediaRecordsLeft, maxRecordsInBuffer);
 
-    auto calcRecordNumberToSeek = 
+    auto calcRecordNumberToSeek =
         [&index](auto currentItr, auto startItr, int maxMediaRecords)
         {
             int mediaRecordsInBlock = 0;
@@ -740,7 +740,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
                     {
                         loadDataFromIndex(
                             hasDiscontinue ? addToResultAscUnordered : addToResultAsc,
-                            recordMatcher->filter(), 
+                            recordMatcher->filter(),
                             breakCallback, index, startItr, endItr, rez);
                     }
                 }

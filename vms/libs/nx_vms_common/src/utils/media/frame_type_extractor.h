@@ -11,7 +11,7 @@ extern "C"
 #include <libavcodec/avcodec.h>
 }
 
-#include <nx/streaming/av_codec_media_context.h>
+#include <nx/media/codec_parameters.h>
 
 class NX_VMS_COMMON_API FrameTypeExtractor
 {
@@ -44,6 +44,3 @@ private:
 };
 
 #endif // FRAME_TYPE_EXTRACTOR_H
-
-
-

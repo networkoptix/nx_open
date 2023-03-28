@@ -5,10 +5,10 @@
 #include <functional>
 
 #include <QtCore/QObject>
-#include <QtMultimedia/QVideoFrame>
 #include <QtGui/QOpenGLContext>
+#include <QtMultimedia/QVideoFrame>
 
-#include <nx/streaming/video_data_packet.h>
+#include <nx/media/video_data_packet.h>
 
 #include "abstract_render_context_synchronizer.h"
 

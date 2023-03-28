@@ -4,8 +4,8 @@
 
 #include <QtCore/QDateTime>
 
-#include <utils/math/math.h>
 #include <date_time_formatter/date_time_formatter.h>
+#include <nx/utils/math/math.h>
 
 using std::chrono::milliseconds;
 

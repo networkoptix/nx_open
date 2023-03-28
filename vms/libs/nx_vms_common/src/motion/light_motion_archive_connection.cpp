@@ -40,7 +40,7 @@ QnAbstractCompressedMetadataPtr QnLightMotionArchiveConnection::getMotionData(qi
         m_lastResult->m_duration = nextTimeUsec - m_lastResult->timestamp;
     }
     else {
-        m_lastResult = QnMetaDataV1::fromLightData(*itr);
+        m_lastResult = QnMetaDataV1::fromLightData(*itr, qnSyncTime->currentTimePoint());
     }
 
     if (!m_lastResult->containTime(timeUsec))

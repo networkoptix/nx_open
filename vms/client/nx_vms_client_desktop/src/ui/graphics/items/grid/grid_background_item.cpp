@@ -9,6 +9,7 @@
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
@@ -26,7 +27,6 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
 #include <utils/color_space/yuvconvert.h>
-#include <utils/math/math.h>
 
 #if defined(_WIN32)
 /**
