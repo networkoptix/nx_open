@@ -212,6 +212,18 @@ void migrateLastUsedConnectionFrom4_2(LocalSettings* settings, QSettings* oldSet
     settings->lastUsedConnection = data;
 }
 
+void migrateLogSettingsFrom5_0(LocalSettings* settings, QSettings* oldSettings)
+{
+    nx::utils::property_storage::migrateValue(oldSettings,
+        settings->maxLogFileSizeB, "maxLogFileSize");
+
+    if (oldSettings->contains("logArchiveSize") && !settings->maxLogVolumeSizeB.exists())
+    {
+        auto oldValue = oldSettings->value("logArchiveSize").toULongLong();
+        settings->maxLogVolumeSizeB = (oldValue + 1) * settings->maxLogFileSizeB.value();
+    }
+}
+
 } // namespace
 
 LocalSettings::LocalSettings():
@@ -260,6 +272,7 @@ void LocalSettings::migrateOldSettings()
     migrateSettingsFrom5_1(this, oldSettings.get());
     migrateLastUsedConnectionFrom4_2(this, oldSettings.get());
     migrateMediaFoldersFrom4_3(this, oldSettings.get());
+    migrateLogSettingsFrom5_0(this, oldSettings.get());
 }
 
 void LocalSettings::setDefaults()

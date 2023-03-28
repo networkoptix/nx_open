@@ -8,6 +8,7 @@
 
 #include <common/common_globals.h>
 #include <nx/branding.h>
+#include <nx/utils/log/log_settings.h>
 #include <nx/utils/property_storage/storage.h>
 #include <nx/vms/client/core/system_logon/connection_data.h>
 #include <nx/vms/client/desktop/export/settings/export_layout_persistent_settings.h>
@@ -56,6 +57,15 @@ public:
     Property<QString> locale{this, "locale", nx::branding::defaultLocale()};
 
     Property<QString> logLevel{this, "logLevel"};
+    Property<qint64> maxLogFileSizeB{this, nx::utils::log::kMaxLogFileSizeSymbolicName,
+        nx::utils::log::kDefaultMaxLogFileSizeB};
+    Property<qint64> maxLogVolumeSizeB{this, nx::utils::log::kMaxLogVolumeSizeSymbolicName,
+        nx::utils::log::kDefaultMaxLogVolumeSizeB};
+    Property<std::chrono::seconds> maxLogFileTimePeriodS{this,
+        nx::utils::log::kMaxLogFileTimePeriodSymbolicName,
+        nx::utils::log::kDefaultMaxLogFileTimePeriodS};
+    Property<bool> logArchivingEnabled{this, nx::utils::log::kLogArchivingEnabledSymbolicName,
+        nx::utils::log::kDefaultLogArchivingEnabled};
 
     Property<QnUuid> pcUuid{this, "pcUuid", {},
         "Unique id for this PC for videowall construction."};

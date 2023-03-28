@@ -89,16 +89,10 @@ nx::vms::api::ServerLogSettings loadClientSettings()
     nx::vms::api::ServerLogSettings result;
     result.mainLog.primaryLevel = levelFromString(appContext()->localSettings()->logLevel());
 
-    QSettings rawSettings;
-    result.maxVolumeSizeB = rawSettings.value(
-        kMaxLogVolumeSizeSymbolicName,
-        250 * 1024 * 1024).toULongLong();
-    result.maxFileSizeB = rawSettings.value(
-        kMaxLogFileSizeSymbolicName,
-        10 * 1024 * 1024).toULongLong();
-    result.maxFileTimePeriodS = std::chrono::seconds(rawSettings.value(
-        kMaxLogFileTimePeriodSymbolicName,
-        0).toULongLong());
+    result.maxVolumeSizeB = appContext()->localSettings()->maxLogVolumeSizeB();
+    result.maxFileSizeB = appContext()->localSettings()->maxLogFileSizeB();
+    result.maxFileTimePeriodS = appContext()->localSettings()->maxLogFileTimePeriodS();
+    result.archivingEnabled = appContext()->localSettings()->logArchivingEnabled();
 
     return result;
 }
@@ -110,22 +104,16 @@ void storeAndApplyClientSettings(nx::vms::api::ServerLogSettings settings)
 
     const auto level = settings.mainLog.primaryLevel;
     appContext()->localSettings()->logLevel = LogsManagementModel::logLevelName(level);
-
-    QSettings rawSettings;
-    rawSettings.setValue(
-        kMaxLogVolumeSizeSymbolicName,
-        settings.maxVolumeSizeB);
-    rawSettings.setValue(
-        kMaxLogFileSizeSymbolicName,
-        settings.maxFileSizeB);
-    rawSettings.setValue(
-        kMaxLogFileTimePeriodSymbolicName,
-        (long long)settings.maxFileTimePeriodS.count()); //< Type cast from count() is ambigous.
+    appContext()->localSettings()->maxLogVolumeSizeB = settings.maxVolumeSizeB;
+    appContext()->localSettings()->maxLogFileSizeB = settings.maxFileSizeB;
+    appContext()->localSettings()->maxLogFileTimePeriodS = settings.maxFileTimePeriodS;
+    appContext()->localSettings()->logArchivingEnabled = settings.archivingEnabled;
 
     LoggerSettings loggerSettings;
     loggerSettings.maxVolumeSizeB = settings.maxVolumeSizeB;
     loggerSettings.maxFileSizeB = settings.maxFileSizeB;
     loggerSettings.maxFileTimePeriodS = settings.maxFileTimePeriodS;
+    loggerSettings.archivingEnabled = settings.archivingEnabled;
     loggerSettings.level.primary = level;
 
     // Initialize as a set in order to remove duplicates.
