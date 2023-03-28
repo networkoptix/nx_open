@@ -21,7 +21,7 @@ static constexpr int kMaxLogRotation = 999;
 static constexpr qint64 kDefaultMaxLogVolumeSizeB = 250 * 1024 * 1024;
 static constexpr qint64 kDefaultMaxLogFileSizeB = 10 * 1024 * 1024;
 static constexpr std::chrono::seconds kDefaultMaxLogFileTimePeriodS = std::chrono::seconds::zero();
-static constexpr bool kDefaultDisableLogArchiving = false;
+static constexpr bool kDefaultLogArchivingEnabled = true;
 
 class NX_UTILS_API AbstractWriter
 {
@@ -78,7 +78,7 @@ public:
         qint64 maxVolumeSizeB = kDefaultMaxLogVolumeSizeB; /**< Maximum volume size. */
         qint64 maxFileSizeB = kDefaultMaxLogFileSizeB; /**< Maximum file size. */
         std::chrono::seconds maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS; /**< Maximum file duration in time. */
-        bool disableArchiving = kDefaultDisableLogArchiving; /**< Zipping enabled/disabled flag. */
+        bool archivingEnabled = kDefaultLogArchivingEnabled; /**< Zipping enabled/disabled flag. */
     };
 
     File(Settings settings);

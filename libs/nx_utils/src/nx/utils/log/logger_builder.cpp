@@ -93,7 +93,7 @@ std::unique_ptr<Logger> LoggerBuilder::buildLogger(
             fileSettings.maxVolumeSizeB = settings.maxVolumeSizeB;
             fileSettings.maxFileSizeB = settings.maxFileSizeB;
             fileSettings.maxFileTimePeriodS = settings.maxFileTimePeriodS;
-            fileSettings.disableArchiving = settings.disableArchiving;
+            fileSettings.archivingEnabled = settings.archivingEnabled;
             fileSettings.name = settings.directory.isEmpty()
                 ? baseName
                 : (settings.directory + "/" + baseName);

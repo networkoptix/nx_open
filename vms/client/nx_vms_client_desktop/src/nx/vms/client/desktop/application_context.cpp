@@ -338,11 +338,6 @@ struct ApplicationContext::Private
             return;
 
         NX_INFO(NX_SCOPE_TAG, "Log is initialized from the settings");
-        const auto rawSettings = LogsManagementWatcher::clientLogSettings();
-        const auto maxVolumeSize = rawSettings.maxVolumeSizeB;
-        const auto maxFileSize = rawSettings.maxFileSizeB;
-        const auto maxFileTimePeriod = rawSettings.maxFileTimePeriodS;
-
         auto logLevel = startupParameters.logLevel;
         auto logFile = startupParameters.logFile;
 
@@ -359,9 +354,10 @@ struct ApplicationContext::Private
         Settings logSettings;
         logSettings.loggers.resize(1);
         auto& logger = logSettings.loggers.front();
-        logger.maxVolumeSizeB = maxVolumeSize;
-        logger.maxFileSizeB = maxFileSize;
-        logger.maxFileTimePeriodS = std::chrono::seconds(maxFileTimePeriod);
+        logger.maxVolumeSizeB = appContext()->localSettings()->maxLogVolumeSizeB();
+        logger.maxFileSizeB = appContext()->localSettings()->maxLogFileSizeB();
+        logger.maxFileTimePeriodS = appContext()->localSettings()->maxLogFileTimePeriodS();
+        logger.archivingEnabled = appContext()->localSettings()->logArchivingEnabled();
         logger.level.parse(logLevel);
         logger.logBaseName = logFile.isEmpty()
             ? ("client_log" + logFileNameSuffix)

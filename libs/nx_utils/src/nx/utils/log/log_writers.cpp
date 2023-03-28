@@ -73,7 +73,7 @@ void File::setSettings(const Settings& settings)
     m_settings.maxFileSizeB = settings.maxFileSizeB;
     m_settings.maxFileTimePeriodS = settings.maxFileTimePeriodS;
     NX_ASSERT(m_settings.maxVolumeSizeB >= m_settings.maxFileSizeB);
-    m_settings.disableArchiving = settings.disableArchiving;
+    m_settings.archivingEnabled = settings.archivingEnabled;
 }
 
 void File::write(Level /*level*/, const QString& message)
@@ -146,7 +146,7 @@ QString File::makeBaseFileName(QString fullPath)
 
 QString File::getFileName(size_t backupNumber) const
 {
-    if (m_settings.disableArchiving || backupNumber == 0)
+    if (!m_settings.archivingEnabled || backupNumber == 0)
         return makeFileName(m_settings.name, backupNumber, Extension::log);
 
     return makeFileName(m_settings.name, backupNumber, Extension::zip);
@@ -194,7 +194,7 @@ bool File::openFile()
 
 void File::archive(QString fileName, QString archiveName)
 {
-    NX_ASSERT(!m_settings.disableArchiving);
+    NX_ASSERT(m_settings.archivingEnabled);
     auto tmpArchiveName = archiveName;
     tmpArchiveName.replace(toQString(Extension::zip), toQString(Extension::zipTmp));
 
@@ -304,7 +304,7 @@ void File::rotateAndStartArchivingIfNeeded()
             dir.rename(fileName, correctName);
     }
 
-    if (m_settings.disableArchiving)
+    if (!m_settings.archivingEnabled)
     {
         auto rotateName = makeFileName(m_settings.name, firstFreeNumber, Extension::log);
         if (!NX_ASSERT(!QFile::exists(rotateName)))
@@ -407,7 +407,7 @@ void File::rotateLeftovers()
         stem + "_*" + toQString(Extension::zipTmp)}, QDir::Files, QDir::Name);
     for (auto fileName: rotatedList)
     {
-        if (m_settings.disableArchiving || fileName.endsWith(toQString(Extension::zipTmp)))
+        if (!m_settings.archivingEnabled || fileName.endsWith(toQString(Extension::zipTmp)))
         {
             const auto correctName = fileName.endsWith(toQString(Extension::tmp))
                 ? fileName.chopped(toQString(Extension::tmp).size()) + toQString(Extension::log)
