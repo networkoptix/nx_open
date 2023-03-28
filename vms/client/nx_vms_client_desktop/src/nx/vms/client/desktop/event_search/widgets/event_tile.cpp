@@ -147,8 +147,8 @@ struct EventTile::Private
     Qt::MouseButton clickButton = Qt::NoButton;
     Qt::KeyboardModifiers clickModifiers;
     QPoint clickPoint;
+    QString title;
     QCache<int, QString> titleByWidth; //< key - width of nameLabel, value - trimmed title string
-    QTextDocument doc;
     int currentWidth = 0;
 
     Private(EventTile* q):
@@ -164,20 +164,40 @@ struct EventTile::Private
 
     void setTitle(const QString& value)
     {
+        if (title == value)
+            return;
+
+        title = value;
         currentWidth = 0;
         titleByWidth.clear();
         titleByWidth.insert(0, new QString(value));
-        doc.setHtml(nx::vms::common::html::toHtml(value));
+
+        updateTitleForCurrentWidth();
     }
 
-    void updateTitlesIfNeeded(int width)
+    void updateTitleForCurrentWidth()
     {
-        if (!titleByWidth.contains(width))
+        const auto width = q->ui->nameLabel->width();
+        if (width == 0 || width == currentWidth)
+            return;
+
+        QString text;
+        if (const auto textPtr = titleByWidth.object(width))
         {
+            text = *textPtr;
+        }
+        else
+        {
+            QTextDocument doc;
+            doc.setHtml(nx::vms::common::html::toHtml(title));
             doc.setTextWidth(width);
             WidgetUtils::elideDocumentLines(&doc, kTileTitleLineLimit, true);
-            titleByWidth.insert(width, new QString(doc.toHtml("utf-8")));
+            text = doc.toHtml("utf-8");
+            titleByWidth.insert(width, new QString(text));
         }
+
+        q->ui->nameLabel->setText(text);
+        currentWidth = width;
     }
 
     void handleHoverChanged(bool hovered)
@@ -468,18 +488,7 @@ EventTile::~EventTile()
 bool EventTile::eventFilter(QObject* object, QEvent* event)
 {
     if (object == ui->nameLabel && event->type() == QEvent::Resize)
-    {
-        auto resizeEvent = static_cast<QResizeEvent*>(event);
-        if (auto width = resizeEvent->size().width(); width != 0)
-        {
-            d->updateTitlesIfNeeded(width);
-            if (d->currentWidth != width)
-            {
-                d->currentWidth = width;
-                ui->nameLabel->setText(*d->titleByWidth[width]);
-            }
-        }
-    }
+        d->updateTitleForCurrentWidth();
 
     return base_type::eventFilter(object, event);
 }
@@ -514,7 +523,6 @@ QString EventTile::title() const
 void EventTile::setTitle(const QString& value)
 {
     d->setTitle(value);
-    ui->nameLabel->setText(value);
     ui->mainWidget->setHidden(value.isEmpty());
 }
 
