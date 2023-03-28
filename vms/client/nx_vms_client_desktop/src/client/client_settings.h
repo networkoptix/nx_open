@@ -14,6 +14,7 @@
 #include <core/resource/resource_display_info.h>
 #include <health/system_health.h>
 #include <nx/branding.h>
+#include <nx/utils/log/log_settings.h>
 #include <nx/utils/qset.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
@@ -123,6 +124,10 @@ public:
         BACKGROUND_IMAGE,
 
         LOG_LEVEL,
+        MAX_LOG_SIZE,
+        MAX_LOG_VOLUME_SIZE,
+        MAX_LOG_TIME_PERIOD,
+        LOG_ARCHIVING,
 
         /** Initial and maximal live buffer lengths, in milliseconds. */
         INITIAL_LIVE_BUFFER_MSECS,
@@ -300,6 +305,10 @@ private:
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_R_PROPERTY(bool,                         stickReconnectToServer,                             STICKY_RECONNECT,           false)
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  "none")
+        QN_DECLARE_RW_PROPERTY(qint64,                      maxLogFileSizeB,        setMaxLogFileSizeB,         MAX_LOG_SIZE,               nx::utils::log::kDefaultMaxLogFileSizeB)
+        QN_DECLARE_RW_PROPERTY(qint64,                      maxLogVolumeSizeB,      setMaxLogVolumeSizeB,       MAX_LOG_VOLUME_SIZE,        nx::utils::log::kDefaultMaxLogVolumeSizeB)
+        QN_DECLARE_RW_PROPERTY(int,                         maxLogFileTimePeriodS,  setMaxLogFileTimePeriodS,   MAX_LOG_TIME_PERIOD,        nx::utils::log::kDefaultMaxLogFileTimePeriodS.count())
+        QN_DECLARE_RW_PROPERTY(bool,                        logArchivingEnabled,    setLogArchivingEnabled,     LOG_ARCHIVING,              nx::utils::log::kDefaultLogArchivingEnabled)
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMs,    setInitialLiveBufferMs,     INITIAL_LIVE_BUFFER_MSECS,  50)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMs,    setMaximumLiveBufferMs,     MAXIMUM_LIVE_BUFFER_MSECS,  500)
         QN_DECLARE_RW_PROPERTY(QString,                     detectedObjectDisplaySettings, setDetectedObjectDisplaySettings, DETECTED_OBJECT_DISPLAY_SETTINGS, QString())
@@ -348,6 +357,7 @@ private:
     void migrateLastUsedConnection();
     // Migration between 4.3 and 4.3.
     void migrateMediaFolders();
+    void migrateLogSettings();
 
 public:
     // Override getter

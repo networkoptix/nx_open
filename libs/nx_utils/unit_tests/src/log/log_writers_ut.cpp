@@ -34,13 +34,13 @@ public:
     {
     }
 
-    std::unique_ptr<AbstractWriter> makeWriter(size_t file, size_t volume = kDefaultMaxLogVolumeSizeB, bool disableArchiving = false)
+    std::unique_ptr<AbstractWriter> makeWriter(size_t file, size_t volume = kDefaultMaxLogVolumeSizeB, bool archivingEnabled = true)
     {
         File::Settings settings;
         settings.name = m_basePath;
         settings.maxFileSizeB = file;
         settings.maxVolumeSizeB = volume;
-        settings.disableArchiving = disableArchiving;
+        settings.archivingEnabled = archivingEnabled;
         return std::make_unique<File>(settings);
     }
 
@@ -200,7 +200,7 @@ TEST_F(LogFile, RotationZipNoZip)
     checkFile({"1234567890"});
 
     {
-        auto w = makeWriter(kLogSize, kVolumeSize, true);
+        auto w = makeWriter(kLogSize, kVolumeSize, false);
         w->write(Level::undefined, "1234567890"); //< Overflow
     }
     checkFile({"1234567890", "1234567890"}, "_001", File::Extension::log);
@@ -217,7 +217,7 @@ TEST_F(LogFile, RotationZipNoZip)
     checkFile();
 
     {
-        auto w = makeWriter(kLogSize, kVolumeSize, true);
+        auto w = makeWriter(kLogSize, kVolumeSize, false);
         w->write(Level::undefined, "a");
         w->write(Level::undefined, "b");
         w->write(Level::undefined, "c");

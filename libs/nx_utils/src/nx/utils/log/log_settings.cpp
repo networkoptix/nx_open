@@ -62,9 +62,9 @@ bool LoggerSettings::parse(const QString& str)
                 maxFileTimePeriodS = std::chrono::duration_cast<std::chrono::seconds>(duration.value());
             parseSucceeded = parseSucceeded && duration;
         }
-        else if (param.first == kDisableLogArchivingSymbolicName)
+        else if (param.first == kLogArchivingEnabledSymbolicName)
         {
-            disableArchiving = QVariant(param.second.c_str()).toBool();
+            archivingEnabled = QVariant(param.second.c_str()).toBool();
         }
     }
 
@@ -101,8 +101,8 @@ static void readRotationParams(
         kMaxLogFileSizeSymbolicName, defaults.maxFileSizeB).toLongLong();
     target->maxFileTimePeriodS = std::chrono::seconds((size_t) settings->value(
         kMaxLogFileTimePeriodSymbolicName, (int) defaults.maxFileTimePeriodS.count()).toLongLong());
-    target->disableArchiving = settings->value(
-        kDisableLogArchivingSymbolicName, defaults.disableArchiving).toBool();
+    target->archivingEnabled = settings->value(
+        kLogArchivingEnabledSymbolicName, defaults.archivingEnabled).toBool();
 
     if (!NX_ASSERT(target->maxVolumeSizeB >= target->maxFileSizeB,
         "Volume size %1 is less then file size %2", target->maxVolumeSizeB, target->maxFileSizeB))
@@ -122,7 +122,7 @@ Settings::Settings(QSettings* settings)
         .maxVolumeSizeB = kDefaultMaxLogVolumeSizeB,
         .maxFileSizeB = kDefaultMaxLogFileSizeB,
         .maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS,
-        .disableArchiving = kDefaultDisableLogArchiving,
+        .archivingEnabled = kDefaultLogArchivingEnabled,
     });
 
     for (const auto& group: settings->childGroups())
@@ -139,7 +139,7 @@ Settings::Settings(QSettings* settings)
             if (levelKey == kMaxLogVolumeSizeSymbolicName
                 || levelKey == kMaxLogFileSizeSymbolicName
                 || levelKey == kMaxLogFileTimePeriodSymbolicName
-                || levelKey == kDisableLogArchivingSymbolicName)
+                || levelKey == kLogArchivingEnabledSymbolicName)
             {
                 continue; //< Already parsed by readRotationParams.
             }
@@ -237,7 +237,7 @@ void Settings::loadCompatibilityLogger(
     if (duration)
         loggerSettings.maxFileTimePeriodS = std::chrono::duration_cast<std::chrono::seconds>(duration.value());
 
-    loggerSettings.disableArchiving = settings.value(makeKey(kDisableLogArchivingSymbolicName)).toBool();
+    loggerSettings.archivingEnabled = settings.value(makeKey(kLogArchivingEnabledSymbolicName)).toBool();
 
     loggerSettings.logBaseName = settings.value(makeKey("baseName")).toString();
     if (loggerSettings.logBaseName.isEmpty())

@@ -410,6 +410,26 @@ void QnClientSettings::migrateMediaFolders()
     setMediaFolders(mediaFolders);
 }
 
+void QnClientSettings::migrateLogSettings()
+{
+    if (!m_settings->contains(name(MAX_LOG_SIZE)) && m_settings->contains("maxLogFileSize"))
+    {
+        auto oldValue = m_settings->value("maxLogFileSize").toULongLong();
+        setMaxLogFileSizeB(oldValue);
+        writeValueToSettings(m_settings, MAX_LOG_SIZE, oldValue);
+    }
+    m_settings->remove("maxLogFileSize");
+
+    if (!m_settings->contains(name(MAX_LOG_VOLUME_SIZE)) && m_settings->contains("logArchiveSize"))
+    {
+        auto oldValue = m_settings->value("logArchiveSize").toULongLong();
+        auto newValue = (oldValue + 1) * maxLogFileSizeB();
+        setMaxLogVolumeSizeB(newValue);
+        writeValueToSettings(m_settings, MAX_LOG_VOLUME_SIZE, newValue);
+    }
+    m_settings->remove("logArchiveSize");
+}
+
 void QnClientSettings::load()
 {
     m_settings->sync();
@@ -441,6 +461,7 @@ void QnClientSettings::migrate()
 {
     migrateLastUsedConnection();
     migrateMediaFolders();
+    migrateLogSettings();
 }
 
 QVariant QnClientSettings::iniConfigValue(const QString& paramName)

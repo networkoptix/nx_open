@@ -88,17 +88,10 @@ nx::vms::api::ServerLogSettings loadClientSettings()
 
     nx::vms::api::ServerLogSettings result;
     result.mainLog.primaryLevel = levelFromString(qnSettings->logLevel());
-
-    QSettings rawSettings;
-    result.maxVolumeSizeB = rawSettings.value(
-        kMaxLogVolumeSizeSymbolicName,
-        250 * 1024 * 1024).toULongLong();
-    result.maxFileSizeB = rawSettings.value(
-        kMaxLogFileSizeSymbolicName,
-        10 * 1024 * 1024).toULongLong();
-    result.maxFileTimePeriodS = std::chrono::seconds(rawSettings.value(
-        kMaxLogFileTimePeriodSymbolicName,
-        0).toULongLong());
+    result.maxVolumeSizeB = qnSettings->maxLogVolumeSizeB();
+    result.maxFileSizeB = qnSettings->maxLogFileSizeB();
+    result.maxFileTimePeriodS = std::chrono::seconds(qnSettings->maxLogFileTimePeriodS());
+    result.archivingEnabled = qnSettings->logArchivingEnabled();
 
     return result;
 }
@@ -110,22 +103,16 @@ void storeAndApplyClientSettings(nx::vms::api::ServerLogSettings settings)
 
     const auto level = settings.mainLog.primaryLevel;
     qnSettings->setLogLevel(LogsManagementModel::logLevelName(level));
-
-    QSettings rawSettings;
-    rawSettings.setValue(
-        kMaxLogVolumeSizeSymbolicName,
-        settings.maxVolumeSizeB);
-    rawSettings.setValue(
-        kMaxLogFileSizeSymbolicName,
-        settings.maxFileSizeB);
-    rawSettings.setValue(
-        kMaxLogFileTimePeriodSymbolicName,
-        (long long)settings.maxFileTimePeriodS.count()); //< Type cast from count() is ambigous.
+    qnSettings->setMaxLogVolumeSizeB(settings.maxVolumeSizeB);
+    qnSettings->setMaxLogFileSizeB(settings.maxFileSizeB);
+    qnSettings->setMaxLogFileTimePeriodS((long long)settings.maxFileTimePeriodS.count());
+    qnSettings->setLogArchivingEnabled(settings.archivingEnabled);
 
     LoggerSettings loggerSettings;
     loggerSettings.maxVolumeSizeB = settings.maxVolumeSizeB;
     loggerSettings.maxFileSizeB = settings.maxFileSizeB;
     loggerSettings.maxFileTimePeriodS = settings.maxFileTimePeriodS;
+    loggerSettings.archivingEnabled = settings.archivingEnabled;
     loggerSettings.level.primary = level;
 
     // Initialize as a set in order to remove duplicates.
