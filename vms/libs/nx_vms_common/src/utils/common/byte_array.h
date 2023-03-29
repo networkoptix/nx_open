@@ -150,6 +150,7 @@ public:
 
 private:
     bool reallocate(size_t capacity);
+    char* allocateBuffer(size_t capacity);
 
 private:
     size_t m_alignment = 1;
