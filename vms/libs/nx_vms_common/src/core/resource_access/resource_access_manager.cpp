@@ -208,9 +208,9 @@ bool QnResourceAccessManager::hasGlobalPermission(
 }
 
 Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource) const
+    const QnResourcePtr& targetResource) const
 {
-    if (!subject.isValid() || !resource)
+    if (!subject.isValid() || !targetResource)
         return Qn::NoPermissions;
 
     // User is already removed.
@@ -221,30 +221,76 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubje
     }
 
     // Resource is already removed.
-    if (resource->hasFlags(Qn::removed))
+    if (targetResource->hasFlags(Qn::removed))
         return Qn::NoPermissions;
 
     // Resource is not added to pool, checking if we can create such resource.
-    if (!resource->resourcePool())
+    if (!targetResource->resourcePool())
     {
-        const auto result = canCreateResourceInternal(subject, resource)
+        const auto result = canCreateResourceInternal(subject, targetResource)
             ? Qn::ReadWriteSavePermission
             : Qn::NoPermissions;
-        NX_VERBOSE(this, "Permissions for %1 to create new %2 is %3", subject, resource, result);
+        NX_VERBOSE(this, "Permissions for %1 to create new %2 is %3",
+            subject, targetResource, result);
         return result;
     }
 
-    const auto result = calculatePermissions(subject, resource);
-    NX_VERBOSE(this, "Calculated permissions for %1 ower %2 is %3", subject, resource, result);
+    const auto result = calculatePermissions(subject, targetResource);
+    NX_VERBOSE(this, "Calculated permissions for %1 ower %2 is %3", subject,
+        targetResource, result);
     return result;
+}
+
+Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubject& subject,
+    const nx::vms::api::UserRoleData& targetGroup) const
+{
+    if (!subject.isValid() || targetGroup.id.isNull())
+        return Qn::NoPermissions;
+
+    // User is already removed.
+    if (const auto& user = subject.user())
+    {
+        if (!user->resourcePool() || user->hasFlags(Qn::removed))
+            return Qn::NoPermissions;
+    }
+
+    const auto result = calculatePermissionsInternal(subject, targetGroup);
+    NX_VERBOSE(this, "Calculated permissions for %1 ower %2 is %3", subject, targetGroup, result);
+    return result;
+}
+
+Qn::Permissions QnResourceAccessManager::permissions(
+    const QnResourceAccessSubject& subject, const QnUuid& targetId) const
+{
+    if (const auto targetResource = resourcePool()->getResourceById(targetId))
+        return permissions(subject, targetResource);
+
+    const auto targetGroup = userRolesManager()->userRole(targetId);
+    return permissions(subject, targetGroup);
 }
 
 bool QnResourceAccessManager::hasPermission(
     const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource,
+    const QnResourcePtr& targetResource,
     Qn::Permissions requiredPermissions) const
 {
-    return (permissions(subject, resource) & requiredPermissions) == requiredPermissions;
+    return (permissions(subject, targetResource) & requiredPermissions) == requiredPermissions;
+}
+
+bool QnResourceAccessManager::hasPermission(
+    const QnResourceAccessSubject& subject,
+    const nx::vms::api::UserRoleData& targetGroup,
+    Qn::Permissions requiredPermissions) const
+{
+    return (permissions(subject, targetGroup) & requiredPermissions) == requiredPermissions;
+}
+
+bool QnResourceAccessManager::hasPermission(
+    const QnResourceAccessSubject& subject,
+    const QnUuid& targetId,
+    Qn::Permissions requiredPermissions) const
+{
+    return (permissions(subject, targetId) & requiredPermissions) == requiredPermissions;
 }
 
 bool QnResourceAccessManager::hasPermission(
@@ -698,6 +744,33 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     }
 
     return checkUserType(result);
+}
+
+Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
+    const QnResourceAccessSubject& subject, const nx::vms::api::UserRoleData& targetGroup) const
+{
+    if (targetGroup.id.isNull())
+        return Qn::NoPermissions;
+
+    Qn::Permissions result = Qn::NoPermissions;
+    const bool isSubjectOwner = subject.user() && subject.user()->isOwner();
+
+    if (hasAdminPermissions(subject))
+    {
+        result = Qn::ReadPermission;
+
+        if (!targetGroup.isPredefined)
+        {
+            // Admins can only be edited by owner, other groups - by all admins.
+            if (isSubjectOwner || !m_accessRightsResolver->hasAdminAccessRights(targetGroup.id))
+                result |= Qn::FullGenericPermissions | Qn::WriteAccessRightsPermission;
+
+            if (targetGroup.type == UserType::ldap)
+                result.setFlag(Qn::WriteNamePermission, false);
+        }
+    }
+
+    return result;
 }
 
 //-------------------------------------------------------------------------------------------------

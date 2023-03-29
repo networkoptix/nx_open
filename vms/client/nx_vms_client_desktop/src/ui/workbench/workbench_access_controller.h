@@ -61,11 +61,24 @@ public:
     Qn::Permissions permissions(const QnResourcePtr& resource) const;
 
     /**
+     * @param targetId Id of a resource or a user group to get permissions for.
+     * @returns Permissions for the given subject.
+     */
+    Qn::Permissions permissions(const QnUuid& targetId) const;
+
+    /**
      * @param resource Resource to check permissions for.
      * @param requiredPermissions Permissions to check.
      * @returns Whether actual permissions for the given resource include all required permissions.
      */
     bool hasPermissions(const QnResourcePtr& resource, Qn::Permissions requiredPermissions) const;
+
+    /**
+     * @param targetId Id of a resource or a user group to check permissions for.
+     * @param requiredPermissions Permissions to check.
+     * @returns Whether actual permissions for the given resource include all required permissions.
+     */
+    bool hasPermissions(const QnUuid& targetId, Qn::Permissions requiredPermissions) const;
 
     /**
      * @param requiredPermissions Check whether the current user has the specified permision

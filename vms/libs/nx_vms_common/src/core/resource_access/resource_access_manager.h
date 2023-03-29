@@ -26,6 +26,7 @@ struct CameraData;
 struct StorageData;
 struct LayoutData;
 struct UserData;
+struct UserRoleData;
 struct VideowallData;
 struct WebPageData;
 
@@ -86,22 +87,60 @@ public:
         GlobalPermission requiredPermission) const;
 
     /**
-     * @param subject User that should have permissions.
-     * @param resource Resource to get permissions for.
+     * @param subject User or group that should have permissions.
+     * @param targetResource Resource to get permissions for.
      * @returns Permissions that user have for the given resource.
      */
     Qn::Permissions permissions(const QnResourceAccessSubject& subject,
-        const QnResourcePtr& resource) const;
+        const QnResourcePtr& targetResource) const;
 
     /**
-     * @param subject User that should have permissions.
-     * @param resource Resource to get permissions for.
+     * @param subject User or group that should have permissions.
+     * @param targetGroup Group to get permissions for.
+     * @returns Permissions that user have for the given group.
+     */
+    Qn::Permissions permissions(const QnResourceAccessSubject& subject,
+        const nx::vms::api::UserRoleData& targetGroup) const;
+
+    /**
+     * @param subject User or group that should have permissions.
+     * @param targetId Id of a resource or a user group to get permissions for.
+     * @returns Permissions that user have for the given resource.
+     */
+    Qn::Permissions permissions(const QnResourceAccessSubject& subject,
+        const QnUuid& targetId) const;
+
+    /**
+     * @param subject User or group that should have permissions.
+     * @param targetResource Resource to check permissions for.
      * @param requiredPermissions Permission to check.
      * @returns True if actual permissions include required permission.
      */
     bool hasPermission(
         const QnResourceAccessSubject& subject,
-        const QnResourcePtr& resource,
+        const QnResourcePtr& targetResource,
+        Qn::Permissions requiredPermissions) const;
+
+    /**
+     * @param subject User or group that should have permissions.
+     * @param targetGroup Group to get permissions for.
+     * @param requiredPermissions Permission to check.
+     * @returns True if actual permissions include required permission.
+     */
+    bool hasPermission(
+        const QnResourceAccessSubject& subject,
+        const nx::vms::api::UserRoleData& targetGroup,
+        Qn::Permissions requiredPermissions) const;
+
+    /**
+     * @param subject User or group that should have permissions.
+     * @param target Id of a resource or a user group to get permissions for.
+     * @param requiredPermissions Permission to check.
+     * @returns True if actual permissions include required permission.
+     */
+    bool hasPermission(
+        const QnResourceAccessSubject& subject,
+        const QnUuid& targetId,
         Qn::Permissions requiredPermissions) const;
 
     /**
@@ -112,7 +151,7 @@ public:
      */
     bool hasPermission(
         const Qn::UserAccessData& accessData,
-        const QnResourcePtr& resource,
+        const QnResourcePtr& targetResource,
         Qn::Permissions permissions) const;
 
     /**
@@ -263,6 +302,8 @@ private:
         const QnLayoutResourcePtr& layout) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
         const QnUserResourcePtr& targetUser) const;
+    Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
+        const nx::vms::api::UserRoleData& targetGroup) const;
 
 private:
     const std::unique_ptr<nx::core::access::AccessRightsResolver> m_accessRightsResolver;

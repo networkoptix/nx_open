@@ -25,6 +25,14 @@ namespace nx::vms::common::test {
 using namespace nx::core::access;
 using namespace nx::vms::api;
 
+static constexpr Qn::Permissions kReadGroupPermissions = Qn::ReadPermission;
+
+static constexpr Qn::Permissions kFullGroupPermissions =
+    Qn::FullGenericPermissions | Qn::WriteAccessRightsPermission;
+
+static constexpr Qn::Permissions kFullLdapGroupPermissions =
+    Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteAccessRightsPermission;
+
 class ResourceAccessManagerTest: public ContextBasedTest
 {
 protected:
@@ -748,11 +756,10 @@ TEST_F(ResourceAccessManagerTest, cannotPushScreenWithCamerasOnExistingLayout)
     ASSERT_FALSE(resourceAccessManager()->canModifyResource(m_currentUser, layout, layoutData));
 }
 
-/************************************************************************/
-/* Checking user access rights                                          */
-/************************************************************************/
+// ------------------------------------------------------------------------------------------------
+// Checking user access rights
 
-/** Check user can edit himself (but cannot rename, remove and change access rights). */
+// Check user can edit himself (but cannot rename, remove and change access rights).
 TEST_F(ResourceAccessManagerTest, checkUserEditHimself)
 {
     loginAsOwner();
@@ -811,8 +818,7 @@ TEST_F(ResourceAccessManagerTest, checkOwnerCanNotEditOtherOwner)
 
     for (const auto& permission: {
         Qn::WritePasswordPermission, Qn::WriteAccessRightsPermission,
-        Qn::WriteEmailPermission, Qn::WriteFullNamePermission,
-    })
+        Qn::WriteEmailPermission, Qn::WriteFullNamePermission})
     {
         const auto label = QJson::serialized(permission).toStdString();
         EXPECT_FALSE(hasPermission(localOwner, cloudOwner, permission)) << label;
@@ -1053,9 +1059,100 @@ TEST_F(ResourceAccessManagerTest, checkParentGroupsValidity)
     ASSERT_FALSE(resourceAccessManager()->canModifyUser(m_currentUser, user, userData));
 }
 
-/************************************************************************/
-/* Checking cameras access rights                                       */
-/************************************************************************/
+// ------------------------------------------------------------------------------------------------
+// Checking access rights to user groups.
+
+TEST_F(ResourceAccessManagerTest, checkNoAccessToInvalidGroup)
+{
+    loginAsOwner();
+
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, UserRoleData{}),
+        Qn::Permissions());
+}
+
+TEST_F(ResourceAccessManagerTest, checkOwnerAccessToGroups)
+{
+    loginAsOwner();
+
+    const auto adminsGroup = createRole(GlobalPermission::none,
+        {QnPredefinedUserRoles::id(Qn::UserRole::administrator)});
+
+    const auto nonAdminsGroup = createRole(GlobalPermission::none,
+        {QnPredefinedUserRoles::id(Qn::UserRole::viewer)});
+
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, adminsGroup),
+        kFullGroupPermissions);
+
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, nonAdminsGroup),
+        kFullGroupPermissions);
+}
+
+TEST_F(ResourceAccessManagerTest, checkAdminAccessToGroups)
+{
+    loginAs(Qn::UserRole::administrator);
+
+    const auto adminsGroup = createRole(GlobalPermission::none,
+        {QnPredefinedUserRoles::id(Qn::UserRole::administrator)});
+
+    const auto nonAdminsGroup = createRole(GlobalPermission::none,
+        {QnPredefinedUserRoles::id(Qn::UserRole::viewer)});
+
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, adminsGroup),
+        kReadGroupPermissions);
+
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, nonAdminsGroup),
+        kFullGroupPermissions);
+}
+
+// Non-admins have no access to user groups, even no Qn::ReadPermission.
+TEST_F(ResourceAccessManagerTest, checkNonAdminAccessToGroups)
+{
+    loginAs(Qn::UserRole::advancedViewer);
+
+    const auto adminsGroup = createRole(GlobalPermission::none,
+        {QnPredefinedUserRoles::id(Qn::UserRole::administrator)});
+
+    const auto nonAdminsGroup = createRole(GlobalPermission::none,
+        {QnPredefinedUserRoles::id(Qn::UserRole::viewer)});
+
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, adminsGroup),
+        Qn::Permissions());
+
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, nonAdminsGroup),
+        Qn::Permissions());
+}
+
+TEST_F(ResourceAccessManagerTest, checkAccessToLdapGroups)
+{
+    loginAsOwner();
+
+    nx::vms::api::UserRoleData ldapGroup(QnUuid::createUuid(),
+        "group name",
+        GlobalPermission::none,
+        {QnPredefinedUserRoles::id(Qn::UserRole::administrator)});
+
+    ldapGroup.type = UserType::ldap;
+    userRolesManager()->addOrUpdateUserRole(ldapGroup);
+
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, ldapGroup),
+        kFullLdapGroupPermissions);
+}
+
+TEST_F(ResourceAccessManagerTest, checkAccessToPredefinedGroups)
+{
+    loginAsOwner();
+
+    const auto predefinedGroup = QnPredefinedUserRoles::get(
+        QnPredefinedUserRoles::id(Qn::UserRole::liveViewer));
+
+    ASSERT_TRUE(!!predefinedGroup);
+
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, *predefinedGroup),
+        kReadGroupPermissions);
+}
+
+// ------------------------------------------------------------------------------------------------
+// Checking cameras access rights.
 
 // Nobody can view desktop camera footage.
 TEST_F(ResourceAccessManagerTest, checkDesktopCameraFootage)
@@ -1656,6 +1753,36 @@ TEST_F(ResourceAccessManagerTest, checkVideowallAsViewer)
     Qn::Permissions forbidden = Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
 
     checkPermissions(videowall, desired, forbidden);
+}
+
+// ------------------------------------------------------------------------------------------------
+// Permissions by id.
+
+TEST_F(ResourceAccessManagerTest, checkPermissionsById)
+{
+    loginAsOwner();
+
+    auto camera = addCamera();
+    auto server = addServer();
+    auto user = addUser(Qn::UserRole::viewer);
+    auto group = createRole(GlobalPermission::none,
+        {QnPredefinedUserRoles::id(Qn::UserRole::viewer)});
+
+    ASSERT_EQ(
+        resourceAccessManager()->permissions(m_currentUser, camera),
+        resourceAccessManager()->permissions(m_currentUser, camera->getId()));
+
+    ASSERT_EQ(
+        resourceAccessManager()->permissions(m_currentUser, server),
+        resourceAccessManager()->permissions(m_currentUser, server->getId()));
+
+    ASSERT_EQ(
+        resourceAccessManager()->permissions(m_currentUser, user),
+        resourceAccessManager()->permissions(m_currentUser, user->getId()));
+
+    ASSERT_EQ(
+        resourceAccessManager()->permissions(m_currentUser, group),
+        resourceAccessManager()->permissions(m_currentUser, group.id));
 }
 
 } // namespace nx::vms::common::test

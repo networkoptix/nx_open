@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 
+using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
 using namespace nx::core::access;
 
@@ -118,11 +119,22 @@ Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr& re
     return m_dataByResource.value(resource).permissions;
 }
 
+Qn::Permissions QnWorkbenchAccessController::permissions(const QnUuid& targetId) const
+{
+    return resourceAccessManager()->permissions(m_user, targetId);
+}
+
 bool QnWorkbenchAccessController::hasPermissions(
     const QnResourcePtr& resource,
     Qn::Permissions requiredPermissions) const
 {
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
+}
+
+bool QnWorkbenchAccessController::hasPermissions(
+    const QnUuid& targetId, Qn::Permissions requiredPermissions) const
+{
+    return (permissions(targetId) & requiredPermissions) == requiredPermissions;
 }
 
 bool QnWorkbenchAccessController::anyResourceHasPermissions(
