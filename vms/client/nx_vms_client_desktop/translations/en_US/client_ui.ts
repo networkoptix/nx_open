@@ -3008,10 +3008,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Analytics data will continue to be stored on the disabled storage.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
         <translation></translation>
     </message>
@@ -3021,6 +3017,10 @@
     </message>
     <message>
         <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
