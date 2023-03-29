@@ -7,6 +7,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
@@ -407,11 +408,15 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
         return true;
     }
 
-    for (const auto& r: *resources)
+    for (const auto& resource: *resources)
     {
-        if (context->resourceAccessManager()->hasPermission(user, r, Qn::ViewContentPermission))
+        const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
+            ? Qn::ViewContentPermission
+            : Qn::ReadPermission;
+
+        if (context->resourceAccessManager()->hasPermission(user, resource, requiredPermission))
         {
-            NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event from %2", user, r);
+            NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event from %2", user, resource);
             return true;
         }
     }
