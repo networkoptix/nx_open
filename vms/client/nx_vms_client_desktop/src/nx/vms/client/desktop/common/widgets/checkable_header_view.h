@@ -20,6 +20,8 @@ public:
     bool highlightCheckedIndicator() const;
     void setHighlightCheckedIndicator(bool value);
 
+    void setAlignment(int logicalIndex, Qt::Alignment alignment);
+
 signals:
     void checkStateChanged(Qt::CheckState state);
 
@@ -28,6 +30,9 @@ protected:
     virtual QSize sectionSizeFromContents(int logicalIndex) const override;
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
+    virtual void initStyleOptionForIndex(
+        QStyleOptionHeader* option,
+        int logicalIndex) const override;
 
 private slots:
     void at_sectionClicked(int logicalIndex);
@@ -36,6 +41,7 @@ private:
     const int m_checkBoxColumn;
     bool m_highlightCheckedIndicator = false;
     Qt::CheckState m_checkState = Qt::Unchecked;
+    QHash<int, Qt::Alignment> m_textAlignment;
 };
 
 } // namespace nx::vms::client::desktop
