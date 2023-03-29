@@ -684,7 +684,7 @@ APPLY(501, saveUserDeprecated, nx::vms::api::UserDataDeprecated, \
                        false, /* system*/ \
                        false, /*isRemoveOperation*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper(), \
+                       UserNotificationManagerHelper(), \
                        SaveUserAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
