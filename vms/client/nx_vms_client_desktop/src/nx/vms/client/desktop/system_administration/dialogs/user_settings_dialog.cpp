@@ -75,6 +75,7 @@ struct UserSettingsDialog::Private
     DialogType dialogType;
     QmlProperty<int> tabIndex;
     QmlProperty<bool> isSaving;
+    QmlProperty<bool> ldapError;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
     std::optional<QnUserResourcePtr> user;
     rest::Handle m_currentRequest = -1;
@@ -84,6 +85,7 @@ struct UserSettingsDialog::Private
         dialogType(dialogType),
         tabIndex(q->rootObjectHolder(), "tabIndex"),
         isSaving(q->rootObjectHolder(), "isSaving"),
+        ldapError(q->rootObjectHolder(), "ldapError"),
         self(q->rootObjectHolder(), "self")
     {
     }
@@ -351,6 +353,8 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
             systemContext()->accessSubjectHierarchy(),
             currentUser->getId(),
             state.userId);
+
+    d->ldapError = user->isLdap() && !user->externalId().isEmpty() && !user->externalId().synced;
 
     return state;
 }

@@ -46,6 +46,8 @@ Item
     property bool enabled: true
     property int userType: UserSettingsGlobal.LocalUser
 
+    property bool ldapError: false
+
     property var self
 
     property var editingContext
@@ -453,6 +455,14 @@ Item
         id: informer
 
         visible: false
+        enabled: control.deleteAvailable && control.enabled
+
+        Binding
+        {
+            target: informer
+            property: "visible"
+            value: control.ldapError
+        }
 
         anchors.bottom: parent.bottom
         anchors.left: parent.left
@@ -466,6 +476,7 @@ Item
         buttonIcon.height: 14
         buttonIcon.source: "image://svg/skin/user_settings/user_delete.svg"
 
-        onClicked: informer.visible = false
+        onClicked: control.deleteRequested()
+        onCloseClicked: informer.visible = false
     }
 }

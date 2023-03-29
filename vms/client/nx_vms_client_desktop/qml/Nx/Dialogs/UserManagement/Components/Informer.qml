@@ -17,8 +17,10 @@ Rectangle
     property alias text: informerText.text
     property alias buttonText: informerDeleteButton.text
     property alias buttonIcon: informerDeleteButton.icon
+    property alias enabled: informerDeleteButton.enabled
 
     signal clicked()
+    signal closeClicked()
 
     Text
     {
@@ -57,6 +59,8 @@ Rectangle
                     ? Qt.rgba(1, 1, 1, 0.08) //< Pressed.
                     : Qt.rgba(1, 1, 1, 0.1) //< Default.
         }
+
+        onClicked: informer.clicked()
     }
 
     ImageButton
@@ -71,7 +75,7 @@ Rectangle
         icon.height: 20
         icon.color: ColorTheme.colors.light4
 
-        onClicked: informer.clicked()
+        onClicked: informer.closeClicked()
     }
 
     DropShadow
