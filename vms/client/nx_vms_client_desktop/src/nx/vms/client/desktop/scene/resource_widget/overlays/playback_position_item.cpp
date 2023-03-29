@@ -96,11 +96,7 @@ PlaybackPositionItem::PlaybackPositionItem(WindowContext* windowContext, QGraphi
     registerAnimation(m_animationTimerListener);
     m_animationTimerListener->startListening();
 
-    connect(navigator(), &QnWorkbenchNavigator::timelinePositionChanged,
-        this, &PlaybackPositionItem::cancelAnimation);
-    connect(action(ui::action::FastForwardAction), &QAction::triggered,
-        this, &PlaybackPositionItem::cancelAnimation);
-    connect(action(ui::action::RewindAction), &QAction::triggered,
+    connect(navigator(), &QnWorkbenchNavigator::positionChanged,
         this, &PlaybackPositionItem::cancelAnimation);
 }
 
