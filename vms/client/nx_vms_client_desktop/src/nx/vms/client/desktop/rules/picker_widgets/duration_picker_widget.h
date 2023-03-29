@@ -129,45 +129,51 @@ private:
     void updateUi() override
     {
         auto field = theField();
-        const bool isProlonged =
-            parentParamsWidget()->eventDescriptor()->flags.testFlag(vms::rules::ItemFlag::prolonged);
 
-        if (!isProlonged && field->value() == F::value_type::zero())
+        if (m_fieldDescriptor->fieldName == vms::rules::utils::kDurationFieldName)
         {
-            field->setValue(defaultValue());
-            return;
+            const bool isProlonged =
+                parentParamsWidget()->eventDescriptor()->flags.testFlag(vms::rules::ItemFlag::prolonged);
+
+            if (!isProlonged && field->value() == F::value_type::zero())
+            {
+                field->setValue(defaultValue());
+                return;
+            }
+
+            setReadOnly(m_checkBox, !isProlonged);
         }
 
-        setReadOnly(m_checkBox, !isProlonged);
-
         DurationPicker<F>::updateUi();
+
+        const bool hasInterval = field->value() != F::value_type::zero();
 
         if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName
             || m_fieldDescriptor->fieldName == vms::rules::utils::kPlaybackTimeFieldName)
         {
-            m_timeDurationWidget->setVisible(m_checkBox->isChecked());
+            m_timeDurationWidget->setVisible(hasInterval);
 
             QString hint;
             if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
             {
                 hint = DurationPickerWidgetStrings::intervalOfActionHint(
-                    /*isInstant*/ !m_checkBox->isChecked());
+                    /*isInstant*/ !hasInterval);
             }
             else
             {
                 hint = DurationPickerWidgetStrings::playbackTimeHint(
-                    /*isLive*/ !m_checkBox->isChecked());
+                    /*isLive*/ !hasInterval);
             }
 
             m_checkBox->setText(QString{"%1: %2"}.arg(m_fieldDescriptor->displayName).arg(hint));
         }
         else
         {
-            m_timeDurationWidget->setEnabled(m_checkBox->isChecked());
+            m_timeDurationWidget->setEnabled(hasInterval);
         }
 
         const QSignalBlocker blocker{m_checkBox};
-        m_checkBox->setChecked(field->value() != F::value_type::zero());
+        m_checkBox->setChecked(hasInterval);
     }
 
     void onStateChanged()
