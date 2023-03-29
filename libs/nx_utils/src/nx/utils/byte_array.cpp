@@ -146,9 +146,7 @@ ByteArray& ByteArray::operator=(const ByteArray& right)
     m_size = right.m_size;
     m_padding = right.m_padding;
 
-    m_data = (char*) nx::kit::utils::mallocAligned(
-        m_capacity + m_padding,
-        m_alignment);
+    m_data = allocateBuffer(m_capacity);
 
     memcpy(m_data, right.constData(), right.size());
     m_ignore = 0;
@@ -176,6 +174,17 @@ ByteArray& ByteArray::operator=(ByteArray&& right)
     return *this;
 }
 
+char* ByteArray::allocateBuffer(size_t capacity)
+{
+    char* data = (char*) nx::kit::utils::mallocAligned((size_t) capacity + m_padding, m_alignment);
+
+    // If the first 23 bits of the additional bytes are not 0, then damaged MPEG bitstreams could
+    // cause overread and segfault.
+    if (data)
+        memset(data + capacity, 0, m_padding);
+    return data;
+}
+
 bool ByteArray::reallocate(size_t capacity)
 {
     if (!(NX_ASSERT(capacity >= m_size,
@@ -187,8 +196,7 @@ bool ByteArray::reallocate(size_t capacity)
     if (capacity < m_capacity)
         return true;
 
-    char* data = (char*) nx::kit::utils::mallocAligned(
-        (size_t) capacity + m_padding, m_alignment);
+    char* data = allocateBuffer(capacity);
 
     if (!data)
         return false;
@@ -196,9 +204,6 @@ bool ByteArray::reallocate(size_t capacity)
     if (m_data && m_size)
         memcpy(data, m_data, m_size);
 
-    // If the first 23 bits of the additional bytes are not 0, then damaged MPEG bitstreams could
-    // cause overread and segfault.
-    memset(data + capacity, 0, m_padding);
 
     if (m_data)
         nx::kit::utils::freeAligned(m_data);
