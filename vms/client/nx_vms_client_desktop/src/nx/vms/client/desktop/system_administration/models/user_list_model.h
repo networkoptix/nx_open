@@ -22,6 +22,7 @@ public:
     enum Columns
     {
         CheckBoxColumn,
+        UserWarningColumn,
         UserTypeColumn,
         LoginColumn,
         FullNameColumn,

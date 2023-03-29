@@ -74,6 +74,7 @@ public:
     {
         switch (index.column())
         {
+            case UserListModel::UserWarningColumn:
             case UserListModel::UserTypeColumn:
                 return Skin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>());
 
@@ -95,15 +96,16 @@ public:
             painter->setOpacity(painter->opacity() * nx::style::Hints::kDisabledItemOpacity);
 
         // Paint right-aligned user type icon or left-aligned custom permissions icon:
-        const bool isUserTypeColumn = index.column() == UserListModel::UserTypeColumn;
-        if (isUserTypeColumn || index.column() == UserListModel::IsCustomColumn)
+        const bool isUserIconColumn = index.column() == UserListModel::UserTypeColumn
+            || index.column() == UserListModel::UserWarningColumn;
+        if (isUserIconColumn || index.column() == UserListModel::IsCustomColumn)
         {
             const auto icon = index.data(Qt::DecorationRole).value<QIcon>();
             if (icon.isNull())
                 return;
 
-            const auto horizontalAlignment = isUserTypeColumn ? Qt::AlignRight : Qt::AlignLeft;
-            const qreal padding = isUserTypeColumn ? 0 : style::Metrics::kStandardPadding;
+            const auto horizontalAlignment = isUserIconColumn ? Qt::AlignCenter : Qt::AlignLeft;
+            const qreal padding = isUserIconColumn ? 0 : style::Metrics::kStandardPadding;
 
             const auto rect = QStyle::alignedRect(Qt::LeftToRight,
                 horizontalAlignment | Qt::AlignVCenter,
@@ -383,7 +385,7 @@ void UserListWidget::Private::setupUi()
 
     ui->usersTable->setModel(sortModel);
     ui->usersTable->setHeader(header);
-    ui->usersTable->setIconSize(QSize(36, 24));
+    ui->usersTable->setIconSize(QSize(24, 24));
     ui->usersTable->setItemDelegate(new UserListWidget::Delegate(q));
 
     header->setVisible(true);
@@ -392,6 +394,13 @@ void UserListWidget::Private::setupUi()
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
     header->setSectionResizeMode(UserListModel::UserGroupsColumn, QHeaderView::Stretch);
     header->setSectionsClickable(true);
+    for (const auto column: {UserListModel::UserWarningColumn, UserListModel::UserTypeColumn})
+    {
+        header->setSectionResizeMode(column, QHeaderView::Fixed);
+        header->setAlignment(column, Qt::AlignHCenter);
+    }
+    header->resizeSection(UserListModel::UserWarningColumn, 20);
+    header->resizeSection(UserListModel::UserTypeColumn, 30);
 
     connect(header, &CheckableHeaderView::checkStateChanged,
         this, &Private::handleHeaderCheckStateChanged);
