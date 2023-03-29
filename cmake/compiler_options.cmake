@@ -314,6 +314,11 @@ if(compilerMsvc)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(/wd4250)
 
+        # Avoid the following warning when building gtest:
+        # "um\winbase.h(9531,5): warning C5105: macro expansion producing 'defined' has undefined
+        # behavior"
+        add_compile_options(/wd5105)
+
         # Avoid unnamed objects with custom construction and destruction. Suppressing this warning
         # as it is displayed very frequently in common places, e.g. in `QObject::connect` calls.
         add_compile_options(/wd26444)
