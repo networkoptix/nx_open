@@ -532,7 +532,7 @@ Handle ServerConnection::bindSystemToCloud(
 
     auto request = prepareRequest(
         nx::network::http::Method::post,
-        prepareUrl("/rest/v1/system/cloudBind",
+        prepareUrl("/rest/v3/system/cloud/bind",
             /*params*/ {{"userAgent", prepareUserAgent()}}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(data));
@@ -560,7 +560,7 @@ Handle ServerConnection::unbindSystemFromCloud(
 
     auto request = prepareRequest(
         nx::network::http::Method::post,
-        prepareUrl("/rest/v1/system/cloudUnbind",
+        prepareUrl("/rest/v3/system/cloud/unbind",
             /*params*/ {{"userAgent", prepareUserAgent()}}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(data));
