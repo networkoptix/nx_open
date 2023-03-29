@@ -33,8 +33,22 @@ QDateTime addHours(const QDateTime& dateTime, int hours)
         newHours = qMod(newHours, 24);
     }
 
-    return QDateTime(dateTime.date().addDays(deltaDays), QTime(newHours, dateTime.time().minute(),
-        dateTime.time().second(), dateTime.time().msec()));
+    const QDateTime result(
+        dateTime.date().addDays(deltaDays),
+        QTime(newHours,
+            dateTime.time().minute(),
+            dateTime.time().second(),
+            dateTime.time().msec()));
+
+    if (result.isValid())
+        return result;
+
+    // In Qt 5 the resulting date may be invalid when incoming date and time represent a
+    // non-existing time point of daylight saving time shift. For example if the clock is shifted
+    // 1h forward in the US, the interval 2:00 - 3:00 will not exist. After 1:59 it's be 3:00.
+    // If we try to construct QDateTime for 2:00, it'll become invalid and will have a timestamp of
+    // 1:00. To overcome this issue, we need to try to add 1 hour more.
+    return addHours(dateTime, hours + 1);
 }
 } // namespace
 
