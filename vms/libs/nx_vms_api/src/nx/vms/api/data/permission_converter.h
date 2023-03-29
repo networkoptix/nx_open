@@ -11,12 +11,13 @@
 
 namespace nx::vms::api {
 
+// TODO: Move to UserDataDeprecated with all related conversion stuff.
 namespace PermissionConverter
 {
     NX_VMS_API AccessRightsData accessRights(
         GlobalPermissions* permissions,
         const QnUuid& id,
-        const std::optional<std::vector<QnUuid>>& accessibleResources);
+        const std::optional<std::vector<QnUuid>>& accessibleResources = std::nullopt);
 
     NX_VMS_API void extractFromResourceAccessRights(
         const std::vector<AccessRightsData>& allAccessRights,

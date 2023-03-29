@@ -7,6 +7,7 @@
 #include <nx/vms/api/data/user_group_data.h>
 
 #include "permission_converter.h"
+#include "user_data_deprecated.h"
 
 namespace nx::vms::api {
 
@@ -75,11 +76,17 @@ UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
         user.externalId = std::move(*externalId);
     if (isOwner)
         user.groupIds.push_back(kAdministratorsGroupId);
+    if (const auto& id = UserDataDeprecated::permissionPresetToGroupId(user.permissions))
+    {
+        user.permissions = {};
+        user.groupIds.push_back(*id);
+    }
     if (!userRoleId.isNull())
         user.groupIds.push_back(std::move(userRoleId));
 
-    auto accessRights =
-        PermissionConverter::accessRights(&user.permissions, user.id, accessibleResources);
+    auto accessRights = PermissionConverter::accessRights(
+        &user.permissions, user.id, accessibleResources);
+
     return {std::move(user), std::move(accessRights)};
 }
 
@@ -98,14 +105,13 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
         model.isOwner = baseData.isAdministrator();
         if (!baseData.externalId.isEmpty())
             model.externalId = std::move(baseData.externalId);
+
         for (const auto& id: baseData.groupIds)
         {
-            // TODO: #vkutin Convert predefined groups to target global permissions.
-            if (!kPredefinedGroupIds.contains(id))
-            {
+            if (const auto preset = UserDataDeprecated::groupIdToPermissionPreset(model.userRoleId))
+                model.permissions |= preset;
+            else if (model.userRoleId.isNull())
                 model.userRoleId = id;
-                break;
-            }
         }
 
         PermissionConverter::extractFromResourceAccessRights(

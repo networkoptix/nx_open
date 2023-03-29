@@ -2,12 +2,12 @@
 
 #pragma once
 
+#include "access_rights_data.h"
 #include "user_data.h"
 
 namespace nx::vms::api {
 
 // VMS Transaction structure before 5.2.
-// THIS STRUCT IS HERE FOR CLOUD ONLY!
 struct NX_VMS_API UserDataDeprecated: ResourceData
 {
     UserDataDeprecated(): ResourceData(UserData::kResourceTypeId) {}
@@ -19,6 +19,11 @@ struct NX_VMS_API UserDataDeprecated: ResourceData
     bool operator==(const UserDataDeprecated& other) const = default;
 
     void fillId();
+
+    /**
+     * Converts this legacy user data into the new one assiging default values to new fields.
+     */
+    std::tuple<UserData, AccessRightsData> toUserData() const;
 
     bool isAdmin = false;
     GlobalPermissions permissions = GlobalPermission::none;
@@ -33,6 +38,9 @@ struct NX_VMS_API UserDataDeprecated: ResourceData
     bool isEnabled = true;
     bool isCloud = false;
     QString fullName;
+
+    static std::optional<QnUuid> permissionPresetToGroupId(GlobalPermissions preset);
+    static GlobalPermissions groupIdToPermissionPreset(const QnUuid& id);
 };
 #define UserDataDeprecated_Fields \
     ResourceData_Fields \
