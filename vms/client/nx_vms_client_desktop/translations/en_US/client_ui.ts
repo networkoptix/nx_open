@@ -499,14 +499,6 @@
 <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-        <source>Do not archive primary stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Do not archive secondary stream</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Auto</source>
         <translation></translation>
     </message>
@@ -627,11 +619,27 @@
         <translation></translation>
     </message>
     <message>
-        <source>Do not export video automatically</source>
+        <source>Do not record primary stream</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export From Device</source>
+        <source>Do not record secondary stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import From Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import video automatically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Page Port</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1010,10 +1018,6 @@
 <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-        <source>HTTP content</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Login to authenticate (optional)</source>
         <translation></translation>
     </message>
@@ -1034,16 +1038,20 @@
         <translation></translation>
     </message>
     <message>
-        <source>HTTP URL</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Authentication type</source>
         <translation></translation>
     </message>
     <message>
         <source>Request type</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>HTTP(S) URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP(S) content</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1249,6 +1257,10 @@
         <source>Mute audio when the mic is active</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Allow computer entering sleep mode on idle</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1430,10 +1442,6 @@
     </message>
     <message>
         <source>Shared layouts</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
         <translation></translation>
     </message>
 </context>

@@ -1203,10 +1203,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Do HTTP request</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Device output</source>
         <translation></translation>
     </message>
@@ -1754,11 +1750,15 @@
         <translation></translation>
     </message>
     <message>
-        <source>Intercom informer</source>
+        <source>Failed to backup file %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to backup file %1</source>
+        <source>Do HTTP(S) request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Intercom Informer</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
