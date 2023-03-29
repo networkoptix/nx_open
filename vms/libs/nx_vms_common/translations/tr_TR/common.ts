@@ -1203,10 +1203,6 @@
       <translation>Alarm Düzenini Göster</translation>
     </message>
     <message>
-      <source>Do HTTP request</source>
-      <translation>HTTP isteği</translation>
-    </message>
-    <message>
       <source>Device output</source>
       <translation>Aygıt Çıkışı</translation>
     </message>
@@ -1754,12 +1750,16 @@
       <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation>İnterkom bilgilendiricisi</translation>
-    </message>
-    <message>
       <source>Failed to backup file %1</source>
       <translation>%1 dosyası yedeklenemedi</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation>HTTP(S) isteği yap</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation>İnterkom bilgilendiricisini göster</translation>
     </message>
   </context>
   <context>

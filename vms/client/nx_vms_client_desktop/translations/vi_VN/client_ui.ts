@@ -499,14 +499,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>Không lưu trữ luồng chính</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>Không lưu trữ dòng thứ cấp</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>Tự động</translation>
     </message>
@@ -627,12 +619,28 @@
       <translation>Giữ cài đặt thời gian của camera</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>Không tự động xuất video</translation>
+      <source>Do not record primary stream</source>
+      <translation>Không ghi luồng chính</translation>
     </message>
     <message>
-      <source>Export From Device</source>
-      <translation>Xuất từ thiết bị</translation>
+      <source>Do not record secondary stream</source>
+      <translation>Không ghi luồng phụ</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation>Nhập từ thiết bị</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Nhập video tự động</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Trang Web</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Cổng trang web</translation>
     </message>
   </context>
   <context>
@@ -1010,10 +1018,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP Nội dung</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Đăng nhập vào xác thực (tùy chọn)</translation>
     </message>
@@ -1034,16 +1038,20 @@
       <translation>Kiểu Nội dung</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>URL HTTP</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>Xác thực...</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>Loại yêu cầu</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation>URL HTTP(S)</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>
@@ -1249,6 +1257,10 @@
       <source>Mute audio when the mic is active</source>
       <translation>Tắt tiếng khi mic đang hoạt động</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1431,10 +1443,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>Bố cục được chia sẻ</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Chọn một số người dùng trong &quot;Hiển thị đến dòng&quot; để hiển thị bố cục cục bộ của người dùng đó trong danh sách này</translation>
     </message>
   </context>
   <context>

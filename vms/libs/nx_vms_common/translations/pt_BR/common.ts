@@ -1203,10 +1203,6 @@
       <translation>Mostrar no Layout de Alarme</translation>
     </message>
     <message>
-      <source>Do HTTP request</source>
-      <translation>Enviar requisição HTTP</translation>
-    </message>
-    <message>
       <source>Device output</source>
       <translation>Saída do dispositivo</translation>
     </message>
@@ -1754,12 +1750,16 @@
       <translation>Erro de certificado do servidor &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation>Informante de intercomunicação</translation>
-    </message>
-    <message>
       <source>Failed to backup file %1</source>
       <translation>Falha ao fazer backup do arquivo %1</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
     </message>
   </context>
   <context>

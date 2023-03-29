@@ -499,14 +499,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>Birincil Akışı Arşivleme</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>İkincil Akışı Arşivleme</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>Otomatik</translation>
     </message>
@@ -627,12 +619,28 @@
       <translation>Kamera zaman ayarlarını koru</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>Videoyu otomatik olarak dışa aktarma</translation>
+      <source>Do not record primary stream</source>
+      <translation>Birincil akışı kaydetme</translation>
     </message>
     <message>
-      <source>Export From Device</source>
-      <translation>Cihazdan Dışa Aktar</translation>
+      <source>Do not record secondary stream</source>
+      <translation>İkincil akışı kaydetme</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation>Cihazdan İçe Aktar</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Videoyu otomatik olarak içe aktar</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Web Sayfası</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Web Sayfası Bağlantı Noktası</translation>
     </message>
   </context>
   <context>
@@ -1010,10 +1018,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP içeriği</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Kimlik doğrulaması (isteğe Bağlı)</translation>
     </message>
@@ -1034,16 +1038,20 @@
       <translation>İçerik Tipi</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>Kimlik doğrulama türü</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>Talep Türü</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S) Bağlantısı</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>
@@ -1249,6 +1257,10 @@
       <source>Mute audio when the mic is active</source>
       <translation type="unfinished">Mute audio when the mic is active</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1431,10 +1443,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>Paylaşılan ekran düzenleri</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>&quot;göstermek onun yerel düzenleri bu listede görüntülemek için&quot; satır için tek bir kullanıcı seçin</translation>
     </message>
   </context>
   <context>

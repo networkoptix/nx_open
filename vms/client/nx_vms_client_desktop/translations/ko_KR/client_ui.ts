@@ -499,14 +499,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>주 스트림을 저장하지 않음</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>보조 스트림을 저장하지 않음</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>자동</translation>
     </message>
@@ -627,12 +619,28 @@
       <translation>카메라 시간 설정 유지</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <source>Do not record primary stream</source>
+      <translation type="unfinished">Do not record primary stream</translation>
     </message>
     <message>
-      <source>Export From Device</source>
-      <translation type="unfinished">Export From Device</translation>
+      <source>Do not record secondary stream</source>
+      <translation type="unfinished">Do not record secondary stream</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation type="unfinished">Import From Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>웹페이지:</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation type="unfinished">Web Page Port</translation>
     </message>
   </context>
   <context>
@@ -1010,10 +1018,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP 콘텐츠</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>사용자 로그인(옵션)</translation>
     </message>
@@ -1034,16 +1038,20 @@
       <translation>콘텐츠 형식</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>인증 유형</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>요청 유형</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>
@@ -1249,6 +1257,10 @@
       <source>Mute audio when the mic is active</source>
       <translation>마이크가 활성 상태일 때 오디오 음소거</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1431,10 +1443,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>공유된 레이아웃</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>자신의 로컬 레이아웃을 보여지게 하려면 &quot;Show to&quot;에서 한 사용자를 선택</translation>
     </message>
   </context>
   <context>

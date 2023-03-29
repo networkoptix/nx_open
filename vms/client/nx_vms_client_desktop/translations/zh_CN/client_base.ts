@@ -2352,6 +2352,14 @@
     </message>
   </context>
   <context>
+    <name>QnCamDisplay</name>
+    <message>
+      <source>%1 Running</source>
+      <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+      <translation type="unfinished">%1 Running</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
@@ -5505,6 +5513,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Remote archive synchronization available</source>
       <translation type="unfinished">Remote archive synchronization available</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization has been stopped</source>
+      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7188,6 +7200,10 @@ We recommend you not to open this web page. If you understand the risks, you can
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7245,10 +7261,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Open door</source>
       <translation>开门</translation>
-    </message>
-    <message>
-      <source>Drop</source>
-      <translation type="unfinished">Drop</translation>
     </message>
   </context>
   <context>
@@ -7324,8 +7336,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>服务器不会将时间设置推送到摄像机。</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
@@ -9159,10 +9171,6 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>选择布局</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>在 &quot;列表中选择单个用户, 然後显示本地布局到&quot;</translation>
-    </message>
-    <message>
       <source>Local layouts can only be shown to their owners.</source>
       <translation>本地布局仅对其所有者显示。</translation>
     </message>
@@ -9173,6 +9181,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>某些用户对所选布局不具有访问权限。指令將不起作用。</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
     </message>
   </context>
   <context>
@@ -10212,6 +10224,18 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <message>
       <source>On-device recordings were found</source>
       <translation type="unfinished">On-device recordings were found</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 stopped</source>
+      <translation type="unfinished">Export archive from %1 stopped</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by user</source>
+      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by user</source>
+      <translation type="unfinished">The recording settings have been changed by user</translation>
     </message>
   </context>
   <context>

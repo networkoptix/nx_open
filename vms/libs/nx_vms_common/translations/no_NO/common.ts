@@ -1203,10 +1203,6 @@
       <translation>Vis på alarm-visning</translation>
     </message>
     <message>
-      <source>Do HTTP request</source>
-      <translation>Gjør HTTP-forespørsel</translation>
-    </message>
-    <message>
       <source>Device output</source>
       <translation>Enhetsutgang</translation>
     </message>
@@ -1754,12 +1750,16 @@
       <translation>Server &quot;%1&quot; sertifikatfeil</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation>Intercom informant</translation>
-    </message>
-    <message>
       <source>Failed to backup file %1</source>
       <translation>Kunne ikke sikkerhetskopiere filen %1</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation>Gjør HTTP(S)-forespørsel</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation>Vis Intercom Informer</translation>
     </message>
   </context>
   <context>

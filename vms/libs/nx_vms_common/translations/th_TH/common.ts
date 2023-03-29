@@ -1157,10 +1157,6 @@
       <translation>แสดงบนเค้าโครงการเตือนภัย</translation>
     </message>
     <message>
-      <source>Do HTTP request</source>
-      <translation>ส่ง HTTP</translation>
-    </message>
-    <message>
       <source>Device output</source>
       <translation>อุปกรณ์เอาท์พุท</translation>
     </message>
@@ -1696,12 +1692,16 @@
       <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
-    </message>
-    <message>
       <source>Failed to backup file %1</source>
       <translation type="unfinished">Failed to backup file %1</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
     </message>
   </context>
   <context>

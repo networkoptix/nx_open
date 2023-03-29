@@ -499,14 +499,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>ไ่ม่ต้องการเก็บภาพหลัก</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>ไม่ต้องการเก็บภาพรอง</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>อัตโนมัติ</translation>
     </message>
@@ -627,12 +619,28 @@
       <translation type="unfinished">Keep camera time settings</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <source>Do not record primary stream</source>
+      <translation type="unfinished">Do not record primary stream</translation>
     </message>
     <message>
-      <source>Export From Device</source>
-      <translation type="unfinished">Export From Device</translation>
+      <source>Do not record secondary stream</source>
+      <translation type="unfinished">Do not record secondary stream</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation type="unfinished">Import From Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>เว็บเพจ:</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation type="unfinished">Web Page Port</translation>
     </message>
   </context>
   <context>
@@ -1010,10 +1018,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP เนื้อหา</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>เข้าสู่ระบบเพื่อรับรองความถูกต้อง (ถ้ามี)</translation>
     </message>
@@ -1034,16 +1038,20 @@
       <translation>ชนิดของเนื้อหา</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>ประเภทการตรวจสอบสิทธิ์</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>ประเภทคำขอ</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>
@@ -1249,6 +1257,10 @@
       <source>Mute audio when the mic is active</source>
       <translation type="unfinished">Mute audio when the mic is active</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1431,10 +1443,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>แชร์เค้าโครง</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>เลือกผู้ใช้เพียงรายเดียวใน &quot;แสดงเป็น&quot; บรรทัดเพื่อแสดงเค้าโครงในเครื่องของเขาในรายการนี้</translation>
     </message>
   </context>
   <context>

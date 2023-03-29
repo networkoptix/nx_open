@@ -2383,6 +2383,14 @@
     </message>
   </context>
   <context>
+    <name>QnCamDisplay</name>
+    <message>
+      <source>%1 Running</source>
+      <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+      <translation>%1 läuft</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
@@ -5574,6 +5582,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Remote archive synchronization available</source>
       <translation>Remote-Archivsynchronisierung verfügbar</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization has been stopped</source>
+      <translation>Die Synchronisierung von Remote-Archiven wurde gestoppt</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7300,6 +7312,10 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation>Das Bildmaterial dieser Kameras wird bis zu %1 %2 gesichert</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7358,10 +7374,6 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <message>
       <source>Open door</source>
       <translation>Tür öffnen</translation>
-    </message>
-    <message>
-      <source>Drop</source>
-      <translation>Auflegen</translation>
     </message>
   </context>
   <context>
@@ -7438,8 +7450,8 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <translation>Der Server überträgt die Zeiteinstellungen nicht an die Kamera.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation>Videos, die auf dem internen Speicher der Kamera aufgezeichnet wurden, werden nicht automatisch in das Hauptarchiv hochgeladen.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
@@ -9292,10 +9304,6 @@ Sie können es erzwingen, aber es kann die CPU-Last erheblich erhöhen.</transla
       <translation>Layout auswählen...</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Wählen Sie einen einzelnen Benutzer in der Zeile &quot;Anzeigen auf&quot; aus, um seine lokalen Layouts in dieser Liste anzuzeigen</translation>
-    </message>
-    <message>
       <source>Local layouts can only be shown to their owners.</source>
       <translation>Lokale Layouts können nur ihren Besitzern angezeigt werden.</translation>
     </message>
@@ -9306,6 +9314,10 @@ Sie können es erzwingen, aber es kann die CPU-Last erheblich erhöhen.</transla
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Einige Benutzer haben keinen Zugriff auf das ausgewählte Layout. Aktion wird für sie nicht funktionieren.</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation>Suchen Sie nach einem lokalen Layout? Wählen Sie nur einen Benutzer aus der Liste &quot;Anzeigen an&quot; aus, um dessen lokale Layouts hier als Option anzuzeigen.</translation>
     </message>
   </context>
   <context>
@@ -10361,6 +10373,18 @@ Sie können %2 anzeigen oder diesen Artikel %3 lesen, um mehr über das aktuelle
     <message>
       <source>On-device recordings were found</source>
       <translation>Aufzeichnungen auf dem Gerät wurden gefunden</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 stopped</source>
+      <translation>Exportieren des Archivs von %1 gestoppt</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by user</source>
+      <translation>Die Einstellungen des Archivstreams wurden vom Benutzer geändert</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by user</source>
+      <translation>Die Aufnahmeeinstellungen wurden vom Benutzer geändert</translation>
     </message>
   </context>
   <context>

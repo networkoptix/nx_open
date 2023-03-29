@@ -499,14 +499,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>不使用主码流存储</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>不使用次码流存储</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>自动</translation>
     </message>
@@ -627,12 +619,28 @@
       <translation>保持摄像机时间设置</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <source>Do not record primary stream</source>
+      <translation type="unfinished">Do not record primary stream</translation>
     </message>
     <message>
-      <source>Export From Device</source>
-      <translation type="unfinished">Export From Device</translation>
+      <source>Do not record secondary stream</source>
+      <translation type="unfinished">Do not record secondary stream</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation type="unfinished">Import From Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>网页:</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation type="unfinished">Web Page Port</translation>
     </message>
   </context>
   <context>
@@ -1010,10 +1018,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP内容</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>请进行登录验证(可选)</translation>
     </message>
@@ -1034,16 +1038,20 @@
       <translation>内容类型</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTPS URL 地址</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>身份验证类型</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>请求类型</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>
@@ -1249,6 +1257,10 @@
       <source>Mute audio when the mic is active</source>
       <translation>当麦克风启用时，将音频切换成静音</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1431,10 +1443,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>共享布局</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>在 &quot;列表中选择单个用户, 然後显示本地布局到&quot;</translation>
     </message>
   </context>
   <context>

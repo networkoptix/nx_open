@@ -2383,6 +2383,14 @@
     </message>
   </context>
   <context>
+    <name>QnCamDisplay</name>
+    <message>
+      <source>%1 Running</source>
+      <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+      <translation>%1$ çalışıyor</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
@@ -5573,6 +5581,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Remote archive synchronization available</source>
       <translation>Uzak arşiv senkronizasyonu mevcut</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization has been stopped</source>
+      <translation>Uzak arşiv senkronizasyonu durduruldu</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7299,6 +7311,10 @@ We recommend you not to open this web page. If you understand the risks, you can
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation>Bu kameralardan alınan görüntüler %1 %2 tamamen yedeklenir</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation>Yedekleme işlemi başladığında ilerleme görüntülenecektir</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7357,10 +7373,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Open door</source>
       <translation>Kapı aç</translation>
-    </message>
-    <message>
-      <source>Drop</source>
-      <translation>Kesmek</translation>
     </message>
   </context>
   <context>
@@ -7437,8 +7449,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">Server will not push time settings to the camera.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation>Kamera dahili depolamasına kaydedilen video, ana arşive otomatik olarak yüklenmeyecektir.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation>Kamera&apos;s dahili deposunda kaydedilen video otomatik olarak ana arşive yüklenecektir.</translation>
     </message>
   </context>
   <context>
@@ -9291,10 +9303,6 @@ You can force it, but it may significantly increase CPU load.</translation>
       <translation>Düzen seç...</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>&quot;göstermek onun yerel düzenleri bu listede görüntülemek için&quot; satır için tek bir kullanıcı seçin</translation>
-    </message>
-    <message>
       <source>Local layouts can only be shown to their owners.</source>
       <translation>Yerel düzenler yalnızca sahiplerine gösterilebilir.</translation>
     </message>
@@ -9305,6 +9313,10 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Seçilen kullanıcıların hiçbiri seçilen yerleşime erişemez. Eylem çalışmayacak.</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation>Yerel bir düzen mi arıyorsunuz? Burada bir seçenek olarak yerel düzenlerini görüntülemek için &quot;Göster&quot; listesinden yalnızca bir kullanıcı seçin.</translation>
     </message>
   </context>
   <context>
@@ -10357,6 +10369,18 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <message>
       <source>On-device recordings were found</source>
       <translation>Cihaz üzerinde kayıtlar bulundu</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 stopped</source>
+      <translation type="unfinished">Export archive from %1 stopped</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by user</source>
+      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by user</source>
+      <translation type="unfinished">The recording settings have been changed by user</translation>
     </message>
   </context>
   <context>

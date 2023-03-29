@@ -1157,10 +1157,6 @@
       <translation>Hiển thị trên Bố cục cảnh báo</translation>
     </message>
     <message>
-      <source>Do HTTP request</source>
-      <translation>Gởi HTTP yêu cầu</translation>
-    </message>
-    <message>
       <source>Device output</source>
       <translation>Sản lượng thiết bị</translation>
     </message>
@@ -1696,12 +1692,16 @@
       <translation>Lỗi chứng chỉ máy chủ &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation>Trình thông báo intercom</translation>
-    </message>
-    <message>
       <source>Failed to backup file %1</source>
       <translation>Không thể sao lưu tệp %1</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation>Thực hiện yêu cầu HTTP(S)</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation>Hiển thị thông tin liên lạc nội bộ</translation>
     </message>
   </context>
   <context>

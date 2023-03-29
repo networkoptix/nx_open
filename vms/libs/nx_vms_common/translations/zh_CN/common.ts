@@ -1157,10 +1157,6 @@
       <translation>显示报警视图</translation>
     </message>
     <message>
-      <source>Do HTTP request</source>
-      <translation>进行HTTP请求</translation>
-    </message>
-    <message>
       <source>Device output</source>
       <translation>设备输出</translation>
     </message>
@@ -1696,12 +1692,16 @@
       <translation>服务器 &quot;%1&quot; 认证错误</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
-    </message>
-    <message>
       <source>Failed to backup file %1</source>
       <translation type="unfinished">Failed to backup file %1</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
     </message>
   </context>
   <context>

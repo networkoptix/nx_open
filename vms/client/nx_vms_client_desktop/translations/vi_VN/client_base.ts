@@ -2352,6 +2352,14 @@
     </message>
   </context>
   <context>
+    <name>QnCamDisplay</name>
+    <message>
+      <source>%1 Running</source>
+      <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+      <translation>%1 Đang chạy</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
@@ -5504,6 +5512,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Remote archive synchronization available</source>
       <translation>Đồng bộ hóa lưu trữ từ xa khả dụng</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization has been stopped</source>
+      <translation>Đồng bộ hóa lưu trữ từ xa đã bị dừng</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7189,6 +7201,10 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation>Cảnh quay từ camera này được sao lưu đến %1 %2</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation>Tiến trình sẽ được hiển thị khi quá trình sao lưu bắt đầu</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7246,10 +7262,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Open door</source>
       <translation>Mở cửa</translation>
-    </message>
-    <message>
-      <source>Drop</source>
-      <translation>Bỏ</translation>
     </message>
   </context>
   <context>
@@ -7325,8 +7337,8 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Máy chủ sẽ không đẩy cài đặt thời gian vào camera.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation>Video được ghi trên bộ nhớ nội bộ của camera sẽ không được tự động tải lên kho lưu trữ chính.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation>Video được ghi trên bộ nhớ nội bộ của camera sẽ được tự động tải lên kho lưu trữ chính.</translation>
     </message>
   </context>
   <context>
@@ -9160,10 +9172,6 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <translation>Chọn bố cục...</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Chọn một số người dùng trong &quot;Hiển thị đến&quot; dòng để hiển thị bố cục trong danh sách này</translation>
-    </message>
-    <message>
       <source>Local layouts can only be shown to their owners.</source>
       <translation>Bố cục cục bộ chỉ có thể được hiển thị cho chủ sở hữu bố cục.</translation>
     </message>
@@ -9174,6 +9182,10 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Một số người dùng không có quyền truy cập vào bố cục đã chọn. Hành động sẽ không thực hiện được.</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation>Tìm kiếm một bố cục cục bộ? Chỉ chọn một người dùng từ danh sách &quot;Hiển thị tới&quot; để hiển thị bố cục cục bộ dưới dạng tùy chọn tại đây.</translation>
     </message>
   </context>
   <context>
@@ -10216,6 +10228,18 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     <message>
       <source>On-device recordings were found</source>
       <translation>Đã tìm thấy bản ghi trên thiết bị</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 stopped</source>
+      <translation type="unfinished">Export archive from %1 stopped</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by user</source>
+      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by user</source>
+      <translation type="unfinished">The recording settings have been changed by user</translation>
     </message>
   </context>
   <context>

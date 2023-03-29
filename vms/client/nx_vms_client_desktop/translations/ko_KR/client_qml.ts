@@ -1153,7 +1153,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Access denied</source>
-      <translation type="unfinished">Access denied</translation>
+      <translation>접근이 거부됨</translation>
     </message>
   </context>
   <context>

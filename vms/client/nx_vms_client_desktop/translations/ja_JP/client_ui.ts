@@ -499,14 +499,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>プライマリストリームを録画しない</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>セカンダリストリームを録画しない</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>自動</translation>
     </message>
@@ -627,12 +619,28 @@
       <translation>カメラの時刻設定を保持する</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>ビデオを自動的にエクスポートしない</translation>
+      <source>Do not record primary stream</source>
+      <translation>プライマリストリームを録画しない</translation>
     </message>
     <message>
-      <source>Export From Device</source>
-      <translation>デバイスからエクスポート</translation>
+      <source>Do not record secondary stream</source>
+      <translation>セカンダリストリームを録画しない</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation>デバイスからインポート</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>映像を自動的にインポート</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>ウェブページ</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Webページポート</translation>
     </message>
   </context>
   <context>
@@ -1010,10 +1018,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTPコンテンツ</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>ログイン認証</translation>
     </message>
@@ -1034,16 +1038,20 @@
       <translation>コンテンツタイプ</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>認証タイプ</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>要求のタイプ</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation>HTTP(S) コンテンツ</translation>
     </message>
   </context>
   <context>
@@ -1249,6 +1257,10 @@
       <source>Mute audio when the mic is active</source>
       <translation>マイクがアクティブなときに音声をミュート</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation>アイドル時にコンピュータがスリープ モードに入るのを許可する</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1431,10 +1443,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>共有レイアウト</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>&quot;表示先&quot; 行でユーザー1名を選択すると、そのユーザーのローカルレイアウトがリストに表示されます</translation>
     </message>
   </context>
   <context>

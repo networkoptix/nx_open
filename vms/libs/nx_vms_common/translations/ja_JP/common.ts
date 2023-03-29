@@ -1157,10 +1157,6 @@
       <translation>アラームレイアウトに表示</translation>
     </message>
     <message>
-      <source>Do HTTP request</source>
-      <translation>HTTPリクエスト</translation>
-    </message>
-    <message>
       <source>Device output</source>
       <translation>デバイスI/O出力</translation>
     </message>
@@ -1696,12 +1692,16 @@
       <translation>サーバー &quot;%1&quot; 証明書エラー</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation>インターホン通知</translation>
-    </message>
-    <message>
       <source>Failed to backup file %1</source>
       <translation>ファイル %1 のバックアップに失敗しました</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation>HTTP(S) リクエストを実行</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation>インターホン通知者を表示</translation>
     </message>
   </context>
   <context>

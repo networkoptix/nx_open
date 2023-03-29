@@ -499,14 +499,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>Ikke opptak av primærstrøm</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>Deaktver lagring av sekunder strøm</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>Auto</translation>
     </message>
@@ -627,12 +619,28 @@
       <translation>Behold kameraets tidsinnstillinger</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>Ikke eksporter video automatisk</translation>
+      <source>Do not record primary stream</source>
+      <translation>Ikke ta opp primærstrøm</translation>
     </message>
     <message>
-      <source>Export From Device</source>
-      <translation>Eksporter fra enhet</translation>
+      <source>Do not record secondary stream</source>
+      <translation>Ikke ta opp sekundærstrøm</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation>Importer fra enhet</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Importer video automatisk</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Nettside</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Nettsideport</translation>
     </message>
   </context>
   <context>
@@ -1010,10 +1018,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP-innhold</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Logg inn for å autentisere (valgfritt)</translation>
     </message>
@@ -1034,16 +1038,20 @@
       <translation>Innholdstype</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>Autentiseringstype</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>Forespørselstype</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation>HTTP(S)-innhold</translation>
     </message>
   </context>
   <context>
@@ -1249,6 +1257,10 @@
       <source>Mute audio when the mic is active</source>
       <translation>Demp lyden når mikrofonen er aktiv</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation>La datamaskinen gå i hvilemodus når inaktiv</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1431,10 +1443,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>Delte visninger</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Velg en enkelt bruker i &quot;Vis til&quot; linje for å vise de lokale layoutene i denne listen</translation>
     </message>
   </context>
   <context>

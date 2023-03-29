@@ -1157,10 +1157,6 @@
       <translation>影像彈跳</translation>
     </message>
     <message>
-      <source>Do HTTP request</source>
-      <translation>發送一則HTTP命令</translation>
-    </message>
-    <message>
       <source>Device output</source>
       <translation>設備輸出</translation>
     </message>
@@ -1696,12 +1692,16 @@
       <translation>伺服器&quot;%1&quot; 憑證錯誤</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation>對講機通知</translation>
-    </message>
-    <message>
       <source>Failed to backup file %1</source>
       <translation>檔案備份失敗 %1</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
     </message>
   </context>
   <context>

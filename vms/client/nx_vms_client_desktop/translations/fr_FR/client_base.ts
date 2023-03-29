@@ -2383,6 +2383,14 @@
     </message>
   </context>
   <context>
+    <name>QnCamDisplay</name>
+    <message>
+      <source>%1 Running</source>
+      <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+      <translation type="unfinished">%1 Running</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
@@ -5578,6 +5586,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>Remote archive synchronization available</source>
       <translation>Synchronisation des archives à distance disponible</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization has been stopped</source>
+      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7304,6 +7316,10 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation>Les images de ces caméras sont sauvegardées jusqu'à %1 %2</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7362,10 +7378,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>Open door</source>
       <translation>Ouvrir la porte</translation>
-    </message>
-    <message>
-      <source>Drop</source>
-      <translation>Laisser tomber</translation>
     </message>
   </context>
   <context>
@@ -7442,8 +7454,8 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <translation>Le serveur ne poussera pas les paramètres de l'heure à la caméra.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation>La vidéo enregistrée sur la caméra interne ne sera pas automatiquement téléchargée dans l'archive principale.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
@@ -9296,10 +9308,6 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
       <translation>Sélectionner mise en page...</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Sélectionnez un seul utilisateur dans &quot;Afficher sur&quot; ligne pour afficher ses mises en page locale dans cette liste</translation>
-    </message>
-    <message>
       <source>Local layouts can only be shown to their owners.</source>
       <translation>Mises en page locales ne peuvent être montrées qu'à leurs propriétaires.</translation>
     </message>
@@ -9310,6 +9318,10 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Certains utilisateurs n'ont pas accès à la mise en page sélectionnée. L'action ne fonctionnera pas pour eux.</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
     </message>
   </context>
   <context>
@@ -10365,6 +10377,18 @@ Vous pouvez consulter %2 ou lire ce %3 pour en savoir plus sur le problème actu
     <message>
       <source>On-device recordings were found</source>
       <translation>Des enregistrements sur l'appareil ont été trouvés</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 stopped</source>
+      <translation type="unfinished">Export archive from %1 stopped</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by user</source>
+      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by user</source>
+      <translation type="unfinished">The recording settings have been changed by user</translation>
     </message>
   </context>
   <context>

@@ -499,14 +499,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>Arkivera inte primärströmmen</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>Arkivera inte sekundära strömmen</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>Auto</translation>
     </message>
@@ -627,12 +619,28 @@
       <translation>Behåll kamerans tidsinställningar</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>Exportera inte video automatiskt</translation>
+      <source>Do not record primary stream</source>
+      <translation>Spela inte in primärström</translation>
     </message>
     <message>
-      <source>Export From Device</source>
-      <translation>Exportera från enhet</translation>
+      <source>Do not record secondary stream</source>
+      <translation>Spela inte in sekundär ström</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation>Importera från enhet</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Importera video automatiskt</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Webbsida</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Porten för webbsida</translation>
     </message>
   </context>
   <context>
@@ -1010,10 +1018,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP-innehåll</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Logga in för att autentisera (valfritt)</translation>
     </message>
@@ -1034,16 +1038,20 @@
       <translation>Innehållstyp</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP-URL</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>Autentiseringstyp</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>Typ av begäran</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>
@@ -1249,6 +1257,10 @@
       <source>Mute audio when the mic is active</source>
       <translation>Stäng av ljudet när mikrofonen är aktiv</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1431,10 +1443,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>Delade vyer</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Välj en enskild användare i &quot;Visa till&quot; rad för att visa sina lokala vyer i den här listan</translation>
     </message>
   </context>
   <context>

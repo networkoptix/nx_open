@@ -499,14 +499,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>Не записывать первый поток</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>Не записывать второй поток</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>Авто</translation>
     </message>
@@ -627,12 +619,28 @@
       <translation>Сохранить настройки времени камеры</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <source>Do not record primary stream</source>
+      <translation type="unfinished">Do not record primary stream</translation>
     </message>
     <message>
-      <source>Export From Device</source>
-      <translation type="unfinished">Export From Device</translation>
+      <source>Do not record secondary stream</source>
+      <translation type="unfinished">Do not record secondary stream</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation type="unfinished">Import From Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Web-интерфейс</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation type="unfinished">Web Page Port</translation>
     </message>
   </context>
   <context>
@@ -1010,10 +1018,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP запрос</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Имя пользователя для аутентификации (необязательно)</translation>
     </message>
@@ -1034,16 +1038,20 @@
       <translation>Тип содержимого</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>URL HTTPS</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>Тип аутентификации</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>Тип запроса</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>
@@ -1249,6 +1257,10 @@
       <source>Mute audio when the mic is active</source>
       <translation>Отключить звук, когда микрофон активен</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1431,10 +1443,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>Раскладки с общим доступом</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Выберите одного пользователя в строке &quot;Показать&quot; чтобы отобразить его локальные раскладки в этом списке</translation>
     </message>
   </context>
   <context>

@@ -1203,10 +1203,6 @@
       <translation>Afficher sur mise en page Alarme</translation>
     </message>
     <message>
-      <source>Do HTTP request</source>
-      <translation>Faire requête HTTP</translation>
-    </message>
-    <message>
       <source>Device output</source>
       <translation>Sortie Périphérique</translation>
     </message>
@@ -1754,12 +1750,16 @@
       <translation>Erreur serveur &quot;%1&quot; certificat</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation>Informeur Interphone</translation>
-    </message>
-    <message>
       <source>Failed to backup file %1</source>
       <translation>Échec de la sauvegarde du fichier %1</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation>Faire une requête HTTP(S)</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation>Afficher l'informateur d'interphone</translation>
     </message>
   </context>
   <context>

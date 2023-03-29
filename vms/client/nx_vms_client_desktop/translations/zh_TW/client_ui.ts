@@ -499,14 +499,6 @@
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
-      <source>Do not archive primary stream</source>
-      <translation>不錄存主串流</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>不錄存第二串流</translation>
-    </message>
-    <message>
       <source>Auto</source>
       <translation>自動</translation>
     </message>
@@ -627,12 +619,28 @@
       <translation>保持攝影機時間設定</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>停止自動匯出錄影資料</translation>
+      <source>Do not record primary stream</source>
+      <translation type="unfinished">Do not record primary stream</translation>
     </message>
     <message>
-      <source>Export From Device</source>
-      <translation>從裝置匯出</translation>
+      <source>Do not record secondary stream</source>
+      <translation type="unfinished">Do not record secondary stream</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation type="unfinished">Import From Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>網頁</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation type="unfinished">Web Page Port</translation>
     </message>
   </context>
   <context>
@@ -1010,10 +1018,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP內容</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>認証帳號 (非必要)</translation>
     </message>
@@ -1034,16 +1038,20 @@
       <translation>內容類型</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
       <source>Authentication type</source>
       <translation>驗證類型</translation>
     </message>
     <message>
       <source>Request type</source>
       <translation>請求類型</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) content</source>
+      <translation type="unfinished">HTTP(S) content</translation>
     </message>
   </context>
   <context>
@@ -1249,6 +1257,10 @@
       <source>Mute audio when the mic is active</source>
       <translation>當麥克風啟用時則將音訊切換成靜音</translation>
     </message>
+    <message>
+      <source>Allow computer entering sleep mode on idle</source>
+      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1431,10 +1443,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>共享佈局</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>在 &quot;列表中選擇單個使用者, 然後顯示本地佈局到&quot;</translation>
     </message>
   </context>
   <context>

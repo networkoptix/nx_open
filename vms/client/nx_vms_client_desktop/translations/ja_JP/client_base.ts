@@ -2352,6 +2352,14 @@
     </message>
   </context>
   <context>
+    <name>QnCamDisplay</name>
+    <message>
+      <source>%1 Running</source>
+      <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+      <translation>%1 実行中</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
@@ -5505,6 +5513,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Remote archive synchronization available</source>
       <translation>リモートアーカイブの同期が利用可能です</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization has been stopped</source>
+      <translation>カメラストレージとの同期が停止されました</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7189,6 +7201,10 @@ We recommend you not to open this web page. If you understand the risks, you can
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation>これらのカメラからの映像は %1 %2 までバックアップされています</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation>バックアッププロセスが開始されると進行状況が表示されます</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7246,10 +7262,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Open door</source>
       <translation>ドアを開く</translation>
-    </message>
-    <message>
-      <source>Drop</source>
-      <translation>切断</translation>
     </message>
   </context>
   <context>
@@ -7325,8 +7337,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>サーバーは時刻設定をカメラに通知しません。</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation>カメラの内部ストレージに保存された映像は、自動的にはメインアーカイブにアップロードされません。</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation>カメラの内部ストレージに保存された映像は、メインアーカイブに自動的にアップロードされます。</translation>
     </message>
   </context>
   <context>
@@ -9160,10 +9172,6 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>レイアウトを選択...</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>&quot;表示先&quot; 行でユーザー1名を選択すると、そのユーザーのローカルレイアウトがリストに表示されます</translation>
-    </message>
-    <message>
       <source>Local layouts can only be shown to their owners.</source>
       <translation>ローカルレイアウトはその所有者にのみ表示できます。</translation>
     </message>
@@ -9174,6 +9182,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>一部のユーザーは選択されたレイアウトにアクセスできません。当該ユーザーに対してアクションは機能しません。</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation>ローカルレイアウトをお探しですか？ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;表示先&quot; リストからユーザーを1名のみ選択してください。</translation>
     </message>
   </context>
   <context>
@@ -10215,6 +10227,18 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     <message>
       <source>On-device recordings were found</source>
       <translation>デバイス内録画が見つかりました</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 stopped</source>
+      <translation>%1 からのアーカイブのエクスポートが停止しました</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by user</source>
+      <translation>アーカイブストリームの設定がユーザーによって変更されました</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by user</source>
+      <translation>録画設定がユーザーによって変更されました</translation>
     </message>
   </context>
   <context>

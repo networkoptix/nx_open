@@ -1203,10 +1203,6 @@
       <translation>Zeige auf Alarmlayout</translation>
     </message>
     <message>
-      <source>Do HTTP request</source>
-      <translation>HTTP-Anfrage starten</translation>
-    </message>
-    <message>
       <source>Device output</source>
       <translation>Geräteausgabe</translation>
     </message>
@@ -1754,12 +1750,16 @@
       <translation>Server &quot;%1&quot; Zertifikatsfehler</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation>Intercom-Informant</translation>
-    </message>
-    <message>
       <source>Failed to backup file %1</source>
       <translation>Sicherung der Datei %1 fehlgeschlagen</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation>HTTP(S)-Anfrage durchführen</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation>Intercom Informer anzeigen</translation>
     </message>
   </context>
   <context>

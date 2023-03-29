@@ -1157,10 +1157,6 @@
       <translation>알람 레이아웃에 표시</translation>
     </message>
     <message>
-      <source>Do HTTP request</source>
-      <translation>HTTP 요청</translation>
-    </message>
-    <message>
       <source>Device output</source>
       <translation>장치 출력</translation>
     </message>
@@ -1696,12 +1692,16 @@
       <translation>서버 &quot;%1&quot; 인증서 오류</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
-    </message>
-    <message>
       <source>Failed to backup file %1</source>
       <translation type="unfinished">Failed to backup file %1</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
     </message>
   </context>
   <context>

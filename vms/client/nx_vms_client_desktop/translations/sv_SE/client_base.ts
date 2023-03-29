@@ -2383,6 +2383,14 @@
     </message>
   </context>
   <context>
+    <name>QnCamDisplay</name>
+    <message>
+      <source>%1 Running</source>
+      <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+      <translation>%1 körs</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
@@ -5578,6 +5586,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Remote archive synchronization available</source>
       <translation>Synkronisering av fjärrarkiv</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization has been stopped</source>
+      <translation>Fjärrarkivsynkronisering har stoppats</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7304,6 +7316,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
       <translation>Filmer från dessa kameror säkerhetskopieras till %1 %2</translation>
     </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation>Framstegen kommer att visas när säkerhetskopieringsprocessen startar</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7362,10 +7378,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Open door</source>
       <translation>Öppna dörr</translation>
-    </message>
-    <message>
-      <source>Drop</source>
-      <translation>Släpp</translation>
     </message>
   </context>
   <context>
@@ -7442,8 +7454,8 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Servern skickar inte tidsinställningar till kameran.</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive automatically.</source>
-      <translation>Video som spelas in på den interna kamerans lagringsutrymme kommer inte att laddas upp till huvudarkivet automatiskt.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation>Video inspelad på den interna kameran&apos;s lagring kommer inte att laddas upp till huvudarkivet.</translation>
     </message>
   </context>
   <context>
@@ -9296,10 +9308,6 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
       <translation>Välj layout...</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Välj en enskild användare i &quot;Visa till&quot; rad för att visa sina lokala vyer i den här listan</translation>
-    </message>
-    <message>
       <source>Local layouts can only be shown to their owners.</source>
       <translation>Lokala layouter kan bara visas för sina ägare.</translation>
     </message>
@@ -9310,6 +9318,10 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Vissa användare har inte tillgång till den valda layouten. Åtgärden fungerar inte för dem.</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation>Letar du efter en lokal layout? Välj endast en användare från listan &quot;Visa till&quot; för att visa deras lokala layouter som ett alternativ här.</translation>
     </message>
   </context>
   <context>
@@ -10364,6 +10376,18 @@ Du kan se %2 eller läsa den här %3 för att lära dig mer om det aktuella prob
     <message>
       <source>On-device recordings were found</source>
       <translation>Inspelningar på enheten hittades</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 stopped</source>
+      <translation type="unfinished">Export archive from %1 stopped</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by user</source>
+      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by user</source>
+      <translation type="unfinished">The recording settings have been changed by user</translation>
     </message>
   </context>
   <context>
