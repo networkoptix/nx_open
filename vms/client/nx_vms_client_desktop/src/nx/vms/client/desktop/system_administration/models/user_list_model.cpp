@@ -417,12 +417,13 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                     switch (user->userType())
                     {
                         case nx::vms::api::UserType::cloud:
-                            return user->isEnabled()
-                                ? QString("cloud/cloud_20.png")
-                                : QString("cloud/cloud_20_disabled.png");
+                            return QString("user_settings/user_cloud.svg");
 
                         case nx::vms::api::UserType::ldap:
-                            return QString("user_settings/user_type_ldap.png");
+                            return QString("user_settings/user_ldap.svg");
+
+                        case nx::vms::api::UserType::local:
+                            return QString("user_settings/user_local.svg");
 
                         default:
                             break;
@@ -666,6 +667,16 @@ bool SortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& r
 
     switch (sortColumn())
     {
+        case UserListModel::UserWarningColumn:
+        {
+            const bool l = leftUser->externalId().isEmpty() || leftUser->externalId().synced;
+            const bool r = rightUser->externalId().isEmpty() || rightUser->externalId().synced;
+            if (l != r)
+                return r;
+
+            break;
+        }
+
         case UserListModel::UserTypeColumn:
         {
             const auto leftType = leftUser->userType();
