@@ -34,6 +34,19 @@ void CheckableHeaderView::setCheckState(Qt::CheckState state)
     }
 }
 
+void CheckableHeaderView::setAlignment(int logicalIndex, Qt::Alignment alignment)
+{
+    m_textAlignment[logicalIndex] = alignment;
+}
+
+void CheckableHeaderView::initStyleOptionForIndex(
+    QStyleOptionHeader* option,
+    int logicalIndex) const
+{
+    base_type::initStyleOptionForIndex(option, logicalIndex);
+    option->textAlignment = m_textAlignment.value(logicalIndex, defaultAlignment());
+}
+
 void CheckableHeaderView::paintSection(
     QPainter* painter, const QRect& rect, int logicalIndex) const
 {

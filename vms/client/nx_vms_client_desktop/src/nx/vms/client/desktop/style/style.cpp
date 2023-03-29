@@ -3426,6 +3426,20 @@ QRect Style::subElementRect(
                         rect.setX(rect.x() - Metrics::kSortIndicatorSize);
                     }
                 }
+                else if ((header->textAlignment & Qt::AlignHCenter)
+                    && header->text.isEmpty()
+                    && header->icon.isNull())
+                {
+                    // When label text is centered but empty adjust its rect so that sort indicator
+                    // ends up exactly in the center.
+                    const int margin = pixelMetric(PM_HeaderMargin, header, widget);
+                    const int arrowSize = pixelMetric(PM_HeaderMarkSize, header, widget);
+
+                    rect = header->rect;
+                    rect.setX(rect.center().x() - margin + 1 - arrowSize / 2);
+                    rect.setWidth(1);
+                    return rect;
+                }
 
                 const auto horizontalAlignment = header->textAlignment & ~Qt::AlignVertical_Mask;
                 rect = option->fontMetrics.boundingRect(rect,
