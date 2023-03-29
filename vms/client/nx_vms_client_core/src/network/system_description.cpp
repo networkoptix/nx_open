@@ -195,7 +195,8 @@ bool QnSystemDescription::hasLocalServer() const
             const auto host = getServerHost(moduleInformation.id).host();
             return !nx::network::SocketGlobals::addressResolver().isCloudHostname(host)
                 && (nx::network::HostAddress(host).isLoopback()
-                    || qnLocalNetworkInterfacesManager->containsHost(host));
+                    || (NX_ASSERT(qnLocalNetworkInterfacesManager)
+                        && qnLocalNetworkInterfacesManager->containsHost(host)));
         });
 }
 
