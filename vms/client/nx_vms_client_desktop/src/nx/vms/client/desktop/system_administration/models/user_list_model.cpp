@@ -405,6 +405,13 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
         {
             switch (index.column())
             {
+                case UserWarningColumn:
+                {
+                    return user->externalId().isEmpty() || user->externalId().synced
+                        ? QVariant{}
+                        : QVariant("user_settings/user_alert.svg");
+                }
+
                 case UserTypeColumn:
                 {
                     switch (user->userType())

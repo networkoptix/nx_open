@@ -293,6 +293,10 @@ void UserGroupsWidget::Private::setupUi()
     header->setSectionResizeMode(UserGroupListModel::ParentGroupsColumn, QHeaderView::Stretch);
     header->setSectionsClickable(true);
 
+    header->setSectionResizeMode(UserGroupListModel::GroupTypeColumn, QHeaderView::Fixed);
+    header->resizeSection(UserGroupListModel::GroupTypeColumn, 28);
+    header->setAlignment(UserGroupListModel::GroupTypeColumn, Qt::AlignHCenter);
+
     connect(header, &CheckableHeaderView::checkStateChanged, this,
         [this](Qt::CheckState checkState)
         {
