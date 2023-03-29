@@ -114,8 +114,11 @@ void ResourceTreeComposer::rebuildEntity()
 
         composition->setSubEntity(webPagesGroup, m_entityBuilder->createWebPagesGroupEntity());
 
-        composition->setSubEntity(
-            otherSystemsGroup, m_entityBuilder->createOtherSystemsGroupEntity());
+        if (!ini().hideOtherSystemsFromResourceTree)
+        {
+            composition->setSubEntity(
+                otherSystemsGroup, m_entityBuilder->createOtherSystemsGroupEntity());
+        }
 
         composition->setSubEntity(
             localResourcesGroup, m_entityBuilder->createLocalFilesGroupEntity());

@@ -376,6 +376,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
 
     NX_INI_STRING("", clientExecutableName,
         "[SQ] Special executable name to launch 'New Window' or Video Wall.");
+
+    NX_INI_FLAG(false, hideOtherSystemsFromResourceTree,
+        "[SQ] Do not display 'Other Systems' node in the Resource Tree.");
 };
 
 NX_VMS_CLIENT_DESKTOP_API Ini& ini();
