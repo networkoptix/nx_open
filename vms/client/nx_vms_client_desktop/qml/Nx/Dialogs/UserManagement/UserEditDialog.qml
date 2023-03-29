@@ -59,6 +59,7 @@ DialogWithState
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
     property bool isSaving: false
+    property bool ldapError: false
     property var self
 
     signal deleteRequested()
@@ -100,6 +101,7 @@ DialogWithState
                 globalPermissions: dialog.globalPermissions
                 sharedResources: dialog.sharedResources
                 enabled: dialog.editable && !dialog.isSaving
+                ldapError: dialog.ldapError
 
                 onDeleteRequested: dialog.deleteRequested()
                 onAuditTrailRequested: dialog.auditTrailRequested()
