@@ -49,7 +49,6 @@ QnWebResourceWidget::QnWebResourceWidget(
         ? new GraphicsWebEngineView(resource(), this)
         : new GraphicsWebEngineView({}, this)) //< Page will be loaded from saved state later.
 {
-    setOption(AlwaysShowName, true);
     setOption(AllowFocus, false);
 
     m_webEngineView->installEventFilter(this);
