@@ -404,6 +404,9 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
         {
             ui->stackedWidget->setCurrentWidget(ui->statusPage);
             m_testSmtpConfigurationButton->setEnabled(true);
+            ui->serverAddressInput->setIntermediateValidationResult();
+            ui->userInput->setIntermediateValidationResult();
+            ui->passwordInput->setIntermediateValidationResult();
 
             if (success)
             {
@@ -418,10 +421,16 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
                 {
                     setConfigurationStatus(Error);
                     setConfigurationStatusHint(smtpErrorCodeToString(result.data.errorCode));
+                    if (result.data.errorCode == email::SmtpError::connectionTimeout)
+                    {
+                        ui->serverAddressInput->setInvalidValidationResult(
+                            tr("Cannot reach the server"));
+                    }
                     if (result.data.errorCode == email::SmtpError::authenticationFailed)
                     {
                         ui->userInput->setInvalidValidationResult();
-                        ui->passwordInput->setInvalidValidationResult();
+                        ui->passwordInput->setInvalidValidationResult(
+                            tr("Username or Password are incorrect"));
                     }
                 }
             }
@@ -599,7 +608,7 @@ QString OutgoingMailSettingsWidget::Private::smtpErrorCodeToString(nx::email::Sm
             return tr("Connection timed out");
 
         case SmtpError::authenticationFailed:
-            return tr("Username or Password are incorrect");
+            return tr("Authentication failed");
 
         default:
             return tr("Unknown error");

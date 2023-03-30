@@ -17,6 +17,7 @@ NX_REFLECTION_ENUM_CLASS(SmtpError,
     connectionTimeout,
     responseTimeout,
     sendDataTimeout,
+    wrongProtocol,
     authenticationFailed,
     serverFailure, //< 4xx SMTP error
     clientFailure //< 5xx SMTP error
