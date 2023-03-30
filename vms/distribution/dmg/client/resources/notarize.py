@@ -26,9 +26,18 @@ def get_upload_error_message(request_result):
     return error_data[0].get('message')
 
 
-def execute(command):
+def masked_command(command, masked_secrets=()):
+    def masked_arg(arg):
+        for secret in masked_secrets:
+            arg = arg.replace(secret, "*****")
+        return arg
+
+    return (masked_arg(arg) for arg in command)
+
+
+def execute(command, masked_secrets=()):
     try:
-        logging.info(f"-- Running: {command}")
+        logging.info(f"-- Running: {masked_command(command, masked_secrets)}")
         output = subprocess.check_output(command)
         return True, output
     except subprocess.CalledProcessError as error:
@@ -41,12 +50,12 @@ def upload_for_notarization(options):
         '--output-format', 'xml',
         '-f', options.dmg_file_name,
         '--primary-bundle-id', options.bundle_id,
-        '-itc_provider', options.teamId,
+        '-itc_provider', options.team_id,
         '-u', options.user,
         '-p', options.password
     ]
 
-    success, output = execute(command)
+    success, output = execute(command, masked_secrets=[options.user, options.password])
     request_result = None
 
     if success:
@@ -75,7 +84,7 @@ def check_notarization_completion(options):
         '--output-format', 'xml'
     ]
 
-    success, output = execute(command)
+    success, output = execute(command, masked_secrets=[options.user, options.password])
     progress_data = plistlib.load(io.BytesIO(output))
     info = progress_data.get('notarization-info')
     if not success or not info:
@@ -125,19 +134,16 @@ def add_standard_parser_parameters(parser):
     parser.add_argument(
         '--user',
         metavar='<Apple Developer ID>',
-        dest='user',
-        required=True)
+        help="User can also be specified with NOTARIZATION_USER environment variable")
 
     parser.add_argument(
         '--password',
         metavar="<Apple Developer Password>",
-        dest='password',
-        required=True)
+        help="Password can also be specified with NOTARIZATION_PASSWORD environment variable")
 
     parser.add_argument(
         '--timeout',
         metavar="<Timeout of operation in minutes>",
-        dest='timeout',
         type=int,
         default=20)
 
@@ -148,7 +154,6 @@ def setup_notarize_parser(subparsers):
     notarizationParser.add_argument(
         '--team-id',
         metavar="<Apple Team ID>",
-        dest='teamId',
         required=True)
 
     notarizationParser.add_argument(
@@ -160,7 +165,6 @@ def setup_notarize_parser(subparsers):
     notarizationParser.add_argument(
         '--bundle-id',
         metavar="<Application Bundle ID>",
-        dest='bundle_id',
         required=True)
 
 
@@ -170,7 +174,6 @@ def setup_check_parser(subparsers):
     checkParsers.add_argument(
         '--request-id',
         metavar="<Request ID>",
-        dest='request_id',
         required=True)
 
 
@@ -190,6 +193,17 @@ def main():
 
     start_time = time.monotonic()
     options = parser.parse_args()
+
+    if not options.user:
+        options.user = os.getenv("NOTARIZATION_USER")
+        if not options.user:
+            show_critical_error_and_exit(
+                "Notarization user is not specified. See --help for details.")
+    if not options.password:
+        options.password = os.getenv("NOTARIZATION_PASSWORD")
+        if not options.password:
+            show_critical_error_and_exit(
+                "Notarization password is not specified. See --help for details.")
 
     if not os.path.exists(options.dmg_file_name):
         show_critical_error_and_exit(f"File {options.dmg_file_name} does not exist.")
