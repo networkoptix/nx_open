@@ -1613,7 +1613,7 @@
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+      <translation>Contagem máxima de encadeamentos para sincronização de arquivo remoto (&lt;= 0 - automático, máximo 32)</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization</source>

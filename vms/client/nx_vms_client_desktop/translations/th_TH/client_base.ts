@@ -6674,7 +6674,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>เลือกผู้ใช้งานอย่างน้อยหนึ่งคน</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -8859,7 +8859,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>คำเตือน</translation>
     </message>
     <message>
       <source>Info</source>
@@ -8867,11 +8867,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>การ​แก้ไข​จุด​บกพร่อง</translation>
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>ละเอียด</translation>
     </message>
   </context>
   <context>

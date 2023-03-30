@@ -5770,7 +5770,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>User Management</translation>
     </message>
     <message>
       <source>Time Sync</source>
@@ -9519,7 +9519,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Warning</translation>
     </message>
     <message>
       <source>Info</source>

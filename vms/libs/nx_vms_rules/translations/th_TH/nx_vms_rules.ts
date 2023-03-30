@@ -343,21 +343,21 @@
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>ไม่มีข้อมูลที่ได้รับในช่วงที่ผ่านมา %n วินาที.</numerusform>
       </translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>ข้อผิดพลาด RTP ในสตรีมหลัก (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>ข้อผิดพลาด RTP ในสตรีมสำรอง (%1).</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>อุปกรณ์ไม่ตอบสนองต่อคำขอเครือข่าย</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -383,19 +383,19 @@
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>ที่อยู่เครือข่าย %1 ไม่ใช่ที่อยู่แบบหลายผู้รับ.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>การเชื่อมต่อกับกล้อง (กระแสหลัก) ถูกปิดโดยไม่คาดคิด.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>การเชื่อมต่อกับกล้อง (กระแสรอง) ถูกปิดโดยไม่คาดคิด.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>การเชื่อมต่อกับอุปกรณ์ที่ถูกปิดโดยไม่คาดคิด.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
@@ -559,11 +559,11 @@
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์ขาดหายไป.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>วิดีโอหยุดลงอย่างกะทันหัน</translation>
     </message>
   </context>
   <context>
@@ -655,27 +655,27 @@
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>I / O ข้อผิดพลาดที่เกิดขึ้นใน %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>ความเร็วไม่เพียงพอ HDD / SSD สำหรับการบันทึกไปยัง %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD/SSD disk %1 เต็ม ดิสก์มีข้อมูลมากเกินไปที่ไม่ได้รับการจัดการโดย VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>ดิสก์ระบบ &quot;%1&quot; ใกล้เต็มแล้ว</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>ที่เก็บข้อมูล Analytics &quot;%1&quot; ออฟไลน์</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>พื้นที่เก็บข้อมูล Analytics &quot;%1&quot; ใกล้จะเต็มแล้ว</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
@@ -733,11 +733,11 @@
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>คำอธิบาย:%1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>เหตุผล: %1</translation>
     </message>
   </context>
   <context>

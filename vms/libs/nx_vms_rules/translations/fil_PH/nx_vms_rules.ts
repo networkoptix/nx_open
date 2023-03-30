@@ -262,7 +262,7 @@
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Interval of action</translation>
     </message>
     <message>
       <source>Login</source>
@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Interval of action</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
@@ -505,7 +505,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Interval of action</translation>
     </message>
     <message>
       <source>Additional recipients</source>
@@ -633,7 +633,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Interval of action</translation>
     </message>
     <message>
       <source>Speak to users</source>

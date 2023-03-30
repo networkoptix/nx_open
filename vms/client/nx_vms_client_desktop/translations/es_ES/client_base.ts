@@ -5496,7 +5496,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Gestión de usuarios</translation>
     </message>
     <message>
       <source>Time Sync</source>
@@ -6781,7 +6781,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Seleccione al menos un usuario</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -8993,7 +8993,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Advertencia</translation>
     </message>
     <message>
       <source>Info</source>
@@ -9001,11 +9001,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>Depurar</translation>
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>Verbose</translation>
     </message>
   </context>
   <context>
@@ -12039,7 +12039,7 @@ Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Adminis
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>Guardar diseño como nube</translation>
     </message>
   </context>
   <context>

@@ -3008,10 +3008,6 @@
       <translation>バックアップの再インデックス</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>分析データは、無効化されたストレージに引き続き保存されます。</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>無効化された保存先への録画は停止しますが、古い映像は引き続き削除されます。</translation>
     </message>
@@ -3022,6 +3018,10 @@
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
       <translation>分析データは大量のスペースを占有する可能性があります。システムパーティションではなく、別の場所を選択することをお勧めします。</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation>分析およびモーションデータは、無効なストレージに引き続き保存されます。</translation>
     </message>
   </context>
   <context>
