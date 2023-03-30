@@ -58,6 +58,7 @@ DialogWithState
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
     property bool isSaving: false
+    property bool ldapError: false
     property var self
 
     signal groupClicked(var id)
