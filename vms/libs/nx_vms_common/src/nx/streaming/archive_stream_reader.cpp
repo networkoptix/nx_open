@@ -1288,7 +1288,7 @@ bool QnArchiveStreamReader::jumpToEx(
     if (needJump)
     {
         beforeJumpInternal(newTime);
-        channeljumpToUnsync(newTime, 0, usePreciseSeek);
+        channeljumpToUnsync(newTime, 0, skipTime);
     }
 
     if(useMutex)
