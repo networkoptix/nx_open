@@ -75,6 +75,8 @@ nx_wix_light(${unsigned_msi_filename}
         distribution_wix_client_help_module
 )
 
+nx_add_targets_to_strengthened(${unsigned_msi_filename})
+
 if(codeSigning)
     set(unsigned_distribution_path
         "${CMAKE_CURRENT_BINARY_DIR}/client-unsigned.exe")
@@ -131,7 +133,6 @@ if(codeSigning)
         SOURCE_FILE ${unsigned_distribution_path}
         TARGET_FILE ${signed_distribution_path}
     )
-    nx_add_targets_to_strengthened(distribution_wix_client_signed_exe)
 else()
     add_custom_target(distribution_wix_client ALL
         COMMENT "[Wix] Building client distribution"
@@ -139,5 +140,4 @@ else()
             ${unsigned_distribution_path}
     )
     set_target_properties(distribution_wix_client PROPERTIES FOLDER distribution)
-    nx_add_targets_to_strengthened(distribution_wix_client)
 endif()
