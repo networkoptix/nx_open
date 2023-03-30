@@ -15,7 +15,12 @@ Storage::Storage(AbstractBackend* backend, QObject* parent):
 
 bool Storage::isWritable() const
 {
-    return m_backend->isWritable();
+    return !m_readOnly && m_backend->isWritable();
+}
+
+void Storage::setReadOnly(bool readOnly)
+{
+    m_readOnly = readOnly;
 }
 
 void Storage::load()
@@ -103,11 +108,17 @@ QString Storage::readValue(const QString& name)
 
 void Storage::writeValue(const QString& name, const QString& value)
 {
+    if (m_readOnly)
+        return;
+
     m_backend->writeValue(name, value);
 }
 
 void Storage::removeValue(const QString& name)
 {
+    if (m_readOnly)
+        return;
+
     m_backend->removeValue(name);
 }
 

@@ -14,7 +14,6 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
-class QSettings;
 class QnSystemDescription;
 class CloudStatusWatcherPrivate;
 

@@ -36,22 +36,27 @@ void ShowOnceSettings::migrate()
         return;
 
     auto oldSettings = std::make_unique<QSettings>();
-    oldSettings->beginGroup("show_once");
 
-    cloudLayoutsPromo = oldSettings->value("CloudLayoutsPromo").toBool();
-    cloudPromo = oldSettings->value("CloudPromoNotification").toBool();
-    digestDisableNotification = oldSettings->value("DigestDisableNotification").toBool();
-    sharedLayoutEdit = oldSettings->value("SharedLayoutEdit").toBool();
-    removeItemsFromLayout = oldSettings->value("RemoveItemsFromLayout").toBool();
-    removeItemsFromShowreel = oldSettings->value("RemoveItemsFromShowreel").toBool();
-    deleteResources = oldSettings->value("DeleteResources").toBool();
-    mergeResourceGroups = oldSettings->value("MergeResourceGroups").toBool();
-    moveProxiedWebpageWarning = oldSettings->value("MoveProxiedWebpageWarning").toBool();
-    deleteLocalLayouts = oldSettings->value("DeleteLocalLayouts").toBool();
-    ptzPresetInUse = oldSettings->value("PtzPresetInUse").toBool();
-    newPtzMechanicPromo = oldSettings->value("NewPtzMechanicPromoBlock").toBool();
-    autoTrackingPromo = oldSettings->value("AutoTrackingPromoBlock").toBool();
-    versionMismatch = oldSettings->value("NewPtzMechanicPromoBlock").toBool();
+    const auto readValue =
+        [&oldSettings](const QString& name)
+        {
+            return oldSettings->value("show_once/" + name).toBool();
+        };
+
+    cloudLayoutsPromo = readValue("CloudLayoutsPromo");
+    cloudPromo = readValue("CloudPromoNotification");
+    digestDisableNotification = readValue("DigestDisableNotification");
+    sharedLayoutEdit = readValue("SharedLayoutEdit");
+    removeItemsFromLayout = readValue("RemoveItemsFromLayout");
+    removeItemsFromShowreel = readValue("RemoveItemsFromShowreel");
+    deleteResources = readValue("DeleteResources");
+    mergeResourceGroups = readValue("MergeResourceGroups");
+    moveProxiedWebpageWarning = readValue("MoveProxiedWebpageWarning");
+    deleteLocalLayouts = readValue("DeleteLocalLayouts");
+    ptzPresetInUse = readValue("PtzPresetInUse");
+    newPtzMechanicPromo = readValue("NewPtzMechanicPromoBlock");
+    autoTrackingPromo = readValue("AutoTrackingPromoBlock");
+    versionMismatch = readValue("NewPtzMechanicPromoBlock");
 
     migrationDone = true;
 }

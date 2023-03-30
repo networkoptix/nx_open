@@ -5,7 +5,6 @@
 #include <algorithm>
 
 #include <QtCore/QPointer>
-#include <QtCore/QSettings>
 #include <QtCore/QTimer>
 #include <QtCore/QUrl>
 

@@ -30,15 +30,7 @@ static const QString kSecureKeyPropertyName("key");
 nx::utils::property_storage::AbstractBackend* createBackend(bool useQSettings)
 {
     if (useQSettings)
-    {
-        return new nx::utils::property_storage::QSettingsBackend(
-            new QSettings(
-                QSettings::NativeFormat,
-                QSettings::UserScope,
-                QCoreApplication::organizationName(),
-                QCoreApplication::applicationName()),
-            "client_core");
-    }
+        return new nx::utils::property_storage::QSettingsBackend(new QSettings(), "client_core");
 
     return new nx::utils::property_storage::FileSystemBackend(
         QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
@@ -104,6 +96,9 @@ Settings::Settings(const InitializationOptions& options):
     {
         setSecurityKey(options.securityKey);
     }
+
+    if (options.useQSettingsBackend)
+        setReadOnly(true);
 
     load();
 
@@ -233,7 +228,6 @@ void Settings::migrateOldSettings()
             .useKeychain = false,
             .useQSettingsBackend = true,
             .securityKey = securityKey()});
-    oldSettings->load();
 
     migrateAllSettingsFrom_v51(oldSettings.get());
     migrateSystemAuthenticationDataFrom_v42(oldSettings.get());

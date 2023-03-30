@@ -7,7 +7,6 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QPropertyAnimation>
-#include <QtCore/QSettings>
 #include <QtGui/QAction>
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsScene>
@@ -731,7 +730,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 return false;
             // If two arrow keys are pressed simultaneously, only first one is counted.
             if (m_rewindTimer->isActive())
-                return false; 
+                return false;
 
             m_rewindTimer->start(500);
             m_rewindDirection = direction;
@@ -896,7 +895,7 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
 
             m_ptzInstrument->toggleContinuousPtz(widget, direction, false);
         };
-    
+
     const auto stopShift =
         [this]()
         {
