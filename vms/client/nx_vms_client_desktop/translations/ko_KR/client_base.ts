@@ -5427,7 +5427,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>사용자 관리</translation>
     </message>
     <message>
       <source>Time Sync</source>
@@ -6676,7 +6676,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>최소 하나의 사용자를 선택하세요</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -8861,7 +8861,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>주의</translation>
     </message>
     <message>
       <source>Info</source>
@@ -8869,11 +8869,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>디버그</translation>
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>세부내용</translation>
     </message>
   </context>
   <context>

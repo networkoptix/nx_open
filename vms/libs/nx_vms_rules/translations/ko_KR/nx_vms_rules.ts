@@ -343,21 +343,21 @@
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>%n 초간 데이터 받기 실패.</numerusform>
       </translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>기본 스트림의 RTP 오류 (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>보조 스트림의 RTP 오류 (%1).</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>RTP 패킷 손실이 발생함.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>장치는 네트워크 요청에 응답 하지 않습니다.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -387,15 +387,15 @@
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>카메라 메인스트림 연결이 예상치 못하게 끊겼습니다.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>카메라 2nd 스트림이 에상치 못하게 끊겼습니다.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>장치 연결이 예상치 못하게 끊김.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
@@ -559,11 +559,11 @@
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>서버 접속 연결 실패.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>서버는 예기치 않게 중단 되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -655,27 +655,27 @@
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>%1에 I/O 오류 발생.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>%1. 에 저장을 위한 HDD/SSD 속도 정보.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD/SSD 디스크 "%1" 꽉 찼습니다. 디스크에 VM에 의해 관리 되지 않는 너무 많은 데이터를 포함 합니다.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>시스템 디스크 &quot;%1&quot;가 거의 찼습니다.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>웹 로그 분석 저장 공간 &quot;%1&quot; 은 오프라인입니다.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>에널리틱 저장소 &quot;%1&quot; 가 거의 찼습니다.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
@@ -733,11 +733,11 @@
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>캡션: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>원인: %1</translation>
     </message>
   </context>
   <context>

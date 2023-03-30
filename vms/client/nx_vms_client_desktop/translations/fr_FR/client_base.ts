@@ -6783,7 +6783,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Sélectionner au moins un usager</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -8995,7 +8995,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Attention</translation>
     </message>
     <message>
       <source>Info</source>
@@ -9003,11 +9003,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>Débogage</translation>
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>Verbose</translation>
     </message>
   </context>
   <context>

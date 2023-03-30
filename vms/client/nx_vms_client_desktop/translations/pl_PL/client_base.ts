@@ -9251,7 +9251,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Ostrzeżenie</translation>
     </message>
     <message>
       <source>Info</source>
@@ -9259,11 +9259,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>Debugowanie</translation>
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>Szczegóły</translation>
     </message>
   </context>
   <context>
@@ -11818,7 +11818,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Zapisać zmiany przed wyjściem?</translation>
     </message>
   </context>
   <context>
@@ -12290,7 +12290,7 @@ Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</tra
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Wybierz folder...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>

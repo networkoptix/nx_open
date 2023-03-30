@@ -5498,7 +5498,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Gestão Utilizadores</translation>
     </message>
     <message>
       <source>Time Sync</source>
@@ -6783,7 +6783,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Seleccione pelo menos um utilizador</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -8995,7 +8995,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Aviso</translation>
     </message>
     <message>
       <source>Info</source>
@@ -9003,7 +9003,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>Depurar/Debug</translation>
     </message>
     <message>
       <source>Verbose</source>

@@ -1343,7 +1343,7 @@
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>設定排程</translation>
     </message>
     <message>
       <source>Test Action</source>
@@ -3008,10 +3008,6 @@
       <translation>重新建立備份索引檔</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>分析數據將續存於已停用的存儲中。</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>將停止錄影到停用的儲存裝置上, 而且舊的錄影資料將繼續被刪除.</translation>
     </message>
@@ -3022,6 +3018,10 @@
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
       <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
     </message>
   </context>
   <context>
@@ -3172,7 +3172,7 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ 新增使用者</translation>
     </message>
     <message>
       <source>No users found</source>

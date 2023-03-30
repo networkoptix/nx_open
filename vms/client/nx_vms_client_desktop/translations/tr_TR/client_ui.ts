@@ -341,7 +341,7 @@
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>Tüm dosyalar başarıyla yedeklendi! Yeni dosyalar otomatik olarak yedeklenecek</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
@@ -611,7 +611,7 @@
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation type="unfinished">Use different values for pan and tilt</translation>
+      <translation>Pan ve tilt için farklı değerler kullanın</translation>
     </message>
     <message>
       <source>Tilt</source>
@@ -1118,7 +1118,7 @@
     </message>
     <message>
       <source>Enter your encryption password to view the archive</source>
-      <translation type="unfinished">Enter your encryption password to view the archive</translation>
+      <translation>Arşivi görüntülemek için şifreleme parolanızı girin</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1421,7 +1421,7 @@
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation type="unfinished">Automatically restore saved windows configuration</translation>
+      <translation>Kaydedilen pencere yapılandırmasını otomatik olarak geri yükle</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
@@ -1429,7 +1429,7 @@
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation type="unfinished">Mute audio when the mic is active</translation>
+      <translation>Mikrofon etkinken sesi kapatın</translation>
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
@@ -1685,7 +1685,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
+      <translation>İçe aktarılan kullanıcı için özet kimlik doğrulamasına izin ver</translation>
     </message>
   </context>
   <context>
@@ -2617,7 +2617,7 @@
     </message>
     <message>
       <source>rewind for</source>
-      <translation type="unfinished">rewind for</translation>
+      <translation>için geri sar</translation>
     </message>
     <message>
       <source>Live</source>
@@ -2753,7 +2753,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
+      <translation>Yönetici olmayan kullanıcılar için sunucuları ağaçta görüntüle</translation>
     </message>
     <message>
       <source>Archive encryption</source>
@@ -2773,7 +2773,7 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>HTTPS'yi desteklemeyen kameralarla bağlantı kesilecek.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2815,7 +2815,7 @@
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation type="unfinished">Self-signed root certificate</translation>
+      <translation>Kendinden imzalı kök sertifika</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -2839,7 +2839,7 @@
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
+      <translation>Sabitlenmiş sertifikayı görüntüle</translation>
     </message>
   </context>
   <context>
@@ -3008,10 +3008,6 @@
       <translation>Yedeklemeyi tekrar indexle</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>Analytics verileri, engelli deposunda depolanmaya devam edecek.</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>Kayıt depolama durduralacaktır. Hedef dışı kayıtlar silinmeye devam edecektir.</translation>
     </message>
@@ -3022,6 +3018,10 @@
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
       <translation>Analitik verileri büyük miktarda yer kaplayabilir. Bunun için sistem bölümü yerine başka bir konum seçmenizi öneririz.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation>Analitik ve hareket verileri, devre dışı bırakılan depolama alanında saklanmaya devam edecektir.</translation>
     </message>
   </context>
   <context>
@@ -3325,7 +3325,7 @@
     </message>
     <message>
       <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
+      <translation>Bu web sayfasını sunucu aracılığıyla proxy'le</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3341,11 +3341,11 @@
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation type="unfinished">Proxy all requested contents</translation>
+      <translation>İstenen tüm içerikleri proxy'le</translation>
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>SSL sertifikası kontrolü olmadan web sayfasının açılmasına izin ver</translation>
     </message>
   </context>
   <context>

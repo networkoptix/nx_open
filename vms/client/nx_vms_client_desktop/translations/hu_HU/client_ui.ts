@@ -1343,7 +1343,7 @@
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>Ütemezés beállítása</translation>
     </message>
     <message>
       <source>Test Action</source>
@@ -3008,10 +3008,6 @@
       <translation>Biztonsági mentés újraindexálása</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>Az Analytics adatait továbbra is a letiltott tárhely tárolja.</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>Rögzítés a lekapcsolt tárolóra leáll. A lejáró felvételek továbbra is törlésre kerülnek.</translation>
     </message>
@@ -3022,6 +3018,10 @@
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
       <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
     </message>
   </context>
   <context>
@@ -3172,7 +3172,7 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ Felhasználó hozzáadása</translation>
     </message>
     <message>
       <source>No users found</source>

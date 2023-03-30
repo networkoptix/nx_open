@@ -1343,7 +1343,7 @@
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>Настроить расписание</translation>
     </message>
     <message>
       <source>Test Action</source>
@@ -2628,7 +2628,7 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>Связь с событием</translation>
     </message>
     <message>
       <source>New Rule</source>
@@ -2644,7 +2644,7 @@
     </message>
     <message>
       <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <translation>Сброс на правила по умолчанию</translation>
     </message>
   </context>
   <context>
@@ -3008,10 +3008,6 @@
       <translation>Переиндексировать резервную копию</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>Данные аналитики будут по-прежнему храниться в отключенном хранилище.</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>Запись на отключённое хранилище прекратится. Однако, удаление устаревших записей будет продолжаться.</translation>
     </message>
@@ -3022,6 +3018,10 @@
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
       <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
     </message>
   </context>
   <context>
@@ -3172,7 +3172,7 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ Добавить пользователя</translation>
     </message>
     <message>
       <source>No users found</source>

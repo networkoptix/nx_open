@@ -1343,7 +1343,7 @@
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>Ustaw harmonogram</translation>
     </message>
     <message>
       <source>Test Action</source>
@@ -1865,11 +1865,11 @@
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Pobieranie ukończone!</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Nie udało się zapisać logów do wybranego folderu</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -3008,10 +3008,6 @@
       <translation>Indeksuj backup</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>Dane analityczne będą nadal przechowywane w wyłączonym archiwum.</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>Nagrywanie na wyłączonym archiwum zostanie wstrzymane. Jednak usuwanie przestarzałego materiału z tego archiwum będzie nadal kontynuowane.</translation>
     </message>
@@ -3022,6 +3018,10 @@
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
       <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
     </message>
   </context>
   <context>
@@ -3172,7 +3172,7 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ Dodaj użytkownika</translation>
     </message>
     <message>
       <source>No users found</source>

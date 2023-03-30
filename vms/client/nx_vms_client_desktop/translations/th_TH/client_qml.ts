@@ -274,7 +274,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
   </context>
   <context>

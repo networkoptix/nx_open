@@ -347,30 +347,30 @@
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>Geen gegevens ontvangen tijdens de laatste %n seconden.</numerusform>
+        <numerusform>Geen gegevens ontvangen tijdens de laatste %n seconden.</numerusform>
       </translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>RTP fout in de primaire stream (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>RTP-fout in secundaire stream (%1).</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>RTP-pakketverlies gedetecteerd.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>Cameratijd is weer normaal.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Apparaat reageert niet op netwerkverzoeken.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -388,19 +388,19 @@
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>Netwerkadres %1 is geen multicast-adres.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Verbinding met de camera (primaire stream) is onverwacht verbroken.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Verbinding met de camera (sub stream) werd onverwacht verbroken.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Verbinding met apparaat is onverwacht verbroken.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
@@ -564,11 +564,11 @@
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>Verbinding met de server is verloren.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Server is onverwacht gestopt.</translation>
     </message>
   </context>
   <context>
@@ -660,27 +660,27 @@
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>I/O fout opgetreden op %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>Niet genoeg snelheid HDD/SSD voor opname naar %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD / SSD-schijf &quot;%1&quot; is vol. Disk bevat te veel gegevens die niet door VMS worden beheerd.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Systeemschijf &quot;%1&quot; is bijna vol.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Analytics-opslag &quot;%1&quot; is offline.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Analytics-opslag &quot;%1&quot; is bijna vol.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
@@ -738,11 +738,11 @@
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>Bijschrift: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>Reden: %1</translation>
     </message>
   </context>
   <context>

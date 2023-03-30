@@ -6703,7 +6703,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Sanal kameralar, USB veya web kameralar sunucular arasında taşınamaz. Bu cihazlar %1 üzerinde kalacak:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
@@ -6715,7 +6715,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>Sanal kameralar, USB veya web kameralar sunucular arasında taşınamaz</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
@@ -8168,7 +8168,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect System to %1</translation>
+      <translation>%1 Sisteme bağlanmak için hesap şifrenizi girin</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8636,7 +8636,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>Dışa aktarma kullanılamıyor: Bu kameranın seçilen zaman aralığı için bir video arşivi yok.</translation>
     </message>
   </context>
   <context>
@@ -12209,7 +12209,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
-      <translation type="unfinished">Client update package is missing for current platform.</translation>
+      <translation>Mevcut platform için istemci güncelleme paketi eksik.</translation>
     </message>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>

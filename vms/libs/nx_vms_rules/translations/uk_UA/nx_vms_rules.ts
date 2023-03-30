@@ -270,7 +270,7 @@
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Інтервал спрацьовування</translation>
     </message>
     <message>
       <source>Login</source>
@@ -355,32 +355,32 @@
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
       </translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>Помилка RTP в основному потоці (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>Помилка RTP у вторинному потоці (%1).</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>Виявлено втрату RTP пакетів.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>Час камери знову нормалізується.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Пристрій не відповідає на запити мережі.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -398,19 +398,19 @@
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>Мережева адреса %1 не є адресою мультикасту.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Підключення до камери (основний потік) було несподівано закрито.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Підключення до камери (вторинний потік) було несподівано закрито.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Підключення до пристрою було несподівано закрито.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
@@ -429,7 +429,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Інтервал спрацьовування</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
@@ -515,7 +515,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Інтервал спрацьовування</translation>
     </message>
     <message>
       <source>Additional recipients</source>
@@ -574,11 +574,11 @@
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>З'єднання із сервером втрачено.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Відбулася несподівана зупинка сервера.</translation>
     </message>
   </context>
   <context>
@@ -643,7 +643,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Інтервал спрацьовування</translation>
     </message>
     <message>
       <source>Speak to users</source>
@@ -670,27 +670,27 @@
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>Помилка введення / виведення на %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>Недостатньо швидкості HDD/SSD для запису на %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>Диск &quot;%1&quot; переповнений. Диск містить занадто багато даних, що не відносяться до системи.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Системний диск &quot;%1&quot; майже повний.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Analytics storage &quot;%1&quot; офлайн.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Analytics storage &quot;%1&quot; майже заповнена.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
@@ -748,11 +748,11 @@
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>Заголовок: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>Причина: %1</translation>
     </message>
   </context>
   <context>

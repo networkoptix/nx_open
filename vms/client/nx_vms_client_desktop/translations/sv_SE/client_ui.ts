@@ -3008,10 +3008,6 @@
       <translation>Återskapa Backup</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>Analytics-data fortsätter att lagras i det inaktiverade lagret.</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>Inspelning till avaktiverad lagring stoppas. Men det kommer att fortsätta att radera utdaterat material från det.</translation>
     </message>
@@ -3022,6 +3018,10 @@
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
       <translation>Analysdata kan ta stora mängder utrymme. Vi rekommenderar att du väljer en annan plats för den istället för systempartitionen.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation>Analys- och rörelsedata kommer att fortsätta att lagras på den inaktiverade lagringen.</translation>
     </message>
   </context>
   <context>

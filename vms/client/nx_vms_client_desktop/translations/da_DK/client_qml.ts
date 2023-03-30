@@ -1202,7 +1202,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Access denied</source>
-      <translation type="unfinished">Access denied</translation>
+      <translation>Adgang nægtet</translation>
     </message>
   </context>
   <context>

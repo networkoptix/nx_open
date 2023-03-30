@@ -278,7 +278,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Accedi a</translation>
     </message>
   </context>
   <context>
@@ -1202,7 +1202,7 @@ per attivare il PTZ</translation>
     </message>
     <message>
       <source>Access denied</source>
-      <translation type="unfinished">Access denied</translation>
+      <translation>Accesso negato</translation>
     </message>
   </context>
   <context>

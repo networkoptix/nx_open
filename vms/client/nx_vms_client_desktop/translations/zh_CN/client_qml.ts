@@ -1192,7 +1192,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Access denied</source>
-      <translation type="unfinished">Access denied</translation>
+      <translation>访问被拒绝</translation>
     </message>
   </context>
   <context>

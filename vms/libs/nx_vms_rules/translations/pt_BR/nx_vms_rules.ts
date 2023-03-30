@@ -347,9 +347,9 @@
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nenhum dado recebido durante os últimos %n segundos.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+        <numerusform>Nenhum dado recebido durante os últimos %n segundos.</numerusform>
       </translation>
     </message>
     <message>
@@ -392,15 +392,15 @@
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>A ligação à câmara (Stream principal) foi terminada inesperadamente.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>A ligação à câmara (Stream secundário) foi terminada inesperadamente.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>A ligação ao dispositivo foi terminado inesperadamente.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>

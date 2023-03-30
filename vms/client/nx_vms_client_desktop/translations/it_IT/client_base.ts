@@ -5495,7 +5495,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Gestione utenti</translation>
     </message>
     <message>
       <source>Time Sync</source>
@@ -6780,7 +6780,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Selezionare almeno un utente</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -8992,7 +8992,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Attenzione</translation>
     </message>
     <message>
       <source>Info</source>
@@ -9000,11 +9000,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>Debug</translation>
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>Dettagliato</translation>
     </message>
   </context>
   <context>

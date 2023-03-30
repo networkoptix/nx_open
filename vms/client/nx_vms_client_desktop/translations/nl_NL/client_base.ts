@@ -5494,7 +5494,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Gebruikersbeheer</translation>
     </message>
     <message>
       <source>Time Sync</source>
@@ -6779,7 +6779,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Selecteer minstens één gebruiker</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -8991,7 +8991,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Waarschuwing</translation>
     </message>
     <message>
       <source>Info</source>
@@ -8999,11 +8999,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>Debug</translation>
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>Verbose</translation>
     </message>
   </context>
   <context>

@@ -270,7 +270,7 @@
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Interwał działania</translation>
     </message>
     <message>
       <source>Login</source>
@@ -355,11 +355,11 @@
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nie otrzymano żadnych danych w ciągu ostatnich %n sekund.</numerusform>
         <numerusform>Nie otrzymano żadnych danych w ciągu ostatnich %n sekund.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+        <numerusform>Nie otrzymano żadnych danych w ciągu ostatnich %n sekund.</numerusform>
+        <numerusform>Nie otrzymano żadnych danych w ciągu ostatnich %n sekund.</numerusform>
       </translation>
     </message>
     <message>
@@ -402,15 +402,15 @@
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Połączenie z kamerą (pierwszy strumień) zostało nieoczekiwanie zamknięte.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Połączenie z kamerą (drugi strumień) zostało nieoczekiwanie zamknięte.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Połączenie z urządzeniem zostało nieoczekiwanie zamknięte.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
@@ -429,7 +429,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Interwał działania</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
@@ -515,7 +515,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Interwał działania</translation>
     </message>
     <message>
       <source>Additional recipients</source>
@@ -643,7 +643,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Interwał działania</translation>
     </message>
     <message>
       <source>Speak to users</source>
@@ -686,11 +686,11 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Archiwum analityki &quot;%1&quot; jest offline.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Archiwum analityki &quot;%1&quot; jest prawie pełne.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
