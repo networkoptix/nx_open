@@ -9,7 +9,7 @@
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
 #include <nx/vms/client/desktop/system_administration/models/recursive_members_model.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
-
+#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
 
@@ -32,6 +32,7 @@ public:
     {
         // Build the following structure:
         //
+        // "admin",
         // "user1",
         // "user2",
         // "user3",
@@ -74,6 +75,13 @@ public:
         // "    user5",
         // "    group5",
         // "group5",
+
+        m_admin = addUser("admin", {QnPredefinedUserRoles::id(Qn::UserRole::owner)});
+        const auto admin =
+            systemContext()->resourcePool()->getResourceById<QnUserResource>(m_admin);
+
+        // Login as admin.
+        systemContext()->accessController()->setUser(admin);
 
         auto group1 = addGroup("group1", {});
         m_group2 = addGroup("group2", {});
@@ -226,6 +234,7 @@ public:
     QnUuid m_group3;
     QnUuid m_group4;
     QnUuid m_group5;
+    QnUuid m_admin;
     QnUuid m_user2;
     QnUuid m_user3;
     QnUuid m_user5;
@@ -456,6 +465,7 @@ TEST_F(MembersModelTest, removeUserResource)
     removeUser(m_user5);
 
     static const QStringList kAllSubjects = {
+        "admin",
         "user1",
         "user2",
         "user3",
@@ -498,6 +508,7 @@ TEST_F(MembersModelTest, addUserResource)
     addUser("user2a", {m_group3, m_group5});
 
     static const QStringList kAllSubjects = {
+        "admin",
         "user1",
         "user2",
         "user2a",
@@ -546,6 +557,7 @@ TEST_F(MembersModelTest, addGroup)
     addGroup("group6", {m_group4});
 
     static const QStringList kAllSubjects = {
+        "admin",
         "user1",
         "user2",
         "user3",
@@ -592,6 +604,7 @@ TEST_F(MembersModelTest, removeGroup)
     removeGroup(m_group4);
 
     static const QStringList kAllSubjects = {
+        "admin",
         "user1",
         "user2",
         "user3",
@@ -632,6 +645,7 @@ TEST_F(MembersModelTest, renameGroup)
     renameGroup(m_group4, "group55");
 
     static const QStringList kAllSubjects = {
+        "admin",
         "user1",
         "user2",
         "user3",
@@ -676,6 +690,7 @@ TEST_F(MembersModelTest, renameUser)
     renameUser(m_user3, "user1a");
 
     static const QStringList kAllSubjects = {
+        "admin",
         "user1",
         "user1a",
         "user2",

@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../globals/session_notifier.h"
@@ -308,11 +309,19 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
             }
         }
 
-        const auto currentUser = systemContext()->userWatcher()->user();
-        state.editable = MembersModel::isEditable(
-            systemContext()->accessSubjectHierarchy(),
-            currentUser->getId(),
-            state.groupId);
+        state.permissionsEditable = systemContext()->accessController()->hasPermissions(
+            state.groupId,
+            Qn::WriteAccessRightsPermission);
+
+        state.membersEditable = !state.isLdap
+            && systemContext()->accessController()->canCreateUser(
+                /*targetPermissions*/ {},
+                /*targetGroups*/ {groupId},
+                /*isOwner*/ groupId == QnPredefinedUserRoles::id(Qn::UserRole::owner));
+
+        state.parentGroupsEditable = systemContext()->accessController()->hasPermissions(
+            state.groupId,
+            Qn::WriteAccessRightsPermission);
     }
 
     return state;

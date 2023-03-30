@@ -21,7 +21,6 @@ struct GroupSettingsDialogState
     // Subject ID should go first for correct AccessSubjectEditingContext initialization.
     Q_PROPERTY(QnUuid groupId MEMBER groupId)
 
-    Q_PROPERTY(bool editable MEMBER editable)
     Q_PROPERTY(QString name MEMBER name)
     Q_PROPERTY(QString description MEMBER description)
     Q_PROPERTY(bool isLdap MEMBER isLdap)
@@ -29,17 +28,19 @@ struct GroupSettingsDialogState
     Q_PROPERTY(QList<nx::vms::client::desktop::MembersModelGroup> parentGroups
         READ getParentGroups
         WRITE setParentGroups)
+    Q_PROPERTY(bool parentGroupsEditable MEMBER parentGroupsEditable)
     Q_PROPERTY(QList<QnUuid> groups READ getGroups WRITE setGroups)
     Q_PROPERTY(MembersListWrapper users MEMBER users)
+    Q_PROPERTY(bool membersEditable MEMBER membersEditable)
     Q_PROPERTY(nx::vms::api::GlobalPermissions globalPermissions MEMBER globalPermissions)
     Q_PROPERTY(nx::core::access::ResourceAccessMap sharedResources MEMBER sharedResources)
+    Q_PROPERTY(bool permissionsEditable MEMBER permissionsEditable)
 
 public:
     bool operator==(const GroupSettingsDialogState& other) const = default;
 
     QnUuid groupId;
 
-    bool editable = true;
     QString name;
     QString description;
 
@@ -58,14 +59,18 @@ public:
         parentGroups = {v.begin(), v.end()};
     }
 
+    bool parentGroupsEditable = true;
     std::set<QnUuid> groups;
     QList<QnUuid> getGroups() const { return {groups.begin(), groups.end()}; }
     void setGroups(const QList<QnUuid>& v) { groups = {v.begin(), v.end()}; }
 
     MembersListWrapper users;
 
+    bool membersEditable = true;
+
     nx::vms::api::GlobalPermissions globalPermissions;
     nx::core::access::ResourceAccessMap sharedResources;
+    bool permissionsEditable = true;
 };
 
 class NX_VMS_CLIENT_DESKTOP_API GroupSettingsDialog:

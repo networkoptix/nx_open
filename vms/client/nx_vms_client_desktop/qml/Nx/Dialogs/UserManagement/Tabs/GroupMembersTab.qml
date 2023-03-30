@@ -64,7 +64,7 @@ MembershipSettings
 
     component SummaryItem: MembershipTreeItem
     {
-        enabled: control.enabled && model.isRemovable
+        enabled: control.enabled && model.canEditParents
         offset: model.offset
         iconSource: model.isUser
             ? model.isLdap

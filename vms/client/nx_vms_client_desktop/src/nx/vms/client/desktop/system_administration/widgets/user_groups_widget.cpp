@@ -30,6 +30,7 @@
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
 
@@ -381,13 +382,10 @@ void UserGroupsWidget::Private::handleModelChanged()
 bool UserGroupsWidget::Private::canDeleteGroup(const QnUuid &groupId)
 {
     const auto groupData = q->userRolesManager()->userRole(groupId);
-    return !groupData.id.isNull()
-        && !groupData.isPredefined
-        && groupData.type == api::UserType::local
-        && MembersModel::isEditable(
-            q->systemContext()->accessSubjectHierarchy(),
-            q->systemContext()->userWatcher()->user()->getId(),
-            groupId);
+
+    return q->systemContext()->accessController()->hasPermissions(
+        groupData.id,
+        Qn::RemovePermission);
 }
 
 void UserGroupsWidget::Private::handleSelectionChanged()

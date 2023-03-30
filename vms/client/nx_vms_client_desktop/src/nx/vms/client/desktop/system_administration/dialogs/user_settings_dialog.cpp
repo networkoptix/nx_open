@@ -347,12 +347,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.globalPermissions =
         user->getRawPermissions() & nx::vms::api::kNonDeprecatedGlobalPermissions;
 
-    state.editable =
-        state.userId == currentUser->getId()
-        || MembersModel::isEditable(
-            systemContext()->accessSubjectHierarchy(),
-            currentUser->getId(),
-            state.userId);
+    state.permissionsEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
 
     d->ldapError = user->isLdap() && !user->externalId().isEmpty() && !user->externalId().synced;
 

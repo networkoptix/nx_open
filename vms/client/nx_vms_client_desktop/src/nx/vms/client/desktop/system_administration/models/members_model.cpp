@@ -560,7 +560,8 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     roles[GroupSectionRole] = "groupSection";
     roles[IsLdap] = "isLdap";
     roles[Cycle] = "cycle";
-    roles[IsRemovable] = "isRemovable";
+    roles[CanEditParents] = "canEditParents";
+    roles[CanEditMembers] = "canEditMembers";
     return roles;
 }
 
@@ -572,7 +573,10 @@ bool MembersModel::isAllowedMember(const QnUuid& groupId) const
     if (MembersCache::isPredefined(groupId))
         return false;
 
-    return !m_subjectContext->subjectHierarchy()->isRecursiveMember(m_subjectId, {groupId});
+    return systemContext()->accessController()->hasPermissions(
+            groupId,
+            Qn::WriteAccessRightsPermission)
+        && !m_subjectContext->subjectHierarchy()->isRecursiveMember(m_subjectId, {groupId});
 }
 
 bool MembersModel::isAllowedParent(const QnUuid& groupId) const
@@ -584,47 +588,6 @@ bool MembersModel::isAllowedParent(const QnUuid& groupId) const
         return false;
 
     return !m_subjectContext->subjectHierarchy()->recursiveParents({groupId}).contains(m_subjectId);
-}
-
-bool MembersModel::isEditable(
-    const nx::core::access::SubjectHierarchy* hierarchy,
-    const QnUuid& currentUserId,
-    const QnUuid& id)
-{
-    // Owner (Administrators in 5.2+) can edit everyone.
-    const bool selfIsOwner = hierarchy->isRecursiveMember(
-        currentUserId, {QnPredefinedUserRoles::id(Qn::UserRole::owner)});
-
-    if (selfIsOwner)
-        return true;
-
-    // Administrator (PowerUsers in 5.2+) can edit non-owners and non-admins.
-    const bool selfIsAdmin = hierarchy->isRecursiveMember(
-        currentUserId, {QnPredefinedUserRoles::id(Qn::UserRole::administrator)});
-
-    static const QSet<QnUuid> ownerOrAdmin = {
-        QnPredefinedUserRoles::id(Qn::UserRole::owner),
-        QnPredefinedUserRoles::id(Qn::UserRole::administrator),
-    };
-
-    const bool idIsOwnerOrAdmin = ownerOrAdmin.contains(id)
-        || hierarchy->isRecursiveMember(id, ownerOrAdmin);
-
-    return selfIsAdmin && !idIsOwnerOrAdmin;
-}
-
-bool MembersModel::isRemovable(const QnUuid& id) const
-{
-    // TODO: Special types of users/groups should not be editable/removable at all.
-
-    if (m_cache->info(m_subjectId).isLdap && m_cache->info(id).isLdap)
-        return false;
-
-    const auto user = systemContext()->accessController()->user();
-    if (!user)
-        return false;
-
-    return isEditable(m_subjectContext->subjectHierarchy(), user->getId(), id);
 }
 
 QVariant MembersModel::data(const QModelIndex& index, int role) const
@@ -689,12 +652,27 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
         case Cycle:
             return m_groupsWithCycles.contains(id);
 
-        case IsRemovable:
-            return isRemovable(id);
+        case CanEditParents:
+            return !(m_cache->info(m_subjectId).isLdap && m_cache->info(id).isLdap)
+                && systemContext()->accessController()->hasPermissions(
+                    id,
+                    Qn::WriteAccessRightsPermission);
+
+        case CanEditMembers:
+            return canEditMembers(id);
 
         default:
             return {};
     }
+}
+
+bool MembersModel::canEditMembers(const QnUuid& id) const
+{
+    return !m_cache->info(id).isLdap
+        && systemContext()->accessController()->canCreateUser(
+            /*targetPermissions*/ {},
+            /*targetGroups*/ {id},
+            /*isOwner*/ id == QnPredefinedUserRoles::id(Qn::UserRole::owner));
 }
 
 bool MembersModel::setData(const QModelIndex& index, const QVariant& value, int role)
@@ -827,7 +805,7 @@ public:
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
         return (sourceModel()->data(sourceIndex, MembersModel::IsAllowedMember).toBool()
                 || (sourceModel()->data(sourceIndex, MembersModel::IsMemberRole).toBool()))
-            && sourceModel()->data(sourceIndex, MembersModel::IsRemovable).toBool()
+            && sourceModel()->data(sourceIndex, MembersModel::CanEditParents).toBool()
             && base_type::filterAcceptsRow(sourceRow, sourceParent);
     }
 };
@@ -862,7 +840,7 @@ public:
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
         return (sourceModel()->data(sourceIndex, MembersModel::IsAllowedParent).toBool()
                 || sourceModel()->data(sourceIndex, MembersModel::IsParentRole).toBool())
-            && sourceModel()->data(sourceIndex, MembersModel::IsRemovable).toBool()
+            && sourceModel()->data(sourceIndex, MembersModel::CanEditMembers).toBool()
             && base_type::filterAcceptsRow(sourceRow, sourceParent);
     }
 };

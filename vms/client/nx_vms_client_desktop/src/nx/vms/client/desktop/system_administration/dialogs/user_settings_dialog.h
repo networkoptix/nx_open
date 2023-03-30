@@ -21,8 +21,6 @@ struct UserSettingsDialogState
     // Subject ID should go first for correct AccessSubjectEditingContext initialization.
     Q_PROPERTY(QnUuid userId MEMBER userId)
 
-    Q_PROPERTY(bool editable MEMBER editable)
-
     Q_PROPERTY(nx::vms::client::desktop::UserSettingsGlobal::UserType userType MEMBER userType)
     Q_PROPERTY(bool isSelf MEMBER isSelf)
 
@@ -47,11 +45,10 @@ struct UserSettingsDialogState
     Q_PROPERTY(bool parentGroupsEditable MEMBER parentGroupsEditable)
     Q_PROPERTY(nx::core::access::ResourceAccessMap sharedResources MEMBER sharedResources)
     Q_PROPERTY(nx::vms::api::GlobalPermissions globalPermissions MEMBER globalPermissions)
+    Q_PROPERTY(bool permissionsEditable MEMBER permissionsEditable)
 
 public:
     bool operator==(const UserSettingsDialogState& other) const = default;
-
-    bool editable = true;
 
     UserSettingsGlobal::UserType userType = UserSettingsGlobal::LocalUser;
     bool isSelf = false;
@@ -90,6 +87,7 @@ public:
 
     nx::core::access::ResourceAccessMap sharedResources;
     nx::vms::api::GlobalPermissions globalPermissions;
+    bool permissionsEditable = true;
 };
 
 class NX_VMS_CLIENT_DESKTOP_API UserSettingsDialog:

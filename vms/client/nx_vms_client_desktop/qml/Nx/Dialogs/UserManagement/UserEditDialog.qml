@@ -54,7 +54,7 @@ DialogWithState
     property bool parentGroupsEditable: true
     property alias globalPermissions: globalPermissionsModel.globalPermissions
     property alias sharedResources: membersModel.sharedResources
-    property bool editable: true
+    property bool permissionsEditable: true
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
@@ -100,7 +100,7 @@ DialogWithState
                 groups: dialog.parentGroups
                 globalPermissions: dialog.globalPermissions
                 sharedResources: dialog.sharedResources
-                enabled: dialog.editable && !dialog.isSaving
+                enabled: !dialog.isSaving
                 ldapError: dialog.ldapError
 
                 onDeleteRequested: dialog.deleteRequested()
@@ -125,7 +125,7 @@ DialogWithState
 
                 model: membersModel
                 enabled: !dialog.isSaving
-                editable: dialog.parentGroupsEditable && dialog.editable
+                editable: dialog.parentGroupsEditable
 
                 onAddGroupClicked: dialog.groupClicked(null)
             }
@@ -143,7 +143,7 @@ DialogWithState
                 id: permissionSettings
                 anchors.fill: parent
 
-                enabled: dialog.editable && !dialog.isSaving
+                enabled: dialog.permissionsEditable && !dialog.isSaving
 
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext
@@ -162,7 +162,7 @@ DialogWithState
                 id: globalPermissionSettings
                 anchors.fill: parent
 
-                editable: dialog.editable && !dialog.isSaving
+                editable: dialog.permissionsEditable && !dialog.isSaving
 
                 model: GlobalPermissionsModel
                 {
