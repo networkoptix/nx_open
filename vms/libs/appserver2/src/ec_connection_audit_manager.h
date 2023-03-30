@@ -85,6 +85,11 @@ public:
 
     void addAuditRecord(
         ApiCommand::Value command,
+        const nx::vms::api::ResourceParamWithRefData& param,
+        const QnAuthSession& authInfo);
+
+    void addAuditRecord(
+        ApiCommand::Value command,
         const nx::vms::api::ResourceParamWithRefDataList& params,
         const QnAuthSession& authInfo);
 

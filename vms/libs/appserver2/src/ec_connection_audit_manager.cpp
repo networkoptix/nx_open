@@ -184,6 +184,19 @@ void ECConnectionAuditManager::addAuditRecord(
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value command,
+    const ResourceParamWithRefData& param,
+    const QnAuthSession& authInfo)
+{
+    if (nx::vms::common::SystemSettings::isGlobalSetting(param))
+    {
+        std::map<QString, QString> settings;
+        settings[param.name] = param.value;
+        commonModule()->auditManager()->notifySettingsChanged(authInfo, std::move(settings));
+    }
+}
+
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value command,
     const ResourceParamWithRefDataList& params,
     const QnAuthSession& authInfo)
 {
