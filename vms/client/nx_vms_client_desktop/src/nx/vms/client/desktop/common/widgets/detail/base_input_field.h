@@ -87,7 +87,7 @@ public:
 
 public:
     void setIntermediateValidationResult();
-    void setInvalidValidationResult();
+    void setInvalidValidationResult(const QString& message = {});
 
     virtual ValidationResult calculateValidationResult() const;
 
