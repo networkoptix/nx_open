@@ -221,7 +221,7 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
 
             nx::vms::common::CameraHotspotData hotspot;
             hotspot.pos = {0.5, 0.5};
-            if (!NX_ASSERT(kHotspotsPalette.empty()))
+            if (NX_ASSERT(!kHotspotsPalette.empty()))
                 hotspot.accentColorName = kHotspotsPalette.first().name();
             auto index = d->ui->hotspotsEditorWidget->appendHotspot(hotspot);
             d->ui->hotspotsEditorWidget->setSelectedHotspotIndex(index);
