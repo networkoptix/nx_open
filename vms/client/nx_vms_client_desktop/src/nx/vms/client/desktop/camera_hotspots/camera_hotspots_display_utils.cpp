@@ -156,7 +156,7 @@ void paintHotspot(
     // Paint decoration which is icon or text.
     if (option.decoration.canConvert<QString>())
     {
-        static const auto kTextColor = colorTheme()->color("camera.hotspots.textColor");
+        static const auto kTextColor = colorTheme()->color("camera.hotspots.text");
 
         double textOpacity = 1.0;
         if (option.state == CameraHotspotDisplayOption::State::disabled)
