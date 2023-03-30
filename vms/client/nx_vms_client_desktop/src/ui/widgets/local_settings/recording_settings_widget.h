@@ -5,26 +5,23 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h> //< TODO: #sivanov Move out enums.
+#include <nx/vms/client/desktop/resource/screen_recording/types.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
-namespace Ui {
-class RecordingSettings;
-}
+namespace Ui { class RecordingSettingsWidget; }
 
 class QnDwm;
-namespace nx::vms::client::desktop { class VideoRecorderSettings; }
 
-class QnRecordingSettingsWidget : public QnAbstractPreferencesWidget
+namespace nx::vms::client::desktop {
+
+class RecordingSettingsWidget: public QnAbstractPreferencesWidget
 {
     Q_OBJECT
     typedef QnAbstractPreferencesWidget base_type;
 
 public:
-    explicit QnRecordingSettingsWidget(
-        nx::vms::client::desktop::VideoRecorderSettings* recorderSettings,
-        QWidget* parent = nullptr);
-    virtual ~QnRecordingSettingsWidget();
+    explicit RecordingSettingsWidget(QWidget* parent = nullptr);
+    virtual ~RecordingSettingsWidget();
 
     virtual void applyChanges() override;
     virtual void loadDataToUi() override;
@@ -38,14 +35,14 @@ private:
     void initQualityCombobox();
     void initResolutionCombobox();
 
-    Qn::CaptureMode captureMode() const;
-    void setCaptureMode(Qn::CaptureMode c);
+    screen_recording::CaptureMode captureMode() const;
+    void setCaptureMode(screen_recording::CaptureMode c);
 
-    Qn::DecoderQuality decoderQuality() const;
-    void setDecoderQuality(Qn::DecoderQuality q);
+    screen_recording::Quality quality() const;
+    void setQuality(screen_recording::Quality q);
 
-    Qn::Resolution resolution() const;
-    void setResolution(Qn::Resolution r);
+    screen_recording::Resolution resolution() const;
+    void setResolution(screen_recording::Resolution resolution);
 
     int screen() const;
     void setScreen(int screen);
@@ -60,7 +57,8 @@ private:
     void at_dwm_compositionChanged();
 
 private:
-    QScopedPointer<Ui::RecordingSettings> ui;
-    nx::vms::client::desktop::VideoRecorderSettings* m_settings;
+    QScopedPointer<Ui::RecordingSettingsWidget> ui;
     QnDwm* m_dwm;
 };
+
+} // namespace nx::vms::client::desktop

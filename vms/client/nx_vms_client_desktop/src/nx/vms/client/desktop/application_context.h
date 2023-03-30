@@ -30,6 +30,7 @@ class RadassController;
 class ResourceFactory;
 class ResourcesChangesManager;
 class RunningInstancesManager;
+class ScreenRecordingSettings;
 class SharedMemoryManager;
 class ShowOnceSettings;
 class SystemContext;
@@ -159,6 +160,8 @@ public:
      * Local Client settings.
      */
     LocalSettings* localSettings() const;
+
+    ScreenRecordingSettings* screenRecordingSettings() const;
 
     ShowOnceSettings* showOnceSettings() const;
 

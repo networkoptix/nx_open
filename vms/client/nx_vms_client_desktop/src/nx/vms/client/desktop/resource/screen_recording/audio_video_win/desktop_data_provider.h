@@ -3,9 +3,9 @@
 #pragma once
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/resource/screen_recording/audio_device_info.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_data_provider_base.h>
-
-#include "../video_recorder_settings.h"
+#include <nx/vms/client/desktop/resource/screen_recording/types.h>
 
 namespace nx::vms::client::desktop {
 
@@ -21,7 +21,7 @@ public:
         int desktopNum, // = 0,
         const core::AudioDeviceInfo* audioDevice,
         const core::AudioDeviceInfo* audioDevice2,
-        Qn::CaptureMode mode,
+        screen_recording::CaptureMode mode,
         bool captureCursor,
         const QSize& captureResolution,
         float encodeQualuty, // in range 0.0 .. 1.0

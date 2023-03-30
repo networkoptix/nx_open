@@ -7,8 +7,8 @@
 #include <QtMultimedia/QAudioDevice>
 #include <QtMultimedia/QAudioSource>
 
-extern "C" {
-#include <speex/speex_preprocess.h>
+extern "C"
+{
 #include <libavcodec/avcodec.h>
 }
 
@@ -21,22 +21,19 @@ extern "C" {
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/settings/audio_recording_settings.h>
 #include <utils/common/synctime.h>
-
-#include "../audio_recorder_settings.h"
 
 namespace nx::vms::client::core {
 
-namespace
-{
-    const auto kSingleChannelBitrate = 64000;
-    const auto kStereoChannelCount = 2;
-    const auto kBitsInByte = 8;
-    const auto kDefaultSampleRate = 44100;
-    const auto kDefaultSampleSize = 16;
-    const auto kDefaultChannelCount = 1;
-    const auto kDefaultCodec = "audio/pcm";
-}
+namespace {
+
+const auto kSingleChannelBitrate = 64000;
+const auto kStereoChannelCount = 2;
+const auto kDefaultSampleRate = 44100;
+const auto kDefaultChannelCount = 1;
+
+} // namespace
 
 struct DesktopAudioOnlyDataProvider::AudioSourceInfo
 {
@@ -65,10 +62,8 @@ DesktopAudioOnlyDataProvider::AudioSourceInfo::~AudioSourceInfo()
         qFreeAligned(frameBuffer);
 }
 
-DesktopAudioOnlyDataProvider::DesktopAudioOnlyDataProvider(QnResourcePtr ptr) :
-    DesktopDataProviderBase(ptr),
-    m_initialized(false),
-    m_stopping(false)
+DesktopAudioOnlyDataProvider::DesktopAudioOnlyDataProvider(QnResourcePtr ptr):
+    DesktopDataProviderBase(ptr)
 {
 }
 
@@ -102,13 +97,9 @@ void DesktopAudioOnlyDataProvider::resizeBuffers(int frameSize)
 void DesktopAudioOnlyDataProvider::startInputs()
 {
     for(auto& info: m_audioSourcesInfo)
-    {
-        info->ioDevice =
-            info->input->start();
-    }
+        info->ioDevice = info->input->start();
 
-    auto primaryIODevice =
-        m_audioSourcesInfo.at(0)->ioDevice;
+    auto primaryIODevice = m_audioSourcesInfo.at(0)->ioDevice;
 
     Qn::directConnect(
         primaryIODevice,
@@ -213,7 +204,7 @@ QAudioFormat DesktopAudioOnlyDataProvider::getAppropriateAudioFormat(
 
 bool DesktopAudioOnlyDataProvider::initInputDevices()
 {
-    AudioRecorderSettings settings;
+    AudioRecordingSettings settings;
     auto primaryAudioDevice = settings.primaryAudioDevice();
     auto secondaryAudioDevice = nx::build_info::isMobile()
         ? AudioDeviceInfo() // It is not allowed to run several devices at mobile platform.

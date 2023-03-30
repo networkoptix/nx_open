@@ -6,9 +6,9 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/thread/long_runnable.h>
+#include <nx/vms/client/desktop/resource/screen_recording/types.h>
 #include <utils/common/threadqueue.h>
 
-#include "../video_recorder_settings.h"
 #include "screen_grabber.h"
 
 namespace nx::vms::client::desktop {
@@ -23,7 +23,7 @@ public:
         int displayNumber = D3DADAPTER_DEFAULT,
         int queueSize = DEFAULT_QUEUE_SIZE,
         int frameRate = DEFAULT_FRAME_RATE,
-        Qn::CaptureMode mode = Qn::FullScreenNoAeroMode,
+        screen_recording::CaptureMode mode = screen_recording::CaptureMode::fullScreenNoAero,
         bool captureCursor = true,
         const QSize& captureResolution = QSize(0, 0),
         QWidget* widget = nullptr);

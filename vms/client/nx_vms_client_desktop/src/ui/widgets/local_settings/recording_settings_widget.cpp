@@ -6,23 +6,22 @@
 #include <QtGui/QScreen>
 #include <QtWidgets/QApplication>
 
+#include <nx/vms/client/desktop/settings/screen_recording_settings.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
 #include <ui/widgets/dwm.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-using namespace nx::vms::client::desktop;
+namespace nx::vms::client::desktop {
 
-QnRecordingSettingsWidget::QnRecordingSettingsWidget(
-    VideoRecorderSettings* settings,
-    QWidget *parent)
-    :
+using namespace screen_recording;
+
+RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent):
     base_type(parent),
-    ui(new Ui::RecordingSettings),
-    m_settings(settings),
+    ui(new Ui::RecordingSettingsWidget),
     m_dwm(new QnDwm(this))
 {
     ui->setupUi(this);
@@ -40,67 +39,67 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->browseRecordingFolderButton, &QPushButton::clicked, this,
-        &QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked);
+        &RecordingSettingsWidget::at_browseRecordingFolderButton_clicked);
 
     connect(m_dwm, &QnDwm::compositionChanged, this,
-        &QnRecordingSettingsWidget::at_dwm_compositionChanged);
+        &RecordingSettingsWidget::at_dwm_compositionChanged);
 
     at_dwm_compositionChanged();
     updateDisableAeroCheckbox();
     updateRecordingWarning();
 }
 
-QnRecordingSettingsWidget::~QnRecordingSettingsWidget()
+RecordingSettingsWidget::~RecordingSettingsWidget()
 {
 }
 
-void QnRecordingSettingsWidget::loadDataToUi()
+void RecordingSettingsWidget::loadDataToUi()
 {
-    setCaptureMode(m_settings->captureMode());
-    setDecoderQuality(m_settings->decoderQuality());
-    setResolution(m_settings->resolution());
-    setScreen(m_settings->screen());
-    ui->captureCursorCheckBox->setChecked(m_settings->captureCursor());
-    ui->recordingFolderLineEdit->setText(m_settings->recordingFolder());
+    setCaptureMode(screenRecordingSettings()->captureMode());
+    setQuality(screenRecordingSettings()->quality());
+    setResolution(screenRecordingSettings()->resolution());
+    setScreen(screenRecordingSettings()->screen());
+    ui->captureCursorCheckBox->setChecked(screenRecordingSettings()->captureCursor());
+    ui->recordingFolderLineEdit->setText(screenRecordingSettings()->recordingFolder());
 }
 
-void QnRecordingSettingsWidget::applyChanges()
+void RecordingSettingsWidget::applyChanges()
 {
     bool isChanged = false;
 
-    if (m_settings->captureMode() != captureMode())
+    if (screenRecordingSettings()->captureMode() != captureMode())
     {
-        m_settings->setCaptureMode(captureMode());
+        screenRecordingSettings()->captureMode = captureMode();
         isChanged = true;
     }
 
-    if (m_settings->decoderQuality() != decoderQuality())
+    if (screenRecordingSettings()->quality() != quality())
     {
-        m_settings->setDecoderQuality(decoderQuality());
+        screenRecordingSettings()->quality = quality();
         isChanged = true;
     }
 
-    if (m_settings->resolution() != resolution())
+    if (screenRecordingSettings()->resolution() != resolution())
     {
-        m_settings->setResolution(resolution());
+        screenRecordingSettings()->resolution = resolution();
         isChanged = true;
     }
 
-    if (m_settings->screen() != screen())
+    if (screenRecordingSettings()->screen() != screen())
     {
-        m_settings->setScreen(screen());
+        screenRecordingSettings()->setScreen(screen());
         isChanged = true;
     }
 
-    if (m_settings->captureCursor() != ui->captureCursorCheckBox->isChecked())
+    if (screenRecordingSettings()->captureCursor() != ui->captureCursorCheckBox->isChecked())
     {
-        m_settings->setCaptureCursor(ui->captureCursorCheckBox->isChecked());
+        screenRecordingSettings()->captureCursor = ui->captureCursorCheckBox->isChecked();
         isChanged = true;
     }
 
-    if (m_settings->recordingFolder() != ui->recordingFolderLineEdit->text())
+    if (screenRecordingSettings()->recordingFolder() != ui->recordingFolderLineEdit->text())
     {
-        m_settings->setRecordingFolder(ui->recordingFolderLineEdit->text());
+        screenRecordingSettings()->recordingFolder = ui->recordingFolderLineEdit->text();
         isChanged = true;
     }
 
@@ -108,33 +107,32 @@ void QnRecordingSettingsWidget::applyChanges()
         emit recordingSettingsChanged();
 }
 
-bool QnRecordingSettingsWidget::hasChanges() const
+bool RecordingSettingsWidget::hasChanges() const
 {
     // TODO: #sivanov Refactor and emit hasChangesChanged correctly.
 
-    if (m_settings->captureMode() != captureMode())
+    if (screenRecordingSettings()->captureMode() != captureMode())
         return true;
 
-    if (m_settings->decoderQuality() != decoderQuality())
+    if (screenRecordingSettings()->quality() != quality())
         return true;
 
-    if (m_settings->resolution() != resolution())
+    if (screenRecordingSettings()->resolution() != resolution())
         return true;
 
-    if (m_settings->screen() != screen())
+    if (screenRecordingSettings()->screen() != screen())
         return true;
 
-    if (m_settings->captureCursor() != ui->captureCursorCheckBox->isChecked())
+    if (screenRecordingSettings()->captureCursor() != ui->captureCursorCheckBox->isChecked())
         return true;
 
-    if (m_settings->recordingFolder() != ui->recordingFolderLineEdit->text())
+    if (screenRecordingSettings()->recordingFolder() != ui->recordingFolderLineEdit->text())
         return true;
 
     return false;
 }
 
-
-void QnRecordingSettingsWidget::initScreenComboBox()
+void RecordingSettingsWidget::initScreenComboBox()
 {
     const auto screens = QGuiApplication::screens();
     for (qsizetype i = 0; i < screens.size(); ++i)
@@ -158,103 +156,106 @@ void QnRecordingSettingsWidget::initScreenComboBox()
     ui->screenLabel->setVisible(screenSelectorVisible);
 
     connect(ui->screenComboBox, QnComboboxCurrentIndexChanged, this,
-        &QnRecordingSettingsWidget::updateDisableAeroCheckbox);
+        &RecordingSettingsWidget::updateDisableAeroCheckbox);
     connect(ui->screenComboBox, QnComboboxCurrentIndexChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
-void QnRecordingSettingsWidget::initQualityCombobox()
+void RecordingSettingsWidget::initQualityCombobox()
 {
-    ui->qualityComboBox->addItem(tr("Best"), Qn::BestQuality);
-    ui->qualityComboBox->addItem(tr("Average"), Qn::BalancedQuality);
-    ui->qualityComboBox->addItem(tr("Performance"), Qn::PerformanceQuality);
+    ui->qualityComboBox->addItem(tr("Best"), QVariant::fromValue(Quality::best));
+    ui->qualityComboBox->addItem(tr("Average"), QVariant::fromValue(Quality::balanced));
+    ui->qualityComboBox->addItem(tr("Performance"), QVariant::fromValue(Quality::performance));
 
     connect(ui->qualityComboBox, QnComboboxCurrentIndexChanged, this,
-        &QnRecordingSettingsWidget::updateRecordingWarning);
+        &RecordingSettingsWidget::updateRecordingWarning);
     connect(ui->qualityComboBox, QnComboboxCurrentIndexChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
-void QnRecordingSettingsWidget::initResolutionCombobox()
+void RecordingSettingsWidget::initResolutionCombobox()
 {
-    ui->resolutionComboBox->addItem(tr("Native"), Qn::NativeResolution);
-    ui->resolutionComboBox->addItem(tr("Quarter Native"), Qn::QuaterNativeResolution);
-    ui->resolutionComboBox->addItem(lit("1920x1080"), Qn::Exact1920x1080Resolution);
-    ui->resolutionComboBox->addItem(lit("1280x720"), Qn::Exact1280x720Resolution);
-    ui->resolutionComboBox->addItem(lit("640x480"), Qn::Exact640x480Resolution);
-    ui->resolutionComboBox->addItem(lit("320x240"), Qn::Exact320x240Resolution);
+    ui->resolutionComboBox->addItem(tr("Native"), QVariant::fromValue(Resolution::native));
+    ui->resolutionComboBox->addItem(tr("Quarter Native"),
+        QVariant::fromValue(Resolution::quarterNative));
+    ui->resolutionComboBox->addItem("1920x1080", QVariant::fromValue(Resolution::_1920x1080));
+    ui->resolutionComboBox->addItem("1280x720", QVariant::fromValue(Resolution::_1280x720));
+    ui->resolutionComboBox->addItem("640x480", QVariant::fromValue(Resolution::_640x480));
+    ui->resolutionComboBox->addItem("320x240", QVariant::fromValue(Resolution::_320x240));
     ui->resolutionComboBox->setCurrentIndex(0);
 
     connect(ui->resolutionComboBox, QnComboboxCurrentIndexChanged, this,
-        &QnRecordingSettingsWidget::updateRecordingWarning);
+        &RecordingSettingsWidget::updateRecordingWarning);
     connect(ui->resolutionComboBox, QnComboboxCurrentIndexChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
-bool QnRecordingSettingsWidget::isPrimaryScreenSelected() const
+bool RecordingSettingsWidget::isPrimaryScreenSelected() const
 {
     const auto screens = QGuiApplication::screens();
     return (screens.size() == 1) || (screen() == screens.indexOf(qApp->primaryScreen()));
 }
 
-Qn::CaptureMode QnRecordingSettingsWidget::captureMode() const
+CaptureMode RecordingSettingsWidget::captureMode() const
 {
     if (!m_dwm->isSupported() || !m_dwm->isCompositionEnabled())
-        return Qn::FullScreenMode; // no need to disable aero if dwm is disabled
+        return CaptureMode::fullScreen; //< No need to disable Aero if DWM is disabled.
 
     if (!isPrimaryScreenSelected())
-        return Qn::FullScreenMode; // recording from secondary screen without aero is not supported
+    {
+        // Recording from a secondary screen without Aero is not supported.
+        return CaptureMode::fullScreen;
+    }
 
-    return (ui->disableAeroCheckBox->isChecked()
-        ? Qn::FullScreenNoAeroMode
-        : Qn::FullScreenMode);
+    return ui->disableAeroCheckBox->isChecked()
+        ? CaptureMode::fullScreenNoAero
+        : CaptureMode::fullScreen;
 }
 
-void QnRecordingSettingsWidget::setCaptureMode(Qn::CaptureMode c)
+void RecordingSettingsWidget::setCaptureMode(CaptureMode captureMode)
 {
-    ui->disableAeroCheckBox->setChecked(c == Qn::FullScreenNoAeroMode);
+    ui->disableAeroCheckBox->setChecked(captureMode == CaptureMode::fullScreenNoAero);
 }
 
-Qn::DecoderQuality QnRecordingSettingsWidget::decoderQuality() const
+Quality RecordingSettingsWidget::quality() const
 {
-    return static_cast<Qn::DecoderQuality>(ui->qualityComboBox->currentData().toInt());
+    return ui->qualityComboBox->currentData().value<Quality>();
 }
 
-void QnRecordingSettingsWidget::setDecoderQuality(Qn::DecoderQuality q)
+void RecordingSettingsWidget::setQuality(Quality quality)
 {
-    int index = ui->qualityComboBox->findData(q);
+    int index = ui->qualityComboBox->findData(QVariant::fromValue(quality));
     ui->qualityComboBox->setCurrentIndex(index);
 }
 
-Qn::Resolution QnRecordingSettingsWidget::resolution() const
+Resolution RecordingSettingsWidget::resolution() const
 {
-    return static_cast<Qn::Resolution>(ui->resolutionComboBox->currentData().toInt());
+    return ui->resolutionComboBox->currentData().value<Resolution>();
 }
 
-void QnRecordingSettingsWidget::setResolution(Qn::Resolution r)
+void RecordingSettingsWidget::setResolution(Resolution resolution)
 {
-    int index = ui->resolutionComboBox->findData(r);
+    int index = ui->resolutionComboBox->findData(QVariant::fromValue(resolution));
     ui->resolutionComboBox->setCurrentIndex(index);
 }
 
-int QnRecordingSettingsWidget::screen() const
+int RecordingSettingsWidget::screen() const
 {
     return ui->screenComboBox->itemData(ui->screenComboBox->currentIndex()).toInt();
 }
 
-void QnRecordingSettingsWidget::setScreen(int screen)
+void RecordingSettingsWidget::setScreen(int screen)
 {
     ui->screenComboBox->setCurrentIndex(screen);
 }
 
-void QnRecordingSettingsWidget::updateRecordingWarning()
+void RecordingSettingsWidget::updateRecordingWarning()
 {
-    ui->recordingWarningLabel->setVisible(decoderQuality() == Qn::BestQuality
-        && (resolution() == Qn::Exact1920x1080Resolution
-            || resolution() == Qn::NativeResolution));
+    ui->recordingWarningLabel->setVisible(quality() == Quality::best
+        && (resolution() == Resolution::_1920x1080 || resolution() == Resolution::native));
 }
 
-void QnRecordingSettingsWidget::updateDisableAeroCheckbox()
+void RecordingSettingsWidget::updateDisableAeroCheckbox()
 {
     // without Aero only recording from primary screen is supported
 
@@ -270,7 +271,7 @@ void QnRecordingSettingsWidget::updateDisableAeroCheckbox()
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked()
+void RecordingSettingsWidget::at_browseRecordingFolderButton_clicked()
 {
     QString dirName = QFileDialog::getExistingDirectory(this,
         tr("Select Folder..."),
@@ -282,8 +283,10 @@ void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked()
     emit hasChangesChanged();
 }
 
-void QnRecordingSettingsWidget::at_dwm_compositionChanged()
+void RecordingSettingsWidget::at_dwm_compositionChanged()
 {
     /* Aero is already disabled if dwm is not enabled or not supported. */
     ui->disableAeroCheckBox->setVisible(m_dwm->isSupported() && m_dwm->isCompositionEnabled());
 }
+
+} // namespace nx::vms::client::desktop

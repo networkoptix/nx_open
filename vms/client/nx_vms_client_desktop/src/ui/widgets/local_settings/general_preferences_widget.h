@@ -11,17 +11,13 @@ namespace Ui {
 class GeneralPreferencesWidget;
 }
 
-namespace nx::vms::client::desktop { class VideoRecorderSettings; }
-
 class QnGeneralPreferencesWidget : public QnAbstractPreferencesWidget
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    explicit QnGeneralPreferencesWidget(
-        nx::vms::client::desktop::VideoRecorderSettings* settings,
-        QWidget* parent = nullptr);
+    explicit QnGeneralPreferencesWidget(QWidget* parent = nullptr);
     virtual ~QnGeneralPreferencesWidget() override;
 
     virtual void applyChanges() override;
@@ -68,5 +64,4 @@ private:
 
 private:
     QScopedPointer<Ui::GeneralPreferencesWidget> ui;
-    nx::vms::client::desktop::VideoRecorderSettings* m_recorderSettings;
 };

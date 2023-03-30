@@ -44,7 +44,7 @@ BufferedScreenGrabber::BufferedScreenGrabber(
     int displayNumber,
     int queueSize,
     int frameRate,
-    Qn::CaptureMode mode,
+    screen_recording::CaptureMode mode,
     bool captureCursor,
     const QSize& captureResolution,
     QWidget* widget)
@@ -81,7 +81,7 @@ void BufferedScreenGrabber::pleaseStop()
 
 void BufferedScreenGrabber::run()
 {
-    if (m_grabber.getMode() == Qn::FullScreenNoAeroMode)
+    if (m_grabber.getMode() == screen_recording::CaptureMode::fullScreenNoAero)
     {
         NX_MUTEX_LOCKER locker( &m_instanceMutex );
         if (++m_aeroInstanceCounter == 1)
@@ -115,7 +115,7 @@ void BufferedScreenGrabber::run()
         }
     }
 
-    if (m_grabber.getMode() == Qn::FullScreenNoAeroMode)
+    if (m_grabber.getMode() == screen_recording::CaptureMode::fullScreenNoAero)
     {
         NX_MUTEX_LOCKER locker( &m_instanceMutex );
         if (--m_aeroInstanceCounter == 0)

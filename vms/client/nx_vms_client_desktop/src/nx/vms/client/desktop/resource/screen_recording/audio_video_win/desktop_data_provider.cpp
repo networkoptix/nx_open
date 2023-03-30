@@ -6,7 +6,8 @@
 #include <mmsystem.h>
 #include <windows.h>
 
-extern "C" {
+extern "C"
+{
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
@@ -328,7 +329,7 @@ bool EncodedAudioInfo::setupPostProcess(
 struct DesktopDataProvider::Private
 {
     const int desktopNum;
-    const Qn::CaptureMode captureMode;
+    const screen_recording::CaptureMode captureMode;
     const bool captureCursor;
     const QSize captureResolution;
     const float encodeQualuty;
@@ -374,7 +375,7 @@ DesktopDataProvider::DesktopDataProvider(
     int desktopNum,
     const core::AudioDeviceInfo* audioDevice,
     const core::AudioDeviceInfo* audioDevice2,
-    Qn::CaptureMode captureMode,
+    screen_recording::CaptureMode captureMode,
     bool captureCursor,
     const QSize& captureResolution,
     float encodeQualuty, //< In range [0.0, 1.0].

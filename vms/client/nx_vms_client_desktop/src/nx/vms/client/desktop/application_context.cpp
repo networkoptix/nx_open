@@ -52,6 +52,7 @@
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/ipc_settings_synchronizer.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
@@ -278,6 +279,7 @@ struct ApplicationContext::Private
         #endif
 
         objectDisplaySettings = std::make_unique<ObjectDisplaySettings>();
+        screenRecordingSettings = std::make_unique<ScreenRecordingSettings>();
         showOnceSettings = std::make_unique<ShowOnceSettings>();
     }
 
@@ -526,6 +528,7 @@ struct ApplicationContext::Private
     std::unique_ptr<LocalSettings> localSettings;
     std::unique_ptr<QnClientRuntimeSettings> runtimeSettings;
     std::unique_ptr<ObjectDisplaySettings> objectDisplaySettings;
+    std::unique_ptr<ScreenRecordingSettings> screenRecordingSettings;
     std::unique_ptr<ShowOnceSettings> showOnceSettings;
 
     // State modules.
@@ -772,6 +775,11 @@ UnifiedResourcePool* ApplicationContext::unifiedResourcePool() const
 LocalSettings* ApplicationContext::localSettings() const
 {
     return d->localSettings.get();
+}
+
+ScreenRecordingSettings* ApplicationContext::screenRecordingSettings() const
+{
+    return d->screenRecordingSettings.get();
 }
 
 ShowOnceSettings* ApplicationContext::showOnceSettings() const

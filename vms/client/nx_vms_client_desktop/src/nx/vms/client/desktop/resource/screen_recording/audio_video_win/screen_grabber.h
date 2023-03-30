@@ -14,10 +14,10 @@
 #include <QtGui/QPixmap>
 
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/vms/client/desktop/resource/screen_recording/types.h>
 
-#include "../video_recorder_settings.h"
-
-extern "C" {
+extern "C"
+{
 struct SwsContext;
 }
 
@@ -25,28 +25,31 @@ namespace nx::vms::client::desktop {
 
 struct CaptureInfo
 {
-    CaptureInfo(): pts(0), opaque(0), width(0), height(0), terminated(false) {}
-    qint64 pts;
-    void* opaque;
-    int width;
-    int height;
+    qint64 pts = 0;
+    void* opaque = nullptr;
+    int width = 0;
+    int height = 0;
     QPoint pos;
-    bool terminated;
+    bool terminated = false;
 };
 
-typedef QSharedPointer<CaptureInfo> CaptureInfoPtr;
+using CaptureInfoPtr = QSharedPointer<CaptureInfo>;
 
 class ScreenGrabber: public QObject
 {
     Q_OBJECT
+
 public:
-
-
     // resolution (0,0) - use default(native resolution)
     // negative resolution - use specified scale factor
 
-    ScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMode mode, bool captureCursor,
-                    const QSize& captureResolution, QWidget* widget);
+    ScreenGrabber(
+        int displayNumber,
+        int poolSize,
+        screen_recording::CaptureMode mode,
+        bool captureCursor,
+        const QSize& captureResolution,
+        QWidget* widget);
     virtual ~ScreenGrabber();
 
     // capture screenshot in YUV 4:2:0 format
@@ -64,7 +67,7 @@ public:
     int screenWidth() const;
     int screenHeight() const;
     void pleaseStop();
-    Qn::CaptureMode getMode() const { return m_mode; }
+    screen_recording::CaptureMode getMode() const { return m_mode; }
     void setTimer(QElapsedTimer* timer) { m_timer = timer;  }
 private:
     HRESULT        InitD3D(HWND hWnd);
@@ -89,7 +92,7 @@ private:
     unsigned m_frameNum = 0;
     int m_currentIndex = 0;
 
-    const Qn::CaptureMode m_mode;
+    const screen_recording::CaptureMode m_mode;
     const int m_poolSize;
     const bool m_captureCursor;
     const HDC m_cursorDC;
