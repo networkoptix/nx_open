@@ -6730,7 +6730,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Sanal kameralar, USB veya web kameralar sunucular arasında taşınamaz. Bu cihazlar %1 üzerinde kalacak:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
@@ -6742,11 +6742,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move Group without Them</source>
-      <translation type="unfinished">Move Group without Them</translation>
+      <translation>Grubu Onlar olmadan taşı</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>Sanal kameralar, USB veya web kameralar sunucular arasında taşınamaz</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
@@ -7971,7 +7971,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect System to %1</translation>
+      <translation>%1 Sisteme bağlanmak için hesap şifrenizi girin</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8425,7 +8425,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>Dışa aktarma kullanılamıyor: Bu kameranın seçilen zaman aralığı için bir video arşivi yok.</translation>
     </message>
   </context>
   <context>
@@ -10091,7 +10091,7 @@ Read this %2 to learn more about certificate validation.</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>yardım makalesi</translation>
     </message>
     <message>
       <source>This message may be shown multiple times when connecting to a multi-server system.</source>
@@ -10372,15 +10372,15 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Export archive from %1 stopped</source>
-      <translation type="unfinished">Export archive from %1 stopped</translation>
+      <translation>%1 üzerinden arşiv aktarma durduruldu</translation>
     </message>
     <message>
       <source>The archive stream settings have been changed by user</source>
-      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+      <translation>Arşiv akışı ayarları kullanıcı tarafından değiştirildi</translation>
     </message>
     <message>
       <source>The recording settings have been changed by user</source>
-      <translation type="unfinished">The recording settings have been changed by user</translation>
+      <translation>Kayıt ayarları kullanıcı tarafından değiştirildi</translation>
     </message>
   </context>
   <context>
@@ -11649,7 +11649,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
-      <translation type="unfinished">Client update package is missing for current platform.</translation>
+      <translation>Mevcut platform için istemci güncelleme paketi eksik.</translation>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>

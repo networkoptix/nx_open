@@ -314,7 +314,7 @@
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>Tüm dosyalar başarıyla yedeklendi! Yeni dosyalar otomatik olarak yedeklenecek</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
@@ -584,7 +584,7 @@
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation type="unfinished">Use different values for pan and tilt</translation>
+      <translation>Pan ve tilt için farklı değerler kullanın</translation>
     </message>
     <message>
       <source>Tilt</source>
@@ -970,7 +970,7 @@
     </message>
     <message>
       <source>Enter your encryption password to view the archive</source>
-      <translation type="unfinished">Enter your encryption password to view the archive</translation>
+      <translation>Arşivi görüntülemek için şifreleme parolanızı girin</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1051,7 +1051,7 @@
     </message>
     <message>
       <source>HTTP(S) content</source>
-      <translation type="unfinished">HTTP(S) content</translation>
+      <translation>HTTP(S) içeriği</translation>
     </message>
   </context>
   <context>
@@ -1247,7 +1247,7 @@
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation type="unfinished">Automatically restore saved windows configuration</translation>
+      <translation>Kaydedilen pencere yapılandırmasını otomatik olarak geri yükle</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
@@ -1255,11 +1255,11 @@
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation type="unfinished">Mute audio when the mic is active</translation>
+      <translation>Mikrofon etkinken sesi kapatın</translation>
     </message>
     <message>
       <source>Allow computer entering sleep mode on idle</source>
-      <translation type="unfinished">Allow computer entering sleep mode on idle</translation>
+      <translation>Bilgisayarın boştayken uyku moduna girmesine izin ver</translation>
     </message>
   </context>
   <context>
@@ -1508,7 +1508,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
+      <translation>İçe aktarılan kullanıcı için özet kimlik doğrulamasına izin ver</translation>
     </message>
   </context>
   <context>
@@ -2122,7 +2122,7 @@
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Güvenli Kimlik Doğrulamayı Zorla</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -2309,7 +2309,7 @@
     </message>
     <message>
       <source>rewind for</source>
-      <translation type="unfinished">rewind for</translation>
+      <translation>için geri sar</translation>
     </message>
     <message>
       <source>Live</source>
@@ -2422,7 +2422,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
+      <translation>Yönetici olmayan kullanıcılar için sunucuları ağaçta görüntüle</translation>
     </message>
     <message>
       <source>Archive encryption</source>
@@ -2442,7 +2442,7 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>HTTPS'yi desteklemeyen kameralarla bağlantı kesilecek.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2484,7 +2484,7 @@
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation type="unfinished">Self-signed root certificate</translation>
+      <translation>Kendinden imzalı kök sertifika</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -2508,7 +2508,7 @@
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
+      <translation>Sabitlenmiş sertifikayı görüntüle</translation>
     </message>
   </context>
   <context>
@@ -3004,7 +3004,7 @@
     </message>
     <message>
       <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
+      <translation>Bu web sayfasını sunucu aracılığıyla proxy'le</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3020,11 +3020,11 @@
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation type="unfinished">Proxy all requested contents</translation>
+      <translation>İstenen tüm içerikleri proxy'le</translation>
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>SSL sertifikası kontrolü olmadan web sayfasının açılmasına izin ver</translation>
     </message>
   </context>
   <context>

@@ -10379,15 +10379,15 @@ Du kan se %2 eller läsa den här %3 för att lära dig mer om det aktuella prob
     </message>
     <message>
       <source>Export archive from %1 stopped</source>
-      <translation type="unfinished">Export archive from %1 stopped</translation>
+      <translation>Import av arkiv från %1 slutförd</translation>
     </message>
     <message>
       <source>The archive stream settings have been changed by user</source>
-      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+      <translation>Arkiv strömningsinställningarna har ändrats av användaren</translation>
     </message>
     <message>
       <source>The recording settings have been changed by user</source>
-      <translation type="unfinished">The recording settings have been changed by user</translation>
+      <translation>Inspelningsinställningarna har ändrats av användaren</translation>
     </message>
   </context>
   <context>

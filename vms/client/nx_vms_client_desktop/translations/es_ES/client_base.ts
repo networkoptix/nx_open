@@ -10377,15 +10377,15 @@ Puede ver %2 o leer este %3 para obtener más información sobre el problema act
     </message>
     <message>
       <source>Export archive from %1 stopped</source>
-      <translation type="unfinished">Export archive from %1 stopped</translation>
+      <translation>Exportar archivo desde %1 detenido</translation>
     </message>
     <message>
       <source>The archive stream settings have been changed by user</source>
-      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+      <translation>Los ajustes de flujo de archivo han sido modificados por el usuario</translation>
     </message>
     <message>
       <source>The recording settings have been changed by user</source>
-      <translation type="unfinished">The recording settings have been changed by user</translation>
+      <translation>Los ajustes de grabación han sido modificados por el usuario</translation>
     </message>
   </context>
   <context>
