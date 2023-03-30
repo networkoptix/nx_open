@@ -10,8 +10,6 @@
 #include <nx/utils/uuid.h>
 #include <utils/common/instance_storage.h>
 
-class QSettings;
-
 namespace nx::vms::common {
 
 class AbstractCertificateVerifier;

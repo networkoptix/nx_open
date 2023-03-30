@@ -7,10 +7,9 @@
 namespace nx::utils::property_storage {
 
 QSettingsBackend::QSettingsBackend(QSettings* settings, const QString& group):
-    m_settings(settings)
+    m_settings(settings),
+    m_group(group)
 {
-    if (!group.isEmpty())
-        m_settings->beginGroup(group);
 }
 
 QSettingsBackend::~QSettingsBackend()
@@ -26,24 +25,24 @@ QString QSettingsBackend::readValue(const QString& name, bool* success)
 {
     if (success)
         *success = true;
-    return m_settings->value(name).toString();
+    return m_settings->value(m_group + "/" + name).toString();
 }
 
 bool QSettingsBackend::writeValue(const QString& name, const QString& value)
 {
-    m_settings->setValue(name, value);
+    m_settings->setValue(m_group + "/" + name, value);
     return true;
 }
 
 bool QSettingsBackend::removeValue(const QString& name)
 {
-    m_settings->remove(name);
+    m_settings->remove(m_group + "/" + name);
     return true;
 }
 
 bool QSettingsBackend::exists(const QString& name) const
 {
-    return m_settings->contains(name);
+    return m_settings->contains(m_group + "/" + name);
 }
 
 bool QSettingsBackend::sync()

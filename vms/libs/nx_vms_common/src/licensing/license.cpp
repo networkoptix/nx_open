@@ -5,7 +5,6 @@
 #include <cassert>
 
 #include <QtCore/QCryptographicHash>
-#include <QtCore/QSettings>
 #include <QtCore/QStringList>
 
 #include <openssl/rsa.h>

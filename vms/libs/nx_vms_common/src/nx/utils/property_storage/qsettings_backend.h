@@ -32,6 +32,7 @@ public:
 
 private:
     QScopedPointer<QSettings> m_settings;
+    QString m_group;
 };
 
 } // namespace property_storage

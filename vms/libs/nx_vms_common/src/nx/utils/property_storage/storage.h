@@ -27,6 +27,7 @@ public:
     virtual ~Storage() = default;
 
     bool isWritable() const;
+    void setReadOnly(bool readOnly);
     void registerProperty(BaseProperty* property);
     void unregisterProperty(BaseProperty* property);
     Q_INVOKABLE bool exists(const QString& name) const;
@@ -59,6 +60,7 @@ private:
     QScopedPointer<AbstractBackend> m_backend;
     QHash<QString, BaseProperty*> m_properties;
     QByteArray m_securityKey;
+    bool m_readOnly = false;
 };
 
 } // namespace nx::utils::property_storage

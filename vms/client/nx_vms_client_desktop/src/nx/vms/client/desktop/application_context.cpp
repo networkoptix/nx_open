@@ -2,7 +2,6 @@
 
 #include "application_context.h"
 
-#include <QtCore/QSettings>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QThread>
 #include <QtQml/QQmlEngine>
@@ -255,7 +254,6 @@ struct ApplicationContext::Private
         NX_ASSERT(!QCoreApplication::organizationName().isEmpty());
 
         localSettings = std::make_unique<LocalSettings>();
-        localSettings->migrateOldSettings();
 
         // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
         #if defined(Q_OS_WIN)

@@ -4,7 +4,6 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFile>
-#include <QtCore/QSettings>
 #include <QtGui/QAction>
 
 #include <api/common_message_processor.h>
