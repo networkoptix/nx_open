@@ -22,8 +22,8 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/export/tools/export_storage_stream_recorder.h>
 #include <nx/vms/client/desktop/resource/screen_recording/desktop_data_provider_wrapper.h>
-#include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/time/formatter.h>
@@ -205,24 +205,13 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     if (!NX_ASSERT(screenRecordingAction))
         return;
 
-    VideoRecorderSettings recorderSettings;
-
     QDateTime dt = QDateTime::currentDateTime();
-    QString filePath = recorderSettings.recordingFolder()
+    QString filePath = screenRecordingSettings()->recordingFolder()
         + "/"
         + nx::utils::replaceNonFileNameCharacters(
             nx::format("video_recording_%1.avi",
                 nx::vms::time::toString(dt, nx::vms::time::Format::filename_date)),
             '_');
-    core::AudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
-    core::AudioDeviceInfo secondAudioDevice;
-    if (recorderSettings.secondaryAudioDevice().fullName() != audioDevice.fullName())
-        secondAudioDevice = recorderSettings.secondaryAudioDevice();
-    if (QMediaDevices::audioInputs().isEmpty())
-    {
-        audioDevice = core::AudioDeviceInfo(); // no audio devices
-        secondAudioDevice = core::AudioDeviceInfo();
-    }
 
     const auto res = resourcePool()->getResourceById<core::DesktopResource>(
         core::DesktopResource::getDesktopResourceUuid());

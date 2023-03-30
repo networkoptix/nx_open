@@ -18,9 +18,10 @@
 #include "nx/media/sse_helper.h"
 #include "utils/color_space/yuvconvert.h"
 
-extern "C" {
-#include <libavformat/avformat.h>
+extern "C"
+{
 #include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 }
@@ -29,21 +30,23 @@ static const int LOGO_CORNER_OFFSET = 8;
 
 namespace nx::vms::client::desktop {
 
+using namespace screen_recording;
+
 nx::Mutex ScreenGrabber::m_guiWaitMutex;
 
 ScreenGrabber::ScreenGrabber(int displayNumber,
     int poolSize,
-    Qn::CaptureMode mode,
+    screen_recording::CaptureMode mode,
     bool captureCursor,
     const QSize& captureResolution,
     QWidget* widget):
-    m_displayNumber(mode == Qn::WindowMode ? 0 : displayNumber),
+    m_displayNumber(mode == CaptureMode::window ? 0 : displayNumber),
     m_mode(mode),
     m_poolSize(poolSize + 1),
     m_captureCursor(captureCursor),
     m_cursorDC(CreateCompatibleDC(0)),
     m_captureResolution(captureResolution),
-    m_needRescale(captureResolution.width() != 0 || mode == Qn::WindowMode),
+    m_needRescale(captureResolution.width() != 0 || mode == CaptureMode::window),
     m_widget(widget)
 {
     qRegisterMetaType<CaptureInfoPtr>();
@@ -125,7 +128,7 @@ HRESULT ScreenGrabber::InitD3D(HWND hWnd)
     d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE; // D3DPRESENT_INTERVAL_DEFAULT;
     d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
 
-    if (m_mode != Qn::WindowMode)
+    if (m_mode != CaptureMode::window)
     {
         if (FAILED(m_pD3D->CreateDevice(m_displayNumber,
                 D3DDEVTYPE_HAL,
@@ -269,7 +272,7 @@ CaptureInfoPtr ScreenGrabber::captureFrame()
     if (m_needStop)
         return rez;
 
-    if (m_mode == Qn::WindowMode)
+    if (m_mode == CaptureMode::window)
     {
         rez->opaque = m_openGLData[m_currentIndex];
         QGenericReturnArgument ret;
@@ -341,7 +344,7 @@ void ScreenGrabber::drawLogo(quint8* data, int width, int height)
     if (m_logo.width() == 0)
         return;
     int left = width - m_logo.width() - LOGO_CORNER_OFFSET;
-    int top = m_mode == Qn::WindowMode
+    int top = (m_mode == CaptureMode::window)
         ? LOGO_CORNER_OFFSET
         : height - m_logo.height() - LOGO_CORNER_OFFSET;
 
@@ -660,7 +663,7 @@ bool ScreenGrabber::dataToFrame(
                 m_tmpFrame->linesize[1],
                 roundWidth,
                 height,
-                m_mode == Qn::WindowMode);
+                m_mode == CaptureMode::window);
         }
         else
         {
@@ -688,7 +691,7 @@ bool ScreenGrabber::dataToFrame(
                 pFrame->linesize[1],
                 roundWidth,
                 height,
-                m_mode == Qn::WindowMode);
+                m_mode == CaptureMode::window);
         }
         else
         {
@@ -703,7 +706,7 @@ bool ScreenGrabber::capturedDataToFrame(CaptureInfoPtr captureInfo, AVFrame* pFr
     static const int RGBA32_BYTES_PER_PIXEL = 4;
 
     bool rez = false;
-    if (m_mode == Qn::WindowMode)
+    if (m_mode == CaptureMode::window)
         rez = dataToFrame((quint8*) captureInfo->opaque,
             captureInfo->width * RGBA32_BYTES_PER_PIXEL,
             captureInfo->width,
@@ -727,7 +730,7 @@ int ScreenGrabber::height() const
 
 void ScreenGrabber::setLogo(const QPixmap& logo)
 {
-    if (m_mode == Qn::WindowMode)
+    if (m_mode == CaptureMode::window)
         m_logo = QPixmap::fromImage(logo.toImage().mirrored(false, true));
     else
         m_logo = logo;

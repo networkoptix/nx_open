@@ -9,8 +9,8 @@
 
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -62,7 +62,6 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     m_restartLabel(nullptr)
 {
     ui->setupUi(this);
-    auto recorderSettings = new VideoRecorderSettings(this);
     auto updateRecorderSettings =
         [this]
         {
@@ -70,8 +69,7 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
                 desktopCamera->forcedUpdate();
         };
 
-
-    auto generalPageWidget = new QnGeneralPreferencesWidget(recorderSettings, this);
+    auto generalPageWidget = new QnGeneralPreferencesWidget(this);
     addPage(GeneralPage, generalPageWidget, tr("General"));
     connect(generalPageWidget, &QnGeneralPreferencesWidget::recordingSettingsChanged, this,
         updateRecorderSettings);
@@ -81,9 +79,9 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     if (screenRecordingAction)
     {
-        auto recordingSettingsWidget = new QnRecordingSettingsWidget(recorderSettings, this);
+        auto recordingSettingsWidget = new RecordingSettingsWidget(this);
         addPage(RecordingPage, recordingSettingsWidget, tr("Screen Recording"));
-        connect(recordingSettingsWidget, &QnRecordingSettingsWidget::recordingSettingsChanged, this,
+        connect(recordingSettingsWidget, &RecordingSettingsWidget::recordingSettingsChanged, this,
             updateRecorderSettings);
     }
 

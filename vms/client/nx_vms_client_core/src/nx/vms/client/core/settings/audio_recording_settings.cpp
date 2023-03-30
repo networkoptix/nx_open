@@ -1,17 +1,17 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "audio_recorder_settings.h"
+#include "audio_recording_settings.h"
 
-#include <QtCore/QDir>
-#include <QtMultimedia/QMediaDevices>
+#include <QtCore/QStandardPaths>
 #include <QtMultimedia/QAudioDevice>
+#include <QtMultimedia/QMediaDevices>
+
+#include <nx/build_info.h>
+#include <nx/utils/property_storage/filesystem_backend.h>
 
 #if defined(Q_OS_WIN)
-    #include <nx/vms/client/core/resource/screen_recording/audio_device_info_win.h>
+#include <nx/vms/client/core/resource/screen_recording/audio_device_info_win.h>
 #endif // defined(Q_OS_WIN)
-
-#include <nx/utils/app_info.h>
-#include <nx/build_info.h>
 
 namespace nx::vms::client::core {
 
@@ -28,7 +28,7 @@ QString getFullDeviceName(const QString& shortName)
     #endif
 }
 
-AudioRecorderSettings::DeviceList fetchDevicesList()
+QList<AudioDeviceInfo> fetchDevicesList()
 {
     auto availableDevices = QMediaDevices::audioInputs();
 
@@ -38,7 +38,6 @@ AudioRecorderSettings::DeviceList fetchDevicesList()
         // QAudioDeviceInfo::availableDevices(), one from WASAPI, one from winMM, see QTBUG-75781.
         // Since they are actually the same devices provided by different interfaces, bad things
         // may occur when both are selected as input source (immediate crash on use attempt).
-        // TODO: Qt6 QAudioDeviceInfo::availableDevices() is replaced with QMediaDevices::audioInputs().
         // Suggested workaround with realm() method can't be used in Qt 6 - no such method exists.
 
         // Device order will be kept.
@@ -70,7 +69,7 @@ AudioRecorderSettings::DeviceList fetchDevicesList()
             availableDevices.erase(getDuplicatingWasapiDeviceItr());
     }
 
-    AudioRecorderSettings::DeviceList devices;
+    QList<AudioDeviceInfo> devices;
     QMap<QString, int> countByName; //< #vbreus Is it still makes sense, or just was workaround?
     for (const auto& info: availableDevices)
     {
@@ -85,84 +84,52 @@ AudioRecorderSettings::DeviceList fetchDevicesList()
 
 } // namespace
 
-QString AudioRecorderSettings::kNoDevice = "<none>";
+QString AudioRecordingSettings::kNoDevice = "<none>";
 
-AudioRecorderSettings::AudioRecorderSettings(QObject* parent):
-    QObject(parent),
-    m_devices([&mutex = m_mutex](){ NX_MUTEX_LOCKER lock(&mutex); return fetchDevicesList(); })
-{
-    m_settings.beginGroup("videoRecording"); //< Don't rename, backward compatibility.
-}
-
-AudioRecorderSettings::~AudioRecorderSettings()
+AudioRecordingSettings::AudioRecordingSettings():
+    Storage(new nx::utils::property_storage::FileSystemBackend(
+        QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
+            + "/settings/screen_recording")),
+    m_devices(fetchDevicesList())
 {
 }
 
-AudioDeviceInfo AudioRecorderSettings::getDeviceByName(const QString& name) const
+QList<AudioDeviceInfo> AudioRecordingSettings::availableDevices() const
 {
-    if (!name.isEmpty())
-    {
-        for (const AudioDeviceInfo& info: m_devices.get())
-        {
-            if (name == info.fullName())
-                return info;
-        }
-    }
-
-    return {};
+    return m_devices;
 }
 
-AudioDeviceInfo AudioRecorderSettings::primaryAudioDevice() const
+AudioDeviceInfo AudioRecordingSettings::primaryAudioDevice() const
 {
-    const auto& name = primaryAudioDeviceName();
+    const auto name = primaryAudioDeviceName();
     if (name == kNoDevice)
         return {};
 
-    const AudioDeviceInfo& info = getDeviceByName(name);
-    if (!info.isNull())
-        return info;
+    const AudioDeviceInfo device = getDeviceByName(name);
+    if (!device.isNull())
+        return device;
 
     return defaultPrimaryAudioDevice();
 }
 
-QString AudioRecorderSettings::primaryAudioDeviceName() const
+AudioDeviceInfo AudioRecordingSettings::secondaryAudioDevice() const
 {
-    return m_settings.value("primaryAudioDevice").toString();
-}
-
-void AudioRecorderSettings::setPrimaryAudioDeviceName(const QString& audioDeviceName)
-{
-    m_settings.setValue("primaryAudioDevice", audioDeviceName);
-}
-
-AudioDeviceInfo AudioRecorderSettings::secondaryAudioDevice() const
-{
-    const auto& name = secondaryAudioDeviceName();
+    const auto name = secondaryAudioDeviceName();
     if (name == kNoDevice)
         return {};
 
-    const AudioDeviceInfo& device = getDeviceByName(name);
+    const AudioDeviceInfo device = getDeviceByName(name);
     if (!device.isNull())
         return device;
 
     return defaultSecondaryAudioDevice();
 }
 
-QString AudioRecorderSettings::secondaryAudioDeviceName() const
+AudioDeviceInfo AudioRecordingSettings::defaultPrimaryAudioDevice() const
 {
-    return m_settings.value("secondaryAudioDevice").toString();
-}
+    const auto devices = availableDevices();
 
-void AudioRecorderSettings::setSecondaryAudioDeviceName(const QString& audioDeviceName)
-{
-    m_settings.setValue("secondaryAudioDevice", audioDeviceName);
-}
-
-AudioDeviceInfo AudioRecorderSettings::defaultPrimaryAudioDevice() const
-{
-    const DeviceList& devices = availableDevices();
-
-    // On windows it always returns non-existent "Default Audio Input Device".
+    // On Windows it always returns non-existent "Default Audio Input Device".
     const QAudioDevice info = QMediaDevices::defaultAudioInput();
 
     if (!info.isNull())
@@ -180,13 +147,13 @@ AudioDeviceInfo AudioRecorderSettings::defaultPrimaryAudioDevice() const
     return {};
 }
 
-AudioDeviceInfo AudioRecorderSettings::defaultSecondaryAudioDevice() const
+AudioDeviceInfo AudioRecordingSettings::defaultSecondaryAudioDevice() const
 {
     const QStringList checkList{"Rec. Playback", "Stereo mix", "What you hear"};
 
     for (const auto& name: checkList)
     {
-        const AudioDeviceInfo& info = getDeviceByName(name);
+        const AudioDeviceInfo info = getDeviceByName(name);
         if (!info.isNull())
             return info;
     }
@@ -194,18 +161,18 @@ AudioDeviceInfo AudioRecorderSettings::defaultSecondaryAudioDevice() const
     return {};
 }
 
-QString AudioRecorderSettings::recordingFolder() const
+AudioDeviceInfo AudioRecordingSettings::getDeviceByName(const QString& name) const
 {
-    const auto dir = m_settings.value("recordingFolder").toString();
-    if (!dir.isEmpty())
-        return dir;
+    if (!name.isEmpty())
+    {
+        for (const AudioDeviceInfo& info: m_devices)
+        {
+            if (name == info.fullName())
+                return info;
+        }
+    }
 
-    return QDir::tempPath();
-}
-
-void AudioRecorderSettings::setRecordingFolder(const QString& folder)
-{
-    m_settings.setValue("recordingFolder", folder);
+    return {};
 }
 
 } // namespace nx::vms::client::core

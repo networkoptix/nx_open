@@ -10,8 +10,8 @@
 #include <common/common_module.h>
 #include <nx/build_info.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
@@ -26,13 +26,9 @@ namespace {
 const int kMsecsPerMinute = 60 * 1000;
 }
 
-QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(
-    VideoRecorderSettings* settings,
-    QWidget* parent)
-    :
+QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget* parent):
     base_type(parent),
-    ui(new Ui::GeneralPreferencesWidget),
-    m_recorderSettings(settings)
+    ui(new Ui::GeneralPreferencesWidget)
 {
     ui->setupUi(this);
 
@@ -94,17 +90,17 @@ void QnGeneralPreferencesWidget::applyChanges()
     appContext()->localSettings()->playAudioForAllItems =
         ui->playAudioForAllCamerasCheckbox->isChecked();
 
-    bool recorderSettingsChanged = false;
-    if (m_recorderSettings->primaryAudioDeviceName() != primaryAudioDeviceName())
+    bool recordingSettingsChanged = false;
+    if (screenRecordingSettings()->primaryAudioDeviceName() != primaryAudioDeviceName())
     {
-        m_recorderSettings->setPrimaryAudioDeviceName(primaryAudioDeviceName());
-        recorderSettingsChanged = true;
+        screenRecordingSettings()->primaryAudioDeviceName = primaryAudioDeviceName();
+        recordingSettingsChanged = true;
     }
 
-    if (m_recorderSettings->secondaryAudioDeviceName() != secondaryAudioDeviceName())
+    if (screenRecordingSettings()->secondaryAudioDeviceName() != secondaryAudioDeviceName())
     {
-        m_recorderSettings->setSecondaryAudioDeviceName(secondaryAudioDeviceName());
-        recorderSettingsChanged = true;
+        screenRecordingSettings()->secondaryAudioDeviceName = secondaryAudioDeviceName();
+        recordingSettingsChanged = true;
     }
 
     appContext()->localSettings()->autoLogin = autoLogin();
@@ -115,16 +111,16 @@ void QnGeneralPreferencesWidget::applyChanges()
 
     appContext()->localSettings()->muteOnAudioTransmit = muteOnAudioTransmit();
 
-    if (recorderSettingsChanged)
-        emit recordingSettingsChanged();
+    if (recordingSettingsChanged)
+        emit this->recordingSettingsChanged();
 }
 
 void QnGeneralPreferencesWidget::loadDataToUi()
 {
     setMediaFolders(appContext()->localSettings()->mediaFolders());
     setUserIdleTimeoutMs(appContext()->localSettings()->userIdleTimeoutMs());
-    setPrimaryAudioDeviceName(m_recorderSettings->primaryAudioDeviceName());
-    setSecondaryAudioDeviceName(m_recorderSettings->secondaryAudioDeviceName());
+    setPrimaryAudioDeviceName(screenRecordingSettings()->primaryAudioDeviceName());
+    setSecondaryAudioDeviceName(screenRecordingSettings()->secondaryAudioDeviceName());
     setAutoStart(appContext()->localSettings()->autoStart());
     setAutoLogin(appContext()->localSettings()->autoLogin());
     setRestoreUserSessionData(appContext()->localSettings()->restoreUserSessionData());
@@ -164,10 +160,10 @@ bool QnGeneralPreferencesWidget::hasChanges() const
             return true;
     }
 
-    if (m_recorderSettings->primaryAudioDeviceName() != primaryAudioDeviceName())
+    if (screenRecordingSettings()->primaryAudioDeviceName() != primaryAudioDeviceName())
         return true;
 
-    if (m_recorderSettings->secondaryAudioDeviceName() != secondaryAudioDeviceName())
+    if (screenRecordingSettings()->secondaryAudioDeviceName() != secondaryAudioDeviceName())
         return true;
 
     if (appContext()->localSettings()->autoLogin() != autoLogin())
@@ -275,20 +271,21 @@ void QnGeneralPreferencesWidget::initAudioDevices()
     ui->primaryAudioDeviceComboBox->clear();
     ui->secondaryAudioDeviceComboBox->clear();
 
-    QString defaultPrimaryDeviceName = m_recorderSettings->defaultPrimaryAudioDevice().fullName();
+    QString defaultPrimaryDeviceName =
+        screenRecordingSettings()->defaultPrimaryAudioDevice().fullName();
     if (defaultPrimaryDeviceName.isEmpty())
         defaultPrimaryDeviceName = tr("None");
     ui->primaryAudioDeviceComboBox->addItem(tr("Auto (%1)").arg(defaultPrimaryDeviceName));
-    ui->primaryAudioDeviceComboBox->addItem(tr("None"), core::AudioRecorderSettings::kNoDevice);
+    ui->primaryAudioDeviceComboBox->addItem(tr("None"), core::AudioRecordingSettings::kNoDevice);
 
     QString defaultSecondaryDeviceName =
-        m_recorderSettings->defaultSecondaryAudioDevice().fullName();
+        screenRecordingSettings()->defaultSecondaryAudioDevice().fullName();
     if (defaultSecondaryDeviceName.isEmpty())
         defaultSecondaryDeviceName = tr("None");
     ui->secondaryAudioDeviceComboBox->addItem(tr("Auto (%1)").arg(defaultSecondaryDeviceName));
-    ui->secondaryAudioDeviceComboBox->addItem(tr("None"), core::AudioRecorderSettings::kNoDevice);
+    ui->secondaryAudioDeviceComboBox->addItem(tr("None"), core::AudioRecordingSettings::kNoDevice);
 
-    for (const auto& deviceName: m_recorderSettings->availableDevices())
+    for (const auto& deviceName: screenRecordingSettings()->availableDevices())
     {
         const QString& name = deviceName.fullName();
         ui->primaryAudioDeviceComboBox->addItem(name, name);

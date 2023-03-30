@@ -50,8 +50,8 @@ private:
     void preprocessAudioBuffers(std::vector<AudioSourceInfoPtr>& preprocessList);
 
 private:
-    bool m_initialized;
-    bool m_stopping;
+    bool m_initialized = false;
+    bool m_stopping = false;
     int m_frameSize = 0;
     QByteArray m_internalBuffer;
     nx::media::ffmpeg::AudioEncoder m_audioEncoder;
