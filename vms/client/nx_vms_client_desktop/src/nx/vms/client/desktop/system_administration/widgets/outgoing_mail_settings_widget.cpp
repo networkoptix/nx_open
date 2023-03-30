@@ -184,7 +184,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
     m_testSmtpConfigurationButton->setFlat(true);
     m_testSmtpConfigurationButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
     m_testSmtpConfigurationButton->resize(m_testSmtpConfigurationButton->minimumSizeHint());
-    m_testSmtpConfigurationButton->setFocusPolicy(Qt::NoFocus);
+    m_testSmtpConfigurationButton->setFocusPolicy(Qt::ClickFocus);
     static constexpr QMargins kCheckButtonMargins = {0, -4, 0, 0};
     anchorWidgetToParent(m_testSmtpConfigurationButton, Qt::TopEdge | Qt::RightEdge, kCheckButtonMargins);
 
