@@ -106,7 +106,8 @@ public:
         MemberSectionRole, //< IsUserRole ? "U" : "G"
         GroupSectionRole, // Built-in? "B" : "C"
         Cycle,
-        IsRemovable,
+        CanEditParents,
+        CanEditMembers,
     };
 
     MembersModel();
@@ -150,12 +151,7 @@ public:
 
     MembersCache* membersCache() const { return m_cache.get(); }
 
-    bool isRemovable(const QnUuid& id) const;
-
-    static bool isEditable(
-        const nx::core::access::SubjectHierarchy* hierarchy,
-        const QnUuid& currentUserId,
-        const QnUuid& id);
+    bool canEditMembers(const QnUuid& id) const;
 
 signals:
     void groupIdChanged();

@@ -42,7 +42,10 @@ DialogWithState
     property alias users: membersModel.users
     property alias globalPermissions: globalPermissionsModel.globalPermissions
     property alias sharedResources: membersModel.sharedResources
-    property bool editable: true //< Not used by current dialog type.
+
+    property bool parentGroupsEditable //< Not used by current dialog type.
+    property bool membersEditable //< Not used by current dialog type.
+    property bool permissionsEditable //< Not used by current dialog type.
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex

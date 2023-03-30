@@ -43,7 +43,9 @@ DialogWithState
     property alias users: membersModel.users
     property alias globalPermissions: globalPermissionsModel.globalPermissions
     property alias sharedResources: membersModel.sharedResources
-    property bool editable: true
+    property bool parentGroupsEditable
+    property bool membersEditable
+    property bool permissionsEditable
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
@@ -95,12 +97,12 @@ DialogWithState
 
                 enabled: !dialog.isSaving
 
-                nameEditable: !dialog.isLdap && !dialog.isPredefined && dialog.editable
+                nameEditable: !dialog.isLdap && !dialog.isPredefined && !dialog.isSaving
                 isLdap: dialog.isLdap
                 groups: dialog.parentGroups
                 userCount: membersModel.users.length
                 groupCount: membersModel.groups.length
-                deleteAvailable: !dialog.isLdap && !dialog.isPredefined && dialog.editable
+                deleteAvailable: !dialog.isLdap && !dialog.isPredefined && !dialog.isSaving
                 editingContext: membersModel.editingContext
                 globalPermissions: dialog.globalPermissions
                 sharedResources: dialog.sharedResources
@@ -125,7 +127,7 @@ DialogWithState
                 anchors.fill: parent
 
                 model: membersModel
-                editable: dialog.editable
+                editable: dialog.parentGroupsEditable
                 enabled: !dialog.isSaving
 
                 onAddGroupClicked: dialog.groupClicked(null)
@@ -144,7 +146,7 @@ DialogWithState
                 id: permissionSettings
                 anchors.fill: parent
 
-                enabled: !dialog.isPredefined && dialog.editable && !dialog.isSaving
+                enabled: !dialog.isPredefined && dialog.permissionsEditable && !dialog.isSaving
 
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext
@@ -163,7 +165,7 @@ DialogWithState
                 id: globalPermissionSettings
                 anchors.fill: parent
 
-                enabled: !dialog.isPredefined && dialog.editable && !dialog.isSaving
+                enabled: !dialog.isPredefined && dialog.permissionsEditable && !dialog.isSaving
 
                 model: GlobalPermissionsModel
                 {
@@ -186,7 +188,7 @@ DialogWithState
                 anchors.fill: parent
 
                 model: membersModel
-                editable: !dialog.isLdap && dialog.editable
+                editable: !dialog.isLdap && dialog.membersEditable
                 enabled: !dialog.isSaving
             }
         }
