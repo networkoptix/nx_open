@@ -925,10 +925,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>In Future</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Showreels</source>
         <translation></translation>
     </message>
@@ -951,6 +947,10 @@
     <message>
         <source>Searching Bookmarks, Objects, Events</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>In the Future</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
