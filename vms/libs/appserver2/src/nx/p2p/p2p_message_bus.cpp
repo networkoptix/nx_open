@@ -967,7 +967,10 @@ void MessageBus::sendTransactionImpl(
     NX_ASSERT(!(remotePeer == peerId)); //< loop
 
     if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, this))
-        printTran(connection, tran, Connection::Direction::outgoing);
+    {
+        if (connection->shouldTransactionBeSentToPeer(tran) == FilterResult::allow)
+            printTran(connection, tran, Connection::Direction::outgoing);
+    }
 
 #if 0
     // TODO: it is improvement to handle persistent transactions in case of buffer overflow.
