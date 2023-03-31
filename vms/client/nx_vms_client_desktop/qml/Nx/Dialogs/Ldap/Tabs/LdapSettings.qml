@@ -121,6 +121,7 @@ Rectangle
                         filterDialog.name,
                         filterDialog.baseDn,
                         filterDialog.filter)
+                    list.currentIndex = 0
                 }
                 else
                 {
@@ -130,8 +131,6 @@ Rectangle
                         filterDialog.baseDn,
                         filterDialog.filter)
                 }
-
-                list.currentIndex = list.count - 1
             }
         }
     }
