@@ -66,8 +66,8 @@ QVariant LdapFiltersModel::data(const QModelIndex& index, int role) const
 
 void LdapFiltersModel::addFilter(const QString& name, const QString& base, const QString& filter)
 {
-    beginInsertRows({}, d->filters.size(), d->filters.size());
-    d->filters.append(LdapFilter{
+    beginInsertRows({}, 0, 0);
+    d->filters.insert(0, LdapFilter{
         .name = name,
         .base = base,
         .filter = filter
