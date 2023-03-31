@@ -25,6 +25,22 @@ bool RtcpNackPart::parse(const uint8_t* data, size_t size)
     return true;
 }
 
+int RtcpNackPart::serialize(uint8_t* data, size_t size) const
+{
+    try
+    {
+        nx::utils::BitStreamWriter bitstream(data, data + size);
+        bitstream.putBits(16, pid);
+        bitstream.putBits(16, blp);
+        bitstream.flushBits();
+        return bitstream.getBytesCount();
+    }
+    catch (const nx::utils::BitStreamException&)
+    {
+        return 0;
+    }
+}
+
 std::vector<uint16_t> RtcpNackPart::getSequenceNumbers() const
 {
     std::vector<uint16_t> result{};
@@ -89,6 +105,36 @@ bool RtcpNackReport::parse(const uint8_t* data, size_t size)
     }
 }
 
+int RtcpNackReport::serialize(uint8_t* data, size_t size) const
+{
+    try
+    {
+        nx::utils::BitStreamWriter bitstream(data, data + size);
+        bitstream.putBits(8, header.firstByte);
+        bitstream.putBits(8, header.payloadType);
+        bitstream.putBits(16, header.length);
+        bitstream.putBits(32, header.sourceSsrc);
+        bitstream.putBits(32, header.senderSsrc);
+        bitstream.flushBits();
+        for (const auto& i: nacks)
+        {
+            int serialized = bitstream.getBytesCount();
+            int toSkip = i.serialize(data + serialized, size - serialized);
+            bitstream.skipBits(toSkip * 8);
+        }
+        return bitstream.getBytesCount();
+    }
+    catch (const nx::utils::BitStreamException&)
+    {
+        return 0;
+    }
+}
+
+size_t RtcpNackReport::serialized() const
+{
+    return kRtcpFeedbackHeaderSize + 4 * nacks.size();
+}
+
 std::vector<uint16_t> RtcpNackReport::getAllSequenceNumbers() const
 {
     std::vector<uint16_t> result;
@@ -97,6 +143,56 @@ std::vector<uint16_t> RtcpNackReport::getAllSequenceNumbers() const
         const auto sequences = i.getSequenceNumbers();
         result.insert(result.end(), sequences.begin(), sequences.end());
     }
+    return result;
+}
+
+RtcpNackReport buildNackReport(
+    uint32_t sourceSsrc,
+    uint32_t senderSsrc,
+    const std::vector<uint16_t>& sequences)
+{
+    RtcpNackReport result;
+    result.header.firstByte = 0x80 | kRtcpFeedbackFormatNack;
+    result.header.payloadType = kRtcpGenericFeedback;
+    // THe length of the RTCP packet in 32-bit words minus one, including the header and any
+    // padding.
+    result.header.length = (kRtcpFeedbackHeaderSize / 4) - 1;
+    result.header.sourceSsrc = sourceSsrc;
+    result.header.senderSsrc = senderSsrc;
+
+    if (sequences.empty())
+        return result;
+
+    std::optional<uint16_t> startSequence;
+    uint16_t sequenceMask = 0;
+    constexpr int kMaxSequenceNumber = 4096;
+    int sequenceLimit = std::min(kMaxSequenceNumber, (int) sequences.size());
+    for (int i = 0; i < sequenceLimit; ++i)
+    {
+        if (!startSequence)
+            startSequence = sequences[i];
+        bool isStart = (*startSequence == sequences[i]);
+        bool isLast = (i == (int) sequences.size() - 1);
+        bool isOutOfMask = (sequences[i] - *startSequence > 16 || sequences[i] < *startSequence);
+        if (!isOutOfMask && !isStart)
+        {
+            sequenceMask |= (1 << (sequences[i] - *startSequence - 1));
+        }
+        if (isLast || isOutOfMask)
+        {
+            result.nacks.emplace_back(RtcpNackPart{*startSequence, sequenceMask});
+            sequenceMask = 0;
+        }
+        if (isOutOfMask)
+        {
+            *startSequence = sequences[i];
+        }
+        if (isLast && isOutOfMask)
+        {
+            result.nacks.emplace_back(RtcpNackPart{*startSequence, sequenceMask});
+        }
+    }
+    result.header.length += result.nacks.size();
     return result;
 }
 
