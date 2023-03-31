@@ -4,11 +4,11 @@
 
 #include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/resolvers/own_resource_access_resolver.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
 #include "private/resource_access_resolver_test_fixture.h"
@@ -27,6 +27,12 @@ public:
         return new OwnResourceAccessResolver(manager.get(),
             systemContext()->globalPermissionsWatcher());
     }
+
+    QnUserResourcePtr addAdmin()
+    {
+        // User must have own admin permissions, not inherited.
+        return addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::admin);
+    }
 };
 
 TEST_F(OwnResourceAccessResolverTest, noAccess)
@@ -37,14 +43,14 @@ TEST_F(OwnResourceAccessResolverTest, noAccess)
 
 TEST_F(OwnResourceAccessResolverTest, notApplicableResource)
 {
-    const auto user = createUser(GlobalPermission::none);
+    const auto user = createUser(NoGroup);
     manager->setOwnResourceAccessMap(kTestSubjectId, {{user->getId(), AccessRight::view}});
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, user), AccessRights());
 }
 
 TEST_F(OwnResourceAccessResolverTest, noDesktopCameraAccess)
 {
-    const auto user = createUser(GlobalPermission::none);
+    const auto user = createUser(NoGroup);
     const auto camera = addDesktopCamera(user);
     manager->setOwnResourceAccessMap(user->getId(), {{camera->getId(), AccessRight::view}});
     ASSERT_EQ(resolver->accessRights(user->getId(), camera), AccessRights());
@@ -95,50 +101,44 @@ TEST_F(OwnResourceAccessResolverTest, notificationSignals)
 
 TEST_F(OwnResourceAccessResolverTest, adminAccessToCamera)
 {
-    const auto adminGroupId = QnPredefinedUserRoles::id(Qn::UserRole::administrator);
     const auto camera = addCamera();
-    ASSERT_EQ(resolver->accessRights(adminGroupId, camera), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, camera), kFullAccessRights);
 }
 
 TEST_F(OwnResourceAccessResolverTest, noAdminAccessToDesktopCamera)
 {
-    const auto adminGroupId = QnPredefinedUserRoles::id(Qn::UserRole::administrator);
-    const auto other = addUser(GlobalPermission::viewerPermissions);
+    const auto other = addUser(NoGroup);
     const auto camera = addDesktopCamera(other);
-    ASSERT_EQ(resolver->accessRights(adminGroupId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, camera), AccessRights());
 }
 
 TEST_F(OwnResourceAccessResolverTest, adminAccessToWebPage)
 {
-    const auto adminGroupId = QnPredefinedUserRoles::id(Qn::UserRole::administrator);
     const auto webPage = addWebPage();
-    ASSERT_EQ(resolver->accessRights(adminGroupId, webPage), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, webPage), kFullAccessRights);
 }
 
 TEST_F(OwnResourceAccessResolverTest, adminAccessToVideowall)
 {
-    const auto adminGroupId = QnPredefinedUserRoles::id(Qn::UserRole::administrator);
     const auto videowall = addVideoWall();
-    ASSERT_EQ(resolver->accessRights(adminGroupId, videowall), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, videowall), kFullAccessRights);
 }
 
 TEST_F(OwnResourceAccessResolverTest, adminAccessToSharedLayout)
 {
-    const auto adminGroupId = QnPredefinedUserRoles::id(Qn::UserRole::administrator);
     const auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
-    ASSERT_EQ(resolver->accessRights(adminGroupId, layout), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, layout), kFullAccessRights);
 }
 
 // TODO: Fix resource assess for group-inherited permissions.
 TEST_F(OwnResourceAccessResolverTest, adminAccessToPrivateLayout)
 {
-    const auto adminGroupId = QnPredefinedUserRoles::id(Qn::UserRole::administrator);
-    const auto user = addUser(GlobalPermission::none);
+    const auto user = addUser(NoGroup);
     const auto layout = addLayout();
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
-    ASSERT_EQ(resolver->accessRights(adminGroupId, layout), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, layout), kFullAccessRights);
 }
 
 } // namespace test

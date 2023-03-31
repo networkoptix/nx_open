@@ -26,7 +26,7 @@ struct CameraData;
 struct StorageData;
 struct LayoutData;
 struct UserData;
-struct UserRoleData;
+struct UserGroupData;
 struct VideowallData;
 struct WebPageData;
 
@@ -100,7 +100,7 @@ public:
      * @returns Permissions that user have for the given group.
      */
     Qn::Permissions permissions(const QnResourceAccessSubject& subject,
-        const nx::vms::api::UserRoleData& targetGroup) const;
+        const nx::vms::api::UserGroupData& targetGroup) const;
 
     /**
      * @param subject User or group that should have permissions.
@@ -129,7 +129,7 @@ public:
      */
     bool hasPermission(
         const QnResourceAccessSubject& subject,
-        const nx::vms::api::UserRoleData& targetGroup,
+        const nx::vms::api::UserGroupData& targetGroup,
         Qn::Permissions requiredPermissions) const;
 
     /**
@@ -244,11 +244,7 @@ public:
     bool canCreateUser(
         const QnResourceAccessSubject& subject,
         GlobalPermissions targetPermissions,
-        const std::vector<QnUuid>& targetGroups,
-        bool isOwner) const;
-    bool canCreateUser(
-        const QnResourceAccessSubject& subject,
-        Qn::UserRole role) const;
+        const std::vector<QnUuid>& targetGroups) const;
     bool canModifyUser(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& target,
@@ -303,7 +299,7 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
         const QnUserResourcePtr& targetUser) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const nx::vms::api::UserRoleData& targetGroup) const;
+        const nx::vms::api::UserGroupData& targetGroup) const;
 
 private:
     const std::unique_ptr<nx::core::access::AccessRightsResolver> m_accessRightsResolver;

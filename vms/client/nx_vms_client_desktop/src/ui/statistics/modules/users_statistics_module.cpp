@@ -10,6 +10,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/reflect/string_conversion.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 
 namespace {
 
@@ -70,7 +71,8 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
         : resourceAccessManager()->globalPermissions(currentUser);
     result.insert(kCurrentUserPermissionsTag,
         QString::fromStdString(nx::reflect::toString(currentUserPermissions)));
-    result.insert(kCurrentUserRoleTag, toString(currentUser->userRole()));
+    result.insert(kCurrentUserRoleTag,
+        nx::vms::common::userGroupNames(currentUser).join(", "));
 
     return result;
 }
@@ -78,5 +80,3 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
 void QnUsersStatisticsModule::reset()
 {
 }
-
-

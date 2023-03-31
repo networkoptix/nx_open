@@ -11,10 +11,9 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>

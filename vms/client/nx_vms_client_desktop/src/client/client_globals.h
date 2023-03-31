@@ -235,7 +235,6 @@ namespace Qn
         ActionEmittedBy,                            /** */
 
         GlobalPermissionsRole,                      /**< Global permissions role. Value of type GlobalPermissions. */
-        UserRoleRole,                               /**< Type of user role. Value of type Qn::UserRole. */
 
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
         ResolutionModeRole,                         /**< Role for resolution mode. */

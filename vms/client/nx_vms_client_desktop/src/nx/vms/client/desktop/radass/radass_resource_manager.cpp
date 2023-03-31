@@ -10,7 +10,7 @@
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/enum_string_conversion.h>
 #include <nx/utils/algorithm/same.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>

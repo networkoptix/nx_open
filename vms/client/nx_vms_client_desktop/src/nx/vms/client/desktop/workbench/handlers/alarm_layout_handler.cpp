@@ -17,7 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/datetime.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>

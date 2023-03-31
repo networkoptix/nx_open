@@ -6,13 +6,14 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/user_resource.h>
 #include <nx/core/access/access_types.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/utils/log/log.h>
 
 using namespace nx::core::access;
+using namespace nx::vms::common;
 
 QnGlobalPermissionsManager::QnGlobalPermissionsManager(
     Mode mode,
@@ -31,10 +32,10 @@ QnGlobalPermissionsManager::QnGlobalPermissionsManager(
         connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
             &QnGlobalPermissionsManager::handleResourceRemoved, Qt::DirectConnection);
 
-        connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-            &QnGlobalPermissionsManager::handleRoleAddedOrUpdated, Qt::DirectConnection);
-        connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
-            &QnGlobalPermissionsManager::handleRoleRemoved, Qt::DirectConnection);
+        connect(m_context->userGroupManager(), &UserGroupManager::addedOrUpdated, this,
+            &QnGlobalPermissionsManager::handleGroupAddedOrUpdated, Qt::DirectConnection);
+        connect(m_context->userGroupManager(), &UserGroupManager::removed, this,
+            &QnGlobalPermissionsManager::handleGroupRemoved, Qt::DirectConnection);
 
         connect(m_context->accessSubjectHierarchy(), &SubjectHierarchy::changed, this,
             &QnGlobalPermissionsManager::handleHierarchyChanged, Qt::DirectConnection);
@@ -70,7 +71,7 @@ GlobalPermissions QnGlobalPermissionsManager::globalPermissions(
         NX_MUTEX_LOCKER lk(&m_mutex);
 
         QSet<QnUuid> subjects{{subject.id()}};
-        subjects += systemContext()->accessSubjectHierarchy()->recursiveParents(subjects);
+        subjects += nx::vms::common::userGroupsWithParents(systemContext(), subjects);
 
         for (const auto& effectiveId: subjects)
         {
@@ -153,12 +154,16 @@ GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
         return {};
     }
 
-    const auto rolesPermissions =
-        [this](const auto& roleIds)
+    const auto permissionsFromGroups =
+        [this](const auto& groupIds)
         {
+            const auto allGroupIds = userGroupsWithParents(m_context, groupIds);
+            const auto allGroups = m_context->userGroupManager()->getGroupsByIds(allGroupIds);
+
             GlobalPermissions result;
-            for (const auto& role: m_context->userRolesManager()->userRolesWithParents(roleIds))
-                result |= role.permissions;
+            for (const auto& group: allGroups)
+                result |= group.permissions;
+
             return filterDependentPermissions(result);
         };
 
@@ -191,15 +196,15 @@ GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
         }
 
         const auto raw = filterDependentPermissions(user->getRawPermissions());
-        const auto roleIds = user->userRoleIds();
-        const auto roles = rolesPermissions(roleIds);
-        NX_VERBOSE(this, "%1 has raw %2 and roles %3 from %4",
-            user, raw, roles, nx::containerString(roleIds));
-        return raw | roles;
+        const auto groupIds = user->groupIds();
+        const auto fromGroups = permissionsFromGroups(groupIds);
+        NX_VERBOSE(this, "%1 has raw %2 and groups %3 from %4",
+            user, raw, fromGroups, nx::containerString(groupIds));
+        return raw | fromGroups;
     }
     else //< Subject is a role.
     {
-        auto result = rolesPermissions(std::vector{subject.id()});
+        auto result = permissionsFromGroups(std::vector{subject.id()});
         /* If user belongs to group, he cannot be an admin - by design. */
         result &= ~GlobalPermissions(GlobalPermission::admin);
         NX_VERBOSE(this, "Role %1 has %3", subject.id(), result);
@@ -242,14 +247,16 @@ void QnGlobalPermissionsManager::handleResourceRemoved(const QnResourcePtr& reso
         handleSubjectRemoved(user);
 }
 
-void QnGlobalPermissionsManager::handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole)
+void QnGlobalPermissionsManager::handleGroupAddedOrUpdated(
+    const nx::vms::api::UserGroupData& userGroup)
 {
-    updateGlobalPermissions(userRole);
+    updateGlobalPermissions(userGroup);
 }
 
-void QnGlobalPermissionsManager::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
+void QnGlobalPermissionsManager::handleGroupRemoved(
+    const nx::vms::api::UserGroupData& userGroup)
 {
-    handleSubjectRemoved(userRole);
+    handleSubjectRemoved(userGroup);
 }
 
 void QnGlobalPermissionsManager::handleSubjectRemoved(const QnResourceAccessSubject& subject)

@@ -6,25 +6,28 @@
 #include <QtQml/QtQml>
 
 #include <client_core/client_core_module.h>
+#include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/system_administration/models/user_list_model.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 #include "../globals/user_settings_global.h"
 
+using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
 
 MembersModelGroup MembersModelGroup::fromId(SystemContext* systemContext, const QnUuid& id)
 {
-    const auto group = systemContext->userRolesManager()->userRole(id);
+    const auto group = systemContext->userGroupManager()->find(id).value_or(api::UserGroupData{});
 
     return {
         .id = group.id,
@@ -44,7 +47,9 @@ MembersModel::MembersModel():
 {
 }
 
-MembersModel::~MembersModel() {}
+MembersModel::~MembersModel()
+{
+}
 
 int MembersModel::customGroupCount() const
 {
@@ -52,7 +57,7 @@ int MembersModel::customGroupCount() const
         return 0;
 
     const auto result =
-        m_cache->sorted().groups.size() - QnPredefinedUserRoles::enumValues().size();
+        m_cache->sorted().groups.size() - common::PredefinedUserGroups::list().size();
 
     return result < 0 ? 0 : result;
 }
@@ -165,6 +170,8 @@ void MembersModel::checkCycles()
 
 void MembersModel::readUsersAndGroups()
 {
+    const auto userGroupManager = systemContext()->userGroupManager();
+
     if (m_subjectContext.isNull() && !m_subjectId.isNull())
     {
         m_subjectContext.reset(new AccessSubjectEditingContext(systemContext()));
@@ -269,11 +276,8 @@ void MembersModel::readUsersAndGroups()
                 }
             });
 
-        auto userRolesManager = systemContext()->userRolesManager();
-
-        m_connections << connect(
-            userRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
-            [this](const nx::vms::api::UserRoleData& userGroup)
+        m_connections << connect(userGroupManager, &UserGroupManager::addedOrUpdated, this,
+            [this](const nx::vms::api::UserGroupData& userGroup)
             {
                 if (!m_cache)
                     return;
@@ -287,8 +291,8 @@ void MembersModel::readUsersAndGroups()
                 checkCycles();
             });
 
-        m_connections << connect(userRolesManager, &QnUserRolesManager::userRoleRemoved, this,
-            [this](const nx::vms::api::UserRoleData& userGroup)
+        m_connections << connect(userGroupManager, &UserGroupManager::removed, this,
+            [this](const nx::vms::api::UserGroupData& userGroup)
             {
                 if (!m_cache)
                     return;
@@ -323,7 +327,7 @@ void MembersModel::readUsersAndGroups()
                 for (const auto& user: users)
                 {
                     addedIds.insert(user->getId());
-                    const auto groupIds = user->userRoleIds();
+                    const auto groupIds = user->groupIds();
                     modifiedGroups += QSet<QnUuid>{groupIds.begin(), groupIds.end()};
 
                     subscribeToUser(user);
@@ -348,7 +352,7 @@ void MembersModel::readUsersAndGroups()
                 {
                     unsubscribeFromUser(user);
                     removedIds.insert(user->getId());
-                    const auto groupIds = user->userRoleIds();
+                    const auto groupIds = user->groupIds();
                     modifiedGroups += QSet<QnUuid>{groupIds.begin(), groupIds.end()};
                 }
 
@@ -417,13 +421,11 @@ void MembersModel::readUsersAndGroups()
         m_subjectContext->setCurrentSubjectId(m_subjectId);
     }
 
-    const auto userRolesManager = systemContext()->userRolesManager();
-
     m_subjectMembers = {};
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
 
     for (const auto& id: members)
-        (userRolesManager->hasRole(id) ? m_subjectMembers.groups : m_subjectMembers.users) << id;
+        (userGroupManager->contains(id) ? m_subjectMembers.groups : m_subjectMembers.users) << id;
 
     std::sort(m_subjectMembers.users.begin(), m_subjectMembers.users.end());
     std::sort(m_subjectMembers.groups.begin(), m_subjectMembers.groups.end());
@@ -468,7 +470,7 @@ void MembersModel::setUsers(const MembersListWrapper& users)
     // Copy groups.
     for (const auto& id: members)
     {
-        if (systemContext()->userRolesManager()->hasRole(id))
+        if (systemContext()->userGroupManager()->contains(id))
             newMembers.insert(id);
     }
 
@@ -500,7 +502,7 @@ void MembersModel::setGroups(const QList<QnUuid>& groups)
     // Copy users.
     for (const auto& id: members)
     {
-        if (!systemContext()->userRolesManager()->hasRole(id))
+        if (!systemContext()->userGroupManager()->contains(id))
             newMembers.insert(id);
     }
 
@@ -532,7 +534,6 @@ void MembersModel::addMember(const QnUuid& memberId)
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
     members.insert(memberId);
-
     m_subjectContext->setRelations(parents, members);
 }
 
@@ -541,7 +542,6 @@ void MembersModel::removeMember(const QnUuid& memberId)
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
     members.remove(memberId);
-
     m_subjectContext->setRelations(parents, members);
 }
 
@@ -671,8 +671,7 @@ bool MembersModel::canEditMembers(const QnUuid& id) const
     return !m_cache->info(id).isLdap
         && systemContext()->accessController()->canCreateUser(
             /*targetPermissions*/ {},
-            /*targetGroups*/ {id},
-            /*isOwner*/ id == QnPredefinedUserRoles::id(Qn::UserRole::owner));
+            /*targetGroups*/ {id});
 }
 
 bool MembersModel::setData(const QModelIndex& index, const QVariant& value, int role)

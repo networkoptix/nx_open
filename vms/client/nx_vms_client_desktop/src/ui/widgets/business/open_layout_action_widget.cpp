@@ -12,13 +12,13 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/event_rules/layout_selection_dialog.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/strings_helper.h>
 #include <ui/models/resource/resource_list_model.h>
@@ -47,7 +47,7 @@ OpenLayoutActionWidget::OpenLayoutActionWidget(
 
     setSubjectsButton(ui->selectUsersButton);
 
-    m_validator = new QnLayoutAccessValidationPolicy(systemContext);
+    m_validator = new QnLayoutAccessValidationPolicy{};
     setValidationPolicy(m_validator); //< Takes ownership, so we use raw pointer here.
 
     connect(ui->rewindForWidget, &RewindForWidget::valueEdited, this,
@@ -224,19 +224,21 @@ QnLayoutResourcePtr OpenLayoutActionWidget::getSelectedLayout()
 std::pair<QnUserResourceList, QList<QnUuid>> OpenLayoutActionWidget::getSelectedUsersAndRoles()
 {
     QnUserResourceList users;
-    QList<QnUuid> roles;
+    QList<QnUuid> groupIds;
     if (model())
     {
         const auto params = model()->actionParams();
         if (params.allUsers)
             return {{}, {}};
 
-        userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
-        users.append(systemContext()->accessSubjectHierarchy()->usersInGroups(nx::utils::toQSet(roles)));
+        nx::vms::common::getUsersAndGroups(systemContext(),
+            params.additionalResources, users, groupIds);
+        users.append(systemContext()->accessSubjectHierarchy()->usersInGroups(
+            nx::utils::toQSet(groupIds)));
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
     }
 
-    return std::pair(users, roles);
+    return std::pair(users, groupIds);
 }
 
 void OpenLayoutActionWidget::updateLayoutsButton()

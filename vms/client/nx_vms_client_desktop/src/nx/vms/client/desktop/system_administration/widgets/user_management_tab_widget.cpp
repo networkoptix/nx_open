@@ -13,6 +13,8 @@
 #include "user_groups_widget.h"
 #include "user_list_widget.h"
 
+using namespace nx::vms::common;
+
 namespace nx::vms::client::desktop {
 
 struct UserManagementTabWidget::Private
@@ -31,7 +33,7 @@ struct UserManagementTabWidget::Private
     }
 };
 
-UserManagementTabWidget::UserManagementTabWidget(QnUserRolesManager* manager, QWidget* parent):
+UserManagementTabWidget::UserManagementTabWidget(UserGroupManager* manager, QWidget* parent):
     base_type(parent),
     d(new Private{.q = this})
 {

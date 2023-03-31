@@ -8,7 +8,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>

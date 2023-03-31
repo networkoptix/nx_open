@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "user_roles_model.h"
+#include "private/user_roles_model_p.h"
 
 #include <algorithm>
 
@@ -9,7 +10,6 @@
 
 #include <client/client_globals.h>
 #include <common/common_globals.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <ui/models/private/user_roles_model_p.h>
@@ -19,37 +19,21 @@
 
 #include <nx/utils/string.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 
-/*
-* QnUserRolesModel
-*/
-
-QnUserRolesModel::QnUserRolesModel(QObject* parent, DisplayRoleFlags flags) :
+QnUserRolesModel::QnUserRolesModel(QObject* parent, DisplayRoleFlags flags):
     base_type(parent),
-    d_ptr(new QnUserRolesModelPrivate(this, flags))
+    d(new Private(this, flags))
 {
 }
 
 QnUserRolesModel::~QnUserRolesModel()
 {
+    // Required here for forward-declared scoped pointer destruction.
 }
 
-int QnUserRolesModel::rowForUser(const QnUserResourcePtr& user) const
+void QnUserRolesModel::setUserRoles(const nx::vms::api::UserGroupDataList& roles)
 {
-    Q_D(const QnUserRolesModel);
-    return d->rowForUser(user);
-}
-
-int QnUserRolesModel::rowForRole(Qn::UserRole role) const
-{
-    Q_D(const QnUserRolesModel);
-    return d->rowForRole(role);
-}
-
-void QnUserRolesModel::setUserRoles(const nx::vms::api::UserRoleDataList& roles)
-{
-    Q_D(QnUserRolesModel);
     d->setUserRoles(roles);
 }
 
@@ -72,7 +56,6 @@ int QnUserRolesModel::rowCount(const QModelIndex& parent) const
     if (parent.isValid())
         return 0;
 
-    Q_D(const QnUserRolesModel);
     return d->count();
 }
 
@@ -86,42 +69,21 @@ int QnUserRolesModel::columnCount(const QModelIndex& parent) const
 
 void QnUserRolesModel::setCustomRoleStrings(const QString& name, const QString& description)
 {
-    Q_D(QnUserRolesModel);
     d->setCustomRoleStrings(name, description);
 }
 
 bool QnUserRolesModel::hasCheckBoxes() const
 {
-    Q_D(const QnUserRolesModel);
-    return d->m_hasCheckBoxes;
+    return d->hasCheckBoxes;
 }
 
 void QnUserRolesModel::setHasCheckBoxes(bool value)
 {
-    Q_D(QnUserRolesModel);
-    if (d->m_hasCheckBoxes == value)
+    if (d->hasCheckBoxes == value)
         return;
 
     ScopedReset reset(this);
-    d->m_hasCheckBoxes = value;
-}
-
-bool QnUserRolesModel::predefinedRoleIdsEnabled() const
-{
-    Q_D(const QnUserRolesModel);
-    return d->m_predefinedRoleIdsEnabled;
-}
-
-void QnUserRolesModel::setPredefinedRoleIdsEnabled(bool value)
-{
-    Q_D(QnUserRolesModel);
-    if (d->m_predefinedRoleIdsEnabled == value)
-        return;
-
-    d->m_predefinedRoleIdsEnabled = value;
-
-    if (const int count = rowCount())
-        emit dataChanged(index(0, 0), index(count - 1, columnCount() - 1));
+    d->hasCheckBoxes = value;
 }
 
 Qt::ItemFlags QnUserRolesModel::flags(const QModelIndex& index) const
@@ -141,20 +103,18 @@ QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
     if (index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    Q_D(const QnUserRolesModel);
-
     auto roleModel = d->roleByRow(index.row());
 
     switch (role)
     {
-        /* Role name: */
+        // Role name.
         case Qt::DisplayRole:
         case Qt::AccessibleTextRole:
             return index.column() == NameColumn
                 ? roleModel.name
                 : QString();
 
-        /* Role description: */
+        // Role description.
         case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::AccessibleDescriptionRole:
@@ -162,23 +122,19 @@ QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
                 ? roleModel.description
                 : QString();
 
-        /* Role check state: */
+        // Role check state.
         case Qt::CheckStateRole:
             return index.column() == CheckColumn
-                ? QVariant(d->m_checked.contains(index) ? Qt::Checked : Qt::Unchecked)
+                ? QVariant(d->checked.contains(index) ? Qt::Checked : Qt::Unchecked)
                 : QVariant();
 
-        /* Role uuid (for custom roles): */
+        // Role uuid (for custom roles).
         case Qn::UuidRole:
-            return QVariant::fromValue(d->id(index.row(), d->m_predefinedRoleIdsEnabled));
+            return QVariant::fromValue(d->id(index.row()));
 
-        /* Role permissions (for built-in roles): */
+        // Role permissions (for built-in roles).
         case Qn::GlobalPermissionsRole:
             return QVariant::fromValue(roleModel.permissions);
-
-        /* Role type: */
-        case Qn::UserRoleRole:
-            return QVariant::fromValue(roleModel.roleType);
 
         default:
             return QVariant();
@@ -195,11 +151,10 @@ bool QnUserRolesModel::setData(const QModelIndex& index, const QVariant& value, 
 
     const bool checked = value.toInt() == Qt::Checked;
 
-    Q_D(QnUserRolesModel);
     if (checked)
-        d->m_checked.insert(index);
+        d->checked.insert(index);
     else
-        d->m_checked.remove(index);
+        d->checked.remove(index);
 
     emit dataChanged(
         index.sibling(index.row(), 0),
@@ -212,27 +167,25 @@ QSet<QnUuid> QnUserRolesModel::checkedRoles() const
 {
     QSet<QnUuid> result;
 
-    Q_D(const QnUserRolesModel);
-    for (const auto& index: d->m_checked)
-        result.insert(d->id(index.row(), true));
+    for (const auto& index: d->checked)
+        result.insert(d->id(index.row()));
 
     return result;
 }
 
 void QnUserRolesModel::setCheckedRoles(const QSet<QnUuid>& ids)
 {
-    Q_D(QnUserRolesModel);
-    d->m_checked.clear();
+    d->checked.clear();
 
     QHash<QnUuid, int> rowById;
     for (int row = 0; row < d->count(); ++row)
-        rowById[d->id(row, true)] = row;
+        rowById[d->id(row)] = row;
 
     for (const auto& id: ids)
     {
         const int row = rowById.value(id, -1);
         if (row >= 0)
-            d->m_checked.insert(createIndex(row, CheckColumn));
+            d->checked.insert(createIndex(row, CheckColumn));
     }
 
     emit dataChanged(

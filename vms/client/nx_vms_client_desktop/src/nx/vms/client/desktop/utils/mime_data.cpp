@@ -12,7 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
 #include <nx/utils/app_info.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>

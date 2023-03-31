@@ -26,7 +26,7 @@ using ServerConnectionPtr = std::shared_ptr<ServerConnection>;
 
 namespace nx::vms::api {
 
-struct UserRoleData;
+struct UserGroupData;
 
 } // namespace nx::vms::api
 
@@ -37,7 +37,7 @@ class NX_VMS_CLIENT_CORE_API RemoteConnectionAwareMock: public ConnectionInfo
 public:
     virtual ~RemoteConnectionAwareMock() {}
     virtual bool saveUser(const QnUserResourcePtr&) { return true; }
-    virtual bool saveGroup(const nx::vms::api::UserRoleData&) { return true; }
+    virtual bool saveGroup(const nx::vms::api::UserGroupData&) { return true; }
 };
 
 class NX_VMS_CLIENT_CORE_API RemoteConnectionAware

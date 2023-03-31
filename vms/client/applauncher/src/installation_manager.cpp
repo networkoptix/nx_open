@@ -13,7 +13,7 @@
 #include <nx/build_info.h>
 #include <nx/utils/file_system.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/zip/extractor.h>
 
 #if defined(Q_OS_MACX)

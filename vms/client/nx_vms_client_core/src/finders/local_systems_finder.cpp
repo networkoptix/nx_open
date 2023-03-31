@@ -2,7 +2,7 @@
 
 #include "local_systems_finder.h"
 
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 
 namespace {
 

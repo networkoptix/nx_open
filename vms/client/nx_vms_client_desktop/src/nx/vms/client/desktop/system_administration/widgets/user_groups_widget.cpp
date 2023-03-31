@@ -12,7 +12,6 @@
 
 #include <client/client_globals.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/customizable_sort_filter_proxy_model.h>
@@ -28,9 +27,13 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_access_controller.h>
+
+using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
 
@@ -146,7 +149,7 @@ class UserGroupsWidget::Private: public QObject
     nx::utils::ImplPtr<Ui::UserGroupsWidget> ui{new Ui::UserGroupsWidget()};
 
 public:
-    const QPointer<QnUserRolesManager> manager;
+    const QPointer<UserGroupManager> manager;
     UserGroupListModel* const groupsModel{new UserGroupListModel(q)};
     CustomizableSortFilterProxyModel* const sortModel{new CustomizableSortFilterProxyModel(q)};
     CheckableHeaderView* const header{new CheckableHeaderView(
@@ -159,14 +162,14 @@ public:
         qnSkin->icon("text_buttons/trash.png"), tr("Delete"), selectionControls)};
 
 public:
-    explicit Private(UserGroupsWidget* q, QnUserRolesManager* manager);
+    explicit Private(UserGroupsWidget* q, UserGroupManager* manager);
     void setupUi();
 
     void handleModelChanged();
     void handleSelectionChanged();
     void handleCellClicked(const QModelIndex& index);
 
-    nx::vms::api::UserRoleDataList userRoles() const;
+    nx::vms::api::UserGroupDataList userGroups() const;
 
     bool canDeleteGroup(const QnUuid& group);
 
@@ -183,7 +186,7 @@ private:
 // -----------------------------------------------------------------------------------------------
 // UserGroupsWidget
 
-UserGroupsWidget::UserGroupsWidget(QnUserRolesManager* manager, QWidget* parent):
+UserGroupsWidget::UserGroupsWidget(UserGroupManager* manager, QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     d(new Private(this, manager))
@@ -192,20 +195,27 @@ UserGroupsWidget::UserGroupsWidget(QnUserRolesManager* manager, QWidget* parent)
         return;
 
     d->setupUi();
-    d->groupsModel->reset(d->userRoles());
+    d->groupsModel->reset(d->userGroups());
 
-    connect(manager, &QnUserRolesManager::userRoleAddedOrUpdated, d.get(),
-        [this](const nx::vms::api::UserRoleData& group)
+    connect(manager, &UserGroupManager::addedOrUpdated, d.get(),
+        [this](const nx::vms::api::UserGroupData& group)
         {
             if (!d->deletedGroupIds.contains(group.id))
                 d->groupsModel->addOrUpdateGroup(group);
         });
 
-    connect(manager, &QnUserRolesManager::userRoleRemoved, d.get(),
-        [this](const nx::vms::api::UserRoleData& group)
+    connect(manager, &UserGroupManager::removed, d.get(),
+        [this](const nx::vms::api::UserGroupData& group)
         {
             d->groupsModel->removeGroup(group.id);
             d->deletedGroupIds.remove(group.id);
+            emit hasChangesChanged();
+        });
+
+    connect(manager, &UserGroupManager::reset, d.get(),
+        [this]()
+        {
+            loadDataToUi();
             emit hasChangesChanged();
         });
 }
@@ -218,7 +228,7 @@ UserGroupsWidget::~UserGroupsWidget()
 void UserGroupsWidget::loadDataToUi()
 {
     d->deletedGroupIds.clear();
-    d->groupsModel->reset(d->userRoles());
+    d->groupsModel->reset(d->userGroups());
 }
 
 void UserGroupsWidget::applyChanges()
@@ -246,7 +256,7 @@ bool UserGroupsWidget::hasChanges() const
 // -----------------------------------------------------------------------------------------------
 // UserGroupsWidget::Private
 
-UserGroupsWidget::Private::Private(UserGroupsWidget* q, QnUserRolesManager* manager):
+UserGroupsWidget::Private::Private(UserGroupsWidget* q, UserGroupManager* manager):
     q(q),
     manager(manager)
 {
@@ -379,13 +389,10 @@ void UserGroupsWidget::Private::handleModelChanged()
     handleSelectionChanged();
 }
 
-bool UserGroupsWidget::Private::canDeleteGroup(const QnUuid &groupId)
+bool UserGroupsWidget::Private::canDeleteGroup(const QnUuid& groupId)
 {
-    const auto groupData = q->userRolesManager()->userRole(groupId);
-
     return q->systemContext()->accessController()->hasPermissions(
-        groupData.id,
-        Qn::RemovePermission);
+        groupId, Qn::RemovePermission);
 }
 
 void UserGroupsWidget::Private::handleSelectionChanged()
@@ -442,9 +449,9 @@ void UserGroupsWidget::Private::deleteSelected()
     emit q->hasChangesChanged();
 }
 
-nx::vms::api::UserRoleDataList UserGroupsWidget::Private::userRoles() const
+nx::vms::api::UserGroupDataList UserGroupsWidget::Private::userGroups() const
 {
-    return manager->userRoles();
+    return manager->groups();
 }
 
 QSet<QnUuid> UserGroupsWidget::Private::visibleGroupIds() const

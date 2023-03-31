@@ -42,7 +42,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/metadata_log_parser.h>
 #include <nx/media/media_data_packet.h>
 #include <nx/media/sse_helper.h>

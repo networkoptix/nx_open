@@ -4,7 +4,8 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 
 namespace nx::vms::rules {
 
@@ -26,7 +27,7 @@ bool SourceUserField::match(const QVariant& value) const
     if (!user)
         return false;
 
-    return nx::utils::toQSet(user->allUserRoleIds()).intersects(ids());
+    return nx::vms::common::userGroupsWithParents(user).intersects(ids());
 }
 
 } // namespace nx::vms::rules

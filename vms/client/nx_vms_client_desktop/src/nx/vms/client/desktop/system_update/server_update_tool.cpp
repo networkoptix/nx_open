@@ -20,7 +20,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>

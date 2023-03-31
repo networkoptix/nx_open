@@ -235,7 +235,7 @@ FocusScope
 
             readonly property var optimizedSelectedIndexes: Array.prototype.map.call(
                 // Convert selectedIndexes to QVariantList to avoid huge performance loss.
-                NxGlobals.toVariantList(selectedIndexes),
+                NxGlobals.toQVariantList(selectedIndexes),
                 index => NxGlobals.toPersistent(index))
 
             onOptimizedSelectedIndexesChanged:

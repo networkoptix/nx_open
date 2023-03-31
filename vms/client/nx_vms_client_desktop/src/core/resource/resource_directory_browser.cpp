@@ -13,7 +13,7 @@
 #include <core/resource/layout_reader.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/layout/layout_file_info.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>

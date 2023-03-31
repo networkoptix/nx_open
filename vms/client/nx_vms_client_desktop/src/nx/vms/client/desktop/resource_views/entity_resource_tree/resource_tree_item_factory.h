@@ -11,8 +11,6 @@
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/shared_item/shared_item.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
-namespace nx::vms::api { struct UserRoleData; }
-
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
@@ -73,9 +71,6 @@ public:
 
     // Resource Tree cloud system item within 'Other Systems' group.
     AbstractItemPtr createCloudSystemItem(const QString& systemId);
-
-    // Resource Tree user role group item.
-    AbstractItemPtr createUserRoleItem(const QnUuid& roleUuid);
 
     // Resource Tree showreel item.
     AbstractItemPtr createShowreelItem(const QnUuid& showreelUuid);

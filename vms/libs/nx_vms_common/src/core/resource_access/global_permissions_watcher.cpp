@@ -3,16 +3,18 @@
 #include "global_permissions_watcher.h"
 
 #include <QtCore/QPointer>
+#include <QtCore/QSignalBlocker>
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 
 namespace nx::core::access {
 
 using namespace nx::vms::api;
+using namespace nx::vms::common;
 
 namespace {
 
@@ -37,12 +39,17 @@ class GlobalPermissionsWatcher::Private: public QObject
 {
     GlobalPermissionsWatcher* const q;
 
+    const QPointer<QnResourcePool> resourcePool;
+    const QPointer<UserGroupManager> userGroupManager;
+
 public:
     Private(GlobalPermissionsWatcher* q,
         QnResourcePool* resourcePool,
-        QnUserRolesManager* userGroupManager)
+        UserGroupManager* userGroupManager)
         :
-        q(q)
+        q(q),
+        resourcePool(resourcePool),
+        userGroupManager(userGroupManager)
     {
         if (!NX_ASSERT(resourcePool && userGroupManager))
             return;
@@ -53,16 +60,19 @@ public:
         connect(resourcePool, &QnResourcePool::resourceRemoved,
             this, &Private::handleResourceRemoved, Qt::DirectConnection);
 
-        connect(userGroupManager, &QnUserRolesManager::userRoleAddedOrUpdated,
+        connect(userGroupManager, &UserGroupManager::addedOrUpdated,
             this, &Private::handleGroupAddedOrUpdated, Qt::DirectConnection);
 
-        connect(userGroupManager, &QnUserRolesManager::userRoleRemoved,
+        connect(userGroupManager, &UserGroupManager::removed,
             this, &Private::handleGroupRemoved, Qt::DirectConnection);
+
+        connect(userGroupManager, &UserGroupManager::reset,
+            this, &Private::handleGroupsReset, Qt::DirectConnection);
 
         for (const auto& user: resourcePool->getResources<QnUserResource>())
             handleUserChanged(user);
 
-        for (const auto& group: userGroupManager->userRoles())
+        for (const auto& group: userGroupManager->groups())
             handleGroupAddedOrUpdated(group);
     }
 
@@ -106,14 +116,35 @@ public:
         handleSubjectChanged(user->getId(), permissions);
     }
 
-    void handleGroupAddedOrUpdated(const UserRoleData& group)
+    void handleGroupAddedOrUpdated(const UserGroupData& group)
     {
         handleSubjectChanged(group.id, group.permissions);
     }
 
-    void handleGroupRemoved(const UserRoleData& group)
+    void handleGroupRemoved(const UserGroupData& group)
     {
         handleSubjectRemoved(group.id);
+    }
+
+    void handleGroupsReset()
+    {
+        if (q->isUpdating())
+            return;
+        {
+            const QSignalBlocker blocker(q);
+
+            NX_MUTEX_LOCKER lk(&mutex);
+            globalPermissions.clear();
+            lk.unlock();
+
+            for (const auto& user: resourcePool->getResources<QnUserResource>())
+                handleUserChanged(user);
+
+            for (const auto& group: userGroupManager->groups())
+                handleGroupAddedOrUpdated(group);
+        }
+
+        emit q->globalPermissionsReset();
     }
 
     void handleSubjectChanged(const QnUuid& subjectId, GlobalPermissions permissions)
@@ -153,7 +184,7 @@ public:
 
 GlobalPermissionsWatcher::GlobalPermissionsWatcher(
     QnResourcePool* resourcePool,
-    QnUserRolesManager* userGroupManager,
+    UserGroupManager* userGroupManager,
     QObject* parent)
     :
     base_type(parent),

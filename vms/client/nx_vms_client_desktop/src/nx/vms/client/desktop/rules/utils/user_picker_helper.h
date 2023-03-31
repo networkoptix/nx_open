@@ -4,6 +4,7 @@
 
 #include <QtCore/QCoreApplication>
 
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 class QnSubjectValidationPolicy;
@@ -29,7 +30,7 @@ private:
     bool m_acceptAll{false};
     bool m_isValid{false};
     QnUserResourceList m_users;
-    QnUuidList m_roles;
+    api::UserGroupDataList m_groups;
 };
 
 } // namespace nx::vms::client::desktop::rules

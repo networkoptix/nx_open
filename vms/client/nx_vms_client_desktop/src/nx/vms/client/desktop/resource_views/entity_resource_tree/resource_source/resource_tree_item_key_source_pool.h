@@ -77,18 +77,6 @@ public:
     UniqueResourceSourcePtr shareableLayoutsSource(const QnUserResourcePtr& user);
 
     /**
-     * Provides users resources stored in the resource pool which doesn't belong to any
-     * role.
-     */
-    UniqueResourceSourcePtr usersSource(const QnUserResourcePtr& excludeUser);
-
-    /**
-     * Provides users resources stored in the resource pool which belong to the role with
-     * given ID.
-     */
-    UniqueResourceSourcePtr roleUsersSource(const QnUuid& roleId);
-
-    /**
      * Provides integration resources stored in the resource pool.
      */
     UniqueResourceSourcePtr integrationsSource(

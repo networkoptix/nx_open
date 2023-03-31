@@ -18,12 +18,12 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/core/access/access_types.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/streaming/abstract_archive_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/data/analytics_data.h>
@@ -38,6 +38,7 @@
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/scoped_timer.h>
 
@@ -242,7 +243,7 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubje
 }
 
 Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubject& subject,
-    const nx::vms::api::UserRoleData& targetGroup) const
+    const nx::vms::api::UserGroupData& targetGroup) const
 {
     if (!subject.isValid() || targetGroup.id.isNull())
         return Qn::NoPermissions;
@@ -265,8 +266,8 @@ Qn::Permissions QnResourceAccessManager::permissions(
     if (const auto targetResource = resourcePool()->getResourceById(targetId))
         return permissions(subject, targetResource);
 
-    const auto targetGroup = userRolesManager()->userRole(targetId);
-    return permissions(subject, targetGroup);
+    const auto targetGroup = userGroupManager()->find(targetId);
+    return targetGroup ? permissions(subject, *targetGroup) : Qn::NoPermissions;
 }
 
 bool QnResourceAccessManager::hasPermission(
@@ -279,7 +280,7 @@ bool QnResourceAccessManager::hasPermission(
 
 bool QnResourceAccessManager::hasPermission(
     const QnResourceAccessSubject& subject,
-    const nx::vms::api::UserRoleData& targetGroup,
+    const nx::vms::api::UserGroupData& targetGroup,
     Qn::Permissions requiredPermissions) const
 {
     return (permissions(subject, targetGroup) & requiredPermissions) == requiredPermissions;
@@ -345,8 +346,7 @@ bool QnResourceAccessManager::canCreateResourceInternal(
     {
         return canCreateUser(subject,
             targetUser->getRawPermissions(),
-            targetUser->userRoleIds(),
-            targetUser->isOwner());
+            targetUser->groupIds());
     }
 
     if (const auto storage = target.dynamicCast<QnStorageResource>())
@@ -686,7 +686,9 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnUserResourcePtr& targetUser) const
 {
-    const auto checkUserType =
+    const bool isSubjectOwner = subject.user() && subject.user()->isOwner();
+
+    const auto filterByUserType =
         [targetUser](Qn::Permissions permissions)
         {
             switch (targetUser->userType())
@@ -713,41 +715,41 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             }
         };
 
-    Qn::Permissions result = Qn::NoPermissions;
-    const bool isSubjectOwner = subject.user() && subject.user()->isOwner();
+    // Permissions on self.
 
     if (targetUser == subject.user())
     {
-        /* Everyone can edit own data. */
-        result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission
+        // Everyone can edit own data, except own access rights.
+        Qn::Permissions result = Qn::ReadWriteSavePermission | Qn::WritePasswordPermission
             | Qn::WriteEmailPermission | Qn::WriteFullNamePermission;
 
         if (isSubjectOwner)
             result |= Qn::WriteDigestPermission;
+
+        return filterByUserType(result);
     }
-    else if (hasAdminPermissions(subject))
+
+    // Permissions on others.
+
+    if (!hasAdminPermissions(subject))
+        return Qn::NoPermissions;
+
+    if (targetUser->isOwner())
     {
-        result |= Qn::ReadPermission;
+        if (isSubjectOwner && !targetUser->isCloud())
+            return Qn::ReadWriteSavePermission | Qn::WriteDigestPermission;
 
-        // Nobody can do anything with the owner (except digest mode change).
-        if (targetUser->isOwner())
-        {
-            if (isSubjectOwner && !targetUser->isCloud())
-                result |= Qn::ReadWriteSavePermission | Qn::WriteDigestPermission;
-
-            return result;
-        }
-
-        // Admins can only be edited by owner, other users - by all admins.
-        if (isSubjectOwner || !m_accessRightsResolver->hasAdminAccessRights(targetUser->getId()))
-            result |= Qn::FullUserPermissions;
+        return Qn::ReadPermission;
     }
 
-    return checkUserType(result);
+    if (isSubjectOwner || !m_accessRightsResolver->hasAdminAccessRights(targetUser->getId()))
+        return filterByUserType(Qn::FullUserPermissions);
+
+    return Qn::ReadPermission;
 }
 
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
-    const QnResourceAccessSubject& subject, const nx::vms::api::UserRoleData& targetGroup) const
+    const QnResourceAccessSubject& subject, const nx::vms::api::UserGroupData& targetGroup) const
 {
     if (targetGroup.id.isNull())
         return Qn::NoPermissions;
@@ -891,26 +893,29 @@ bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subje
     if (data.type == UserType::cloud && !data.fullName.isEmpty())
         return false; //< Full name for cloud users is allowed to modify via cloud portal only.
 
-    return canCreateUser(subject, data.permissions, data.groupIds, data.isOwner());
+    return canCreateUser(subject, data.permissions, data.groupIds);
 }
 
 bool QnResourceAccessManager::canCreateUser(
     const QnResourceAccessSubject& subject,
-    GlobalPermissions targetPermissions,
-    const std::vector<QnUuid>& targetGroups,
-    bool isOwner) const
+    GlobalPermissions newPermissions,
+    const std::vector<QnUuid>& targetGroups) const
 {
     if (!subject.isValid())
         return false;
 
-    // Nobody can create owners.
-    if (isOwner)
+    // For backward compatibility we still allow assigning of deprecated global permissions.
+    //if ((newPermissions & ~kAssignableGlobalPermissions) != 0)
+    //    return false;
+
+    if (!nx::vms::common::allUserGroupsExist(systemContext(), targetGroups))
         return false;
 
-    if (!userRolesManager()->hasRoles(targetGroups))
-        return false;
+    const auto effectivePermissions = accumulatePermissions(newPermissions, targetGroups);
 
-    const auto effectivePermissions = accumulatePermissions(targetPermissions, targetGroups);
+    // No one can create owners.
+    if (effectivePermissions.testFlag(GlobalPermission::owner))
+        return false;
 
     // Only owner can create admins.
     if (effectivePermissions.testFlag(GlobalPermission::admin))
@@ -920,49 +925,56 @@ bool QnResourceAccessManager::canCreateUser(
     return hasAdminPermissions(subject);
 }
 
-bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subject,
-    Qn::UserRole role) const
-{
-    const auto permissions = QnPredefinedUserRoles::permissions(role);
-    const bool isOwner = (role == Qn::UserRole::owner);
-    return canCreateUser(subject, permissions, {}, isOwner);
-}
-
 bool QnResourceAccessManager::canModifyUser(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& target,
     const nx::vms::api::UserData& update) const
 {
-    if (!userRolesManager()->hasRoles(update.groupIds))
+    if (!nx::vms::common::allUserGroupsExist(systemContext(), update.groupIds))
         return false;
+
+    // For backward compatibility we still allow assigning of deprecated global permissions.
+    //if ((update.permissions & ~kAssignableGlobalPermissions) != 0)
+    //    return false;
 
     auto userResource = target.dynamicCast<QnUserResource>();
-    NX_ASSERT(userResource);
-
-    if (!subject.isValid() || !target)
+    if (!subject.isValid() || !NX_ASSERT(userResource))
         return false;
 
-    // Nobody can make user an owner unless target user is already an owner.
-    if (!userResource->isOwner() && update.isOwner())
+    const auto oldPermissions = accumulatePermissions(
+        userResource->getRawPermissions(), userResource->groupIds());
+
+    const auto newPermissions = accumulatePermissions(update.permissions, update.groupIds);
+
+    const bool permissionsChanged = oldPermissions != newPermissions
+        || userResource->getRawPermissions() != update.permissions
+        || nx::utils::toQSet(userResource->groupIds()) != nx::utils::toQSet(update.groupIds)
+        || userResource->isEnabled() != update.isEnabled;
+
+    // Cannot modify own permissions.
+    if (subject.user() == target && permissionsChanged)
         return false;
 
-    const auto sourcePermissions = accumulatePermissions(
-        userResource->getRawPermissions(), userResource->userRoleIds());
-
-    const auto targetPermissions = accumulatePermissions(update.permissions, update.groupIds);
-
-    if (sourcePermissions.testFlag(GlobalPermission::admin)
-        || targetPermissions.testFlag(GlobalPermission::admin))
+    // Admin permissions can be granted or revoked only by an owner.
+    if (oldPermissions.testFlag(GlobalPermission::admin)
+        != newPermissions.testFlag(GlobalPermission::admin))
     {
         if (!(subject.user() && subject.user()->isOwner()))
             return false;
+    }
+
+    // Owner permissions cannot be granted or revoked.
+    if (oldPermissions.testFlag(GlobalPermission::owner)
+        != newPermissions.testFlag(GlobalPermission::owner))
+    {
+        return false;
     }
 
     // Changing user type is always prohibited.
     if (userResource->userType() != update.type)
         return false;
 
-    /* We should have full access to user to modify him. */
+    // We should have full access to user to modify him.
     Qn::Permissions requiredPermissions = Qn::ReadWriteSavePermission;
 
     if (const auto digest = userResource->getDigest(); digest != update.digest)
@@ -983,7 +995,7 @@ bool QnResourceAccessManager::canModifyUser(
     if (userResource->getHash().toString() != update.hash)
         requiredPermissions |= Qn::WritePasswordPermission;
 
-    if (sourcePermissions != targetPermissions || userResource->isEnabled() != update.isEnabled)
+    if (permissionsChanged)
         requiredPermissions |= Qn::WriteAccessRightsPermission;
 
     if (userResource->getEmail() != update.email)

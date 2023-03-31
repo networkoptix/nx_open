@@ -5,7 +5,7 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 
 #include "analytics_settings_manager.h"
 

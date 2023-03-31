@@ -7,7 +7,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 
 namespace nx::vms::client::desktop {
 

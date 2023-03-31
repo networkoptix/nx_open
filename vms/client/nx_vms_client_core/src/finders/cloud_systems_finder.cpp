@@ -15,7 +15,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/application_context.h>

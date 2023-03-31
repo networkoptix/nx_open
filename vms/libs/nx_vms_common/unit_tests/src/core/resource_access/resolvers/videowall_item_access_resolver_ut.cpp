@@ -9,6 +9,7 @@
 #include <core/resource_access/resolvers/own_resource_access_resolver.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
 #include "private/resource_access_resolver_test_fixture.h"
@@ -64,7 +65,7 @@ TEST_F(VideowallItemAccessResolverTest, noAccess)
 
 TEST_F(VideowallItemAccessResolverTest, notApplicableResource)
 {
-    const auto user = createUser(GlobalPermission::admin);
+    const auto user = createUser(kAdministratorsGroupId);
     manager->setOwnResourceAccessMap(kTestSubjectId, {{user->getId(), AccessRight::view}});
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, user), AccessRights());
 }

@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/log/format.h>
-#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 
@@ -51,11 +51,11 @@ class EventFieldContextTest: public nx::vms::common::test::ContextBasedTest
 TEST_F(EventFieldContextTest, SourceUserField)
 {
     const auto permission = nx::vms::api::GlobalPermission::userInput;
-    const auto user = addUser(permission);
+    const auto user = addUser(NoGroup, kTestUserName, api::UserType::local, permission);
     const auto userIdValue = QVariant::fromValue(user->getId());
-    const auto role = createRole(permission);
+    const auto group = createUserGroup(permission);
 
-    user->setSingleUserRole(role.id);
+    user->setGroupIds({group.id});
 
     auto field = SourceUserField(systemContext());
 
@@ -73,7 +73,7 @@ TEST_F(EventFieldContextTest, SourceUserField)
     EXPECT_TRUE(field.match(userIdValue));
 
     // User role is matched.
-    field.setIds({role.id});
+    field.setIds({group.id});
     EXPECT_TRUE(field.match(userIdValue));
 }
 

@@ -12,7 +12,6 @@ class QnGlobalPermissionsManager;
 class QnResourceAccessManager;
 class QnResourcePool;
 class QnRuntimeInfoManager;
-class QnUserRolesManager;
 
 namespace ec2 { class AbstractECConnection; }
 
@@ -21,6 +20,7 @@ namespace nx::vms::common {
 class ShowreelManager;
 class SystemContext;
 class SystemSettings;
+class UserGroupManager;
 
 class NX_VMS_COMMON_API SystemContextInitializer
 {
@@ -91,9 +91,9 @@ public:
     QnRuntimeInfoManager* runtimeInfoManager() const;
 
     /**
-     * List of all User Roles.
+     * List of all User Groups.
      */
-    QnUserRolesManager* userRolesManager() const;
+    UserGroupManager* userGroupManager() const;
 
     // TODO: #GDM Remove field.
     SystemContext* m_context = nullptr;

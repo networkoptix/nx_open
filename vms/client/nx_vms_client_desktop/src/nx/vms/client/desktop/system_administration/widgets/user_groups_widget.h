@@ -6,7 +6,7 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnUserRolesManager;
+namespace nx::vms::common { class UserGroupManager; }
 
 namespace nx::vms::client::desktop {
 
@@ -16,7 +16,7 @@ class UserGroupsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchCo
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    explicit UserGroupsWidget(QnUserRolesManager* manager, QWidget* parent = nullptr);
+    explicit UserGroupsWidget(nx::vms::common::UserGroupManager* manager, QWidget* parent = nullptr);
     virtual ~UserGroupsWidget() override;
 
     virtual void loadDataToUi() override;

@@ -25,7 +25,7 @@ public:
         const QnTransaction<nx::vms::api::AccessRightsData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<nx::vms::api::UserRoleData>& tran,
+        const QnTransaction<nx::vms::api::UserGroupData>& tran,
         NotificationSource source);
 };
 

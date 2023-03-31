@@ -188,13 +188,16 @@ constexpr auto nxReflectVisitAllEnumItems(GlobalPermission*, Visitor&& visitor)
 Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
 
-constexpr GlobalPermissions kNonDeprecatedGlobalPermissions{
+constexpr GlobalPermissions kNonDeprecatedGlobalPermissions =
     GlobalPermission::admin
     | GlobalPermission::owner
     | GlobalPermission::viewLogs
     | GlobalPermission::customUser
-    | GlobalPermission::requireFreshSession
-};
+    | GlobalPermission::requireFreshSession;
+
+constexpr GlobalPermissions kAssignableGlobalPermissions =
+    GlobalPermission::viewLogs
+    | GlobalPermission::customUser;
 
 constexpr GlobalPermissions kDeprecatedGlobalPermissions{~kNonDeprecatedGlobalPermissions};
 

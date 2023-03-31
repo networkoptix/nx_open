@@ -5,7 +5,6 @@
 #include <QtQml/QtQml>
 
 #include <core/resource_access/subject_hierarchy.h>
-#include <core/resource_management/user_roles_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -19,7 +18,9 @@ RecursiveMembersModel::RecursiveMembersModel():
 {
 }
 
-RecursiveMembersModel::~RecursiveMembersModel() {}
+RecursiveMembersModel::~RecursiveMembersModel()
+{
+}
 
 QHash<int, QByteArray> RecursiveMembersModel::roleNames() const
 {

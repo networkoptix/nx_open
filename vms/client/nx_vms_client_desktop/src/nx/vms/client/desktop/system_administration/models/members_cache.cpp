@@ -5,36 +5,20 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 
 namespace nx::vms::client::desktop {
 
-namespace {
-
-// Return sorted list if predefined groups.
-static const QList<QnUuid> predefinedGroupIds()
-{
-    QList<QnUuid> result;
-    for (auto role: QnPredefinedUserRoles::enumValues())
-        result << QnPredefinedUserRoles::id(role);
-    return result;
-}
-
-static const QSet<QnUuid> predefinedGroupIdsSet()
-{
-    QSet<QnUuid> result;
-    for (auto role: QnPredefinedUserRoles::enumValues())
-        result << QnPredefinedUserRoles::id(role);
-    return result;
-}
-
-} // namespace
+using nx::vms::common::PredefinedUserGroups;
 
 MembersCache::MembersCache()
-{}
+{
+}
 
 MembersCache::~MembersCache()
-{}
+{
+}
 
 MembersCache::Info MembersCache::info(const QnUuid& id) const
 {
@@ -43,33 +27,20 @@ MembersCache::Info MembersCache::info(const QnUuid& id) const
 
 bool MembersCache::isPredefined(const QnUuid& groupId)
 {
-    static const auto predefinedIds = predefinedGroupIdsSet();
-    return predefinedIds.contains(groupId);
+    return PredefinedUserGroups::contains(groupId);
 }
 
 MembersCache::Info MembersCache::infoFromContext(
     nx::vms::common::SystemContext* systemContext,
     const QnUuid& id)
 {
-    const auto groupsManager = systemContext->userRolesManager();
-
-    if (const auto data = QnPredefinedUserRoles::get(id))
+    if (const auto group = systemContext->userGroupManager()->find(id))
     {
         return {
-            .name = data->name,
-            .description = data->description,
+            .name = group->name,
+            .description = group->description,
             .isGroup = true,
-            .isLdap = (data->type == nx::vms::api::UserType::ldap),
-        };
-    }
-    if (const auto group = groupsManager->userRole(id); !group.id.isNull())
-    {
-        return {
-            .name = group.name,
-            .description = group.description,
-            .isGroup = true,
-            .isLdap = (group.type == nx::vms::api::UserType::ldap),
-        };
+            .isLdap = (group->type == nx::vms::api::UserType::ldap)};
     }
 
     if (const auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(id))
@@ -87,7 +58,6 @@ MembersCache::Info MembersCache::infoFromContext(
 void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
 {
     m_systemContext = systemContext;
-    auto rolesManager = systemContext->userRolesManager();
 
     m_info.clear();
     m_sortedCache.clear();
@@ -95,7 +65,7 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
 
     Members members;
 
-    const auto allGroups = rolesManager->userRoles();
+    const auto allGroups = systemContext->userGroupManager()->groups();
     for (const auto& group: allGroups)
     {
         const auto id = group.getId();
@@ -137,7 +107,7 @@ std::function<bool(const QnUuid&, const QnUuid&)> MembersCache::lessFunc() const
             }
             else if (predefinedLeft)
             {
-                const auto predefList = predefinedGroupIds();
+                const auto predefList = PredefinedUserGroups::ids();
                 return predefList.indexOf(l) < predefList.indexOf(r);
             }
 

@@ -199,11 +199,10 @@ bool QnWorkbenchAccessController::canCreateLayout(
 
 bool QnWorkbenchAccessController::canCreateUser(
     GlobalPermissions targetPermissions,
-    const std::vector<QnUuid>& targetGroups,
-    bool isOwner) const
+    const std::vector<QnUuid>& targetGroups) const
 {
     return m_user && resourceAccessManager()->canCreateUser(
-        m_user, targetPermissions, targetGroups, isOwner);
+        m_user, targetPermissions, targetGroups);
 }
 
 bool QnWorkbenchAccessController::canCreateVideoWall() const

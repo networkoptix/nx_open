@@ -32,7 +32,8 @@ public:
 
     QModelIndexList selection() const
     {
-        return toTypedList<QModelIndex>(invokeQmlMethod<QVariantList>(*this, "selection"));
+        return nx::utils::toTypedQList<QModelIndex>(
+            invokeQmlMethod<QVariantList>(*this, "selection"));
     }
 
     void setSelection(const QModelIndexList& indexes) const

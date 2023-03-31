@@ -10,6 +10,5 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_sources/local_media_source.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_sources/proxied_web_resource_source.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_sources/server_resource_source.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_sources/user_resource_source.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_sources/videowall_resource_source.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_sources/webpage_resource_source.h>

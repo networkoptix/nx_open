@@ -78,7 +78,7 @@ private:
     QnResourcePtr getResource(Column column, const nx::vms::event::ActionData& action) const;
     QVariant foregroundData(Column column, const nx::vms::event::ActionData& action) const;
 
-    static QVariant iconData(Column column, const nx::vms::event::ActionData& action);
+    QVariant iconData(Column column, const nx::vms::event::ActionData& action) const;
     QVariant mouseCursorData(Column column, const nx::vms::event::ActionData& action) const;
     QString textData(Column column, const nx::vms::event::ActionData& action) const;
     QString tooltip(Column column, const nx::vms::event::ActionData& action) const;

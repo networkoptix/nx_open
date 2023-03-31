@@ -4,7 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/test_support/test_options.h>
-#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/test_support/test_context.h>
 
 namespace nx::vms::common::test {
@@ -30,17 +30,17 @@ public:
 
 TEST_F(QnCachedPermissionsPerformanceTest, createUsers)
 {
-    run([&] { addUser(GlobalPermission::none); } );
+    run([&] { addUser(NoGroup); } );
 }
 
 TEST_F(QnCachedPermissionsPerformanceTest, createUsersInRole)
 {
-    const auto r = createRole(GlobalPermission::none);
+    const auto g = createUserGroup(NoGroup);
     run(
         [&]
         {
-            const auto u = addUser(GlobalPermission::none);
-            u->setUserRoleIds({r.id});
+            const auto u = addUser(NoGroup);
+            u->setGroupIds({g.id});
         });
 }
 
@@ -49,9 +49,9 @@ TEST_F(QnCachedPermissionsPerformanceTest, createUsersInRoles)
     run(
         [&]
         {
-            const auto r = createRole(GlobalPermission::none);
-            const auto u = addUser(GlobalPermission::none);
-            u->setUserRoleIds({r.id});
+            const auto g = createUserGroup(NoGroup);
+            const auto u = addUser(NoGroup);
+            u->setGroupIds({g.id});
         });
 }
 

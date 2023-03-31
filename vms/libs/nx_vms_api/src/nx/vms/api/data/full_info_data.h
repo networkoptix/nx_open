@@ -16,7 +16,7 @@
 #include "resource_type_data.h"
 #include "showreel_data.h"
 #include "user_data.h"
-#include "user_role_data.h"
+#include "user_group_data.h"
 #include "videowall_data.h"
 #include "webpage_data.h"
 
@@ -34,7 +34,7 @@ struct NX_VMS_API FullInfoData
     CameraDataList cameras;
     CameraAttributesDataList cameraUserAttributesList;
     UserDataList users;
-    UserRoleDataList userGroups;
+    UserGroupDataList userGroups;
     AccessRightsDataList accessRights;
     LayoutDataList layouts;
     VideowallDataList videowalls;

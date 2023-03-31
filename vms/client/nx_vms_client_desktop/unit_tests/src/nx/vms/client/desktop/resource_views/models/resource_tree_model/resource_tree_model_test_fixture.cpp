@@ -23,7 +23,6 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -492,11 +491,10 @@ void ResourceTreeModelTest::setupAllVideowallsAccess(
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAs(
-    const QString& name, Qn::UserRole userGroup) const
+    const QString& name, const QnUuid& groupId) const
 {
     logout();
     const auto users = resourcePool()->getResources<QnUserResource>();
-    const auto groupId = QnPredefinedUserRoles::id(userGroup);
 
     const std::vector<QnUuid> groupIds = groupId.isNull()
         ? std::vector<QnUuid>{}
@@ -505,7 +503,7 @@ QnUserResourcePtr ResourceTreeModelTest::loginAs(
     const auto itr = std::find_if(users.cbegin(), users.cend(),
         [this, name, &groupIds](const QnUserResourcePtr& user)
         {
-            return user->getName() == name && user->userRoleIds() == groupIds;
+            return user->getName() == name && user->groupIds() == groupIds;
         });
 
     QnUserResourcePtr user;
@@ -516,9 +514,9 @@ QnUserResourcePtr ResourceTreeModelTest::loginAs(
     else
     {
         user = addUser(name, GlobalPermission::none);
-        user->setUserRoleIds(groupIds);
+        user->setGroupIds(groupIds);
 
-        if (userGroup == Qn::UserRole::owner)
+        if (groupId == api::kOwnersGroupId)
             user->setOwner(true);
     }
 
@@ -528,27 +526,27 @@ QnUserResourcePtr ResourceTreeModelTest::loginAs(
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsOwner(const QString& name) const
 {
-    return loginAs(name, Qn::UserRole::owner);
+    return loginAs(name, api::kOwnersGroupId);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsAdmin(const QString& name) const
 {
-    return loginAs(name, Qn::UserRole::administrator);
+    return loginAs(name, api::kAdministratorsGroupId);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsLiveViewer(const QString& name) const
 {
-    return loginAs(name, Qn::UserRole::liveViewer);
+    return loginAs(name, api::kLiveViewersGroupId);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsAdvancedViewer(const QString& name) const
 {
-    return loginAs(name, Qn::UserRole::advancedViewer);
+    return loginAs(name, api::kAdvancedViewersGroupId);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsCustomUser(const QString& name) const
 {
-    return loginAs(name, Qn::UserRole::customPermissions);
+    return loginAs(name, {});
 }
 
 QnUserResourcePtr ResourceTreeModelTest::currentUser() const

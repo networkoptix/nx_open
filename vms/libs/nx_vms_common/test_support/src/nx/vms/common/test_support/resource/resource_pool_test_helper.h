@@ -9,7 +9,7 @@
 
 #include "camera_resource_stub.h"
 
-namespace nx::vms::api { struct UserRoleData; }
+namespace nx::vms::api { struct UserGroupData; }
 
 class NX_VMS_COMMON_TEST_SUPPORT_API QnResourcePoolTestHelper:
     public nx::vms::common::SystemContextAware
@@ -17,19 +17,32 @@ class NX_VMS_COMMON_TEST_SUPPORT_API QnResourcePoolTestHelper:
 public:
     using nx::vms::common::SystemContextAware::SystemContextAware;
 
+    enum NoGroupTag { NoGroup };
+
+    struct Ids
+    {
+        Ids(NoGroupTag) {}
+        Ids(const QnUuid& id): data({id}) {}
+        Ids(std::initializer_list<QnUuid> ids): data(ids) {}
+
+        std::vector<QnUuid> data;
+    };
+
     static constexpr auto kTestUserName = "user";
     static constexpr auto kTestUserName2 = "user_2";
 
     QnUserResourcePtr createUser(
-        GlobalPermissions globalPermissions,
+        Ids parentGroupIds,
         const QString& name = kTestUserName,
         nx::vms::api::UserType userType = nx::vms::api::UserType::local,
+        GlobalPermissions globalPermissions = GlobalPermission::none,
         const QString& ldapDn = "");
 
     QnUserResourcePtr addUser(
-        GlobalPermissions globalPermissions,
+        Ids parentGroupIds,
         const QString& name = kTestUserName,
         nx::vms::api::UserType userType = nx::vms::api::UserType::local,
+        GlobalPermissions globalPermissions = GlobalPermission::none,
         const QString& ldapDn = "");
 
     QnLayoutResourcePtr createLayout();
@@ -60,13 +73,14 @@ public:
 
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 
-    nx::vms::api::UserRoleData createRole(
-        GlobalPermissions permissions, std::vector<QnUuid> parentGroupIds = {});
+    nx::vms::api::UserGroupData createUserGroup(
+        Ids parentGroupIds, QString name = QString{});
 
-    nx::vms::api::UserRoleData createRole(const QString& name,
-        GlobalPermissions permissions, std::vector<QnUuid> parentGroupIds = {});
+    nx::vms::api::UserGroupData createUserGroup(
+        GlobalPermissions permissions, QString name = QString{});
 
-    void removeRole(const QnUuid& roleId);
+    void addOrUpdateUserGroup(const nx::vms::api::UserGroupData& group);
+    void removeUserGroup(const QnUuid& groupId);
 
     void clear();
 };

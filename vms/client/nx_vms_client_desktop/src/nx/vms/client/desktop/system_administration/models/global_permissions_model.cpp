@@ -7,11 +7,11 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -105,9 +105,8 @@ QVariant GlobalPermissionsModel::data(const QModelIndex& index, int role) const
 
             for (const auto& id: groupIds)
             {
-                const auto group = m_context->systemContext()->userRolesManager()->userRole(id);
-                if (!group.name.isEmpty())
-                    result << tr("Permission granted by %1 group").arg(html::bold(group.name));
+                if (const auto group = m_context->systemContext()->userGroupManager()->find(id))
+                    result << tr("Permission granted by %1 group").arg(html::bold(group->name));
             }
 
             return result.join("<br>");
@@ -161,11 +160,11 @@ void GlobalPermissionsModel::updateInfo()
     if (m_context)
     {
         const auto resourcePool = m_context->systemContext()->resourcePool();
-        const auto groupManager = m_context->systemContext()->userRolesManager();
+        const auto groupManager = m_context->systemContext()->userGroupManager();
         const auto id = m_context->currentSubjectId();
 
-        if (const auto group = groupManager->userRole(id); !group.name.isEmpty())
-            permissions = group.permissions;
+        if (const auto group = groupManager->find(id))
+            permissions = group->permissions;
         else if (const auto user = resourcePool->getResourceById<QnUserResource>(id))
             permissions = user->getRawPermissions();
     }

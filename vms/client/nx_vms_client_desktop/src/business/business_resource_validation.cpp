@@ -18,21 +18,22 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/branding.h>
 #include <nx/network/app_info.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <utils/email/email.h>
 
+using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -332,8 +333,7 @@ bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
 
     /* We can get here either user id or role id. User should be checked additionally, role is
      * always counted as valid (if exists). */
-    return !userRolesManager()->userRole(resourceId).id.isNull()
-        || QnPredefinedUserRoles::enumValue(resourceId) != Qn::UserRole::customUserRole;
+    return userGroupManager()->contains(resourceId);
 }
 
 bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
@@ -341,8 +341,8 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
     auto context = appContext()->currentSystemContext();
 
     QnUserResourceList users;
-    QList<QnUuid> roles;
-    context->userRolesManager()->usersAndRoles(ids, users, roles);
+    QList<QnUuid> groupIds;
+    nx::vms::common::getUsersAndGroups(context, ids, users, groupIds);
 
     if (!std::all_of(users.cbegin(), users.cend(), &isValidUser))
         return false;
@@ -356,35 +356,36 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
         return false;
     }
 
-    const auto groupUsers = context->accessSubjectHierarchy()->usersInGroups(nx::utils::toQSet(roles));
+    const auto groupUsers = context->accessSubjectHierarchy()->usersInGroups(
+        nx::utils::toQSet(groupIds));
     if (!std::all_of(groupUsers.cbegin(), groupUsers.cend(), isValidUser))
         return false;
 
-    return countEnabledUsers(users) != 0 || !roles.empty() || !additionalRecipients.empty();
+    return countEnabledUsers(users) != 0 || !groupIds.empty() || !additionalRecipients.empty();
 }
 
 QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool detailed,
     const QString& additionalList)
 {
-    auto module = appContext()->currentSystemContext();
+    auto context = appContext()->currentSystemContext();
 
     QnUserResourceList users;
-    QList<QnUuid> roles;
-    module->userRolesManager()->usersAndRoles(ids, users, roles);
+    UserGroupDataList groups;
+    nx::vms::common::getUsersAndGroups(context, ids, users, groups);
     users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
 
     auto additional = parseAdditional(additionalList);
 
-    if (users.empty() && roles.empty() && additional.isEmpty())
+    if (users.empty() && groups.empty() && additional.isEmpty())
         return nx::vms::event::StringsHelper::needToSelectUserText();
 
     if (!detailed)
     {
         QStringList recipients;
-        if (!users.empty() || !roles.empty())
+        if (!users.empty() || !groups.empty())
         {
-            recipients << nx::vms::event::StringsHelper(module)
-                .actionSubjects(users, roles, true);
+            recipients << nx::vms::event::StringsHelper(context)
+                .actionSubjects(users, groups, true);
         }
 
         if (!additional.empty())
@@ -407,11 +408,15 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     }
 
     int total = users.size();
+    QSet<QnUuid> groupIds;
 
-    for (const auto& roleId: roles)
-        receivers << module->userRolesManager()->userRoleName(roleId);
+    for (const auto& group: groups)
+    {
+        groupIds.insert(group.id);
+        receivers.push_back(group.name);
+    }
 
-    for (const auto& user: module->accessSubjectHierarchy()->usersInGroups(nx::utils::toQSet(roles)))
+    for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(groupIds))
     {
         if (!user || !user->isEnabled())
             continue;
@@ -498,11 +503,13 @@ bool actionAllowedForUser(const nx::vms::event::AbstractActionPtr& action,
     if (std::find(subjects.cbegin(), subjects.cend(), userId) != subjects.cend())
         return true;
 
-    for (const auto& roleId: user->allUserRoleIds())
+    const auto userGroups = nx::vms::common::userGroupsWithParents(user);
+    for (const auto& groupId: userGroups)
     {
-        if (std::find(subjects.cbegin(), subjects.cend(), roleId) != subjects.cend())
+        if (std::find(subjects.cbegin(), subjects.cend(), groupId) != subjects.cend())
             return true;
     }
+
     return false;
 }
 
@@ -536,14 +543,14 @@ void QnSubjectValidationPolicy::analyze(
     invalidUsers.clear();
 
     QnUserResourceList users;
-    QList<QnUuid> roleIds;
+    QList<QnUuid> groupIds;
 
     if (allUsers)
         users = resourcePool()->getResources<QnUserResource>();
     else
-        userRolesManager()->usersAndRoles(subjects, users, roleIds);
+        nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
 
-    for (const auto& id: roleIds)
+    for (const auto& id: groupIds)
     {
         switch (roleValidity(id))
         {
@@ -578,12 +585,12 @@ QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
         return QValidator::Invalid;
 
     QnUserResourceList users;
-    QList<QnUuid> roleIds;
+    QList<QnUuid> groupIds;
 
     if (allUsers)
         users = resourcePool()->getResources<QnUserResource>();
     else
-        userRolesManager()->usersAndRoles(subjects, users, roleIds);
+        nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
 
     enum StateFlag
     {
@@ -594,7 +601,7 @@ QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
 
     int state = 0;
 
-    for (const auto& id: roleIds)
+    for (const auto& id: groupIds)
     {
         switch (roleValidity(id))
         {
@@ -711,12 +718,14 @@ void QnRequiredPermissionSubjectPolicy::setCameras(
 
 bool QnRequiredPermissionSubjectPolicy::isRoleValid(const QnUuid& roleId) const
 {
-    const auto customRole = userRolesManager()->userRole(roleId);
+    const auto group = userGroupManager()->find(roleId);
+    if (!group)
+        return false;
 
     const auto cameraHasPermission =
-        [this, &customRole](auto camera)
+        [this, groupId = *group](auto camera)
         {
-            return resourceAccessManager()->hasPermission(customRole, camera, m_requiredPermission);
+            return resourceAccessManager()->hasPermission(groupId, camera, m_requiredPermission);
         };
 
     if (m_cameras.isEmpty())
@@ -755,9 +764,12 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
     {
         if (invalidRoles.size() == 1)
         {
+            const auto group = userGroupManager()->find(invalidRoles.front()).value_or(
+                UserGroupData{});
+
             alert = tr("Role %1 has no %2 permission",
                 "%1 is the name of selected role, %2 is permission name")
-                .arg(html::bold(userRolesManager()->userRoleName(invalidRoles.front())))
+                .arg(html::bold(group.name))
                 .arg(m_permissionName);
         }
         else if (validRoles.empty())
@@ -804,29 +816,24 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
 //-------------------------------------------------------------------------------------------------
 // QnLayoutAccessValidationPolicy
 
-QnLayoutAccessValidationPolicy::QnLayoutAccessValidationPolicy(SystemContext* systemContext):
-    m_accessManager(systemContext->resourceAccessManager()),
-    m_rolesManager(systemContext->userRolesManager())
-{
-}
-
 QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const QnUuid& roleId) const
 {
+    const auto group = userGroupManager()->find(roleId);
+    if (!group)
+        return QValidator::Invalid;
+
     if (m_layout)
     {
         // Admins have access to all layouts.
-        if (QnPredefinedUserRoles::adminIds().contains(roleId))
+        if (nx::vms::api::kAdminGroupIds.contains(roleId))
             return QValidator::Acceptable;
 
         // For other users access permissions depend on the layout kind.
         if (m_layout->isShared())
         {
             // Shared layout. Ask AccessManager for details.
-            if (m_accessManager->hasPermission(
-                m_rolesManager->userRole(roleId), m_layout, Qn::ReadPermission))
-            {
+            if (resourceAccessManager()->hasPermission(*group, m_layout, Qn::ReadPermission))
                 return QValidator::Acceptable;
-            }
 
             const auto groupUsers = accessSubjectHierarchy()->usersInGroups({roleId});
             if (std::any_of(groupUsers.cbegin(), groupUsers.cend(),
@@ -851,7 +858,7 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const QnUuid& rol
 bool QnLayoutAccessValidationPolicy::userValidity(const QnUserResourcePtr& user) const
 {
     return m_layout
-        ? m_accessManager->hasPermission(user, m_layout, Qn::ReadPermission)
+        ? resourceAccessManager()->hasPermission(user, m_layout, Qn::ReadPermission)
         : true;
 }
 
@@ -894,10 +901,11 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
         [this](const QSet<QnUuid>& subjects) -> QnUserResourceList
         {
             QnUserResourceList users;
-            QnUuidList roles;
-            userRolesManager()->usersAndRoles(subjects, users, roles);
+            QnUuidList groupIds;
+            nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
 
-            for (const auto& user: accessSubjectHierarchy()->usersInGroups(nx::utils::toQSet(roles)))
+            for (const auto& user: accessSubjectHierarchy()->usersInGroups(
+                nx::utils::toQSet(groupIds)))
             {
                 if (std::find_if(users.begin(), users.end(),
                     [user](const QnUserResourcePtr& existing)

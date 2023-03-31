@@ -6,12 +6,12 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -145,29 +145,30 @@ void UserGroupRequestChain::requestSaveGroup(const UserGroupRequest::AddOrUpdate
             if (auto userGroup = std::get_if<nx::vms::api::UserGroupModel>(&errorOrData);
                 userGroup && success)
             {
-                auto existingGroup =
-                    systemContext()->userRolesManager()->userRole(data.groupData.id);
+                auto group =
+                    systemContext()->userGroupManager()->find(
+                        data.groupData.id).value_or(api::UserGroupData{});
 
-                if (existingGroup.id.isNull())
+                if (group.id.isNull())
                 {
-                    existingGroup.id = userGroup->id;
-                    existingGroup.name = data.groupData.name;
-                    existingGroup.description = data.groupData.description;
-                    existingGroup.parentGroupIds = data.groupData.parentGroupIds;
-                    existingGroup.permissions = data.groupData.permissions;
+                    group.id = userGroup->id;
+                    group.name = data.groupData.name;
+                    group.description = data.groupData.description;
+                    group.parentGroupIds = data.groupData.parentGroupIds;
+                    group.permissions = data.groupData.permissions;
                 }
                 else
                 {
-                    if (existingGroup.parentGroupIds != data.originalParents)
+                    if (group.parentGroupIds != data.originalParents)
                     {
                         requestComplete(success);
                         return; //< Already updated.
                     }
 
-                    existingGroup.parentGroupIds = data.originalParents;
+                    group.parentGroupIds = data.originalParents;
                 }
 
-                userRolesManager()->addOrUpdateUserRole(existingGroup);
+                userGroupManager()->addOrUpdate(group);
                 if (userGroup->resourceAccessRights)
                 {
                     updateResourceAccessRights(
@@ -204,9 +205,8 @@ void UserGroupRequestChain::requestRemoveGroup(const UserGroupRequest::RemoveGro
 
             if (success)
             {
-                const auto userGroup = systemContext()->userRolesManager()->userRole(id);
-                if (!userGroup.id.isNull()) //< Remove if not already removed.
-                    userRolesManager()->removeUserRole(id);
+                // Remove if not already removed.
+                userGroupManager()->remove(id);
             }
             else if (auto error = std::get_if<nx::network::rest::Result>(&result))
             {
@@ -301,19 +301,19 @@ void UserGroupRequestChain::updateResourceAccessRights(
 
 nx::vms::api::UserGroupModel UserGroupRequestChain::fromGroupId(const QnUuid& groupId)
 {
-    const auto userGroup = systemContext()->userRolesManager()->userRole(groupId);
-    if (userGroup.id.isNull())
+    const auto userGroup = systemContext()->userGroupManager()->find(groupId);
+    if (!userGroup)
         return {};
 
     nx::vms::api::UserGroupModel groupData;
 
     // Fill in all non-optional fields.
-    groupData.id = userGroup.id;
-    groupData.name = userGroup.name;
-    groupData.description = userGroup.description;
-    groupData.type = userGroup.type;
-    groupData.permissions = userGroup.permissions;
-    groupData.parentGroupIds = userGroup.parentGroupIds;
+    groupData.id = userGroup->id;
+    groupData.name = userGroup->name;
+    groupData.description = userGroup->description;
+    groupData.type = userGroup->type;
+    groupData.permissions = userGroup->permissions;
+    groupData.parentGroupIds = userGroup->parentGroupIds;
     return groupData;
 }
 
@@ -336,7 +336,7 @@ nx::vms::api::UserModelV3 UserGroupRequestChain::fromUserId(const QnUuid& userId
     userData.isHttpDigestEnabled =
         user->getDigest() != nx::vms::api::UserData::kHttpIsDisabledStub;
 
-    userData.groupIds = user->userRoleIds();
+    userData.groupIds = user->groupIds();
 
     return userData;
 }
@@ -346,15 +346,15 @@ void UserGroupRequestChain::applyGroup(
     const std::vector<QnUuid>& prev,
     const std::vector<QnUuid>& next)
 {
-    auto userGroup = systemContext()->userRolesManager()->userRole(groupId);
-    if (userGroup.id.isNull())
+    auto userGroup = systemContext()->userGroupManager()->find(groupId);
+    if (!userGroup)
         return;
 
-    if (userGroup.parentGroupIds != prev)
+    if (userGroup->parentGroupIds != prev)
         return; //< Already updated.
 
-    userGroup.parentGroupIds = next;
-    systemContext()->userRolesManager()->addOrUpdateUserRole(userGroup);
+    userGroup->parentGroupIds = next;
+    systemContext()->userGroupManager()->addOrUpdate(*userGroup);
 }
 
 void UserGroupRequestChain::applyUser(
@@ -366,10 +366,10 @@ void UserGroupRequestChain::applyUser(
     if (!user)
         return;
 
-    if (user->userRoleIds() != prev)
+    if (user->groupIds() != prev)
         return;
 
-    user->setUserRoleIds(next);
+    user->setGroupIds(next);
 }
 
 void UserGroupRequestChain::applyUser(

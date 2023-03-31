@@ -107,8 +107,8 @@ public:
 
     bool canCreateStorage(const QnUuid& serverId) const;
     bool canCreateLayout(const nx::vms::api::LayoutData& layoutData) const;
-    bool canCreateUser(GlobalPermissions targetPermissions, const std::vector<QnUuid>& targetGroups,
-        bool isOwner) const;
+    bool canCreateUser(
+        GlobalPermissions targetPermissions, const std::vector<QnUuid>& targetGroups) const;
     bool canCreateVideoWall() const;
     bool canCreateWebPage() const;
 

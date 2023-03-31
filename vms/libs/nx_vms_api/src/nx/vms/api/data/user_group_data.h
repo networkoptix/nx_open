@@ -2,11 +2,13 @@
 
 #pragma once
 
+#include <set>
+
 #include <QtCore/QString>
 
-#include "user_data.h"
-
 #include <nx/vms/api/types/access_rights_types.h>
+
+#include "user_data.h"
 
 namespace nx::vms::api {
 
@@ -14,7 +16,7 @@ namespace nx::vms::api {
  * %param[readonly] id Internal user role identifier. This identifier can be used as {id} path
  *     parameter in requests related to a user role.
  */
-struct NX_VMS_API UserRoleData: IdData
+struct NX_VMS_API UserGroupData: IdData
 {
     /**%apidoc Name of the user role. */
     QString name;
@@ -37,22 +39,19 @@ struct NX_VMS_API UserRoleData: IdData
     /**%apidoc[readonly] External identification data (currently used for LDAP only). */
     UserExternalId externalId;
 
-    UserRoleData() = default;
-    UserRoleData(
+    UserGroupData() = default;
+    UserGroupData(
         const QnUuid& id, const QString& name,
         GlobalPermissions permissions = {}, std::vector<QnUuid> parentGroupIds = {});
 
-    static UserRoleData makePredefined(
+    static UserGroupData makePredefined(
         const QnUuid& id,
         const QString& name,
         const QString& description,
         GlobalPermissions permissions);
 
-    bool operator==(const UserRoleData& other) const = default;
+    bool operator==(const UserGroupData& other) const = default;
     QString toString() const;
-
-    // Predefined id for LDAP Default user role in VMS DB.
-    static const QnUuid kLdapDefaultId;
 };
 #define UserRoleData_Fields \
     IdData_Fields \
@@ -63,7 +62,19 @@ struct NX_VMS_API UserRoleData: IdData
     (parentGroupIds) \
     (isPredefined) \
     (externalId)
-NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserRoleData)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserGroupData)
+
+NX_VMS_API extern const QnUuid kOwnersGroupId;
+NX_VMS_API extern const QnUuid kAdministratorsGroupId;
+NX_VMS_API extern const QnUuid kAdvancedViewersGroupId;
+NX_VMS_API extern const QnUuid kViewersGroupId;
+NX_VMS_API extern const QnUuid kLiveViewersGroupId;
+
+NX_VMS_API extern const std::set<QnUuid> kPredefinedGroupIds;
+NX_VMS_API extern const std::set<QnUuid> kAdminGroupIds;
+
+// Predefined id for LDAP Default user group in VMS DB.
+NX_VMS_API extern const QnUuid kDefaultLdapGroupId;
 
 } // namespace nx::vms::api
 

@@ -40,6 +40,7 @@ class AbstractCertificateVerifier;
 class DeviceLicenseUsageWatcher;
 class VideoWallLicenseUsageWatcher;
 class SystemSettings;
+class UserGroupManager;
 
 /**
  * Storage for the application Resource Context classes. One Resource Context corresponds to one
@@ -208,9 +209,9 @@ public:
     SystemSettings* globalSettings() const;
 
     /**
-     * List of all User Roles.
+     * List of all User Groups.
      */
-    QnUserRolesManager* userRolesManager() const;
+    UserGroupManager* userGroupManager() const;
 
     /**
      * Manages which Resources are directly shared with Users or Roles.

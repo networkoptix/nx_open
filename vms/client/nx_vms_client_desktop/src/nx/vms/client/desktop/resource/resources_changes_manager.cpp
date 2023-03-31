@@ -19,7 +19,6 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/data/server_model.h>
@@ -35,6 +34,7 @@
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
@@ -46,6 +46,8 @@
 #include <nx_ec/managers/abstract_webpage_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
+
+using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
 

@@ -8,62 +8,39 @@
 #include <ui/models/user_roles_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnUserRolesModel;
+#include "../user_roles_model.h"
 
-struct RoleDescription
-{
-    RoleDescription() {}
-
-    explicit RoleDescription(const Qn::UserRole roleType);
-    explicit RoleDescription(const nx::vms::api::UserRoleData& userRole);
-
-    Qn::UserRole roleType;
-    QString name;
-    QString description;
-    GlobalPermissions permissions;
-    QnUuid roleUuid;
-};
-
-class QnUserRolesModelPrivate: public QObject, public QnWorkbenchContextAware
+class QnUserRolesModel::Private: public QObject, public QnWorkbenchContextAware
 {
     using base_type = QObject;
-
-    using UserRoleData = nx::vms::api::UserRoleData;
-    using UserRoleDataList = nx::vms::api::UserRoleDataList;
+    QnUserRolesModel* const q;
 
 public:
-    QnUserRolesModelPrivate(QnUserRolesModel* parent, QnUserRolesModel::DisplayRoleFlags flags);
+    explicit Private(QnUserRolesModel* q, QnUserRolesModel::DisplayRoleFlags flags);
 
-    int rowForUser(const QnUserResourcePtr& user) const;
-    int rowForRole(Qn::UserRole role) const;
+    void setUserRoles(nx::vms::api::UserGroupDataList value);
 
-    void setUserRoles(UserRoleDataList value);
-
-    RoleDescription roleByRow(int row) const;
+    nx::vms::api::UserGroupData roleByRow(int row) const;
     int count() const;
 
-    QnUuid id(int row, bool predefinedRoleIdsEnabled) const;
+    QnUuid id(int row) const;
 
     void setCustomRoleStrings(const QString& name, const QString& description);
 
 private:
-    bool updateUserRole(const nx::vms::api::UserRoleData& userRole);
-    bool removeUserRole(const nx::vms::api::UserRoleData& userRole);
+    bool updateUserRole(const nx::vms::api::UserGroupData& userRole);
+    bool removeUserRole(const nx::vms::api::UserGroupData& userRole);
     bool removeUserRoleById(const QnUuid& roleId);
 
-private:
-    QnUserRolesModel* q_ptr;
-    Q_DECLARE_PUBLIC(QnUserRolesModel)
+public:
+    bool hasCheckBoxes = false;
+    QSet<QPersistentModelIndex> checked;
 
-    QList<Qn::UserRole> m_standardRoles;
-    nx::vms::api::UserRoleDataList m_userRoles;
+private:
+    nx::vms::api::UserGroupDataList m_userRoles;
     const bool m_customRoleEnabled;
     const bool m_onlyAssignable;
 
     QString m_customRoleName;
     QString m_customRoleDescription;
-
-    bool m_hasCheckBoxes = false;
-    bool m_predefinedRoleIdsEnabled = false;
-    QSet<QPersistentModelIndex> m_checked;
 };

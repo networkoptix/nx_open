@@ -191,7 +191,7 @@ TreeView
         onSaveExpandedState:
         {
             // Convert selectedIndexes to QVariantList to avoid huge performance loss.
-            const expandedIndexes = NxGlobals.toVariantList(resourceTree.expandedState())
+            const expandedIndexes = NxGlobals.toQVariantList(resourceTree.expandedState())
             stateStorage = acquireExpandedState(expandedIndexes, stateStorage)
         }
 

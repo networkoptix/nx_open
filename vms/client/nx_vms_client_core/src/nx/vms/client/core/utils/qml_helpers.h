@@ -7,17 +7,9 @@
 #include <QtCore/QVariantList>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/qt_helpers.h>
 
 namespace nx::vms::client::core {
-
-template<typename T>
-QList<T> toTypedList(const QVariantList& source)
-{
-    QList<T> result;
-    for (const QVariant& item: source)
-        result << item.value<T>();
-    return result;
-}
 
 template<typename ResultType, typename... ArgTypes>
 ResultType invokeQmlMethod(QObject* object, const char* methodName, ArgTypes... args)

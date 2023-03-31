@@ -4,6 +4,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/data/user_group_data.h>
 
 #include "permission_converter.h"
 
@@ -73,14 +74,12 @@ UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
     if (externalId)
         user.externalId = std::move(*externalId);
     if (isOwner)
-        user.groupIds.push_back(UserData::kOwnerGroupId);
+        user.groupIds.push_back(kOwnersGroupId);
     if (!userRoleId.isNull())
         user.groupIds.push_back(std::move(userRoleId));
 
     auto accessRights =
         PermissionConverter::accessRights(&user.permissions, user.id, accessibleResources);
-    if (!user.isOwner() && !user.groupIds.empty() && accessibleResources)
-        accessRights.checkResourceExists = CheckResourceExists::customRole;
     return {std::move(user), std::move(accessRights)};
 }
 
@@ -101,9 +100,8 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
             model.externalId = std::move(baseData.externalId);
         for (const auto& id: baseData.groupIds)
         {
-            // TODO: Replace when QnPredefinedUserRoles is moved into nx::vms::api.
-            // if (QnPredefinedUserRoles::enumValue(id) == Qn::UserRole::customUserRole)
-            if (!id.toSimpleString().startsWith("00000000-0000-0000-0000-1000"))
+            // TODO: #vkutin Convert predefined groups to target global permissions.
+            if (!kPredefinedGroupIds.contains(id))
             {
                 model.userRoleId = id;
                 break;

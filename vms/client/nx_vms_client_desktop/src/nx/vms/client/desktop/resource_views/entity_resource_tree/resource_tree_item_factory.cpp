@@ -9,10 +9,8 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <finders/systems_finder.h>
 #include <network/base_system_description.h>
-#include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -98,29 +96,6 @@ InvalidatorPtr recorderNameInvalidator(
         [groupId, invalidator = result.get()](const QString& changedGroupId)
         {
             if (groupId == changedGroupId)
-                invalidator->invalidate();
-        }));
-
-    return result;
-}
-
-//-------------------------------------------------------------------------------------------------
-// Provider and invalidator pair factory functions for an user role group name generic item.
-//-------------------------------------------------------------------------------------------------
-GenericItem::DataProvider userRoleNameProvider(QnUserRolesManager* rolesManager, const QnUuid& id)
-{
-    return [rolesManager, id]() { return rolesManager->userRoleName(id); };
-}
-
-InvalidatorPtr userRoleNameInvalidator(QnUserRolesManager* rolesManager, const QnUuid& roleId)
-{
-    auto result = std::make_shared<Invalidator>();
-
-    result->connections()->add(rolesManager->connect(
-        rolesManager, &QnUserRolesManager::userRoleAddedOrUpdated,
-        [roleId, invalidator = result.get()](const nx::vms::api::UserRoleData& userRole)
-        {
-            if (roleId == userRole.id)
                 invalidator->invalidate();
         }));
 
@@ -603,20 +578,6 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::OtherSystems_Help))
         .withRole(Qn::ExtraInfoRole, extraInfoProvider, extraInfoInvalidator)
         .withFlags(cloudSystemFlagsProvider(systemId));
-}
-
-AbstractItemPtr ResourceTreeItemFactory::createUserRoleItem(const QnUuid& roleUuid)
-{
-    const auto userRolesManager = systemContext()->userRolesManager();
-    const auto nameProvider = userRoleNameProvider(userRolesManager, roleUuid);
-    const auto nameInvalidator = userRoleNameInvalidator(userRolesManager, roleUuid);
-
-    return GenericItemBuilder()
-        .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
-        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Users))
-        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::role))
-        .withRole(Qn::UuidRole, QVariant::fromValue(roleUuid))
-        .withFlags({Qt::ItemIsEnabled, Qt::ItemIsSelectable, Qt::ItemIsDropEnabled});
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createShowreelItem(const QnUuid& showreelId)

@@ -8,7 +8,8 @@
 #include "abstract_global_permissions_watcher.h"
 
 class QnResourcePool;
-class QnUserRolesManager;
+
+namespace nx::vms::common { class UserGroupManager; }
 
 namespace nx::core::access {
 
@@ -25,7 +26,7 @@ class NX_VMS_COMMON_API GlobalPermissionsWatcher:
 public:
     explicit GlobalPermissionsWatcher(
         QnResourcePool* resourcePool,
-        QnUserRolesManager* userGroupManager,
+        nx::vms::common::UserGroupManager* userGroupManager,
         QObject* parent = nullptr);
 
     virtual ~GlobalPermissionsWatcher() override;

@@ -11,7 +11,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/utils/math/math.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>

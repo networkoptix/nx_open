@@ -18,7 +18,6 @@
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/branding.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
@@ -338,7 +337,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.parentGroupsEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
 
     // List of groups.
-    for (const QnUuid& groupId: user->userRoleIds())
+    for (const QnUuid& groupId: user->groupIds())
         state.parentGroups.insert(MembersModelGroup::fromId(systemContext(), groupId));
 
     state.sharedResources = systemContext()->accessRightsManager()->ownResourceAccessMap(
@@ -459,7 +458,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                     user->setFullName(state.fullName);
                     user->setRawPermissions(state.globalPermissions);
                     user->setEnabled(state.userEnabled);
-                    user->setUserRoleIds(data->groupIds);
+                    user->setGroupIds(data->groupIds);
                     if (data->resourceAccessRights)
                     {
                         UserGroupRequestChain::updateResourceAccessRights(

@@ -9,7 +9,8 @@
 #include "subject_hierarchy.h"
 
 class QnResourcePool;
-class QnUserRolesManager;
+
+namespace nx::vms::common { class UserGroupManager; }
 
 namespace nx::core::access {
 
@@ -23,7 +24,7 @@ class NX_VMS_COMMON_API ResourceAccessSubjectHierarchy: public SubjectHierarchy
 public:
     explicit ResourceAccessSubjectHierarchy(
         QnResourcePool* resourcePool,
-        QnUserRolesManager* userGroupsManager,
+        nx::vms::common::UserGroupManager* userGroupManager,
         QObject* parent = nullptr);
 
     virtual ~ResourceAccessSubjectHierarchy() override;

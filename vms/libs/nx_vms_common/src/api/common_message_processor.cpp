@@ -23,7 +23,6 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/status_dictionary.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <licensing/license.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/socket_common.h>
@@ -38,6 +37,7 @@
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/time/abstract_time_sync_manager.h>
@@ -306,13 +306,13 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         userManager.get(),
         &ec2::AbstractUserNotificationManager::userRoleAddedOrUpdated,
         this,
-        &QnCommonMessageProcessor::on_userRoleChanged,
+        &QnCommonMessageProcessor::on_userGroupChanged,
         connectionType);
     connect(
         userManager.get(),
         &ec2::AbstractUserNotificationManager::userRoleRemoved,
         this,
-        &QnCommonMessageProcessor::on_userRoleRemoved,
+        &QnCommonMessageProcessor::on_userGroupRemoved,
         connectionType);
 
     const auto layoutManager = connection->layoutNotificationManager();
@@ -702,19 +702,23 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const AccessRightsData& ac
         {accessRights.resourceRights.begin(), accessRights.resourceRights.end()});
 }
 
-void QnCommonMessageProcessor::on_userRoleChanged(const UserRoleData& userRole)
+void QnCommonMessageProcessor::on_userGroupChanged(const UserGroupData& userGroup)
 {
-    m_context->userRolesManager()->addOrUpdateUserRole(userRole);
+    m_context->userGroupManager()->addOrUpdate(userGroup);
 }
 
-void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
+void QnCommonMessageProcessor::on_userGroupRemoved(const QnUuid& userGroupId)
 {
-    m_context->userRolesManager()->removeUserRole(userRoleId);
+    m_context->userGroupManager()->remove(userGroupId);
+
     for (const auto& user: resourcePool()->getResources<QnUserResource>())
     {
-        auto roles = user->userRoleIds();
-        if (nx::utils::erase_if(roles, [&userRoleId](const auto& id) { return id == userRoleId; }))
-            user->setUserRoleIds(roles);
+        const auto isGroupRemoved =
+            [&userGroupId](const auto& id) { return id == userGroupId; };
+
+        auto groupIds = user->groupIds();
+        if (nx::utils::erase_if(groupIds, isGroupRemoved))
+            user->setGroupIds(groupIds);
     }
 }
 
@@ -885,9 +889,9 @@ void QnCommonMessageProcessor::resetAccessRights(const AccessRightsDataList& acc
     m_context->accessRightsManager()->resetAccessRights(accessMaps);
 }
 
-void QnCommonMessageProcessor::resetUserRoles(const UserRoleDataList& roles)
+void QnCommonMessageProcessor::resetUserGroups(const UserGroupDataList& userGroups)
 {
-    m_context->userRolesManager()->resetUserRoles(roles);
+    m_context->userGroupManager()->resetAll(userGroups);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &, ec2::NotificationSource source)
@@ -1011,7 +1015,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
     resetAccessRights(fullData.accessRights);
-    resetUserRoles(fullData.userGroups);
+    resetUserGroups(fullData.userGroups);
     resetLicenses(fullData.licenses);
     m_context->showreelManager()->resetShowreels(fullData.showreels);
 

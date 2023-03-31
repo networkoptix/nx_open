@@ -5,9 +5,8 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
-
 #include <nx/reflect/string_conversion.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/event/action_factory.h>
 
 namespace nx {
@@ -16,7 +15,7 @@ namespace event {
 
 namespace {
 
-static const QList<QnUuid> kOwnerRoleIds{QnPredefinedUserRoles::id(Qn::UserRole::owner)};
+static const QList<QnUuid> kOwnerRoleIds{api::kOwnersGroupId};
 
 } // namespace
 

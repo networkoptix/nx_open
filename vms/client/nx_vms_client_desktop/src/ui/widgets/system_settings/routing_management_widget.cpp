@@ -20,7 +20,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <utils/common/event_processors.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 

@@ -6,17 +6,17 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/audio/audiodevice.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/rules/actions/enter_fullscreen_action.h>
 #include <nx/vms/rules/actions/exit_fullscreen_action.h>
 #include <nx/vms/rules/actions/open_layout_action.h>
@@ -57,8 +57,8 @@ bool checkUserPermissions(const QnUserResourcePtr& user, const ActionPtr& action
     if (userSelection.all || userSelection.ids.contains(user->getId()))
         return true;
 
-    const auto userRoles = nx::utils::toQSet(user->allUserRoleIds());
-    return userRoles.intersects(userSelection.ids);
+    const auto userGroups = nx::vms::common::userGroupsWithParents(user);
+    return userGroups.intersects(userSelection.ids);
 }
 
 } // namespace

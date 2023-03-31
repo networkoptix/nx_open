@@ -15,7 +15,7 @@
 #include <finders/systems_finder.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>

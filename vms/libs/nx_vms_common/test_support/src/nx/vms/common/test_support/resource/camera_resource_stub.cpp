@@ -7,7 +7,7 @@
 #include <core/resource/camera_media_stream_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/crypt/symmetrical.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 
 namespace nx {
 

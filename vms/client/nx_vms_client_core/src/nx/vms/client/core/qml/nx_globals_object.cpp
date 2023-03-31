@@ -9,6 +9,7 @@
 #include <QtQuick/private/qquickflickable_p.h>
 #include <QtQuick/private/qquickitem_p.h>
 
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/common/html/html.h>
 
 namespace nx::vms::client::core {
@@ -100,12 +101,9 @@ Q_INVOKABLE Qt::ItemFlags NxGlobalsObject::itemFlags(const QModelIndex& index) c
         : Qt::ItemFlags{};
 }
 
-QVariantList NxGlobalsObject::toVariantList(const QModelIndexList& indexList) const
+QVariantList NxGlobalsObject::toQVariantList(const QModelIndexList& indexList) const
 {
-    QVariantList result;
-    result.reserve(indexList.size());
-    std::copy(indexList.cbegin(), indexList.cend(), std::back_inserter(result));
-    return result;
+    return nx::utils::toQVariantList(indexList);
 }
 
 nx::utils::SoftwareVersion NxGlobalsObject::softwareVersion(const QString& version) const

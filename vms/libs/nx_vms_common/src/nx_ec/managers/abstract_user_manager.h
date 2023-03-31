@@ -6,7 +6,7 @@
 #include <nx/utils/async_handler_executor.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/user_data_ex.h>
-#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 
 #include <QtCore/QObject>
 
@@ -24,7 +24,7 @@ signals:
      * will fail to pick correct metadata when you try to emit queued signal
      */
     void addedOrUpdated(const nx::vms::api::UserData& user, ec2::NotificationSource source);
-    void userRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole);
+    void userRoleAddedOrUpdated(const nx::vms::api::UserGroupData& userRole);
     void removed(const QnUuid& id, ec2::NotificationSource source);
     void userRoleRemoved(const QnUuid& id);
     void accessRightsChanged(const nx::vms::api::AccessRightsData& access);
@@ -66,17 +66,17 @@ public:
     ErrorCode removeSync(const QnUuid& id);
 
     virtual int getUserRoles(
-        Handler<nx::vms::api::UserRoleDataList> handler,
+        Handler<nx::vms::api::UserGroupDataList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode getUserRolesSync(nx::vms::api::UserRoleDataList* outDataList);
+    ErrorCode getUserRolesSync(nx::vms::api::UserGroupDataList* outDataList);
 
     virtual int saveUserRole(
-        const nx::vms::api::UserRoleData& data,
+        const nx::vms::api::UserGroupData& data,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode saveUserRoleSync(const nx::vms::api::UserRoleData& data);
+    ErrorCode saveUserRoleSync(const nx::vms::api::UserGroupData& data);
 
     virtual int removeUserRole(
         const QnUuid& id,

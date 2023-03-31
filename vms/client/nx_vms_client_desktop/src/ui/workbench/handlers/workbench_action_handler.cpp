@@ -61,7 +61,7 @@
 #include <nx/utils/math/math.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/platform/process.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>

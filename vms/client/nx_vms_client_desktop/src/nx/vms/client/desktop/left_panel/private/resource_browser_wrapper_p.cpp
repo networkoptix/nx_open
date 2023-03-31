@@ -455,7 +455,7 @@ void ResourceBrowserWrapper::acquireClientState()
     if (!NX_ASSERT(!tree.model()->isFiltering()))
         return;
 
-    const auto expandedIndexes = toTypedList<QModelIndex>(
+    const auto expandedIndexes = nx::utils::toTypedQList<QModelIndex>(
         invokeQmlMethod<QVariantList>(tree(), "expandedState"));
 
     expandedNodeIds.clear();

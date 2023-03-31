@@ -7,10 +7,12 @@
 #include <business/business_resource_validation.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
+
+using namespace nx::vms::api;
 
 namespace nx::vms::client::desktop::rules {
 
@@ -24,7 +26,7 @@ UserPickerHelper::UserPickerHelper(
     SystemContextAware{context},
     m_acceptAll{acceptAll}
 {
-    userRolesManager()->usersAndRoles(ids, m_users, m_roles);
+    nx::vms::common::getUsersAndGroups(context, ids, m_users, m_groups);
     const auto validity = policy->validity(acceptAll, ids);
     m_isValid = validity == QValidator::Acceptable
         || (validity == QValidator::Intermediate && isIntermediateStateValid);
@@ -35,35 +37,37 @@ QString UserPickerHelper::text() const
     if (m_acceptAll)
         return tr("All Users");
 
-    if (m_users.empty() && m_roles.empty())
+    if (m_users.empty() && m_groups.empty())
         return tr("Select at least one user");
 
-    if (m_users.size() == 1 && m_roles.empty())
+    if (m_users.size() == 1 && m_groups.empty())
         return m_users.front()->getName();
 
-    if (m_users.empty() && m_roles.size() == 1)
+    if (m_users.empty() && m_groups.size() == 1)
     {
         return QString("%1 %2 %3")
-            .arg(tr("Role"))
+            .arg(tr("Group"))
             .arg(QChar(0x2013)) //< En-dash.
-            .arg(systemContext()->userRolesManager()->userRoleName(m_roles.front()));
+            .arg(m_groups.front().name);
     }
 
-    if (m_roles.empty())
+    if (m_groups.empty())
         return tr("%n Users", "", m_users.size());
 
     if (!m_users.empty())
     {
         return QString("%1, %2")
-            .arg(tr("%n Roles", "", m_roles.size()))
+            .arg(tr("%n Groups", "", m_groups.size()))
             .arg(tr("%n Users", "", m_users.size()));
     }
 
-    static const auto kAdminRoles = nx::utils::toQSet(QnPredefinedUserRoles::adminIds());
-    if (nx::utils::toQSet(m_roles) == kAdminRoles)
+    if (m_groups.size() == kAdminGroupIds.size() && std::all_of(m_groups.cbegin(), m_groups.cend(),
+        [](const api::UserGroupData& group) { return kAdminGroupIds.contains(group.id); }))
+    {
         return tr("All Administrators");
+    }
 
-    return tr("%n Roles", "", m_roles.size());
+    return tr("%n Groups", "", m_groups.size());
 }
 
 QIcon UserPickerHelper::icon() const
@@ -77,10 +81,10 @@ QIcon UserPickerHelper::icon() const
             /*correctDevicePixelRatio*/ false);
     }
 
-    if (m_users.isEmpty() && m_roles.isEmpty())
+    if (m_users.isEmpty() && m_groups.empty())
         return qnSkin->icon("tree/user_alert.svg");
 
-    const bool multiple = m_users.size() > 1 || !m_roles.empty();
+    const bool multiple = m_users.size() > 1 || !m_groups.empty();
     const QIcon icon = qnSkin->icon(multiple
         ? (m_isValid ? "tree/users.svg" : "tree/users_alert.svg")
         : (m_isValid ? "tree/user.svg" : "tree/user_alert.svg"));

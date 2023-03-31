@@ -4,11 +4,11 @@
 
 #include <QtWidgets/QListWidget>
 
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context.h>
@@ -46,11 +46,11 @@ QWidget* createGroupListWidget(QnSessionAwareMessageBox* parent, const QSet<QnUu
     for (const auto& id: groups)
     {
         const auto groupData =
-            parent->context()->systemContext()->userRolesManager()->userRole(id);
-        if (groupData.id.isNull())
+            parent->context()->systemContext()->userGroupManager()->find(id);
+        if (!groupData)
             continue;
 
-        auto item = new QListWidgetItem(groupData.name, groupList);
+        auto item = new QListWidgetItem(groupData->name, groupList);
         item->setFlags({Qt::ItemIsEnabled});
         item->setIcon(customIcon);
     }

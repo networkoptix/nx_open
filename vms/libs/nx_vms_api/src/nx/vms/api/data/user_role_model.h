@@ -9,7 +9,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 
 #include "access_rights_data.h"
-#include "user_role_data.h"
+#include "user_group_data.h"
 
 namespace nx::vms::api {
 
@@ -37,9 +37,9 @@ struct NX_VMS_API UserRoleModel
     QnUuid getId() const { return id; }
     void setId(QnUuid id_) { id = std::move(id_); }
 
-    using DbReadTypes = std::tuple<UserRoleData, AccessRightsData>;
-    using DbUpdateTypes = std::tuple<UserRoleData, std::optional<AccessRightsData>>;
-    using DbListTypes = std::tuple<UserRoleDataList, AccessRightsDataList>;
+    using DbReadTypes = std::tuple<UserGroupData, AccessRightsData>;
+    using DbUpdateTypes = std::tuple<UserGroupData, std::optional<AccessRightsData>>;
+    using DbListTypes = std::tuple<UserGroupDataList, AccessRightsDataList>;
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserRoleModel> fromDbTypes(DbListTypes data);

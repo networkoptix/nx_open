@@ -18,7 +18,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/math/math.h>
@@ -30,6 +29,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/events/reasoned_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/time/formatter.h>
@@ -297,18 +297,18 @@ QnResourcePtr QnEventLogModel::getResource(
 QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
 {
     QnUserResourceList users;
-    QList<QnUuid> roles;
-    userRolesManager()->usersAndRoles(ids, users, roles);
+    nx::vms::api::UserGroupDataList groups;
+    nx::vms::common::getUsersAndGroups(systemContext(), ids, users, groups);
 
-    const int numDeleted = int(ids.size()) - (users.size() + roles.size());
+    const int numDeleted = int(ids.size()) - (users.size() + groups.size());
     NX_ASSERT(numDeleted >= 0);
     if (numDeleted <= 0)
-        return m_stringsHelper->actionSubjects(users, roles);
+        return m_stringsHelper->actionSubjects(users, groups);
 
     const QString removedSubjectsText = tr("%n Removed subjects", "", numDeleted);
-    return roles.empty() && users.empty()
+    return groups.empty() && users.empty()
         ? removedSubjectsText
-        : m_stringsHelper->actionSubjects(users, roles, false) + lit(", ") + removedSubjectsText;
+        : m_stringsHelper->actionSubjects(users, groups, false) + lit(", ") + removedSubjectsText;
 }
 
 QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const
@@ -316,16 +316,16 @@ QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const
     static const auto kRemovedUserName = '<' + tr("Subject removed") + '>';
 
     QnUserResourceList users;
-    QList<QnUuid> roles;
-    userRolesManager()->usersAndRoles(
-        QVector<QnUuid>{id}, users, roles);
+    nx::vms::api::UserGroupDataList groups;
+    nx::vms::common::getUsersAndGroups(
+        systemContext(), QVector<QnUuid>{id}, users, groups);
 
-    return users.empty() && roles.empty()
+    return users.empty() && groups.empty()
         ? kRemovedUserName
-        : m_stringsHelper->actionSubjects(users, roles, false);
+        : m_stringsHelper->actionSubjects(users, groups, false);
 }
 
-QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& action)
+QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& action) const
 {
     QnUuid resId;
     switch (column)
@@ -355,13 +355,13 @@ QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& 
                   || actionType == ActionType::showOnAlarmLayoutAction)
             {
                 QnUserResourceList users;
-                QList<QnUuid> roles;
-                qnClientCoreModule->commonModule()->userRolesManager()->usersAndRoles(
-                    action.actionParams.additionalResources, users, roles);
+                QList<QnUuid> groups;
+                nx::vms::common::getUsersAndGroups(systemContext(),
+                    action.actionParams.additionalResources, users, groups);
                 const bool multiple = action.actionParams.additionalResources.empty()
                     || action.actionParams.additionalResources.size() > 1
                     || users.size() > 1
-                    || !roles.empty();
+                    || !groups.empty();
                 return qnResIconCache->icon(multiple
                     ? QnResourceIconCache::Users
                     : QnResourceIconCache::User);

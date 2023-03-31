@@ -16,7 +16,7 @@
 #include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/math/math.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>

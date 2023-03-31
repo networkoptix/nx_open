@@ -12,7 +12,6 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/fusion/model_functions.h>
@@ -20,11 +19,12 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/time/formatter.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -33,6 +33,8 @@
 #include "aggregation_info.h"
 #include "events/events.h"
 #include "rule.h"
+
+using namespace nx::vms::api;
 
 namespace {
 
@@ -639,7 +641,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
                 QJson::deserialized<NetworkIssueEvent::MulticastAddressConflictParameters>(
                     reasonParamsEncoded.toUtf8());
 
-            const auto addressLine = (params.stream == nx::vms::api::StreamIndex::primary)
+            const auto addressLine = (params.stream == StreamIndex::primary)
                 ? tr("Address %1 is already in use by %2 on primary stream.",
                     "%1 is the address, %2 is the device name")
                 : tr("Address %1 is already in use by %2 on secondary stream.",
@@ -938,61 +940,63 @@ QString StringsHelper::actionSubjects(const RulePtr& rule, bool showName) const
         return allUsersText();
 
     QnUserResourceList users;
-    QList<QnUuid> roles;
+    UserGroupDataList groups;
 
     if (requiresUserResource(rule->actionType()))
     {
-        m_context->userRolesManager()->usersAndRoles(rule->actionResources(), users, roles);
+        nx::vms::common::getUsersAndGroups(m_context,
+            rule->actionResources(), users, groups);
     }
     else
     {
-        m_context->userRolesManager()->usersAndRoles(
-            rule->actionParams().additionalResources,
-            users,
-            roles);
+        nx::vms::common::getUsersAndGroups(m_context,
+            rule->actionParams().additionalResources, users, groups);
     }
 
     users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
-    return actionSubjects(users, roles, showName);
+    return actionSubjects(users, groups, showName);
 }
 
 QString StringsHelper::actionSubjects(
     const QnUserResourceList& users,
-    const QList<QnUuid>& roles,
+    const UserGroupDataList& groups,
     bool showName) const
 {
-    if (users.empty() && roles.empty())
+    if (users.empty() && groups.empty())
         return needToSelectUserText();
 
     if (showName)
     {
-        if (users.size() == 1 && roles.empty())
+        if (users.size() == 1 && groups.empty())
             return users.front()->getName();
 
-        if (users.empty() && roles.size() == 1)
+        if (users.empty() && groups.size() == 1)
         {
             return lit("%1 %2 %3")
-                .arg(tr("Role"))
+                .arg(tr("Group"))
                 .arg(QChar(L'\x2013')) //< En-dash.
-                .arg(m_context->userRolesManager()->userRoleName(roles.front()));
+                .arg(groups.front().name);
         }
     }
 
-    if (roles.empty())
+    if (groups.empty())
         return tr("%n Users", "", users.size());
 
     if (!users.empty())
     {
         return lit("%1, %2")
-            .arg(tr("%n Roles", "", roles.size()))
+            .arg(tr("%n Groups", "", groups.size()))
             .arg(tr("%n Users", "", users.size()));
     }
 
-    static const auto kAdminRoles = nx::utils::toQSet(QnPredefinedUserRoles::adminIds());
-    if (nx::utils::toQSet(roles) == kAdminRoles)
+    std::set<QnUuid> groupIds;
+    for (const auto& group: groups)
+        groupIds.insert(group.id);
+
+    if (groupIds == kAdminGroupIds)
         return tr("All Administrators");
 
-    return tr("%n Roles", "", roles.size());
+    return tr("%n Groups", "", groups.size());
 }
 
 QString StringsHelper::allUsersText()
