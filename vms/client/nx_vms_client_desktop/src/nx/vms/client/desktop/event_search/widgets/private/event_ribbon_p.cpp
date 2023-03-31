@@ -1508,9 +1508,9 @@ QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
 void EventRibbon::Private::updateHover()
 {
     const bool hoverEnabled = !qApp->activeModalWidget() && !qApp->activePopupWidget();
-    const auto pos = WidgetUtils::mapFromGlobal(q, QCursor::pos());
-    if (q->isVisible() && q->rect().contains(pos) && hoverEnabled)
+    if (q->isVisible() && q->underMouse() && hoverEnabled)
     {
+        const auto pos = WidgetUtils::mapFromGlobal(q, QCursor::pos());
         const int index = indexAtPos(pos);
         if ((index < 0 && !m_tileHovered) || (index >= 0 && m_hoveredIndex.row() == index))
             return;
