@@ -211,13 +211,6 @@ private:
         bool storePassword,
         const nx::utils::SharedGuardPtr& completionTracker = nullptr);
 
-    // After a system is configured, it changes its localId.
-    // Therefore, we need to get current localId value for saving credentials.
-    // If we don't want to connect to a system, we have to do it this way.
-    void storeCredentialsWithoutConnection(
-        const nx::network::SocketAddress& address,
-        const nx::network::http::Credentials& credentials);
-
     bool saveCredentialsAllowed() const;
     bool is2FaEnabledForUser() const;
 

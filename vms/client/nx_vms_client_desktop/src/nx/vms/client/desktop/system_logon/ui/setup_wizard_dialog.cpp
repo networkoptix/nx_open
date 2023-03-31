@@ -110,12 +110,7 @@ void SetupWizardDialog::loadPage()
 
 QString SetupWizardDialog::password() const
 {
-    return d->loginInfo.localPassword;
-}
-
-bool SetupWizardDialog::savePassword() const
-{
-    return d->loginInfo.savePassword;
+    return d->localPassword;
 }
 
 } // namespace nx::vms::client::desktop

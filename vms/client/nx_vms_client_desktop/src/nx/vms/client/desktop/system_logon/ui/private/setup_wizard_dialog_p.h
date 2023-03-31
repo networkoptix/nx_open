@@ -28,7 +28,7 @@ public slots:
     /**
      * Connect to the System using local administrator with the provided password.
      */
-    void connectUsingLocalAdmin(const QString& password, bool savePassword);
+    void connectUsingLocalAdmin(const QString& password, bool /*dummy*/);
 
     /**
      * Close dialog.
@@ -41,14 +41,8 @@ public slots:
     void load(const QUrl& url);
 
 public:
-    struct LoginInfo
-    {
-        QString localPassword;
-        bool savePassword = false;
-    };
-
     nx::vms::client::desktop::WebViewWidget* webViewWidget;
-    LoginInfo loginInfo;
+    QString localPassword;
 };
 
 } // namespace nx::vms::client::desktop

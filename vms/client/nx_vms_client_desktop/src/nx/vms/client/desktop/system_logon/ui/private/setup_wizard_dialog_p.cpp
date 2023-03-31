@@ -51,7 +51,7 @@ void SetupWizardDialogPrivate::cancel()
         webView->disconnect(q);
 
     // Security fix to make sure we will never try to login further.
-    loginInfo = {};
+    localPassword = QString();
 
     q->reject();
 }
@@ -60,23 +60,22 @@ void SetupWizardDialogPrivate::openUrlInBrowser(const QString &urlString)
 {
     QUrl url(urlString);
 
-    NX_INFO(this, lit("External URL requested: %1")
-        .arg(urlString));
+    NX_INFO(this, "External URL requested: %1", urlString);
 
     if (!url.isValid())
     {
-        NX_WARNING(this, lit("External URL is invalid: %1")
-            .arg(urlString));
+        NX_WARNING(this, "External URL is invalid: %1", urlString);
         return;
     }
 
     QDesktopServices::openUrl(url);
 }
 
-void SetupWizardDialogPrivate::connectUsingLocalAdmin(const QString& password, bool savePassword)
+void SetupWizardDialogPrivate::connectUsingLocalAdmin(const QString& password, bool /*dummy*/)
 {
-    loginInfo.localPassword = password;
-    loginInfo.savePassword = savePassword;
+    // Second parameter is kept for compatibilty reasons and should be removed with corresponding
+    // changes in webadmin.
+    localPassword = password;
 }
 
 } // namespace nx::vms::client::desktop
