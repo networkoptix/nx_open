@@ -68,9 +68,6 @@ RulesDialog::RulesDialog(QWidget* parent):
         {
             m_rulesTableModel->removeRule(
                 m_rulesFilterModel->mapToSource(m_ui->tableView->selectionModel()->currentIndex()));
-            m_displayedRule = m_rulesTableModel->rule(m_rulesFilterModel->mapToSource(m_ui->tableView->currentIndex()));
-            updateControlButtons();
-            displayRule();
         });
 
     connect(m_ui->eventTypePicker, &EventTypePickerWidget::eventTypePicked, this,
@@ -200,12 +197,12 @@ void RulesDialog::setupRuleTableView()
     horizontalHeader->moveSection(RulesTableModel::EditedStateColumn,
         RulesTableModel::EnabledStateColumn);
 
-    connect(m_ui->tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
-        [this](const QItemSelection& selected)
+    connect(m_ui->tableView->selectionModel(), &QItemSelectionModel::currentChanged, this,
+        [this](const QModelIndex& current)
         {
-            m_displayedRule = selected.empty()
-                ? std::weak_ptr<SimplifiedRule>{}
-                : m_rulesTableModel->rule(m_rulesFilterModel->mapToSource(m_ui->tableView->currentIndex()));
+            m_displayedRule = current.isValid()
+                ? m_rulesTableModel->rule(m_rulesFilterModel->mapToSource(current))
+                : std::weak_ptr<SimplifiedRule>{};
 
             updateControlButtons();
             displayRule();
