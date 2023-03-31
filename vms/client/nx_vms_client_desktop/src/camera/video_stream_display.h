@@ -121,8 +121,8 @@ private:
     SwsContext *m_scaleContext;
     int m_outputWidth;
     int m_outputHeight;
-    bool m_mtDecoding = false;
-    bool m_needReinitDecoders;
+    std::atomic_bool m_mtDecoding = false;
+    std::atomic_bool m_needReinitDecoders = false;
     bool m_reverseMode;
     bool m_prevReverseMode;
     QQueue<QSharedPointer<CLVideoDecoderOutput>> m_reverseQueue;

@@ -71,7 +71,6 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(
     m_scaleContext(nullptr),
     m_outputWidth(0),
     m_outputHeight(0),
-    m_needReinitDecoders(false),
     m_reverseMode(false),
     m_prevReverseMode(false),
     m_flushedBeforeReverseStart(false),
@@ -467,12 +466,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
 
     m_isLive = data->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE);
-    bool needReinitDecoders;
-    {
-        NX_MUTEX_LOCKER lock(&m_mtx);
-        needReinitDecoders = m_needReinitDecoders;
-        m_needReinitDecoders = false;
-    }
+    const bool needReinitDecoders = m_needReinitDecoders.exchange(false);
 
     if (qAbs(m_speed - 1.0) < FPS_EPS && m_canUseBufferedFrameDisplayer)
     {
@@ -851,7 +845,6 @@ void QnVideoStreamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode va
 
 void QnVideoStreamDisplay::setMTDecoding(bool value)
 {
-    NX_MUTEX_LOCKER lock(&m_mtx);
     m_mtDecoding = value;
     m_needReinitDecoders = true;
 }
