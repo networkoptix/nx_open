@@ -350,7 +350,7 @@ QWidget* QnBusinessRuleItemDelegate::createTargetEditor(QWidget* parent,
     else if (actionType == ActionType::openLayoutAction)
     {
         auto usersButton = new QnSelectUsersDialogButton(parent);
-        auto validator = new QnLayoutAccessValidationPolicy(systemContext());
+        auto validator = new QnLayoutAccessValidationPolicy{};
         validator->setLayout(
             resourcePool()->getResourceById<QnLayoutResource>(
                 model->actionParams().actionResourceId));

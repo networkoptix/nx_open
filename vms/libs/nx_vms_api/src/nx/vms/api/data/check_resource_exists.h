@@ -9,7 +9,6 @@ enum class CheckResourceExists
 {
     yes,
     no,
-    customRole, /**< UserModel and ModifyAccessRightsChecker only. */
 };
 
 } // namespace nx::vms::api

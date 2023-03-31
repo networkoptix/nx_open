@@ -73,10 +73,10 @@ QnGlobalPermissionsManager* QnCommonModuleAware::globalPermissionsManager() cons
         : nullptr;
 }
 
-QnUserRolesManager* QnCommonModuleAware::userRolesManager() const
+UserGroupManager* QnCommonModuleAware::userGroupManager() const
 {
     return NX_ASSERT(m_commonModule)
-        ? m_commonModule->systemContext()->userRolesManager()
+        ? m_commonModule->systemContext()->userGroupManager()
         : nullptr;
 }
 

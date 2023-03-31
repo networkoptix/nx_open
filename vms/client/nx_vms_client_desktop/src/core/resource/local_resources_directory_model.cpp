@@ -11,7 +11,7 @@
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/common/system_context.h>
 
 using namespace std::literals::chrono_literals;

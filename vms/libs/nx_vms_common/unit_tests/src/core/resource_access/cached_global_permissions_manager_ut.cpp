@@ -7,7 +7,6 @@
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/core/access/access_types.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
@@ -63,71 +62,72 @@ private:
     std::map<QnUuid, GlobalPermissions> m_notifiedAccess;
 };
 
-TEST_F(QnCachedGlobalPermissionsManagerTest, checkSingleRole)
+TEST_F(QnCachedGlobalPermissionsManagerTest, checkSingleGroup)
 {
-    auto role = createRole(GlobalPermission::accessAllMedia);
-    ASSERT_TRUE(expectPermissions(role, GlobalPermission::accessAllMedia));
+    auto group = createUserGroup(GlobalPermission::accessAllMedia);
+    ASSERT_TRUE(expectPermissions(group, GlobalPermission::accessAllMedia));
 
-    auto user = addUser(GlobalPermission::userInput);
+    auto user = addUser(
+        NoGroup, kTestUserName, nx::vms::api::UserType::local, GlobalPermission::userInput);
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::userInput));
 
-    user->setUserRoleIds({role.id});
+    user->setGroupIds({group.id});
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::accessAllMedia | GlobalPermission::userInput));
 
-    userRolesManager()->removeUserRole(role.id);
+    removeUserGroup(group.id);
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::userInput));
 }
 
-TEST_F(QnCachedGlobalPermissionsManagerTest, checkMultipleRoles)
+TEST_F(QnCachedGlobalPermissionsManagerTest, checkMultipleGroups)
 {
-    auto mediaRole = createRole(GlobalPermission::accessAllMedia);
-    ASSERT_TRUE(expectPermissions(mediaRole, GlobalPermission::accessAllMedia));
+    auto mediaGroup = createUserGroup(GlobalPermission::accessAllMedia);
+    ASSERT_TRUE(expectPermissions(mediaGroup, GlobalPermission::accessAllMedia));
 
-    auto inputRole = createRole(GlobalPermission::userInput);
-    ASSERT_TRUE(expectPermissions(inputRole, GlobalPermission::userInput));
+    auto inputGroup = createUserGroup(GlobalPermission::userInput);
+    ASSERT_TRUE(expectPermissions(inputGroup, GlobalPermission::userInput));
 
-    auto user = addUser(GlobalPermission::none);
+    auto user = addUser(NoGroup);
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::none));
 
-    user->setUserRoleIds({mediaRole.id});
+    user->setGroupIds({mediaGroup.id});
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::accessAllMedia));
 
-    user->setUserRoleIds({inputRole.id});
+    user->setGroupIds({inputGroup.id});
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::userInput));
 
-    user->setUserRoleIds({mediaRole.id, inputRole.id});
+    user->setGroupIds({mediaGroup.id, inputGroup.id});
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::accessAllMedia | GlobalPermission::userInput));
 
-    userRolesManager()->removeUserRole(mediaRole.id);
+    removeUserGroup(mediaGroup.id);
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::userInput));
 
-    userRolesManager()->removeUserRole(inputRole.id);
+    removeUserGroup(inputGroup.id);
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::none));
 }
 
-TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleInheritance)
+TEST_F(QnCachedGlobalPermissionsManagerTest, checkGroupInheritance)
 {
-    auto mediaRole = createRole(GlobalPermission::accessAllMedia);
-    ASSERT_TRUE(expectPermissions(mediaRole, GlobalPermission::accessAllMedia));
+    auto mediaGroup = createUserGroup(GlobalPermission::accessAllMedia);
+    ASSERT_TRUE(expectPermissions(mediaGroup, GlobalPermission::accessAllMedia));
 
-    auto inputRole = createRole(GlobalPermission::userInput);
-    ASSERT_TRUE(expectPermissions(inputRole, GlobalPermission::userInput));
+    auto inputGroup = createUserGroup(GlobalPermission::userInput);
+    ASSERT_TRUE(expectPermissions(inputGroup, GlobalPermission::userInput));
 
-    auto inheritedRole = createRole(GlobalPermission::none, {mediaRole.id, inputRole.id});
-    ASSERT_TRUE(expectPermissions(inheritedRole, GlobalPermission::accessAllMedia | GlobalPermission::userInput));
+    auto inheritedGroup = createUserGroup({mediaGroup.id, inputGroup.id});
+    ASSERT_TRUE(expectPermissions(inheritedGroup, GlobalPermission::accessAllMedia | GlobalPermission::userInput));
 
-    auto user = addUser(GlobalPermission::none);
+    auto user = addUser(NoGroup);
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::none));
 
-    user->setUserRoleIds({inheritedRole.id});
+    user->setGroupIds({inheritedGroup.id});
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::accessAllMedia | GlobalPermission::userInput));
 
-    userRolesManager()->removeUserRole(mediaRole.id);
-    ASSERT_TRUE(expectPermissions(inheritedRole, GlobalPermission::userInput));
+    removeUserGroup(mediaGroup.id);
+    ASSERT_TRUE(expectPermissions(inheritedGroup, GlobalPermission::userInput));
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::userInput));
 
-    userRolesManager()->removeUserRole(inputRole.id);
-    ASSERT_TRUE(expectPermissions(inheritedRole, GlobalPermission::none));
+    removeUserGroup(inputGroup.id);
+    ASSERT_TRUE(expectPermissions(inheritedGroup, GlobalPermission::none));
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::none));
 }
 

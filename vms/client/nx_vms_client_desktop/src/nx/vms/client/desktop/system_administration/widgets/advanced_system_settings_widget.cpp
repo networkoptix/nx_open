@@ -15,6 +15,7 @@
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/desktop/system_administration/widgets/logs_management_widget.h>
 #include <ui/widgets/system_settings/database_management_widget.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -97,10 +98,8 @@ void AdvancedSystemSettingsWidget::Private::setCurrentTab(int idx)
 
 bool AdvancedSystemSettingsWidget::Private::backupAndRestoreIsVisible() const
 {
-    const auto isOwner = q->context()->user() && q->context()->user()->isOwner();
-
-    const auto isAdministrator =
-        q->context()->user() && q->context()->user()->userRole() == Qn::UserRole::administrator;
+    const auto isOwner = q->accessController()->hasGlobalPermission(GlobalPermission::owner);
+    const auto isAdministrator = q->accessController()->hasGlobalPermission(GlobalPermission::admin);
 
     const auto hasOwnerApiForAdmins = q->context()->currentServer()->getServerFlags().testFlag(
         nx::vms::api::SF_OwnerApiForAdmins);

@@ -9,9 +9,10 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/models/user_roles_model.h>
 
 namespace {
@@ -38,7 +39,6 @@ RoleListModel::RoleListModel(QObject* parent):
     base_type(parent, StandardRoleFlag | UserRoleFlag)
 {
     setHasCheckBoxes(true);
-    setPredefinedRoleIdsEnabled(true);
 }
 
 void RoleListModel::setRoleValidator(RoleValidator roleValidator)
@@ -250,7 +250,7 @@ bool UserListModel::systemHasCustomUsers() const
     // Is it still viable? Or we need to detect users with customized access rights?
 
     const auto customUsers = resourcePool()->getResources<QnUserResource>(
-        [](const QnUserResourcePtr& user) { return user->userRoleIds().empty(); });
+        [](const QnUserResourcePtr& user) { return user->groupIds().empty(); });
 
     return !customUsers.empty();
 }
@@ -296,7 +296,7 @@ bool UserListModel::filterAcceptsRow(int sourceRow,
     if (!user || !user->isEnabled())
         return false;
 
-    if (m_customUsersOnly && user->userRole() != Qn::UserRole::customPermissions)
+    if (m_customUsersOnly && !user->groupIds().empty())
         return false;
 
     return base_type::filterAcceptsRow(sourceRow, sourceParent);
@@ -320,12 +320,10 @@ bool UserListModel::isIndirectlyChecked(const QModelIndex& index) const
     if (!user)
         return false;
 
-    const auto role = user->userRole();
-    const auto roleId = role == Qn::UserRole::customUserRole
-        ? user->firstRoleId()
-        : QnPredefinedUserRoles::id(role);
+    const auto groups = nx::vms::common::userGroupsWithParents(user);
 
-    return m_rolesModel->checkedRoles().contains(roleId);
+    return std::any_of(groups.begin(), groups.end(),
+        [this](const QnUuid& groupId) { return m_rolesModel->checkedRoles().contains(groupId); });
 }
 
 QnUserResourcePtr UserListModel::getUser(const QModelIndex& index)
@@ -403,7 +401,7 @@ void RoleListDelegate::getDisplayInfo(const QModelIndex& index,
     static const auto kExtraInfoTemplate = QString::fromWCharArray(L"\x2013 %1"); //< "- %1"
     const auto roleId = index.data(Qn::UuidRole).value<QnUuid>();
     const int usersInRole = countEnabledUsers(accessSubjectHierarchy()->usersInGroups({roleId}));
-    baseName = userRolesManager()->userRoleName(roleId);
+    baseName = userGroupManager()->find(roleId).value_or(api::UserGroupData{}).name;
     extInfo = kExtraInfoTemplate.arg(tr("%n Users", "", usersInRole));
 }
 

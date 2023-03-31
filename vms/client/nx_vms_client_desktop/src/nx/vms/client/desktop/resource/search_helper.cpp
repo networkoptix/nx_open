@@ -9,9 +9,9 @@
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 
 namespace nx::vms::client::desktop::resources::search_helper {
 
@@ -109,10 +109,8 @@ Matches matchSearchWords(const QStringList& searchWords, const QnResourcePtr& re
 
         if (const auto& user = resource.dynamicCast<QnUserResource>())
         {
-            const QString roleName = user->systemContext()
-                ? user->systemContext()->userRolesManager()->userRoleName(user)
-                : QnPredefinedUserRoles::name(user->userRole());
-            checkParameter(Parameter::roleName, roleName);
+            for (const auto& name: nx::vms::common::userGroupNames(user))
+                checkParameter(Parameter::roleName, name);
         }
     }
 

@@ -4,6 +4,7 @@
 
 #include <optional>
 
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
@@ -105,7 +106,8 @@ public:
 
     // Argument showName controls showing specific subject name in case of just one subject.
     QString actionSubjects(const RulePtr& rule, bool showName = true) const;
-    QString actionSubjects(const QnUserResourceList& users, const QList<QnUuid>& roles,
+    QString actionSubjects(const QnUserResourceList& users,
+        const nx::vms::api::UserGroupDataList& groups,
         bool showName = true) const;
 
     static QString allUsersText();

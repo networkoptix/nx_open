@@ -12,7 +12,7 @@
 #include <nx/utils/bit_stream.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/qmetaobject_helper.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cmath.h>

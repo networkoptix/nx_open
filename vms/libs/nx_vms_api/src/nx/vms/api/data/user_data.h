@@ -50,7 +50,6 @@ struct NX_VMS_API UserData: ResourceData
 
     static const QString kResourceTypeName;
     static const QnUuid kResourceTypeId;
-    static const QnUuid kOwnerGroupId;
 
     static constexpr const char* kCloudPasswordStub = "password_is_in_cloud";
     static constexpr const char* kHttpIsDisabledStub = "http_is_disabled";

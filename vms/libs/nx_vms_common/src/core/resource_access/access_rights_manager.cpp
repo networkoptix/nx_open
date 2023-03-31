@@ -4,14 +4,15 @@
 
 #include <QtCore/QPointer>
 
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
 
 namespace nx::core::access {
 
 using namespace nx::vms::api;
+using namespace nx::vms::common;
 
 struct AccessRightsManager::Private
 {
@@ -35,11 +36,8 @@ AccessRightsManager::~AccessRightsManager()
 
 ResourceAccessMap AccessRightsManager::ownResourceAccessMap(const QnUuid& subjectId) const
 {
-    if (const Qn::UserRole role = QnPredefinedUserRoles::enumValue(subjectId);
-        role != Qn::UserRole::customUserRole && role != Qn::UserRole::customPermissions)
-    {
-        return QnPredefinedUserRoles::accessRights(role);
-    }
+    if (PredefinedUserGroups::contains(subjectId))
+        return PredefinedUserGroups::accessRights(subjectId);
 
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->ownAccessMaps.value(subjectId);
@@ -59,42 +57,50 @@ void AccessRightsManager::resetAccessRights(const QHash<QnUuid, ResourceAccessMa
     emit accessRightsReset();
 }
 
-void AccessRightsManager::setOwnResourceAccessMap(const QnUuid& subjectId,
+bool AccessRightsManager::setOwnResourceAccessMap(const QnUuid& subjectId,
     const ResourceAccessMap& value)
 {
-    const Qn::UserRole role = QnPredefinedUserRoles::enumValue(subjectId);
-    if (!NX_ASSERT(role == Qn::UserRole::customUserRole))
-        return;
+    if (PredefinedUserGroups::contains(subjectId))
+        return false;
 
     {
         NX_MUTEX_LOCKER lk(&d->mutex);
 
-        const bool existing = d->ownAccessMaps.contains(subjectId);
-        auto& accessMapRef = d->ownAccessMaps[subjectId];
+        if (d->ownAccessMaps.value(subjectId) == value)
+            return false;
 
-        if (existing && accessMapRef == value)
-            return;
-
-        accessMapRef = value;
+        d->ownAccessMaps[subjectId] = value;
     }
 
     NX_DEBUG(this, "Access rights are set for subject %1", subjectId);
     NX_VERBOSE(this, value);
 
     emit ownAccessRightsChanged({subjectId});
+    return true;
 }
 
-void AccessRightsManager::removeSubjects(const QSet<QnUuid>& subjectIds)
+bool AccessRightsManager::removeSubjects(const QSet<QnUuid>& subjectIds)
 {
+    QSet<QnUuid> removedSubjectIds;
+
     {
         NX_MUTEX_LOCKER lk(&d->mutex);
 
         for (const auto id: subjectIds)
-            d->ownAccessMaps.remove(id);
+        {
+            if (d->ownAccessMaps.remove(id))
+                removedSubjectIds.insert(id);
+        }
     }
 
-    NX_DEBUG(this, "Access rights are cleared for %1 subjects: %2", subjectIds.size(), subjectIds);
-    emit ownAccessRightsChanged(subjectIds);
+    if (removedSubjectIds.empty())
+        return false;
+
+    NX_DEBUG(this, "Access rights are cleared for %1 subjects: %2",
+        removedSubjectIds.size(), removedSubjectIds);
+
+    emit ownAccessRightsChanged(removedSubjectIds);
+    return true;
 }
 
 void AccessRightsManager::clear()

@@ -5,7 +5,7 @@
 #include <core/resource/user_resource.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <utils/email/email.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 
 namespace nx::vms::client::desktop {
 

@@ -4,7 +4,7 @@
 
 #include <core/resource/client_camera.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/common/intercom/utils.h>
 

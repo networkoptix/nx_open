@@ -93,13 +93,6 @@ QnGlobalPermissionsManager* QnCommonModule::globalPermissionsManager() const
         : nullptr;
 }
 
-QnUserRolesManager* QnCommonModule::userRolesManager() const
-{
-    return NX_ASSERT(d->systemContext)
-        ? d->systemContext->userRolesManager()
-        : nullptr;
-}
-
 QnCameraHistoryPool* QnCommonModule::cameraHistoryPool() const
 {
     return NX_ASSERT(d->systemContext)

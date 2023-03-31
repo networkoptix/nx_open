@@ -9,7 +9,6 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/resource/property_adaptors.h>
@@ -175,7 +174,7 @@ TEST_F(ActionBuilderTest, builderWithTargetFieldButWithoutUserProducedNoAction)
 
 TEST_F(ActionBuilderTest, builderWithOneTargetUserProducesOneAction)
 {
-    const auto user = addUser(GlobalPermission::viewLogs);
+    const auto user = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {user->getId()},
@@ -193,8 +192,8 @@ TEST_F(ActionBuilderTest, builderWithOneTargetUserProducesOneAction)
 
 TEST_F(ActionBuilderTest, builderWithManyUserWithSameRightsProducesOneAction)
 {
-    const auto user1 = addUser(GlobalPermission::viewLogs);
-    const auto user2 = addUser(GlobalPermission::viewLogs);
+    const auto user1 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
+    const auto user2 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {user1->getId(), user2->getId()},
@@ -216,8 +215,8 @@ TEST_F(ActionBuilderTest, builderWithManyUserWithSameRightsProducesOneAction)
 
 TEST_F(ActionBuilderTest, builderProperlyHandleAllUsersSelection)
 {
-    const auto user1 = addUser(GlobalPermission::viewLogs);
-    const auto user2 = addUser(GlobalPermission::viewLogs);
+    const auto user1 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
+    const auto user2 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {},
@@ -239,18 +238,13 @@ TEST_F(ActionBuilderTest, builderProperlyHandleAllUsersSelection)
 
 TEST_F(ActionBuilderTest, builderProperlyHandleUserRoles)
 {
-    const QnUuid adminsGroupId = QnPredefinedUserRoles::id(Qn::UserRole::administrator);
-
-    const auto admin = addUser(GlobalPermission::none);
-    admin->setUserRoleIds({adminsGroupId});
-
-    const auto user = addUser(GlobalPermission::none);
-    user->setUserRoleIds({QnPredefinedUserRoles::id(Qn::UserRole::liveViewer)});
+    const auto admin = addUser(kAdministratorsGroupId);
+    const auto user = addUser(kLiveViewersGroupId);
 
     const auto camera = addCamera();
 
     UuidSelection selection{
-        .ids = {adminsGroupId},
+        .ids = {kAdministratorsGroupId},
         .all = false};
 
     auto builder = makeBuilderWithTargetUserField(selection);
@@ -270,7 +264,7 @@ TEST_F(ActionBuilderTest, builderProperlyHandleUserRoles)
 
 TEST_F(ActionBuilderTest, builderWithTargetUsersWithoutAppropriateRightsProducedNoAction)
 {
-    const auto user = addUser(GlobalPermission::viewLogs);
+    const auto user = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
     const auto camera = addCamera();
 
     UuidSelection selection{
@@ -290,10 +284,11 @@ TEST_F(ActionBuilderTest, builderWithTargetUsersProducedActionsOnlyForUsersWithA
 {
     const auto camera = addCamera();
 
-    const auto accessAllMediaUser = addUser(GlobalPermission::viewLogs);
-    accessAllMediaUser->setUserRoleIds({QnPredefinedUserRoles::id(Qn::UserRole::liveViewer)});
+    const auto accessAllMediaUser = addUser(kLiveViewersGroupId, kTestUserName,
+        UserType::local, GlobalPermission::viewLogs);
 
-    const auto accessNoneUser = addUser(GlobalPermission::viewLogs);
+    const auto accessNoneUser = addUser(NoGroup, kTestUserName,
+        UserType::local, GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {accessAllMediaUser->getId(), accessNoneUser->getId()},
@@ -316,11 +311,11 @@ TEST_F(ActionBuilderTest, builderWithTargetUsersProducedActionsOnlyForUsersWithA
 
 TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
 {
-    auto user1 = addUser(GlobalPermission::viewLogs);
+    auto user1 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
     auto cameraOfUser1 = addCamera();
     setOwnAccessRights(user1->getId(), {{cameraOfUser1->getId(), AccessRight::view}});
 
-    auto user2 = addUser(GlobalPermission::viewLogs);
+    auto user2 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
     auto cameraOfUser2 = addCamera();
     setOwnAccessRights(user2->getId(), {{cameraOfUser2->getId(), AccessRight::view}});
 
@@ -365,11 +360,11 @@ TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
 
 TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
 {
-    auto user1 = addUser(GlobalPermission::viewLogs);
+    auto user1 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
     auto cameraOfUser1 = addCamera();
     setOwnAccessRights(user1->getId(), {{cameraOfUser1->getId(), AccessRight::view}});
 
-    auto user2 = addUser(GlobalPermission::viewLogs);
+    auto user2 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
     auto cameraOfUser2 = addCamera();
     setOwnAccessRights(user2->getId(), {{cameraOfUser2->getId(), AccessRight::view}});
 
@@ -405,7 +400,7 @@ TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
 
 TEST_F(ActionBuilderTest, eventWithoutDevicesIsProcessed)
 {
-    auto user1 = addUser(GlobalPermission::viewLogs);
+    auto user1 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
 
     UuidSelection selection{ .all = true };
     auto builder = makeBuilderWithTargetUserField(selection);
@@ -427,7 +422,7 @@ TEST_F(ActionBuilderTest, eventWithoutDevicesIsProcessed)
 
 TEST_F(ActionBuilderTest, userWithoutPermissionsReceivesNoAction)
 {
-    auto user1 = addUser(GlobalPermission::none);
+    auto user1 = addUser(NoGroup);
 
     UuidSelection selection{.ids = {user1->getId()}};
     auto builder = makeBuilderWithTargetUserField(selection);
@@ -444,7 +439,7 @@ TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
     using nx::vms::event::EventType;
     using namespace std::chrono;
 
-    auto user1 = addUser(GlobalPermission::admin);
+    auto user1 = addUser(kAdministratorsGroupId);
     auto filterProp = nx::vms::common::BusinessEventFilterResourcePropertyAdaptor();
 
     filterProp.setResource(user1);
@@ -464,7 +459,7 @@ TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
 
 TEST_F(ActionBuilderTest, clientAndServerAction)
 {
-    const auto user = addUser(nx::vms::api::GlobalPermission::viewLogs);
+    const auto user = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
 
     UuidSelection selection{
         .ids = {user->getId()},

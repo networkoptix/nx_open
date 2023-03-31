@@ -8,7 +8,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/branding.h>
 #include <nx/network/app_info.h>
 #include <nx/utils/string.h>
@@ -20,11 +19,14 @@
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include "private/subject_selection_dialog_p.h"
+
+using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -335,7 +337,7 @@ void SubjectSelectionDialog::validateAllUsers()
 std::vector<QnResourceAccessSubject> SubjectSelectionDialog::allSubjects() const
 {
     const auto users = resourcePool()->getResources<QnUserResource>();
-    const auto groups = userRolesManager()->userRoles();
+    const auto groups = userGroupManager()->groups();
 
     std::vector<QnResourceAccessSubject> result;
     result.reserve(users.size() + groups.size());
@@ -347,8 +349,8 @@ std::vector<QnResourceAccessSubject> SubjectSelectionDialog::allSubjects() const
 void SubjectSelectionDialog::setCheckedSubjects(const QSet<QnUuid>& ids)
 {
     QnUserResourceList users;
-    QList<QnUuid> roleIds;
-    userRolesManager()->usersAndRoles(ids, users, roleIds);
+    QList<QnUuid> groupIds;
+    nx::vms::common::getUsersAndGroups(systemContext(), ids, users, groupIds);
 
     QSet<QnUuid> userIds;
     bool nonCustomUsers = false;
@@ -356,11 +358,11 @@ void SubjectSelectionDialog::setCheckedSubjects(const QSet<QnUuid>& ids)
     for (const auto& user: users)
     {
         userIds.insert(user->getId());
-        nonCustomUsers = nonCustomUsers || user->userRole() != Qn::UserRole::customPermissions;
+        nonCustomUsers = nonCustomUsers || !user->groupIds().empty();
     }
 
     m_users->setCheckedUsers(userIds);
-    m_roles->setCheckedRoles({roleIds.cbegin(), roleIds.cend()});
+    m_roles->setCheckedRoles({groupIds.cbegin(), groupIds.cend()});
 
     if (nonCustomUsers)
         ui->showAllUsers->setChecked(true);

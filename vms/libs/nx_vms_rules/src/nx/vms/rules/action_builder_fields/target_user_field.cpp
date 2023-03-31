@@ -5,8 +5,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/common/system_context.h>
 
 namespace nx::vms::rules {
@@ -27,13 +27,13 @@ QnUserResourceSet TargetUserField::users() const
     else
     {
         QnUserResourceList users;
-        QnUuidList roles;
-        systemContext()->userRolesManager()->usersAndRoles(ids(), users, roles);
+        QnUuidList groupIds;
+        nx::vms::common::getUsersAndGroups(systemContext(), ids(), users, groupIds);
 
         result = nx::utils::toQSet(users);
 
         const auto groupUsers = systemContext()->accessSubjectHierarchy()->usersInGroups(
-            nx::utils::toQSet(roles));
+            nx::utils::toQSet(groupIds));
 
         for (const auto& user: groupUsers)
             result.insert(user);

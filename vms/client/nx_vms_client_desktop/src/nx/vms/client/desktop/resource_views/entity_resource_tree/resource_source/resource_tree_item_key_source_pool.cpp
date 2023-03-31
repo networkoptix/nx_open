@@ -165,19 +165,6 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::shareableLayoutsSource(
             std::make_unique<LayoutResourceSource>(resourcePool(), user, true)));
 }
 
-UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::usersSource(
-    const QnUserResourcePtr& excludeUser)
-{
-    return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<UserResourceSource>(resourcePool(), excludeUser));
-}
-
-UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::roleUsersSource(const QnUuid& roleId)
-{
-    return std::make_shared<ResourceSourceAdapter>(std::make_unique<UserResourceSource>(
-        resourcePool(), QnUserResourcePtr(), roleId));
-}
-
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::integrationsSource(
     const QnResourceAccessSubject& subject,
     bool includeProxiedIntegrations)

@@ -7,7 +7,7 @@
 
 #include <nx/vms/client/core/utils/grid_walker.h>
 
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <utils/common/hash.h>
 
 namespace nx::vms::client::core {

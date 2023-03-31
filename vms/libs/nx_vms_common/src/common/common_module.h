@@ -57,7 +57,6 @@ public:
     QnResourcePool* resourcePool() const;
     QnResourceAccessManager* resourceAccessManager() const;
     QnGlobalPermissionsManager* globalPermissionsManager() const;
-    QnUserRolesManager* userRolesManager() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
     QnResourcePropertyDictionary* resourcePropertyDictionary() const;
     QnResourceStatusDictionary* resourceStatusDictionary() const;

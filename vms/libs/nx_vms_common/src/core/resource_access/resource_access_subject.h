@@ -3,7 +3,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 
 /**
 * This class represents subject of resource access - user or user role.
@@ -13,7 +13,7 @@ class NX_VMS_COMMON_API QnResourceAccessSubject final
 public:
     QnResourceAccessSubject();
     QnResourceAccessSubject(const QnUserResourcePtr& user);
-    QnResourceAccessSubject(const nx::vms::api::UserRoleData& role);
+    QnResourceAccessSubject(const nx::vms::api::UserGroupData& role);
     QnResourceAccessSubject(const QnResourceAccessSubject& other);
 
     const QnUserResourcePtr& user() const { return m_user; }

@@ -12,7 +12,7 @@
 
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/utils/geometry.h>
 
 using nx::vms::client::core::Geometry;

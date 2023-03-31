@@ -19,7 +19,7 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/data/access_rights_data.h>
-#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
@@ -393,7 +393,7 @@ TEST_F(InheritedResourceAccessResolverTest, resourceAccessDetails)
 
 TEST_F(InheritedResourceAccessResolverTest, noInheritedDesktopCameraAccess)
 {
-    auto user = addUser(GlobalPermission::viewerPermissions);
+    auto user = addUser(kViewersGroupId);
     auto camera = addDesktopCamera(user);
 
     manager->setOwnResourceAccessMap(subjects->id("Group 1"),
@@ -408,7 +408,7 @@ TEST_F(InheritedResourceAccessResolverTest, noInheritedDesktopCameraAccess)
 
 TEST_F(InheritedResourceAccessResolverTest, inheritedDesktopCameraAccessViaVideowall)
 {
-    auto user = addUser(GlobalPermission::viewerPermissions);
+    auto user = addUser(kViewersGroupId);
     auto camera = addDesktopCamera(user);
     auto videowall = addVideoWall();
     auto layout = addLayoutForVideoWall(videowall);
@@ -428,7 +428,7 @@ TEST_F(InheritedResourceAccessResolverTest, inheritedDesktopCameraAccessViaVideo
 
 TEST_F(InheritedResourceAccessResolverTest, inheritedAdminAccessRights)
 {
-    auto group = createRole(GlobalPermission::admin);
+    auto group = createUserGroup(GlobalPermission::admin);
     subjects->setId("Admin Group", group.id);
     subjects->addOrUpdate("Group 2", {"Group 1", "Admin Group"});
 
@@ -447,7 +447,7 @@ TEST_F(InheritedResourceAccessResolverTest, inheritedAdminAccessRights)
     ASSERT_EQ(resolver->accessRights(subjects->id("User 1"), camera), kFullAccessRights);
     ASSERT_EQ(resolver->accessRights(subjects->id("User 2"), camera), AccessRights());
 
-    auto user = addUser(GlobalPermission::admin);
+    auto user = addUser(kAdministratorsGroupId);
     auto desktopCamera = addDesktopCamera(user);
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 1"), desktopCamera), AccessRights());
     ASSERT_EQ(resolver->accessRights(subjects->id("Admin Group"), desktopCamera), AccessRights());

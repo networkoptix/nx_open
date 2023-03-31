@@ -77,7 +77,7 @@ public:
     void resetPropertyList(const nx::vms::api::ResourceParamWithRefDataList& params);
     void resetStatusList(const nx::vms::api::ResourceStatusDataList& params);
     void resetAccessRights(const nx::vms::api::AccessRightsDataList& accessRights);
-    void resetUserRoles(const nx::vms::api::UserRoleDataList& roles);
+    void resetUserGroups(const nx::vms::api::UserGroupDataList& userGroups);
     void resetEventRules(const nx::vms::api::EventRuleDataList& eventRules);
     void resetVmsRules(const nx::vms::api::rules::RuleList& vmsRules);
     virtual void addHardwareIdMapping(const nx::vms::api::HardwareIdMapping& /*data*/) {}
@@ -170,8 +170,8 @@ private slots:
     void on_resourceStatusRemoved(const QnUuid& resourceId, ec2::NotificationSource source);
 
     void on_accessRightsChanged(const nx::vms::api::AccessRightsData& accessRights);
-    void on_userRoleChanged(const nx::vms::api::UserRoleData& userRole);
-    void on_userRoleRemoved(const QnUuid& userRoleId);
+    void on_userGroupChanged(const nx::vms::api::UserGroupData& userGroup);
+    void on_userGroupRemoved(const QnUuid& userGroupId);
 
     void on_cameraUserAttributesChanged(const nx::vms::api::CameraAttributesData& userAttributes);
     void on_cameraUserAttributesRemoved(const QnUuid& cameraId);

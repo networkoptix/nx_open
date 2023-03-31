@@ -11,14 +11,14 @@
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/branding.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/string.h>
-#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
@@ -70,17 +70,6 @@ public:
             {
                 if (auto user = resource.dynamicCast<QnUserResource>())
                     removeUser(user);
-            });
-
-        connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-            [this](const nx::vms::api::UserRoleData& userRole)
-            {
-                for (auto user: users)
-                {
-                    if (user->firstRoleId() != userRole.id)
-                        continue;
-                    handleUserChanged(user);
-                }
             });
 
         connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
@@ -353,7 +342,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 case EmailColumn:
                     return user->getEmail();
                 case UserGroupsColumn:
-                    return userRolesManager()->userRoleName(user);
+                    return nx::vms::common::userGroupNames(user).join(", ");
                 default:
                     break;
             }

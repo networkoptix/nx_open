@@ -12,16 +12,21 @@ class QnLicensePool;
 class QnResourcePool;
 class QnResourceAccessManager;
 class QnRuntimeInfoManager;
-class QnUserRolesManager;
 class QnCameraHistoryPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnResourceDataPool;
 class QnCommonMessageProcessor;
 
+namespace nx::vms::common {
+
+class SystemSettings;
+class SystemContext;
+class UserGroupManager;
+
+} // namespace nx::vms::common
+
 namespace nx::core::access { class ResourceAccessSubjectHierarchy; }
-namespace nx::vms::common { class SystemSettings; }
-namespace nx::vms::common { class SystemContext; }
 namespace nx::vms::event { class RuleManager; }
 namespace nx::vms::rules { class Engine; }
 namespace ec2 { class AbstractECConnection; }
@@ -47,7 +52,7 @@ public:
     QnResourceAccessManager* resourceAccessManager() const;
     nx::core::access::ResourceAccessSubjectHierarchy* accessSubjectHierarchy() const;
     QnGlobalPermissionsManager* globalPermissionsManager() const;
-    QnUserRolesManager* userRolesManager() const;
+    nx::vms::common::UserGroupManager* userGroupManager() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
     QnResourcePropertyDictionary* resourcePropertyDictionary() const;
     QnResourceStatusDictionary* statusDictionary() const;

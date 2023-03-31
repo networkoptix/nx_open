@@ -31,10 +31,10 @@ public:
     void resetAccessRights(const QHash<QnUuid /*subjectId*/, ResourceAccessMap>& accessRights);
 
     /** Sets specified access rights for the specified subject. */
-    void setOwnResourceAccessMap(const QnUuid& subjectId, const ResourceAccessMap& value);
+    bool setOwnResourceAccessMap(const QnUuid& subjectId, const ResourceAccessMap& value);
 
     /** Removes access rights information for specified subjects. */
-    void removeSubjects(const QSet<QnUuid>& subjectIds);
+    bool removeSubjects(const QSet<QnUuid>& subjectIds);
 
     /** Clears all access rights for all subjects. */
     void clear();

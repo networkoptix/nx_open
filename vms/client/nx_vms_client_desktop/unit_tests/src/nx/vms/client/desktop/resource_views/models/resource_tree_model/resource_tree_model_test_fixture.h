@@ -132,7 +132,7 @@ protected:
     void setupAllVideowallsAccess(
         const QnUserResourcePtr& user, nx::vms::api::AccessRights accessRights) const;
 
-    QnUserResourcePtr loginAs(const QString& name, Qn::UserRole userGroup) const;
+    QnUserResourcePtr loginAs(const QString& name, const QnUuid& groupId) const;
     QnUserResourcePtr loginAsOwner(const QString& name) const;
     QnUserResourcePtr loginAsAdmin(const QString& name) const;
     QnUserResourcePtr loginAsLiveViewer(const QString& name) const;

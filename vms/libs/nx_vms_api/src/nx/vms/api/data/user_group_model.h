@@ -10,7 +10,7 @@
 
 #include "access_rights_data.h"
 #include "user_data.h"
-#include "user_role_data.h"
+#include "user_group_data.h"
 #include "user_external_id.h"
 
 namespace nx::vms::api {
@@ -52,9 +52,9 @@ struct NX_VMS_API UserGroupModel
 
     bool operator==(const UserGroupModel& other) const = default;
 
-    using DbReadTypes = std::tuple<UserRoleData, AccessRightsData>;
-    using DbUpdateTypes = std::tuple<UserRoleData, std::optional<AccessRightsData>>;
-    using DbListTypes = std::tuple<UserRoleDataList, AccessRightsDataList>;
+    using DbReadTypes = std::tuple<UserGroupData, AccessRightsData>;
+    using DbUpdateTypes = std::tuple<UserGroupData, std::optional<AccessRightsData>>;
+    using DbListTypes = std::tuple<UserGroupDataList, AccessRightsDataList>;
 
     QnUuid getId() const { return id; }
     void setId(QnUuid id_) { id = std::move(id_); }

@@ -5,8 +5,8 @@
 #include <QtCore/QCryptographicHash>
 
 #include <api/model/password_data.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_properties.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
@@ -14,6 +14,8 @@
 #include <nx/reflect/json/serializer.h>
 #include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/algorithm.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/switch.h>
@@ -214,37 +216,6 @@ QnUserResource::~QnUserResource()
 {
 }
 
-Qn::UserRole QnUserResource::userRole() const
-{
-    if (isOwner())
-        return Qn::UserRole::owner;
-
-    if (!userRoleIds().empty())
-        return Qn::UserRole::customUserRole;
-
-    auto permissions = getRawPermissions();
-
-    if (permissions.testFlag(GlobalPermission::admin))
-        return Qn::UserRole::administrator;
-
-    switch (permissions)
-    {
-        case (int) GlobalPermission::advancedViewerPermissions:
-            return Qn::UserRole::advancedViewer;
-
-        case (int) GlobalPermission::viewerPermissions:
-            return Qn::UserRole::viewer;
-
-        case (int) GlobalPermission::liveViewerPermissions:
-            return Qn::UserRole::liveViewer;
-
-        default:
-            break;
-    };
-
-    return Qn::UserRole::customPermissions;
-}
-
 QnUserHash QnUserResource::getHash() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
@@ -399,8 +370,8 @@ bool QnUserResource::isBuiltInAdmin() const
 bool QnUserResource::isOwner() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-    return nx::utils::find_if(m_userRoleIds,
-        [](const auto id) { return id == nx::vms::api::UserData::kOwnerGroupId; });
+    return nx::utils::find_if(m_groupIds,
+        [](const auto id) { return id == nx::vms::api::kOwnersGroupId; });
 }
 
 void QnUserResource::setOwner(bool value)
@@ -408,66 +379,37 @@ void QnUserResource::setOwner(bool value)
     if (value == isOwner())
         return;
 
-    auto groupIds = userRoleIds();
+    auto ids = groupIds();
     if (value)
-    {
-        groupIds.insert(groupIds.begin(), nx::vms::api::UserData::kOwnerGroupId);
-    }
+        ids.insert(ids.begin(), nx::vms::api::kOwnersGroupId);
     else
-    {
-        nx::utils::erase_if(groupIds,
-            [](const auto id) { return id == nx::vms::api::UserData::kOwnerGroupId; });
-    }
+        nx::utils::erase_if(ids, [](const auto id) { return id == nx::vms::api::kOwnersGroupId; });
 
-    setUserRoleIds(groupIds);
+    setGroupIds(ids);
     emit permissionsChanged(::toSharedPointer(this));
 }
 
-std::vector<QnUuid> QnUserResource::userRoleIds() const
+std::vector<QnUuid> QnUserResource::groupIds() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-    return m_userRoleIds;
+    return m_groupIds;
 }
 
-void QnUserResource::setUserRoleIds(const std::vector<QnUuid>& userRoleIds)
+void QnUserResource::setGroupIds(const std::vector<QnUuid>& value)
 {
-    std::vector<QnUuid> previousRoleIds;
+    std::vector<QnUuid> previousValue;
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        if (m_userRoleIds == userRoleIds)
+        if (m_groupIds == value)
             return;
-        previousRoleIds = m_userRoleIds;
-        m_userRoleIds = userRoleIds;
+        previousValue = m_groupIds;
+        m_groupIds = value;
     }
-    NX_VERBOSE(this, "Roles changed from %1 to %2",
-        nx::containerString(previousRoleIds), nx::containerString(userRoleIds));
-    emit userRolesChanged(::toSharedPointer(this), previousRoleIds);
-}
 
-std::vector<QnUuid> QnUserResource::allUserRoleIds() const
-{
-    if (const auto role = userRole(); role != Qn::UserRole::customUserRole)
-        return {QnPredefinedUserRoles::id(role)};
+    NX_VERBOSE(this, "User groups changed from %1 to %2",
+        nx::containerString(previousValue), nx::containerString(value));
 
-    const auto system = systemContext();
-    if (!system)
-        return {};
-
-    std::vector<QnUuid> roleIds;
-    for (const auto& role: system->userRolesManager()->userRolesWithParents(userRoleIds()))
-        roleIds.push_back(role.id);
-    return roleIds;
-}
-
-QnUuid QnUserResource::firstRoleId() const
-{
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    return m_userRoleIds.empty() ? QnUuid() : m_userRoleIds.front();
-}
-
-void QnUserResource::setSingleUserRole(const QnUuid& id)
-{
-    setUserRoleIds(id.isNull() ? std::vector<QnUuid>{} : std::vector<QnUuid>{id});
+    emit userRolesChanged(::toSharedPointer(this), previousValue);
 }
 
 bool QnUserResource::isEnabled() const
@@ -628,12 +570,12 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         if (oldPermissions != newPermissions)
             notifiers << [r = toSharedPointer(this)]{ emit r->permissionsChanged(r); };
 
-        if (m_userRoleIds != localOther->m_userRoleIds)
+        if (m_groupIds != localOther->m_groupIds)
         {
-            const auto previousRoleIds = m_userRoleIds;
-            m_userRoleIds = localOther->m_userRoleIds;
-            notifiers << [r = toSharedPointer(this), previousRoleIds]
-                { emit r->userRolesChanged(r, previousRoleIds); };
+            const auto previousGroupIds = m_groupIds;
+            m_groupIds = localOther->m_groupIds;
+            notifiers << [r = toSharedPointer(this), previousGroupIds]
+                { emit r->userRolesChanged(r, previousGroupIds); };
         }
 
         if (m_email != localOther->m_email)

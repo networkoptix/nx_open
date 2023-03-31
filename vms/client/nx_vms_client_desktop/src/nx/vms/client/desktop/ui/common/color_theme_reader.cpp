@@ -8,7 +8,7 @@
 #include <utils/common/hash.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 
 namespace nx::vms::client::desktop {
 

@@ -10,16 +10,17 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/strings_helper.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 using namespace nx;
+using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -201,11 +202,13 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
     else
     {
         QnUserResourceList users;
-        QList<QnUuid> roles;
-        userRolesManager()->usersAndRoles(params.metadata.instigators, users, roles);
+        UserGroupDataList groups;
+        nx::vms::common::getUsersAndGroups(systemContext(),
+            params.metadata.instigators, users, groups);
+
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
 
-        if (users.isEmpty() && roles.isEmpty())
+        if (users.empty() && groups.empty())
         {
             ui->usersButton->setText(vms::event::StringsHelper::needToSelectUserText());
             ui->usersButton->setIcon(qnSkin->icon(lit("tree/user_alert.svg")));
@@ -218,16 +221,16 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
                     {
                         return m_validationPolicy->userValidity(user);
                     })
-                && std::all_of(roles.begin(), roles.end(),
-                    [this](const QnUuid& roleId)
+                && std::all_of(groups.begin(), groups.end(),
+                    [this](const UserGroupData& group)
                     {
-                        return m_validationPolicy->roleValidity(roleId) == QValidator::Acceptable;
+                        return m_validationPolicy->roleValidity(group.id) == QValidator::Acceptable;
                     });
 
             // TODO: #vkutin #3.2 Color the button red if selection is completely invalid.
 
-            const bool multiple = users.size() > 1 || !roles.empty();
-            ui->usersButton->setText(m_helper->actionSubjects(users, roles));
+            const bool multiple = users.size() > 1 || !groups.empty();
+            ui->usersButton->setText(m_helper->actionSubjects(users, groups));
             ui->usersButton->setIcon(icon(multiple
                 ? (allValid ? lit("tree/users.svg") : lit("tree/users_alert.svg"))
                 : (allValid ? lit("tree/user.svg") : lit("tree/user_alert.svg"))));

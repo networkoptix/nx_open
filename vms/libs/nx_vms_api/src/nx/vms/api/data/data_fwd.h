@@ -42,7 +42,7 @@ struct ServerFootageData;
 struct ServerRuntimeEventData;
 struct StorageData;
 struct UserData;
-struct UserRoleData;
+struct UserGroupData;
 struct VideowallControlMessageData;
 struct VideowallData;
 struct WebPageData;
@@ -66,7 +66,7 @@ using ResourceTypeDataList = std::vector<ResourceTypeData>;
 using ServerFootageDataList = std::vector<ServerFootageData>;
 using StorageDataList = std::vector<StorageData>;
 using UserDataList = std::vector<UserData>;
-using UserRoleDataList = std::vector<UserRoleData>;
+using UserGroupDataList = std::vector<UserGroupData>;
 using VideowallDataList = std::vector<VideowallData>;
 using WebPageDataList = std::vector<WebPageData>;
 

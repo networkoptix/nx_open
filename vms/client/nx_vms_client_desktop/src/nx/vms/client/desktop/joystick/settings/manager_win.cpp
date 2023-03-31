@@ -8,7 +8,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include <nx/utils/log/log_main.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 
 #include "device_win.h"
 #include "descriptors.h"

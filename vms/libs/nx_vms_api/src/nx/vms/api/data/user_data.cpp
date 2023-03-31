@@ -5,14 +5,13 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/algorithm.h>
 
+#include "user_group_data.h"
+
 namespace nx::vms::api {
 
 const QString UserData::kResourceTypeName = lit("User");
 const QnUuid UserData::kResourceTypeId =
     ResourceData::getFixedTypeId(UserData::kResourceTypeName);
-
-// TODO: This value should be in sync with QnPredefinedUserRoles::id(Qn::UserRole::owner).
-const QnUuid UserData::kOwnerGroupId("00000000-0000-0000-0000-100000000000");
 
 constexpr const char* UserData::kCloudPasswordStub;
 
@@ -34,7 +33,7 @@ void UserData::fillId()
 
 bool UserData::isOwner() const
 {
-    return nx::utils::find_if(groupIds, [](const auto id) { return id == kOwnerGroupId; });
+    return nx::utils::find_if(groupIds, [](const auto id) { return id == kOwnersGroupId; });
 }
 
 QString toString(UserType type)

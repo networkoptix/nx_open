@@ -35,7 +35,7 @@
 #include <ui/animation/animation_timer.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/checked_cast.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 
 #include "instrument_manager.h"
 

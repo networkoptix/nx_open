@@ -31,7 +31,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>

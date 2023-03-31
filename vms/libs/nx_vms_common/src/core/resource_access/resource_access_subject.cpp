@@ -11,7 +11,7 @@ QnResourceAccessSubject::QnResourceAccessSubject(const QnUserResourcePtr& user):
         m_id = user->getId();
 }
 
-QnResourceAccessSubject::QnResourceAccessSubject(const nx::vms::api::UserRoleData& role):
+QnResourceAccessSubject::QnResourceAccessSubject(const nx::vms::api::UserGroupData& role):
     m_id(role.id)
 {
 }

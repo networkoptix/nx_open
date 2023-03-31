@@ -570,7 +570,7 @@ void fromApiToResource(const UserData& src, QnUserResourcePtr& dst)
     dst->setOwner(src.isOwner());
     dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
-    dst->setUserRoleIds(src.groupIds);
+    dst->setGroupIds(src.groupIds);
     dst->setFullName(src.fullName);
 
     dst->setRawPermissions(src.permissions);
@@ -589,7 +589,7 @@ void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
     dst.permissions = src->getRawPermissions();
     dst.email = src->getEmail();
     dst.cryptSha512Hash = src->getCryptSha512Hash();
-    dst.groupIds = src->userRoleIds();
+    dst.groupIds = src->groupIds();
     dst.fullName = src->fullName();
     dst.externalId = src->externalId();
     dst.type = src->userType();

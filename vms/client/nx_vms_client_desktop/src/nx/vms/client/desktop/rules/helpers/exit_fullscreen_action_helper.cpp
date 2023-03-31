@@ -6,7 +6,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>

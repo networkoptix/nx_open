@@ -24,9 +24,8 @@
 #include <core/resource/resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/random.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
@@ -38,6 +37,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/event/events/poe_over_budget_event.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
@@ -140,8 +140,8 @@ namespace {
                     auto resource = resourcePool()->getResourceById(id);
                     if (resource)
                         return resourcePassText(resource);
-                    auto role = userRolesManager()->userRole(id);
-                    return role.name.contains(m_filterText, Qt::CaseInsensitive);
+                    auto group = userGroupManager()->find(id);
+                    return group && group->name.contains(m_filterText, Qt::CaseInsensitive);
                 };
 
             const auto& cameras = resourcePool()->getAllCameras(QnResourcePtr(), true);
@@ -188,7 +188,6 @@ namespace {
         QString m_filterText;
         QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
     };
-
 
     nx::network::rest::Params makeTestRuleParams(
         const QnBusinessRuleViewModelPtr& rule,

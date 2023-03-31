@@ -14,7 +14,7 @@ QN_FUSION_DEFINE_FUNCTIONS(UserRoleModel, (csv_record)(json)(ubjson)(xml))
 
 UserRoleModel::DbUpdateTypes UserRoleModel::toDbTypes() &&
 {
-    UserRoleData userRole;
+    UserGroupData userRole;
     userRole.id = std::move(id);
     userRole.name = std::move(name);
     userRole.description = std::move(description);
@@ -27,7 +27,7 @@ UserRoleModel::DbUpdateTypes UserRoleModel::toDbTypes() &&
 
 std::vector<UserRoleModel> UserRoleModel::fromDbTypes(DbListTypes all)
 {
-    auto& baseList = std::get<UserRoleDataList>(all);
+    auto& baseList = std::get<UserGroupDataList>(all);
     auto& allAccessRights = std::get<AccessRightsDataList>(all);
 
     std::vector<UserRoleModel> result;

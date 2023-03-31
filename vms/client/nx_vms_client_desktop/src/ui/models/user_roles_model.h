@@ -8,11 +8,11 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 
-class QnUserRolesModelPrivate;
 class QnUserRolesModel: public ScopedModelOperations<QAbstractItemModel>
 {
     Q_OBJECT
@@ -40,17 +40,10 @@ public:
 
     /* Role-specific stuff: */
 
-    int rowForUser(const QnUserResourcePtr& user) const;
-    int rowForRole(Qn::UserRole role) const;
-
-    void setUserRoles(const nx::vms::api::UserRoleDataList& roles);
+    void setUserRoles(const nx::vms::api::UserGroupDataList& roles);
 
     /* If we want to override "Custom" role name and tooltip. */
     void setCustomRoleStrings(const QString& name, const QString& description);
-
-    /* Controls if UuidRole data contains predefined role pseudo uuids. */
-    bool predefinedRoleIdsEnabled() const;
-    void setPredefinedRoleIdsEnabled(bool value);
 
     /* Role selection support. */
 
@@ -74,8 +67,8 @@ public:
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
 private:
-    QScopedPointer<QnUserRolesModelPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(QnUserRolesModel)
+    class Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserRolesModel::DisplayRoleFlags);

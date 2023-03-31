@@ -7,9 +7,9 @@
 #include <client/desktop_client_message_processor.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
@@ -63,20 +63,13 @@ protected:
         accessController()->setUser({});
     }
 
-    void loginAs(const QnUuid& groupId, const QString& name = "user")
+    void loginAs(Ids groupIds, const QString& name = "user")
     {
         logout();
-        auto user = createUser(GlobalPermission::none, name);
-        if (!groupId.isNull())
-            user->setUserRoleIds({groupId});
+        auto user = createUser(groupIds, name);
         resourcePool()->addResource(user);
         emulateConnectionEstablished();
         accessController()->setUser(user);
-    }
-
-    void loginAs(const Qn::UserRole userGroup, const QString& name = "user")
-    {
-        loginAs(QnPredefinedUserRoles::id(userGroup), name);
     }
 
     QnVirtualCameraResourcePtr createCamera()
@@ -126,7 +119,7 @@ protected:
 
 TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomIsCreated)
 {
-    loginAs(Qn::UserRole::liveViewer);
+    loginAs(kLiveViewersGroupId);
     EXPECT_TRUE(layouts().empty());
 
     const auto intercomCamera = addIntercomCamera();
@@ -137,7 +130,7 @@ TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomIsCreated)
 
 TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomIsInitialized)
 {
-    loginAs(Qn::UserRole::liveViewer);
+    loginAs(kLiveViewersGroupId);
     EXPECT_TRUE(layouts().empty());
 
     const auto camera = createCamera();
@@ -153,7 +146,7 @@ TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomIsInitialized)
 
 TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomAccessIsGranted)
 {
-    loginAs(QnUuid{}); //< Custom.
+    loginAs(NoGroup);
 
     const auto intercomCamera = addIntercomCamera();
     EXPECT_TRUE(layouts().empty());
@@ -171,7 +164,7 @@ TEST_F(IntercomManagerTest, removeLocalIntercomLayoutWhenIntercomIsDeleted)
 {
     const auto intercomCamera = addIntercomCamera();
 
-    loginAs(Qn::UserRole::liveViewer);
+    loginAs(kLiveViewersGroupId);
     EXPECT_EQ(layouts().size(), 1);
 
     resourcePool()->removeResource(intercomCamera);
@@ -180,7 +173,7 @@ TEST_F(IntercomManagerTest, removeLocalIntercomLayoutWhenIntercomIsDeleted)
 
 TEST_F(IntercomManagerTest, removeLocalIntercomLayoutWhenIntercomAccessIsRevoked)
 {
-    loginAs(QnUuid{}); //< Custom.
+    loginAs(NoGroup);
 
     const auto intercomCamera = addIntercomCamera();
 
@@ -202,7 +195,7 @@ TEST_F(IntercomManagerTest, dontCreateIntercomLayoutIfOneExists)
     addIntercomLayout(intercomCamera);
     EXPECT_EQ(layouts().size(), 1);
 
-    loginAs(Qn::UserRole::liveViewer);
+    loginAs(kLiveViewersGroupId);
     EXPECT_EQ(layouts().size(), 1);
 }
 
@@ -213,7 +206,7 @@ TEST_F(IntercomManagerTest, dontCreateIntercomLayoutIfOneExists)
 
 TEST_F(IntercomManagerTest, dontRemoveRemoteIntercomLayoutWhenIntercomAccessIsRevoked)
 {
-    loginAs(QnUuid{}); //< Custom.
+    loginAs(NoGroup);
 
     const auto intercomCamera = addIntercomCamera();
     const auto layout = addIntercomLayout(intercomCamera);

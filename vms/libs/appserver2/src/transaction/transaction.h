@@ -739,7 +739,7 @@ APPLY(509, removeAccessRights, nx::vms::api::IdData, /* Remove records from vms_
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),                     \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(505, getUserGroups, nx::vms::api::UserRoleDataList, \
+APPLY(505, getUserGroups, nx::vms::api::UserGroupDataList, \
                        false, \
                        false, \
                        false, /*isRemoveOperation*/ \
@@ -751,7 +751,7 @@ APPLY(505, getUserGroups, nx::vms::api::UserRoleDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(506, saveUserGroup, nx::vms::api::UserRoleData, \
+APPLY(506, saveUserGroup, nx::vms::api::UserGroupData, \
                        true, \
                        false, \
                        false, /*isRemoveOperation*/ \

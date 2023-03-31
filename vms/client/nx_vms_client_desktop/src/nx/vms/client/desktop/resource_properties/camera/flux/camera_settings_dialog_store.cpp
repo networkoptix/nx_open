@@ -9,7 +9,8 @@
 #include <nx/reflect/json/serializer.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/common/flux/private_flux_store.h>
 
 #include "camera_settings_dialog_state_reducer.h"
@@ -20,30 +21,6 @@ using State = CameraSettingsDialogState;
 using Reducer = CameraSettingsDialogStateReducer;
 
 using namespace nx::vms::api;
-
-namespace {
-
-template<typename T>
-QVariantList toVariantList(const T& collection)
-{
-    QVariantList result;
-    for (const auto& item: collection)
-        result.append(QVariant::fromValue(item));
-    return result;
-}
-
-template<typename L>
-L fromVariantList(const QVariantList& list)
-{
-    using T = std::decay_t<decltype(*L().begin())>;
-
-    L result;
-    for (const auto& item: list)
-        result.push_back(item.value<T>());
-    return result;
-}
-
-} // namespace
 
 struct CameraSettingsDialogStore::Private:
     PrivateFluxStore<CameraSettingsDialogStore, State>
@@ -711,7 +688,7 @@ void CameraSettingsDialogStore::setAnalyticsEngines(const QList<AnalyticsEngineI
 
 QVariantList CameraSettingsDialogStore::userEnabledAnalyticsEngines() const
 {
-    return toVariantList(d->state.analytics.userEnabledEngines.get());
+    return nx::utils::toQVariantList(d->state.analytics.userEnabledEngines.get());
 }
 
 void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const QSet<QnUuid>& value)
@@ -744,7 +721,7 @@ bool CameraSettingsDialogStore::analyticsSettingsLoading() const
 
 void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const QVariantList& value)
 {
-    setUserEnabledAnalyticsEngines(nx::utils::toQSet(fromVariantList<QList<QnUuid>>(value)));
+    setUserEnabledAnalyticsEngines(nx::utils::toQSet(nx::utils::toTypedQList<QnUuid>(value)));
 }
 
 int CameraSettingsDialogStore::analyticsStreamIndex(const QnUuid& engineId) const

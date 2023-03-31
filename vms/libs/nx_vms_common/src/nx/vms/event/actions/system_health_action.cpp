@@ -2,7 +2,7 @@
 
 #include "system_health_action.h"
 
-#include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <utils/common/synctime.h>
@@ -24,8 +24,7 @@ SystemHealthAction::SystemHealthAction(
     setRuntimeParams(runtimeParams);
 
     ActionParameters actionParams;
-    const auto& ids = QnPredefinedUserRoles::adminIds();
-    actionParams.additionalResources = std::vector(ids.begin(), ids.end());
+    actionParams.additionalResources = {api::kAdminGroupIds.begin(), api::kAdminGroupIds.end()};
     setParams(actionParams);
 }
 

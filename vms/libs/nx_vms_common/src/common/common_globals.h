@@ -575,24 +575,6 @@ namespace Qn {
     Q_DECLARE_FLAGS(Permissions, Permission)
     Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
 
-    /**
-     * An enumeration for user role types: predefined roles, custom groups, custom permissions.
-     */
-    enum class UserRole
-    {
-        // TODO: This value should be removed. Role permissions shoud be added on top of own
-        //     user permissions.
-        customUserRole = -2,
-        customPermissions = -1,
-        owner = 0,
-        administrator = 1,
-        advancedViewer = 2,
-        viewer = 3,
-        liveViewer = 4
-    };
-    Q_ENUM_NS(UserRole)
-    NX_VMS_COMMON_API QString toString(UserRole value);
-
     NX_REFLECTION_ENUM_CLASS(FisheyeCameraProjection,
         equidistant,
         stereographic,

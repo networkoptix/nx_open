@@ -15,15 +15,17 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/branding.h>
 #include <nx/cloud/db/client/data/auth_data.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/ec2/ec_connection_notification_manager.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -767,7 +769,7 @@ struct SaveUserAccess
                 "Creating an owner user is not allowed.")));
         }
 
-        if (!systemContext->userRolesManager()->hasRoles(param.groupIds))
+        if (!nx::vms::common::allUserGroupsExist(systemContext, param.groupIds))
         {
             return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
                 "User Role does not exist.")));
@@ -1387,7 +1389,7 @@ struct SaveUserRoleAccess
     Result operator()(
         SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
-        const nx::vms::api::UserRoleData& param)
+        const nx::vms::api::UserGroupData& param)
     {
         if (auto r = AdminOnlyAccess()(systemContext, accessData, param); !r)
         {
@@ -1396,22 +1398,28 @@ struct SaveUserRoleAccess
             return r;
         }
 
-        auto userRoleManager = systemContext->userRolesManager();
-        const auto parentRoles = userRoleManager->userRolesWithParents(param.parentGroupIds);
-        if (const auto cycledRole =
-            nx::utils::find_if(parentRoles, [&](const auto& role) { return role.id == param.id; }))
+        QSet<QnUuid> parentIds = nx::utils::toQSet(param.parentGroupIds);
+        parentIds += systemContext->accessSubjectHierarchy()->recursiveParents(parentIds);
+
+        if (parentIds.contains(param.id))
         {
+            const auto cycledGroups = systemContext->accessSubjectHierarchy()->directMembers(
+                param.id).intersect(parentIds);
+
+            const auto cycledGroupNames = nx::vms::common::userGroupNames(
+                systemContext, cycledGroups);
+
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                "Parent Role cycle is forbidden. This Role is already inherided by '%1'."),
-                cycledRole->name));
+                "Circular dependencies are forbidden. This Role is already inherited by '%1'."),
+                cycledGroupNames.join("', '")));
         }
 
         if (!hasSystemAccess(accessData))
         {
             if (!param.externalId.isEmpty())
             {
-                const auto userRole = userRoleManager->userRole(param.id);
-                if (!userRole.externalId.isEmpty() && userRole.externalId != param.externalId)
+                const auto group = systemContext->userGroupManager()->find(param.id);
+                if (group && !group->externalId.isEmpty() && group->externalId != param.externalId)
                 {
                     return Result(ErrorCode::forbidden, ServerApiErrors::tr(
                         "Change of `externalId` is forbidden."));
@@ -1437,23 +1445,21 @@ struct RemoveUserRoleAccess
             return r;
         }
 
-        for (const auto& user: systemContext->resourcePool()->getResources<QnUserResource>())
+        const auto memberIds = systemContext->accessSubjectHierarchy()->directMembers(param.id);
+        for (const auto& id: memberIds)
         {
-            if (nx::utils::find_if(user->userRoleIds(), [&](const auto& id) { return id == param.id; }))
+            const auto member = systemContext->accessSubjectHierarchy()->subjectById(id);
+            if (auto user = member.user())
             {
                 return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                     "Removing Role is forbidden because it is still used by '%1'."),
                     user->getName()));
             }
-        }
-
-        for (const auto& role: systemContext->userRolesManager()->userRoles())
-        {
-            if (nx::utils::find_if(role.parentGroupIds, [&](const auto& id) { return id == param.id; }))
+            else if (auto group = systemContext->userGroupManager()->find(id))
             {
                 return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                     "Removing Role is forbidden because it is still inherited by '%1'."),
-                    role.name));
+                    group->name));
             }
         }
 
@@ -1472,44 +1478,25 @@ struct ModifyAccessRightsChecker
             return Result();
 
         auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(param.userId);
-        if (!param.resourceRights.empty())
-        {
-            if ((param.checkResourceExists == nx::vms::api::CheckResourceExists::customRole)
-                || ((param.checkResourceExists == nx::vms::api::CheckResourceExists::yes) && user
-                    && (user->userRole() == Qn::UserRole::customUserRole)))
-            {
-                return Result(ErrorCode::forbidden, ServerApiErrors::tr(
-                    "User with a custom User Role is not allowed to change shared Resources."));
-            }
-        }
 
         const auto accessRightMap = systemContext->accessRightsManager()->ownResourceAccessMap(
             param.userId);
 
         // CRUD API PATCH merges with existing shared resources so they can be not changed.
         std::map<QnUuid, nx::vms::api::AccessRights> sharedResourceRights;
-        if (user)
+        if (user || systemContext->userGroupManager()->contains(param.userId))
         {
             sharedResourceRights = {accessRightMap.keyValueBegin(), accessRightMap.keyValueEnd()};
         }
         else
         {
-            auto role = systemContext->userRolesManager()->userRole(param.userId);
-            if (role.id.isNull())
+            // We can clear shared Resources even after the User or Role is deleted.
+            if (!param.resourceRights.empty()
+                && (param.checkResourceExists == nx::vms::api::CheckResourceExists::yes))
             {
-                // We can clear shared Resources even after the User or Role is deleted.
-                if (!param.resourceRights.empty()
-                    && (param.checkResourceExists == nx::vms::api::CheckResourceExists::yes))
-                {
-                    return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
-                        "To set shared Resources, %1 must be a valid User or Role."),
-                        param.userId));
-                }
-            }
-            else
-            {
-                sharedResourceRights =
-                    {accessRightMap.keyValueBegin(), accessRightMap.keyValueEnd()};
+                return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+                    "To set shared Resources, %1 must be a valid User or Role."),
+                    param.userId));
             }
         }
 

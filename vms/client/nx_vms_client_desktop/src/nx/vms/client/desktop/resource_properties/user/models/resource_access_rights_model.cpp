@@ -15,7 +15,6 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -23,6 +22,7 @@
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 
 // We removed common metatype declaration but for some reason it's still required here for proper
 // `QVector<AccessRight>` registration.
@@ -563,9 +563,8 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
 
     for (const auto& groupId: accessInfo.providerUserGroups)
     {
-        const auto group = resource->systemContext()->userRolesManager()->userRole(groupId);
-        if (!group.name.isEmpty())
-            descriptions << tr("Access granted by %1 group").arg(html::bold(group.name));
+        if (const auto group = resource->systemContext()->userGroupManager()->find(groupId))
+            descriptions << tr("Access granted by %1 group").arg(html::bold(group->name));
     }
 
     for (const auto& providerResource: accessInfo.indirectProviders)

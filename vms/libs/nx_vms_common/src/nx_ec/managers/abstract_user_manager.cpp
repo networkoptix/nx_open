@@ -43,7 +43,7 @@ ErrorCode AbstractUserManager::removeSync(const QnUuid& id)
         });
 }
 
-ErrorCode AbstractUserManager::getUserRolesSync(nx::vms::api::UserRoleDataList* outDataList)
+ErrorCode AbstractUserManager::getUserRolesSync(nx::vms::api::UserGroupDataList* outDataList)
 {
     return detail::callSync(
         [&](auto handler)
@@ -53,7 +53,7 @@ ErrorCode AbstractUserManager::getUserRolesSync(nx::vms::api::UserRoleDataList* 
         outDataList);
 }
 
-ErrorCode AbstractUserManager::saveUserRoleSync(const nx::vms::api::UserRoleData& data)
+ErrorCode AbstractUserManager::saveUserRoleSync(const nx::vms::api::UserGroupData& data)
 {
     return detail::callSync(
         [&](auto handler)

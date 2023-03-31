@@ -13,7 +13,7 @@
 #include <nx/reflect/string_conversion.h>
 #include <utils/common/util.h>
 #include <nx/utils/string.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/network/rest/params.h>
 #include <nx/vms/event/actions/abstract_action.h>
 

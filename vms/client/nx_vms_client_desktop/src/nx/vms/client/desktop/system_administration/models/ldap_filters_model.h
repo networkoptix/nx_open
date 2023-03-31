@@ -7,7 +7,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
-#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 
 namespace nx::vms::client::desktop {
 

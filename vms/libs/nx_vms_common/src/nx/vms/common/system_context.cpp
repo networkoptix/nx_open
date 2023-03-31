@@ -18,7 +18,6 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/status_dictionary.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <licensing/license.h>
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/analytics/taxonomy/state_watcher.h>
@@ -27,6 +26,7 @@
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/event/rule_manager.h>
 
@@ -51,7 +51,7 @@ struct SystemContext::Private
     std::unique_ptr<QnServerAdditionalAddressesDictionary> serverAdditionalAddressesDictionary;
     std::unique_ptr<QnRuntimeInfoManager> runtimeInfoManager;
     std::unique_ptr<SystemSettings> globalSettings;
-    std::unique_ptr<QnUserRolesManager> userRolesManager;
+    std::unique_ptr<UserGroupManager> userGroupManager;
     std::unique_ptr<ResourceAccessSubjectHierarchy> accessSubjectHierarchy;
     std::unique_ptr<GlobalPermissionsWatcher> globalPermissionsWatcher;
     std::unique_ptr<AccessRightsManager> accessRightsManager;
@@ -94,15 +94,16 @@ SystemContext::SystemContext(
         std::make_unique<QnServerAdditionalAddressesDictionary>();
     d->runtimeInfoManager = std::make_unique<QnRuntimeInfoManager>();
     d->globalSettings = std::make_unique<SystemSettings>(this);
-    d->userRolesManager = std::make_unique<QnUserRolesManager>(this);
+
+    d->userGroupManager = std::make_unique<UserGroupManager>();
 
     d->accessSubjectHierarchy = std::make_unique<ResourceAccessSubjectHierarchy>(
         d->resourcePool.get(),
-        d->userRolesManager.get());
+        d->userGroupManager.get());
 
     d->globalPermissionsWatcher = std::make_unique<GlobalPermissionsWatcher>(
         d->resourcePool.get(),
-        d->userRolesManager.get());
+        d->userGroupManager.get());
 
     d->accessRightsManager = std::make_unique<AccessRightsManager>();
 
@@ -262,9 +263,9 @@ SystemSettings* SystemContext::globalSettings() const
     return d->globalSettings.get();
 }
 
-QnUserRolesManager* SystemContext::userRolesManager() const
+UserGroupManager* SystemContext::userGroupManager() const
 {
-    return d->userRolesManager.get();
+    return d->userGroupManager.get();
 }
 
 GlobalPermissionsWatcher* SystemContext::globalPermissionsWatcher() const

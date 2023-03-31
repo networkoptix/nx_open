@@ -11,7 +11,7 @@
 
 #include <core/resource/camera_bookmark.h>
 
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 

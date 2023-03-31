@@ -5,188 +5,129 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <ui/workbench/workbench_context.h>
+
+using namespace nx::vms::common;
+
+using nx::vms::api::UserGroupData;
+using nx::vms::api::UserGroupDataList;
 
 namespace {
 
-bool lessRoleByName(const nx::vms::api::UserRoleData& r1, const nx::vms::api::UserRoleData& r2)
+bool lessRoleByName(const UserGroupData& r1, const UserGroupData& r2)
 {
     return nx::utils::naturalStringCompare(r1.name, r2.name, Qt::CaseInsensitive) < 0;
 };
 
 } // namespace
 
-RoleDescription::RoleDescription(const Qn::UserRole roleType):
-    roleType(roleType),
-    name(QnPredefinedUserRoles::name(roleType)),
-    description(QnPredefinedUserRoles::description(roleType)),
-    permissions(QnPredefinedUserRoles::permissions(roleType)),
-    roleUuid(QnUuid())
-{
-}
-
-RoleDescription::RoleDescription(const nx::vms::api::UserRoleData& userRole):
-    roleType(Qn::UserRole::customUserRole),
-    name(userRole.name),
-    description(QnPredefinedUserRoles::description(roleType)),
-    permissions(QnPredefinedUserRoles::permissions(roleType)),
-    roleUuid(userRole.id)
-{
-}
-
-QnUserRolesModelPrivate::QnUserRolesModelPrivate(
-    QnUserRolesModel* parent,
+QnUserRolesModel::Private::Private(
+    QnUserRolesModel* q,
     QnUserRolesModel::DisplayRoleFlags flags)
     :
     base_type(),
-    QnWorkbenchContextAware(parent),
-    q_ptr(parent),
+    QnWorkbenchContextAware(q),
+    q(q),
     m_customRoleEnabled(flags.testFlag(QnUserRolesModel::CustomRoleFlag)),
     m_onlyAssignable(flags.testFlag(QnUserRolesModel::AssignableFlag))
 {
-    connect(parent, &QAbstractItemModel::modelAboutToBeReset, this,
-        [this]() { m_checked.clear(); });
+    connect(q, &QAbstractItemModel::modelAboutToBeReset, this,
+        [this]() { checked.clear(); });
 
     if (flags.testFlag(QnUserRolesModel::UserRoleFlag))
     {
-        m_userRoles = userRolesManager()->userRoles();
+        m_userRoles = systemContext()->userGroupManager()->groups();
         std::sort(m_userRoles.begin(), m_userRoles.end(), lessRoleByName);
 
-        connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-            &QnUserRolesModelPrivate::updateUserRole);
-        connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
-            &QnUserRolesModelPrivate::removeUserRole);
+        connect(systemContext()->userGroupManager(), &UserGroupManager::addedOrUpdated,
+            this, &QnUserRolesModel::Private::updateUserRole);
+        connect(systemContext()->userGroupManager(), &UserGroupManager::removed,
+            this, &QnUserRolesModel::Private::removeUserRole);
     }
 }
 
-int QnUserRolesModelPrivate::rowForUser(const QnUserResourcePtr& user) const
-{
-    /* Rows order: standard, user-defined, custom. */
-
-    int defaultRow = m_customRoleEnabled
-        ? count() - 1
-        : -1;
-
-    auto role = user->userRole();
-    switch (role)
-    {
-        case Qn::UserRole::customUserRole:
-        {
-            auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
-                [roleId = user->firstRoleId()](const UserRoleData& role)
-                {
-                    return role.id == roleId;
-                });
-
-            if (roleIterator == m_userRoles.end())
-                return defaultRow;
-
-            return std::distance(m_userRoles.begin(), roleIterator) + m_standardRoles.size();
-        }
-
-        case Qn::UserRole::customPermissions:
-            return defaultRow;
-
-        default:
-            break;
-    }
-
-    return m_standardRoles.indexOf(role);
-}
-
-int QnUserRolesModelPrivate::rowForRole(Qn::UserRole role) const
-{
-    return m_standardRoles.indexOf(role);
-}
-
-void QnUserRolesModelPrivate::setUserRoles(UserRoleDataList value)
+void QnUserRolesModel::Private::setUserRoles(UserGroupDataList value)
 {
     std::sort(value.begin(), value.end(), lessRoleByName);
     if (m_userRoles == value)
         return;
 
-    Q_Q(QnUserRolesModel);
     QnUserRolesModel::ScopedReset reset(q);
     m_userRoles = value;
 }
 
-bool QnUserRolesModelPrivate::updateUserRole(const UserRoleData& userRole)
+bool QnUserRolesModel::Private::updateUserRole(const UserGroupData& userRole)
 {
-    Q_Q(QnUserRolesModel);
     auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
-        [&userRole](const UserRoleData& role)
+        [&userRole](const UserGroupData& role)
         {
             return role.id == userRole.id;
         });
 
-    auto indexOffset = m_standardRoles.size();
-
-    /* If added: */
+    // If added.
     if (roleIterator == m_userRoles.end())
     {
-        auto insertionPosition = std::upper_bound(m_userRoles.begin(), m_userRoles.end(),
+        const auto insertionPosition = std::upper_bound(m_userRoles.begin(), m_userRoles.end(),
             userRole, lessRoleByName);
 
-        int row = std::distance(m_userRoles.begin(), insertionPosition) + indexOffset;
+        const int row = std::distance(m_userRoles.begin(), insertionPosition);
 
         QnUserRolesModel::ScopedInsertRows insertRows(q,  row, row);
         m_userRoles.insert(insertionPosition, userRole);
         return true;
     }
 
-    /* If updated: */
-    int sourceIndex = std::distance(m_userRoles.begin(), roleIterator);
-    int sourceRow = sourceIndex + indexOffset;
+    // If updated.
+    int sourceRow = std::distance(m_userRoles.begin(), roleIterator);
 
     if (roleIterator->name != userRole.name)
     {
         auto newPosition = std::upper_bound(m_userRoles.begin(), m_userRoles.end(),
             userRole, lessRoleByName);
 
-        int destinationIndex = std::distance(m_userRoles.begin(), newPosition);
-        int destinationRow = destinationIndex + indexOffset;
+        int destinationRow = std::distance(m_userRoles.begin(), newPosition);
 
-        /* Update row order if sorting changes: */
-        if (sourceIndex != destinationIndex && sourceIndex + 1 != destinationIndex)
+        // Update row order if sorting changes.
+        if (sourceRow != destinationRow && sourceRow + 1 != destinationRow)
         {
             QnUserRolesModel::ScopedMoveRows moveRows(q,
                 QModelIndex(), sourceRow, sourceRow,
                 QModelIndex(), destinationRow);
 
-            if (destinationIndex > sourceIndex)
+            if (destinationRow > sourceRow)
             {
-                /* Role moved forward: */
+                // Role moved forward.
                 std::rotate(roleIterator, roleIterator + 1, newPosition);
                 --newPosition;
                 --destinationRow;
             }
             else
             {
-                /* Role moved backward: */
-                using reverse = UserRoleDataList::reverse_iterator;
+                // Role moved backwards.
+                using reverse = UserGroupDataList::reverse_iterator;
                 std::rotate(reverse(roleIterator + 1), reverse(roleIterator), reverse(newPosition));
             }
 
-            /* Prepare new position for data change: */
+            // Prepare new position for data change.
             roleIterator = newPosition;
             sourceRow = destinationRow;
         }
     }
 
-    /* Data change: */
+    // Data change.
     *roleIterator = userRole;
     QModelIndex changed = q->index(sourceRow, 0);
     emit q->dataChanged(changed, changed);
     return false;
 }
 
-bool QnUserRolesModelPrivate::removeUserRoleById(const QnUuid& roleId)
+bool QnUserRolesModel::Private::removeUserRoleById(const QnUuid& roleId)
 {
-    auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
-        [&roleId](const UserRoleData& role)
+    const auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
+        [&roleId](const UserGroupData& role)
         {
             return role.id == roleId;
         });
@@ -194,55 +135,46 @@ bool QnUserRolesModelPrivate::removeUserRoleById(const QnUuid& roleId)
     if (roleIterator == m_userRoles.end())
         return false;
 
-    int row = std::distance(m_userRoles.begin(), roleIterator) + m_standardRoles.size();
+    const int row = std::distance(m_userRoles.begin(), roleIterator);
 
-    Q_Q(QnUserRolesModel);
     QnUserRolesModel::ScopedRemoveRows removeRows(q,  row, row);
     m_userRoles.erase(roleIterator);
     return true;
 }
 
-bool QnUserRolesModelPrivate::removeUserRole(const UserRoleData& userRole)
+bool QnUserRolesModel::Private::removeUserRole(const UserGroupData& userRole)
 {
     return removeUserRoleById(userRole.id);
 }
 
-RoleDescription QnUserRolesModelPrivate::roleByRow(int row) const
+UserGroupData QnUserRolesModel::Private::roleByRow(int row) const
 {
-    NX_ASSERT(row >= 0 && row < count());
-    if (row < 0)
-        return RoleDescription();
+    if (!NX_ASSERT(row >= 0 && row < count()))
+        return {};
 
-    if (row < m_standardRoles.size())
-        return RoleDescription(m_standardRoles[row]);
-
-    row -= m_standardRoles.size();
     if (row < m_userRoles.size())
-        return RoleDescription(m_userRoles[row]);
+        return m_userRoles[row];
 
-    NX_ASSERT(m_customRoleEnabled);
-    if (m_customRoleEnabled)
-    {
-        auto result = RoleDescription(Qn::UserRole::customPermissions);
-        if (!m_customRoleName.isEmpty())
-            result.name = m_customRoleName;
-        if (!m_customRoleDescription.isEmpty())
-            result.description = m_customRoleDescription;
-        return result;
-    }
+    if (!NX_ASSERT(m_customRoleEnabled))
+        return {};
 
-    return RoleDescription();
+    UserGroupData result;
+    result.name = m_customRoleName.isEmpty()
+        ? tr("Custom")
+        : m_customRoleName;
+    result.description = m_customRoleDescription.isEmpty()
+        ? tr("Custom access rights")
+        : m_customRoleDescription;
+    return result;
 }
 
-int QnUserRolesModelPrivate::count() const
+int QnUserRolesModel::Private::count() const
 {
-    int total = m_standardRoles.size() + (int)m_userRoles.size();
-    if (m_customRoleEnabled)
-        ++total;
-    return total;
+    const auto total = (int) m_userRoles.size();
+    return m_customRoleEnabled ? (total + 1) : total;
 }
 
-void QnUserRolesModelPrivate::setCustomRoleStrings(const QString& name, const QString& description)
+void QnUserRolesModel::Private::setCustomRoleStrings(const QString& name, const QString& description)
 {
     if (m_customRoleName == name && m_customRoleDescription == description)
         return;
@@ -253,15 +185,11 @@ void QnUserRolesModelPrivate::setCustomRoleStrings(const QString& name, const QS
     if (!m_customRoleEnabled)
         return;
 
-    Q_Q(QnUserRolesModel);
     QModelIndex customRoleIndex = q->index(count() - 1, 0);
     emit q->dataChanged(customRoleIndex, customRoleIndex);
 }
 
-QnUuid QnUserRolesModelPrivate::id(int row, bool predefinedRoleIdsEnabled) const
+QnUuid QnUserRolesModel::Private::id(int row) const
 {
-    const auto role = roleByRow(row);
-    return role.roleType != Qn::UserRole::customUserRole && predefinedRoleIdsEnabled
-        ? QnPredefinedUserRoles::id(role.roleType)
-        : role.roleUuid;
+    return roleByRow(row).id;
 }

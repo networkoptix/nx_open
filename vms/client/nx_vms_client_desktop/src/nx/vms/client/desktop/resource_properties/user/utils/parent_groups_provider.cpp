@@ -5,10 +5,10 @@
 #include <QtQml/QtQml>
 
 #include <core/resource_access/subject_hierarchy.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/client/desktop/system_administration/models/members_cache.h>
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -51,20 +51,21 @@ QVariant ParentGroupsProvider::data(const QModelIndex& index, int role) const
     if (index.row() < 0 || index.row() >= (int) m_groups.size() || !m_context)
         return {};
 
+    const auto group =
+        [this](const QModelIndex& index)
+        {
+            return m_context->systemContext()->userGroupManager()->find(
+                m_groups.at(index.row())).value_or(api::UserGroupData{});
+        };
+
     switch (role)
     {
         case Qt::DisplayRole:
-        {
-            const auto groupsManager = m_context->systemContext()->userRolesManager();
-            const auto group = groupsManager->userRole(m_groups.at(index.row()));
-            return group.name;
-        }
+            return group(index).name;
+
         case isLdap:
-        {
-            const auto groupsManager = m_context->systemContext()->userRolesManager();
-            const auto group = groupsManager->userRole(m_groups.at(index.row()));
-            return group.type == nx::vms::api::UserType::ldap;
-        }
+            return group(index).type == nx::vms::api::UserType::ldap;
+
         case isParent:
         {
             const auto directParents =
@@ -72,6 +73,7 @@ QVariant ParentGroupsProvider::data(const QModelIndex& index, int role) const
 
             return directParents.contains(m_groups.at(index.row()));
         }
+
         case isPredefined:
             return MembersCache::isPredefined(m_groups.at(index.row()));
 

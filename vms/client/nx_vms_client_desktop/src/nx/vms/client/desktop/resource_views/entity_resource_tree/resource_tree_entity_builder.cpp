@@ -13,7 +13,6 @@
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <finders/systems_finder.h>
 #include <network/system_description.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>

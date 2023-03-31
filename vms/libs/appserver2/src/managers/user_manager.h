@@ -33,11 +33,11 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int getUserRoles(
-        Handler<nx::vms::api::UserRoleDataList> handler,
+        Handler<nx::vms::api::UserGroupDataList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int saveUserRole(
-        const nx::vms::api::UserRoleData& data,
+        const nx::vms::api::UserGroupData& data,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -136,12 +136,12 @@ int QnUserManager<QueryProcessorType>::remove(
 
 template<class QueryProcessorType>
 int QnUserManager<QueryProcessorType>::getUserRoles(
-    Handler<nx::vms::api::UserRoleDataList> handler,
+    Handler<nx::vms::api::UserGroupDataList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::UserRoleDataList>(
+    processor().template processQueryAsync<QnUuid, nx::vms::api::UserGroupDataList>(
         ApiCommand::getUserGroups,
         QnUuid(),
         [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
@@ -150,7 +150,7 @@ int QnUserManager<QueryProcessorType>::getUserRoles(
 
 template<class QueryProcessorType>
 int QnUserManager<QueryProcessorType>::saveUserRole(
-    const nx::vms::api::UserRoleData& data,
+    const nx::vms::api::UserGroupData& data,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {

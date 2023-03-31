@@ -4,11 +4,13 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
 #include <nx/vms/client/desktop/system_administration/models/recursive_members_model.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
@@ -38,11 +40,11 @@ public:
         // "user3",
         // "user4",
         // "user5",
-        // "Owner",
-        // "Administrator",
-        // "Advanced Viewer",
-        // "Viewer",
-        // "Live Viewer",
+        // "Owners",
+        // "Administrators",
+        // "Advanced Viewers",
+        // "Viewers",
+        // "Live Viewers",
         // "group1",
         // "    group3",
         // "        user1",
@@ -76,7 +78,7 @@ public:
         // "    group5",
         // "group5",
 
-        m_admin = addUser("admin", {QnPredefinedUserRoles::id(Qn::UserRole::owner)});
+        m_admin = addUser("admin", {api::kOwnersGroupId});
         const auto admin =
             systemContext()->resourcePool()->getResourceById<QnUserResource>(m_admin);
 
@@ -109,18 +111,18 @@ public:
         user->setIdUnsafe(QnUuid::createUuid());
         user->setName(name);
         user->addFlags(Qn::remote);
-        user->setUserRoleIds(parents);
+        user->setGroupIds(parents);
         systemContext()->resourcePool()->addResource(user);
         return user->getId();
     }
 
     QnUuid addGroup(const QString& name, const std::vector<QnUuid>& parents)
     {
-        api::UserRoleData group;
+        api::UserGroupData group;
         group.setId(QnUuid::createUuid());
         group.name = name;
         group.parentGroupIds = parents;
-        systemContext()->userRolesManager()->addOrUpdateUserRole(group);
+        systemContext()->userGroupManager()->addOrUpdate(group);
         return group.id;
     }
 
@@ -137,27 +139,27 @@ public:
         const auto allUsers = systemContext()->resourcePool()->getResources<QnUserResource>();
         for (const auto& user: allUsers)
         {
-            std::vector<QnUuid> ids = user->userRoleIds();
+            std::vector<QnUuid> ids = user->groupIds();
             if (nx::utils::erase_if(ids, [&user](auto id){ return id == user->getId(); }))
-                user->setUserRoleIds(ids);
+                user->setGroupIds(ids);
         }
 
-        for (auto group: systemContext()->userRolesManager()->userRoles())
+        for (auto group: systemContext()->userGroupManager()->groups())
         {
             const auto isTargetGroup = [&group](auto id){ return id == group.id; };
             if (nx::utils::erase_if(group.parentGroupIds, isTargetGroup))
-                systemContext()->userRolesManager()->addOrUpdateUserRole(group);
+                systemContext()->userGroupManager()->addOrUpdate(group);
         }
 
-        systemContext()->userRolesManager()->removeUserRole(id);
+        systemContext()->userGroupManager()->remove(id);
     }
 
     void renameGroup(const QnUuid& id, const QString& newName)
     {
-        auto group = systemContext()->userRolesManager()->userRole(id);
+        auto group = systemContext()->userGroupManager()->find(id).value_or(api::UserGroupData{});
         ASSERT_EQ(id, group.id);
         group.name = newName;
-        systemContext()->userRolesManager()->addOrUpdateUserRole(group);
+        systemContext()->userGroupManager()->addOrUpdate(group);
     }
 
     void renameUser(const QnUuid& id, const QString& newName)
@@ -239,6 +241,17 @@ public:
     QnUuid m_user3;
     QnUuid m_user5;
 };
+
+TEST_F(MembersModelTest, prerequisiteCheckPredefinedGroupNames)
+{
+    using nx::vms::common::PredefinedUserGroups;
+
+    ASSERT_EQ(PredefinedUserGroups::find(api::kOwnersGroupId)->name, "Owners");
+    ASSERT_EQ(PredefinedUserGroups::find(api::kAdministratorsGroupId)->name, "Administrators");
+    ASSERT_EQ(PredefinedUserGroups::find(api::kAdvancedViewersGroupId)->name, "Advanced Viewers");
+    ASSERT_EQ(PredefinedUserGroups::find(api::kViewersGroupId)->name, "Viewers");
+    ASSERT_EQ(PredefinedUserGroups::find(api::kLiveViewersGroupId)->name, "Live Viewers");
+}
 
 TEST_F(MembersModelTest, removeAndAddParentForGroup)
 {
@@ -385,11 +398,11 @@ TEST_F(MembersModelTest, allowedParents)
     m_model->setGroupId(m_group2);
 
     static const QStringList kAllowedParents = {
-        "Owner",
-        "Administrator",
-        "Advanced Viewer",
-        "Viewer",
-        "Live Viewer",
+        "Owners",
+        "Administrators",
+        "Advanced Viewers",
+        "Viewers",
+        "Live Viewers",
         "group1"
     };
 
@@ -470,11 +483,11 @@ TEST_F(MembersModelTest, removeUserResource)
         "user2",
         "user3",
         "user4",
-        "Owner",
-        "Administrator",
-        "Advanced Viewer",
-        "Viewer",
-        "Live Viewer",
+        "Owners",
+        "Administrators",
+        "Advanced Viewers",
+        "Viewers",
+        "Live Viewers",
         "group1",
         "group2",
         "group3",
@@ -515,11 +528,11 @@ TEST_F(MembersModelTest, addUserResource)
         "user3",
         "user4",
         "user5",
-        "Owner",
-        "Administrator",
-        "Advanced Viewer",
-        "Viewer",
-        "Live Viewer",
+        "Owners",
+        "Administrators",
+        "Advanced Viewers",
+        "Viewers",
+        "Live Viewers",
         "group1",
         "group2",
         "group3",
@@ -563,11 +576,11 @@ TEST_F(MembersModelTest, addGroup)
         "user3",
         "user4",
         "user5",
-        "Owner",
-        "Administrator",
-        "Advanced Viewer",
-        "Viewer",
-        "Live Viewer",
+        "Owners",
+        "Administrators",
+        "Advanced Viewers",
+        "Viewers",
+        "Live Viewers",
         "group1",
         "group2",
         "group3",
@@ -610,11 +623,11 @@ TEST_F(MembersModelTest, removeGroup)
         "user3",
         "user4",
         "user5",
-        "Owner",
-        "Administrator",
-        "Advanced Viewer",
-        "Viewer",
-        "Live Viewer",
+        "Owners",
+        "Administrators",
+        "Advanced Viewers",
+        "Viewers",
+        "Live Viewers",
         "group1",
         "group2",
         "group3",
@@ -651,11 +664,11 @@ TEST_F(MembersModelTest, renameGroup)
         "user3",
         "user4",
         "user5",
-        "Owner",
-        "Administrator",
-        "Advanced Viewer",
-        "Viewer",
-        "Live Viewer",
+        "Owners",
+        "Administrators",
+        "Advanced Viewers",
+        "Viewers",
+        "Live Viewers",
         "group1",
         "group2",
         "group3",
@@ -696,11 +709,11 @@ TEST_F(MembersModelTest, renameUser)
         "user2",
         "user4",
         "user5",
-        "Owner",
-        "Administrator",
-        "Advanced Viewer",
-        "Viewer",
-        "Live Viewer",
+        "Owners",
+        "Administrators",
+        "Advanced Viewers",
+        "Viewers",
+        "Live Viewers",
         "group1",
         "group2",
         "group3",

@@ -10,7 +10,6 @@
 
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <ui/common/indents.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/style.h>

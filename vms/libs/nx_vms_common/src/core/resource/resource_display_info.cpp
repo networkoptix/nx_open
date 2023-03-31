@@ -10,12 +10,12 @@
 #include <core/resource/resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/common/resource/server_host_priority.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 
 using namespace nx::vms::common;
 
@@ -151,10 +151,7 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     if (flags.testFlag(Qn::user))
     {
         if (const auto user = m_resource.dynamicCast<QnUserResource>())
-        {
-            if (const auto systemContext = user->systemContext())
-                m_extraInfo = systemContext->userRolesManager()->userRoleName(user);
-        }
+            m_extraInfo = nx::vms::common::userGroupNames(user).join(", ");
     }
     else
     {

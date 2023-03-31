@@ -17,7 +17,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -30,6 +29,7 @@
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/dialogs/common/message_box.h>
 #include <utils/common/synctime.h>
@@ -219,12 +219,12 @@ struct LdapSettingsWidget::Private
 
     int getLdapGroupCount() const
     {
-        const auto groups = q->systemContext()->userRolesManager()->userRoles();
+        const auto groups = q->systemContext()->userGroupManager()->groups();
         return std::count_if(groups.begin(), groups.end(),
-            [](auto g)
+            [](const auto& group)
             {
-                return g.type == nx::vms::api::UserType::ldap
-                    && g.id != nx::vms::api::UserRoleData::kLdapDefaultId;
+                return group.type == nx::vms::api::UserType::ldap
+                    && group.id != nx::vms::api::kDefaultLdapGroupId;
             });
     }
 

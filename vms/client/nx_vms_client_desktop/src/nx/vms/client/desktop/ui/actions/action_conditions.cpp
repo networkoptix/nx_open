@@ -26,7 +26,6 @@
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <network/router.h>
 #include <network/system_helpers.h>

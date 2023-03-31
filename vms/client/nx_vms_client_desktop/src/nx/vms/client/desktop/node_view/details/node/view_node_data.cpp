@@ -6,7 +6,7 @@
 #include "view_node_data_builder.h"
 
 #include <nx/utils/log/assert.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 
 namespace {
 

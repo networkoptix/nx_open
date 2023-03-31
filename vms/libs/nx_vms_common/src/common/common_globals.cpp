@@ -32,30 +32,6 @@ Qn::ConnectionRole fromStreamIndex(nx::vms::api::StreamIndex streamIndex)
     }
 }
 
-QString toString(UserRole value)
-{
-    switch (value)
-    {
-        case UserRole::customUserRole:
-            return "customUserRole";
-        case UserRole::customPermissions:
-            return "customPermissions";
-        case UserRole::owner:
-            return "owner";
-        case UserRole::administrator:
-            return "administrator";
-        case UserRole::advancedViewer:
-            return "advancedViewer";
-        case UserRole::viewer:
-            return "viewer";
-        case UserRole::liveViewer:
-            return "liveViewer";
-        default:
-            NX_ASSERT(false, "Unexpected enumeration value %1", (int) value);
-            return "unknown";
-    }
-}
-
 QString toString(Qn::TimePeriodContent value)
 {
     switch (value)

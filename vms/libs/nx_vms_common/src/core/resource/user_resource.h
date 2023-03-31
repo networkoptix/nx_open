@@ -14,7 +14,7 @@
 
 struct PasswordHashes;
 
-namespace nx { namespace network { namespace aio { class Timer; } } }
+namespace nx::network::aio { class Timer; }
 
 namespace nx::vms::api {
 
@@ -92,8 +92,6 @@ public:
     bool isCloud() const { return userType() == nx::vms::api::UserType::cloud; }
     bool isLocal() const { return userType() == nx::vms::api::UserType::local; }
 
-    Qn::UserRole userRole() const;
-
     QnUserHash getHash() const;
 
     enum class DigestSupport
@@ -135,17 +133,8 @@ public:
      */
     bool isBuiltInAdmin() const;
 
-    std::vector<QnUuid> userRoleIds() const;
-    void setUserRoleIds(const std::vector<QnUuid>& userRoleIds);
-
-    /**
-     * Custom or Predefined Role IDs including inherited values.
-     */
-    std::vector<QnUuid> allUserRoleIds() const;
-
-    // TODO: Remove this helpers and adapt all usages to handle several roles.
-    QnUuid firstRoleId() const;
-    void setSingleUserRole(const QnUuid& id);
+    std::vector<QnUuid> groupIds() const;
+    void setGroupIds(const std::vector<QnUuid>& value);
 
     bool isEnabled() const;
     void setEnabled(bool isEnabled);
@@ -200,7 +189,7 @@ private:
     QByteArray m_cryptSha512Hash;
     QString m_realm;
     std::atomic<GlobalPermissions> m_permissions;
-    std::vector<QnUuid> m_userRoleIds;
+    std::vector<QnUuid> m_groupIds;
     std::atomic<bool> m_isEnabled{true};
     QString m_email;
     QString m_fullName;

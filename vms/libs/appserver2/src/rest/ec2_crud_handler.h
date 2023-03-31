@@ -260,7 +260,7 @@ private:
             std::is_same_v<T, nx::vms::api::StoredFileDataList> ||
             std::is_same_v<T, nx::vms::api::AccessRightsDataList> ||
             std::is_same_v<T, nx::vms::api::UserDataList> ||
-            std::is_same_v<T, nx::vms::api::UserRoleDataList> ||
+            std::is_same_v<T, nx::vms::api::UserGroupDataList> ||
             std::is_same_v<T, nx::vms::api::LayoutDataList> ||
             std::is_same_v<T, nx::vms::api::ShowreelDataList> ||
             std::is_same_v<T, nx::vms::api::LookupListDataList> ||
@@ -283,7 +283,7 @@ private:
             return ApiCommand::Value::getAccessRights;
         else if constexpr(std::is_same_v<T, nx::vms::api::UserDataList>)
             return ApiCommand::Value::getUsers;
-        else if constexpr(std::is_same_v<T, nx::vms::api::UserRoleDataList>)
+        else if constexpr(std::is_same_v<T, nx::vms::api::UserGroupDataList>)
             return ApiCommand::Value::getUserGroups;
         else if constexpr(std::is_same_v<T, nx::vms::api::LayoutDataList>)
             return ApiCommand::Value::getLayouts;
@@ -327,7 +327,7 @@ private:
         static_assert(
             std::is_same_v<T, nx::vms::api::StoredFileData> ||
             std::is_same_v<T, nx::vms::api::AccessRightsData> ||
-            std::is_same_v<T, nx::vms::api::UserRoleData> ||
+            std::is_same_v<T, nx::vms::api::UserGroupData> ||
             std::is_same_v<T, nx::vms::api::UserDataEx> ||
             std::is_same_v<T, nx::vms::api::LayoutData> ||
             std::is_same_v<T, nx::vms::api::ShowreelData> ||
@@ -351,7 +351,7 @@ private:
             return ApiCommand::Value::setAccessRights;
         else if constexpr (std::is_same_v<T, nx::vms::api::UserDataEx>)
             return ApiCommand::Value::saveUser;
-        else if constexpr (std::is_same_v<T, nx::vms::api::UserRoleData>)
+        else if constexpr (std::is_same_v<T, nx::vms::api::UserGroupData>)
             return ApiCommand::Value::saveUserGroup;
         else if constexpr (std::is_same_v<T, nx::vms::api::LayoutData>)
             return ApiCommand::Value::saveLayout;

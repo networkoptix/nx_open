@@ -10,7 +10,7 @@
 #include <nx/vms/common/system_context_aware.h>
 
 class QnResourceAccessSubject;
-namespace nx::vms::api { struct UserRoleData; }
+namespace nx::vms::api { struct UserGroupData; }
 
 class NX_VMS_COMMON_API QnGlobalPermissionsManager:
     public QObject,
@@ -74,8 +74,8 @@ private:
 
     void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
-    void handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole);
-    void handleRoleRemoved(const nx::vms::api::UserRoleData& userRole);
+    void handleGroupAddedOrUpdated(const nx::vms::api::UserGroupData& userGroup);
+    void handleGroupRemoved(const nx::vms::api::UserGroupData& userGroup);
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
     void handleHierarchyChanged(

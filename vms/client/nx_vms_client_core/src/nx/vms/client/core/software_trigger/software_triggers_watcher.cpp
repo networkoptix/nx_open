@@ -9,13 +9,13 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/strings_helper.h>
@@ -53,11 +53,13 @@ bool appropriateSoftwareTriggerRule(
     if (nx::utils::contains(subjects, currentUser->getId()))
         return true;
 
-    for (const auto& roleId: currentUser->allUserRoleIds())
+    const auto userGroups = nx::vms::common::userGroupsWithParents(currentUser);
+    for (const auto& groupId: userGroups)
     {
-        if (nx::utils::contains(subjects, roleId))
+        if (nx::utils::contains(subjects, groupId))
             return true;
     }
+
     return false;
 }
 
@@ -86,8 +88,8 @@ bool appropriateSoftwareTriggerRule(
     if (userField->acceptAll() || userField->ids().contains(currentUser->getId()))
         return true;
 
-    auto userRoles = nx::utils::toQSet(currentUser->allUserRoleIds());
-    return userRoles.intersects(userField->ids());
+    const auto userGroups = nx::vms::common::userGroupsWithParents(currentUser);
+    return userGroups.intersects(userField->ids());
 }
 
 } // namespace

@@ -49,7 +49,7 @@
 #include "data/update_data.h"
 #include "data/user_data.h"
 #include "data/user_data_ex.h"
-#include "data/user_role_data.h"
+#include "data/user_group_data.h"
 #include "data/videowall_data.h"
 #include "data/videowall_license_overflow_data.h"
 #include "data/webpage_data.h"
@@ -161,7 +161,7 @@ void Metatypes::initialize()
     qRegisterMetaType<UpdateInstallData>();
     qRegisterMetaType<UserData>();
     qRegisterMetaType<UserDataEx>();
-    qRegisterMetaType<UserRoleData>();
+    qRegisterMetaType<UserGroupData>();
     qRegisterMetaType<UpdateUploadResponseData>();
     qRegisterMetaType<VideowallData>();
     qRegisterMetaType<VideowallControlMessageData>();

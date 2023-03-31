@@ -197,7 +197,6 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(ActionEmittedBy),
 
         IDR_ITEM(GlobalPermissionsRole),
-        IDR_ITEM(UserRoleRole),
 
         IDR_ITEM(ValidationStateRole),
         IDR_ITEM(ResolutionModeRole),

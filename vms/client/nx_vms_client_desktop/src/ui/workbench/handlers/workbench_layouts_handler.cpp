@@ -15,7 +15,6 @@
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -47,6 +46,7 @@
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -290,11 +290,13 @@ void LayoutsHandler::at_businessActionReceived(
                 if (std::find(permitted.begin(), permitted.end(), currentUser->getId()) != permitted.end())
                     return true;
 
-                for (const auto& roleId: currentUser->allUserRoleIds())
+                const auto groups = nx::vms::common::userGroupsWithParents(currentUser);
+                for (const auto& groupId: groups)
                 {
-                    if (std::find(permitted.begin(), permitted.end(), roleId) != permitted.end())
+                    if (std::find(permitted.begin(), permitted.end(), groupId) != permitted.end())
                         return true;
                 }
+
                 return false;
             };
 

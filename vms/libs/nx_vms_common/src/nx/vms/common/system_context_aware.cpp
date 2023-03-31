@@ -94,9 +94,9 @@ QnRuntimeInfoManager* SystemContextAware::runtimeInfoManager() const
     return systemContext()->runtimeInfoManager();
 }
 
-QnUserRolesManager* SystemContextAware::userRolesManager() const
+UserGroupManager* SystemContextAware::userGroupManager() const
 {
-    return systemContext()->userRolesManager();
+    return systemContext()->userGroupManager();
 }
 
 } // namespace nx::vms::common

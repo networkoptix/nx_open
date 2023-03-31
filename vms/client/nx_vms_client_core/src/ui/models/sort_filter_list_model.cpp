@@ -4,7 +4,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
 
 class QnSortFilterListModelPrivate: public QObject
 {

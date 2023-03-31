@@ -8,10 +8,10 @@
 #include <QtCore/QStringList>
 
 #include <client/client_globals.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
 
 namespace nx::vms::client::desktop {
 
@@ -64,8 +64,7 @@ struct UserGroupListModel::Private
 
     static bool isBuiltIn(const UserGroupData& group)
     {
-        // TODO: #vkutin Implement it properly when possible.
-        return (bool) QnPredefinedUserRoles::get(group.id);
+        return common::PredefinedUserGroups::contains(group.id);
     }
 
     static bool hasOwnPermissions(const UserGroupData& group)

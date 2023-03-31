@@ -8,44 +8,41 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/api/data/camera_data.h>
-#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/intercom/utils.h>
+#include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 
 #include "storage_resource_stub.h"
 
-using namespace nx::vms::common;
+using namespace nx::vms::api;
 
-QnUserResourcePtr QnResourcePoolTestHelper::createUser(GlobalPermissions globalPermissions,
+QnUserResourcePtr QnResourcePoolTestHelper::createUser(
+    Ids parentGroupIds,
     const QString& name,
-    nx::vms::api::UserType userType,
+    UserType userType,
+    GlobalPermissions globalPermissions,
     const QString& ldapDn)
 {
     QnUserResourcePtr user(new QnUserResource(userType, ldapDn));
     user->setIdUnsafe(QnUuid::createUuid());
     user->setName(name);
     user->setPasswordAndGenerateHash(name);
-
-    // Handle deprecated permission presets as predefined user groups.
-    globalPermissions.setFlag(GlobalPermission::customUser, false);
-    if (const auto id = QnPredefinedUserRoles::presetId(globalPermissions))
-    {
-        user->setUserRoleIds({*id});
-        globalPermissions &= ~QnPredefinedUserRoles::get(*id)->permissions;
-    }
-
+    user->setGroupIds(parentGroupIds.data);
     user->setRawPermissions(globalPermissions);
     user->addFlags(Qn::remote);
     return user;
 }
 
-QnUserResourcePtr QnResourcePoolTestHelper::addUser(GlobalPermissions globalPermissions,
+QnUserResourcePtr QnResourcePoolTestHelper::addUser(
+    Ids parentGroupIds,
     const QString& name,
-    nx::vms::api::UserType userType,
+    UserType userType,
+    GlobalPermissions globalPermissions,
     const QString& ldapDn)
 {
-    auto user = createUser(globalPermissions, name, userType, ldapDn);
+    const auto user = createUser(parentGroupIds, name, userType, globalPermissions, ldapDn);
     resourcePool()->addResource(user);
     return user;
 }
@@ -68,7 +65,7 @@ QnUuid QnResourcePoolTestHelper::addToLayout(
     const QnLayoutResourcePtr& layout,
     const QnResourcePtr& resource)
 {
-    LayoutItemData item;
+    nx::vms::common::LayoutItemData item;
     item.uuid = QnUuid::createUuid();
     item.resource.id = resource->getId();
     layout->addItem(item);
@@ -102,7 +99,7 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::createDesktopCamera(
     const QnUserResourcePtr& user)
 {
     auto camera = createCamera(Qn::LicenseType::LC_Invalid);
-    camera->setTypeId(nx::vms::api::CameraData::kDesktopCameraTypeId);
+    camera->setTypeId(CameraData::kDesktopCameraTypeId);
     camera->setFlags(Qn::desktop_camera);
     camera->setModel("virtual desktop camera"); //< TODO: #sivanov Globalize the constant.
     camera->setName(user->getName());
@@ -125,7 +122,7 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::addIntercomCamera()
     const auto camera = createCamera();
 
     static const QString kOpenDoorPortName = QString::fromStdString(
-        nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::powerRelay));
+        nx::reflect::toString(ExtendedCameraOutput::powerRelay));
 
     QnIOPortData intercomFeaturePort;
     intercomFeaturePort.outputName = kOpenDoorPortName;
@@ -202,13 +199,13 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayoutForVideoWall(
     return layout;
 }
 
-QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer(nx::vms::api::ServerFlags additionalFlags)
+QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer(ServerFlags additionalFlags)
 {
     QnMediaServerResourcePtr server(new QnMediaServerResource());
     server->setIdUnsafe(QnUuid::createUuid());
     server->setUrl("http://localhost:7001");
     resourcePool()->addResource(server);
-    server->setStatus(nx::vms::api::ResourceStatus::online);
+    server->setStatus(ResourceStatus::online);
     server->setServerFlags(server->getServerFlags() | additionalFlags);
     return server;
 }
@@ -221,30 +218,41 @@ QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerRes
     return storage;
 }
 
-nx::vms::api::UserRoleData QnResourcePoolTestHelper::createRole(
-    GlobalPermissions permissions, std::vector<QnUuid> parentGroupIds)
+UserGroupData QnResourcePoolTestHelper::createUserGroup(Ids parentGroupIds, QString name)
 {
-    return createRole(NX_FMT("Role for %1", nx::reflect::json::serialize(permissions)),
-        permissions, parentGroupIds);
+    if (name.isNull())
+    {
+        name = NX_FMT("Group inherited from `%1`", nx::vms::common::userGroupNames(
+            systemContext(), parentGroupIds.data).join("', '"));
+    }
+
+    UserGroupData group{QnUuid::createUuid(), name, GlobalPermission::none, parentGroupIds.data};
+    systemContext()->userGroupManager()->addOrUpdate(group);
+    return group;
 }
 
-nx::vms::api::UserRoleData QnResourcePoolTestHelper::createRole(const QString& name,
-    GlobalPermissions permissions, std::vector<QnUuid> parentGroupIds)
+UserGroupData QnResourcePoolTestHelper::createUserGroup(GlobalPermissions permissions, QString name)
 {
-    nx::vms::api::UserRoleData role{QnUuid::createUuid(), name, permissions, parentGroupIds};
-    userRolesManager()->addOrUpdateUserRole(role);
-    return role;
+    if (name.isNull())
+        name = NX_FMT("Role for %1", nx::reflect::json::serialize(permissions));
+
+    UserGroupData group{QnUuid::createUuid(), name, permissions, {}};
+    addOrUpdateUserGroup(group);
+    return group;
 }
 
-void QnResourcePoolTestHelper::removeRole(const QnUuid& roleId)
+void QnResourcePoolTestHelper::addOrUpdateUserGroup(const UserGroupData& group)
 {
-    userRolesManager()->removeUserRole(roleId);
+    systemContext()->userGroupManager()->addOrUpdate(group);
+}
+
+void QnResourcePoolTestHelper::removeUserGroup(const QnUuid& groupId)
+{
+    systemContext()->userGroupManager()->remove(groupId);
 }
 
 void QnResourcePoolTestHelper::clear()
 {
     resourcePool()->clear();
-
-    const QSignalBlocker blocker(userRolesManager());
-    userRolesManager()->resetUserRoles({});
+    systemContext()->userGroupManager()->resetAll({});
 }

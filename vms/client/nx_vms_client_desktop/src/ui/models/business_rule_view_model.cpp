@@ -15,10 +15,10 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/string_conversion.h>
-#include <nx/utils/qset.h>
+#include <nx/utils/qt_helpers.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/rules/event_action_subtype.h>
@@ -31,6 +31,7 @@
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/actions.h>
@@ -72,7 +73,8 @@ QSet<QnUuid> toIds(const QnResourceList& resources)
     return nx::utils::toQSet(resources.ids());
 }
 
-inline std::vector<QnUuid> toStdVector(const QList<QnUuid>& values)
+template<typename List>
+inline std::vector<QnUuid> toStdVector(const List& values)
 {
     return {values.cbegin(), values.cend()};
 }
@@ -94,10 +96,12 @@ template<class IDList>
 QSet<QnUuid> filterSubjectIds(const IDList& ids)
 {
     QnUserResourceList users;
-    QList<QnUuid> roles;
+    QList<QnUuid> groupIds;
 
-    appContext()->currentSystemContext()->userRolesManager()->usersAndRoles(ids, users, roles);
-    return toIds(users).unite(nx::utils::toQSet(roles));
+    nx::vms::common::getUsersAndGroups(appContext()->currentSystemContext(),
+        ids, users, groupIds);
+
+    return toIds(users).unite(nx::utils::toQSet(groupIds));
 }
 
 QSet<QnUuid> filterActionResources(
@@ -243,7 +247,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     for (const auto actionType: lexComparator.lexSortedActions(clientActions))
         addActionItem(actionType);
 
-    m_actionParams.additionalResources = toStdVector(QnPredefinedUserRoles::adminIds());
+    m_actionParams.additionalResources = toStdVector(nx::vms::api::kAdminGroupIds);
 
     updateActionTypesModel();
     updateEventStateModel();
@@ -619,11 +623,12 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
                 return qnSkin->icon("tree/user_alert.svg");
 
             QnUserResourceList users;
-            QList<QnUuid> roles;
-            userRolesManager()->usersAndRoles(m_actionParams.additionalResources, users, roles);
+            QList<QnUuid> groupIds;
+            nx::vms::common::getUsersAndGroups(systemContext(),
+                m_actionParams.additionalResources, users, groupIds);
             users = users.filtered(
                 [](const QnUserResourcePtr& user) { return user->isEnabled(); });
-            return (users.size() > 1 || !roles.empty())
+            return (users.size() > 1 || !groupIds.empty())
                 ? qnResIconCache->icon(QnResourceIconCache::Users)
                 : qnResIconCache->icon(QnResourceIconCache::User);
         }
@@ -765,7 +770,7 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
 
         actionParams.allUsers = false;
         actionParams.additionalResources = additionalUserIsRequired
-            ? toStdVector(QnPredefinedUserRoles::adminIds())
+            ? toStdVector(nx::vms::api::kAdminGroupIds)
             : std::vector<QnUuid>();
 
         switch (m_actionType)
@@ -789,7 +794,7 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
     m_actionParams = m_cachedActionParams[m_actionType];
 
     if (userIsRequired && !userWasRequired)
-        m_actionResources = nx::utils::toQSet(QnPredefinedUserRoles::adminIds());
+        m_actionResources = nx::utils::toQSet(nx::vms::api::kAdminGroupIds);
 
     Fields fields = Field::actionType | Field::actionParams | Field::modified;
     if (cameraIsRequired != cameraWasRequired || userIsRequired != userWasRequired)
@@ -1147,8 +1152,9 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     // TODO: #vkutin #3.1 Check camera access permissions
 
                     QnUserResourceList users;
-                    QList<QnUuid> roles;
-                    userRolesManager()->usersAndRoles(m_eventParams.metadata.instigators, users, roles);
+                    nx::vms::api::UserGroupDataList groups;
+                    nx::vms::common::getUsersAndGroups(systemContext(),
+                        m_eventParams.metadata.instigators, users, groups);
 
                     const auto eventResources = resourcePool()->getResourcesByIds(filtered);
 
@@ -1167,11 +1173,10 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         };
 
                     const auto isRoleValid =
-                        [this, eventResources](const QnUuid& roleId)
+                        [this, eventResources](const nx::vms::api::UserGroupData& group)
                         {
-                            const auto group = userRolesManager()->userRole(roleId);
                             return std::any_of(eventResources.begin(), eventResources.end(),
-                                [this, &group](auto resource)
+                                [this, &group](const auto& resource)
                                 {
                                     return resourceAccessManager()->hasPermission(
                                         group,
@@ -1181,7 +1186,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         };
 
                     return std::any_of(users.cbegin(), users.cend(), isUserValid)
-                        || std::any_of(roles.cbegin(), roles.cend(), isRoleValid);
+                        || std::any_of(groups.cbegin(), groups.cend(), isRoleValid);
                 }
 
                 default:
@@ -1278,7 +1283,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     if (m_actionParams.allUsers)
                         return true;
 
-                    QnLayoutAccessValidationPolicy layoutAccessPolicy(systemContext());
+                    QnLayoutAccessValidationPolicy layoutAccessPolicy{};
                     layoutAccessPolicy.setLayout(layout);
 
                     // TODO: use iterator-based constructor after update to Qt 5.14.
@@ -1415,10 +1420,11 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
             if (m_actionParams.allUsers)
                 return nx::vms::event::StringsHelper::allUsersText();
             QnUserResourceList users;
-            QList<QnUuid> roles;
-            userRolesManager()->usersAndRoles(m_actionParams.additionalResources, users, roles);
+            nx::vms::api::UserGroupDataList groups;
+            nx::vms::common::getUsersAndGroups(systemContext(),
+                m_actionParams.additionalResources, users, groups);
             users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
-            return m_helper->actionSubjects(users, roles);
+            return m_helper->actionSubjects(users, groups);
         }
         case ActionType::bookmarkAction:
         case ActionType::cameraRecordingAction:

@@ -11,6 +11,7 @@
 #include <core/resource_access/resolvers/abstract_resource_access_resolver.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 
@@ -57,7 +58,7 @@ public:
 
 TEST_F(AbstractResourceAccessResolverTest, notApplicableResourceAccess)
 {
-    const auto user = addUser(GlobalPermission::admin);
+    const auto user = addUser(kAdministratorsGroupId);
     testAccessMap[user->getId()] = kFullAccessRights;
     ASSERT_EQ(accessRights({}, user), AccessRights());
 }
@@ -101,7 +102,7 @@ TEST_F(AbstractResourceAccessResolverTest, noDesktopCameraAccess)
 {
     testAccessMap[kAllDevicesGroupId] = kFullAccessRights;
 
-    const auto user = createUser(GlobalPermission::admin);
+    const auto user = createUser(kAdministratorsGroupId);
     const auto camera = addDesktopCamera(user);
     ASSERT_EQ(accessRights({}, camera), AccessRights());
 }

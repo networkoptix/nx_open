@@ -38,7 +38,7 @@ public:
     Q_INVOKABLE Qt::ItemFlags itemFlags(const QModelIndex& index) const;
 
     /** Operations with QModelIndexList in QML are incredibly slow, pass QVariantList instead. */
-    Q_INVOKABLE QVariantList toVariantList(const QModelIndexList& indexList) const;
+    Q_INVOKABLE QVariantList toQVariantList(const QModelIndexList& indexList) const;
 
     Q_INVOKABLE nx::utils::SoftwareVersion softwareVersion(const QString& version) const;
 
