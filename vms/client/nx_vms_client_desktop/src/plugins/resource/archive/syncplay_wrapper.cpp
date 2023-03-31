@@ -629,7 +629,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     NX_MUTEX_LOCKER lock( &d->timeMutex );
-    if (d->lastJumpTime == DATETIME_NOW)
+    if (d->lastJumpTime == DATETIME_NOW && !d->paused)
     {
         d->gotCacheTimer.invalidate();
         return DATETIME_NOW;
