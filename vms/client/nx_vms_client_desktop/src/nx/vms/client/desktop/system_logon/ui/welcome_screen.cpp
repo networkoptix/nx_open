@@ -599,75 +599,6 @@ void WelcomeScreen::testSystemOnline(const QString& serverUrl)
     }
 }
 
-void WelcomeScreen::storeCredentialsWithoutConnection(
-    const nx::network::SocketAddress& address,
-    const nx::network::http::Credentials& credentials)
-{
-    auto client =
-        nx::network::http::AsyncHttpClient::create(nx::network::ssl::kAcceptAnyCertificate);
-    // TODO: #sivanov Do we still have to force authentication type here? Request is unathorized.
-    client->setAuthType(nx::network::http::AuthType::authBasicAndDigest);
-
-    // First connection to a system may take a long time because it may require hole punching.
-    client->setSendTimeoutMs(kSystemConnectTimeout.count());
-    client->setResponseReadTimeoutMs(kSystemConnectTimeout.count());
-    m_runningRequests.push_back(client);
-
-    QPointer<QObject> guard(this);
-
-    const auto handleReply =
-        [this, guard, address, credentials](nx::network::http::AsyncHttpClientPtr reply)
-        {
-             executeInThread(guard->thread(),
-                [this, guard, address, credentials, reply]
-                {
-                    if (!guard)
-                        return;
-
-                    if (reply->failed())
-                    {
-                        NX_DEBUG(this, nx::format("Factory system <%1>: failed reply"), address);
-                    }
-                    else
-                    {
-                        const auto data = reply->fetchMessageBodyBuffer();
-
-                        nx::network::rest::JsonResult jsonReply;
-                        if (!QJson::deserialize(data, &jsonReply))
-                        {
-                            NX_DEBUG(this,
-                                "Factory system <%1>: failed to deserialize json reply:\n%2",
-                                address, data);
-                            return;
-                        }
-
-                        nx::vms::api::ModuleInformation moduleInformation;
-                        if (!QJson::deserialize(jsonReply.reply, &moduleInformation))
-                        {
-                            NX_DEBUG(this,
-                                "Factory system <%1>: failed to deserialize module information:\n%2",
-                                address, data);
-                            return;
-                        }
-
-                        const auto localSystemId = helpers::getLocalSystemId(moduleInformation);
-                        CredentialsManager::storeCredentials(localSystemId, credentials);
-                    }
-
-                    m_runningRequests.removeOne(reply);
-                }); //< executeInThread
-
-            reply->pleaseStopSync();
-        }; //< handleReply
-
-    const auto url = nx::network::url::Builder()
-        .setScheme(nx::network::http::kSecureUrlSchemeName)
-        .setEndpoint(address)
-        .setPath("/api/moduleInformation")
-        .toUrl();
-    client->doGet(url, handleReply);
-}
-
 void WelcomeScreen::setupFactorySystem(
     const QString& systemId,
     const QString& serverUrl,
@@ -696,18 +627,6 @@ void WelcomeScreen::setupFactorySystem(
             const auto dialog = new SetupWizardDialog(address, serverId, mainWindowWidget());
             dialog->setAttribute(Qt::WA_DeleteOnClose);
 
-            const auto saveCredentials =
-                [this, dialog, address, controlsGuard]()
-                {
-                    if (!dialog->savePassword())
-                        return;
-
-                    const auto credentials = nx::network::http::PasswordCredentials(
-                        helpers::kFactorySystemUser.toStdString(),
-                        dialog->password().toStdString());
-                    storeCredentialsWithoutConnection(address, credentials);
-                };
-
             const auto connectToSystem =
                 [this, dialog, address, serverId, controlsGuard]()
                 {
@@ -719,11 +638,10 @@ void WelcomeScreen::setupFactorySystem(
                         serverId,
                         address,
                         credentials,
-                        dialog->savePassword(),
+                        /*storePassword*/ false,
                         controlsGuard);
                 };
 
-            connect(dialog, &QDialog::rejected, this, saveCredentials);
             connect(dialog, &QDialog::accepted, this, connectToSystem);
 
             if (!ini().modalServerSetupWizard)
