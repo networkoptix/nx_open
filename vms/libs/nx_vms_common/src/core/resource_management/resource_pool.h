@@ -10,18 +10,13 @@
 #include <QtCore/QObject>
 
 #include <api/helpers/camera_id_helper.h>
-
-#include <core/resource/resource_fwd.h>
-
 #include <common/common_globals.h>
-
-
-#include <nx/utils/uuid.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/impl_ptr.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/string.h>
-
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/uuid.h>
 
 class QThreadPool;
 namespace nx::vms::common { class SystemContext; }
@@ -295,6 +290,8 @@ public:
         bool useCompatible = false) const;
 
     QnUserResourcePtr getAdministrator() const;
+
+    QnUserResourcePtr userByName(const QString& name) const;
 
     /**
      * @brief getVideoWallItemByUuid            Find videowall item by uuid.

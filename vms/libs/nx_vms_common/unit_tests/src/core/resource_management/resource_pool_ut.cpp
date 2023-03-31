@@ -134,4 +134,50 @@ TEST_F(QnResourcePoolTest, findCameraTest)
         [&](auto c) { return findCameraByFlexibleId(resourcePool(), "no_such_id"); });
 }
 
+TEST_F(QnResourcePoolTest, userByName)
+{
+    static const QString kName("email@gmail.com");
+    static const QString kName2("different_name");
+
+    const auto localUser = addUser({}, kName, nx::vms::api::UserType::local);
+    const auto ldapUser = addUser({}, kName, nx::vms::api::UserType::ldap);
+    ASSERT_EQ(resourcePool()->userByName(kName), localUser);
+
+    const auto localUser2 = addUser({}, kName, nx::vms::api::UserType::local);
+    ASSERT_EQ(resourcePool()->userByName(kName), QnUserResourcePtr());
+
+    localUser->setEnabled(false);
+    ASSERT_EQ(resourcePool()->userByName(kName), localUser2);
+
+    resourcePool()->removeResources({localUser2});
+    ASSERT_EQ(resourcePool()->userByName(kName), ldapUser);
+
+    const auto ldapUser2 = addUser({}, kName, nx::vms::api::UserType::ldap);
+    ldapUser->setEnabled(false);
+    ASSERT_EQ(resourcePool()->userByName(kName), ldapUser2);
+
+    resourcePool()->removeResources({ldapUser2});
+    ASSERT_EQ(resourcePool()->userByName(kName), QnUserResourcePtr());
+
+    ldapUser->setEnabled(true);
+    ASSERT_EQ(resourcePool()->userByName(kName), ldapUser);
+
+    const auto cloudUser = addUser({}, kName, nx::vms::api::UserType::cloud);
+    ASSERT_EQ(resourcePool()->userByName(kName), cloudUser);
+
+    cloudUser->setEnabled(false);
+    ASSERT_EQ(resourcePool()->userByName(kName), ldapUser);
+
+    const auto otherLocalUser = addUser({}, kName2, nx::vms::api::UserType::local);
+    ASSERT_EQ(resourcePool()->userByName(kName), ldapUser);
+    ASSERT_EQ(resourcePool()->userByName(kName2), otherLocalUser);
+
+    otherLocalUser->setName(kName);
+    ASSERT_EQ(resourcePool()->userByName(kName), otherLocalUser);
+    ASSERT_EQ(resourcePool()->userByName(kName2), QnUserResourcePtr());
+
+    cloudUser->setEnabled(true);
+    ASSERT_EQ(resourcePool()->userByName(kName), cloudUser);
+}
+
 } // namespace nx::vms::common::test
