@@ -10377,15 +10377,15 @@ Du kan se %2 eller lese denne %3 for å lære mer om det nåværende problemet.<
     </message>
     <message>
       <source>Export archive from %1 stopped</source>
-      <translation type="unfinished">Export archive from %1 stopped</translation>
+      <translation>Import av arkiv fra %1 stoppet</translation>
     </message>
     <message>
       <source>The archive stream settings have been changed by user</source>
-      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+      <translation>Innstillinger for arkiv har blitt endret av bruker</translation>
     </message>
     <message>
       <source>The recording settings have been changed by user</source>
-      <translation type="unfinished">The recording settings have been changed by user</translation>
+      <translation>Opptaksinnstillingene har blitt endret av bruker</translation>
     </message>
   </context>
   <context>
