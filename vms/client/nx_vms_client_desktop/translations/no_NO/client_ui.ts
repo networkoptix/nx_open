@@ -3021,7 +3021,7 @@
     </message>
     <message>
       <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
+      <translation>Analyse-data vil fortsette å bli lagret på den deaktiverte stasjonen.</translation>
     </message>
   </context>
   <context>
