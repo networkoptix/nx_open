@@ -58,7 +58,7 @@ BubbleToolTip::BubbleToolTip(
     :
     QObject(parent),
     QnWorkbenchContextAware(context),
-    d(new Private{this})
+    d(new Private{.q = this})
 {
     connect(MouseSpy::instance(), &MouseSpy::mouseMove, this,
         [this]()
@@ -115,6 +115,9 @@ void BubbleToolTip::show()
 
 void BubbleToolTip::hide(bool immediately)
 {
+    if (d->state == State::hidden)
+        return;
+
     if (d->widget)
         invokeQmlMethod<void>(d->widget->rootObject(), "hide", immediately);
 
@@ -123,6 +126,9 @@ void BubbleToolTip::hide(bool immediately)
 
 void BubbleToolTip::suppress(bool immediately)
 {
+    if (d->state == State::suppressed)
+        return;
+
     if (d->widget)
         invokeQmlMethod<void>(d->widget->rootObject(), "hide", immediately);
     if (d->state == State::shown)
