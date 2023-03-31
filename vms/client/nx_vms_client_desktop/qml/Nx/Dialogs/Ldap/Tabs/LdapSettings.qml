@@ -170,7 +170,7 @@ Rectangle
         }
     }
 
-    Column
+    ColumnLayout
     {
         anchors.fill: parent
         spacing: 8
@@ -181,7 +181,7 @@ Rectangle
         {
             color: ColorTheme.colors.dark8
 
-            width: parent.width
+            Layout.fillWidth: true
             height: childrenRect.height + 24
 
             Spinner
@@ -461,6 +461,7 @@ Rectangle
             id: continuousImportHeader
             text: qsTr("Continuous User Import")
             textLeftMargin: continuousImportSwitch.width + 4
+            Layout.fillWidth: true
 
             SwitchIcon
             {
@@ -490,7 +491,7 @@ Rectangle
             text: qsTr("VMS imports and synchronizes users and groups with LDAP in real time")
             font: Qt.font({pixelSize: 14, weight: Font.Normal})
             color: ColorTheme.colors.light16
-            width: parent.width
+            Layout.fillWidth: true
             wrapMode: Text.WordWrap
         }
 
@@ -501,13 +502,14 @@ Rectangle
             font: Qt.font({pixelSize: 14, weight: Font.Normal})
             color: ColorTheme.colors.red_core
             visible: !control.continuousSync
-            width: parent.width
+            Layout.fillWidth: true
             wrapMode: Text.WordWrap
         }
 
         SectionHeader
         {
             text: qsTr("Filters")
+            Layout.fillWidth: true
 
             TextButton
             {
@@ -538,8 +540,9 @@ Rectangle
         {
             id: list
 
-            width: parent.width
-            height: Math.min(list.count, 3) * 22
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
             clip: true
 
             readonly property real scrollBarWidth: scrollBar.visible ? scrollBar.width : 0
@@ -587,7 +590,7 @@ Rectangle
                     anchors.leftMargin: 4
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
-                    anchors.rightMargin: 28 + list.scrollBarWidth
+                    anchors.rightMargin: 28
 
                     spacing: 8
 
