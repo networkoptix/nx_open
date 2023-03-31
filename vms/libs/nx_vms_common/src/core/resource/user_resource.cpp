@@ -618,5 +618,5 @@ void QnUserResource::fillIdUnsafe()
 
 QString QnUserResource::idForToStringFromPtr() const
 {
-    return getName();
+    return NX_FMT("%1: %2, %3", userType(), getName(), getId());
 }

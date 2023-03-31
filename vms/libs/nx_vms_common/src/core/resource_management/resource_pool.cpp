@@ -197,7 +197,11 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
     for (const QnResourcePtr& resource: std::as_const(resources))
     {
         if (!resource || resource->resourcePool() != this)
+        {
+            NX_VERBOSE(this, "Skip different pool resource %1, id: %2, name: %3",
+                resource, resource->getId(), resource->getName());
             continue;
+        }
 
         NX_VERBOSE(this, "Removing resource %1, id: %2, name: %3",
             resource, resource->getId(), resource->getName());
@@ -492,6 +496,15 @@ QnUserResourcePtr QnResourcePool::getAdministrator() const
     return QnUserResourcePtr();
 }
 
+QnUserResourcePtr QnResourcePool::userByName(const QString& name) const
+{
+    NX_READ_LOCKER locker(&m_resourcesMutex);
+    const auto it = d->usersByName.find(name.toLower());
+    if (it == d->usersByName.end())
+        return {};
+    return it->second.main();
+}
+
 void QnResourcePool::clear()
 {
     QVector<QnResourcePtr> tempList;
@@ -516,6 +529,7 @@ void QnResourcePool::clear()
         d->mediaServers.clear();
         d->storages.clear();
         d->resourcesByPhysicalId.clear();
+        d->usersByName.clear();
     }
 
     for (const auto& resource: std::as_const(tempList))
