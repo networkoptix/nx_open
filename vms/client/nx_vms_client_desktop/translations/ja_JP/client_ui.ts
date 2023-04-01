@@ -925,10 +925,6 @@
       <translation>PTZ</translation>
     </message>
     <message>
-      <source>In Future</source>
-      <translation>実装予定</translation>
-    </message>
-    <message>
       <source>Showreels</source>
       <translation>シーケンス表示</translation>
     </message>
@@ -951,6 +947,10 @@
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
       <translation>ブックマーク、オブジェクト、イベントの検索</translation>
+    </message>
+    <message>
+      <source>In the Future</source>
+      <translation type="unfinished">In the Future</translation>
     </message>
   </context>
   <context>

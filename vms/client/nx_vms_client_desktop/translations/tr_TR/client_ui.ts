@@ -925,10 +925,6 @@
       <translation>PTZ</translation>
     </message>
     <message>
-      <source>In Future</source>
-      <translation>Gelecekte</translation>
-    </message>
-    <message>
       <source>Showreels</source>
       <translation>Kamera Tur</translation>
     </message>
@@ -951,6 +947,10 @@
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
       <translation>Yer İmlerini, Nesneleri, Olayları Arama</translation>
+    </message>
+    <message>
+      <source>In the Future</source>
+      <translation type="unfinished">In the Future</translation>
     </message>
   </context>
   <context>
