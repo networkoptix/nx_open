@@ -925,10 +925,6 @@
       <translation>PTZ</translation>
     </message>
     <message>
-      <source>In Future</source>
-      <translation>I fremtiden</translation>
-    </message>
-    <message>
       <source>Showreels</source>
       <translation>Bildesyklus</translation>
     </message>
@@ -951,6 +947,10 @@
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
       <translation>Søker i bokmerker, objekter, hendelser</translation>
+    </message>
+    <message>
+      <source>In the Future</source>
+      <translation type="unfinished">In the Future</translation>
     </message>
   </context>
   <context>

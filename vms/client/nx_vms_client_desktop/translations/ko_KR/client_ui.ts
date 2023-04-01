@@ -925,10 +925,6 @@
       <translation>PTZ</translation>
     </message>
     <message>
-      <source>In Future</source>
-      <translation type="unfinished">In Future</translation>
-    </message>
-    <message>
       <source>Showreels</source>
       <translation>쇼릴</translation>
     </message>
@@ -951,6 +947,10 @@
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
       <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+    </message>
+    <message>
+      <source>In the Future</source>
+      <translation type="unfinished">In the Future</translation>
     </message>
   </context>
   <context>

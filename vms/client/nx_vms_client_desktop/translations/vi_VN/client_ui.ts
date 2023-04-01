@@ -925,10 +925,6 @@
       <translation>PTZ</translation>
     </message>
     <message>
-      <source>In Future</source>
-      <translation>Trong tương lai</translation>
-    </message>
-    <message>
       <source>Showreels</source>
       <translation>Showreels</translation>
     </message>
@@ -951,6 +947,10 @@
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
       <translation>Tìm kiếm Dấu trang, Đối tượng, Sự kiện</translation>
+    </message>
+    <message>
+      <source>In the Future</source>
+      <translation type="unfinished">In the Future</translation>
     </message>
   </context>
   <context>
@@ -3021,7 +3021,7 @@
     </message>
     <message>
       <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
+      <translation>Dữ liệu phân tích và chuyển động sẽ tiếp tục được lưu trữ trên bộ nhớ đã bị vô hiệu hóa.</translation>
     </message>
   </context>
   <context>
