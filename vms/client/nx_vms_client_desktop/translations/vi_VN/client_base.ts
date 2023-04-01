@@ -10231,15 +10231,15 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     </message>
     <message>
       <source>Export archive from %1 stopped</source>
-      <translation type="unfinished">Export archive from %1 stopped</translation>
+      <translation>Xuất bộ lưu trữ từ %1 đã dừng</translation>
     </message>
     <message>
       <source>The archive stream settings have been changed by user</source>
-      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+      <translation>Người dùng đã thay đổi cài đặt luồng lưu trữ</translation>
     </message>
     <message>
       <source>The recording settings have been changed by user</source>
-      <translation type="unfinished">The recording settings have been changed by user</translation>
+      <translation>Người dùng đã thay đổi cài đặt ghi hình</translation>
     </message>
   </context>
   <context>
