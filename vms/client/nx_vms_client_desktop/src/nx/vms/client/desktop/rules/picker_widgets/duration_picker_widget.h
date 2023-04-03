@@ -105,11 +105,14 @@ public:
             &QCheckBox::stateChanged,
             this,
             &OptionalDurationPicker<F>::onStateChanged);
+
+        setMinimumHeight(m_timeDurationWidget->minimumHeight());
     }
 
 private:
     PICKER_WIDGET_COMMON_USINGS
     using DurationPicker<F>::m_timeDurationWidget;
+    using DurationPicker<F>::setMinimumHeight;
 
     QCheckBox* m_checkBox{nullptr};
     bool m_isDurationField{false};
