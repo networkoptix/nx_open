@@ -728,9 +728,9 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
         {
             if (!navigator()->canJump())
                 return false;
-            // If two arrow keys are pressed simultaneously, only first one is counted.
-            if (m_rewindTimer->isActive())
-                return false;
+            // If two arrow keys are pressed simultaneously, change direction to the next one.
+            if (m_rewindTimer->isActive() && m_rewindDirection == direction)
+                return true;
 
             m_rewindTimer->start(500);
             m_rewindDirection = direction;
