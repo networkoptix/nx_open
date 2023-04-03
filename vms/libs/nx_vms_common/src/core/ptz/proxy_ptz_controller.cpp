@@ -191,6 +191,13 @@ bool QnProxyPtzController::activateTour(const QString& tourId)
         : false;
 }
 
+std::optional<QnPtzTour> QnProxyPtzController::getActiveTour()
+{
+    return m_controller
+        ? m_controller->getActiveTour()
+        : std::nullopt;
+}
+
 bool QnProxyPtzController::getTours(
     QnPtzTourList* tours) const
 {

@@ -70,6 +70,7 @@ public: // Overrides section
     virtual bool createTour(const QnPtzTour& tour) override;
     virtual bool removeTour(const QString& tourId) override;
     virtual bool activateTour(const QString& tourId) override;
+    virtual std::optional<QnPtzTour> getActiveTour() override;
     virtual bool getTours(QnPtzTourList* tours) const override;
 
     virtual bool getActiveObject(QnPtzObject* activeObject) const override;

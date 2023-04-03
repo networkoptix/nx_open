@@ -27,6 +27,11 @@ QnResourcePtr QnAbstractPtzController::resource() const
     return m_resource;
 }
 
+std::optional<QnPtzTour> QnAbstractPtzController::getActiveTour()
+{
+    return std::nullopt;
+}
+
 bool QnAbstractPtzController::hasCapabilities(
     Ptz::Capabilities capabilities,
     const Options& options) const
