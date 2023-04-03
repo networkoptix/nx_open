@@ -2,6 +2,8 @@
 
 #include "log_logger.h"
 
+#include <cstdlib>
+
 #include <QtCore/QDateTime>
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
@@ -19,9 +21,60 @@
 
 #include <nx/build_info.h>
 
+namespace {
+
+using namespace nx::utils::log;
+
+static const std::array<QString, kLevelsCount> kLevels =
+    nx::reflect::enumeration::visitAllItems<Level>(
+        [](auto&&... items)
+        {
+            return std::array<QString, kLevelsCount>{
+                toString(items.value).toUpper()...};
+        });
+
+template<typename... Items, size_t... N>
+size_t findIndex(Level level, std::index_sequence<N...>, Items&&... items)
+{
+    size_t index;
+    bool found = false;
+    found = ((items.value == level ? (found = true, index = N, found) : found) || ... || false);
+    if (!found)
+        return kLevels.size() - 1;
+    return index;
+}
+
+const QString& findLevel(Level level)
+{
+    const auto idx = nx::reflect::enumeration::visitAllItems<Level>(
+        [level](auto&&... items)
+        {
+            return findIndex(level, std::make_index_sequence<sizeof...(items)>(), items...);
+        });
+    return kLevels[idx];
+}
+} // namespace
+
 namespace nx {
 namespace utils {
 namespace log {
+
+QString Logger::OneSecondCache::now()
+{
+    using namespace std::chrono;
+    const auto now = system_clock::now();
+    const auto onlySec = duration_cast<seconds>(now.time_since_epoch());
+    const auto onlyMsec = duration_cast<milliseconds>(now.time_since_epoch()).count() % 1000;
+    QString dateTime;
+
+    if (std::abs((onlySec - m_lastTimestamp).count()) >= 1)
+    {
+        m_cachedDateTime = QDateTime::fromSecsSinceEpoch(onlySec.count())
+            .toString("yyyy-MM-dd HH:mm:ss.%1");
+        m_lastTimestamp = onlySec;
+    }
+    return m_cachedDateTime.arg(onlyMsec, 3, 10, QChar('0'));
+}
 
 Logger::Logger(
     std::set<Filter> filters,
@@ -53,11 +106,13 @@ void Logger::log(Level level, const Tag& tag, const QString& message)
 
 void Logger::logForced(Level level, const Tag& tag, const QString& message)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    auto dateTime = m_dateTimeCache.lock()->now();
+
     static const QString kTemplate = QLatin1String("%1 %2 %3 %4: %5");
     const auto output = kTemplate
-        .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz")).arg(thisThreadId(), 6)
-        .arg(toString(level).toUpper(), 7, QLatin1Char(' ')).arg(tag.toString()).arg(message);
+        .arg(dateTime).arg(thisThreadId(), 6)
+        .arg(findLevel(level), 7, QLatin1Char(' '))
+        .arg(tag.toString()).arg(message);
 
     if (m_writer)
     {

@@ -30,6 +30,7 @@ cf::future<cf::unit> AbstractWriter::stopArchivingAsync()
 
 void StdOut::write(Level level, const QString& message)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     writeImpl(level, message);
 }
 
