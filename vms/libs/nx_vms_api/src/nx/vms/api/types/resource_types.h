@@ -235,19 +235,21 @@ enum ServerFlag
     SF_Edge = 0x001,
     SF_RemoteEC = 0x002,
     SF_HasPublicIP = 0x004,
-    SF_IfListCtrl = 0x008,
-    SF_timeCtrl = 0x010,
+    SF_deprecated_IfListCtrl = 0x008,
+
+    /**%apidoc[unused] Removed in 5.2 because no longer used. */
+    SF_deprecated_TimeCtrl = 0x010,
 
     /**%apidoc[unused]
      * System name is default, so it will be displayed as "Unassigned System' in NxTool.
      */
-    SF_Obsolete_AutoSystemName = 0x020,
+    SF_deprecated_AutoSystemName = 0x020,
 
     /**%apidoc The Server has a setting isArmServer=true. */
     SF_ArmServer = 0x040,
 
     /**%apidoc[unused] Removed in 5.1, was proprietary. */
-    SF_Obsolete_Has_HDD = 0x080,
+    SF_deprecated_HasHDD = 0x080,
 
     /**%apidoc
      * The System is just installed, it has the default admin password and is not connected to the
@@ -263,7 +265,7 @@ enum ServerFlag
     SF_P2pSyncDone = 0x1000000,
 
     /**%apidoc[unused] Removed in 5.1 - Edge-only licenses are gone. */
-    SF_Obsolete_RequiresEdgeLicense = 0x2000000,
+    SF_deprecated_RequiresEdgeLicense = 0x2000000,
 
     /**%apidoc Server can provide information about built-in PoE block. */
     SF_HasPoeManagementCapability = 0x4000000,
@@ -289,15 +291,15 @@ constexpr auto nxReflectVisitAllEnumItems(ServerFlag*, Visitor&& visitor)
         Item{ServerFlag::SF_Edge, "SF_Edge"},
         Item{ServerFlag::SF_RemoteEC, "SF_RemoteEC"},
         Item{ServerFlag::SF_HasPublicIP, "SF_HasPublicIP"},
-        Item{ServerFlag::SF_IfListCtrl, "SF_IfListCtrl"},
-        Item{ServerFlag::SF_timeCtrl, "SF_timeCtrl"},
-        Item{ServerFlag::SF_Obsolete_AutoSystemName, "SF_AutoSystemName"},
+        Item{ServerFlag::SF_deprecated_IfListCtrl, "SF_IfListCtrl"},
+        Item{ServerFlag::SF_deprecated_TimeCtrl, "SF_timeCtrl"},
+        Item{ServerFlag::SF_deprecated_AutoSystemName, "SF_AutoSystemName"},
         Item{ServerFlag::SF_ArmServer, "SF_ArmServer"},
-        Item{ServerFlag::SF_Obsolete_Has_HDD, "SF_Has_HDD"},
+        Item{ServerFlag::SF_deprecated_HasHDD, "SF_Has_HDD"},
         Item{ServerFlag::SF_NewSystem, "SF_NewSystem"},
         Item{ServerFlag::SF_SupportsTranscoding, "SF_SupportsTranscoding"},
         Item{ServerFlag::SF_P2pSyncDone, "SF_P2pSyncDone"},
-        Item{ServerFlag::SF_Obsolete_RequiresEdgeLicense, "SF_RequiresEdgeLicense"},
+        Item{ServerFlag::SF_deprecated_RequiresEdgeLicense, "SF_RequiresEdgeLicense"},
         Item{ServerFlag::SF_HasPoeManagementCapability, "SF_HasPoeManagementCapability"},
         Item{ServerFlag::SF_HasFanMonitoringCapability, "SF_HasFanMonitoringCapability"},
         Item{ServerFlag::SF_HasBuzzer, "SF_HasBuzzer"},

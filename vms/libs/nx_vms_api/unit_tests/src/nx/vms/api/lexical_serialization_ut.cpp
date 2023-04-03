@@ -70,18 +70,18 @@ TEST(Lexical, enumSerialization)
     EXPECT_EQ("media", nx::reflect::toString(StreamDataFilters(StreamDataFilter::media)));
 }
 
-TEST(Lexical, obsoleteServerFlags)
+TEST(Lexical, deprecatedServerFlags)
 {    
     // The following Server Flags have been declared obsolete, but must be properly deserialized
     // from their original names for compatibility.
     
-    EXPECT_EQ(ServerFlag::SF_Obsolete_AutoSystemName,
+    EXPECT_EQ(ServerFlag::SF_deprecated_AutoSystemName,
         nx::reflect::fromString<ServerFlag>("SF_AutoSystemName"));
 
-    EXPECT_EQ(ServerFlag::SF_Obsolete_RequiresEdgeLicense,
+    EXPECT_EQ(ServerFlag::SF_deprecated_RequiresEdgeLicense,
         nx::reflect::fromString<ServerFlag>("SF_RequiresEdgeLicense"));
         
-    EXPECT_EQ(ServerFlag::SF_Obsolete_Has_HDD,
+    EXPECT_EQ(ServerFlag::SF_deprecated_HasHDD,
         nx::reflect::fromString<ServerFlag>("SF_Has_HDD"));
 }
 
