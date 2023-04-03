@@ -2,7 +2,10 @@
 
 #pragma once
 
+#include <chrono>
 #include <optional>
+
+#include <nx/utils/lockable.h>
 
 #include "abstract_logger.h"
 #include "log_settings.h"
@@ -61,6 +64,16 @@ private:
     void handleLevelChange(nx::Locker<nx::Mutex>* lock) const;
 
 private:
+    class OneSecondCache
+    {
+    public:
+        QString now();
+
+    private:
+        std::chrono::seconds m_lastTimestamp;
+        QString m_cachedDateTime;
+    };
+
     mutable nx::Mutex m_mutex;
     const std::set<Filter> m_hardFilters;
     Level m_defaultLevel = Level::none;
@@ -68,6 +81,7 @@ private:
     LoggerSettings m_settings;
     QString m_applicationName;
     QString m_binaryPath;
+    Lockable<OneSecondCache> m_dateTimeCache;
     std::unique_ptr<AbstractWriter> m_writer;
     LevelFilters m_levelFilters;
 };

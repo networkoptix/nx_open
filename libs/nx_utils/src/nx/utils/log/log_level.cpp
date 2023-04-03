@@ -44,40 +44,36 @@ Level levelFromString(const QString& levelString)
     return Level::undefined;
 }
 
+static const std::array<QString, kLevelsCount> kLevelStrings =
+    nx::reflect::enumeration::visitAllItems<Level>(
+        [](auto&&... items)
+        {
+            return std::array<QString, kLevelsCount>{
+                QString::fromStdString(nx::reflect::enumeration::toString(items.value))...};
+        });
+
+template<typename... Items, size_t... N>
+static size_t findIndex(Level level, std::index_sequence<N...>, Items&&... items)
+{
+    size_t index;
+    bool found = false;
+    found = ((items.value == level ? (found = true, index = N, found) : found) || ... || false);
+    if (!found)
+        return sizeof...(items);
+    return index;
+}
+
 QString toString(Level level)
 {
-    switch (level)
-    {
-        case Level::undefined:
-            return "undefined";
-
-        case Level::none:
-            return "none";
-
-        case Level::error:
-            return "error";
-
-        case Level::warning:
-            return "warning";
-
-        case Level::info:
-            return "info";
-
-        case Level::debug:
-            return "debug";
-
-        case Level::verbose:
-            return "verbose";
-
-        case Level::trace:
-            return "trace";
-
-        case Level::notConfigured:
-            return "notConfigured";
-    };
-
-    NX_ASSERT(false, nx::format("Unknown level: %1").arg(static_cast<int>(level)));
-    return nx::format("unknown(%1)").arg(static_cast<int>(level));
+    const auto idx = nx::reflect::enumeration::visitAllItems<Level>(
+        [level](auto&&... items)
+        {
+            return findIndex(level, std::make_index_sequence<sizeof...(items)>(), items...);
+        });
+    const auto id = static_cast<int>(level);
+    if (!NX_ASSERT(idx < kLevelStrings.size(), "Unknown level: %1", id))
+        return NX_FMT("unknown(%1)", id);
+    return kLevelStrings[idx];
 }
 
 //-------------------------------------------------------------------------------------------------
