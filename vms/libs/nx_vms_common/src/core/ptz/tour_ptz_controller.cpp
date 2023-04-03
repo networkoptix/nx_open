@@ -205,6 +205,11 @@ bool QnTourPtzController::activateTour(const QString& tourId)
     return true;
 }
 
+std::optional<QnPtzTour> QnTourPtzController::getActiveTour()
+{
+    return m_activeTour;
+}
+
 bool QnTourPtzController::getTours(QnPtzTourList* tours) const
 {
     *tours = m_adaptor->value().values();

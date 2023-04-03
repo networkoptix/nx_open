@@ -347,6 +347,8 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     virtual bool activateTour(const QString& tourId) = 0;
 
+    virtual std::optional<QnPtzTour> getActiveTour();
+
     /**
      * Gets a list of all PTZ tours for the camera.
      *
