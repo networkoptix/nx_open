@@ -23,6 +23,12 @@ NX_REFLECTION_ENUM_CLASS(Level,
     notConfigured = 0xFF
 )
 
+constexpr size_t kLevelsCount = nx::reflect::enumeration::visitAllItems<Level>(
+    [](auto&&... items)
+    {
+        return sizeof...(items);
+    });
+
 Level NX_UTILS_API levelFromString(const QString& levelString);
 QString NX_UTILS_API toString(Level level);
 
