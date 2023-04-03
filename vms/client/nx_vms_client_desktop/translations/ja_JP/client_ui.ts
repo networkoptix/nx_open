@@ -950,7 +950,7 @@
     </message>
     <message>
       <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
+      <translation>将来</translation>
     </message>
   </context>
   <context>
