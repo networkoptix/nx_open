@@ -21,13 +21,14 @@ public:
 private:
     QSlider* m_volumeSlider = nullptr;
     QPushButton* m_testPushButton = nullptr;
+    bool m_inProgress = false;
     float m_audioDeviceCachedVolume = 0.;
 
     void updateUi() override;
 
     void onVolumeChanged();
     void onTestButtonClicked();
-    Q_INVOKABLE void onTextSaid();
+    void onTextSaid();
 };
 
 } // namespace nx::vms::client::desktop::rules

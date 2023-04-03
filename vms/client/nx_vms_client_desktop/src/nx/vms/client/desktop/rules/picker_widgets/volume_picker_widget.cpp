@@ -61,7 +61,10 @@ void VolumePicker::updateUi()
 
 void VolumePicker::onVolumeChanged()
 {
-    theField()->setValue(static_cast<float>(m_volumeSlider->value()) / kOneHundredPercent);
+    const auto newValue = static_cast<float>(m_volumeSlider->value()) / kOneHundredPercent;
+    theField()->setValue(newValue);
+    if (m_inProgress)
+        nx::audio::AudioDevice::instance()->setVolume(newValue);
 }
 
 void VolumePicker::onTestButtonClicked()
@@ -104,7 +107,10 @@ void VolumePicker::onTestButtonClicked()
         m_audioDeviceCachedVolume = nx::audio::AudioDevice::instance()->volume();
         nx::audio::AudioDevice::instance()->setVolume(theField()->value());
         if (AudioPlayer::playFileAsync(filePath, this, [this] { onTextSaid(); }))
+        {
+            m_inProgress = true;
             m_testPushButton->setEnabled(false);
+        }
     }
     else
     {
@@ -115,6 +121,7 @@ void VolumePicker::onTestButtonClicked()
 void VolumePicker::onTextSaid()
 {
     nx::audio::AudioDevice::instance()->setVolume(m_audioDeviceCachedVolume);
+    m_inProgress = false;
     m_testPushButton->setEnabled(true);
 }
 
