@@ -5,7 +5,6 @@
 #include "../action_builder_fields/event_id_field.h"
 #include "../action_builder_fields/sound_field.h"
 #include "../action_builder_fields/target_device_field.h"
-#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/volume_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -21,7 +20,8 @@ const ItemDescriptor& RepeatSoundAction::manifest()
         .flags = {ItemFlag::prolonged, ItemFlag::executeOnClientAndServer},
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
-            makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("Play to users")),
+            utils::makeTargetUserFieldDescriptor(
+                tr("Play to users"), {}, /*isAvailableForAdminsByDefault*/ false),
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName, tr("Sound")),
             makeFieldDescriptor<VolumeField>(
                 "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),

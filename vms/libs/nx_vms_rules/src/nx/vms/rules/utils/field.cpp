@@ -2,8 +2,11 @@
 
 #include "field.h"
 
+#include <nx/vms/api/data/user_group_data.h>
+
 #include "../action_builder_fields/extract_detail_field.h"
 #include "../action_builder_fields/optional_time_field.h"
+#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../aggregated_event.h"
 #include "../basic_action.h"
@@ -84,6 +87,25 @@ FieldDescriptor makeTextFormatterFieldDescriptor(
         fieldName,
         {},
         {{ "text", formatString }});
+}
+
+FieldDescriptor makeTargetUserFieldDescriptor(
+    const QString& displayName,
+    const QString& description,
+    bool isAvailableForAdminsByDefault)
+{
+    return makeFieldDescriptor<TargetUserField>(
+        utils::kUsersFieldName,
+        displayName,
+        description,
+        {
+            {
+                "ids",
+                QVariant::fromValue(isAvailableForAdminsByDefault
+                    ? QnUuidSet{vms::api::kOwnersGroupId, vms::api::kAdministratorsGroupId}
+                    : QnUuidSet{})
+            }
+        });
 }
 
 QnUuidList getDeviceIds(const AggregatedEventPtr& event)

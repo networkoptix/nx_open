@@ -4,7 +4,6 @@
 
 #include "../action_builder_fields/event_devices_field.h"
 #include "../action_builder_fields/flag_field.h"
-#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -18,7 +17,7 @@ const ItemDescriptor& PushNotificationAction::manifest()
         .id = utils::type<PushNotificationAction>(),
         .displayName = tr("Send mobile notification"),
         .fields = {
-            makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("To")),
+            utils::makeTargetUserFieldDescriptor(tr("To")),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<TextWithFields>("caption", tr("Header"), QString(),
                 {
