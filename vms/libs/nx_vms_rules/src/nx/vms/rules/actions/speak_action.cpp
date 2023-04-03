@@ -3,7 +3,6 @@
 #include "speak_action.h"
 
 #include "../action_builder_fields/target_device_field.h"
-#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../action_builder_fields/volume_field.h"
 #include "../utils/field.h"
@@ -20,7 +19,7 @@ const ItemDescriptor& SpeakAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
-            makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("Speak to users")),
+            utils::makeTargetUserFieldDescriptor(tr("Speak to users")),
             makeFieldDescriptor<TextWithFields>(utils::kTextFieldName, tr("Speak the following"), {},
                 {
                     { "text", "{@EventDescription}" }

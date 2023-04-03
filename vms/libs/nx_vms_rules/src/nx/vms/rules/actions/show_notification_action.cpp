@@ -5,7 +5,6 @@
 #include "../action_builder_fields/event_devices_field.h"
 #include "../action_builder_fields/event_id_field.h"
 #include "../action_builder_fields/flag_field.h"
-#include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -21,7 +20,7 @@ const ItemDescriptor& NotificationAction::manifest()
         .description = "",
         .fields = {
             makeFieldDescriptor<EventIdField>("id", "Event ID"),
-            makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("To")),
+            utils::makeTargetUserFieldDescriptor(tr("To")),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName, tr("Force Acknowledgement")),
             makeFieldDescriptor<TextWithFields>("caption", tr("Caption"), QString(),
