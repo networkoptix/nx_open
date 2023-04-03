@@ -41,6 +41,8 @@ public:
 
 private:
     static void writeImpl(Level level, const QString& message);
+
+    nx::Mutex m_mutex;
 };
 
 /**
