@@ -329,7 +329,7 @@
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
-      <translation type="unfinished">To start backup enable it for some cameras and apply settings.</translation>
+      <translation>Yedeklemeyi başlatmak için bazı kameralar için etkinleştirin ve ayarları uygulayın.</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -345,7 +345,7 @@
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>Depolama sorunu nedeniyle yedekleme durduruldu. Depolama sorunu çözüldükten sonra yedekleme otomatik olarak devam edecek</translation>
     </message>
   </context>
   <context>
@@ -950,7 +950,7 @@
     </message>
     <message>
       <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
+      <translation>Gelecekte</translation>
     </message>
   </context>
   <context>
@@ -1314,7 +1314,7 @@
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation type="unfinished">Select some devices to setup failover priority</translation>
+      <translation>Yük devretme önceliğini ayarlamak için bazı cihazlar seçin</translation>
     </message>
     <message>
       <source>No Failover</source>
@@ -1417,7 +1417,7 @@
     </message>
     <message>
       <source>Connect to the previous system on startup</source>
-      <translation type="unfinished">Connect to the previous system on startup</translation>
+      <translation>Başlangıçta önceki sisteme bağlan</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
@@ -2777,11 +2777,11 @@
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Sunucuları yalnızca şifrelenmiş bağlantıları kabul etmeye zorla</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Video trafiğini masaüstü ve mobil istemciler için şifreleyin</translation>
     </message>
     <message>
       <source>Manage Users</source>
@@ -2835,7 +2835,7 @@
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
+      <translation>Bu sertifikaya sabitle</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
