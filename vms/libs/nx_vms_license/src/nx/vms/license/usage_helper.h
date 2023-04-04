@@ -150,8 +150,9 @@ public:
     */
     CamLicenseUsageHelper(
         QnCommonModule* commonModule,
-        QObject* parent = nullptr,
-        bool watchCameraChanges = true);
+        bool watchCameraChanges = true,
+        bool considerOnlineServersOnly = false,
+        QObject* parent = nullptr);
 
     CamLicenseUsageHelper(
         const QnVirtualCameraResourceList &proposedCameras,
@@ -183,6 +184,7 @@ protected:
 private:
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
+    bool m_considerOnlineServersOnly = false;
 };
 
 class SingleCamLicenseStatusHelper: public Connective<QObject>

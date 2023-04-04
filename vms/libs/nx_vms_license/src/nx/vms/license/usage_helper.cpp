@@ -344,10 +344,12 @@ QList<Qn::LicenseType> UsageHelper::licenseTypes() const
 /************************************************************************/
 CamLicenseUsageHelper::CamLicenseUsageHelper(
     QnCommonModule* commonModule,
-    QObject* parent,
-    bool watchCameraChanges)
+    bool watchCameraChanges,
+    bool considerOnlineServersOnly,
+    QObject* parent)
     :
-    base_type(commonModule, parent)
+    base_type(commonModule, parent),
+    m_considerOnlineServersOnly(considerOnlineServersOnly)
 {
     if (watchCameraChanges)
     {
@@ -496,7 +498,15 @@ void CamLicenseUsageHelper::calculateUsedLicenses(
     for (const auto& camera: resPool->getAllCameras(QnResourcePtr(), true))
     {
         if (camera->isLicenseUsed())
+        {
+            if (m_considerOnlineServersOnly)
+            {
+                auto server = camera->getParentResource();
+                if (server && !server->isOnline())
+                    continue;
+            }
             oldCameras[groupId(camera)].insert(camera);
+        }
     }
 
     for (const auto& data : oldCameras)
