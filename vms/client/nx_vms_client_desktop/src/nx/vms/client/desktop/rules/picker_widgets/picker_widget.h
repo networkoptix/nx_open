@@ -82,7 +82,9 @@ protected:
 
     F* theField() const
     {
-        return theFieldImpl<F>();
+        auto field = theFieldImpl<F>();
+        NX_ASSERT(field);
+        return field;
     }
 
 private:
