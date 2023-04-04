@@ -60,11 +60,11 @@ public:
     nx::network::AbstractCommunicatingSocket* getMediaSocket();
     nx::streaming::rtsp::UdpSocketPair& getUdpSockets() { return m_udpSockets; }
     void shutdown();
-    void setTransport(nx::vms::api::RtpTransportType rtpTransport);
+    bool setTransport(nx::vms::api::RtpTransportType rtpTransport);
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
 
-    void updateRemotePorts(quint16 mediaPort, quint16 rtcpPort);
+    bool updateRemotePorts(quint16 mediaPort, quint16 rtcpPort);
     void setHostAddress(const nx::network::HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
 
@@ -78,7 +78,9 @@ public:
 private:
     AddressInfo addressInfo(int port) const;
     void processRtcpData();
-    void updateSockets();
+    bool updateSockets();
+    std::unique_ptr<nx::network::AbstractDatagramSocket> createMulticastSocket(int port);
+    bool createMulticastSockets();
 
 private:
     QnRtspClient* m_owner = nullptr;
@@ -302,7 +304,7 @@ public:
 
     QElapsedTimer lastReceivedDataTimer() const;
 
-    void parseSetupResponse(const QString& response, SDPTrackInfo* outTrack, int trackIndex);
+    bool parseSetupResponse(const QString& response, SDPTrackInfo* outTrack, int trackIndex);
     std::chrono::milliseconds keepAliveTimeOut() const { return m_keepAliveTimeOut; }
     QString sessionId() const { return m_SessionId; }
 
