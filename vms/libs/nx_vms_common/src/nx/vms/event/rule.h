@@ -73,19 +73,19 @@ public:
 
     static RuleList getDefaultRules();
 
-    /**
-     * Some guids in getSystemRules() didn't match to original SQL script.
-     * It is fixed now, but old database could has these invalid guids.
-     * return map of invalid and valid guids. map key contains old guid.
-     */
-    static QMap<QnUuid, QnUuid> remappedGuidsToFix();
     static RuleList getNotificationRules();
     static RuleList getSystemRules();
     static RuleList getRulesUpd43();
-    static RuleList getRulesUpd48();
-    static RuleList getDisabledRulesUpd43();
     static RuleList getPluginDiagnosticEventUpdateRules();
     static RuleList getServerCertificateErrorRules();
+
+    /**
+     * Some guids in getSystemRules() didn't match to the original SQL script. It is fixed already,
+     * but an old database could has these invalid guids.
+     * @returns Map of valid guids by old (invalid) guids.
+     */
+    static QMap<QnUuid, QnUuid> remappedGuidsToFix();
+    static RuleList getDisabledRulesUpd43();
 
     Rule* clone();
     void removeResource(const QnUuid& resId);

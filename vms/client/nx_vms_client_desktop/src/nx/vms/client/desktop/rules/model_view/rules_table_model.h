@@ -155,6 +155,8 @@ private:
     bool isIndexValid(const QModelIndex &index) const;
     bool isRuleModified(const SimplifiedRule* rule) const;
 
+    void onRuleAddedOrUpdated(QnUuid ruleId, bool added);
+
     QVariant idColumnData(const QModelIndex& index, int role) const;
     QVariant eventColumnData(const QModelIndex& index, int role) const;
     QVariant actionColumnData(const QModelIndex& index, int role) const;

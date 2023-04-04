@@ -23,7 +23,6 @@ const QByteArray koldGuidPostfix("DEFAULT_BUSINESS_RULES");
 const QByteArray Rule::kGuidPostfix("vms_businessrule");
 
 Rule::Rule() :
-    m_id(),
     m_eventType(EventType::undefinedEvent),
     m_eventState(EventState::active), //< By default, rule triggers on toggle event start.
                                //< For example, if motion starts/stops, send alert on start only.
@@ -290,8 +289,7 @@ QMap<QnUuid, QnUuid> Rule::remappedGuidsToFix()
 
 RuleList Rule::getDefaultRules()
 {
-    RuleList result;
-    result
+    auto result = RuleList()
         << getNotificationRules()
         << getSystemRules()
         << getRulesUpd43()
@@ -300,19 +298,7 @@ RuleList Rule::getDefaultRules()
 
     std::set<QnUuid> ruleIds;
     for (const auto& rule: result)
-    {
-        NX_ASSERT(ruleIds.count(rule->id()) == 0, "Default rule id conflict: %1", rule->id());
-        ruleIds.insert(rule->id());
-    }
-
-    auto disabledRules = getDisabledRulesUpd43();
-
-    result.erase(std::remove_if(result.begin(), result.end(),
-        [&disabledRules](const auto& rulePtr)
-        {
-            return std::any_of(disabledRules.cbegin(), disabledRules.cend(),
-                [&rulePtr](const auto& drPtr) { return drPtr->id() == rulePtr->id(); });
-        }), result.end());
+        NX_ASSERT(ruleIds.insert(rule->id()).second, "Default rule id conflict: %1", rule->id());
 
     return result;
 }
@@ -366,15 +352,6 @@ RuleList Rule::getRulesUpd43()
 {
     return {//           Id      period isSystem actionType         eventType         subjects allUsers
         RulePtr(new Rule(24,     0,     false, ActionType::showPopupAction, EventType::userDefinedEvent, {},      true)),
-        RulePtr(new Rule(900022, 0,     true, ActionType::diagnosticsAction, EventType::userDefinedEvent))
-    };
-}
-
-RuleList Rule::getRulesUpd48()
-{
-    return {//           Id      period isSystem actionType         eventType            subjects allUsers
-        RulePtr(new Rule(900023, 0,     false, ActionType::showPopupAction, EventType::backupFinishedEvent, {},      true)),
-        RulePtr(new Rule(900024, 0,     true, ActionType::diagnosticsAction, EventType::backupFinishedEvent))
     };
 }
 

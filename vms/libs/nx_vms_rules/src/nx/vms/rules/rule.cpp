@@ -135,6 +135,16 @@ bool Rule::enabled() const
     return m_enabled;
 }
 
+bool Rule::isSystem() const
+{
+    return m_system;
+}
+
+void Rule::setSystem(bool system)
+{
+    m_system = system;
+}
+
 void Rule::setSchedule(const QByteArray& schedule)
 {
     m_schedule = schedule;

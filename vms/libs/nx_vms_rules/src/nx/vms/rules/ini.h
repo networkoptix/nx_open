@@ -16,6 +16,9 @@ struct NX_VMS_RULES_API Ini: public nx::kit::IniConfig
     // TODO: #amalov Temporary solution for 5.1. Should be removed in the future.
     NX_INI_FLAG(false, fullSupport,
         "Process cloud notification only when set to false.");
+
+    NX_INI_FLAG(false, showSystemRules,
+        "Show system rules in the rules editor.");
 };
 
 NX_VMS_RULES_API Ini& ini();
