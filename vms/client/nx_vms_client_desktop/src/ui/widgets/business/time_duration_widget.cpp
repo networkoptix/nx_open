@@ -20,6 +20,8 @@ TimeDurationWidget::TimeDurationWidget(QWidget *parent):
 {
     ui->setupUi(this);
     ui->periodComboBox->addItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Seconds), kSeconds);
+    ui->periodComboBox->setVisible(false); //< Have sense to be visible only when more than 1 item is added.
+    ui->prefixLabel->setText(QnTimeStrings::fullSuffix(QnTimeStrings::Suffix::Seconds, /*count*/ 0));
 
     connect(ui->periodComboBox, QnComboboxCurrentIndexChanged, this,
         [this]
@@ -87,6 +89,8 @@ void TimeDurationWidget::addDurationSuffix(QnTimeStrings::Suffix suffix)
     }
 
     ui->periodComboBox->addItem(suffixName, period);
+    ui->prefixLabel->setVisible(false);
+    ui->periodComboBox->setVisible(true);
 }
 
 void TimeDurationWidget::setValue(int secs)

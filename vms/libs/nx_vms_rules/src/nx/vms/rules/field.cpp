@@ -58,14 +58,20 @@ QMap<QString, QJsonValue> Field::serializedProperties() const
 bool Field::setProperties(const QVariantMap& properties)
 {
     bool isAllPropertiesSet = true;
-    std::for_each(properties.constKeyValueBegin(), properties.constKeyValueEnd(),
-        [this, &isAllPropertiesSet](const std::pair<QString, QVariant>& p){
-            if (!setProperty(p.first.toUtf8(), p.second))
-            {
-                NX_ERROR(this, "Failed to set property %1 for the %2 field", p.first, metatype());
-                isAllPropertiesSet = false;
-            }
-        });
+    const auto propertyNames = utils::propertyNames(this);
+
+    for (const auto& propertyName: utils::propertyNames(this))
+    {
+        const auto propertyIt = properties.constFind(propertyName);
+        if (propertyIt == properties.constEnd()) //< Only declared properties must be set.
+            continue;
+
+        if (!setProperty(propertyName, propertyIt.value()))
+        {
+            NX_ERROR(this, "Failed to set property %1 for the %2 field", propertyName, metatype());
+            isAllPropertiesSet = false;
+        }
+    }
 
     return isAllPropertiesSet;
 }

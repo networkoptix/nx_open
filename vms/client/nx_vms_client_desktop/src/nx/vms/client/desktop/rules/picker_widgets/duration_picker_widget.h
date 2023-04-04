@@ -32,9 +32,6 @@ public:
         m_timeDurationWidget = new TimeDurationWidget;
         m_timeDurationWidget->setSizePolicy(
             QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
-        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
-        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
 
         contentLayout->addWidget(m_timeDurationWidget);
 
@@ -119,7 +116,7 @@ private:
 
     std::chrono::microseconds defaultValue() const
     {
-        return m_fieldDescriptor->properties.value("value").template value<std::chrono::seconds>();
+        return m_fieldDescriptor->properties.value("default").template value<std::chrono::seconds>();
     }
 
     virtual void onDescriptorSet() override
@@ -127,6 +124,16 @@ private:
         DurationPicker<F>::onDescriptorSet();
 
         m_checkBox->setText(m_fieldDescriptor->displayName);
+        if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
+        {
+            m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
+            m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
+            m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
+        }
+
+        auto maxIt = m_fieldDescriptor->properties.constFind("max");
+        if (maxIt != m_fieldDescriptor->properties.constEnd())
+            m_timeDurationWidget->setMaximum(maxIt->template value<std::chrono::seconds>().count());
     }
 
     void updateUi() override
