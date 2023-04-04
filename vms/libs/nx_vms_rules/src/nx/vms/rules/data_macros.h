@@ -15,6 +15,6 @@ public: \
     type getter() const { return m_##getter; } \
     void setter(const type &val) { m_##getter = val; } \
 private: \
-    type m_##getter;
+    type m_##getter{};
 
 } // namespace nx::vms::rules

@@ -16,8 +16,10 @@ namespace nx::vms::rules::utils {
 
 namespace {
 
-constexpr auto kDefaultDurationValue = std::chrono::seconds{5};
-constexpr auto kDefaultIntervalValue = std::chrono::seconds{60};
+constexpr auto kInitialDurationValue = std::chrono::seconds{5};
+constexpr auto kInitialIntervalValue = std::chrono::seconds{60};
+constexpr auto kInitialPlaybackValue = std::chrono::seconds{0};
+constexpr auto kMaxPlaybackTime = std::chrono::seconds{300};
 constexpr auto kDefaultPlaybackValue = std::chrono::seconds{1};
 
 } // namespace
@@ -30,7 +32,10 @@ FieldDescriptor makeIntervalFieldDescriptor(
         kIntervalFieldName,
         displayName,
         description,
-        {{"value", QVariant::fromValue(kDefaultIntervalValue)}});
+        {
+            {"value", QVariant::fromValue(kInitialIntervalValue)},
+            {"default", QVariant::fromValue(kInitialIntervalValue)}
+        });
 }
 
 FieldDescriptor makeDurationFieldDescriptor(
@@ -41,7 +46,10 @@ FieldDescriptor makeDurationFieldDescriptor(
         kDurationFieldName,
         displayName,
         description,
-        {{"value", QVariant::fromValue(kDefaultDurationValue)}});
+        {
+            {"value", QVariant::fromValue(kInitialDurationValue)},
+            {"default", QVariant::fromValue(kInitialDurationValue)}
+        });
 }
 
 FieldDescriptor makePlaybackFieldDescriptor(
@@ -52,7 +60,11 @@ FieldDescriptor makePlaybackFieldDescriptor(
         kPlaybackTimeFieldName,
         displayName,
         description,
-        {{"value", QVariant::fromValue(kDefaultPlaybackValue)}});
+        {
+            {"value", QVariant::fromValue(kInitialPlaybackValue)},
+            {"default", QVariant::fromValue(kDefaultPlaybackValue)},
+            {"max", QVariant::fromValue(kMaxPlaybackTime)},
+        });
 }
 
 FieldDescriptor makeStateFieldDescriptor(

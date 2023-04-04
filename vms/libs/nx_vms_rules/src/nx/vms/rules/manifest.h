@@ -130,7 +130,7 @@ FieldDescriptor makeFieldDescriptor(
         .displayName = displayName,
         .description = description,
         .properties = properties,
-        .linkedFields = linkedFields,
+        .linkedFields = linkedFields
     };
 }
 
