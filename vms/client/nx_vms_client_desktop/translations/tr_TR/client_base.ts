@@ -7206,7 +7206,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+      <translation>Ayarları uygulamak istediğiniz aralıkları takvimden seçin.</translation>
     </message>
   </context>
   <context>
@@ -7301,7 +7301,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
+      <translation>Yeni eklenen kamera ayarları sistemdeki tüm sunucular için geçerli olacaktır.</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
@@ -7494,7 +7494,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>Sunucu, zaman ayarlarını kameraya göndermeyecektir.</translation>
     </message>
     <message>
       <source>default</source>
@@ -10285,7 +10285,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected I/O modules</translation>
+      <translation>Seçilen G/Ç modüllerinden bazıları için nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this I/O module</source>
@@ -10337,11 +10337,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
-      <translation type="unfinished">Failed to set archive encryption password</translation>
+      <translation>Arşiv şifreleme parolası ayarlanamadı</translation>
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>Sunucu tarafından kurulan bağlantıları etkilemez.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
@@ -10675,7 +10675,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
+      <translation>Bazı kameralardaki kayıt programı, desteklenmeyen kayıt modları içeriyor.</translation>
     </message>
     <message>
       <source>Replaced camera discovered</source>
@@ -11441,7 +11441,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
-      <translation type="unfinished">Cannot specify a media parameters for the resource without media stream.</translation>
+      <translation>Medya akışı olmadan kaynak için bir medya parametresi belirtilemez.</translation>
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
@@ -11938,7 +11938,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
       <comment>%1 is the product name</comment>
-      <translation type="unfinished">To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</translation>
+      <translation>Yükseltmek için lütfen güncellenmiş bir yapı kurmadan önce %1 kaldırın (tüm veriler kaybolacaktır).</translation>
     </message>
     <message>
       <source>%1 Beta</source>
@@ -12197,7 +12197,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
-      <translation type="unfinished">New client-only updates will be installed automatically. You can change this in the settings.</translation>
+      <translation>Yeni yalnızca-istemci güncelleştirmeleri otomatik olarak yüklenecektir. Bunu ayarlardan değiştirebilirsiniz.</translation>
     </message>
     <message>
       <source>Cannot check for update.</source>

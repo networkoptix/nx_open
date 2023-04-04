@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 henüz erişilebilir değil. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your system administrator.</translation>
+      <translation>Bu yetkilendirme yöntemi yasaktır. Lütfen sistem yöneticinize başvurun.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
@@ -364,15 +364,15 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+      <translation>Devre dışı ise, Cihaz Ayarlarında Kaydı etkinleştirmeyi ve FPS'yi düşürmeyi deneyin (hata &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
+      <translation>Devre dışı ise, Kaydı etkinleştirmeyi ve Kamera Ayarlarında FPS'yi düşürmeyi deneyin (hata &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+      <translation>Devre dışı ise, G/Ç Modülü Ayarlarında Kaydı etkinleştirmeyi deneyin (hata &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -1660,7 +1660,7 @@
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+      <translation>Çıkış meta veri akışı tahsis edilemedi.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
@@ -2193,7 +2193,7 @@
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+      <translation>%1 kamerada &apos;%2&apos;</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
@@ -2221,7 +2221,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+      <translation>Sunucu &quot;%1&quot; sertifika hatası</translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
