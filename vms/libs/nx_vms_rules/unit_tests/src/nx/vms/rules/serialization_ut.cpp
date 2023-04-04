@@ -21,6 +21,19 @@ TEST(VmsRulesSerialization, EventField)
     auto engine = std::make_unique<nx::vms::rules::Engine>(std::make_unique<TestRouter>());
     auto plugin = std::make_unique<nx::vms::rules::test::TestPlugin>(engine.get());
 
+    static const auto kEventType = "nx.vms_rules_serialization.event_field.test";
+    static const auto kFieldName = "test";
+    engine->registerEventField(fieldMetatype<TestEventField>(), []{ return new TestEventField; });
+    engine->registerEvent(
+        ItemDescriptor{
+            .id = kEventType,
+            .displayName = "testField",
+            .fields = {
+                makeFieldDescriptor<TestEventField>(kFieldName, "Test")
+            }
+        },
+        [](){ return new TestEvent; });
+
     auto field = std::make_unique<TestEventField>();
     field->id = QnUuid::createUuid();
     field->idSet << QnUuid::createUuid() << QnUuid::createUuid();
@@ -31,8 +44,7 @@ TEST(VmsRulesSerialization, EventField)
     field->state = State::started;
     field->levels = nx::vms::api::EventLevel::InfoEventLevel;
 
-    static const auto kFieldName = "test";
-    nx::vms::rules::EventFilter filter(QnUuid::createUuid(), "nx.events.test");
+    nx::vms::rules::EventFilter filter(QnUuid::createUuid(), kEventType);
     filter.addField(kFieldName, std::move(field));
 
     auto sourceField = dynamic_cast<TestEventField*>(filter.fields()[kFieldName]);

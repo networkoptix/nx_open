@@ -494,18 +494,30 @@ ActionPtr Engine::cloneAction(const ActionPtr& action) const
 
 std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& serialized) const
 {
-    if (serialized.type.isEmpty())
-        return nullptr;
+    const auto descriptor = eventDescriptor(serialized.type);
+    if (!NX_ASSERT(descriptor, "Descriptor for the '%1' type is not registered", serialized.type))
+        return {};
 
     std::unique_ptr<EventFilter> filter(new EventFilter(serialized.id, serialized.type));
 
-    for (const auto& [name, fieldInfo]: serialized.fields)
+    for (const auto& fieldDescriptor: descriptor->fields)
     {
-        auto field = buildEventField(fieldInfo);
+        std::unique_ptr<EventFilterField> field;
+        const auto serializedFieldIt = serialized.fields.find(fieldDescriptor.fieldName);
+        if (serializedFieldIt != serialized.fields.end())
+        {
+            NX_ASSERT(serializedFieldIt->second.type == fieldDescriptor.id);
+            field = buildEventField(serializedFieldIt->second);
+        }
+        else //< As the field isn't present in the received serialized filter, make a default one.
+        {
+            field = buildEventField(fieldDescriptor.id);
+        }
+
         if (!field)
             return nullptr;
 
-        filter->addField(name, std::move(field));
+        filter->addField(fieldDescriptor.fieldName, std::move(field));
     }
 
     return filter;
@@ -579,6 +591,10 @@ api::EventFilter Engine::serialize(const EventFilter *filter) const
 
 std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuilder& serialized) const
 {
+    const auto descriptor = actionDescriptor(serialized.type);
+    if (!NX_ASSERT(descriptor, "Descriptor for the '%1' type is not registered", serialized.type))
+        return {};
+
     ActionConstructor ctor = m_actionTypes.value(serialized.type);
     //if (!ctor)
     //    return nullptr;
@@ -587,13 +603,24 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuild
         new ActionBuilder(serialized.id, serialized.type, ctor));
     connect(builder.get(), &ActionBuilder::action, this, &Engine::processAction);
 
-    for (const auto& [name, fieldInfo]: serialized.fields)
+    for (const auto& fieldDescriptor: descriptor->fields)
     {
-        auto field = buildActionField(fieldInfo);
+        std::unique_ptr<ActionBuilderField> field;
+        const auto serializedFieldIt = serialized.fields.find(fieldDescriptor.fieldName);
+        if (serializedFieldIt != serialized.fields.end())
+        {
+            NX_ASSERT(serializedFieldIt->second.type == fieldDescriptor.id);
+            field = buildActionField(serializedFieldIt->second);
+        }
+        else //< As the field isn't present in the received serialized builder, make a default one.
+        {
+            field = buildActionField(fieldDescriptor.id);
+        }
+
         if (!field)
             return nullptr;
 
-        builder->addField(name, std::move(field));
+        builder->addField(fieldDescriptor.fieldName, std::move(field));
     }
 
     return builder;

@@ -370,4 +370,71 @@ TEST_F(EngineTest, cloneEvent)
     }
 }
 
-} // nx::vms::rules::test
+TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
+{
+    // Suppose there is one event and one action registered. Both have two fields each.
+
+    const QString eventFieldType = fieldMetatype<TestEventField>();
+    engine->registerEventField(eventFieldType, []{ return new TestEventField; });
+
+    const QString eventType = "nx.events.test";
+    ItemDescriptor eventDescriptor{
+        .id = eventType,
+        .displayName = "Test Name",
+        .fields = {
+            makeFieldDescriptor<TestEventField>("testField1", "Test Field 1"),
+            makeFieldDescriptor<TestEventField>("testField2", "Test Field 2"),
+        }
+    };
+    engine->registerEvent(eventDescriptor, testEventConstructor);
+
+    const QString actionFieldType = fieldMetatype<TestActionField>();
+    engine->registerActionField(actionFieldType, []{ return new TestActionField; });
+
+    const QString actionType = "nx.actions.test";
+    ItemDescriptor actionDescriptor{
+        .id = actionType,
+        .displayName = "Test Name",
+        .fields = {
+            makeFieldDescriptor<TestActionField>("testField1", "Test Field 1"),
+            makeFieldDescriptor<TestActionField>("testField2", "Test Field 2"),
+        }
+    };
+    engine->registerAction(actionDescriptor, testActionConstructor);
+
+    // Received serialized event filter and action builder both have only one field each.
+
+    vms::api::rules::EventFilter serializedEventFilter {
+        .id = QnUuid::createUuid(),
+        .type = eventType,
+        .fields = {
+            { "testField1", {.type = eventFieldType} }
+        }
+    };
+
+    vms::api::rules::ActionBuilder serializedActionBuilder {
+        .id = QnUuid::createUuid(),
+        .type = actionType,
+        .fields = {
+            { "testField1", {.type = actionFieldType} }
+        }
+    };
+
+    // Expect that built event filter and action builder contains absence field.
+
+    auto eventFilter = engine->buildEventFilter(serializedEventFilter);
+    ASSERT_TRUE(eventFilter);
+    ASSERT_TRUE(eventFilter->fields().contains("testField1"));
+    ASSERT_EQ(eventFilter->fields()["testField1"]->metatype(), eventFieldType);
+    ASSERT_TRUE(eventFilter->fields().contains("testField2"));
+    ASSERT_EQ(eventFilter->fields()["testField2"]->metatype(), eventFieldType);
+
+    auto actionBuilder = engine->buildActionBuilder(serializedActionBuilder);
+    ASSERT_TRUE(actionBuilder);
+    ASSERT_TRUE(actionBuilder->fields().contains("testField1"));
+    ASSERT_EQ(actionBuilder->fields()["testField1"]->metatype(), actionFieldType);
+    ASSERT_TRUE(actionBuilder->fields().contains("testField2"));
+    ASSERT_EQ(actionBuilder->fields()["testField2"]->metatype(), actionFieldType);
+}
+
+} // namespace nx::vms::rules::test
