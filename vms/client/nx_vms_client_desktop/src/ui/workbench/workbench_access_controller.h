@@ -82,9 +82,9 @@ public:
 
     /**
      * @param requiredPermissions Check whether the current user has the specified permision
-     * to at least one resource in the resource pool.
+     * to at least one camera device in the resource pool.
      */
-    bool anyResourceHasPermissions(Qn::Permissions requiredPermissions) const;
+    bool hasPermissionsForAnyDevice(Qn::Permissions requiredPermissions) const;
 
     /**
      * @returns Global permissions of the current user, adjusted to take deprecation and superuser

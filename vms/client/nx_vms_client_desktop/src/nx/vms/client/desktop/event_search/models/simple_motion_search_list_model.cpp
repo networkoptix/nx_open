@@ -103,7 +103,7 @@ bool SimpleMotionSearchListModel::hasAccessRights() const
 {
     // Panel is hidden for live viewers but should be visible when browsing local files offline.
     return !isOnline()
-        || accessController()->anyResourceHasPermissions(Qn::Permission::ViewFootagePermission);
+        || accessController()->hasPermissionsForAnyDevice(Qn::Permission::ViewFootagePermission);
 }
 
 int SimpleMotionSearchListModel::rowCount(const QModelIndex& parent) const

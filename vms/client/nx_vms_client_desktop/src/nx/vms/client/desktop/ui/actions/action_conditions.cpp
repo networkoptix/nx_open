@@ -2413,7 +2413,7 @@ ConditionWrapper hasPermissionsForResources(Qn::Permissions permissions)
         [permissions](const QnResourceList& resources, QnWorkbenchContext* context)
         {
             if (resources.empty())
-                return context->accessController()->anyResourceHasPermissions(permissions);
+                return context->accessController()->hasPermissionsForAnyDevice(permissions);
 
             return std::all_of(resources.begin(), resources.end(),
                 [permissions](auto resource)

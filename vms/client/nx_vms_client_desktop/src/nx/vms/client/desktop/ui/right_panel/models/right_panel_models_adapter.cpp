@@ -897,14 +897,14 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
         {
             // Prohibited for live viewers but should be allowed when browsing local files offline.
             return !q->isOnline()
-                || accessController->anyResourceHasPermissions(
+                || accessController->hasPermissionsForAnyDevice(
                     Qn::Permission::ViewFootagePermission);
         }
 
         case Type::bookmarks:
         {
             return q->isOnline()
-                && accessController->anyResourceHasPermissions(
+                && accessController->hasPermissionsForAnyDevice(
                     Qn::Permission::ViewBookmarksPermission);
         }
 
@@ -917,7 +917,7 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
         case Type::analytics:
         {
             const bool hasPermissions = q->isOnline()
-                && accessController->anyResourceHasPermissions(
+                && accessController->hasPermissionsForAnyDevice(
                     Qn::Permission::ViewFootagePermission);
 
             if (!hasPermissions)
