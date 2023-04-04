@@ -94,17 +94,17 @@
     </message>
     <message>
       <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&amp;apos;s certificate was rejected.</translation>
+      <translation>Sunucu&amp;apos; sertifikası reddedildi.</translation>
     </message>
     <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Restore the connection to %1 and try again</translation>
+      <translation>%1 için bağlantıyı geri yükleyin ve tekrar deneyin</translation>
     </message>
     <message>
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user login is temporarily unavailable</translation>
+      <translation>%1 kullanıcı girişi geçici olarak kullanılamıyor</translation>
     </message>
     <message>
       <source>Connection timed out</source>
@@ -156,21 +156,21 @@
     </message>
     <message>
       <source>If this error persists, please contact your system administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your system administrator.</translation>
+      <translation>Bu hata devam ederse lütfen sistem yöneticinizle iletişime geçin.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+      <translation>%1 için bağlantı henüz hazır değil. İnternet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</translation>
+      <translation>%1 için bağlantı henüz hazır değil. Sunucunun internet bağlantısını kontrol edin veya daha sonra tekrar deneyin.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+      <translation>Sunucuyla bağlantı kurulamadı. Daha sonra tekrar deneyin.</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -184,15 +184,15 @@
     <message>
       <source>Log in to %1 to log in to this system with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this system with %2 user</translation>
+      <translation>%1 Sistemine %2 kullanıcısı ile giriş yapmak için</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a system administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a system administrator.</translation>
+      <translation>Oturum süresi sınırı sistem yöneticisi tarafından değiştirilebilir.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Bu kullanıcı sistem yöneticisi tarafından devre dışı bırakıldı.</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
@@ -205,12 +205,12 @@
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
+      <translation>%1 için iki faktörlü kimlik doğrulamayı etkinleştirebilirsiniz.</translation>
     </message>
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</translation>
+      <translation>Bu Sisteme giriş yapmak için %2 hesabınızda “ %1 hesabınızla her girişte bir doğrulama kodu isteyin” seçeneğini devre dışı bırakın.</translation>
     </message>
   </context>
 </TS>

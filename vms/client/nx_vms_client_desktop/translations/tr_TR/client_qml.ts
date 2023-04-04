@@ -21,19 +21,19 @@
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
+      <translation>Bağlı istemcilerin otomatik olarak uyumlu en son sürüme güncellenmesini sağlamak için bu seçeneği aktif edin.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
+      <translation>Bağlanan istemciler, kullanılabilir yeni sürüm olduğunda otomatik olarak güncellenecektir.</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
+      <translation>Tüm bağlanan istemcilerde sürüm %1 güncelleniyor.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation type="unfinished">Connecting clients will be updated to version %1 on %2.</translation>
+      <translation>Bağlanan istemciler %1 sürümünden %2 sürümüne güncellenecektir.</translation>
     </message>
     <message>
       <source>Check for updates</source>
@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Özel bir istemci kullanıyorsunuz. Güncelleme talimatlarını almak için lütfen %1 ile iletişime geçin.</translation>
     </message>
   </context>
   <context>
@@ -86,13 +86,13 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya kamera eklentisi ayarlarında nesne algılamayı yapılandırın</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n yeni sonuç</numerusform>
+        <numerusform>%n yeni sonuç</numerusform>
       </translation>
     </message>
     <message>
@@ -128,7 +128,7 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya kamera eklentisi ayarlarında nesne algılamayı yapılandırın</translation>
     </message>
     <message>
       <source>Any plugin</source>
@@ -340,7 +340,7 @@
     </message>
     <message>
       <source>See %1 for other events</source>
-      <translation type="unfinished">See %1 for other events</translation>
+      <translation>Diğer olaylar için %1 bakın</translation>
     </message>
     <message>
       <source>No events</source>
@@ -348,7 +348,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya bir Olay Kuralı oluşturun</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -428,7 +428,7 @@
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>Zemin / masa</translation>
     </message>
     <message>
       <source>Angle</source>
@@ -436,7 +436,7 @@
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>Kamera açı düzeltmesi</translation>
     </message>
     <message>
       <source>Lens projection</source>
@@ -483,7 +483,7 @@
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Tarafından tespit edilen</translation>
     </message>
   </context>
   <context>
@@ -629,7 +629,7 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Hareket olaylarını görmek için bir kamera seçin</translation>
     </message>
     <message>
       <source>No motion detected</source>
@@ -637,7 +637,7 @@
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya hareket kaydını etkinleştirin</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -649,7 +649,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Zaman çizelgesinde bir zaman aralığı seçin ve bir yer imi oluşturmak için vurgulanan bölüme sağ tıklayın</translation>
     </message>
   </context>
   <context>
@@ -689,7 +689,7 @@
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Sonuçları filtrelemek için videoda bir alan seçin</translation>
     </message>
   </context>
   <context>
@@ -795,7 +795,7 @@
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Önizlemeyi görüntülemek için nesneyi seçin</translation>
     </message>
     <message>
       <source>Show on Layout</source>
@@ -803,7 +803,7 @@
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>Seçili nesne için önizleme mevcut değil</translation>
     </message>
   </context>
   <context>
@@ -894,7 +894,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>Video dosyalarını veya görüntüleri istemci penceresine sürükleyin veya Yerel Ayarlar iletişim kutusundan yerel medya klasörü ekleyin</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
@@ -919,7 +919,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>ESKİ</translation>
     </message>
   </context>
   <context>
@@ -1065,7 +1065,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>Ufuk düzeltme</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1147,7 +1147,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>Medyanın şifresi çözülemiyor</translation>
     </message>
     <message>
       <source>Password required</source>
@@ -1189,11 +1189,11 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>You can add system to the favorites from the context menu</source>
-      <translation type="unfinished">You can add system to the favorites from the context menu</translation>
+      <translation>İçerik menüsünden sistemi sık kullanılanlara ekleyebilirsiniz</translation>
     </message>
     <message>
       <source>You can hide systems from the main list from the context menu</source>
-      <translation type="unfinished">You can hide systems from the main list from the context menu</translation>
+      <translation>İçerik menüsünden ana listedeki sistemleri gizleyebilirsiniz</translation>
     </message>
   </context>
   <context>
@@ -1275,7 +1275,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>WelcomeScreen</name>
     <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
+      <translation>%1 için erişiminiz yok. Lütfen internet bağlantınızı kontrol edin.</translation>
     </message>
     <message>
       <source>Official Website</source>

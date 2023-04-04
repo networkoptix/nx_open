@@ -325,11 +325,11 @@
     </message>
     <message>
       <source>Mark Selection Start</source>
-      <translation>開始位置の選択</translation>
+      <translation>選択範囲の始点</translation>
     </message>
     <message>
       <source>Mark Selection End</source>
-      <translation>終了位置の選択</translation>
+      <translation>選択範囲の終点</translation>
     </message>
     <message>
       <source>Clear Selection</source>
