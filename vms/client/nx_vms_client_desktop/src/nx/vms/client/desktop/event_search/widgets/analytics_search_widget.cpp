@@ -189,7 +189,7 @@ bool AnalyticsSearchWidget::calculateAllowance() const
         return false;
 
     const bool hasPermissions = model()->isOnline()
-        && accessController()->anyResourceHasPermissions(Qn::Permission::ViewFootagePermission);
+        && accessController()->hasPermissionsForAnyDevice(Qn::Permission::ViewFootagePermission);
 
     return hasPermissions && !d->engines().empty();
 }

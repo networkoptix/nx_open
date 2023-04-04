@@ -137,11 +137,13 @@ bool QnWorkbenchAccessController::hasPermissions(
     return (permissions(targetId) & requiredPermissions) == requiredPermissions;
 }
 
-bool QnWorkbenchAccessController::anyResourceHasPermissions(
+bool QnWorkbenchAccessController::hasPermissionsForAnyDevice(
     Qn::Permissions requiredPermissions) const
 {
-    const auto resources = resourcePool()->getResources();
-    return std::any_of(resources.begin(), resources.end(),
+    const auto devices = resourcePool()->getAllCameras(
+        /*parentId*/QnUuid{}, /*ignoreDesktopCameras*/ true);
+
+    return std::any_of(devices.begin(), devices.end(),
         [this, requiredPermissions](auto resource)
         {
             return (permissions(resource) & requiredPermissions) != 0;

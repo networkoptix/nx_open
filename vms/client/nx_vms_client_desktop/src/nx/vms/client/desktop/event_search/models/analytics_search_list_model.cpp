@@ -116,7 +116,7 @@ void AnalyticsSearchListModel::setLiveTimestampGetter(LiveTimestampGetter value)
 
 bool AnalyticsSearchListModel::hasAccessRights() const
 {
-    return accessController()->anyResourceHasPermissions(Qn::Permission::ViewFootagePermission);
+    return accessController()->hasPermissionsForAnyDevice(Qn::Permission::ViewFootagePermission);
 }
 
 } // namespace nx::vms::client::desktop
