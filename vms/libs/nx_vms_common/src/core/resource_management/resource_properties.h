@@ -55,23 +55,14 @@ signals:
     void propertyChanged(const QnUuid& resourceId, const QString& key);
     void propertyRemoved(const QnUuid& resourceId, const QString& key);
 private:
-    void addToUnsavedParams(const nx::vms::api::ResourceParamWithRefDataList& params);
     void onRequestDone(int reqID, ec2::ErrorCode errorCode);
     void fromModifiedDataToSavedData(
         const QnUuid& resourceId,
         nx::vms::api::ResourceParamWithRefDataList& outData);
     int saveData(const nx::vms::api::ResourceParamWithRefDataList&& data);
-    /**
-     * Removes those elements from \a m_requestInProgress for which
-     * comp(nx::vms::api::ResourceParamWithRefData) returns \a true
-     */
-    template<class Pred> void cancelOngoingRequest(const Pred& pred);
 private:
     using QnResourcePropertyList = QMap<QString, QString>;
     QMap<QnUuid, QnResourcePropertyList> m_items;
     QMap<QnUuid, QnResourcePropertyList> m_modifiedItems;
-    //!Used to mark value as unsaved in case of ec2 request failure
-    QMap<int, nx::vms::api::ResourceParamWithRefDataList> m_requestInProgress;
     mutable nx::Mutex m_mutex;
-    mutable nx::Mutex m_requestMutex;
 };
