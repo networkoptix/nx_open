@@ -57,6 +57,21 @@ static QHostAddress parseConnectionAddress(const QString& line)
     return QHostAddress();
 }
 
+static uint32_t parseSsrc(const QString& line)
+{
+    uint32_t ssrc = 0;
+    auto splittedBySpace = line.split(" ", Qt::SkipEmptyParts);
+    if (!splittedBySpace.empty())
+    {
+        auto splittedByColon = splittedBySpace[0].split(":", Qt::SkipEmptyParts);
+        if (splittedByColon.size() > 1)
+        {
+            ssrc = (uint32_t) splittedByColon[1].toULong();
+        }
+    }
+    return ssrc;
+}
+
 bool parseRtpMap(const QString& line, Sdp::RtpMap* outRtpmap, int* outPayloadType)
 {
     QStringList params = line.split(' ');
@@ -149,6 +164,10 @@ Sdp::Media parseMedia(QStringList& lines, const Sdp::RtpMap& preferredMap)
         else if (line.startsWith("c=", Qt::CaseInsensitive))
         {
             media.connectionAddress = parseConnectionAddress(line);
+        }
+        else if (line.startsWith("a=ssrc:", Qt::CaseInsensitive))
+        {
+            media.ssrc = parseSsrc(line);
         }
     }
     return media;
