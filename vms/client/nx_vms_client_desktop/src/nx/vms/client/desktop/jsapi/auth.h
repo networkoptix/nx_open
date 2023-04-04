@@ -6,23 +6,31 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop::jsapi {
 
-class Auth: public QObject, public core::RemoteConnectionAware
+class Auth:
+    public QObject,
+    public SystemContextAware
 {
     Q_OBJECT
 public:
     using AuthCondition = std::function<bool()>;
 
-    Auth(AuthCondition authCondition, QObject* parent = nullptr);
+    Auth(SystemContext* systemContext, AuthCondition authCondition, QObject* parent = nullptr);
 
-    /** Returns a session token. */
+    /** Returns the session token. */
     Q_INVOKABLE QString sessionToken() const;
 
-    /** Returns a refresh token. */
+    /** Returns the cloud system id. */
+    Q_INVOKABLE QString cloudSystemId() const;
+
+    /** Returns the refresh token. */
     Q_INVOKABLE QString cloudToken() const;
+
+    /** Returns the cloud host. */
+    Q_INVOKABLE QString cloudHost() const;
 
 private:
     AuthCondition m_checkCondition;

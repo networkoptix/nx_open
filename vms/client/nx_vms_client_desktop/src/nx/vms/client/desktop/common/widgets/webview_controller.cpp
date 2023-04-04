@@ -39,6 +39,7 @@
 #include <ui/dialogs/common/certificate_selection_dialog.h>
 #include <ui/dialogs/common/password_dialog.h>
 #include <ui/graphics/items/standard/graphics_qml_view.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/web_downloader.h>
 
 #include "webview_window.h"
@@ -891,7 +892,7 @@ void WebViewController::initClientApiSupport(
     registerApiObjectWithFactory("vms.auth",
         [=](QObject* parent) -> QObject*
         {
-            return new jsapi::Auth(authCondition, parent);
+            return new jsapi::Auth(context->systemContext(), authCondition, parent);
         });
 
     registerApiObjectWithFactory("vms.self",
