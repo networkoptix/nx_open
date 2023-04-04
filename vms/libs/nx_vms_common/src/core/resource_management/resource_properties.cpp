@@ -6,6 +6,7 @@
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
+#include <nx/utils/log/log.h>
 
 QnResourcePropertyDictionary::QnResourcePropertyDictionary(
     nx::vms::common::SystemContext* context,
@@ -38,9 +39,8 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
 
     if (rez != ec2::ErrorCode::ok)
     {
-        qCritical() << Q_FUNC_INFO << ": can't save resource params to Server. Resource physicalId: "
-            << resourceId << ". Description: " << ec2::toString(rez);
-        addToUnsavedParams(params);
+        NX_WARNING(this, "Can't save resource params. Resource: %1. Error: %2",
+            resourceId, ec2::toString(rez));
         return false;
     }
     return true;
@@ -67,9 +67,6 @@ int QnResourcePropertyDictionary::saveData(const nx::vms::api::ResourceParamWith
     ec2::AbstractECConnectionPtr conn = messageBusConnection();
     if (!conn)
         return -1; // not connected to ec2
-    NX_MUTEX_LOCKER lock(&m_requestMutex);
-    //TODO #akolesnikov m_requestInProgress is redundant here, data can be saved to
-    //functor to use instead of \a QnResourcePropertyDictionary::onRequestDone
     int requestId = conn->getResourceManager(Qn::kSystemAccess)->save(
         data,
         [this](int requestId, ec2::ErrorCode errorCode)
@@ -77,7 +74,6 @@ int QnResourcePropertyDictionary::saveData(const nx::vms::api::ResourceParamWith
             onRequestDone(requestId, errorCode);
         },
         this);
-    m_requestInProgress.insert(requestId, std::move(data));
     return requestId;
 }
 
@@ -106,35 +102,7 @@ int QnResourcePropertyDictionary::saveParamsAsync(const QList<QnUuid>& idList)
 
 void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode errorCode )
 {
-    nx::vms::api::ResourceParamWithRefDataList unsavedData;
-    {
-        NX_MUTEX_LOCKER lock( &m_requestMutex );
-        auto itr = m_requestInProgress.find(reqID);
-        if (itr == m_requestInProgress.end())
-            return;
-        if (errorCode != ec2::ErrorCode::ok)
-            unsavedData = std::move(itr.value());
-        m_requestInProgress.erase(itr);
-    }
-    if (!unsavedData.empty())
-        addToUnsavedParams(unsavedData);
     emit asyncSaveDone(reqID, errorCode);
-}
-
-void QnResourcePropertyDictionary::addToUnsavedParams(
-    const nx::vms::api::ResourceParamWithRefDataList& params)
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    for (const auto& param: params)
-    {
-        auto itr = m_modifiedItems.find(param.resourceId);
-        if (itr == m_modifiedItems.end())
-            itr = m_modifiedItems.insert(param.resourceId, QnResourcePropertyList());
-        QnResourcePropertyList& data = itr.value();
-
-        if (!data.contains(param.name))
-            data.insert(param.name, param.value);
-    }
 }
 
 QString QnResourcePropertyDictionary::value(const QnUuid& resourceId, const QString& key) const
@@ -149,7 +117,6 @@ void QnResourcePropertyDictionary::clear()
     NX_MUTEX_LOCKER lock( &m_mutex );
     m_items.clear();
     m_modifiedItems.clear();
-    m_requestInProgress.clear();
 }
 
 void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
@@ -160,12 +127,6 @@ void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
         m_items.remove(id);
         m_modifiedItems.remove(id);
     }
-    //removing from m_requestInProgress
-    cancelOngoingRequest(
-        [&idList](const auto& param) -> bool
-        {
-            return idList.contains(param.resourceId);
-        });
 }
 
 void QnResourcePropertyDictionary::markAllParamsDirty(
@@ -293,13 +254,6 @@ bool QnResourcePropertyDictionary::on_resourceParamRemoved(
         return false;
     }
 
-    //removing from m_requestInProgress
-    cancelOngoingRequest(
-        [&resourceId, &key](const auto& param) -> bool
-        {
-            return param.resourceId == resourceId && param.name == key;
-        });
-
     lock.unlock();
     emit propertyRemoved(resourceId, key);
     return true;
@@ -339,15 +293,4 @@ QHash<QnUuid, QSet<QString>> QnResourcePropertyDictionary::allPropertyNamesByRes
         result.insert(id, nx::utils::toQSet(iter.value().keys()));
     }
     return result;
-}
-
-template<class Pred>
-void QnResourcePropertyDictionary::cancelOngoingRequest(const Pred& pred)
-{
-    for( auto ongoingRequestData: m_requestInProgress )
-    {
-        ongoingRequestData.erase(
-            std::remove_if( ongoingRequestData.begin(), ongoingRequestData.end(), pred ),
-            ongoingRequestData.end() );
-    }
 }
