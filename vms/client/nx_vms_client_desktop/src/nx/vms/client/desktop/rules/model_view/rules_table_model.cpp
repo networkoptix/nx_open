@@ -12,6 +12,7 @@
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/events/generic_event.h>
+#include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/rule.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
@@ -329,37 +330,8 @@ RulesTableModel::RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent
 {
     initialise();
 
-    connect(engine, &vms::rules::Engine::ruleAddedOrUpdated, this,
-        [this](QnUuid ruleId, bool added)
-        {
-            NX_VERBOSE(this, "Rule %1 is %2", ruleId, (added ? "added" : "updated"));
-
-            // If the current user has an intention to remove a rule with such id, it's changes
-            // should be ignored.
-            if (m_removedRules.contains(ruleId))
-                return;
-
-            if (added)
-                m_addedRules.erase(ruleId);
-            else
-                m_modifiedRules.erase(ruleId);
-
-            if (auto simplifiedRule = rule(ruleId).lock())
-            {
-                simplifiedRule->setRule(this->m_engine->cloneRule(ruleId));
-                return;
-            }
-
-            beginInsertRows({}, m_simplifiedRules.size(), m_simplifiedRules.size());
-
-            m_simplifiedRules.emplace_back(
-                new SimplifiedRule(this->m_engine, this->m_engine->cloneRule(ruleId)));
-            m_simplifiedRules.back()->setModelIndex(index(m_simplifiedRules.size() - 1, IdColumn));
-
-            endInsertRows();
-
-            emit stateChanged();
-        });
+    connect(engine, &vms::rules::Engine::ruleAddedOrUpdated,
+        this, &RulesTableModel::onRuleAddedOrUpdated);
 
     connect(engine, &vms::rules::Engine::ruleRemoved, this,
         [this](QnUuid ruleId)
@@ -394,6 +366,37 @@ RulesTableModel::RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent
             emit stateChanged();
         });
 }
+
+void RulesTableModel::onRuleAddedOrUpdated(QnUuid ruleId, bool added)
+{
+    NX_VERBOSE(this, "Rule %1 is %2", ruleId, (added ? "added" : "updated"));
+
+    // If the current user has an intention to remove a rule with such id, it's changes
+    // should be ignored.
+    if (m_removedRules.contains(ruleId))
+        return;
+
+    if (added)
+        m_addedRules.erase(ruleId);
+    else
+        m_modifiedRules.erase(ruleId);
+
+    if (auto simplifiedRule = rule(ruleId).lock())
+    {
+        simplifiedRule->setRule(this->m_engine->cloneRule(ruleId));
+        return;
+    }
+
+    beginInsertRows({}, m_simplifiedRules.size(), m_simplifiedRules.size());
+
+    m_simplifiedRules.emplace_back(
+        new SimplifiedRule(this->m_engine, this->m_engine->cloneRule(ruleId)));
+    m_simplifiedRules.back()->setModelIndex(index(m_simplifiedRules.size() - 1, IdColumn));
+
+    endInsertRows();
+
+    emit stateChanged();
+};
 
 int RulesTableModel::rowCount(const QModelIndex& /*parent*/) const
 {

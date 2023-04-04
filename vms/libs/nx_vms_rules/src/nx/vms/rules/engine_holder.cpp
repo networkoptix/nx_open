@@ -48,8 +48,7 @@ void EngineHolder::connectEngine(
     connect(processor, &QnCommonMessageProcessor::vmsRuleUpdated, engine,
         [engine](const nx::vms::api::rules::Rule& ruleData, ec2::NotificationSource /*source*/)
         {
-            if (auto rule = engine->buildRule(ruleData))
-                engine->updateRule(std::move(rule));
+            engine->updateRule(ruleData);
         },
         connectionType);
 

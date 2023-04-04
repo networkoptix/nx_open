@@ -19,12 +19,13 @@ public:
     QList<EventFilter> eventList;
     QList<ActionBuilder> actionList;
     bool enabled = true;
+    bool system = false;
     nx::vms::api::ScheduleTaskDataList schedule;
     QString comment;
 };
 
 #define nx_vms_api_rules_Rule_Fields \
-    IdData_Fields(eventList)(actionList)(enabled)(schedule)(comment)
+    IdData_Fields(eventList)(actionList)(enabled)(system)(schedule)(comment)
 
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(Rule, (json)(ubjson)(xml))
 

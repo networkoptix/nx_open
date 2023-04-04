@@ -57,6 +57,9 @@ public:
     void setEnabled(bool isEnabled);
     bool enabled() const;
 
+    bool isSystem() const;
+    void setSystem(bool system);
+
     void setSchedule(const QByteArray& schedule);
     QByteArray schedule() const;
     bool timeInSchedule(QDateTime time) const;
@@ -79,6 +82,7 @@ private:
 
     QString m_comment;
     bool m_enabled = true;
+    bool m_system = false;
     QByteArray m_schedule;
 
     bool m_updateInProgress = false;
