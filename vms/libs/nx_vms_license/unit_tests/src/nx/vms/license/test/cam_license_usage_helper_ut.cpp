@@ -18,6 +18,12 @@ namespace {
 const int camerasPerAnalogEncoder = QnLicensePool::camerasPerAnalogEncoder();
 }
 
+enum ServerIndex
+{
+    primary = 0,
+    secondary = 1,
+};
+
 namespace nx::vms::license::test {
 
 class QnCamLicenseUsageHelperTest: public nx::vms::common::test::ContextBasedTest
@@ -27,7 +33,9 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_server = addServer();
+        m_servers[0] = addServer();
+        m_servers[1] = addServer();
+        m_servers[1]->setStatus(nx::vms::api::ResourceStatus::offline);
         m_licenses.reset(new QnLicensePoolScaffold(systemContext()->licensePool()));
         m_helper.reset(new CamLicenseUsageHelper(systemContext()));
         m_helper->setCustomValidator(std::make_unique<QLicenseStubValidator>(systemContext()));
@@ -50,13 +58,14 @@ protected:
     QnVirtualCameraResourceList addRecordingCameras(
         Qn::LicenseType licenseType = Qn::LC_Professional,
         int count = 1,
-        bool licenseRequired = true)
+        bool licenseRequired = true,
+        ServerIndex serverIndex = ServerIndex::primary)
     {
         QnVirtualCameraResourceList result;
         for (int i = 0; i < count; ++i)
         {
             auto camera = addCamera(licenseType);
-            camera->setParentId(m_server->getId());
+            camera->setParentId(m_servers[(int) serverIndex]->getId());
             camera->setScheduleEnabled(licenseRequired);
             result << camera;
         }
@@ -85,7 +94,7 @@ protected:
         m_licenses->addFutureLicenses(count);
     }
 
-    QnMediaServerResourcePtr m_server;
+    std::array<QnMediaServerResourcePtr, 2> m_servers;
     QScopedPointer<QnLicensePoolScaffold> m_licenses;
     QScopedPointer<CamLicenseUsageHelper> m_helper;
 };
@@ -703,6 +712,25 @@ TEST_F(QnCamLicenseUsageHelperTest, licenseTypeChanged)
 
     camera.dynamicCast<nx::CameraResourceStub>()->setLicenseType(Qn::LC_Edge);
     ASSERT_FALSE(m_helper->canEnableRecording(camera));
+}
+
+TEST_F(QnCamLicenseUsageHelperTest, offlineNeighbor)
+{
+    // Add a camera to the primary server.
+    addLicense(Qn::LC_Professional);
+    auto camera = addRecordingCameras(Qn::LC_Professional, 1, true, ServerIndex::primary);
+    
+    // Add a camera to the secondary server.
+    auto camera2 = addRecordingCameras(Qn::LC_Professional, 1, true, ServerIndex::secondary);
+    
+    auto helper = QScopedPointer<CamLicenseUsageHelper>(new CamLicenseUsageHelper(systemContext()));
+    helper->setCustomValidator(std::make_unique<QLicenseStubValidator>(systemContext()));
+    ASSERT_FALSE(helper->isValid());
+
+    auto helper2 = QScopedPointer<CamLicenseUsageHelper>(new CamLicenseUsageHelper(
+        systemContext(), /*considerOnlineServersOnly*/ true));
+    helper2->setCustomValidator(std::make_unique<QLicenseStubValidator>(systemContext()));
+    ASSERT_TRUE(helper2->isValid());
 }
 
 } // namespace nx::vms::license::test
