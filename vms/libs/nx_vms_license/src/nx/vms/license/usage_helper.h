@@ -149,7 +149,10 @@ public:
         Constructors. Each one uses specified watcher or create a new one if parameter is empty.
         With empty watcher parameter creates instance which tracks all cameras.
     */
-    CamLicenseUsageHelper(common::SystemContext* context, QObject* parent = nullptr);
+    CamLicenseUsageHelper(
+        common::SystemContext* context, 
+        bool considerOnlineServersOnly = false,
+        QObject* parent = nullptr);
 
     CamLicenseUsageHelper(
         const QnVirtualCameraResourceList& proposedCameras,
@@ -181,6 +184,7 @@ protected:
 private:
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
+    bool m_considerOnlineServersOnly = false;
 };
 
 class SingleCamLicenseStatusHelper: public QObject
