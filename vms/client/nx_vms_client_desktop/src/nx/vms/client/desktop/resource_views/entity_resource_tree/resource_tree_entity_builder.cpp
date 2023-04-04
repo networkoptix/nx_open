@@ -889,7 +889,9 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCloudSystemCamerasEntity(
         };
 
     auto list = makeKeyList<QnResourcePtr>(itemCreator, numericOrder());
-    list->installItemSource(m_itemKeySourcePool->cloudSystemCamerasSource(systemId));
+
+    if (user() && user()->isCloud())
+        list->installItemSource(m_itemKeySourcePool->cloudSystemCamerasSource(systemId));
 
     return makeFlatteningGroup(
         m_itemFactory->createCloudSystemStatusItem(systemId),
