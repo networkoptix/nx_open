@@ -49,10 +49,12 @@ bool UdpSocketPair::bind()
     }
 
     if (!rtcpSocket)
+    {
+        NX_WARNING(this, "Failed to bind two UDP sockets to sequential ports");
         mediaSocket.reset();
+    }
 
     return mediaSocket && rtcpSocket;
 }
 
 }
-
