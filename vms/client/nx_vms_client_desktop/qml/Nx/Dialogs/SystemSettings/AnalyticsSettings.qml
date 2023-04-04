@@ -84,8 +84,22 @@ Item
         anchors.right: scrollBarParent.left
         anchors.margins: 16
 
-        settingsView.enabled: !!store && !store.loading
-        settingsView.scrollBarParent: scrollBarParent
+        settingsView
+        {
+            enabled: !!store && !store.loading
+            scrollBarParent: scrollBarParent
+
+            requestParametersFunction: (model) => { return store.requestParameters(model) }
+
+            onValuesEdited: (activeItem, parameters) =>
+            {
+                store.setSettingsValues(
+                    viewModel.currentEngineId,
+                    activeItem ? activeItem.name : "",
+                    settings.settingsView.getValues(),
+                    parameters)
+            }
+        }
 
         settingsViewHeader
         {
@@ -99,15 +113,6 @@ Item
             header: qsTr("This plugin has no settings at the System level.")
             description: qsTr("Check Camera Settings to configure this plugin.")
             loading: !!store && store.loading
-        }
-
-        settingsView.onValuesEdited: (activeItem) =>
-        {
-            store.setSettingsValues(
-                viewModel.currentEngineId,
-                activeItem ? activeItem.name : "",
-                activeItem ? activeItem.parametersModel : "",
-                settings.settingsView.getValues())
         }
 
         Binding

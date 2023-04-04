@@ -12,7 +12,7 @@ ActiveTextItem
     property string validationErrorMessage: ""
 
     property alias textFieldItem: control.contentItem
-    readonly property bool filled: textFieldItem.text !== ""
+    readonly property bool filled: !!textFieldItem && textFieldItem.text !== ""
 
     signal valueChanged()
 

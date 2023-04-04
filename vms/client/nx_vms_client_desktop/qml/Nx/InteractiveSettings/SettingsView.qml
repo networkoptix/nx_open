@@ -13,7 +13,7 @@ Item
     id: settingsView
 
     signal valuesChanged()
-    signal valuesEdited(Item activeItem)
+    signal valuesEdited(Item activeItem, var parameters)
 
     property Item contentItem: null
     property bool contentEnabled: true
@@ -23,6 +23,9 @@ Item
     property Item placeholderItem: null
     property alias thumbnailSource: sharedData.thumbnailSource
 
+    /** Function with model argument returns json object or null if the request is canceled. */
+    property var requestParametersFunction
+
     implicitWidth: 100
     implicitHeight: contentItem ? contentItem.heightHint : 0
 
@@ -31,6 +34,7 @@ Item
         id: impl
         property bool valuesChangedEnabled: true
         property var currentSectionScrollBar: null
+        property var initialValues
     }
 
     QtObject
@@ -81,6 +85,7 @@ Item
             impl.currentSectionScrollBar.sizeChanged.connect(scroll)
         }
 
+        impl.initialValues = initialValues
         if (initialValues)
             setValues(initialValues)
 
@@ -104,10 +109,16 @@ Item
         impl.valuesChangedEnabled = true
     }
 
-    function _emitValuesChanged()
+    function restoreValue(item)
     {
-        if (impl.valuesChangedEnabled)
-            valuesChanged()
+        impl.valuesChangedEnabled = false
+
+        if (impl.initialValues)
+            Settings.setValue(item, impl.initialValues[item.name])
+        else
+            Settings.resetValue(item);
+
+        impl.valuesChangedEnabled = true
     }
 
     function triggerValuesEdited(activeItem)
@@ -115,7 +126,14 @@ Item
         if (!impl.valuesChangedEnabled || !settingsView.enabled)
             return
 
-        valuesEdited(activeItem)
+        const parameters = activeItem && activeItem.parametersModel && requestParametersFunction
+            ? requestParametersFunction(activeItem.parametersModel)
+            : {}
+
+        if (!parameters)
+            return restoreValue(activeItem)
+
+        valuesEdited(activeItem, parameters)
         valuesChanged()
     }
 

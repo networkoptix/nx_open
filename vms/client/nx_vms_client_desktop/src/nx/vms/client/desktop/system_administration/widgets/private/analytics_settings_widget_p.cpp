@@ -98,17 +98,23 @@ QJsonObject AnalyticsSettingsWidget::Private::settingsValues(const QnUuid& engin
     return settingsValuesByEngineId.value(engineId).values;
 }
 
+QVariant AnalyticsSettingsWidget::Private::requestParameters(const QJsonObject& model)
+{
+    const auto values = AnalyticsSettingsActionsHelper::requestSettingsJson(model, /*parent*/ q);
+    return values ? *values : QVariant{};
+}
+
 void AnalyticsSettingsWidget::Private::setSettingsValues(
     const QnUuid& engineId,
     const QString& activeElement,
-    const QJsonObject& paramsModel,
-    const QJsonObject& values)
+    const QJsonObject& values,
+    const QJsonObject& parameters)
 {
     settingsValuesByEngineId.insert(engineId, SettingsValues{values, true});
     hasChanges = true;
 
     if (!activeElement.isEmpty())
-        activeElementChanged(currentEngineId, activeElement, paramsModel);
+        activeElementChanged(currentEngineId, activeElement, parameters);
 
     emit q->hasChangesChanged();
 }
@@ -323,7 +329,7 @@ void AnalyticsSettingsWidget::Private::applySettingsValues()
 void AnalyticsSettingsWidget::Private::activeElementChanged(
     const QnUuid& engineId,
     const QString& activeElement,
-    const QJsonObject& paramsModel)
+    const QJsonObject& parameters)
 {
     if (!pendingApplyRequests.isEmpty() || !pendingRefreshRequests.isEmpty())
         return;
@@ -335,18 +341,12 @@ void AnalyticsSettingsWidget::Private::activeElementChanged(
     if (!NX_ASSERT(engine))
         return;
 
-    const auto paramValues =
-        AnalyticsSettingsActionsHelper::requestSettingsJson(paramsModel, /*parent*/ q);
-
-    if (!paramValues)
-        return;
-
     const auto handle = connectedServerApi()->engineAnalyticsActiveSettingsChanged(
         engine,
         activeElement,
         settingsModel(engineId),
         settingsValuesByEngineId[engineId].values,
-        *paramValues,
+        parameters,
         nx::utils::guarded(this,
             [this, engineId](
                 bool success,
