@@ -49,6 +49,16 @@ auto splitKeyValue(const QString& nameAndValue, QChar delimiter)
     return std::make_tuple(key.trimmed(), value.trimmed());
 };
 
+void configureUdpSocket(
+    std::unique_ptr<nx::network::AbstractDatagramSocket>& socket,
+    int recvBufferSize)
+{
+    socket->setRecvTimeout(500);
+    if (recvBufferSize)
+        socket->setRecvBufferSize(recvBufferSize);
+    socket->setNonBlockingMode(true);
+};
+
 } // namespace
 
 QString extractRtspParam(const QString& buffer, const QString& paramName);
@@ -155,20 +165,22 @@ void QnRtspIoDevice::shutdown()
         m_udpSockets.mediaSocket->shutdown();
 }
 
-void QnRtspIoDevice::updateRemotePorts(quint16 mediaPort, quint16 rtcpPort)
+bool QnRtspIoDevice::updateRemotePorts(quint16 mediaPort, quint16 rtcpPort)
 {
     m_remoteMediaPort = mediaPort;
     m_remoteRtcpPort = rtcpPort;
     if (m_transport == nx::vms::api::RtpTransportType::multicast)
-        updateSockets();
+        return createMulticastSockets();
+    return true;
 }
 
-void QnRtspIoDevice::setTransport(nx::vms::api::RtpTransportType rtpTransport)
+bool QnRtspIoDevice::setTransport(nx::vms::api::RtpTransportType rtpTransport)
 {
     if (m_transport == rtpTransport)
-        return;
+        return true;
+
     m_transport = rtpTransport;
-    updateSockets();
+    return updateSockets();
 }
 
 void QnRtspIoDevice::processRtcpData()
@@ -230,7 +242,33 @@ void QnRtspIoDevice::processRtcpData()
     }
 }
 
-void QnRtspIoDevice::updateSockets()
+std::unique_ptr<nx::network::AbstractDatagramSocket> QnRtspIoDevice::createMulticastSocket(int port)
+{
+    auto result = nx::network::SocketFactory::createDatagramSocket();
+    result->setReuseAddrFlag(true);
+
+    if (!result->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, port)))
+    {
+        NX_WARNING(this, "Failed to bind multicast socket to port: %1, error: %2",
+            port, SystemError::getLastOSErrorCode());
+        return nullptr;
+    }
+
+    configureUdpSocket(result, m_owner->tcpRecvBufferSize());
+    return result;
+}
+
+bool QnRtspIoDevice::createMulticastSockets()
+{
+    m_udpSockets.mediaSocket = createMulticastSocket(m_remoteMediaPort);
+    m_udpSockets.rtcpSocket = createMulticastSocket(m_remoteRtcpPort);
+    if (!m_udpSockets.mediaSocket || !m_udpSockets.rtcpSocket)
+        return false;
+
+    return true;
+}
+
+bool QnRtspIoDevice::updateSockets()
 {
     if (m_transport == nx::vms::api::RtpTransportType::tcp)
     {
@@ -241,47 +279,25 @@ void QnRtspIoDevice::updateSockets()
             if (m_owner->tcpRecvBufferSize())
                 m_owner->setTcpRecvBufferSize(m_owner->tcpRecvBufferSize());
         }
-        return;
+        return true;
     }
-
-    auto configureSocket =
-        [this](std::unique_ptr<nx::network::AbstractDatagramSocket>& socket)
-        {
-            socket->setRecvTimeout(500);
-            if (m_owner->tcpRecvBufferSize())
-                socket->setRecvBufferSize(m_owner->tcpRecvBufferSize());
-            socket->setNonBlockingMode(true);
-        };
-
-    auto createSocket =
-        [this, configureSocket](int port)
-        {
-            auto result = nx::network::SocketFactory::createDatagramSocket();
-            if (m_transport == nx::vms::api::RtpTransportType::multicast)
-                result->setReuseAddrFlag(true);
-
-            // TODO check return values?
-            result->bind(nx::network::SocketAddress(nx::network::HostAddress::anyHost, port));
-            configureSocket(result);
-            return result;
-        };
 
     if (m_transport == nx::vms::api::RtpTransportType::multicast)
-    {
-        m_udpSockets.mediaSocket = createSocket(m_remoteMediaPort);
-        m_udpSockets.rtcpSocket = createSocket(m_remoteRtcpPort);
-        return;
-    }
+        return createMulticastSockets();
 
     if (m_transport == nx::vms::api::RtpTransportType::udp)
     {
         if (!m_udpSockets.bind())
-            return;
+        {
+            NX_WARNING(this, "Failed to bind UDP sockets");
+            return false;
+        }
 
-        configureSocket(m_udpSockets.mediaSocket);
-        configureSocket(m_udpSockets.rtcpSocket);
-        return;
+        configureUdpSocket(m_udpSockets.mediaSocket, m_owner->tcpRecvBufferSize());
+        configureUdpSocket(m_udpSockets.rtcpSocket, m_owner->tcpRecvBufferSize());
+        return true;
     }
+    return true;
 }
 
 QnRtspIoDevice::AddressInfo QnRtspIoDevice::mediaAddressInfo() const
@@ -523,6 +539,7 @@ bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
     if (!m_playNowMode && !sendSetup())
     {
         NX_WARNING(this, "Failed to send SETUP command");
+        m_sdpTracks.clear();
         return false;
     }
 
@@ -813,7 +830,8 @@ bool QnRtspClient::sendSetup()
                 ? ";multicast;"
                 : ";unicast;";
 
-            track.ioDevice->setTransport(m_actualTransport);
+            if (!track.ioDevice->setTransport(m_actualTransport))
+                return false;
 
             if (m_actualTransport != nx::vms::api::RtpTransportType::tcp)
             {
@@ -849,7 +867,8 @@ bool QnRtspClient::sendSetup()
         }
 
         track.setupSuccess = true;
-        parseSetupResponse(response, &track, i);
+        if (!parseSetupResponse(response, &track, i))
+            return false;
 
         if (m_transport == nx::vms::api::RtpTransportType::multicast)
             track.ioDevice->bindToMulticastAddress(track.sdpMedia.connectionAddress, localAddress);
@@ -862,7 +881,7 @@ bool QnRtspClient::sendSetup()
     return true;
 }
 
-void QnRtspClient::parseSetupResponse(const QString& response, SDPTrackInfo* track, int trackIndex)
+bool QnRtspClient::parseSetupResponse(const QString& response, SDPTrackInfo* track, int trackIndex)
 {
     QString sessionParam = extractRtspParam(response, QLatin1String("Session:"));
     bool isFirstParam = true;
@@ -912,14 +931,18 @@ void QnRtspClient::parseSetupResponse(const QString& response, SDPTrackInfo* tra
         }
         else if (key == "server_port" || key == "port")
         {
-            track->ioDevice->updateRemotePorts(part1.toUShort(),
-                part2.isEmpty() ? part1.toUShort() + 1 : part2.toUShort());
+            if (!track->ioDevice->updateRemotePorts(part1.toUShort(),
+                part2.isEmpty() ? part1.toUShort() + 1 : part2.toUShort()))
+            {
+                return false;
+            }
         }
         else if (key == "destination")
         {
             track->sdpMedia.connectionAddress = QHostAddress(value);
         }
     }
+    return true;
 }
 
 void QnRtspClient::addAdditionAttrs( nx::network::http::Request* const request )
