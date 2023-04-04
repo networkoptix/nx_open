@@ -33,7 +33,6 @@ Control
 
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton
-            enabled: hasHelpTopic
 
             GlobalToolTip.delay: 0
             GlobalToolTip.text:
