@@ -116,15 +116,10 @@ Item
                 active: visible
             }
 
-            onValuesEdited: (activeItem) =>
+            requestParametersFunction: (model) => { return backend.requestParameters(model) }
+
+            onValuesEdited: (activeItem, parameters) =>
             {
-                const parameters = activeItem && activeItem.parametersModel
-                    ? backend.requestParameters(activeItem.parametersModel)
-                    : {}
-
-                if (parameters == null)
-                    return
-
                 store.setDeviceAgentSettingsValues(
                     currentEngineId,
                     activeItem ? activeItem.name : "",

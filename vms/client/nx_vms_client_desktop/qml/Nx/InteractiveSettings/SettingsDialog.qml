@@ -27,11 +27,17 @@ Dialog
         return settingsView.getValues()
     }
 
-    function adjustSize()
+    function adjust()
     {
+        if (settingsView.implicitHeight === 0)
+            return
+
+        const previousHeight = height
         height = Math.min(content.implicitHeight + buttonBox.height, preferredHeight)
         minimumHeight = content.implicitHeight - settingsView.implicitHeight + buttonBox.height
-        minimumWidth = content.implicitWidth
+
+        if (height > previousHeight)
+            y -= (height - previousHeight) / 2
     }
 
     onSettingsModelChanged: settingsView.loadModel(settingsModel)
@@ -127,9 +133,10 @@ Dialog
                 id: settingsView
 
                 scrollBarParent: parent
-                onImplicitHeightChanged: adjustSize()
             }
         }
+
+        onImplicitHeightChanged: adjust()
     }
 
     buttonBox: DialogButtonBox

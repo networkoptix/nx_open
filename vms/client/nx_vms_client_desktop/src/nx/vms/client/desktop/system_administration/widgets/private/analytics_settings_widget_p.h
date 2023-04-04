@@ -38,11 +38,13 @@ public:
 
     Q_INVOKABLE QJsonObject settingsValues(const QnUuid& engineId);
 
+    Q_INVOKABLE QVariant requestParameters(const QJsonObject& model);
+
     Q_INVOKABLE void setSettingsValues(
         const QnUuid& engineId,
         const QString& activeElement,
-        const QJsonObject& paramsModel,
-        const QJsonObject& values);
+        const QJsonObject& values,
+        const QJsonObject& parameters);
 
     Q_INVOKABLE QJsonObject settingsModel(const QnUuid& engineId);
     Q_INVOKABLE QJsonObject errors(const QnUuid& engineId) { return m_errors[engineId]; }
@@ -58,7 +60,7 @@ public:
     void activeElementChanged(
         const QnUuid& engineId,
         const QString& activeElement,
-        const QJsonObject& paramsModel);
+        const QJsonObject& parameters);
 
     void applySettingsValues();
 

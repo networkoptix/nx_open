@@ -32,12 +32,15 @@ StackLayout
     readonly property bool isEmpty: !hasOtherSections && !hasItems
 
     property bool fillWidth: true
-    implicitWidth: 100
-    property int heightHint: view.contentItem.implicitHeight
+    property int heightHint: currentIndex > 1
+        ? children[currentIndex].heightHint
+        : view.contentItem.implicitHeight
 
     Scrollable
     {
         id: view
+
+        Layout.minimumWidth: 200 //< Needed to get implicit height calculated correctly.
 
         verticalScrollBar: ScrollBar
         {
