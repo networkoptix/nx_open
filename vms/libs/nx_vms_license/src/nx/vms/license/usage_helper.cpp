@@ -335,8 +335,13 @@ QList<Qn::LicenseType> UsageHelper::licenseTypes() const
 /************************************************************************/
 /* CamLicenseUsageHelper                                              */
 /************************************************************************/
-CamLicenseUsageHelper::CamLicenseUsageHelper(common::SystemContext* context, QObject* parent):
-    base_type(context, parent)
+CamLicenseUsageHelper::CamLicenseUsageHelper(
+    common::SystemContext* context,
+    bool considerOnlineServersOnly,
+    QObject* parent)
+    :
+    base_type(context, parent),
+    m_considerOnlineServersOnly(considerOnlineServersOnly)
 {
     // Watcher exists only on the client side.
     if (auto watcher = context->deviceLicenseUsageWatcher())
@@ -487,7 +492,15 @@ void CamLicenseUsageHelper::calculateUsedLicenses(
     for (const auto& camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
     {
         if (camera->isScheduleEnabled())
+        {
+            if (m_considerOnlineServersOnly)
+            {
+                auto server = camera->getParentResource();
+                if (server && !server->isOnline())
+                    continue;
+            }
             oldCameras[groupId(camera)].insert(camera);
+        }
     }
 
     for (const auto& data : oldCameras)
