@@ -12,6 +12,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/palette.h>
 
@@ -47,7 +48,8 @@ SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
     titleFont.setWeight(QFont::Light);
     ui->captionLabel->setFont(titleFont);
 
-    setPaletteColor(this, QPalette::Window, QColor("#1d2327"));
+    setPaletteColor(this, QPalette::Window,
+        colorTheme()->color("scene.customLayoutBackground"));
     setAutoFillBackground(true);
 
     setWidget(body);

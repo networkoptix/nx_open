@@ -29,20 +29,17 @@
 
 namespace nx::vms::client::desktop {
 
-static constexpr int kPauseOpacity = 153;
-static constexpr int kArchiveOpacity = 127;
-
-static constexpr QColor kPauseBackgroundColor = QColor(194, 38, 38, kPauseOpacity);
-static constexpr QColor kPlayBackgroundColor = QColor(0, 0, 0, kArchiveOpacity);
-
 PlaybackPositionItem::PlaybackPositionItem(WindowContext* windowContext, QGraphicsItem* parent):
     base_type(parent),
     WindowContextAware(windowContext),
     m_pauseButton(new PlaybackPositionIconTextWidget()),
     m_positionAndRecording(new PlaybackPositionIconTextWidget())
 {
-    setAcceptedMouseButtons(Qt::NoButton);
+    static const QColor kPauseBackgroundColor = colorTheme()->color("timeline.playback.pause");
+    static const QColor kArchiveBackgroundColor = colorTheme()->color("timeline.playback.archive");
 
+    setAcceptedMouseButtons(Qt::NoButton);
+    
     PlaybackPositionIconTextWidgetOptions pauseOptions;
     pauseOptions.backgroundColor = kPauseBackgroundColor;
     pauseOptions.borderRadius = 2;
@@ -61,7 +58,7 @@ PlaybackPositionItem::PlaybackPositionItem(WindowContext* windowContext, QGraphi
     m_pauseButton->setIcon(pausePixmap);
 
     PlaybackPositionIconTextWidgetOptions positionOptions;
-    positionOptions.backgroundColor = kPlayBackgroundColor;
+    positionOptions.backgroundColor = kArchiveBackgroundColor;
     positionOptions.horSpacing = 4;
     positionOptions.horPadding = 6;
     positionOptions.vertPadding = 4;
@@ -136,6 +133,9 @@ void PlaybackPositionItem::cancelAnimation()
  */
 void PlaybackPositionItem::tick(int deltaMs)
 {
+    static const QColor kPauseBackgroundColor = colorTheme()->color("timeline.playback.pause");
+    static const QColor kArchiveBackgroundColor = colorTheme()->color("timeline.playback.archive");
+
     if (m_totalMs == kStopped)
         return;
 
@@ -168,9 +168,11 @@ void PlaybackPositionItem::tick(int deltaMs)
     {
         animator->setTimeLimit(100);
         animator->animateTo(1.0);
-        m_pauseButton->options().backgroundColor.setAlpha(kPauseOpacity);
+        m_pauseButton->options().backgroundColor.setAlpha(kPauseBackgroundColor.alpha());
         m_positionAndRecording->options().backgroundColor.setAlpha(
-            m_pauseButton->isVisible() ? kPauseOpacity : kArchiveOpacity);
+            m_pauseButton->isVisible()
+                ? kPauseBackgroundColor.alpha()
+                : kArchiveBackgroundColor.alpha());
         return;
     }
 
@@ -179,9 +181,11 @@ void PlaybackPositionItem::tick(int deltaMs)
         m_totalMs = kStopped;
         animator->setTimeLimit(300);
         animator->animateTo(0.0);
-        m_pauseButton->options().backgroundColor.setAlpha(kPauseOpacity);
+        m_pauseButton->options().backgroundColor.setAlpha(kPauseBackgroundColor.alpha());
         m_positionAndRecording->options().backgroundColor.setAlpha(
-            m_pauseButton->isVisible() ? kPauseOpacity : kArchiveOpacity);
+            m_pauseButton->isVisible()
+                ? kPauseBackgroundColor.alpha()
+                : kArchiveBackgroundColor.alpha());
     }
 }
 
@@ -192,6 +196,9 @@ void PlaybackPositionItem::blink()
 
 void PlaybackPositionItem::setVisibleButtons(int buttons)
 {
+    static const QColor kPauseBackgroundColor = colorTheme()->color("timeline.playback.pause");
+    static const QColor kArchiveBackgroundColor = colorTheme()->color("timeline.playback.archive");
+
     if (buttons & Qn::PauseButton)
     {
         m_pauseButton->setVisible(true);
@@ -204,7 +211,7 @@ void PlaybackPositionItem::setVisibleButtons(int buttons)
     {
         m_pauseButton->setVisible(false);
         auto options = m_positionAndRecording->options();
-        options.backgroundColor = kPlayBackgroundColor;
+        options.backgroundColor = kArchiveBackgroundColor;
         m_positionAndRecording->setOptions(options);
     }
 

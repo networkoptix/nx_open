@@ -2,12 +2,13 @@
 
 #include "popup_shadow.h"
 
+#include <functional>
+
 #include <QtCore/QEvent>
 #include <QtCore/QPointer>
-
 #include <QtWidgets/QLabel>
 
-#include <functional>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -23,7 +24,7 @@ public:
         q(q),
         popup(popup),
         shadow(new QLabel(popup->parentWidget())),
-        color(Qt::black),
+        color(colorTheme()->color("dark1")),
         offset(10, 10),
         blurRadius(10),
         spread(0),
@@ -227,7 +228,7 @@ public:
     QWidget* popup = nullptr;
     QPointer<QLabel> shadow;
 
-    QColor color = Qt::black;
+    QColor color = colorTheme()->color("dark1");
     QPoint offset = QPoint(10, 10);
     int blurRadius = 10;
     int spread = 0;

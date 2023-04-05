@@ -54,10 +54,6 @@ using nx::vms::client::core::Geometry;
 
 namespace {
 
-/** Background color for overlay panels. */
-const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); //< TODO: #sivanov Customization.
-const QColor overlayTextColor = QColor(255, 255, 255, 160); //< TODO: #sivanov Customization.
-
 // We request this size for thumbnails.
 static const QSize kPreviewSize(640, 480);
 }
@@ -175,7 +171,7 @@ void QnVideowallItemWidget::initInfoOverlay()
     QFont font = this->font();
     font.setPixelSize(20);
     setFont(font);
-    setPaletteColor(this, QPalette::WindowText, overlayTextColor);
+    setPaletteColor(this, QPalette::WindowText, colorTheme()->color("videowall.overlayText"));
 
     /* Header overlay. */
     m_headerLabel = new GraphicsLabel();
@@ -192,7 +188,8 @@ void QnVideowallItemWidget::initInfoOverlay()
     m_headerWidget->setLayout(m_headerLayout);
     m_headerWidget->setAcceptedMouseButtons(Qt::NoButton);
     m_headerWidget->setAutoFillBackground(true);
-    setPaletteColor(m_headerWidget, QPalette::Window, overlayBackgroundColor);
+    setPaletteColor(m_headerWidget, QPalette::Window,
+        colorTheme()->color("videowall.overlayBackground"));
 
     QGraphicsLinearLayout *headerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
     headerOverlayLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);

@@ -6,6 +6,8 @@
 
 #include <QtGui/QPainter>
 
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+
 namespace
 {
     enum { kDefaultSeparatorWidth = 1 };
@@ -13,7 +15,7 @@ namespace
 
 SeparatorAreaProperties::SeparatorAreaProperties()
     : width(kDefaultSeparatorWidth)
-    , color(Qt::yellow)
+    , color(nx::vms::client::desktop::colorTheme()->color("yellow_core"))
 {
 }
 
@@ -77,7 +79,7 @@ void QnSeparator::updatePixmap()
 
     const auto size = horizontal ? QSize(length, thickness) : QSize(thickness, length);
     m_pixmap = QPixmap(size);
-    m_pixmap.fill(Qt::red);
+    m_pixmap.fill(Qt::red); //< Used for debug purposes, not visible for a client.
 
     QPainter painter(&m_pixmap);
     painter.setPen(Qt::NoPen);

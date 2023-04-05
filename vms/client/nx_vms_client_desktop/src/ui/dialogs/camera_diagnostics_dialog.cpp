@@ -187,7 +187,7 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(
     if (result)
     {
         message = tr("OK");
-        color = QColor(128, 255, 128); //TODO: customize
+        color = colorTheme()->color("green_core");
     }
     else
     {

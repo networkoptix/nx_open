@@ -90,10 +90,6 @@ const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION_MS;
 const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION_MS * 3;
 #endif
 
-/** Background color for overlay panels. */
-
-const QColor overlayTextColor = QColor(255, 255, 255); // TODO: #sivanov Move to skin.
-
 const float noAspectRatio = -1.0;
 
 // TODO: #sivanov get rid of this
@@ -175,7 +171,7 @@ QnResourceWidget::QnResourceWidget(
     font.setPixelSize(15);
     setFont(font);
 
-    setPaletteColor(this, QPalette::WindowText, overlayTextColor);
+    setPaletteColor(this, QPalette::WindowText, colorTheme()->color("light1"));
     setPaletteColor(this, QPalette::Window, colorTheme()->color("dark5"));
     setPaletteColor(this, QPalette::Highlight, colorTheme()->color("brand_core", 110));
 

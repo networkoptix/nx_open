@@ -35,6 +35,7 @@
     "light16":      "#698796",
     "light17":      "#5f7f8f",
 
+    "blue_core":    "#0000ff",
     "blue8":        "#43c2ff",
     "blue9":        "#39b2ef",
     "blue10":       "#2fa2db",
@@ -148,7 +149,11 @@
                 "text_pressed": "#d8e2e9"
             }
         },
-        "showButton": "#c2a026.setAlpha(199)"
+        "showButton": "#c2a026.setAlpha(199)",
+        "playback": {
+            "pause": "red_core.setAlpha(153)",
+            "archive": "dark1.setAlpha(127)"
+        }
     },
 
     "calendar": {
@@ -214,6 +219,10 @@
             "pen": "#980000",
             "brush": "#c80000.setAlpha(128)"
         },
+        "motionGrid:": {
+            "background": "#ffffff.setAlpha(16)",
+            "foreground": "#ff0000.setAlpha(128)"
+        },
         "twoWayAudio": {
             "background": {
                 "default": "dark1.setAlpha(128)",
@@ -245,7 +254,8 @@
             "invalid": "#f02c2c",
             "text": "#ffffff",
             "paletteCheckMark": "#000000"
-        }
+        },
+        "diagnosticsDialog": "#80ff80"
     },
 
     "server": {
@@ -318,10 +328,16 @@
             "_": "Overview mode",
             "normal": "#808080.setAlpha(196)",
             "selected": "#4082b4.setAlpha(128)"
-        }
+        },
+        "overlayText": "light1.setAlpha(160)",
+        "overlayBackground": "dark1.setAlpha(96)"
     },
 
     "layoutBackgroundSettings": {
         "frameColor": "#808080.setAlpha(196)"
+    },
+
+    "mainWindow": {
+        "customFrame": "light1.setAlpha(64)"
     }
 }

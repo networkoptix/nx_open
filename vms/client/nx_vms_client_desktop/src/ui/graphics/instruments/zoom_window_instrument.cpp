@@ -47,7 +47,6 @@ static constexpr qreal kZoomWindowMaxAspectRatio = kZoomWindowMaxSize / kZoomWin
 static constexpr qreal kMaxZoomWindowAr = 21.0 / 9.0;
 static constexpr int kZoomLineWidth = 2;
 static constexpr int kFrameWidth = 1;
-static constexpr Qt::GlobalColor kFrameColor = Qt::yellow;
 
 bool isZoomAllowed(QGraphicsItem* item)
 {
@@ -87,7 +86,7 @@ public:
     ZoomWindowWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = {}):
         base_type(parent, windowFlags),
         m_interactive(true),
-        m_frameColor(kFrameColor),
+        m_frameColor(colorTheme()->color("yellow_core")),
         m_frameWidth(kFrameWidth)
     {
         setWindowFlags(this->windowFlags() | Qt::Window);

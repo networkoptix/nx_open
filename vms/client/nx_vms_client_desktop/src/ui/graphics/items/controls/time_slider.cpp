@@ -3094,7 +3094,7 @@ void QnTimeSlider::drawThumbnail(
         qreal width = 1.0 + a * 2.0;
         QColor color = linearCombine(
             1.0 - a,
-            QColor(255, 255, 255, 32), //< TODO: #customize
+            colorTheme()->color("light1", 32),
             a,
             kSelectionMarkerColor);
         rect = Geometry::eroded(rect, width / 2.0);
