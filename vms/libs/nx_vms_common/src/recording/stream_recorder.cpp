@@ -235,6 +235,11 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
     #undef VERBOSE
 }
 
+void QnStreamRecorder::resetPacketCount()
+{
+    m_packetCount = 0;
+}
+
 bool QnStreamRecorder::prepareToStart(const QnConstAbstractMediaDataPtr& mediaData)
 {
     m_endDateTimeUs = m_startDateTimeUs = mediaData->timestamp;
@@ -288,6 +293,11 @@ void QnStreamRecorder::setPreciseStartDateTime(int64_t startTimeUs)
     m_startDateTimeUs = startTimeUs;
 }
 
+int64_t QnStreamRecorder::packetCount() const
+{
+    return m_packetCount;
+}
+
 bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 {
     using namespace nx::common::metadata;
@@ -300,7 +310,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         metadata && metadata->metadataType == MetadataType::ObjectDetection)
     {
         NX_VERBOSE(this, "QnStreamRecorder::saveData(): Analytics, timestamp %1 us", md->timestamp);
-        const auto analytics = 
+        const auto analytics =
             std::dynamic_pointer_cast<const QnCompressedObjectMetadataPacket>(metadata);
         saveAnalyticsMetadata(
             analytics ? analytics->packet : fromCompressedMetadataPacket(metadata));
@@ -414,6 +424,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     }
     else
     {
+        ++m_packetCount;
         onSuccessfulWriteData(md);
     }
 
