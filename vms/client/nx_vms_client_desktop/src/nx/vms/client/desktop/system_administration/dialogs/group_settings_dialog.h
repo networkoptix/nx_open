@@ -105,7 +105,7 @@ public:
     static void removeGroups(
         nx::vms::client::desktop::SystemContext* context,
         const QSet<QnUuid>& idsToRemove,
-        std::function<void(bool)> callback = {});
+        std::function<void(bool, const QString&)> callback = {});
 
 public slots:
     void onDeleteRequested();

@@ -198,11 +198,23 @@ void GroupSettingsDialog::onDeleteRequested()
     d->isSaving = true;
 
     const auto handleRemove = nx::utils::guarded(this,
-        [this](bool success)
+        [this](bool success, const QString& errorString)
         {
             d->isSaving = false;
             if (success)
+            {
                 reject();
+                return;
+            }
+
+            QnMessageBox messageBox(
+                QnMessageBoxIcon::Critical,
+                tr("Delete failed"),
+                errorString,
+                QDialogButtonBox::Ok,
+                QDialogButtonBox::Ok,
+                d->parentWidget);
+            messageBox.exec();
         });
 
     removeGroups(systemContext(), {d->groupId}, std::move(handleRemove));
@@ -466,7 +478,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 void GroupSettingsDialog::removeGroups(
     nx::vms::client::desktop::SystemContext* systemContext,
     const QSet<QnUuid>& idsToRemove,
-    std::function<void(bool)> callback)
+    std::function<void(bool, const QString&)> callback)
 {
     auto chain = new UserGroupRequestChain(systemContext);
 
@@ -524,10 +536,10 @@ void GroupSettingsDialog::removeGroups(
     chain->start(nx::utils::guarded(chain,
         [chain, callback = std::move(callback)](
             bool success,
-            const QString& /*errorString*/)
+            const QString& errorString)
         {
             if (callback)
-                callback(success);
+                callback(success, errorString);
             chain->deleteLater();
         }));
 }
