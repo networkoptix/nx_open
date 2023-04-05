@@ -154,7 +154,6 @@ public:
     CustomizableSortFilterProxyModel* const sortModel{new CustomizableSortFilterProxyModel(q)};
     CheckableHeaderView* const header{new CheckableHeaderView(
         UserGroupListModel::CheckBoxColumn, q)};
-    QSet<QnUuid> deletedGroupIds;
 
     ControlBar* const selectionControls{new ControlBar(q)};
 
@@ -200,15 +199,13 @@ UserGroupsWidget::UserGroupsWidget(UserGroupManager* manager, QWidget* parent):
     connect(manager, &UserGroupManager::addedOrUpdated, d.get(),
         [this](const nx::vms::api::UserGroupData& group)
         {
-            if (!d->deletedGroupIds.contains(group.id))
-                d->groupsModel->addOrUpdateGroup(group);
+            d->groupsModel->addOrUpdateGroup(group);
         });
 
     connect(manager, &UserGroupManager::removed, d.get(),
         [this](const nx::vms::api::UserGroupData& group)
         {
             d->groupsModel->removeGroup(group.id);
-            d->deletedGroupIds.remove(group.id);
             emit hasChangesChanged();
         });
 
@@ -227,30 +224,17 @@ UserGroupsWidget::~UserGroupsWidget()
 
 void UserGroupsWidget::loadDataToUi()
 {
-    d->deletedGroupIds.clear();
     d->groupsModel->reset(d->userGroups());
 }
 
 void UserGroupsWidget::applyChanges()
 {
-    if (d->deletedGroupIds.empty())
-        return;
-
-    if (!ui::messages::UserGroups::removeGroups(this, d->deletedGroupIds))
-    {
-        loadDataToUi(); //< Restore groups table.
-        return;
-    }
-
-    const auto deletedGroupIds = d->deletedGroupIds;
-    d->deletedGroupIds = {};
-
-    GroupSettingsDialog::removeGroups(systemContext(), deletedGroupIds);
+    // TODO: Apply changes to visibleSelectedGroupIds().
 }
 
 bool UserGroupsWidget::hasChanges() const
 {
-    return !d->deletedGroupIds.empty();
+    return false;
 }
 
 // -----------------------------------------------------------------------------------------------
@@ -433,20 +417,30 @@ void UserGroupsWidget::Private::createGroup()
 
 void UserGroupsWidget::Private::deleteSelected()
 {
-    const auto toDelete = visibleSelectedGroupIds();
-    if (!NX_ASSERT(!toDelete.isEmpty()))
-        return;
+    QSet<QnUuid> toDelete;
 
-    for (const auto& groupId: toDelete)
+    const auto selectedGroups = visibleSelectedGroupIds();
+    for (const auto& groupId: selectedGroups)
     {
         if (!canDeleteGroup(groupId))
             continue;
 
-        if (NX_ASSERT(groupsModel->removeGroup(groupId)))
-            deletedGroupIds.insert(groupId);
+        toDelete << groupId;
     }
 
-    emit q->hasChangesChanged();
+    if (toDelete.isEmpty())
+        return;
+
+    if (!ui::messages::UserGroups::removeGroups(q, toDelete))
+        return;
+
+    GroupSettingsDialog::removeGroups(q->systemContext(), toDelete, nx::utils::guarded(q,
+        [this](bool /*success*/)
+        {
+            q->setEnabled(true);
+        }));
+
+    q->setEnabled(false);
 }
 
 nx::vms::api::UserGroupDataList UserGroupsWidget::Private::userGroups() const
