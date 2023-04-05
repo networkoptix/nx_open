@@ -106,7 +106,8 @@ void Logger::log(Level level, const Tag& tag, const QString& message)
 
 void Logger::logForced(Level level, const Tag& tag, const QString& message)
 {
-    auto dateTime = m_dateTimeCache.lock()->now();
+    auto lock = m_dateTimeCache.lock();
+    auto dateTime = lock->now();
 
     static const QString kTemplate = QLatin1String("%1 %2 %3 %4: %5");
     const auto output = kTemplate
