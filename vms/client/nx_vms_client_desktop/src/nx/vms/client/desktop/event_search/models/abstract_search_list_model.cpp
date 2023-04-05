@@ -41,18 +41,14 @@ AbstractSearchListModel::AbstractSearchListModel(QnWorkbenchContext* context, QO
 
     onOnlineChanged(!context->user().isNull());
 
-    connect(m_cameraSet.data(), &ManagedCameraSet::camerasAboutToBeChanged, this,
-        [this]()
-        {
-            emit camerasAboutToBeChanged({});
-            clear();
-        });
+    connect(m_cameraSet.data(), &ManagedCameraSet::camerasAboutToBeChanged,
+        this, &AbstractSearchListModel::clear);
 
     connect(m_cameraSet.data(), &ManagedCameraSet::camerasChanged, this,
         [this]()
         {
-            NX_ASSERT(isOnline() || m_cameraSet->cameras().isEmpty());
-            emit camerasChanged({});
+            if (isOnline())
+                emit camerasChanged();
         });
 }
 
@@ -70,6 +66,7 @@ void AbstractSearchListModel::onOnlineChanged(bool isOnline)
 
     if (m_isOnline)
     {
+        emit camerasChanged();
         emit dataNeeded();
     }
     else
