@@ -236,6 +236,9 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                         : tr("Custom group");
                 }
 
+                case ParentGroupsColumn:
+                    return d->getParentGroupNames(group).join("<br>");
+
                 default:
                     return data(index, Qt::DisplayRole).toString();
             }

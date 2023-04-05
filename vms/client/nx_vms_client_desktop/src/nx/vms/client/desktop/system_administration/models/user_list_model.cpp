@@ -86,7 +86,6 @@ public:
     void handleUserChanged(const QnUserResourcePtr& user);
 
     QnUserResourcePtr user(const QModelIndex& index) const;
-    QString permissionsString(const QnUserResourcePtr& user) const;
     bool isUnique(const QnUserResourcePtr& user) const;
 
     Qt::CheckState checkState() const;
@@ -140,43 +139,6 @@ QnUserResourcePtr UserListModel::Private::user(const QModelIndex& index) const
         return QnUserResourcePtr();
 
     return *users.nth(index.row());
-}
-
-// TODO: #vkutin Move this function to more suitable place. Rewrite it if needed.
-QString UserListModel::Private::permissionsString(const QnUserResourcePtr& user) const
-{
-    QStringList permissionStrings;
-
-    GlobalPermissions permissions = globalPermissionsManager()->globalPermissions(user);
-
-    if (user->isOwner())
-        return tr("Owner");
-
-    if (permissions.testFlag(GlobalPermission::admin))
-        return tr("Administrator");
-
-    permissionStrings.append(tr("View live video"));
-
-    if (permissions.testFlag(GlobalPermission::editCameras))
-        permissionStrings.append(QnDeviceDependentStrings::getDefaultNameFromSet(
-            resourcePool(),
-            tr("Adjust device settings"),
-            tr("Adjust camera settings")
-        ));
-
-    if (permissions.testFlag(GlobalPermission::userInput))
-        permissionStrings.append(tr("Use PTZ controls"));
-
-    if (permissions.testFlag(GlobalPermission::viewArchive))
-        permissionStrings.append(tr("View video archives"));
-
-    if (permissions.testFlag(GlobalPermission::exportArchive))
-        permissionStrings.append(tr("Export video"));
-
-    if (permissions.testFlag(GlobalPermission::controlVideowall))
-        permissionStrings.append(tr("Control Video Walls"));
-
-    return permissionStrings.join(lit(", "));
 }
 
 bool UserListModel::Private::isUnique(const QnUserResourcePtr& user) const
@@ -381,7 +343,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                     return user->getEmail();
 
                 case UserGroupsColumn:
-                    return d->permissionsString(user);
+                    return nx::vms::common::userGroupNames(user).join("<br>");
 
                 default:
                     return QString(); // not QVariant() because we want to hide a tooltip if shown.
