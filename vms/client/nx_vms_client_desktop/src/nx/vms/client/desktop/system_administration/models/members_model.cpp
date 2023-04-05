@@ -56,10 +56,9 @@ int MembersModel::customGroupCount() const
     if (!m_cache)
         return 0;
 
-    const auto result =
-        m_cache->sorted().groups.size() - common::PredefinedUserGroups::list().size();
+    const auto stats = m_cache->stats();
 
-    return result < 0 ? 0 : result;
+    return stats.localGroups + stats.cloudGroups;
 }
 
 void MembersModel::loadModelData()
