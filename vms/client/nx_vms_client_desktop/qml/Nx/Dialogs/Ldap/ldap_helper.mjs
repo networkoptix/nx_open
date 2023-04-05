@@ -14,3 +14,8 @@ export function splitUrl(uri)
 
     return  {"hostAndPort": uri, "scheme": "ldap://"}
 }
+
+export function supportsStarTls(scheme)
+{
+    return scheme == "ldap://"
+}

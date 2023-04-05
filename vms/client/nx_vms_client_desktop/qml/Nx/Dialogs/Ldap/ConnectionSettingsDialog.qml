@@ -82,6 +82,8 @@ Dialog
                     Layout.maximumWidth: 84
                     Layout.alignment: Qt.AlignTop
                     model: LdapHelper.kSchemes
+
+                    readonly property bool supportsStarTls: LdapHelper.supportsStarTls(currentText)
                 }
 
                 TextFieldWithValidator
@@ -171,6 +173,23 @@ Dialog
                     id: starTlsCheckbox
                     text: qsTr("Use StarTLS")
                     wrapMode: Text.WordWrap
+
+                    property bool prevChecked: false
+
+                    enabled: schemeCombobox.supportsStarTls
+                    onEnabledChanged:
+                    {
+                        // Save checked state when this checkbox is disabled.
+                        if (!enabled)
+                        {
+                            prevChecked = checked
+                            checked = false
+                        }
+                        else
+                        {
+                            checked = prevChecked
+                        }
+                    }
                 }
 
                 CheckBox
