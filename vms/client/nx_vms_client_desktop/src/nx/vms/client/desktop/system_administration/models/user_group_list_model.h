@@ -8,10 +8,13 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class UserGroupListModel: public ScopedModelOperations<QAbstractListModel>
+class UserGroupListModel:
+    public ScopedModelOperations<QAbstractListModel>,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractListModel>;
@@ -33,7 +36,7 @@ public:
     using UserGroupData = nx::vms::api::UserGroupData;
     using UserGroupDataList = nx::vms::api::UserGroupDataList;
 
-    explicit UserGroupListModel(QObject* parent = nullptr);
+    explicit UserGroupListModel(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~UserGroupListModel() override;
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
