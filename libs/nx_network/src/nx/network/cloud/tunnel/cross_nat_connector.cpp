@@ -204,8 +204,12 @@ void CrossNatConnector::issueConnectRequestToMediator()
         m_connectionMediationInitiator->setTimeout(m_connectTimeout);
     }
 
+    auto connectRequest = prepareConnectRequest(m_localAddress);
+    NX_VERBOSE(this, "cross-nat %1. Sending connect request %2",
+        m_connectSessionId, nx::reflect::json::serialize(connectRequest));
+
     m_connectionMediationInitiator->start(
-        prepareConnectRequest(m_localAddress),
+        std::move(connectRequest),
         [this](auto&&... args) { onConnectResponse(std::move(args)...); });
 }
 
@@ -231,8 +235,8 @@ void CrossNatConnector::onConnectResponse(
     api::ConnectResponse response)
 {
     mediatorResponseCounter().addResult(resultCode);
-    NX_VERBOSE(this, "cross-nat %1. Received %2 response from mediator",
-        m_connectSessionId, resultCode);
+    NX_VERBOSE(this, "cross-nat %1. Received %2 response from mediator: %3",
+        m_connectSessionId, resultCode, nx::reflect::json::serialize(response));
 
     if (m_done)
         return;
