@@ -8,8 +8,6 @@
 namespace nx::rtp {
 
 static const int kOnvifHeaderExtensionLength = 3; //< in 32 bit units
-static const int kOnvifHeaderExtensionId = 0xabac;
-static const int kOnvifHeaderExtensionAltId = 0xabad;
 
 bool OnvifHeaderExtension::read(const uint8_t* data, int size)
 {

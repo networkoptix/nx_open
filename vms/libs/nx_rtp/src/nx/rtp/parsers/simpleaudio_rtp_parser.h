@@ -28,7 +28,6 @@ private:
     int m_bits_per_coded_sample = 0;
     int m_bitrate = 0;
     AVCodecID m_codecId = AV_CODEC_ID_PCM_MULAW;
-    AVSampleFormat m_sampleFormat = AV_SAMPLE_FMT_S16;
 };
 
 } // namespace nx::rtp
