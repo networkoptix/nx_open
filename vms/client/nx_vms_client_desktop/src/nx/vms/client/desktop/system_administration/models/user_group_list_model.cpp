@@ -11,7 +11,9 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -30,9 +32,9 @@ struct UserGroupListModel::Private
         QStringList result;
         for (const auto parentId: group.parentGroupIds)
         {
-            const auto it = findGroup(parentId);
-            if (NX_ASSERT(it != orderedGroups.cend()))
-                result.push_back(it->name);
+            const auto parentGroup = q->systemContext()->userGroupManager()->find(parentId);
+            if (NX_ASSERT(parentGroup))
+                result.push_back(parentGroup->name);
         }
 
         if (result.empty())
@@ -172,8 +174,9 @@ struct UserGroupListModel::Private
 // -----------------------------------------------------------------------------------------------
 // UserGroupListModel
 
-UserGroupListModel::UserGroupListModel(QObject* parent):
+UserGroupListModel::UserGroupListModel(SystemContext* systemContext, QObject* parent):
     base_type(parent),
+    SystemContextAware(systemContext),
     d(new Private{.q = this})
 {
 }

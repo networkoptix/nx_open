@@ -150,7 +150,7 @@ class UserGroupsWidget::Private: public QObject
 
 public:
     const QPointer<UserGroupManager> manager;
-    UserGroupListModel* const groupsModel{new UserGroupListModel(q)};
+    UserGroupListModel* const groupsModel{new UserGroupListModel(q->systemContext(), q)};
     CustomizableSortFilterProxyModel* const sortModel{new CustomizableSortFilterProxyModel(q)};
     CheckableHeaderView* const header{new CheckableHeaderView(
         UserGroupListModel::CheckBoxColumn, q)};
