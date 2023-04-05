@@ -537,148 +537,152 @@ Rectangle
             }
         }
 
-        ListView
+        Item
         {
-            id: list
-
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            clip: true
-
-            readonly property real scrollBarWidth: scrollBar.visible ? scrollBar.width : 0
-
-            model: LdapFiltersModel
+            ListView
             {
-                id: filtersModel
-            }
+                id: list
 
-            hoverHighlightColor: "transparent"
+                anchors.fill: parent
+                clip: true
 
-            delegate: Item
-            {
-                id: filterItem
+                readonly property real scrollBarWidth: scrollBar.visible ? scrollBar.width : 0
 
-                readonly property bool containsMouse: rowMouseArea.containsMouse
-
-                readonly property color textColor: list.currentIndex == index
-                    ? ColorTheme.colors.light4
-                    : ColorTheme.colors.light10
-
-                height: 22
-                width: parent ? parent.width : 0
-
-                Rectangle
+                model: LdapFiltersModel
                 {
-                    anchors.fill: parent
-                    color:
-                    {
-                        if (list.currentIndex == index)
-                            return ColorTheme.colors.brand_core
-
-                        if (filterItem.containsMouse)
-                            return ColorTheme.colors.dark12
-
-                        return "transparent"
-                    }
-
-                    opacity: rowMouseArea.containsMouse ? 0.4 : 0.3
+                    id: filtersModel
                 }
 
-                RowLayout
+                hoverHighlightColor: "transparent"
+
+                delegate: Item
                 {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 4
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: parent.right
-                    anchors.rightMargin: 28
+                    id: filterItem
 
-                    spacing: 8
+                    readonly property bool containsMouse: rowMouseArea.containsMouse
 
-                    Text
+                    readonly property color textColor: list.currentIndex == index
+                        ? ColorTheme.colors.light4
+                        : ColorTheme.colors.light10
+
+                    height: 22
+                    width: parent ? parent.width : 0
+
+                    Rectangle
                     {
-                        text: model.name
-                        color: filterItem.textColor
-                        Layout.minimumWidth: parent.width * 0.3
-                        Layout.maximumWidth: parent.width * 0.3
-                        font: Qt.font({pixelSize: 12, weight: Font.Normal})
-                        elide: Text.ElideRight
+                        anchors.fill: parent
+                        color:
+                        {
+                            if (list.currentIndex == index)
+                                return ColorTheme.colors.brand_core
+
+                            if (filterItem.containsMouse)
+                                return ColorTheme.colors.dark12
+
+                            return "transparent"
+                        }
+
+                        opacity: rowMouseArea.containsMouse ? 0.4 : 0.3
                     }
 
-                    Text
+                    RowLayout
                     {
-                        text: model.base
-                        color: filterItem.textColor
-                        Layout.minimumWidth: parent.width * 0.3
-                        Layout.maximumWidth: parent.width * 0.3
-                        font: Qt.font({pixelSize: 12, weight: Font.Normal})
-                        elide: Text.ElideRight
-                    }
-
-                    Text
-                    {
-                        text: model.filter
-                        color: filterItem.textColor
-                        Layout.fillWidth: true
-                        font: Qt.font({pixelSize: 12, weight: Font.Normal})
-                        elide: Text.ElideRight
-                    }
-                }
-
-                MouseArea
-                {
-                    id: rowMouseArea
-                    anchors.fill: parent
-                    onClicked:
-                    {
-                        list.currentIndex = index
-                        const filterDialog = filterComponent.createObject(control)
-                        filterDialog.name = model.name
-                        filterDialog.baseDn = model.base
-                        filterDialog.filter = model.filter
-                        filterDialog.show()
-                    }
-
-                    cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    hoverEnabled: true
-                    CursorOverride.shape: cursorShape
-                    CursorOverride.active: containsMouse
-
-
-                    ImageButton
-                    {
-                        id: removeFilterButton
-                        visible: rowMouseArea.containsMouse
-                        anchors.right: parent.right
-                        anchors.rightMargin: 4 + list.scrollBarWidth
+                        anchors.left: parent.left
+                        anchors.leftMargin: 4
                         anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        anchors.rightMargin: 28
 
-                        width: 20
-                        height: 20
+                        spacing: 8
 
+                        Text
+                        {
+                            text: model.name
+                            color: filterItem.textColor
+                            Layout.minimumWidth: parent.width * 0.3
+                            Layout.maximumWidth: parent.width * 0.3
+                            font: Qt.font({pixelSize: 12, weight: Font.Normal})
+                            elide: Text.ElideRight
+                        }
+
+                        Text
+                        {
+                            text: model.base
+                            color: filterItem.textColor
+                            Layout.minimumWidth: parent.width * 0.3
+                            Layout.maximumWidth: parent.width * 0.3
+                            font: Qt.font({pixelSize: 12, weight: Font.Normal})
+                            elide: Text.ElideRight
+                        }
+
+                        Text
+                        {
+                            text: model.filter
+                            color: filterItem.textColor
+                            Layout.fillWidth: true
+                            font: Qt.font({pixelSize: 12, weight: Font.Normal})
+                            elide: Text.ElideRight
+                        }
+                    }
+
+                    MouseArea
+                    {
+                        id: rowMouseArea
+                        anchors.fill: parent
+                        onClicked:
+                        {
+                            list.currentIndex = index
+                            const filterDialog = filterComponent.createObject(control)
+                            filterDialog.name = model.name
+                            filterDialog.baseDn = model.base
+                            filterDialog.filter = model.filter
+                            filterDialog.show()
+                        }
+
+                        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
                         hoverEnabled: true
+                        CursorOverride.shape: cursorShape
+                        CursorOverride.active: containsMouse
 
-                        icon.source: "image://svg/skin/user_settings/trash.svg"
-                        icon.width: width
-                        icon.height: height
-                        icon.color: hovered ? ColorTheme.colors.light15 : ColorTheme.colors.light16
 
-                        background: null
+                        ImageButton
+                        {
+                            id: removeFilterButton
+                            visible: rowMouseArea.containsMouse
+                            anchors.right: parent.right
+                            anchors.rightMargin: 4 + list.scrollBarWidth
+                            anchors.verticalCenter: parent.verticalCenter
 
-                        onClicked: filtersModel.removeFilter(index)
+                            width: 20
+                            height: 20
+
+                            hoverEnabled: true
+
+                            icon.source: "image://svg/skin/user_settings/trash.svg"
+                            icon.width: width
+                            icon.height: height
+                            icon.color: hovered ? ColorTheme.colors.light15 : ColorTheme.colors.light16
+
+                            background: null
+
+                            onClicked: filtersModel.removeFilter(index)
+                        }
                     }
                 }
             }
-        }
 
-        Text
-        {
-            text: qsTr("No filters")
-            font: Qt.font({pixelSize: 14, weight: Font.Normal})
-            color: ColorTheme.colors.light16
-            visible: list.count == 0
-            height: 22
-            verticalAlignment: Text.AlignVCenter
+            Text
+            {
+                text: qsTr("No filters")
+                font: Qt.font({pixelSize: 14, weight: Font.Normal})
+                color: ColorTheme.colors.light16
+                visible: list.count == 0
+                height: 22
+                verticalAlignment: Text.AlignVCenter
+            }
         }
     }
 }
