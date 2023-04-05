@@ -100,8 +100,7 @@ signals:
     void livePausedChanged(bool isPaused, QPrivateSignal);
     void liveAboutToBeCommitted(QPrivateSignal);
     void liveCommitted(QPrivateSignal);
-    void camerasAboutToBeChanged(QPrivateSignal);
-    void camerasChanged(QPrivateSignal);
+    void camerasChanged();
     void isOnlineChanged(bool isOnline, QPrivateSignal);
     void dataNeeded();
 
