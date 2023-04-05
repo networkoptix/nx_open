@@ -114,6 +114,11 @@ public:
          * %caption 13
          */
         SessionExpired = 13,
+
+        /**%apidoc
+         * %caption 14
+         */
+        SessionRequired = 14,
     };
 
     static QString errorToString(Result::Error value);
@@ -143,6 +148,7 @@ public:
     static Result serviceUnavailable(std::optional<QString> customMessage = std::nullopt);
     static Result unauthorized(std::optional<QString> customMessage = std::nullopt);
     static Result sessionExpired(std::optional<QString> customMessage = std::nullopt);
+    static Result sessionRequired(std::optional<QString> customMessage = std::nullopt);
 
     template<typename Value>
     static Result invalidParameter(const QString& name, const Value& value)

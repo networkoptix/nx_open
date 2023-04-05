@@ -24,6 +24,7 @@ NX_VMS_COMMON_API QString Result::errorToString(Result::Error value)
         case Result::ServiceUnavailable: return "serviceUnavailable";
         case Result::Unauthorized: return "unauthorized";
         case Result::SessionExpired: return "sessionExpired";
+        case Result::SessionRequired: return "sessionRequired";
     };
 
     return NX_FMT("Unknown_%1", static_cast<int>(value));
@@ -44,6 +45,7 @@ nx::network::http::StatusCode::Value Result::toHttpStatus(Error code)
 
         case Error::Forbidden:
         case Error::SessionExpired:
+        case Error::SessionRequired:
             return http::StatusCode::forbidden;
 
         case Error::Conflict:
@@ -195,6 +197,12 @@ Result Result::unauthorized(std::optional<QString> customMessage)
 Result Result::sessionExpired(std::optional<QString> customMessage)
 {
     return Result{SessionExpired, customMessage ? *customMessage : tr("Session expired.")};
+}
+
+Result Result::sessionRequired(std::optional<QString> customMessage)
+{
+    return Result{SessionRequired,
+        customMessage ? *customMessage : tr("Session authorization required.")};
 }
 
 void serialize(const Result::Error& value, QString* target)
