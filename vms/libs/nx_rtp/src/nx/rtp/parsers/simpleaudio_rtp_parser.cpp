@@ -11,23 +11,12 @@
 
 namespace nx::rtp {
 
-SimpleAudioParser::SimpleAudioParser():
-    AudioStreamParser()
+SimpleAudioParser::SimpleAudioParser(AVCodecID codecId):
+    AudioStreamParser(),
+    m_codecId(codecId)
 {
     StreamParser::setFrequency(8000);
-    m_bits_per_coded_sample = av_get_exact_bits_per_sample(AV_CODEC_ID_PCM_MULAW);
-}
-
-void SimpleAudioParser::setCodecId(AVCodecID codecId)
-{
-    m_codecId = codecId;
-    if (const int bps = av_get_exact_bits_per_sample(codecId); bps != 0)
-        m_bits_per_coded_sample = bps;
-}
-
-void SimpleAudioParser::setBitrate(int bitrate)
-{
-    m_bitrate = bitrate;
+    m_bits_per_coded_sample = av_get_exact_bits_per_sample(codecId);
 }
 
 void SimpleAudioParser::setSdpInfo(const Sdp::Media& sdp)
@@ -36,7 +25,10 @@ void SimpleAudioParser::setSdpInfo(const Sdp::Media& sdp)
     // 1. sizeLength(au size in bits)  or constantSize
 
     if (sdp.rtpmap.clockRate > 0)
+    {
         StreamParser::setFrequency(sdp.rtpmap.clockRate);
+        m_bitrate = m_bits_per_coded_sample * sdp.rtpmap.clockRate;
+    }
     if (sdp.rtpmap.channels > 0)
         m_channels = sdp.rtpmap.channels;
 
@@ -85,11 +77,7 @@ CodecParametersConstPtr SimpleAudioParser::getCodecParameters()
 void SimpleAudioParser::setBitsPerSample(int value)
 {
     m_bits_per_coded_sample = value;
-}
-
-void SimpleAudioParser::setSampleFormat(AVSampleFormat sampleFormat)
-{
-    m_sampleFormat = sampleFormat;
+    m_bitrate = m_bits_per_coded_sample * getFrequency();
 }
 
 } // namespace nx::rtp

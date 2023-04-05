@@ -10,7 +10,7 @@ namespace nx::rtp {
 class NX_RTP_API SimpleAudioParser: public AudioStreamParser
 {
 public:
-    SimpleAudioParser();
+    SimpleAudioParser(AVCodecID codecId);
     virtual void setSdpInfo(const Sdp::Media& sdp) override;
     virtual Result processData(
         const RtpHeader& rtpHeader,
@@ -20,10 +20,7 @@ public:
         bool& gotData) override;
     virtual void clear() override {}
     virtual CodecParametersConstPtr getCodecParameters() override;
-    void setCodecId(AVCodecID codecId);
     void setBitsPerSample(int value);
-    void setSampleFormat(AVSampleFormat sampleFormat);
-    void setBitrate(int bitrate);
 
 private:
     CodecParametersConstPtr m_context;
