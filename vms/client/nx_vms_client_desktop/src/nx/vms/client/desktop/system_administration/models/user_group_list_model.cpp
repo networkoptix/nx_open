@@ -438,7 +438,7 @@ bool UserGroupListModel::removeGroup(const QnUuid& groupId)
     if (it == d->orderedGroups.end())
         return false;
 
-    if (it->isPredefined || it->type != api::UserType::local)
+    if (it->isPredefined || it->type == api::UserType::cloud)
         return false;
 
     const int row = it - d->orderedGroups.begin();
