@@ -36,6 +36,8 @@ QnGlobalPermissionsManager::QnGlobalPermissionsManager(
             &QnGlobalPermissionsManager::handleGroupAddedOrUpdated, Qt::DirectConnection);
         connect(m_context->userGroupManager(), &UserGroupManager::removed, this,
             &QnGlobalPermissionsManager::handleGroupRemoved, Qt::DirectConnection);
+        connect(m_context->userGroupManager(), &UserGroupManager::reset, this,
+            &QnGlobalPermissionsManager::handleGroupReset, Qt::DirectConnection);
 
         connect(m_context->accessSubjectHierarchy(), &SubjectHierarchy::changed, this,
             &QnGlobalPermissionsManager::handleHierarchyChanged, Qt::DirectConnection);
@@ -257,6 +259,12 @@ void QnGlobalPermissionsManager::handleGroupRemoved(
     const nx::vms::api::UserGroupData& userGroup)
 {
     handleSubjectRemoved(userGroup);
+}
+
+void QnGlobalPermissionsManager::handleGroupReset()
+{
+    for (const auto& group: m_context->userGroupManager()->groups())
+        handleGroupAddedOrUpdated(group);
 }
 
 void QnGlobalPermissionsManager::handleSubjectRemoved(const QnResourceAccessSubject& subject)

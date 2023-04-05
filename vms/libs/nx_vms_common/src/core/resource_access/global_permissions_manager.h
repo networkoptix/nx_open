@@ -76,6 +76,7 @@ private:
     void handleResourceRemoved(const QnResourcePtr& resource);
     void handleGroupAddedOrUpdated(const nx::vms::api::UserGroupData& userGroup);
     void handleGroupRemoved(const nx::vms::api::UserGroupData& userGroup);
+    void handleGroupReset();
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
     void handleHierarchyChanged(
