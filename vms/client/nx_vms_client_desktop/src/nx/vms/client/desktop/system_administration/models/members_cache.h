@@ -35,6 +35,13 @@ public:
         bool isLdap = false;
     };
 
+    struct Stats
+    {
+        int localGroups = 0;
+        int cloudGroups = 0;
+        int ldapGroups = 0;
+    };
+
 public:
     MembersCache();
     virtual ~MembersCache();
@@ -50,6 +57,8 @@ public:
     void sortSubjects(QList<QnUuid>& subjects) const;
 
     int indexIn(const QList<QnUuid>& list, const QnUuid& id) const;
+
+    Stats stats() const { return m_stats; }
 
 public slots:
     void modify(
@@ -67,6 +76,8 @@ signals:
 
     void reset();
 
+    void statsChanged();
+
 private:
     static MembersCache::Info infoFromContext(
         nx::vms::common::SystemContext* systemContext,
@@ -77,9 +88,12 @@ private:
 
     std::function<bool(const QnUuid&, const QnUuid&)> lessFunc() const;
 
+    void updateStats(const QSet<QnUuid>& added, const QSet<QnUuid>& removed);
+
 private:
     mutable QHash<QnUuid, Members> m_sortedCache;
     QHash<QnUuid, Info> m_info;
+    Stats m_stats;
     AccessSubjectEditingContext* m_subjectContext = nullptr;
     nx::vms::common::SystemContext* m_systemContext = nullptr;
 };
