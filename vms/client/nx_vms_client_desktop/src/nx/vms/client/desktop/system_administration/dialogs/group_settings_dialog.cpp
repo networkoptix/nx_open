@@ -148,6 +148,13 @@ GroupSettingsDialog::GroupSettingsDialog(
                 updateStateFrom(userGroup.id);
         });
 
+    connect(systemContext->userGroupManager(), &common::UserGroupManager::removed, this,
+        [this](const nx::vms::api::UserGroupData& userGroup)
+        {
+            if (userGroup.id == d->groupId)
+                reject();
+        });
+
     connect(this, &QmlDialogWrapper::rejected, [this] { setGroup({}); });
 }
 

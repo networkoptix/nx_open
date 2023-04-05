@@ -135,6 +135,24 @@ UserSettingsDialog::UserSettingsDialog(
 
     connect(rootObjectHolder()->object(), SIGNAL(groupClicked(QVariant)),
         this, SLOT(onGroupClicked(QVariant)), Qt::QueuedConnection);
+
+    connect(systemContext->resourcePool(),
+        &QnResourcePool::resourcesRemoved,
+        this,
+        [this](const QnResourceList& resources)
+        {
+            if (!d->user || d->user->isNull())
+                return;
+
+            for (const auto& resource: resources)
+            {
+                if (resource == d->user)
+                {
+                    reject();
+                    return;
+                }
+            }
+        });
 }
 
 UserSettingsDialog::~UserSettingsDialog()
