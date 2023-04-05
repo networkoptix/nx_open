@@ -59,11 +59,6 @@ void ManagedCameraSet::setAllCameras()
         ? nx::utils::toQSet(m_resourcePool->getResources<QnVirtualCameraResource>())
         : QnVirtualCameraResourceSet();
 
-    if (objectName() == "TEST")
-    {
-        qDebug() << "Set cameras" << m_notFilteredCameras.size();
-    }
-
     setCameras(Type::all, filteredCameras());
 }
 
