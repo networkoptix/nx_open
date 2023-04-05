@@ -108,7 +108,6 @@ enum class FilterType
     videowalls,
     integrations,
     webPages,
-    users,
     localFiles
 };
 Q_ENUM_NS(FilterType);

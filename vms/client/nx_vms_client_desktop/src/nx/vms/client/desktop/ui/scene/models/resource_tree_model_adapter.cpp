@@ -76,9 +76,6 @@ ResourceTree::NodeType filterNodeType(ResourceTree::FilterType filterType)
         case FilterType::webPages:
             return NodeType::webPages;
 
-        case FilterType::users:
-            return NodeType::users;
-
         case FilterType::localFiles:
             return NodeType::localResources;
     }
@@ -218,7 +215,6 @@ struct ResourceTreeModelAdapter::Private
         switch (effectiveFilterType())
         {
             case FilterType::servers:
-            case FilterType::users:
                 return {};
 
             case FilterType::cameras:

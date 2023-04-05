@@ -93,7 +93,6 @@ FocusScope
                     visible: LocalSettings.iniConfigValue("webPagesAndIntegrations")
                 }
                 MenuAction { text: qsTr("Web Pages"); data: ResourceTree.FilterType.webPages }
-                MenuAction { text: qsTr("Users"); data: ResourceTree.FilterType.users }
                 MenuAction { text: qsTr("Local Files"); data: ResourceTree.FilterType.localFiles }
 
                 onTriggered: (action) =>
