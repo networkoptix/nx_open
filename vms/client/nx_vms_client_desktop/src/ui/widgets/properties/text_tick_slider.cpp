@@ -54,6 +54,7 @@ void QnTextTickSlider::paintEvent(QPaintEvent *event) {
         QString text = QString::number(i);
         QSize tickSize = metrics.size(Qt::TextSingleLine, text);
         
+        // TODO: pprivalov Replace with a proper color when the new colorTheme will be provided.
         painter.setPen(Qt::darkGray);
         if (i != value())
             painter.drawLine(xPos, height() / 2 - 2, xPos, height() / 2 + 2);

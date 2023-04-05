@@ -235,7 +235,7 @@ void drawCrosshair(QPainter* painter, const QRectF& rect)
     const QRectF fullRect = scaleStripper.mapRect(rect);
     const qreal crosshairRadius = std::min(fullRect.width(), fullRect.height()) / 10;
     const QPointF center = fullRect.center();
-    const QBrush color = Qt::red;
+    const QBrush color = Qt::red; //< Predefined color for debug purposes.
 
     {
         QnScopedPainterPenRollback penRollback(painter, QPen(color, 2));
@@ -1759,7 +1759,8 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
         && hasVideo()
         && !d->resource->hasFlags(Qn::local))
     {
-        QColor overlayColor = m_renderer->isLowQualityImage(0)
+        // Predefined colors for debug purposes under the ini flag.
+        QColor overlayColor = m_renderer->isLowQualityImage(0) 
             ? Qt::red
             : Qt::green;
         overlayColor = toTransparent(overlayColor, 0.5);
@@ -1844,10 +1845,10 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
     painter->translate(rect.topLeft());
 
     QnScopedPainterPenRollback penRollback(painter);
-    painter->setPen(QPen(QColor(255, 255, 255, 16), 0.0));
+    painter->setPen(QPen(colorTheme()->color("camera.motionGrid.background"), 0.0));
     painter->drawLines(gridLines[0]);
 
-    painter->setPen(QPen(QColor(255, 0, 0, 128), 0.0));
+    painter->setPen(QPen(colorTheme()->color("camera.motionGrid.foreground"), 0.0));
     painter->drawLines(gridLines[1]);
 }
 
@@ -1919,6 +1920,7 @@ void QnMediaResourceWidget::paintAnalyticsObjectsDebugOverlay(
             for (const auto& rect: packet->rects)
             {
                 const auto absoluteObjectRect = Geometry::subRect(widgetRect, rect);
+                // Predefined color used for debug purposes in the debug method.
                 const QColor overlayColor = toTransparent(Qt::green, 0.3);
                 painter->fillRect(absoluteObjectRect, overlayColor);
             }

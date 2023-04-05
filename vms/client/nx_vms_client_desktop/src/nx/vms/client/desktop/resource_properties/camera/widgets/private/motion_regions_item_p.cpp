@@ -370,7 +370,7 @@ void MotionRegionsItem::Private::updateRegionsImage()
         const auto path = regions[m_channel].getRegionBySensPath(sensitivity);
         const auto color = sensitivity < m_sensitivityColors.size()
             ? m_sensitivityColors[sensitivity]
-            : QColor(Qt::red);
+            : QColor(Qt::red); //< Used in the same manner as an assert to show incorrect color theme.
 
         painter.fillPath(path, color);
     }

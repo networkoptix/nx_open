@@ -2,19 +2,20 @@
 
 #include "roi_figures_overlay_widget.h"
 
-#include <QtGui/QTextCharFormat>
 #include <QtGui/QAbstractTextDocumentLayout>
-#include <QtGui/QTextDocument>
-#include <QtGui/QTextCursor>
 #include <QtGui/QPainter>
+#include <QtGui/QTextCharFormat>
+#include <QtGui/QTextCursor>
+#include <QtGui/QTextDocument>
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QGraphicsTextItem>
 
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/decorations_helper.h>
-#include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/figure_item.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/figure.h>
-#include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/renderer.h>
+#include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/figure_item.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/figures_watcher.h>
+#include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/renderer.h>
 
 namespace {
 
@@ -236,7 +237,8 @@ void RoiFiguresOverlayWidget::Private::paintLabel(
     font.setLetterSpacing(QFont::AbsoluteSpacing, 0.5);
     format.setFont(font);
     // Color and width of outline.
-    format.setTextOutline(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    format.setTextOutline(
+        QPen(colorTheme()->color("dark1"), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
     QAbstractTextDocumentLayout::PaintContext ctx;
     ctx.palette.setColor(QPalette::Text, figure->color());

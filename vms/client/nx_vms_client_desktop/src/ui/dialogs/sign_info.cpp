@@ -3,14 +3,15 @@
 #include "sign_info.h"
 
 #include <QtCore/QDateTime>
-#include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
+#include <QtQml/QQmlEngine>
 
 #include <client_core/client_core_module.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "sign_dialog.h"
@@ -91,7 +92,9 @@ void QnSignInfo::paintEvent(QPaintEvent*)
     QPainter painter(this);
 
     if (finished)
-        m_signHelper.setSignOpacity(opacity, signIsMatched ? QColor(0, 128, 0) : QColor(128, 0, 0));
+        m_signHelper.setSignOpacity(opacity, signIsMatched
+            ? nx::vms::client::desktop::colorTheme()->color("green_core")
+            : nx::vms::client::desktop::colorTheme()->color("red_core"));
     m_signHelper.draw(painter, QSize(width(), height()), m_DrawDetailText);
 
     QString text = tr("Analyzing: %1%").arg(m_progress);
@@ -99,23 +102,26 @@ void QnSignInfo::paintEvent(QPaintEvent*)
     {
         if (signFromFrame.isEmpty())
         {
-            painter.setPen(QColor(128, 0, 0));
+            painter.setPen(
+                nx::vms::client::desktop::colorTheme()->color("red_core"));
             text = tr("Watermark Not Found");
         }
         else if (signIsMatched)
         {
-            painter.setPen(QColor(0, 128, 0));
+            painter.setPen(
+                nx::vms::client::desktop::colorTheme()->color("green_core"));
             text = tr("Watermark Matched");
         }
         else
         {
-            painter.setPen(QColor(128, 0, 0));
+            painter.setPen(
+                nx::vms::client::desktop::colorTheme()->color("red_core"));
             text = tr("Invalid watermark");
         }
     }
     else
     {
-        painter.setPen(Qt::black);
+        painter.setPen(nx::vms::client::desktop::colorTheme()->color("dark1"));
     }
 
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);

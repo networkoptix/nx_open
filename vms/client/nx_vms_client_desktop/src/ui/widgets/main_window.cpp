@@ -860,7 +860,7 @@ void MainWindow::paintEvent(QPaintEvent* event)
     {
         QPainter painter(this);
 
-        painter.setPen(QPen(QColor(255, 255, 255, 64), 1));
+        painter.setPen(QPen(colorTheme()->color("mainWindow.customFrame"), 1));
         painter.drawRect(rect().adjusted(0, 0, -1, -1));
     }
 }

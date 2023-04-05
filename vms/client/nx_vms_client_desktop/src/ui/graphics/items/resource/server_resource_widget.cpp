@@ -239,7 +239,7 @@ protected:
         QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
         {
             // TODO: #sivanov Text drawing is very slow. Replace with cached textures where possible.
-            QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
+            QnScopedPainterPenRollback penRollback(painter, QPen(colorTheme()->color("dark1"), 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 
             painter->setBrush(m_color);
