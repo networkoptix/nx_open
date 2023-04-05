@@ -20,6 +20,7 @@ public:
     enum Columns
     {
         CheckBoxColumn,
+        GroupWarningColumn,
         GroupTypeColumn,
         NameColumn,
         DescriptionColumn,

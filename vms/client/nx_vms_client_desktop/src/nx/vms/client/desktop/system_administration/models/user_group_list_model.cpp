@@ -76,6 +76,15 @@ struct UserGroupListModel::Private
     {
         switch (index.column())
         {
+            case GroupWarningColumn:
+            {
+                if (!NX_ASSERT(q->checkIndex(index)))
+                    return QString();
+
+                const auto& externalId = orderedGroups[index.row()].externalId;
+                return (externalId.isEmpty() || externalId.synced) ? "0" : "1";
+            }
+
             case GroupTypeColumn:
                 return q->data(index, Qt::ToolTipRole).toString();
 
@@ -93,6 +102,11 @@ struct UserGroupListModel::Private
     {
         switch (index.column())
         {
+            case GroupWarningColumn:
+                return nx::format("%1\n%2",
+                    sortKey(index.siblingAtColumn(GroupWarningColumn)),
+                    sortKey(index.siblingAtColumn(NameColumn))).toQString();
+
             case GroupTypeColumn:
                 return nx::format("%1\n%2",
                     sortKey(index.siblingAtColumn(GroupTypeColumn)),
@@ -228,6 +242,11 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
         {
             switch (index.column())
             {
+                case GroupWarningColumn:
+                    return group.externalId.isEmpty() || group.externalId.synced
+                        ? QVariant{}
+                        : QVariant("user_settings/user_alert.svg");
+
                 case GroupTypeColumn:
                 {
                     if (group.type == nx::vms::api::UserType::ldap)
