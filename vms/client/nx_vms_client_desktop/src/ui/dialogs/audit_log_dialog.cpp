@@ -370,7 +370,10 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRec
 {
     QSet<QnUuid> selectedCameras;
     for (const QnAuditRecord* record: checkedRows)
-        selectedCameras << record->resources[0];
+    {
+        if (NX_ASSERT(!record->resources.empty()))
+            selectedCameras << record->resources[0];
+    }
 
     QnAuditRecordRefList result;
     auto filter = [&selectedCameras] (const QnAuditRecord* record)
@@ -505,8 +508,11 @@ void QnAuditLogDialog::at_filterChanged()
         QnAuditRecordRefList cameras;
         for (auto& record: m_cameraData)
         {
-            if (filteredCameras.contains(record.resources[0]))
-                cameras.push_back(&record);
+            if (NX_ASSERT(!record.resources.empty()))
+            {
+                if (filteredCameras.contains(record.resources[0]))
+                    cameras.push_back(&record);
+            }
         }
         m_camerasModel->setData(cameras);
     }
@@ -878,9 +884,11 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     m_cameraData.clear();
     m_filteredData.clear();
 
+    // Details model must be cleared first, otherwise it will be rebuilt on `modelReset` signal
+    // from the main model, and this will cause invalid index access issue.
+    m_detailModel->clearData();
     m_sessionModel->clearData();
     m_camerasModel->clearData();
-    m_detailModel->clearData();
 
     if (!connection())
         return;
