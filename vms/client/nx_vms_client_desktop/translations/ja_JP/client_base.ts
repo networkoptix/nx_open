@@ -11279,7 +11279,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>Display for</source>
       <comment>Time selector will follow</comment>
-      <translation>表示</translation>
+      <translation>表示期間</translation>
     </message>
     <message>
       <source>Display selected for</source>
