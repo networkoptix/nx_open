@@ -2,6 +2,7 @@
 
 #include "rtp_parser.h"
 
+#include <nx/rtp/onvif_header_extension.h>
 #include <nx/rtp/rtp.h>
 #include <nx/utils/log/log.h>
 
@@ -46,7 +47,7 @@ Result RtpParser::processData(
 
     if (rtpHeader.extension.has_value())
     {
-        auto result = m_codecParser->processRtpExtension(
+        auto result = processRtpExtension(
             rtpHeader.extension.value().header,
             packetData + rtpHeader.extension->extensionOffset,
             rtpHeader.extension->extensionSize);
@@ -69,19 +70,63 @@ void RtpParser::clear()
     m_codecParser->clear();
 }
 
-int RtpParser::getFrequency() const
+QnAbstractMediaDataPtr RtpParser::nextData(const nx::rtp::RtcpSenderReport& senderReport)
 {
-    return m_codecParser->getFrequency();
+    auto data = m_codecParser->nextData();
+    if (data)
+    {
+        data->timestamp = getTimestamp(data->timestamp, senderReport);
+        m_isUtcTime = senderReport.ntpTimestamp != 0 || m_onvifExtensionTimestamp.has_value();
+        m_onvifExtensionTimestamp.reset();
+    }
+    return data;
 }
 
-QnAbstractMediaDataPtr RtpParser::nextData()
+bool RtpParser::isUtcTime()
 {
-    return m_codecParser->nextData();
+    return m_isUtcTime;
 }
 
 QString RtpParser::idForToStringFromPtr() const
 {
     return NX_FMT("Payload type %1", m_payloadType);
+}
+
+Result RtpParser::processRtpExtension(
+    const RtpHeaderExtensionHeader& header, quint8* data, int size)
+{
+    // Try to parse onvif timestamp extension (increase the buffer to the extension header, as the
+    // analyzer decodes it itself)
+    if (header.id() == kOnvifHeaderExtensionId || header.id() == kOnvifHeaderExtensionAltId)
+    {
+        const uint8_t* headerData = data - RtpHeaderExtensionHeader::kSize;
+        int headerSize = size + RtpHeaderExtensionHeader::kSize;
+        nx::rtp::OnvifHeaderExtension onvifExtension;
+        if (onvifExtension.read(headerData, headerSize))
+            m_onvifExtensionTimestamp = onvifExtension.ntp;
+
+        return true;
+    }
+
+    return m_codecParser->processRtpExtension(header, data, size);
+}
+
+int64_t RtpParser::getTimestamp(uint32_t rtpTime, const nx::rtp::RtcpSenderReport& senderReport)
+{
+    // onvif
+    if (m_onvifExtensionTimestamp)
+        return m_onvifExtensionTimestamp->count();
+
+    // rtcp
+    if (senderReport.ntpTimestamp > 0)
+    {
+        const int64_t rtpTimeDiff =
+            int32_t(rtpTime - senderReport.rtpTimestamp) * 1000000LL / m_codecParser->getFrequency();
+        return senderReport.ntpTimestamp + rtpTimeDiff;
+    }
+
+    // rtp
+    return m_linearizer.linearize(rtpTime) * 1000000LL / m_codecParser->getFrequency();
 }
 
 } // namespace nx::rtp
