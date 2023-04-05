@@ -370,26 +370,29 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(const QImage& image):
 
 QByteArray CLVideoDecoderOutput::rawData() const
 {
-    const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat) format);
-    if (!descriptor)
+    QByteArray result;
+    auto size = sizeBytes();
+    if (size < 0)
     {
-        NX_WARNING(this, NX_FMT("Failed to get raw data, invalid pixel format: %1", format));
+        NX_WARNING(this, "Failed to get the raw data, invalid pixel format: %1", format);
         return QByteArray();
     }
 
-    QByteArray result;
-    for (int plane = 0; plane < QnFfmpegHelper::planeCount(descriptor) && data[plane]; ++plane)
+    result.resize(size);
+    if (const auto r = av_image_copy_to_buffer(
+        (uint8_t*) result.data(),
+        size,
+        data,
+        linesize,
+        (enum AVPixelFormat) format,
+        width,
+        height,
+        /*align*/ 1);
+        r < 0)
     {
-        int h = height;
-        int w = width;
-        if (QnFfmpegHelper::isChromaPlane(plane, descriptor))
-        {
-            h >>= descriptor->log2_chroma_h;
-            w >>= descriptor->log2_chroma_w;
-        }
-        result.resize(result.size() + h * w);
-        quint8* dst = (quint8*) result.data() + result.size() - h * w;
-        copyPlane(dst, data[plane], w, /*dstStride*/ w, linesize[plane], h);
+        NX_WARNING(this, "Failed to get the raw data, FFmpeg error %1",
+            QnFfmpegHelper::avErrorToString(r));
+        return QByteArray();
     }
     return result;
 }
