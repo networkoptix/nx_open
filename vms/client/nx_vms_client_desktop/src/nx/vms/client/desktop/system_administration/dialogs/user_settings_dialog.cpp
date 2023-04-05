@@ -131,10 +131,10 @@ UserSettingsDialog::UserSettingsDialog(
 
         connect(rootObjectHolder()->object(), SIGNAL(auditTrailRequested()),
             this, SLOT(onAuditTrailRequested()), Qt::QueuedConnection);
-
-        connect(rootObjectHolder()->object(), SIGNAL(groupClicked(QVariant)),
-            this, SLOT(onGroupClicked(QVariant)), Qt::QueuedConnection);
     }
+
+    connect(rootObjectHolder()->object(), SIGNAL(groupClicked(QVariant)),
+        this, SLOT(onGroupClicked(QVariant)), Qt::QueuedConnection);
 }
 
 UserSettingsDialog::~UserSettingsDialog()
