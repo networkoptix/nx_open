@@ -224,17 +224,9 @@ void UserListWidget::loadDataToUi()
 
 void UserListWidget::applyChanges()
 {
-    QnUserResourceList usersToDelete;
-
     d->m_requestChain.reset(new UserGroupRequestChain(systemContext()));
     for (auto user: resourcePool()->getResources<QnUserResource>())
     {
-        if (!d->usersModel->contains(user))
-        {
-            usersToDelete << user;
-            continue;
-        }
-
         UserGroupRequest::UpdateUser updateUser;
 
         const bool enabled = d->usersModel->isUserEnabled(user);
@@ -258,39 +250,15 @@ void UserListWidget::applyChanges()
             d->m_requestChain->append(updateUser);
     }
 
-    // User still can press cancel on 'Confirm Remove' dialog.
-    if (!usersToDelete.empty())
-    {
-        if (messages::Resources::deleteResources(this, usersToDelete))
-        {
-            qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,
-                [this](bool success)
-                {
-                    setEnabled(true);
-
-                    d->m_hasChanges = !success;
-                    emit hasChangesChanged();
-                }));
-
-            setEnabled(false);
-            emit hasChangesChanged();
-        }
-        else
-        {
-            d->usersModel->resetUsers(resourcePool()->getResources<QnUserResource>());
-            d->m_requestChain.reset();
-            return;
-        }
-    }
-    else
-    {
-        d->m_hasChanges = false;
-        emit hasChangesChanged();
-    }
+    setEnabled(false);
 
     d->m_requestChain->start(
         [this](bool success, const QString& errorString)
         {
+            setEnabled(true);
+            d->m_hasChanges = false;
+            emit hasChangesChanged();
+
             if (success)
                 return;
 
@@ -634,11 +602,22 @@ void UserListWidget::Private::deleteSelected()
         if (!q->accessController()->hasPermissions(user, Qn::RemovePermission))
             continue;
 
-        usersModel->removeUser(user);
+        usersToDelete << user;
     }
 
-    m_hasChanges = true;
-    emit q->hasChangesChanged();
+    if (usersToDelete.isEmpty())
+        return;
+
+    if (!messages::Resources::deleteResources(q, usersToDelete))
+        return;
+
+    qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,
+        [this](bool success)
+        {
+            q->setEnabled(true);
+        }));
+
+    q->setEnabled(false);
 }
 
 QnUserResourceList UserListWidget::Private::visibleUsers() const
