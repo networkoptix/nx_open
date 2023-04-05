@@ -49,6 +49,10 @@ public:
     void setNeedReopen();
     bool isAudioPresent() const;
 
+    // For tests.
+    int64_t packetCount() const;
+    void resetPacketCount();
+
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
 signals:
@@ -131,4 +135,5 @@ private:
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
     qint64 m_nextIFrameTime = AV_NOPTS_VALUE;
     mutable nx::Mutex m_mutex;
+    std::atomic<int64_t> m_packetCount = 0;
 };
