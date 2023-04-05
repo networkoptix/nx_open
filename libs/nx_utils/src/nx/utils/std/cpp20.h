@@ -196,15 +196,6 @@ struct compare_three_way
     using is_transparent = void;
 };
 
-template<typename T1, typename T2>
-constexpr common_comparison_category_t<detail::synth3way_t<T1>,
-    detail::synth3way_t<T2>> operator<=>(const pair<T1, T2>& x, const pair<T1, T2>& y)
-{
-    if (auto c = detail::synth3way(x.first, y.first); c != 0)
-        return c;
-    return detail::synth3way(x.second, y.second);
-}
-
 template<typename Key, typename Tp, typename Compare, typename Alloc>
 constexpr detail::synth3way_t<pair<const Key, Tp>> operator<=>(
     const std::map<Key, Tp, Compare, Alloc>& x, const std::map<Key, Tp, Compare, Alloc>& y)
