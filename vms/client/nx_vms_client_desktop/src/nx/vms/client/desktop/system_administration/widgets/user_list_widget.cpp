@@ -612,9 +612,21 @@ void UserListWidget::Private::deleteSelected()
         return;
 
     qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,
-        [this](bool success)
+        [this](bool success, const QString& errorString)
         {
             q->setEnabled(true);
+
+            if (success)
+                return;
+
+            QnMessageBox messageBox(
+                QnMessageBoxIcon::Critical,
+                tr("Delete failed"),
+                errorString,
+                QDialogButtonBox::Ok,
+                QDialogButtonBox::Ok,
+                q);
+            messageBox.exec();
         }));
 
     q->setEnabled(false);

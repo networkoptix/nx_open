@@ -386,20 +386,20 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
 }
 
 void ResourcesChangesManager::deleteResources(const QnResourceList& resources,
-    const GenericCallbackFunction& callback)
+    const GenericCallbackWithErrorFunction& callback)
 {
     const auto safeCallback = safeProcedure(callback);
 
     if (resources.isEmpty())
     {
-        safeCallback(false);
+        safeCallback(false, tr("Resource list is empty"));
         return;
     }
 
     const auto connection = messageBusConnection();
     if (!connection)
     {
-        safeCallback(false);
+        safeCallback(false, tr("No connection"));
         return;
     }
 
@@ -415,7 +415,7 @@ void ResourcesChangesManager::deleteResources(const QnResourceList& resources,
                 resourcePool()->removeResources(resources);
             }
 
-            safeCallback(success);
+            safeCallback(success, success ? ec2::toString(errorCode) : QString{});
 
             if (!success)
                 emit resourceDeletingFailed(resources);

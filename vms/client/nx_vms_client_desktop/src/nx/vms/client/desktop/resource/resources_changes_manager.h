@@ -44,6 +44,7 @@ public:
 
     using GenericChangesFunction = std::function<void()>;
     using GenericCallbackFunction = std::function<void(bool)>;
+    using GenericCallbackWithErrorFunction = std::function<void(bool, const QString&)>;
     using DeleteResourceCallbackFunction = std::function<void(bool, const QnResourcePtr&)>;
 
     /** Generic function to delete resources. */
@@ -53,7 +54,7 @@ public:
 
    void deleteResources(
         const QnResourceList& resources,
-        const GenericCallbackFunction& callback = GenericCallbackFunction());
+        const GenericCallbackWithErrorFunction& callback = GenericCallbackWithErrorFunction());
 
     /** Apply changes to the given camera. */
     void saveCamera(const QnVirtualCameraResourcePtr& camera,

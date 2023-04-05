@@ -289,7 +289,7 @@ void UserSettingsDialog::onDeleteRequested()
     else
     {
         auto callback = nx::utils::guarded(this,
-            [this](bool success)
+            [this](bool success, const QString& /*errorString*/)
             {
                 d->isSaving = false;
 

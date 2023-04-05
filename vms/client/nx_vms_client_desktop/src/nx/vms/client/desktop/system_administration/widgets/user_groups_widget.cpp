@@ -12,6 +12,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
@@ -29,6 +30,7 @@
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -435,9 +437,21 @@ void UserGroupsWidget::Private::deleteSelected()
         return;
 
     GroupSettingsDialog::removeGroups(q->systemContext(), toDelete, nx::utils::guarded(q,
-        [this](bool /*success*/)
+        [this](bool success, const QString& errorString)
         {
             q->setEnabled(true);
+
+            if (success)
+                return;
+
+            QnMessageBox messageBox(
+                QnMessageBoxIcon::Critical,
+                tr("Delete failed"),
+                errorString,
+                QDialogButtonBox::Ok,
+                QDialogButtonBox::Ok,
+                q);
+            messageBox.exec();
         }));
 
     q->setEnabled(false);
