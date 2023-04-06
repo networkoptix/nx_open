@@ -121,6 +121,10 @@ std::function<bool(const QnUuid&, const QnUuid&)> MembersCache::lessFunc() const
             if (leftInfo.isLdap != rightInfo.isLdap)
                 return rightInfo.isLdap;
 
+            // "LDAP Default" goes in front of all LDAP groups.
+            if (l == nx::vms::api::kDefaultLdapGroupId || r == nx::vms::api::kDefaultLdapGroupId)
+                return l == nx::vms::api::kDefaultLdapGroupId;
+
             // Case Insensitive sort.
             const int ret = nx::utils::naturalStringCompare(
                 leftInfo.name, rightInfo.name, Qt::CaseInsensitive);
