@@ -177,6 +177,9 @@ void CrashReporter::scanAndReportAsync()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
+    if (m_terminated)
+        return;
+
     // This function is not supposed to be called more then once per binary, but anyway:
     if (m_activeCollection.isInProgress())
     {
