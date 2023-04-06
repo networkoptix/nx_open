@@ -102,6 +102,9 @@ struct UserGroupListModel::Private
 
     QString combinedSortKey(const QModelIndex& index) const
     {
+        const int ldapDefaultKey = (q->checkIndex(index)
+            && orderedGroups[index.row()].id == nx::vms::api::kDefaultLdapGroupId) ? 0 : 1;
+
         switch (index.column())
         {
             case GroupWarningColumn:
@@ -110,8 +113,9 @@ struct UserGroupListModel::Private
                     sortKey(index.siblingAtColumn(NameColumn))).toQString();
 
             case GroupTypeColumn:
-                return nx::format("%1\n%2",
+                return nx::format("%1\n%2\n%3",
                     sortKey(index.siblingAtColumn(GroupTypeColumn)),
+                    ldapDefaultKey,
                     sortKey(index.siblingAtColumn(NameColumn))).toQString();
 
             case NameColumn:
@@ -120,21 +124,24 @@ struct UserGroupListModel::Private
                     sortKey(index.siblingAtColumn(GroupTypeColumn))).toQString();
 
             case DescriptionColumn:
-                return nx::format("%1\n%2\n%3",
+                return nx::format("%1\n%2\n%3\n%4",
                     sortKey(index.siblingAtColumn(DescriptionColumn)),
                     sortKey(index.siblingAtColumn(GroupTypeColumn)),
+                    ldapDefaultKey,
                     sortKey(index.siblingAtColumn(NameColumn))).toQString();
 
             case ParentGroupsColumn:
-                return nx::format("%1\n%2\n%3",
+                return nx::format("%1\n%2\n%3\n%4",
                     sortKey(index.siblingAtColumn(ParentGroupsColumn)),
                     sortKey(index.siblingAtColumn(GroupTypeColumn)),
+                    ldapDefaultKey,
                     sortKey(index.siblingAtColumn(NameColumn))).toQString();
 
             case PermissionsColumn:
-                return nx::format("%1\n%2\n%3",
+                return nx::format("%1\n%2\n%3\n%4",
                     sortKey(index.siblingAtColumn(PermissionsColumn)),
                     sortKey(index.siblingAtColumn(GroupTypeColumn)),
+                    ldapDefaultKey,
                     sortKey(index.siblingAtColumn(NameColumn))).toQString();
 
             default:
