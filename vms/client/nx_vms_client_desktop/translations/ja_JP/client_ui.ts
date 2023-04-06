@@ -167,7 +167,7 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation>アーカイブを保持...</translation>
+      <translation>アーカイブ保持時間</translation>
     </message>
     <message>
       <source>Max</source>
