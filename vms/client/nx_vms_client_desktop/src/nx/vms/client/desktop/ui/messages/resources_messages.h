@@ -32,7 +32,10 @@ public:
 
     static bool changeVideoWallLayout(QWidget* parent, const QnResourceList& inaccessible);
 
-    static bool deleteResources(QWidget* parent, const QnResourceList& resources);
+    static bool deleteResources(
+        QWidget* parent,
+        const QnResourceList& resources,
+        bool allowSilent = true);
 
     static bool deleteResourcesFailed(QWidget* parent, const QnResourceList& resources);
 

@@ -208,11 +208,17 @@ bool Resources::changeVideoWallLayout(QWidget* parent,
         extras, inaccessible);
 }
 
-bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources)
+bool Resources::deleteResources(
+    QWidget* parent,
+    const QnResourceList& resources,
+    bool allowSilent)
 {
     /* Check if user have already silenced this warning. */
-    if (showOnceSettings()->deleteResources())
-        return true;
+    if (allowSilent)
+    {
+        if (showOnceSettings()->deleteResources())
+            return true;
+    }
 
     if (resources.isEmpty())
         return true;
@@ -233,7 +239,9 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
 
     if (usersOnly)
     {
-        text = tr("Delete %n users?", "", resources.size());
+        text = resources.size() == 1
+            ? tr("Delete user?")
+            : tr("Delete %n users?", "", resources.size());
     }
     else
     {
@@ -279,11 +287,16 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
-    messageBox.setCheckBoxEnabled();
+    if (allowSilent)
+        messageBox.setCheckBoxEnabled();
 
     const auto result = messageBox.exec();
-    if (messageBox.isChecked())
-        showOnceSettings()->deleteResources = true;
+
+    if (allowSilent)
+    {
+        if (messageBox.isChecked())
+            showOnceSettings()->deleteResources = true;
+    }
 
     return result != QDialogButtonBox::Cancel;
 }

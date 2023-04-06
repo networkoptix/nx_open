@@ -192,8 +192,13 @@ void GroupSettingsDialog::onGroupClicked(const QVariant& idVariant)
 
 void GroupSettingsDialog::onDeleteRequested()
 {
-    if (!ui::messages::UserGroups::removeGroups(d->parentWidget, {d->groupId}))
+    if (!ui::messages::UserGroups::removeGroups(
+        d->parentWidget,
+        {d->groupId},
+        /*allowSilent*/ false))
+    {
         return;
+    }
 
     d->isSaving = true;
 

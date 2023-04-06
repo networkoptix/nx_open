@@ -433,7 +433,7 @@ void UserGroupsWidget::Private::deleteSelected()
     if (toDelete.isEmpty())
         return;
 
-    if (!ui::messages::UserGroups::removeGroups(q, toDelete))
+    if (!ui::messages::UserGroups::removeGroups(q, toDelete, /*allowSilent*/ false))
         return;
 
     GroupSettingsDialog::removeGroups(q->systemContext(), toDelete, nx::utils::guarded(q,
