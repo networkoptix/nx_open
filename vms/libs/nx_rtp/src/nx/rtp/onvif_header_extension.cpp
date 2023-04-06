@@ -20,7 +20,7 @@ bool OnvifHeaderExtension::read(const uint8_t* data, int size)
         if (extensionId != kOnvifHeaderExtensionId && extensionId != kOnvifHeaderExtensionAltId)
             return false;
 
-        if (length != kOnvifHeaderExtensionLength)
+        if (length < kOnvifHeaderExtensionLength)
             return false;
 
         const uint32_t seconds = bitstream.getBits(32);
