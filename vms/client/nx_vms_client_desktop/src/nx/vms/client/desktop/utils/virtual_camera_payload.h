@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QVector>
+#include <QtCore/QMetaType>
 #include <QtCore/QString>
+#include <QtCore/QVector>
 
 #include <api/model/virtual_camera_prepare_data.h>
 #include <api/model/virtual_camera_prepare_reply.h>
@@ -65,3 +66,5 @@ struct VirtualCameraUpload
 };
 
 } // namespace nx::vms::client::desktop
+
+Q_DECLARE_METATYPE(nx::vms::client::desktop::VirtualCameraUpload);
