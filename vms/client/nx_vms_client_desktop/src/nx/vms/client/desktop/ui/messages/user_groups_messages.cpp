@@ -32,6 +32,22 @@ public:
     }
 };
 
+QIcon iconForGroup(const nx::vms::api::UserGroupData& group)
+{
+    switch (group.type)
+    {
+        case nx::vms::api::UserType::local:
+            return qnSkin->pixmap("user_settings/group_custom.svg");
+
+        case nx::vms::api::UserType::ldap:
+            return qnSkin->pixmap("user_settings/group_ldap.svg");
+
+        case nx::vms::api::UserType::cloud:
+        default:
+            return {};
+    }
+}
+
 QWidget* createGroupListWidget(QnSessionAwareMessageBox* parent, const QSet<QnUuid>& groups)
 {
     auto groupList = new GroupListWidget(parent);
@@ -40,8 +56,6 @@ QWidget* createGroupListWidget(QnSessionAwareMessageBox* parent, const QSet<QnUu
     groupList->setSelectionMode(QAbstractItemView::NoSelection);
     groupList->setProperty(nx::style::Properties::kSuppressHoverPropery, true);
     groupList->setMaximumHeight(nx::style::Metrics::kViewRowHeight);
-
-    const auto customIcon = qnSkin->pixmap("user_settings/group_custom.svg");
 
     for (const auto& id: groups)
     {
@@ -52,7 +66,7 @@ QWidget* createGroupListWidget(QnSessionAwareMessageBox* parent, const QSet<QnUu
 
         auto item = new QListWidgetItem(groupData->name, groupList);
         item->setFlags({Qt::ItemIsEnabled});
-        item->setIcon(customIcon);
+        item->setIcon(iconForGroup(*groupData));
     }
 
     groupList->setMaximumHeight(groupList->sizeHint().height());
