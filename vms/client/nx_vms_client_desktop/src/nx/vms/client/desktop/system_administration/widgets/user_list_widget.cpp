@@ -608,7 +608,7 @@ void UserListWidget::Private::deleteSelected()
     if (usersToDelete.isEmpty())
         return;
 
-    if (!messages::Resources::deleteResources(q, usersToDelete))
+    if (!messages::Resources::deleteResources(q, usersToDelete, /*allowSilent*/ false))
         return;
 
     qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,

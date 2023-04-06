@@ -264,7 +264,9 @@ void UserSettingsDialog::onDeleteRequested()
         return;
 
     if (!ui::messages::Resources::deleteResources(
-        appContext()->mainWindowContext()->workbenchContext()->mainWindowWidget(), {*d->user}))
+        appContext()->mainWindowContext()->workbenchContext()->mainWindowWidget(),
+        {*d->user},
+        /*allowSilent*/ false))
     {
         return;
     }

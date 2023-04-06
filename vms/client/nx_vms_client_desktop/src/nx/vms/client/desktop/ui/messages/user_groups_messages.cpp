@@ -64,10 +64,13 @@ QWidget* createGroupListWidget(QnSessionAwareMessageBox* parent, const QSet<QnUu
 
 namespace nx::vms::client::desktop::ui::messages {
 
-bool UserGroups::removeGroups(QWidget* parent, const QSet<QnUuid>& groups)
+bool UserGroups::removeGroups(QWidget* parent, const QSet<QnUuid>& groups, bool allowSilent)
 {
-    if (showOnceSettings()->deleteUserGroups())
-        return true;
+    if (allowSilent)
+    {
+        if (showOnceSettings()->deleteUserGroups())
+            return true;
+    }
 
     const QString text = groups.size() == 1
         ? tr("Delete group?")
@@ -83,11 +86,16 @@ bool UserGroups::removeGroups(QWidget* parent, const QSet<QnUuid>& groups)
 
     messageBox.addCustomWidget(createGroupListWidget(&messageBox, groups));
 
-    messageBox.setCheckBoxEnabled();
+    if (allowSilent)
+        messageBox.setCheckBoxEnabled();
 
     const auto result = messageBox.exec();
-    if (messageBox.isChecked())
-        showOnceSettings()->deleteUserGroups = true;
+
+    if (allowSilent)
+    {
+        if (messageBox.isChecked())
+            showOnceSettings()->deleteUserGroups = true;
+    }
 
     return result != QDialogButtonBox::Cancel;
 }

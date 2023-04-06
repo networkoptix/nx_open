@@ -13,7 +13,7 @@ class UserGroups
     Q_DECLARE_TR_FUNCTIONS(Groups)
 
 public:
-    static bool removeGroups(QWidget* parent, const QSet<QnUuid>& groups);
+    static bool removeGroups(QWidget* parent, const QSet<QnUuid>& groups, bool allowSilent = true);
 };
 
 } // nx::vms::client::desktop::ui::messages
