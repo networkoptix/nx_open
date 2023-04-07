@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <vector>
 
 #include <QtCore/QScopedValueRollback>
 // QMenu is the only widget allowed in Right Panel item models.
@@ -670,40 +671,74 @@ rest::Handle AnalyticsSearchListModel::Private::lookupObjectTracksCached(
     const nx::analytics::db::Filter& request,
     GetCallback callback) const
 {
+    if (!NX_ASSERT(thread() == QThread::currentThread()))
+        return {};
+
     struct LookupContext
     {
         nx::analytics::db::Filter filter;
         rest::Handle handle{};
-        std::vector<GetCallback> callbacks;
+        std::map<intptr_t, GetCallback> callbacks;
     };
-    static LookupContext lastRequest;
+    static std::vector<LookupContext> cachedRequests;
 
-    if (lastRequest.callbacks.empty() || lastRequest.filter == request)
+    NX_VERBOSE(q, "Called lookupObjectTracksCached(), %1 requests are currently cached",
+        cachedRequests.size());
+
+    const auto contextIt = std::find_if(cachedRequests.begin(), cachedRequests.end(),
+        [request](const LookupContext& context) { return context.filter == request; });
+
+    if (contextIt != cachedRequests.end())
     {
-        lastRequest.filter = request;
-        lastRequest.callbacks.push_back(std::move(callback));
-
-        if (lastRequest.callbacks.size() == 1)
-        {
-            lastRequest.handle = connectedServerApi()->lookupObjectTracks(request, false /*isLocal*/,
-                [](bool success, rest::Handle handle, nx::analytics::db::LookupResult&& result)
-                {
-                    for (int i = 0; i < lastRequest.callbacks.size(); ++i)
-                    {
-                        const auto& callback = lastRequest.callbacks[i];
-                        if (i < lastRequest.callbacks.size() - 1)
-                            callback(success, handle, nx::analytics::db::LookupResult(result));
-                        else
-                            callback(success, handle, std::move(result));
-                    }
-                    lastRequest.callbacks.clear();
-                }, thread());
-        }
-        return lastRequest.handle;
+        NX_VERBOSE(q, "Using cached request, handle=%1", contextIt->handle);
+        // One model can have only one request running at any time.
+        // Placing second request means the previous one was cancelled.
+        contextIt->callbacks[(intptr_t) this] = std::move(callback);
+        return contextIt->handle;
     }
     else
     {
-        return connectedServerApi()->lookupObjectTracks(request, false /*isLocal*/, callback, thread());
+        const auto responseHandler =
+            [this](bool success, rest::Handle handle, nx::analytics::db::LookupResult&& result)
+            {
+                const auto contextIt = std::find_if(cachedRequests.begin(), cachedRequests.end(),
+                    [&](const LookupContext& context) { return context.handle == handle; });
+
+                NX_VERBOSE(q, "Received a response, handle=%1", handle);
+
+                if (contextIt == cachedRequests.end())
+                {
+                    NX_VERBOSE(q, "No corresponding cached request found (was cancelled)");
+                    return;
+                }
+
+                NX_VERBOSE(q, "Found cached request with %1 callbacks", contextIt->callbacks.size());
+                if (NX_ASSERT(contextIt->handle == handle && !contextIt->callbacks.empty()))
+                {
+                    const auto last = --contextIt->callbacks.end();
+
+                    for (auto it = contextIt->callbacks.begin(); it != last; ++it)
+                        (it->second)(success, handle, nx::analytics::db::LookupResult(result));
+
+                    (last->second)(success, handle, std::move(result));
+                }
+
+                cachedRequests.erase(contextIt);
+
+                NX_VERBOSE(q, "Removed handle=%1 from cache, %2 requests are still cached",
+                    handle, cachedRequests.size());
+        };
+
+        LookupContext context;
+        context.filter = request;
+        context.callbacks[(intptr_t) this] = std::move(callback);
+
+        context.handle = connectedServerApi()->lookupObjectTracks(
+            request, /*isLocal*/ false, responseHandler, thread());
+
+        NX_VERBOSE(q, "Created a new request, handle=%1", context.handle);
+        cachedRequests.push_back(context);
+        return context.handle;
     }
 }
 

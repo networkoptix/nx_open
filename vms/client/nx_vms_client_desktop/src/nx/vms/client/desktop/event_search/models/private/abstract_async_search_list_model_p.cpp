@@ -60,6 +60,7 @@ void AbstractAsyncSearchListModel::Private::cancelPrefetch()
     if (m_request.id && m_prefetchCompletionHandler)
         m_prefetchCompletionHandler({}, FetchResult::cancelled);
 
+    m_prefetchCompletionHandler = {};
     m_request = {};
 }
 
@@ -161,8 +162,10 @@ const AbstractAsyncSearchListModel::Private::FetchInformation&
 void AbstractAsyncSearchListModel::Private::completePrefetch(
     const QnTimePeriod& actuallyFetched, bool success, int fetchedCount)
 {
-    NX_ASSERT(m_request.direction == q->fetchDirection());
+    if (!NX_ASSERT(m_prefetchCompletionHandler))
+        return;
 
+    NX_ASSERT(m_request.direction == q->fetchDirection());
     if (fetchedCount == 0)
     {
         NX_VERBOSE(q, "Pre-fetched no items");
@@ -223,7 +226,6 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
 
     NX_VERBOSE(q, "Fetch result: %1", QVariant::fromValue(result).toString());
 
-    NX_ASSERT(m_prefetchCompletionHandler);
     m_prefetchCompletionHandler(fetchedPeriod(), result);
     m_prefetchCompletionHandler = {};
 
