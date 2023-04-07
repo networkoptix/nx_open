@@ -936,6 +936,11 @@ bool QnBusinessRuleViewModel::isActionUsingSourceCamera() const
     return m_actionParams.useSource && actionCanUseSourceCamera();
 }
 
+QString QnBusinessRuleViewModel::sourceCameraCheckboxText() const
+{
+    return m_helper->sourceCameraCheckboxText(m_actionType);
+}
+
 bool QnBusinessRuleViewModel::actionCanUseSourceServer() const
 {
     return vms::event::requiresServerResource(m_actionType)
