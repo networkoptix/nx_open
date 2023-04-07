@@ -10,6 +10,7 @@
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/rules/model_view/modification_mark_item_delegate.h>
+#include <nx/vms/client/desktop/rules/model_view/rules_sort_filter_proxy_model.h>
 #include <nx/vms/client/desktop/rules/model_view/rules_table_model.h>
 #include <nx/vms/client/desktop/rules/params_widgets/editor_factory.h>
 #include <nx/vms/client/desktop/rules/params_widgets/params_widget.h>
@@ -29,7 +30,7 @@ RulesDialog::RulesDialog(QWidget* parent):
     m_ui(new Ui::RulesDialog()),
     m_rulesTableModel(
         new RulesTableModel(appContext()->currentSystemContext()->vmsRulesEngine(), this)),
-    m_rulesFilterModel(new QSortFilterProxyModel(this))
+    m_rulesFilterModel(new RulesSortFilterProxyModel(this))
 {
     m_ui->setupUi(this);
 

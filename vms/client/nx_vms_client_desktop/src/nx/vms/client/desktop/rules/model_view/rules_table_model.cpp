@@ -128,6 +128,11 @@ QnUuid SimplifiedRule::id() const
     return m_rule->id();
 }
 
+bool SimplifiedRule::isSystem() const
+{
+    return m_rule->isSystem();
+}
+
 QString SimplifiedRule::eventType() const
 {
     if (NX_ASSERT(!m_rule->eventFilters().empty()))
@@ -714,6 +719,8 @@ QVariant RulesTableModel::idColumnData(const QModelIndex& index, int role) const
             return QString("%1 %2")
                 .arg(eventColumnData(index, Qt::DisplayRole).toString())
                 .arg(actionColumnData(index, Qt::DisplayRole).toString());
+        case IsSystemRuleRole:
+            return m_simplifiedRules[index.row()]->isSystem();
     }
 
     return {};
