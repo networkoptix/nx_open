@@ -4,6 +4,9 @@ import Nx.Controls 1.0
 
 import "private"
 
+/**
+ * Interactive Settings type.
+ */
 ActiveTextItem
 {
     id: control
@@ -20,4 +23,3 @@ ActiveTextItem
         textArea.focus: true
     }
 }
-

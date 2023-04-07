@@ -7,6 +7,9 @@ import QtQuick.Layouts 1.15
 import Nx 1.0
 import Nx.Controls 1.0
 
+/**
+ * Interactive Settings type.
+ */
 Control
 {
     property string icon: "info"

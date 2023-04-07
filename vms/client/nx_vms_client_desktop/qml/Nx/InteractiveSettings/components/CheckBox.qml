@@ -8,6 +8,9 @@ import nx.vms.client.desktop 1.0
 
 import "private"
 
+/**
+ * Interactive Settings type.
+ */
 LabeledItem
 {
     id: control

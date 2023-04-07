@@ -4,6 +4,9 @@ import QtQuick 2.0
 
 import "private"
 
+/**
+ * Interactive Settings type.
+ */
 Group
 {
     id: control

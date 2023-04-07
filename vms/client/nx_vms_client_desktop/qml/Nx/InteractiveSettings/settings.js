@@ -78,8 +78,8 @@ function _createItemsRecursively(parent, visualParent, model, depth)
     if (!type)
         return null
 
-    if (type === "GroupBox" && depth === 1)
-        type = "Panel"
+    if (type === "GroupBox")
+        model.depth = depth
 
     const componentPath = "components/%1.qml".arg(type)
     const component = Qt.createComponent(componentPath)

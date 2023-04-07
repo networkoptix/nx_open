@@ -6,6 +6,9 @@ import QtQuick.Layouts
 
 import Nx
 
+/**
+ * Interactive Settings private type.
+ */
 Control
 {
     property alias header: header.text

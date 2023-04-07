@@ -2,6 +2,9 @@
 
 import "private"
 
+/**
+ * Interactive Settings type.
+ */
 Placeholder
 {
     property string icon: "default"

@@ -3,6 +3,9 @@
 import QtQuick
 import QtQuick.Controls
 
+/**
+ * Interactive Settings private type.
+ */
 Control
 {
     id: layout

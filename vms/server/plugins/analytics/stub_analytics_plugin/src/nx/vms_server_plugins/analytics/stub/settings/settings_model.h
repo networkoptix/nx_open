@@ -134,9 +134,16 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                     "defaultValue": true
                 },
                 {
-                    "type": "Link",
-                    "caption": "Customer Support",
-                    "url": "https://example.com/"
+                    "type": "GroupBox",
+                    "caption": "Styled GroupBox",
+                    "style": "label",
+                    "items": [
+                        {
+                            "type": "Link",
+                            "caption": "Customer Support",
+                            "url": "https://example.com/"
+                        }
+                    ]
                 },
                 {
                     "type": "GroupBox",
@@ -459,9 +466,16 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                     "visible": false
                 },
                 {
-                    "type": "Link",
-                    "caption": "Customer Support",
-                    "url": "https://example.com/"
+                    "type": "GroupBox",
+                    "caption": "Styled GroupBox",
+                    "style": "label",
+                    "items": [
+                        {
+                            "type": "Link",
+                            "caption": "Customer Support",
+                            "url": "https://example.com/"
+                        }
+                    ]
                 },
                 {
                     "type": "GroupBox",

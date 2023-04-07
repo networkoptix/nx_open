@@ -4,6 +4,9 @@ import QtQuick 2.6
 
 import Nx 1.0
 
+/**
+ * Interactive Settings type.
+ */
 Rectangle
 {
     id: separator

@@ -696,11 +696,19 @@ Property "name" must be unique, will be used as a caption if caption is not spec
 ---------------------------------------------------------------------------------------------------
 ## GroupBox
 
-Grouping panel with a caption. Top-level groupboxes visually distinguished from the nested.
+Grouping panel with a caption. Top-level groupboxes visually distinguished from the nested if the
+style is not specified or set to `"default"`.
+
+The `"style"` field is optional and accepts the following values:
+- `"default"` (top-level groupboxes will have style `"panel"` and nested will have style `"group"`)
+- `"panel"`
+- `"group"`
+- `"label"`
 
 [proprietary]
 
 ![](doc/images/group-box.png)
+![](doc/images/group-box-styles.png)
 
 [/proprietary]
 
@@ -709,6 +717,7 @@ Grouping panel with a caption. Top-level groupboxes visually distinguished from 
     {
         "type": "GroupBox",
         "caption": "Top-level groupbox",
+        "style": "default",
         "items": [
             { "type": "CheckBox", "caption": "CheckBox", "description": "Hint" },
             { "type": "SpinBox", "caption": "SpinBox",  "description": "Hint" },

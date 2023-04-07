@@ -8,6 +8,9 @@ import "private"
 import "private/utils.js" as Utils
 import "../settings.js" as Settings
 
+/**
+ * Interactive Settings type.
+ */
 Item
 {
     id: control
