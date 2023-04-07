@@ -22,6 +22,7 @@ public:
     virtual ~SimplifiedRule() override;
 
     QnUuid id() const;
+    bool isSystem() const;
 
     QString eventType() const;
     void setEventType(const QString& eventType);
@@ -99,7 +100,8 @@ public:
     enum Roles
     {
         FilterRole = Qt::UserRole,
-        FieldRole
+        FieldRole,
+        IsSystemRuleRole
     };
 
     explicit RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent = nullptr);
