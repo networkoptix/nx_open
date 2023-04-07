@@ -283,11 +283,14 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         ui->useEventSourceServerCheckBox->setEnabled(m_model->actionCanUseSourceServer());
         ui->useEventSourceServerCheckBox->setChecked(m_model->actionIsUsingSourceServer());
 
-        ui->useEventSourceCameraCheckBox->setVisible(
-            nx::vms::event::canUseSourceCamera(m_model->actionType()));
-
-        ui->useEventSourceCameraCheckBox->setEnabled(m_model->actionCanUseSourceCamera());
-        ui->useEventSourceCameraCheckBox->setChecked(m_model->isActionUsingSourceCamera());
+        const auto canUseSourceCamera = nx::vms::event::canUseSourceCamera(m_model->actionType());
+        ui->useEventSourceCameraCheckBox->setVisible(canUseSourceCamera);
+        if (canUseSourceCamera)
+        {
+            ui->useEventSourceCameraCheckBox->setText(m_model->sourceCameraCheckboxText());
+            ui->useEventSourceCameraCheckBox->setEnabled(m_model->actionCanUseSourceCamera());
+            ui->useEventSourceCameraCheckBox->setChecked(m_model->isActionUsingSourceCamera());
+        }
 
         if (m_model->eventType() == EventType::softwareTriggerEvent)
         {

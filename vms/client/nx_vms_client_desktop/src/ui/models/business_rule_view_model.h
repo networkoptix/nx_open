@@ -107,12 +107,13 @@ public:
 
     bool actionCanUseSourceCamera() const;
     bool isActionUsingSourceCamera() const;
+    QString sourceCameraCheckboxText() const;
+    void toggleActionUseSourceCamera();
 
     bool actionCanUseSourceServer() const;
     bool actionIsUsingSourceServer() const;
-
     void toggleActionUseSourceServer();
-    void toggleActionUseSourceCamera();
+
 
     QIcon iconForAction() const;
 
