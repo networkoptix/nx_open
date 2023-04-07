@@ -4,6 +4,7 @@
 #include "ui_rules_dialog.h"
 
 #include <QtCore/QSortFilterProxyModel>
+#include <QtGui/QCloseEvent>
 
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
@@ -144,6 +145,14 @@ void RulesDialog::showEvent(QShowEvent* event)
     resetFilter();
     resetSelection();
     m_ui->searchLineEdit->setFocus();
+}
+
+void RulesDialog::closeEvent(QCloseEvent* event)
+{
+    QnSessionAwareButtonBoxDialog::closeEvent(event);
+
+    if (event->isAccepted())
+        m_displayedRule.reset();
 }
 
 void RulesDialog::accept()
