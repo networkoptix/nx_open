@@ -167,6 +167,8 @@ struct LdapSettingsWidget::Private
         state.groupObjectClass = settings.groupObjectClass;
         state.memberAttribute = settings.memberAttribute;
 
+        state.preferredSyncServer = settings.preferredMasterSyncServer;
+
         LdapState::stateToObject(state, quickWidget->rootObject());
     }
 
@@ -199,6 +201,8 @@ struct LdapSettingsWidget::Private
         settings.loginAttribute = state.loginAttribute;
         settings.groupObjectClass = state.groupObjectClass;
         settings.memberAttribute = state.memberAttribute;
+
+        settings.preferredMasterSyncServer = state.preferredSyncServer;
 
         return settings;
     }

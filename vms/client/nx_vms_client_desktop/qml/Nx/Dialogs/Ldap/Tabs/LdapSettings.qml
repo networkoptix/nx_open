@@ -31,6 +31,7 @@ Rectangle
     property int syncTimeoutS
     property bool syncIsRunning
     property bool syncRequested
+    property var preferredSyncServer
 
     property bool modified
 
@@ -63,6 +64,7 @@ Rectangle
                 control.groupObjectClass = groupObjectClass
                 control.memberAttribute = memberAttribute
                 control.syncTimeoutS = syncTimeoutS
+                control.preferredSyncServer = preferredSyncServer
             }
         }
     }
@@ -433,6 +435,7 @@ Rectangle
                             advancedSettingsDialog.groupObjectClass = control.groupObjectClass
                             advancedSettingsDialog.memberAttribute = control.memberAttribute
                             advancedSettingsDialog.syncTimeoutS = control.syncTimeoutS
+                            advancedSettingsDialog.preferredSyncServer = control.preferredSyncServer
                             advancedSettingsDialog.show()
                         }
                     }
