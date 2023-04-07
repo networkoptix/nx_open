@@ -933,6 +933,12 @@ private:
         nx::network::http::ClientPool::Request request,
         Callback<ResultType> callback);
 
+    Result<QByteArray>::type makeSessionAwareCallback(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        nx::network::http::ClientPool::Request request,
+        Result<QByteArray>::type callback,
+        nx::network::http::AsyncClient::Timeouts timeouts);
+
     template <typename ResultType>
     Handle executeRequest(
         const nx::network::http::ClientPool::Request& request,
