@@ -78,10 +78,6 @@ FocusScope
                         !data || resourceSearchPane.isFilterRelevant(data)
                 }
 
-                MenuAction { text: qsTr("All Types"); data: ResourceTree.FilterType.everything }
-
-                PlatformMenuSeparator {}
-
                 MenuAction { text: qsTr("Servers"); data: ResourceTree.FilterType.servers }
                 MenuAction { text: qsTr("Cameras & Devices"); data: ResourceTree.FilterType.cameras }
                 MenuAction { text: qsTr("Layouts"); data: ResourceTree.FilterType.layouts }
