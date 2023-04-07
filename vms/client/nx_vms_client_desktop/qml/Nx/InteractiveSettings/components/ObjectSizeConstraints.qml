@@ -7,6 +7,9 @@ import Nx.Dialogs 1.0
 
 import "private"
 
+/**
+ * Interactive Settings type.
+ */
 LabeledItem
 {
     id: control

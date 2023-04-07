@@ -4,6 +4,9 @@ import QtQml 2.15
 
 import Nx.Controls 1.0
 
+/**
+ * Interactive Settings private type.
+ */
 TextFieldWithWarning
 {
     id: control

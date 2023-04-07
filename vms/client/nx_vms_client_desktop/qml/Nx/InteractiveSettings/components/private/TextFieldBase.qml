@@ -2,6 +2,9 @@
 
 import QtQuick 2.15
 
+/**
+ * Interactive Settings private type.
+ */
 ActiveTextItem
 {
     id: control

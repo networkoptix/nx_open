@@ -4,6 +4,9 @@ import QtQuick
 
 import "private"
 
+/**
+ * Interactive Settings type.
+ */
 Group
 {
     property string name: ""

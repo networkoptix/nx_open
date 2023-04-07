@@ -8,6 +8,9 @@ import Nx.Controls 1.0
 
 import "private"
 
+/**
+ * Interactive Settings type.
+ */
 StackLayout
 {
     id: control

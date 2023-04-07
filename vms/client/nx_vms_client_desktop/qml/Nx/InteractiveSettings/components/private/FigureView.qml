@@ -11,6 +11,9 @@ import Nx.Items 1.0
 import nx.client.core 1.0
 import nx.client.desktop 1.0
 
+/**
+ * Interactive Settings private type.
+ */
 Item
 {
     id: figureView

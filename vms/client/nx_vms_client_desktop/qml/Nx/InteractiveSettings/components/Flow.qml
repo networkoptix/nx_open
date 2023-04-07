@@ -2,6 +2,9 @@
 
 import "private"
 
+/**
+ * Interactive Settings type.
+ */
 LabeledItem
 {
     property alias childrenItem: layout

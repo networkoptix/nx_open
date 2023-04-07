@@ -7,6 +7,9 @@ import Nx.Controls 1.0 as Nx
 
 import "private"
 
+/**
+ * Interactive Settings type.
+ */
 TextFieldBase
 {
     textFieldItem: TextField

@@ -4,6 +4,9 @@ import QtQuick 2.0
 
 import "utils.js" as Utils
 
+/**
+ * Interactive Settings private type.
+ */
 Item
 {
     property var filledCheckItems: undefined

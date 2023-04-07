@@ -9,6 +9,9 @@ import Nx.Dialogs 1.0
 // Warning! Uses "mediaResourceHelper" and "settingsView" objects from context.
 // TODO: #vkutin #dklychkov Avoid it if possible.
 
+/**
+ * Interactive Settings private type.
+ */
 LabeledItem
 {
     id: control

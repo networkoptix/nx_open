@@ -3,6 +3,9 @@
 import Nx.Controls 1.0
 import nx.vms.client.desktop 1.0
 
+/**
+ * Interactive Settings type.
+ */
 Button
 {
     id: control

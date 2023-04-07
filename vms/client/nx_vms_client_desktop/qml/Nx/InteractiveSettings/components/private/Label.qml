@@ -3,6 +3,9 @@
 import Nx 1.0
 import Nx.Controls 1.0
 
+/**
+ * Interactive Settings private type.
+ */
 ContextHintLabel
 {
     font.pixelSize: 13

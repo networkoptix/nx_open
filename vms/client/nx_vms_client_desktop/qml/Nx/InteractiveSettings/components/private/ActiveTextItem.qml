@@ -2,7 +2,9 @@
 
 import QtQuick 2.15
 
-/** Text item with Active Settings support. */
+/**
+ * Text item with Active Settings support.
+ */
 LabeledItem
 {
     id: control

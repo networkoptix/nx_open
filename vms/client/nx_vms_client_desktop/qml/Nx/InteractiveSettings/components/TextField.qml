@@ -2,6 +2,9 @@
 
 import "private"
 
+/**
+ * Interactive Settings type.
+ */
 TextFieldBase
 {
     textFieldItem: TextField {}
