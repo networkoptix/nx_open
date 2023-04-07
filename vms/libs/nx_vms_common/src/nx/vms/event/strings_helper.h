@@ -84,6 +84,7 @@ public:
 
     QString toggleStateToString(EventState state) const;
     QString ruleDescriptionText(const RulePtr& rule) const;
+    QString sourceCameraCheckboxText(ActionType actionType) const;
 
     QString eventTypeString(
         EventType eventType,
