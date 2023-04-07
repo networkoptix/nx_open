@@ -24,6 +24,7 @@ Dialog
     property alias memberAttribute: userMembershipAttributeTextField.text
 
     property alias syncTimeoutS: syncTimeoutSpinBox.value
+    property alias preferredSyncServer: serverComboBox.selectedServer
 
     modality: Qt.ApplicationModal
 
@@ -257,10 +258,11 @@ Dialog
                 text: qsTr("Proxy LDAP requests via server")
             }
 
-            ComboBox
+            ServerComboBox
             {
+                id: serverComboBox
+
                 Layout.fillWidth: true
-                model: [qsTr("Auto")]
             }
         }
     }

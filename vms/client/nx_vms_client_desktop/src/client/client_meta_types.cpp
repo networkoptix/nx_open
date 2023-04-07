@@ -52,6 +52,7 @@
 #include <nx/vms/client/desktop/system_administration/models/ldap_filters_model.h>
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
 #include <nx/vms/client/desktop/system_administration/models/recursive_members_model.h>
+#include <nx/vms/client/desktop/system_administration/models/server_list_model.h>
 #include <nx/vms/client/desktop/system_logon/data/connect_tiles_proxy_model.h>
 #include <nx/vms/client/desktop/system_logon/data/systems_visibility_sort_filter_model.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
@@ -257,6 +258,7 @@ void QnClientMetaTypes::registerQmlTypes()
     MembersModel::registerQmlType();
     RecursiveMembersModel::registerQmlType();
     LdapFiltersModel::registerQmlType();
+    ServerListModel::registerQmlType();
 
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");

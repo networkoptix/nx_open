@@ -43,6 +43,8 @@ struct LdapSettings
     Q_PROPERTY(QString groupObjectClass MEMBER groupObjectClass)
     Q_PROPERTY(QString memberAttribute MEMBER memberAttribute)
 
+    Q_PROPERTY(QnUuid preferredSyncServer MEMBER preferredSyncServer)
+
 public:
     bool isValid = false;
     QString uri;
@@ -55,6 +57,8 @@ public:
     QString loginAttribute;
     QString groupObjectClass;
     QString memberAttribute;
+
+    QnUuid preferredSyncServer;
 };
 
 class LdapFiltersModel: public QAbstractListModel
