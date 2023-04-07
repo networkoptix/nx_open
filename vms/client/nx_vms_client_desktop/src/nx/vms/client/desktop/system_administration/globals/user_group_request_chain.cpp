@@ -149,24 +149,17 @@ void UserGroupRequestChain::requestSaveGroup(const UserGroupRequest::AddOrUpdate
                     systemContext()->userGroupManager()->find(
                         data.groupData.id).value_or(api::UserGroupData{});
 
-                if (group.id.isNull())
+                if (!group.id.isNull() && group.parentGroupIds != data.originalParents)
                 {
-                    group.id = userGroup->id;
-                    group.name = data.groupData.name;
-                    group.description = data.groupData.description;
-                    group.parentGroupIds = data.groupData.parentGroupIds;
-                    group.permissions = data.groupData.permissions;
+                    requestComplete(success);
+                    return; //< Already updated.
                 }
-                else
-                {
-                    if (group.parentGroupIds != data.originalParents)
-                    {
-                        requestComplete(success);
-                        return; //< Already updated.
-                    }
 
-                    group.parentGroupIds = data.originalParents;
-                }
+                group.id = userGroup->id;
+                group.name = userGroup->name;
+                group.description = userGroup->description;
+                group.parentGroupIds = userGroup->parentGroupIds;
+                group.permissions = userGroup->permissions;
 
                 userGroupManager()->addOrUpdate(group);
                 if (userGroup->resourceAccessRights)
