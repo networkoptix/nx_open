@@ -1099,7 +1099,8 @@ void QnWorkbenchNavigator::fastForward()
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent);
         periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
 
-        const auto currentTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(reader->currentTime());
+        const auto currentTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+            m_timeSlider->sliderTimePosition());
         auto curPeriod = periods.findNearestPeriod(currentTimeMs.count(), false);
         if (curPeriod == periods.end())
             return; //< Reader currently in some invalid state.
@@ -1122,7 +1123,7 @@ void QnWorkbenchNavigator::fastForward()
         return;
     }
 
-    reader->jumpTo(pos, pos);
+    reader->directJumpToNonKeyFrame(pos);
     updateSliderFromReader();
     emit positionChanged();
 }
@@ -1150,7 +1151,8 @@ void QnWorkbenchNavigator::rewind()
         periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
 
         /* We want to jump relatively to current reader position. */
-        const auto currentTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(reader->currentTime());
+        const auto currentTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+            m_timeSlider->sliderTimePosition());
         auto curPeriod = periods.findNearestPeriod(currentTimeMs.count(), false);
         if (curPeriod == periods.end())
             return; //< Reader currently in some invalid state.
@@ -1174,7 +1176,7 @@ void QnWorkbenchNavigator::rewind()
         pos = posMs.count() * 1000;
     }
 
-    reader->jumpTo(pos, pos);
+    reader->directJumpToNonKeyFrame(pos);
     updateSliderFromReader();
     emit positionChanged();
 }
