@@ -873,6 +873,39 @@ QString StringsHelper::ruleDescriptionText(const RulePtr& rule) const
         actionName(rule->actionType()));
 }
 
+QString StringsHelper::sourceCameraCheckboxText(ActionType actionType) const
+{
+    switch (actionType)
+    {
+        case ActionType::showOnAlarmLayoutAction:
+            return tr("Also show source camera");
+
+        case ActionType::fullscreenCameraAction:
+            return tr("Source camera");
+
+        case ActionType::showTextOverlayAction:
+            return tr("Also show on source camera");
+
+        case ActionType::bookmarkAction:
+            return tr("Also set on source camera");
+
+        case ActionType::cameraOutputAction:
+            return tr("Also trigger on source camera");
+
+        case ActionType::cameraRecordingAction:
+            return tr("Also record source camera");
+
+        case ActionType::playSoundOnceAction:
+        case ActionType::playSoundAction:
+        case ActionType::sayTextAction:
+            return tr("Also play on source camera");
+
+        default:
+            NX_ASSERT("Action can't use source camera: %1", actionType);
+            return "Use source camera";
+    }
+}
+
 QString StringsHelper::defaultSoftwareTriggerName()
 {
     return tr("Trigger Name");
