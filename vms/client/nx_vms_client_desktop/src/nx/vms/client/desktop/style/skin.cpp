@@ -153,7 +153,7 @@ QPixmap Skin::getPixmapInternal(const QString& name)
         {
             pixmap = QPixmap::fromImage(QImage(fullPath), Qt::OrderedDither | Qt::OrderedAlphaDither);
             pixmap.setDevicePixelRatio(1); // Force to use not scaled images
-            NX_ASSERT(!pixmap.isNull());
+            NX_ASSERT(!pixmap.isNull(), "Cannot load '%1' pixmap", name);
         }
         QPixmapCache::insert(name, pixmap);
     }
