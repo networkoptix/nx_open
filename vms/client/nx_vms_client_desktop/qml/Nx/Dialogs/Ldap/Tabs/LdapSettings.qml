@@ -24,6 +24,7 @@ Rectangle
     property string password
     property alias filters: filtersModel.filters
     property bool continuousSync
+    property bool continuousSyncEditable
     property bool isValid
     property string loginAttribute
     property string groupObjectClass
@@ -185,6 +186,10 @@ Rectangle
             color: ColorTheme.colors.dark8
 
             Layout.fillWidth: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
+            Layout.topMargin: 12
+
             height: childrenRect.height + 24
 
             Spinner
@@ -463,9 +468,15 @@ Rectangle
         SectionHeader
         {
             id: continuousImportHeader
+
             text: qsTr("Continuous User Import")
             textLeftMargin: continuousImportSwitch.width + 4
+
             Layout.fillWidth: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
+
+            enabled: control.continuousSyncEditable
 
             SwitchIcon
             {
@@ -474,6 +485,7 @@ Rectangle
                 height: 16
                 y: continuousImportHeader.baselineOffset - height + 1
 
+                enabled: control.continuousSyncEditable
                 checkState: control.continuousSync ? Qt.Checked : Qt.Unchecked
                 hovered: continuousImportSwitchMouserArea.containsMouse
 
@@ -484,7 +496,7 @@ Rectangle
                     hoverEnabled: true
                     onClicked:
                     {
-                        control.continuousSync= !control.continuousSync
+                        control.continuousSync = !control.continuousSync
                     }
                 }
             }
@@ -495,7 +507,13 @@ Rectangle
             text: qsTr("VMS imports and synchronizes users and groups with LDAP in real time")
             font: Qt.font({pixelSize: 14, weight: Font.Normal})
             color: ColorTheme.colors.light16
+
             Layout.fillWidth: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
+
+            visible: control.continuousSyncEditable
+
             wrapMode: Text.WordWrap
         }
 
@@ -505,15 +523,22 @@ Rectangle
                 + " in the list of users. Use groups to configure permissions for such users.")
             font: Qt.font({pixelSize: 14, weight: Font.Normal})
             color: ColorTheme.colors.red_core
-            visible: !control.continuousSync
+            visible: !control.continuousSync && control.continuousSyncEditable
+
             Layout.fillWidth: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
+
             wrapMode: Text.WordWrap
         }
 
         SectionHeader
         {
             text: qsTr("Filters")
+
             Layout.fillWidth: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
 
             TextButton
             {
@@ -544,6 +569,8 @@ Rectangle
         {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.leftMargin: 16
+            Layout.rightMargin: 16
 
             ListView
             {
@@ -686,6 +713,16 @@ Rectangle
                 height: 22
                 verticalAlignment: Text.AlignVCenter
             }
+        }
+
+        LdapInfoBanner
+        {
+            visible: !control.continuousSyncEditable
+
+            text: qsTr("Continuous import from LDAP is disabled for this system."
+                + " Some settings may be not available.")
+
+            Layout.fillWidth: true
         }
     }
 }

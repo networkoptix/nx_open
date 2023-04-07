@@ -15,6 +15,8 @@ Item
     property int counter: 0
     property alias textLeftMargin: headerText.x
 
+    property bool enabled: true
+
     baselineOffset: headerText.y + headerText.baselineOffset
 
     Text
@@ -24,6 +26,7 @@ Item
         height: 20
         font: Qt.font({pixelSize: 16, weight: Font.Medium})
         color: ColorTheme.colors.light4
+        opacity: control.enabled ? 1.0 : 0.3
 
         anchors.top: parent.top
         anchors.topMargin: 16
@@ -35,6 +38,7 @@ Item
         width: parent.width
 
         color: ColorTheme.colors.dark12
+        opacity: control.enabled ? 1.0 : 0.3
 
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 4
