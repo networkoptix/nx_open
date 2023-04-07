@@ -575,20 +575,40 @@ Handle ServerConnection::unbindSystemFromCloud(
 
 Handle ServerConnection::dumpDatabase(
     nx::vms::common::SessionTokenHelperPtr helper,
-    Result<ErrorOrData<nx::vms::api::DatabaseDumpData>>::type callback,
+    Result<ErrorOrData<QByteArray>>::type callback,
     QThread* targetThread)
 {
     auto request = prepareRequest(
         nx::network::http::Method::get,
-        prepareUrl("/rest/v1/system/database", /*params*/ {}));
+        prepareUrl("/rest/v2/system/database", /*params*/ {}),
+        nx::network::http::header::ContentType::kBinary.value);
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto internalCallback =
+        [callback = std::move(callback)](
+            bool success,
+            Handle requestId,
+            QByteArray body,
+            const nx::network::http::HttpHeaders&)
+        {
+            if (success)
+            {
+                callback(success, requestId, body);
+                return;
+            }
+            nx::network::rest::Result result;
+            QJson::deserialize(body, &result);
+            callback(success, requestId, result);
+        };
 
     auto timeouts = nx::network::http::AsyncClient::Timeouts::defaults();
     timeouts.responseReadTimeout = std::chrono::minutes(5);
     timeouts.messageBodyReadTimeout = std::chrono::minutes(5);
+
+    auto wrapper =
+        makeSessionAwareCallback(helper, request, std::move(internalCallback), timeouts);
+
     auto handle = request.isValid()
-        ? executeRequest(request, std::move(wrapper), targetThread)
+        ? executeRequest(request, std::move(wrapper), targetThread, timeouts)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
@@ -2067,6 +2087,123 @@ Callback<ResultType> ServerConnection::makeSessionAwareCallback(
 
             // Default path -- pass the result to the original callback.
             callback(success, handle, result);
+        };
+}
+
+ServerConnectionBase::Result<QByteArray>::type ServerConnection::makeSessionAwareCallback(
+    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::network::http::ClientPool::Request request,
+    ServerConnectionBase::Result<QByteArray>::type callback,
+    nx::network::http::AsyncClient::Timeouts timeouts)
+{
+    return
+        [this, helper, request, callback = std::move(callback), timeouts](
+            bool success,
+            Handle handle,
+            QByteArray body,
+            const nx::network::http::HttpHeaders& headers)
+        {
+            const auto interactionThread = qApp->thread();
+            const auto targetThread = QThread::currentThread();
+
+            if (success)
+            {
+                callback(success, handle, body, headers);
+                return;
+            }
+
+            nx::network::rest::Result error;
+            QJson::deserialize(body, &error);
+
+            if (error.error == nx::network::rest::Result::SessionExpired)
+            {
+                // Session is expired. Let's try to issue a new token and resend the request.
+                executeInThread(interactionThread,
+                    [this,
+                        helper,
+                        callback,
+                        success,
+                        handle,
+                        body,
+                        headers,
+                        request,
+                        targetThread,
+                        timeouts]
+                    {
+                        if (auto token = helper->refreshToken())
+                        {
+                            {
+                                // Update credentials.
+                                NX_MUTEX_LOCKER lock(&d->mutex);
+                                this->d->directConnect->credentials.authToken =
+                                    nx::network::http::BearerAuthToken(token->value);
+                            }
+
+                            const auto originalHandle = handle;
+
+                            // Make an auxiliary callback that will pass the original request
+                            // handle to the caller instead of an unknown-to-the-caller resended
+                            // request handle.
+                            ServerConnectionBase::Result<QByteArray>::type fixedCallback =
+                                [this, callback = std::move(callback), originalHandle](
+                                    bool success, Handle handle, QByteArray body,
+                                    const nx::network::http::HttpHeaders& headers)
+                                {
+                                    NX_VERBOSE(d->logTag,
+                                        "Received responce for <%1>, which is a re-send of <%2>",
+                                        handle,
+                                        originalHandle);
+
+                                    {
+                                        // Request is done. Remove the substitution.
+                                        NX_MUTEX_LOCKER lock(&d->mutex);
+                                        d->substitutions.erase(originalHandle);
+                                    }
+
+                                    callback(success, originalHandle, body, headers);
+                                };
+
+                            // We need to update the request too, since it stores credentials.
+                            auto fixedRequest = request;
+                            fixedRequest.credentials->authToken =
+                                nx::network::http::BearerAuthToken(token->value);
+
+                            // Resend the request.
+                            const auto handle = executeRequest(
+                                fixedRequest, std::move(fixedCallback), targetThread, timeouts);
+
+                            NX_VERBOSE(d->logTag,
+                                "<%1> Sending <%2>(%3) with updated credentials",
+                                handle,
+                                originalHandle,
+                                request.url);
+
+                            {
+                                // Store the handles, so we'll be able to cancel the right request.
+                                NX_MUTEX_LOCKER lock(&d->mutex);
+                                d->substitutions[originalHandle] = handle;
+                            }
+                        }
+                        else
+                        {
+                            // Token was not updated. Process the callback in its target thread.
+                            executeInThread(targetThread,
+                                [callback = std::move(callback),
+                                    success,
+                                    handle,
+                                    body = std::move(body),
+                                    headers]
+                                {
+                                    callback(success, handle, body, headers);
+                                });
+                        }
+                    });
+
+                return;
+            }
+
+            // Default path -- pass the result to the original callback.
+            callback(success, handle, body, headers);
         };
 }
 
