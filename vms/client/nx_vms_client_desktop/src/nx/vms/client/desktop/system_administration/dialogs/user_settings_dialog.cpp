@@ -378,6 +378,12 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
     if (!NX_ASSERT(d->user))
         return;
 
+    if (!isModified())
+    {
+        saveStateComplete(state);
+        return;
+    }
+
     nx::vms::api::UserModelV3 userData;
 
     userData.type = (nx::vms::api::UserType) state.userType;

@@ -345,6 +345,12 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
         return;
     }
 
+    if (!isModified())
+    {
+        saveStateComplete(state);
+        return;
+    }
+
     UserGroupRequest::AddOrUpdateGroup updateData;
 
     updateData.newGroup = d->dialogType == createGroup;
