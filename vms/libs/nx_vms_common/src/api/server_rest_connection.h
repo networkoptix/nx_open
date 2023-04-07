@@ -261,7 +261,7 @@ public:
 
     Handle dumpDatabase(
         nx::vms::common::SessionTokenHelperPtr helper,
-        Result<ErrorOrData<nx::vms::api::DatabaseDumpData>>::type callback,
+        Result<ErrorOrData<QByteArray>>::type callback,
         QThread* targetThread);
 
     Handle restoreDatabase(
@@ -816,6 +816,12 @@ private:
         nx::vms::common::SessionTokenHelperPtr helper,
         nx::network::http::ClientPool::Request request,
         Callback<ResultType> callback);
+
+    Result<QByteArray>::type makeSessionAwareCallback(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        nx::network::http::ClientPool::Request request,
+        Result<QByteArray>::type callback,
+        nx::network::http::AsyncClient::Timeouts timeouts);
 
     template <typename ResultType>
     Handle executeRequest(
