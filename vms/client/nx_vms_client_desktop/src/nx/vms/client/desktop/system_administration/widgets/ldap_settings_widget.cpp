@@ -162,6 +162,8 @@ struct LdapSettingsWidget::Private
         }
         state.continuousSync =
             settings.continuousSync == nx::vms::api::LdapSettings::Sync::usersAndGroups;
+        state.continuousSyncEditable =
+            settings.continuousSync != nx::vms::api::LdapSettings::Sync::disabled;
 
         state.loginAttribute = settings.loginAttribute;
         state.groupObjectClass = settings.groupObjectClass;
@@ -194,9 +196,16 @@ struct LdapSettingsWidget::Private
             });
         }
 
-        settings.continuousSync = state.continuousSync
-            ? nx::vms::api::LdapSettings::Sync::usersAndGroups
-            : nx::vms::api::LdapSettings::Sync::groupsOnly;
+        if (state.continuousSyncEditable)
+        {
+            settings.continuousSync = state.continuousSync
+                ? nx::vms::api::LdapSettings::Sync::usersAndGroups
+                : nx::vms::api::LdapSettings::Sync::groupsOnly;
+        }
+        else
+        {
+            settings.continuousSync = nx::vms::api::LdapSettings::Sync::disabled;
+        }
 
         settings.loginAttribute = state.loginAttribute;
         settings.groupObjectClass = state.groupObjectClass;
@@ -247,7 +256,10 @@ LdapSettingsWidget::LdapSettingsWidget(QWidget* parent):
     QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
+    setMinimumHeight(520);
+
     auto boxLayout = new QVBoxLayout(this);
+    boxLayout->setContentsMargins(0, 0, 0, 0);
     boxLayout->addWidget(d->quickWidget);
 }
 
