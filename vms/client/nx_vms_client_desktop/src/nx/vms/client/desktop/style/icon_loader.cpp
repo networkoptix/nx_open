@@ -261,7 +261,7 @@ QIcon IconLoader::loadSvgIconInternal(
     QFile source(basePath);
     if (!source.open(QIODevice::ReadOnly))
     {
-        NX_ASSERT(false, "Cannot load svg icon");
+        NX_ASSERT(false, "Cannot load '%1' icon", name);
         return QIcon();
     }
 

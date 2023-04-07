@@ -2,22 +2,21 @@
 
 #include "user_roles_settings_model.h"
 
-#include <boost/algorithm/cxx11/any_of.hpp>
 #include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <QtGui/QBrush>
 
 #include <client/client_globals.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/user_resource.h>
-
+#include <nx/utils/string.h>
+#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
-
-#include <nx/utils/string.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -222,7 +221,7 @@ QVariant QnUserRolesSettingsModel::data(const QModelIndex& index, int role) cons
     case Qt::DecorationRole:
         return isUserRoleValid(userRole)
             ? qnResIconCache->icon(QnResourceIconCache::Users)
-            : qnSkin->icon("tree/users_error.png");
+            : qnSkin->icon("tree/users.svg").pixmap(nx::style::Metrics::kDefaultIconSize, QnIcon::Error);
 
     case Qn::UuidRole:
         return QVariant::fromValue(userRole.id);
