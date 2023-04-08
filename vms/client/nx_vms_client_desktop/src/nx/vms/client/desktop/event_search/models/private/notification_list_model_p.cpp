@@ -11,6 +11,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -19,7 +20,6 @@
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -60,7 +60,7 @@ static const auto kDisplayTimeout = std::chrono::milliseconds(12500);
 
 QPixmap toPixmap(const QIcon& icon)
 {
-    return Skin::maximumSizePixmap(icon);
+    return core::Skin::maximumSizePixmap(icon);
 }
 
 QSharedPointer<AudioPlayer> loopSound(const QString& filePath)

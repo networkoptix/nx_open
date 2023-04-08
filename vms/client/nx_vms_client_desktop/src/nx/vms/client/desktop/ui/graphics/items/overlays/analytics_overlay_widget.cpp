@@ -14,9 +14,9 @@
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 #include "area_tooltip_item.h"
 

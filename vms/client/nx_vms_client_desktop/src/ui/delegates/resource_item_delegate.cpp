@@ -17,6 +17,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -25,9 +27,7 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -36,6 +36,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -142,20 +143,20 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     {
         case ItemState::normal:
             iconMode = QIcon::Normal;
-            mainColor = colorTheme()->color("resourceTree.mainText");
-            extraColor = colorTheme()->color("resourceTree.extraText");
+            mainColor = core::colorTheme()->color("resourceTree.mainText");
+            extraColor = core::colorTheme()->color("resourceTree.extraText");
             break;
 
         case ItemState::selected:
             iconMode = QIcon::Selected;
-            mainColor = colorTheme()->color("resourceTree.mainTextSelected");
-            extraColor = colorTheme()->color("resourceTree.extraTextSelected");
+            mainColor = core::colorTheme()->color("resourceTree.mainTextSelected");
+            extraColor = core::colorTheme()->color("resourceTree.extraTextSelected");
             break;
 
         case ItemState::accented:
             iconMode = QIcon::Active;
-            mainColor = colorTheme()->color("resourceTree.mainTextAccented");
-            extraColor = colorTheme()->color("resourceTree.extraTextAccented");
+            mainColor = core::colorTheme()->color("resourceTree.mainTextAccented");
+            extraColor = core::colorTheme()->color("resourceTree.extraTextAccented");
             break;
 
         default:
@@ -167,7 +168,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         if (option.state.testFlag(State_Error))
         {
             // Use error text color.
-            mainColor = colorTheme()->color("red_l2");
+            mainColor = core::colorTheme()->color("red_l2");
             iconMode = QnIcon::Error;
         }
         else
@@ -381,23 +382,23 @@ QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptio
     {
         case ItemState::normal:
             editorPalette.setColor(QPalette::Text,
-                colorTheme()->color("resourceTree.mainText"));
+                core::colorTheme()->color("resourceTree.mainText"));
             editorPalette.setColor(QPalette::HighlightedText,
-                colorTheme()->color("resourceTree.mainText"));
+                core::colorTheme()->color("resourceTree.mainText"));
             break;
 
         case ItemState::selected:
             editorPalette.setColor(QPalette::Text,
-                colorTheme()->color("resourceTree.mainTextSelected"));
+                core::colorTheme()->color("resourceTree.mainTextSelected"));
             editorPalette.setColor(QPalette::HighlightedText,
-                colorTheme()->color("resourceTree.mainTextSelected"));
+                core::colorTheme()->color("resourceTree.mainTextSelected"));
             break;
 
         case ItemState::accented:
             editorPalette.setColor(QPalette::Text,
-                colorTheme()->color("resourceTree.mainTextAccented"));
+                core::colorTheme()->color("resourceTree.mainTextAccented"));
             editorPalette.setColor(QPalette::HighlightedText,
-                colorTheme()->color("resourceTree.mainTextAccented"));
+                core::colorTheme()->color("resourceTree.mainTextAccented"));
             break;
 
         default:

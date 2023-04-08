@@ -11,8 +11,8 @@
 #include <QtCore/QJsonDocument>
 
 #include <client/client_module.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace {
 
@@ -89,7 +89,7 @@ Polyline::Direction direction(const QJsonObject& figure)
 FigureInfo extractFigure(FigureType type, const QJsonObject& data)
 {
     static const auto kDefaultRoiColor =
-        nx::vms::client::desktop::ColorTheme::instance()->colors("roi.palette")[0].name();
+        nx::vms::client::core::colorTheme()->colors("roi.palette")[0].name();
 
     const bool visible = data.value(QStringLiteral("showOnCamera")).toBool();
     if (!visible)

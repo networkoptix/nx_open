@@ -16,11 +16,11 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/rules/event_action_subtype.h>
 #include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/action_parameters.h>
@@ -104,6 +104,8 @@ int QnBusinessRuleItemDelegate::optimalWidth(Column column, const QFontMetrics& 
 void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem* option,
     const QModelIndex& index) const
 {
+    using namespace nx::vms::client::core;
+
     base_type::initStyleOption(option, index);
 
     if (index.data(Qn::DisabledRole).toBool())
@@ -131,7 +133,7 @@ void QnBusinessRuleItemDelegate::paint(
     if (!option.state.testFlag(QStyle::State_Selected))
     {
         if (!index.data(Qn::DisabledRole).toBool() && !index.data(Qn::ValidRole).toBool())
-            painter->fillRect(option.rect, colorTheme()->color("red_core", 77));
+            painter->fillRect(option.rect, nx::vms::client::core::colorTheme()->color("red_core", 77));
     }
 
     base_type::paint(painter, option, index);

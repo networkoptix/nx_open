@@ -6,6 +6,7 @@ import QtQuick.Controls.impl 2.15
 import QtQuick.Templates 2.15 as T
 
 import Nx 1.0
+import Nx.Core 1.0
 
 import nx.vms.client.desktop 1.0
 

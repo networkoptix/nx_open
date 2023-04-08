@@ -3,7 +3,7 @@
 #include "hud_overlay_widget.h"
 #include "private/hud_overlay_widget_p.h"
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 
@@ -15,7 +15,8 @@ QnHudOverlayWidget::QnHudOverlayWidget(WindowContext* windowContext, QGraphicsIt
     d_ptr(new QnHudOverlayWidgetPrivate(this))
 {
     setAcceptedMouseButtons(Qt::NoButton);
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("camera.hudElementsBackground"));
+    setPaletteColor(this, QPalette::Window,
+        nx::vms::client::core::colorTheme()->color("camera.hudElementsBackground"));
 }
 
 QnHudOverlayWidget::~QnHudOverlayWidget()

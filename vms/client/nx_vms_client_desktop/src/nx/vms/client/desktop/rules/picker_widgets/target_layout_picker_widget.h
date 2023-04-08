@@ -4,9 +4,9 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <ui/widgets/select_resources_button.h>
 
@@ -59,7 +59,7 @@ protected:
         if (layouts.empty())
             return qnSkin->icon("tree/buggy.png");
 
-        return Skin::maximumSizePixmap(
+        return core::Skin::maximumSizePixmap(
             layouts.size() > 1
                 ? qnResIconCache->icon(QnResourceIconCache::Layouts)
                 : qnResIconCache->icon(layouts.first()),

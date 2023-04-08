@@ -5,7 +5,7 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyle>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 
 namespace nx::vms::client::desktop {
 

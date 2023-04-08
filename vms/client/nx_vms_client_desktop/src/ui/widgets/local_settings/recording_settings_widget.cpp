@@ -6,9 +6,9 @@
 #include <QtGui/QScreen>
 #include <QtWidgets/QApplication>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

@@ -11,14 +11,14 @@
 #include <nx/branding.h>
 #include <nx/network/app_info.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/models/natural_string_sort_proxy_model.h>
 #include <nx/vms/client/desktop/common/utils/item_view_utils.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
@@ -43,7 +43,7 @@ SubjectSelectionDialog::CustomizableOptions
         {
             return user.isCloud();
         };
-    options.alertColor = colorTheme()->color("brand_d5");
+    options.alertColor = core::colorTheme()->color("brand_d5");
     return options;
 }
 

@@ -12,7 +12,7 @@
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/opacity_animator.h>
@@ -86,7 +86,7 @@ public:
     ZoomWindowWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = {}):
         base_type(parent, windowFlags),
         m_interactive(true),
-        m_frameColor(colorTheme()->color("yellow_core")),
+        m_frameColor(nx::vms::client::core::colorTheme()->color("yellow_core")),
         m_frameWidth(kFrameWidth)
     {
         setWindowFlags(this->windowFlags() | Qt::Window);
@@ -482,6 +482,7 @@ ZoomWindowInstrument::~ZoomWindowInstrument()
 
 QColor ZoomWindowInstrument::nextZoomWindowColor() const
 {
+    using namespace nx::vms::client::core;
     static const QList<QColor> kFrameColors{{
         colorTheme()->color("yellow_core"),
         colorTheme()->color("green_l2"),

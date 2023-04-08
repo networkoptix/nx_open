@@ -11,10 +11,10 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyle>
 
+#include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/accessor.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
-#include <nx/vms/client/desktop/style/icon.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>

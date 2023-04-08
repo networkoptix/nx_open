@@ -8,8 +8,8 @@
 
 #include "utils/math/color_transformations.h"
 #include "utils/math/linear_combination.h"
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 using nx::vms::client::core::Geometry;
 
@@ -46,7 +46,7 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
             brushColor = toGrayscale(linearCombine(0.5, brushColor, 0.5, palette().color(QPalette::Disabled, QPalette::Window)));
 
         painter.setBrush(brushColor);
-        painter.setPen(QPen(nx::vms::client::desktop::colorTheme()->color("dark1"), 1));
+        painter.setPen(QPen(nx::vms::client::core::colorTheme()->color("dark1"), 1));
 
         qreal cellSize = result.width();
         qreal trOffset = cellSize / 6.4 + 0.5;

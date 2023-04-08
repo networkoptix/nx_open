@@ -13,8 +13,8 @@
 #include <nx/utils/math/math.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/license/validator.h>
 #include <nx/vms/time/formatter.h>
 #include <utils/common/synctime.h>
@@ -26,6 +26,7 @@ const qint64 kExpirationWarningTimeMs = 15ll * 1000ll * 60ll * 60ll * 24ll;
 
 } // namespace
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::license;
 
@@ -170,7 +171,7 @@ QVariant QnLicenseListModel::foregroundData(const QModelIndex& index) const
         case QnLicenseListModel::ServerColumn:
         {
             if (!serverByLicense(license))
-                return QBrush(colorTheme()->color("red_l2"));
+                return QBrush(core::colorTheme()->color("red_l2"));
             break;
         }
 
@@ -184,16 +185,16 @@ QVariant QnLicenseListModel::foregroundData(const QModelIndex& index) const
                 if (index.column() != QnLicenseListModel::ExpirationDateColumn
                     || code == QnLicenseErrorCode::Expired)
                 {
-                    return QBrush(colorTheme()->color("red_l2"));
+                    return QBrush(core::colorTheme()->color("red_l2"));
                 }
             }
 
             switch (expirationInfo(license, false).first)
             {
                 case Expired:
-                    return QBrush(colorTheme()->color("red_l2"));
+                    return QBrush(core::colorTheme()->color("red_l2"));
                 case SoonExpires:
-                    return QBrush(colorTheme()->color("yellow_core"));
+                    return QBrush(core::colorTheme()->color("yellow_core"));
                 default:
                     break;
             }

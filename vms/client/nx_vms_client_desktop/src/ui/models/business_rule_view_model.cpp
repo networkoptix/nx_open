@@ -20,6 +20,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/api/types/event_rule_types.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/rules/event_action_subtype.h>
 #include <nx/vms/client/desktop/rules/helpers/exit_fullscreen_action_helper.h>
@@ -27,7 +28,6 @@
 #include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>

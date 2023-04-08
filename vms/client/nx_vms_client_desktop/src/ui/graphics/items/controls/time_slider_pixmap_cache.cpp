@@ -9,7 +9,7 @@
 #include <QtWidgets/QApplication>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <platform/platform_abstraction.h>
 #include <ui/common/text_pixmap_cache.h>
 
@@ -18,7 +18,7 @@ using std::chrono::milliseconds;
 QnTimeSliderPixmapCache::QnTimeSliderPixmapCache(int numLevels, QObject *parent):
     QObject(parent),
     m_defaultFont(QApplication::font()),
-    m_defaultColor(nx::vms::client::desktop::colorTheme()->color("light1", 255)),
+    m_defaultColor(nx::vms::client::core::colorTheme()->color("light1", 255)),
     m_dateFont(m_defaultFont),
     m_dateColor(m_defaultColor),
     m_tickmarkFonts(numLevels, m_defaultFont),

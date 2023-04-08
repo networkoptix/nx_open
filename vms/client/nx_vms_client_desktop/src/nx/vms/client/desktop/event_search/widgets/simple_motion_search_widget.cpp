@@ -10,7 +10,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/common/read_only.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
 

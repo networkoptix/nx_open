@@ -2,9 +2,9 @@
 
 #include "control_background_widget.h"
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnControlBackgroundWidget::QnControlBackgroundWidget(QGraphicsItem *parent):
     base_type(parent)

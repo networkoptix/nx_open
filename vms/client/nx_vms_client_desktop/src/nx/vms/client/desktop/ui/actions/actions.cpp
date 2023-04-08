@@ -9,11 +9,11 @@
 #include <core/resource/resource.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/radass/radass_action_factory.h>
 #include <nx/vms/client/desktop/showreel/showreel_actions.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_conditions.h>

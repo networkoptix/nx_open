@@ -5,6 +5,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Controls.impl 2.4 as T
 
 import Nx 1.0
+import Nx.Core 1.0
 import Nx.Controls 1.0 as Nx
 
 Nx.TextField

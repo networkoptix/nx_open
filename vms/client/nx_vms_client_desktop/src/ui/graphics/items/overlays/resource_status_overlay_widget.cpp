@@ -17,10 +17,11 @@
 #include <ui/graphics/instruments/transform_listener_instrument.h>
 #include <utils/math/color_transformations.h>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -91,7 +92,7 @@ void setupButton(QPushButton& button)
         }
     )";
 
-    static const auto kBaseColor = colorTheme()->color("light14");
+    static const auto kBaseColor = core::colorTheme()->color("light14");
 
     static const auto kTextColor = toTransparent(kBaseColor, 0.8).name(QColor::HexArgb);
     static const auto kHoveredTextColor = kBaseColor.name(QColor::HexArgb);
@@ -137,7 +138,7 @@ void setupCustomButton(QPushButton& button)
         }
         )";
 
-    static const auto kBaseColor = colorTheme()->color("light14");
+    static const auto kBaseColor = core::colorTheme()->color("light14");
 
     static const auto kTextColor = toTransparent(kBaseColor, 0.6).name(QColor::HexArgb);
     static const auto kHoveredTextColor = kBaseColor.name(QColor::HexArgb);
@@ -192,8 +193,8 @@ void setupLabel(QLabel* label, LabelStyleFlags style)
     label->setFixedWidth(680);
 
     QColor color = style.testFlag(kErrorStyle)
-        ? colorTheme()->color("red_core")
-        : colorTheme()->color("light16");
+        ? core::colorTheme()->color("red_core")
+        : core::colorTheme()->color("light16");
 
     if (isSuggestion)
         color.setAlphaF(0.5);
@@ -345,8 +346,8 @@ void QnStatusOverlayWidget::setSuggestion(const QString& suggestion)
 
 void QnStatusOverlayWidget::setupPreloader()
 {
-    m_preloader->setIndicatorColor(colorTheme()->color("light16", 191));
-    m_preloader->setBorderColor(colorTheme()->color("dark5"));
+    m_preloader->setIndicatorColor(core::colorTheme()->color("light16", 191));
+    m_preloader->setBorderColor(core::colorTheme()->color("dark5"));
     m_preloader->dots()->setDotRadius(8);
     m_preloader->dots()->setDotSpacing(8);
     m_preloader->setMinimumSize(200, 200); //< For correct downscaling in small items.

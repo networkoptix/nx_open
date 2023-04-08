@@ -5,7 +5,7 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QPushButton>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/private/found_devices_model.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 

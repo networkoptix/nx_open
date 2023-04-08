@@ -5,11 +5,11 @@
 #include <QtCore/QMap>
 #include <QtGui/QColor>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 using ColorSubstitutions = QMap<QColor, QColor>;
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core
 
 inline bool operator<(const QColor& color1, const QColor& color2)
 {

@@ -6,7 +6,7 @@
 
 #include <QtGui/QPainter>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace
 {
@@ -15,7 +15,7 @@ namespace
 
 SeparatorAreaProperties::SeparatorAreaProperties()
     : width(kDefaultSeparatorWidth)
-    , color(nx::vms::client::desktop::colorTheme()->color("yellow_core"))
+    , color(nx::vms::client::core::colorTheme()->color("yellow_core"))
 {
 }
 

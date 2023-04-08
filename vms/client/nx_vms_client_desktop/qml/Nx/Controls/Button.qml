@@ -3,7 +3,9 @@
 import QtQuick 2.6
 import QtQuick.Controls 2.4
 import QtQuick.Controls.impl 2.4
+
 import Nx 1.0
+import Nx.Core 1.0
 import nx.client.desktop 1.0
 
 import "private"

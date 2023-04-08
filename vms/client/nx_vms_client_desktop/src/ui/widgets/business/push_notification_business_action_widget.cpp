@@ -10,9 +10,9 @@
 #include <core/resource/user_resource.h>
 #include <nx/branding.h>
 #include <nx/network/app_info.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/common/system_settings.h>

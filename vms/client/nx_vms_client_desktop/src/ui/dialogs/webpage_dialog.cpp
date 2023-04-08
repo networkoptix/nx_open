@@ -10,11 +10,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/http/http_types.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 
 using namespace nx::vms::api;

@@ -10,7 +10,7 @@
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QGraphicsTextItem>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/decorations_helper.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/figure.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/figure_item.h>
@@ -238,7 +238,7 @@ void RoiFiguresOverlayWidget::Private::paintLabel(
     format.setFont(font);
     // Color and width of outline.
     format.setTextOutline(
-        QPen(colorTheme()->color("dark1"), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        QPen(core::colorTheme()->color("dark1"), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
     QAbstractTextDocumentLayout::PaintContext ctx;
     ctx.palette.setColor(QPalette::Text, figure->color());

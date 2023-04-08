@@ -13,10 +13,10 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/time_sync/time_sync_manager.h>
 #include <nx/vms/time/formatter.h>
@@ -262,7 +262,7 @@ void TimeSynchronizationWidget::setupUi()
     ui->zoneLabel->setForegroundRole(QPalette::Light);
 
     QPalette palette(ui->timePlaceholderLabel->palette());
-    palette.setColor(QPalette::WindowText, colorTheme()->color("dark14"));
+    palette.setColor(QPalette::WindowText, core::colorTheme()->color("dark14"));
     font.setPixelSize(kTimeFontPixelSize);
     font.setWeight(kTimeFontWeight);
     ui->timePlaceholderLabel->setFont(font);

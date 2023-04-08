@@ -7,9 +7,9 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_data.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/common/utils/stream_quality_strings.h>
 
 namespace {
@@ -37,19 +37,19 @@ struct RecordScheduleCellPainter::Private
 
     RecordScheduleCellPainter::DisplayOptions displayOptions;
 
-    const QColor emptyCellColor = colorTheme()->color("dark5");
-    const QColor emptyCellHoveredColor = colorTheme()->color("dark6");
-    const QColor recordAlwaysColor = colorTheme()->color("green_core");
-    const QColor recordAlwaysHoveredColor = colorTheme()->color("green_l1");
-    const QColor recordMotionColor = colorTheme()->color("red_d1");
-    const QColor recordMotionHoveredColor = colorTheme()->color("red_core");
-    const QColor recordObjectsColor = colorTheme()->color("yellow_d1");
-    const QColor recordObjectsHoveredColor = colorTheme()->color("yellow_core");
-    const QColor recordMotionAndObjectsColor = colorTheme()->color("orange_l2");
+    const QColor emptyCellColor = core::colorTheme()->color("dark5");
+    const QColor emptyCellHoveredColor = core::colorTheme()->color("dark6");
+    const QColor recordAlwaysColor = core::colorTheme()->color("green_core");
+    const QColor recordAlwaysHoveredColor = core::colorTheme()->color("green_l1");
+    const QColor recordMotionColor = core::colorTheme()->color("red_d1");
+    const QColor recordMotionHoveredColor = core::colorTheme()->color("red_core");
+    const QColor recordObjectsColor = core::colorTheme()->color("yellow_d1");
+    const QColor recordObjectsHoveredColor = core::colorTheme()->color("yellow_core");
+    const QColor recordMotionAndObjectsColor = core::colorTheme()->color("orange_l2");
     const QColor recordMotionAndObjectsHoveredColor = recordMotionAndObjectsColor.lighter(110);
-    const QColor cellBorderColor = colorTheme()->color("dark4");
-    const QColor lightCellTextColor = colorTheme()->color("light4");
-    const QColor darkCellTextColor = colorTheme()->color("dark7");
+    const QColor cellBorderColor = core::colorTheme()->color("dark4");
+    const QColor lightCellTextColor = core::colorTheme()->color("light4");
+    const QColor darkCellTextColor = core::colorTheme()->color("dark7");
 
     QColor cellColor(RecordingType recordingType, MetadataTypes metadataTypes, bool hovered) const
     {

@@ -108,6 +108,7 @@ QSet<QString> calculateFileList(const QDir& sourceRoot)
         "*.dll",
         "*.conf",
         "client_external.dat",
+        "client_core_external.dat",
         "bytedance_iconpark.dat",
     };
 

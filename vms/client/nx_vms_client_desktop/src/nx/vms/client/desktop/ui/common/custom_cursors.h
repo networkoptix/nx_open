@@ -7,10 +7,9 @@
 
 #include <nx/utils/singleton.h>
 
+namespace nx::vms::client::core { class Skin; }
 
 namespace nx::vms::client::desktop {
-
-class Skin;
 
 class CustomCursors:
     public QObject,
@@ -25,7 +24,7 @@ public:
     static const QCursor& cross;
 
 public:
-    CustomCursors(Skin* skin);
+    CustomCursors(core::Skin* skin);
 
     static void registerQmlType();
 

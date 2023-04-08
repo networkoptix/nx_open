@@ -7,7 +7,7 @@
 #include <QtGui/QPainterPath>
 #include <QtGui/QWindow>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop {
@@ -331,7 +331,7 @@ void BaseTooltip::setRoundingRadius(int radius)
 
 void BaseTooltip::colorizeBorderShape(const QPainterPath& borderShape)
 {
-    QPainter(this).fillPath(borderShape, QBrush(colorTheme()->color("tooltip.background")));
+    QPainter(this).fillPath(borderShape, QBrush(core::colorTheme()->color("tooltip.background")));
 }
 
 void BaseTooltip::mousePressEvent(QMouseEvent* event)

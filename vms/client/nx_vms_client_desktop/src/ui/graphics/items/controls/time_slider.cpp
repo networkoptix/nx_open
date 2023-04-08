@@ -27,11 +27,11 @@
 #include <core/resource/camera_bookmark.h>
 #include <nx/utils/math/arithmetic.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/graphics_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/workbench/timeline/live_preview.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
@@ -62,6 +62,7 @@
 
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::workbench::timeline;
 using namespace nx::vms::common;
@@ -326,11 +327,11 @@ public:
         // TODO: #vkutin Refactor this class to operate with "recording" and "extra" content types.
         const bool analytics = m_slider->selectedExtraContent() == Qn::AnalyticsContent;
 
-        m_colors[Qn::RecordingContent] = colorTheme()->color("green_core");
+        m_colors[Qn::RecordingContent] = core::colorTheme()->color("green_core");
         m_colors[Qn::MotionContent] = analytics
-            ? colorTheme()->color("yellow_core")
-            : colorTheme()->color("red_d1");
-        m_colors[Qn::TimePeriodContentCount] = colorTheme()->color("green_d3");
+            ? core::colorTheme()->color("yellow_core")
+            : core::colorTheme()->color("red_d1");
+        m_colors[Qn::TimePeriodContentCount] = core::colorTheme()->color("green_d3");
 
         m_position = m_minChunkLength = 0ms;
     }
@@ -631,7 +632,7 @@ QnTimeSlider::QnTimeSlider(
     connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
         this, &QnTimeSlider::updateLivePreview);
 
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark6"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark6"));
 
     setSkipUpdateOnSliderChange({ SliderRangeChange, SliderStepsChange, SliderValueChange, SliderMappingChange });
 
@@ -1432,7 +1433,7 @@ void QnTimeSlider::generateProgressPatterns()
     path.lineTo(d4, d2);
     path.closeSubpath();
 
-    static const QColor kLastMinuteStripeColor = colorTheme()->color("dark6", 38);
+    static const QColor kLastMinuteStripeColor = core::colorTheme()->color("dark6", 38);
 
     m_progressPastPattern = QPixmap(d4, d4);
     m_progressPastPattern.fill(Qt::transparent);
@@ -1586,10 +1587,10 @@ int QnTimeSlider::tickmarkLevel(int stepIndex) const
 QColor QnTimeSlider::tickmarkLineColor(int level) const
 {
     static const QList<QColor> kTickmarkLinesColors{{
-        colorTheme()->color("light10"),
-        colorTheme()->color("dark17"),
-        colorTheme()->color("dark13"),
-        colorTheme()->color("dark9"),
+        core::colorTheme()->color("light10"),
+        core::colorTheme()->color("dark17"),
+        core::colorTheme()->color("dark13"),
+        core::colorTheme()->color("dark9"),
     }};
 
     return kTickmarkLinesColors[std::clamp(level, 0, (int) kTickmarkLinesColors.size() - 1)];
@@ -1598,9 +1599,9 @@ QColor QnTimeSlider::tickmarkLineColor(int level) const
 QColor QnTimeSlider::tickmarkTextColor(int level) const
 {
     static const QList<QColor> kTickmarkTextColors{{
-        colorTheme()->color("light8"),
-        colorTheme()->color("light16"),
-        colorTheme()->color("dark15"),
+        core::colorTheme()->color("light8"),
+        core::colorTheme()->color("light16"),
+        core::colorTheme()->color("dark15"),
     }};
 
     return kTickmarkTextColors[std::clamp(level, 0, (int)kTickmarkTextColors.size() - 1)];
@@ -1819,12 +1820,12 @@ void QnTimeSlider::updatePixmapCache()
 
     localFont.setWeight(kDateTextFontWeight);
     m_pixmapCache->setDateFont(localFont);
-    m_pixmapCache->setDateColor(colorTheme()->color("light4"));
+    m_pixmapCache->setDateColor(core::colorTheme()->color("light4"));
 
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(
         tr("No thumbnails available"),
         kNoThumbnailsFontPixelSize,
-        colorTheme()->color("dark16"));
+        core::colorTheme()->color("dark16"));
 
     for (int i = 0; i < kNumTickmarkLevels; ++i)
     {
@@ -2446,7 +2447,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
     if (qFuzzyIsNull(m_totalLineStretch))
     {
         drawSolidBackground(painter, rect());
-        painter->fillRect(lineBarRect, colorTheme()->color("green_core"));
+        painter->fillRect(lineBarRect, core::colorTheme()->color("green_core"));
     }
     else
     {
@@ -2537,7 +2538,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
     drawSelection(painter);
 
     /* Draw position marker. */
-    static const QColor kPositionMarkerColor = colorTheme()->color("light4");
+    static const QColor kPositionMarkerColor = core::colorTheme()->color("light4");
     if (positionMarkerVisible())
     {
         drawMarker(painter,
@@ -2545,7 +2546,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
     }
 
     /* Draw indicators. */
-    static const QColor kIndicatorColor = colorTheme()->color("light4", 102);
+    static const QColor kIndicatorColor = core::colorTheme()->color("light4", 102);
     foreach (milliseconds position, m_indicators)
         drawMarker(painter, position, rect().top(), kIndicatorColor);
 
@@ -2634,7 +2635,7 @@ void QnTimeSlider::drawSeparator(QPainter* painter, const QRectF& rect)
     if (qFuzzyEquals(rect.top(), this->rect().top()))
         return; /* Don't draw separator at the top of the widget. */
 
-    static const QColor kSeparatorColor = colorTheme()->color("dark6");
+    static const QColor kSeparatorColor = core::colorTheme()->color("dark6");
     QnScopedPainterPenRollback penRollback(painter, QPen(kSeparatorColor, 0));
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
     painter->drawLine(rect.topLeft(), rect.topRight());
@@ -2657,7 +2658,7 @@ void QnTimeSlider::drawLastMinute(QPainter* painter, const QRectF& rect)
 
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
 
-    static const QColor kLastMinuteBackgroundColor = colorTheme()->color("dark6", 127);
+    static const QColor kLastMinuteBackgroundColor = core::colorTheme()->color("dark6", 127);
 
     if (sliderPos > startPos && !qFuzzyEquals(startPos, sliderPos))
     {
@@ -2683,8 +2684,8 @@ void QnTimeSlider::drawSelection(QPainter* painter)
     if (!m_selectionValid)
         return;
 
-    static const QColor kSelectionMarkerColor = colorTheme()->color("blue9", 153);
-    static const QColor kSelectionColor = colorTheme()->color("blue8", 77);
+    static const QColor kSelectionMarkerColor = core::colorTheme()->color("blue9", 153);
+    static const QColor kSelectionColor = core::colorTheme()->color("blue8", 77);
 
     if (m_selectionStart == m_selectionEnd)
     {
@@ -2914,8 +2915,8 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
         [this](qint64 number) -> QColor
         {
            static const QList<QColor> kDateBarBackgrounds{{
-                colorTheme()->color("dark11"),
-                colorTheme()->color("dark9"),
+                core::colorTheme()->color("dark11"),
+                core::colorTheme()->color("dark9"),
            }};
 
             return kDateBarBackgrounds[number % kDateBarBackgrounds.size()];
@@ -3088,13 +3089,13 @@ void QnTimeSlider::drawThumbnail(
 
     if (!rect.isEmpty())
     {
-        static const QColor kSelectionMarkerColor = colorTheme()->color("blue9", 153);
+        static const QColor kSelectionMarkerColor = core::colorTheme()->color("blue9", 153);
 
         qreal a = data.selection;
         qreal width = 1.0 + a * 2.0;
         QColor color = linearCombine(
             1.0 - a,
-            colorTheme()->color("light1", 32),
+            core::colorTheme()->color("light1", 32),
             a,
             kSelectionMarkerColor);
         rect = Geometry::eroded(rect, width / 2.0);
@@ -3128,7 +3129,7 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
 
     QFontMetricsF fontMetrics(m_pixmapCache->defaultFont());
 
-    static const QBrush kBookmarkBoundBrush(colorTheme()->color("blue10"));
+    static const QBrush kBookmarkBoundBrush(core::colorTheme()->color("blue10"));
 
     QFont font(m_pixmapCache->defaultFont());
     font.setWeight(kBookmarkFontWeight);
@@ -3165,8 +3166,8 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         bookmarkRect.setLeft(quickPositionFromTime(qMax(bookmarkItem.startTime(), m_windowStart)));
         bookmarkRect.setRight(quickPositionFromTime(qMin(bookmarkItem.endTime(), m_windowEnd)));
 
-        static const QColor kBookmarkColor = colorTheme()->color("blue12", 204);
-        static const QColor kHoveredBookmarkColor = colorTheme()->color("blue10", 230);
+        static const QColor kBookmarkColor = core::colorTheme()->color("blue12", 204);
+        static const QColor kHoveredBookmarkColor = core::colorTheme()->color("blue10", 230);
 
         const bool isHovered = isBookmarkHovered(bookmarkItem);
         const QColor& bgColor = isHovered

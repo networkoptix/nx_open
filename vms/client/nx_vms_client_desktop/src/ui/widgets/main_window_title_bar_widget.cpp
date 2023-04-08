@@ -20,17 +20,17 @@
 #include <finders/systems_finder.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/screen_recording_indicator.h>
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_tab_bar/system_tab_bar.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/common/palette.h>
@@ -43,6 +43,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -60,7 +61,7 @@ QFrame* newVLine(int verticalMargin = 0, const QString& colorName = "")
     line->setFixedWidth(1);
     line->setContentsMargins(0, verticalMargin, 0, verticalMargin);
     if (!colorName.isEmpty())
-        setPaletteColor(line, QPalette::Shadow, colorTheme()->color(colorName));
+        setPaletteColor(line, QPalette::Shadow, core::colorTheme()->color(colorName));
     return line;
 }
 
@@ -156,7 +157,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     setFocusPolicy(Qt::NoFocus);
     setAutoFillBackground(true);
     setAcceptDrops(true);
-    const QColor windowColor = colorTheme()->color("dark7");
+    const QColor windowColor = core::colorTheme()->color("dark7");
     setPaletteColor(this, QPalette::Base, windowColor);
     // Workaround for behavior change Qt5 -> Qt6.
     // Force QPalette detach to prevent inheritance of parent brush, see QTBUG-98762.
@@ -443,7 +444,7 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
 
     auto tabPlaceholder = new QWidget(this);
     tabPlaceholder->setAutoFillBackground(true);
-    setPaletteColor(tabPlaceholder, QPalette::Window, colorTheme()->color("dark10"));
+    setPaletteColor(tabPlaceholder, QPalette::Window, core::colorTheme()->color("dark10"));
 
     mainLayout->addLayout(systemLayout);
     mainLayout->addWidget(tabPlaceholder);

@@ -5,6 +5,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
@@ -12,9 +14,7 @@
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -83,8 +83,8 @@ void LayoutPreviewPainter::setLayout(const QnLayoutResourcePtr& layout)
 void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
 {
     static const int kFrameWidth = 1;
-    static const QColor kFrameColor = colorTheme()->color("dark1");
-    static const QColor kBackgroundColor = colorTheme()->color("dark7");
+    static const QColor kFrameColor = core::colorTheme()->color("dark1");
+    static const QColor kBackgroundColor = core::colorTheme()->color("dark7");
 
     if (paintRect.isEmpty())
         return;

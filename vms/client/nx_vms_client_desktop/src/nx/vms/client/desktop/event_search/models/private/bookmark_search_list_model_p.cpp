@@ -20,7 +20,7 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
@@ -489,7 +489,7 @@ QString BookmarkSearchListModel::Private::iconPath()
 
 QPixmap BookmarkSearchListModel::Private::pixmap()
 {
-    return Skin::colorize(qnSkin->pixmap(iconPath()), color());
+    return core::Skin::colorize(qnSkin->pixmap(iconPath()), color());
 }
 
 QColor BookmarkSearchListModel::Private::color()

@@ -7,7 +7,7 @@
 #include <core/ptz/ptz_preset.h>
 
 #include <nx/vms/text/time_strings.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 #include <nx/utils/algorithm/index_of.h>
 
@@ -44,7 +44,7 @@ namespace {
     static const QnPtzTourSpot defaultSpot(QString(), second*5, speedNormal);
 }
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnPtzTourSpotsModel::QnPtzTourSpotsModel(QObject *parent) :
     base_type(parent)

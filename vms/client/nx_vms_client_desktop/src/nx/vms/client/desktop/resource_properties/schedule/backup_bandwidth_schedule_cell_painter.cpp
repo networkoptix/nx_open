@@ -11,7 +11,7 @@
 #include <nx/vms/client/desktop/resource_properties/schedule/schedule_grid_widget.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace {
 
@@ -30,13 +30,13 @@ struct BackupBandwidthScheduleCellPainter::Private
 {
     BackupBandwidthScheduleCellPainter* const q;
 
-    const QColor noBackupCellColor = colorTheme()->color("dark5");
-    const QColor noBackupHoveredCellColor = colorTheme()->color("dark6");
-    const QColor noLimitColor = colorTheme()->color("green_core");
-    const QColor noLimitHoveredColor = colorTheme()->color("green_l1");
-    const QColor limitColor = colorTheme()->color("red_d1");
-    const QColor limitHoveredColor = colorTheme()->color("red_core");
-    const QColor cellTextColor = colorTheme()->color("light4");
+    const QColor noBackupCellColor = core::colorTheme()->color("dark5");
+    const QColor noBackupHoveredCellColor = core::colorTheme()->color("dark6");
+    const QColor noLimitColor = core::colorTheme()->color("green_core");
+    const QColor noLimitHoveredColor = core::colorTheme()->color("green_l1");
+    const QColor limitColor = core::colorTheme()->color("red_d1");
+    const QColor limitHoveredColor = core::colorTheme()->color("red_core");
+    const QColor cellTextColor = core::colorTheme()->color("light4");
 
     QColor cellColor(const QVariant& cellData, bool hovered) const
     {

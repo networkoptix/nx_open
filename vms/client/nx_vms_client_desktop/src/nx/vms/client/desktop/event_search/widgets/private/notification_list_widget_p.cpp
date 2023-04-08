@@ -20,6 +20,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/subset_list_model.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
@@ -29,11 +31,9 @@
 #include <nx/vms/client/desktop/event_search/widgets/abstract_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
@@ -66,8 +66,8 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     m_headerWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     m_headerWidget->setStyleSheet(
         nx::format("QWidget { background-color: %1; border-left: 1px solid %2; }",
-            colorTheme()->color("dark4").name(),
-            colorTheme()->color("dark8").name()));
+            core::colorTheme()->color("dark4").name(),
+            core::colorTheme()->color("dark8").name()));
 
     m_ribbonContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
@@ -75,7 +75,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     m_separatorLine->setFrameShadow(QFrame::Plain);
     m_separatorLine->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
     m_separatorLine->setMinimumSize({0, 1});
-    setPaletteColor(m_separatorLine, QPalette::Shadow, colorTheme()->color("dark6"));
+    setPaletteColor(m_separatorLine, QPalette::Shadow, core::colorTheme()->color("dark6"));
 
     m_mainLayout->setContentsMargins({});
     m_mainLayout->setSpacing(0);
@@ -108,7 +108,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
 
     m_eventRibbon->scrollBar()->ensurePolished();
     setPaletteColor(m_eventRibbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
-        colorTheme()->color("dark5"));
+        core::colorTheme()->color("dark5"));
 
     m_filterModel->setSourceModel(m_model);
     m_filterModel->setFilterRole(Qn::CloudSystemIdRole);

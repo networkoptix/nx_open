@@ -21,12 +21,12 @@
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/animation/opacity_animator.h>
@@ -94,7 +94,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(
     setAcceptDrops(true);
     setAcceptedMouseButtons(Qt::LeftButton | Qt::RightButton);
     setClickableButtons(Qt::LeftButton | Qt::RightButton);
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark4"));
+    setPaletteColor(this, QPalette::Window, nx::vms::client::core::colorTheme()->color("dark4"));
 
     connect(m_videowall.get(), &QnVideoWallResource::itemChanged, this,
         &QnVideowallItemWidget::at_videoWall_itemChanged);
@@ -171,7 +171,8 @@ void QnVideowallItemWidget::initInfoOverlay()
     QFont font = this->font();
     font.setPixelSize(20);
     setFont(font);
-    setPaletteColor(this, QPalette::WindowText, colorTheme()->color("videowall.overlayText"));
+    setPaletteColor(this, QPalette::WindowText,
+        nx::vms::client::core::colorTheme()->color("videowall.overlayText"));
 
     /* Header overlay. */
     m_headerLabel = new GraphicsLabel();
@@ -189,7 +190,7 @@ void QnVideowallItemWidget::initInfoOverlay()
     m_headerWidget->setAcceptedMouseButtons(Qt::NoButton);
     m_headerWidget->setAutoFillBackground(true);
     setPaletteColor(m_headerWidget, QPalette::Window,
-        colorTheme()->color("videowall.overlayBackground"));
+        nx::vms::client::core::colorTheme()->color("videowall.overlayBackground"));
 
     QGraphicsLinearLayout *headerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
     headerOverlayLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
@@ -241,6 +242,7 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
 void QnVideowallItemWidget::paintFrame(QPainter *painter, const QRectF &paintRect)
 {
+    using namespace nx::vms::client::core;
     static const QColor kNormalFrameColor = colorTheme()->color("videoWall.itemFrame.normal");
     static const QColor kSelectedFrameColor = colorTheme()->color("videoWall.itemFrame.selected");
 

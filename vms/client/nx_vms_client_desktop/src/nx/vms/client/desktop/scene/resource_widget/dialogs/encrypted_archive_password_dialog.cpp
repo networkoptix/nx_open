@@ -16,9 +16,9 @@
 #include <common/common_module.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/crypt/crypt.h>
 #include <ui/common/palette.h>
 
@@ -39,13 +39,13 @@ EncryptedArchivePasswordDialog::EncryptedArchivePasswordDialog(QWidget* parent):
     setAccentStyle(decryptButton);
 
     ui->iconLabel->setPixmap(
-        Skin::maximumSizePixmap(style()->standardIcon(QStyle::SP_MessageBoxWarning)));
+        core::Skin::maximumSizePixmap(style()->standardIcon(QStyle::SP_MessageBoxWarning)));
 
     QFont font = ui->textLabel->font();
     font.setWeight(QFont::Medium);
     font.setPixelSize(15);
     ui->textLabel->setFont(font);
-    setPaletteColor(ui->textLabel, QPalette::WindowText, colorTheme()->color("light10"));
+    setPaletteColor(ui->textLabel, QPalette::WindowText, core::colorTheme()->color("light10"));
 
     connect(decryptButton, &QPushButton::clicked, this,
         [this]()

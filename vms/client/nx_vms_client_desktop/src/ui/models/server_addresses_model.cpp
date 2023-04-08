@@ -6,10 +6,10 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/string.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <utils/common/util.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnServerAddressesModel::QnServerAddressesModel(QObject *parent)
     : base_type(parent)
@@ -154,7 +154,7 @@ QVariant QnServerAddressesModel::data(const QModelIndex &index, int role) const 
         break;
     case Qt::ForegroundRole:
         if (!isManualAddress(index) && index.column() == AddressColumn)
-            return colorTheme()->color("light10");
+            return nx::vms::client::core::colorTheme()->color("light10");
         break;
     default:
         break;

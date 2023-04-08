@@ -5,6 +5,7 @@ import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.15
 
 import Nx 1.0
+import Nx.Core 1.0
 
 import nx.client.desktop 1.0
 

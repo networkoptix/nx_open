@@ -4,7 +4,7 @@
 
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <qt_graphics_items/graphics_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 

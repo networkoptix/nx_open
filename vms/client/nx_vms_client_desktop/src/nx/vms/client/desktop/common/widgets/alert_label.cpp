@@ -4,8 +4,8 @@
 
 #include <QtWidgets/QHBoxLayout>
 
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <ui/common/palette.h>
 #include <ui/widgets/word_wrapped_label.h>
 
@@ -19,9 +19,9 @@ AlertLabel::AlertLabel(QWidget* parent):
     alertIcon->setPixmap(qnSkin->pixmap("tree/warning_yellow.svg"));
     alertIcon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    setPaletteColor(m_alertText, QPalette::WindowText, colorTheme()->color("yellow_d1"));
-    setPaletteColor(m_alertText, QPalette::Link, colorTheme()->color("yellow_d1"));
-    setPaletteColor(m_alertText, QPalette::LinkVisited, colorTheme()->color("yellow_core"));
+    setPaletteColor(m_alertText, QPalette::WindowText, core::colorTheme()->color("yellow_d1"));
+    setPaletteColor(m_alertText, QPalette::Link, core::colorTheme()->color("yellow_d1"));
+    setPaletteColor(m_alertText, QPalette::LinkVisited, core::colorTheme()->color("yellow_core"));
     connect(m_alertText, &QnWordWrappedLabel::linkActivated, this, &AlertLabel::linkActivated);
 
     auto layout = new QHBoxLayout(this);

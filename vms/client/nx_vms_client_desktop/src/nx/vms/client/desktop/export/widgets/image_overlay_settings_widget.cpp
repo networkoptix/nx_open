@@ -8,11 +8,11 @@
 #include <QtGui/QImageReader>
 #include <QtWidgets/QApplication>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace nx::vms::client::desktop {

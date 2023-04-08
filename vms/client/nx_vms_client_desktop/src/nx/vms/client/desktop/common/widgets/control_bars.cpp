@@ -6,8 +6,8 @@
 #include <QtWidgets/QVBoxLayout>
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <ui/common/palette.h>
 
@@ -43,9 +43,9 @@ ControlBar::ControlBar(QWidget* parent):
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("brand_d5"));
-    setPaletteColor(this, QPalette::Link, colorTheme()->color("light4"));
-    setPaletteColor(this, QPalette::LinkVisited, colorTheme()->color("light1"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("brand_d5"));
+    setPaletteColor(this, QPalette::Link, core::colorTheme()->color("light4"));
+    setPaletteColor(this, QPalette::LinkVisited, core::colorTheme()->color("light1"));
 
     d->background->setAutoFillBackground(true);
     d->background->setHidden(true);
@@ -173,8 +173,8 @@ QnWordWrappedLabel* MessageBar::label() const
 AlertBar::AlertBar(QWidget* parent):
     base_type(parent)
 {
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dialog.alertBar"));
-    setPaletteColor(this, QPalette::WindowText, colorTheme()->color("light4"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dialog.alertBar"));
+    setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light4"));
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -182,9 +182,9 @@ AlertBar::AlertBar(QWidget* parent):
 
 MultilineAlertBar::MultilineAlertBar(QWidget* parent): base_type(parent)
 {
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dialog.alertBar"));
-    setPaletteColor(this, QPalette::Link, colorTheme()->color("light4"));
-    setPaletteColor(this, QPalette::LinkVisited, colorTheme()->color("light1"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dialog.alertBar"));
+    setPaletteColor(this, QPalette::Link, core::colorTheme()->color("light4"));
+    setPaletteColor(this, QPalette::LinkVisited, core::colorTheme()->color("light1"));
 
     label()->setAutoFillBackground(true);
     label()->setForegroundRole(QPalette::Text);

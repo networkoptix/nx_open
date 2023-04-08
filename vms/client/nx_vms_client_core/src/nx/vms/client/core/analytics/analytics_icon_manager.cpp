@@ -9,7 +9,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace analytics {
 
 struct IconManager::Private
@@ -43,7 +43,7 @@ IconManager* IconManager::instance()
 
 void IconManager::registerQmlType()
 {
-    qmlRegisterSingletonInstance<IconManager>("nx.vms.client.desktop.analytics", 1, 0,
+    qmlRegisterSingletonInstance<IconManager>("nx.vms.client.core.analytics", 1, 0,
         "IconManager", IconManager::instance());
 }
 
@@ -154,4 +154,4 @@ QString IconManager::Private::analyticsIconsRoot()
 }
 
 } // namespace analytics
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

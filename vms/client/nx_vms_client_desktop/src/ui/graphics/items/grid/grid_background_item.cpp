@@ -13,12 +13,12 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <ui/workaround/gl_native_painting.h>
@@ -193,7 +193,7 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem* parent, QnWorkbenchCon
     base_type(parent),
     QnWorkbenchContextAware(context),
     d_ptr(new QnGridBackgroundItemPrivate()),
-    m_panelColor(colorTheme()->color("scene.customLayoutBackground"))
+    m_panelColor(nx::vms::client::core::colorTheme()->color("scene.customLayoutBackground"))
 {
     setAcceptedMouseButtons(Qt::NoButton);
 

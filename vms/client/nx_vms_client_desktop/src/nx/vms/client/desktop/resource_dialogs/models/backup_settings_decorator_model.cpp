@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/utils.h>
 #include <nx/vms/api/data/backup_settings.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
@@ -19,7 +20,6 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/system_settings.h>
 
 namespace {

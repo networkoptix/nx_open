@@ -7,8 +7,8 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include <ui/graphics/items/generic/clickable_widgets.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>

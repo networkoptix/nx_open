@@ -5,10 +5,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
@@ -75,7 +75,7 @@ private:
         if (canUseSource && useSource)
         {
             m_selectButton->setText(CameraPickerStrings::sourceCameraString());
-            m_selectButton->setIcon(Skin::maximumSizePixmap(
+            m_selectButton->setIcon(core::Skin::maximumSizePixmap(
                 qnResIconCache->icon(QnResourceIconCache::Camera),
                 QIcon::Selected,
                 QIcon::Off,
@@ -87,7 +87,7 @@ private:
                 resourcePool()->template getResourceById<QnVirtualCameraResource>(field->id());
 
             m_selectButton->setText(Policy::getText({camera}));
-            m_selectButton->setIcon(Skin::maximumSizePixmap(
+            m_selectButton->setIcon(core::Skin::maximumSizePixmap(
                 icon(camera),
                 QIcon::Selected,
                 QIcon::Off,

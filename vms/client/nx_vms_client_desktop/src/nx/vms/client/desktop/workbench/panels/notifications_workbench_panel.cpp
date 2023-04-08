@@ -19,8 +19,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/processors/hover_processor.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_pane_settings.h>

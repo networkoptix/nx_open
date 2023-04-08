@@ -35,6 +35,8 @@
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
@@ -49,11 +51,10 @@
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/style/svg_icon_provider.h>
+#include <nx/vms/client/desktop/style/old_style.h>
+#include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/license_health_watcher.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/utils/local_proxy_server.h>
 #include <nx/vms/common/system_settings.h>
@@ -85,26 +86,26 @@ namespace {
 QPalette makeApplicationPalette()
 {
     QPalette result(QApplication::palette());
-    result.setColor(QPalette::WindowText, colorTheme()->color("light16"));
-    result.setColor(QPalette::Button, colorTheme()->color("dark11"));
-    result.setColor(QPalette::Light, colorTheme()->color("light10"));
-    result.setColor(QPalette::Midlight, colorTheme()->color("dark13"));
-    result.setColor(QPalette::Dark, colorTheme()->color("dark9"));
-    result.setColor(QPalette::Mid, colorTheme()->color("dark10"));
-    result.setColor(QPalette::Text, colorTheme()->color("light4"));
-    result.setColor(QPalette::BrightText, colorTheme()->color("light1"));
-    result.setColor(QPalette::ButtonText, colorTheme()->color("light4"));
-    result.setColor(QPalette::Base, colorTheme()->color("dark7"));
-    result.setColor(QPalette::Window, colorTheme()->color("dark7"));
-    result.setColor(QPalette::Shadow, colorTheme()->color("dark5"));
-    result.setColor(QPalette::Highlight, colorTheme()->color("brand_core"));
-    result.setColor(QPalette::HighlightedText, colorTheme()->color("brand_contrast"));
-    result.setColor(QPalette::Link, colorTheme()->color("brand_d2"));
-    result.setColor(QPalette::LinkVisited, colorTheme()->color("brand_core"));
-    result.setColor(QPalette::AlternateBase, colorTheme()->color("dark7"));
-    result.setColor(QPalette::ToolTipBase, colorTheme()->color("light4"));
-    result.setColor(QPalette::ToolTipText, colorTheme()->color("dark4"));
-    result.setColor(QPalette::PlaceholderText, colorTheme()->color("light16"));
+    result.setColor(QPalette::WindowText, core::colorTheme()->color("light16"));
+    result.setColor(QPalette::Button, core::colorTheme()->color("dark11"));
+    result.setColor(QPalette::Light, core::colorTheme()->color("light10"));
+    result.setColor(QPalette::Midlight, core::colorTheme()->color("dark13"));
+    result.setColor(QPalette::Dark, core::colorTheme()->color("dark9"));
+    result.setColor(QPalette::Mid, core::colorTheme()->color("dark10"));
+    result.setColor(QPalette::Text, core::colorTheme()->color("light4"));
+    result.setColor(QPalette::BrightText, core::colorTheme()->color("light1"));
+    result.setColor(QPalette::ButtonText, core::colorTheme()->color("light4"));
+    result.setColor(QPalette::Base, core::colorTheme()->color("dark7"));
+    result.setColor(QPalette::Window, core::colorTheme()->color("dark7"));
+    result.setColor(QPalette::Shadow, core::colorTheme()->color("dark5"));
+    result.setColor(QPalette::Highlight, core::colorTheme()->color("brand_core"));
+    result.setColor(QPalette::HighlightedText, core::colorTheme()->color("brand_contrast"));
+    result.setColor(QPalette::Link, core::colorTheme()->color("brand_d2"));
+    result.setColor(QPalette::LinkVisited, core::colorTheme()->color("brand_core"));
+    result.setColor(QPalette::AlternateBase, core::colorTheme()->color("dark7"));
+    result.setColor(QPalette::ToolTipBase, core::colorTheme()->color("light4"));
+    result.setColor(QPalette::ToolTipText, core::colorTheme()->color("dark4"));
+    result.setColor(QPalette::PlaceholderText, core::colorTheme()->color("light16"));
 
     static const auto kDisabledAlpha = 77;
     static const QList<QPalette::ColorRole> kDimmerRoles{{
@@ -263,20 +264,18 @@ void QnClientModule::initSkin()
     QStringList paths;
     paths << ":/skin";
 
-    QScopedPointer<Skin> skin(new Skin(paths));
+    QScopedPointer<core::Skin> skin(new core::Skin(paths));
 
     QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
-    QApplication::setStyle(skin->newStyle());
+    QApplication::setStyle([]() { return new OldStyle(new Style()); }());
 
     auto commonModule = clientCoreModule()->commonModule();
     commonModule->store(skin.take());
-    commonModule->store(new ColorTheme());
-    commonModule->store(new CustomCursors(Skin::instance()));
+    commonModule->store(new core::ColorTheme());
+    commonModule->store(new CustomCursors(core::Skin::instance()));
 
     QApplication::setPalette(makeApplicationPalette());
     QToolTip::setPalette(QApplication::palette());
-
-    appContext()->qmlEngine()->addImageProvider("svg", new SvgIconProvider());
 }
 
 void QnClientModule::initWebEngine()

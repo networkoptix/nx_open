@@ -33,10 +33,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/vms/api/protocol_version.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/utils/font_loader.h>
-#include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -184,10 +184,6 @@ void initializeExternalResources()
 
     nx::vms::client::core::FontLoader::loadFonts(
         externalResourcesDirectory().absoluteFilePath("fonts"));
-
-    registerExternalResource("client_external.dat");
-    registerExternalResource("bytedance_iconpark.dat",
-        analytics::IconManager::librariesRoot() + "bytedance.iconpark/");
 }
 
 QString calculateLogNameSuffix(
@@ -570,6 +566,7 @@ ApplicationContext::ApplicationContext(
         toCoreMode(mode),
         peerType(startupParameters),
         actualCloudHost(),
+        /*customExternalResourceFile*/ "client_external.dat",
         parent),
     d(new Private{
         .q = this,

@@ -8,9 +8,9 @@
 #include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace nx::vms::client::desktop {
 
@@ -34,7 +34,7 @@ QColor ObjectDisplaySettings::objectColor(const QString& objectTypeId)
 
     if (!settings.color.isValid())
     {
-        settings.color = nx::utils::random::choice(colorTheme()->colors("detectedObject"));
+        settings.color = nx::utils::random::choice(core::colorTheme()->colors("detectedObject"));
         appContext()->localSettings()->detectedObjectSettings = settingsMap;
     }
     return settings.color;

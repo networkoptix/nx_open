@@ -10,18 +10,18 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/slider_tooltip_widget.h>
 #include <ui/processors/hover_processor.h>
-#include <nx/vms/client/desktop/style/icon.h>
+#include <nx/vms/client/core/skin/icon.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace {
 
@@ -547,11 +547,11 @@ void SoftwareTriggerButtonPrivate::ensureImages()
             return generatePixmap(backgroundColor, QColor(), buttonPixmap);
         };
 
-    static const QColor kNormalColor = colorTheme()->color("dark1", 128);
-    static const QColor kActiveColor = colorTheme()->color("brand_core", 179);
-    static const QColor kPressedColor = colorTheme()->color("brand_core", 128);
-    static const QColor kErrorBackgroundColor = colorTheme()->color("red_core", 128);
-    static const QColor kErrorFrameColor = colorTheme()->color("red_core");
+    static const QColor kNormalColor = core::colorTheme()->color("dark1", 128);
+    static const QColor kActiveColor = core::colorTheme()->color("brand_core", 179);
+    static const QColor kPressedColor = core::colorTheme()->color("brand_core", 128);
+    static const QColor kErrorBackgroundColor = core::colorTheme()->color("red_core", 128);
+    static const QColor kErrorFrameColor = core::colorTheme()->color("red_core");
 
     QIcon icon;
     const auto normalPixmap = generateStatePixmap(kNormalColor);

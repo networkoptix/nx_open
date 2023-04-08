@@ -7,13 +7,13 @@
 #include <QtGui/QAction>
 #include <QtWidgets/QToolButton>
 
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/widgets/main_window.h>
@@ -52,16 +52,16 @@ SystemTabBar::SystemTabBar(QWidget *parent):
     auto p = palette();
 
     // Active tab:
-    p.setColor(QPalette::Active, QPalette::Text, colorTheme()->color("light4"));
-    p.setColor(QPalette::Active, QPalette::Base, colorTheme()->color("dark10"));
-    p.setColor(QPalette::Active, QPalette::Light, colorTheme()->color("dark4"));
-    p.setColor(QPalette::Active, QPalette::Dark, colorTheme()->color("dark4"));
+    p.setColor(QPalette::Active, QPalette::Text, core::colorTheme()->color("light4"));
+    p.setColor(QPalette::Active, QPalette::Base, core::colorTheme()->color("dark10"));
+    p.setColor(QPalette::Active, QPalette::Light, core::colorTheme()->color("dark4"));
+    p.setColor(QPalette::Active, QPalette::Dark, core::colorTheme()->color("dark4"));
 
     // Inactive tab:
-    p.setColor(QPalette::Inactive, QPalette::Text, colorTheme()->color("light16"));
-    p.setColor(QPalette::Inactive, QPalette::Base, colorTheme()->color("dark7"));
-    p.setColor(QPalette::Inactive, QPalette::Light, colorTheme()->color("dark6"));
-    p.setColor(QPalette::Inactive, QPalette::Dark, colorTheme()->color("dark8"));
+    p.setColor(QPalette::Inactive, QPalette::Text, core::colorTheme()->color("light16"));
+    p.setColor(QPalette::Inactive, QPalette::Base, core::colorTheme()->color("dark7"));
+    p.setColor(QPalette::Inactive, QPalette::Light, core::colorTheme()->color("dark6"));
+    p.setColor(QPalette::Inactive, QPalette::Dark, core::colorTheme()->color("dark8"));
     setPalette(p);
 
     connect(workbench()->windowContext()->systemTabBarModel(),

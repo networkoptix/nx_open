@@ -5,6 +5,7 @@ import QtQuick.Controls 2.4
 import Qt5Compat.GraphicalEffects
 
 import Nx 1.0
+import Nx.Core 1.0
 import Nx.Models 1.0
 import Nx.Controls 1.0 as Nx
 import nx.vms.client.core 1.0

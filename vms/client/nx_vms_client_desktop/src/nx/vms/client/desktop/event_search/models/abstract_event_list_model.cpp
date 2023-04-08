@@ -7,10 +7,10 @@
 #include <client/client_globals.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>

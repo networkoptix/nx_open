@@ -6,6 +6,7 @@
 #include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QCloseEvent>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
@@ -15,7 +16,6 @@
 #include <nx/vms/client/desktop/rules/params_widgets/editor_factory.h>
 #include <nx/vms/client/desktop/rules/params_widgets/params_widget.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/events/generic_event.h>
@@ -36,9 +36,9 @@ RulesDialog::RulesDialog(QWidget* parent):
 
     const auto buttonIconColor = QPalette().color(QPalette::BrightText);
 
-    m_ui->newRuleButton->setIcon(Skin::colorize(
+    m_ui->newRuleButton->setIcon(core::Skin::colorize(
         qnSkin->pixmap("text_buttons/arythmetic_plus.png"), buttonIconColor));
-    m_ui->deleteRuleButton->setIcon(Skin::colorize(
+    m_ui->deleteRuleButton->setIcon(core::Skin::colorize(
         qnSkin->pixmap("text_buttons/trash.png"), buttonIconColor));
     m_ui->deleteRuleButton->setEnabled(false);
 

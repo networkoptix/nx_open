@@ -15,6 +15,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/common/widgets/scalable_image_widget.h>
@@ -24,8 +26,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
@@ -118,14 +118,14 @@ struct LayoutThumbnailLoader::Private
         noSignalText->setProperty(style::Properties::kDontPolishFontProperty, true);
         noSignalText->setContentsMargins(kMinIndicationMargins);
         noSignalText->setFont(font);
-        setPaletteColor(noSignalText, QPalette::WindowText, colorTheme()->color("red_core"));
+        setPaletteColor(noSignalText, QPalette::WindowText, core::colorTheme()->color("red_core"));
         offlineWidgetLayout->addWidget(noSignalText, 1, Qt::AlignHCenter);
 
         nonCameraWidget->setText(tr("NOT A CAMERA"));
         nonCameraWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
         nonCameraWidget->setContentsMargins(kMinIndicationMargins);
         setPaletteColor(nonCameraWidget.data(), QPalette::WindowText,
-            colorTheme()->color("red_core"));
+            core::colorTheme()->color("red_core"));
         nonCameraWidget->setFont(font);
     }
 

@@ -178,6 +178,7 @@
                 Directory="InstallDirRoot"
                 Source="${bin_source_dir}">
             <Component><File Name="client_external.dat" KeyPath="yes"/></Component>
+            <Component><File Name="client_core_external.dat" KeyPath="yes"/></Component>
             <Component><File Name="bytedance_iconpark.dat" KeyPath="yes"/></Component>
         </ComponentGroup>
 

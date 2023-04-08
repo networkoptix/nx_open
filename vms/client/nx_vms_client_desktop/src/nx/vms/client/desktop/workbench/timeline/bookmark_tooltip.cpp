@@ -9,9 +9,9 @@
 
 #include <core/resource/camera_bookmark.h>
 #include <flowlayout/flowlayout.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace nx::vms::client::desktop::workbench::timeline {
 
@@ -133,8 +133,8 @@ void BookmarkTooltip::setAllowExport(bool allowExport)
 
 void BookmarkTooltip::colorizeBorderShape(const QPainterPath& borderShape)
 {
-    QPainter(this).fillPath(borderShape, QBrush(ColorTheme::transparent(
-        colorTheme()->color("timeline.bookmark.background"), 0.8)));
+    QPainter(this).fillPath(borderShape, QBrush(core::ColorTheme::transparent(
+        core::colorTheme()->color("timeline.bookmark.background"), 0.8)));
 }
 
 QWidget* BookmarkTooltip::createMoreItemsLabel()
@@ -147,7 +147,7 @@ QWidget* BookmarkTooltip::createMoreItemsLabel()
     moreItemsLabel->setAlignment(Qt::AlignCenter);
     moreItemsLabel->setWordWrap(true);
     moreItemsLabel->setStyleSheet(QStringLiteral("color: %1;")
-        .arg(colorTheme()->color("timeline.bookmark.more_items_label").name()));
+        .arg(core::colorTheme()->color("timeline.bookmark.more_items_label").name()));
 
     QFont font = moreItemsLabel->font();
     font.setPixelSize(11);
@@ -165,8 +165,8 @@ QWidget* BookmarkTooltip::createBookmarkSeparator()
     bookmarkSeparator->setStyleSheet(QStringLiteral(
         "border-top: 2px solid %1;"
         "border-bottom: 1px solid %2;")
-        .arg(colorTheme()->color("timeline.bookmark.thick_line").name(),
-             colorTheme()->color("timeline.bookmark.thin_line").name()));
+        .arg(core::colorTheme()->color("timeline.bookmark.thick_line").name(),
+             core::colorTheme()->color("timeline.bookmark.thin_line").name()));
 
     return bookmarkSeparator;
 }
@@ -176,7 +176,7 @@ QWidget* BookmarkTooltip::createNameLabel(const QString& text)
     auto nameLabel = new QLabel(text, this);
     nameLabel->setMargin(0);
     nameLabel->setStyleSheet(QStringLiteral("color: %1;")
-        .arg(colorTheme()->color("timeline.bookmark.label").name()));
+        .arg(core::colorTheme()->color("timeline.bookmark.label").name()));
 
     QFont font = nameLabel->font();
     font.setPixelSize(16);
@@ -191,7 +191,7 @@ QWidget* BookmarkTooltip::createDescriptionLabel(const QString& text)
     auto descriptionLabel = new QLabel(text, this);
     descriptionLabel->setWordWrap(true);
     descriptionLabel->setStyleSheet(QStringLiteral("color: %1;")
-        .arg(colorTheme()->color("timeline.bookmark.label").name()));
+        .arg(core::colorTheme()->color("timeline.bookmark.label").name()));
 
     QFont font = descriptionLabel->font();
     font.setPixelSize(12);
@@ -209,12 +209,12 @@ QWidget* BookmarkTooltip::createTagButton(const QString& tag)
         "QPushButton:!hover{ background-color: %1; color: %2; }"
         "QPushButton:hover{ background-color: %3; color: %4; }"
         "QPushButton:pressed{ background-color: %5; color: %6; }")
-        .arg(colorTheme()->color("timeline.bookmark.button.background").name(),
-             colorTheme()->color("timeline.bookmark.button.text").name(),
-             colorTheme()->color("timeline.bookmark.button.background_hover").name(),
-             colorTheme()->color("timeline.bookmark.button.text_hover").name(),
-             colorTheme()->color("timeline.bookmark.button.background_pressed").name(),
-             colorTheme()->color("timeline.bookmark.button.text_pressed").name()));
+        .arg(core::colorTheme()->color("timeline.bookmark.button.background").name(),
+             core::colorTheme()->color("timeline.bookmark.button.text").name(),
+             core::colorTheme()->color("timeline.bookmark.button.background_hover").name(),
+             core::colorTheme()->color("timeline.bookmark.button.text_hover").name(),
+             core::colorTheme()->color("timeline.bookmark.button.background_pressed").name(),
+             core::colorTheme()->color("timeline.bookmark.button.text_pressed").name()));
     connect(tagButton, &QPushButton::pressed, [this, tag]
         {
             emit tagClicked(tag);
@@ -229,7 +229,7 @@ QWidget* BookmarkTooltip::createInternalSeparator()
     internalSeparator->setFrameShape(QFrame::StyledPanel);
     internalSeparator->setFixedHeight(1);
     internalSeparator->setStyleSheet(QStringLiteral("border-top: 1px solid %1;")
-        .arg(colorTheme()->color("timeline.bookmark.thin_line").name()));
+        .arg(core::colorTheme()->color("timeline.bookmark.thin_line").name()));
 
     return internalSeparator;
 }

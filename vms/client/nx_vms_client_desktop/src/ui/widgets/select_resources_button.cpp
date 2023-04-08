@@ -7,10 +7,11 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -19,7 +20,7 @@ static const int kDefaultMaximumWidth = 300;
 
 QIcon iconHelper(QnResourceIconCache::Key key)
 {
-    return QIcon(Skin::maximumSizePixmap(qnResIconCache->icon(key),
+    return QIcon(core::Skin::maximumSizePixmap(qnResIconCache->icon(key),
         QIcon::Selected, QIcon::Off, false));
 }
 
@@ -74,7 +75,7 @@ void QnSelectResourcesButton::setAppearance(const Appearance& appearance)
 {
     setText(appearance.text);
     setIcon(appearance.icon);
-    setIconSize(Skin::maximumSize(appearance.icon));
+    setIconSize(core::Skin::maximumSize(appearance.icon));
 }
 
 QnSelectResourcesButton::Appearance QnSelectResourcesButton::appearanceForResource(const QnResourcePtr& resource) const

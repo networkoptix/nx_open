@@ -2,6 +2,7 @@
 
 import QtQuick.Controls
 import Nx 1.0
+import Nx.Core 1.0
 
 import "private"
 

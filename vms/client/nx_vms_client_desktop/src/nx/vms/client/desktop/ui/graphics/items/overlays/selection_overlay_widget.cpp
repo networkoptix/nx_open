@@ -5,8 +5,8 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QGraphicsScene>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <ui/workbench/workbench_item.h>
@@ -83,17 +83,17 @@ QColor SelectionWidget::calculateFrameColor() const
     {
         case QnResourceWidget::SelectionState::focusedAndSelected:
         case QnResourceWidget::SelectionState::selected:
-            return colorTheme()->color("brand_core");
+            return core::colorTheme()->color("brand_core");
 
         case QnResourceWidget::SelectionState::focused:
             return hasFrameDistinctionColor(m_widget)
                 ? m_widget->frameDistinctionColor().lighter()
-                : colorTheme()->color("brand_d4");
+                : core::colorTheme()->color("brand_d4");
 
         case QnResourceWidget::SelectionState::inactiveFocused:
             return hasFrameDistinctionColor(m_widget)
                 ? m_widget->frameDistinctionColor()
-                : colorTheme()->color("dark10");
+                : core::colorTheme()->color("dark10");
 
         default:
             return hasFrameDistinctionColor(m_widget)
@@ -112,7 +112,7 @@ void SelectionWidget::paintSelection(QPainter* painter)
 
     const PainterTransformScaleStripper scaleStripper(painter);
     painter->fillRect(scaleStripper.mapRect(rect()),
-        toTransparent(colorTheme()->color("brand_core"),
+        toTransparent(core::colorTheme()->color("brand_core"),
         kSelectionOpacity));
 }
 
@@ -173,7 +173,7 @@ void SelectionWidget::paintOuterFrame(QPainter* painter)
 
     // Dark outer border right near the camera.
     static const int kSpacerBorderWidth = 1;
-    const QColor spacerBorderColor = colorTheme()->color("dark4");
+    const QColor spacerBorderColor = core::colorTheme()->color("dark4");
     Style::paintCosmeticFrame(painter, rect(), spacerBorderColor,
         kSpacerBorderWidth, -kSpacerBorderWidth);
 

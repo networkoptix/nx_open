@@ -15,6 +15,8 @@
 #include <core/resource/resource.h>
 #include <finders/systems_finder.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
@@ -23,9 +25,7 @@
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/html/html.h>
@@ -228,8 +228,8 @@ struct EventTile::Private
         if (style == Style::informer)
             ++lighterBy;
 
-        pal.setColor(QPalette::Window, colorTheme()->lighter(base, lighterBy));
-        pal.setColor(QPalette::Midlight, colorTheme()->lighter(base, lighterBy + 1));
+        pal.setColor(QPalette::Window, core::colorTheme()->lighter(base, lighterBy));
+        pal.setColor(QPalette::Midlight, core::colorTheme()->lighter(base, lighterBy + 1));
         q->setPalette(pal);
     }
 
@@ -348,11 +348,11 @@ EventTile::EventTile(QWidget* parent):
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
 
-    setPaletteColor(this, QPalette::Base, colorTheme()->color("dark7"));
-    setPaletteColor(this, QPalette::Light, colorTheme()->color("light10"));
-    setPaletteColor(this, QPalette::WindowText, colorTheme()->color("light16"));
-    setPaletteColor(this, QPalette::Text, colorTheme()->color("light4"));
-    setPaletteColor(this, QPalette::Highlight, colorTheme()->color("brand_core"));
+    setPaletteColor(this, QPalette::Base, core::colorTheme()->color("dark7"));
+    setPaletteColor(this, QPalette::Light, core::colorTheme()->color("light10"));
+    setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light16"));
+    setPaletteColor(this, QPalette::Text, core::colorTheme()->color("light4"));
+    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core"));
 
     d->closeButton->setHidden(true);
     d->closeButtonAnchor->setMargins(kCloseButtonMarginsWithHeader);

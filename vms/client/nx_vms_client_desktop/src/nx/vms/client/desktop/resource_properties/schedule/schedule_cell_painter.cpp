@@ -5,7 +5,7 @@
 #include <QtGui/QPainter>
 
 #include <utils/math/color_transformations.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace nx::vms::client::desktop {
 
@@ -13,11 +13,11 @@ struct ScheduleCellPainter::Private
 {
     ScheduleCellPainter* const q;
 
-    const QColor emptyCellColor = colorTheme()->color("dark5");
-    const QColor emptyCellHoveredColor = colorTheme()->color("dark6");
-    const QColor nonEmptyCellColor = colorTheme()->color("green_core");
-    const QColor nonEmptyCellHoveredColor = colorTheme()->color("green_l1");
-    const QColor selectionFrameColor = colorTheme()->color("blue13");
+    const QColor emptyCellColor = core::colorTheme()->color("dark5");
+    const QColor emptyCellHoveredColor = core::colorTheme()->color("dark6");
+    const QColor nonEmptyCellColor = core::colorTheme()->color("green_core");
+    const QColor nonEmptyCellHoveredColor = core::colorTheme()->color("green_l1");
+    const QColor selectionFrameColor = core::colorTheme()->color("blue13");
 };
 
 ScheduleCellPainter::ScheduleCellPainter():

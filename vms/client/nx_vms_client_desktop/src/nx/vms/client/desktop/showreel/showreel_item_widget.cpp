@@ -14,14 +14,14 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/graphics/painters/layout_preview_painter.h>
 #include <nx/vms/text/time_strings.h>
 #include <ui/common/palette.h>
@@ -89,8 +89,8 @@ ShowreelItemWidget::ShowreelItemWidget(
     base_type(systemContext, windowContext, item, parent),
     m_previewPainter(new ui::LayoutPreviewPainter())
 {
-    setPaletteColor(this, QPalette::Highlight, colorTheme()->color("brand_core"));
-    setPaletteColor(this, QPalette::Dark, colorTheme()->color("dark17"));
+    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core"));
+    setPaletteColor(this, QPalette::Dark, core::colorTheme()->color("dark17"));
     setOption(QnResourceWidget::InfoOverlaysForbidden);
     setOption(QnResourceWidget::WindowRotationForbidden);
 
@@ -170,7 +170,7 @@ void ShowreelItemWidget::initOverlay()
 
     auto closeButton = new QnImageButtonWidget();
     const auto closeButtonIcon = qnSkin->icon(lit("text_buttons/clear.png"));
-    const auto closeButtonSize = Skin::maximumSize(closeButtonIcon);
+    const auto closeButtonSize = core::Skin::maximumSize(closeButtonIcon);
     closeButton->setIcon(closeButtonIcon);
     closeButton->setFixedSize(closeButtonSize);
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close,

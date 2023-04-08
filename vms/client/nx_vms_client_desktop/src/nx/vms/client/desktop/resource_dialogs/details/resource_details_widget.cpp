@@ -6,10 +6,10 @@
 
 #include <core/resource/camera_resource.h>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/palette.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/widgets/text_edit_label.h>
 #include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
@@ -62,8 +62,8 @@ ResourceDetailsWidget::ResourceDetailsWidget(QWidget* parent):
     ui->captionTextLabel->setFont(captionFont());
     ui->warningCaptionLabel->setFont(captionFont());
 
-    const auto warningCaptionColor = colorTheme()->color("yellow_core");
-    const auto warningDescriptionColor = colorTheme()->color("yellow_d2");
+    const auto warningCaptionColor = core::colorTheme()->color("yellow_core");
+    const auto warningDescriptionColor = core::colorTheme()->color("yellow_d2");
     setPaletteColor(ui->warningCaptionLabel, QPalette::WindowText, warningCaptionColor);
     setPaletteColor(ui->warningExplanationLabel, QPalette::WindowText, warningDescriptionColor);
 

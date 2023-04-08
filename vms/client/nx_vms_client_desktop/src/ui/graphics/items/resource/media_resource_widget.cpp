@@ -54,6 +54,8 @@
 #include <nx/vms/client/core/motion/motion_grid.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h> //< TODO: #sivanov Remove this dependency.
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/software_trigger/software_triggers_controller.h>
 #include <nx/vms/client/core/software_trigger/software_triggers_watcher.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -75,12 +77,10 @@
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/object_tracking_button_controller.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/analytics_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
@@ -1741,7 +1741,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
         const bool isActiveWidget = navigator()->currentMediaWidget() == this;
         if (isActiveWidget && !m_motionSelection[channel].isEmpty())
         {
-            QColor color = colorTheme()->color("camera.motion");
+            QColor color = nx::vms::client::core::colorTheme()->color("camera.motion");
             paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
         }
     }
@@ -1845,10 +1845,12 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
     painter->translate(rect.topLeft());
 
     QnScopedPainterPenRollback penRollback(painter);
-    painter->setPen(QPen(colorTheme()->color("camera.motionGrid.background"), 0.0));
+    painter->setPen(QPen(
+        nx::vms::client::core::colorTheme()->color("camera.motionGrid.background"), 0.0));
     painter->drawLines(gridLines[0]);
 
-    painter->setPen(QPen(colorTheme()->color("camera.motionGrid.foreground"), 0.0));
+    painter->setPen(QPen(
+        nx::vms::client::core::colorTheme()->color("camera.motionGrid.foreground"), 0.0));
     painter->drawLines(gridLines[1]);
 }
 

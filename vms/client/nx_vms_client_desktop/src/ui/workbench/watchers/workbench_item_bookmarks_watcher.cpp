@@ -9,9 +9,9 @@
 #include <camera/camera_bookmarks_query.h>
 #include <core/resource/camera_resource.h>
 #include <nx/utils/datetime.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/graphics/items/overlays/scrollable_text_items_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -68,8 +68,8 @@ namespace
         using namespace nx::vms::common;
 
         //static const QColor kBackgroundColor("#b22e6996");
-        static const QColor kBackgroundColor = ColorTheme::transparent(
-            colorTheme()->color("camera.bookmarkBackground"), 0.7);
+        static const QColor kBackgroundColor = nx::vms::client::core::ColorTheme::transparent(
+            nx::vms::client::core::colorTheme()->color("camera.bookmarkBackground"), 0.7);
 
         enum
         {

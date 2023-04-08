@@ -9,8 +9,8 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QToolButton>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/widgets/common/elided_label.h>
 #include <utils/common/event_processors.h>
 
@@ -326,7 +326,7 @@ void EditableLabel::setButtonIcon(const QIcon& icon)
 {
     d->button->setIcon(icon);
 
-    auto size = Skin::maximumSize(icon);
+    auto size = core::Skin::maximumSize(icon);
     d->button->setIconSize(size);
     d->button->setFixedSize(size);
 }

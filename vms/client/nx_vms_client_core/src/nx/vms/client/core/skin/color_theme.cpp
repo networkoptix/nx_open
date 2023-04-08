@@ -17,7 +17,7 @@
 
 #include "color_theme_reader.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 static ColorTheme* s_instance = nullptr;
 
@@ -33,9 +33,7 @@ struct ColorTheme::Private
     QHash<QColor, ColorInfo> colorInfoByColor;
 
     /** Initialize color values, color groups and color substitutions. */
-    void loadColors(
-        const QString& mainColorsFile = ":/skin/basic_colors.json",
-        const QString& skinColorsFile = ":/skin/skin_colors.json");
+    void loadColors(const QString& mainColorsFile, const QString& skinColorsFile);
 
 private:
     QJsonObject readColorDataFromFile(const QString& fileName) const;
@@ -68,8 +66,7 @@ void ColorTheme::Private::loadColors(const QString& mainColorsFile, const QStrin
 QJsonObject ColorTheme::Private::readColorDataFromFile(const QString& fileName) const
 {
     QFile file(fileName);
-    const bool opened = file.open(QFile::ReadOnly);
-    if (NX_ASSERT(opened, "Cannot read skin file %1", fileName))
+    if (file.open(QFile::ReadOnly))
     {
         const auto& jsonData = file.readAll();
 
@@ -90,20 +87,12 @@ QJsonObject ColorTheme::Private::readColorDataFromFile(const QString& fileName) 
 }
 
 ColorTheme::ColorTheme(QObject* parent):
-    QObject(parent),
-    d(new Private())
+    ColorTheme(":/skin/basic_colors.json", ":/skin/skin_colors.json")
 {
-    if (s_instance)
-        NX_ERROR(this, "Singleton is created more than once.");
-    else
-        s_instance = this;
-
-    d->loadColors();
 }
 
-ColorTheme::ColorTheme(
-    const QString& mainColorsFile,
-    const QString& skinColorsFile,
+ColorTheme::ColorTheme(const QString& basicColorsFileName,
+    const QString& skinColorsFileName,
     QObject* parent)
     :
     QObject(parent),
@@ -114,7 +103,7 @@ ColorTheme::ColorTheme(
     else
         s_instance = this;
 
-    d->loadColors(mainColorsFile, skinColorsFile);
+    d->loadColors(basicColorsFileName, skinColorsFileName);
 }
 
 ColorTheme::~ColorTheme()
@@ -210,7 +199,7 @@ Q_INVOKABLE bool ColorTheme::isLight(const QColor& color)
 
 void ColorTheme::registerQmlType()
 {
-    qmlRegisterType<ColorTheme>("Nx", 1, 0, "ColorThemeBase");
+    qmlRegisterType<ColorTheme>("Nx.Core", 1, 0, "ColorThemeBase");
 }
 
 } // namespace nx::vms::client::desktop

@@ -4,7 +4,7 @@
 
 #include "poe_settings_table_view.h"
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_constants.h>
@@ -23,6 +23,7 @@
 
 namespace {
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace node_view;
 using namespace node_view::details;
@@ -46,7 +47,7 @@ ViewNodeData poweringStatusData(const NetworkPortState& port)
         case PoweringStatus::disconnected:
             builder.withText(PoeSettingsColumn::status, PoeSettingsTableView::tr("Disconnected"));
             builder.withData(
-                PoeSettingsColumn::status, Qt::ForegroundRole, colorTheme()->color("dark13"));
+                PoeSettingsColumn::status, Qt::ForegroundRole, core::colorTheme()->color("dark13"));
             break;
         case PoweringStatus::connected:
             builder.withText(PoeSettingsColumn::status, PoeSettingsTableView::tr("Connected"));
@@ -54,7 +55,7 @@ ViewNodeData poweringStatusData(const NetworkPortState& port)
         case PoweringStatus::powered:
             builder.withText(PoeSettingsColumn::status, PoeSettingsTableView::tr("Powered"));
             builder.withData(PoeSettingsColumn::status, Qt::ForegroundRole,
-                colorTheme()->color("green_core"));
+                core::colorTheme()->color("green_core"));
             break;
         default:
             NX_ASSERT(false, "Unexpected network port powering status!");
@@ -107,7 +108,7 @@ ViewNodeData wrongResourceNodeData(const QString& macAddress, bool connected)
         .withIcon(PoeSettingsColumn::camera, kTransparentIcon).data();
 
     if (isUnknownDevice)
-        builder.withData(PoeSettingsColumn::camera, Qt::ForegroundRole, colorTheme()->color("light10"));
+        builder.withData(PoeSettingsColumn::camera, Qt::ForegroundRole, core::colorTheme()->color("light10"));
     return builder;
 }
 
@@ -238,8 +239,8 @@ node_view::details::NodeViewStatePatch PoeSettingsReducer::totalsDataChangesPatc
         consumption, data.upperPowerLimitWatts);
 
     const auto color = consumption > data.upperPowerLimitWatts
-        ? colorTheme()->color("red_l2")
-        : colorTheme()->color("light4");
+        ? core::colorTheme()->color("red_l2")
+        : core::colorTheme()->color("light4");
 
     const auto nodeData = ViewNodeDataBuilder()
         .withText(PoeSettingsColumn::consumption, text)

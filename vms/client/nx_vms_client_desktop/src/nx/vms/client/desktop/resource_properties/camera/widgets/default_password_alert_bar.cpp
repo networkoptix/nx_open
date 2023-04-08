@@ -5,8 +5,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QHBoxLayout>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <core/resource/camera_resource.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/workbench/workbench_access_controller.h>
 

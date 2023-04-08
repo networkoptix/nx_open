@@ -4,9 +4,9 @@
 #include "ui_oauth_login_placeholder.h"
 
 #include <nx/branding.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop {
@@ -22,7 +22,7 @@ OauthLoginPlaceholder::OauthLoginPlaceholder(QWidget* parent):
     auto errorFont = ui->errorTextLabel->font();
     errorFont.setPixelSize(24);
     ui->errorTextLabel->setFont(errorFont);
-    setPaletteColor(ui->errorTextLabel, QPalette::WindowText, colorTheme()->color("light1"));
+    setPaletteColor(ui->errorTextLabel, QPalette::WindowText, core::colorTheme()->color("light1"));
     ui->errorTextLabel->setText(tr("Cannot connect to %1", "%1 is the cloud name like Nx Cloud")
         .arg(nx::branding::cloudName()));
 

@@ -22,6 +22,8 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -36,7 +38,6 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/showreel/showreel_actions_handler.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/cloud_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
@@ -44,7 +45,6 @@
 #include <nx/vms/client/desktop/system_merge/incompatible_servers_action_handler.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/handlers/alarm_layout_handler.h>
 #include <nx/vms/client/desktop/workbench/watchers/keyboard_modifiers_watcher.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -193,7 +193,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     /* Set up properties. */
     setWindowTitle(QString());
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark4"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark4"));
 
     /* Initialize animations manager. */
     context->instance<ui::workbench::Animations>();
@@ -860,7 +860,7 @@ void MainWindow::paintEvent(QPaintEvent* event)
     {
         QPainter painter(this);
 
-        painter.setPen(QPen(colorTheme()->color("mainWindow.customFrame"), 1));
+        painter.setPen(QPen(core::colorTheme()->color("mainWindow.customFrame"), 1));
         painter.drawRect(rect().adjusted(0, 0, -1, -1));
     }
 }

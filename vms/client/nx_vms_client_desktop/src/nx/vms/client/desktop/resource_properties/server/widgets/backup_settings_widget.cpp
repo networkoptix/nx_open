@@ -11,6 +11,8 @@
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
@@ -20,8 +22,6 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/system_settings.h>
 #include <server/server_storage_manager.h>
 #include <ui/common/palette.h>
@@ -198,7 +198,7 @@ void BackupSettingsWidget::setupPlaceholderPageAppearance()
     placeholderFont.setWeight(kPlaceholderTextWeight);
 
     setPaletteColor(ui->unconfiguredPlaceholderLabel, QPalette::WindowText,
-        colorTheme()->color("dark17"));
+        core::colorTheme()->color("dark17"));
     ui->unconfiguredPlaceholderLabel->setFont(placeholderFont);
 
     const auto pixmap = qnSkin->pixmap(

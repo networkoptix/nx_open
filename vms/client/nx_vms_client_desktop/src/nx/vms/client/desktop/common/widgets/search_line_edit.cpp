@@ -7,7 +7,7 @@
 #include <QtGui/QAction>
 
 #include <ui/common/palette.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <utils/common/delayed.h>
 
 #include <nx/utils/pending_operation.h>

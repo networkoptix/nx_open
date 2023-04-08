@@ -3,8 +3,8 @@
 #include "timestamp_overlay_settings_widget.h"
 #include "ui_timestamp_overlay_settings_widget.h"
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 using nx::core::transcoding::TimestampFormat;

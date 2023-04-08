@@ -8,13 +8,13 @@
 
 #include "color_substitutions.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 /**
  * QPalette analogue.
  * Read basic and skin colors and provide access to them.
  */
-class NX_VMS_CLIENT_DESKTOP_API ColorTheme: public QObject
+class NX_VMS_CLIENT_CORE_API ColorTheme: public QObject
 {
     Q_OBJECT
 
@@ -58,4 +58,4 @@ private:
 
 inline ColorTheme* colorTheme() { return ColorTheme::instance(); }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

@@ -6,6 +6,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Window 2.11
 
 import Nx 1.0
+import Nx.Core 1.0
 import Nx.Models 1.0
 import Nx.Controls 1.0
 import nx.vms.client.core 1.0

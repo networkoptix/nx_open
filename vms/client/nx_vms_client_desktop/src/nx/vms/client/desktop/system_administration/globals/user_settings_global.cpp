@@ -9,7 +9,7 @@
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/desktop/common/utils/password_information.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace nx::vms::client::desktop {
 
@@ -74,17 +74,17 @@ PasswordStrengthData UserSettingsGlobal::passwordStrength(const QString& passwor
     switch (info.acceptance())
     {
         case nx::utils::PasswordAcceptance::Good:
-            result.background = colorTheme()->color("green_core");
+            result.background = core::colorTheme()->color("green_core");
             result.accepted = true;
             break;
 
         case nx::utils::PasswordAcceptance::Acceptable:
-            result.background = colorTheme()->color("yellow_core");
+            result.background = core::colorTheme()->color("yellow_core");
             result.accepted = true;
             break;
 
         default:
-            result.background = colorTheme()->color("red_core");
+            result.background = core::colorTheme()->color("red_core");
             result.accepted = false;
             break;
     }

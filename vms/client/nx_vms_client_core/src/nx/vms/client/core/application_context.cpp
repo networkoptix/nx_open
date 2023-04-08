@@ -10,11 +10,14 @@
 #include <finders/systems_finder.h>
 #include <nx/branding_proxy.h>
 #include <nx/build_info_proxy.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx/vms/utils/external_resources.h>
 #include <utils/media/voice_spectrum_analyzer.h>
 
 // Resources initialization must be located outside of the namespace.
@@ -24,6 +27,15 @@ static void initializeResources()
 }
 
 namespace nx::vms::client::core {
+
+void initializeExternalResources(const QString& customExternalResourceFile)
+{
+    if (!customExternalResourceFile.isEmpty())
+        nx::vms::utils::registerExternalResource(customExternalResourceFile);
+    nx::vms::utils::registerExternalResource("client_core_external.dat");
+    nx::vms::utils::registerExternalResource("bytedance_iconpark.dat",
+        analytics::IconManager::librariesRoot() + "bytedance.iconpark/");
+}
 
 static ApplicationContext* s_instance = nullptr;
 
@@ -85,12 +97,14 @@ struct ApplicationContext::Private
     std::unique_ptr<QnSystemsFinder> systemsFinder;
     std::unique_ptr<nx::vms::discovery::Manager> moduleDiscoveryManager;
     std::unique_ptr<QnVoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
+    std::unique_ptr<ColorTheme> colorTheme;
 };
 
 ApplicationContext::ApplicationContext(
     Mode mode,
     PeerType peerType,
     const QString& customCloudHost,
+    const QString& customExternalResourceFile,
     QObject* parent)
     :
     common::ApplicationContext(peerType, customCloudHost, parent),
@@ -100,6 +114,7 @@ ApplicationContext::ApplicationContext(
         s_instance = this;
 
     initializeResources();
+    initializeExternalResources(customExternalResourceFile);
     initializeMetaTypes();
 
     d->initializeSettings(mode);
@@ -115,6 +130,7 @@ ApplicationContext::ApplicationContext(
         case Mode::desktopClient:
         case Mode::mobileClient:
             d->voiceSpectrumAnalyzer = std::make_unique<QnVoiceSpectrumAnalyzer>();
+            d->colorTheme = std::make_unique<ColorTheme>();
             break;
     }
 }

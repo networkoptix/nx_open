@@ -4,7 +4,6 @@ find_package(Qt6
     COMPONENTS
         OpenGL
         OpenGLWidgets
-        Svg
         QuickWidgets
         QuickControls2
         QuickTemplates2
@@ -41,16 +40,6 @@ nx_add_external_resources_target(nx_vms_client_desktop_external_resources
         ${CMAKE_CURRENT_LIST_DIR}/skins/${customization.skin}
         ${customization_dir}/nx_client_desktop/resources
         ${customization_dir}/icons/all/logo.png
-)
-
-set(bytedance_iconpark_file ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/bytedance_iconpark.dat)
-nx_add_external_resources_target(bytedance_iconpark
-    TARGET_FILE
-        ${bytedance_iconpark_file}
-    QRC_FILE
-        bytedance_iconpark
-    FILES
-        ${open_source_root}/artifacts/analytics_icons/bytedance_iconpark
 )
 
 # Place Roboto font into resources so it can be loaded by Qt WebEngine.
@@ -121,7 +110,6 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         Qt6::Core Qt6::Gui Qt6::Widgets Qt6::OpenGLWidgets Qt6::Network
         Qt6::Qml Qt6::QuickWidgets Qt6::QuickControls2 Qt6::QuickTemplates2
         Qt6::Xml Qt6::Multimedia Qt6::Concurrent
-        Qt6::Svg
         Qt6::WebEngineQuick
         Qt6::WebEngineWidgets
         nx_vms_client_core
@@ -141,7 +129,6 @@ nx_add_target(nx_vms_client_desktop LIBRARY
 )
 nx_make_target_translatable(nx_vms_client_desktop)
 add_dependencies(nx_vms_client_desktop nx_vms_client_desktop_external_resources)
-add_dependencies(nx_vms_client_desktop bytedance_iconpark)
 
 file(GLOB_RECURSE shader_sources CONFIGURE_DEPENDS
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}

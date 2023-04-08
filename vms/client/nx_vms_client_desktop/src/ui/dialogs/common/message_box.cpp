@@ -11,8 +11,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workaround/cancel_drag.h>
@@ -22,8 +22,6 @@ namespace {
 static constexpr int kMinimumWidth = 400;
 
 } // namespace
-
-using namespace nx::vms::client::desktop;
 
 class QnMessageBoxPrivate : public QObject
 {
@@ -491,7 +489,7 @@ QPixmap QnMessageBox::getPixmapByIconId(Icon icon)
     const auto standardPixmap =
         [this](QStyle::StandardPixmap pixmapId) -> QPixmap
         {
-            return Skin::maximumSizePixmap(style()->standardIcon(pixmapId));
+        return nx::vms::client::core::Skin::maximumSizePixmap(style()->standardIcon(pixmapId));
         };
 
     switch (icon)

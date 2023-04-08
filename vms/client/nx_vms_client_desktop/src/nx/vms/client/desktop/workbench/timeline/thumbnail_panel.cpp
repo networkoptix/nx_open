@@ -12,7 +12,7 @@
 #include <ui/help/help_topics.h>
 #include <utils/math/functors.h>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 using std::chrono::milliseconds;
 
@@ -39,8 +39,8 @@ void ThumbnailPanel::paint(
         return;
 
     base_type::paint(painter, option, widget);
-    painter->fillRect(rect(), colorTheme()->color("dark5"));
-    painter->setPen(colorTheme()->color("dark6"));
+    painter->fillRect(rect(), core::colorTheme()->color("dark5"));
+    painter->setPen(core::colorTheme()->color("dark6"));
     painter->drawLine(0, 0, rect().width(), 0);
 
     const QnTimePeriod fullPeriod = fullTimePeriod();

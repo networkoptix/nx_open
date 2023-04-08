@@ -13,6 +13,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_selection_widget.h>
@@ -21,8 +23,6 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
@@ -31,6 +31,7 @@
 
 namespace {
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 static constexpr int kDialogFixedWidth = 640;
@@ -48,8 +49,8 @@ QString makeCameraNameRichText(const QString& cameraName, const QString& extraIn
 {
     using namespace nx::vms::common;
 
-    static const auto kHighlightedNameTextColor = colorTheme()->color("light4");
-    static const auto kExtraInfoTextColor = colorTheme()->color("light10");
+    static const auto kHighlightedNameTextColor = core::colorTheme()->color("light4");
+    static const auto kExtraInfoTextColor = core::colorTheme()->color("light10");
 
     const auto cameraNameRichText = html::bold(html::colored(cameraName, kHighlightedNameTextColor));
     const auto extraInfoRichText = html::colored(extraInfo, kExtraInfoTextColor);
@@ -99,21 +100,21 @@ QLayout* createDataTransferReportItem(
     switch (itemType)
     {
         case DeviceReplacementInfo::Level::info:
-            captionTextColor = colorTheme()->color("light10");
-            descriptionTextColor = colorTheme()->color("light10");
+            captionTextColor = core::colorTheme()->color("light10");
+            descriptionTextColor = core::colorTheme()->color("light10");
             iconPixmap = qnSkin->pixmap("camera_replacement/success.svg");
             break;
 
         case DeviceReplacementInfo::Level::warning:
-            captionTextColor = colorTheme()->color("yellow_core");
-            descriptionTextColor = colorTheme()->color("yellow_d2");
+            captionTextColor = core::colorTheme()->color("yellow_core");
+            descriptionTextColor = core::colorTheme()->color("yellow_d2");
             iconPixmap = qnSkin->pixmap("camera_replacement/warning.svg");
             break;
 
         case DeviceReplacementInfo::Level::error:
         case DeviceReplacementInfo::Level::critical:
-            captionTextColor = colorTheme()->color("red_l2");
-            descriptionTextColor = colorTheme()->color("red_l1");
+            captionTextColor = core::colorTheme()->color("red_l2");
+            descriptionTextColor = core::colorTheme()->color("red_l1");
             iconPixmap = qnSkin->pixmap("camera_replacement/error.svg");
             break;
 
@@ -455,9 +456,9 @@ void CameraReplacementDialog::setupUiContols()
     ui->scrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     // Header appearance.
-    static const auto kHeaderBackgroundColor = colorTheme()->color("dark8");
-    static const auto kHeaderCaptionTextColor = colorTheme()->color("light4");
-    static const auto kHeaderDetailsTextColor = colorTheme()->color("light10");
+    static const auto kHeaderBackgroundColor = core::colorTheme()->color("dark8");
+    static const auto kHeaderCaptionTextColor = core::colorTheme()->color("light4");
+    static const auto kHeaderDetailsTextColor = core::colorTheme()->color("light10");
 
     setPaletteColor(ui->headerContentsWidget, QPalette::Window, kHeaderBackgroundColor);
     ui->headerContentsWidget->setAutoFillBackground(true);
@@ -513,7 +514,7 @@ void CameraReplacementDialog::updateDataTransferReportPage()
 
 void CameraReplacementDialog::updateReplacementSummaryPage()
 {
-    static const auto kCaptionTextColor = colorTheme()->color("light10");
+    static const auto kCaptionTextColor = core::colorTheme()->color("light10");
     static const auto kCameraPixmap = qnResIconCache->icon(QnResourceIconCache::Camera)
         .pixmap(nx::style::Metrics::kDefaultIconSize, QIcon::Selected);
 

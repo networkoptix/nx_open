@@ -8,12 +8,12 @@
 
 #include <qt_graphics_items/graphics_label.h>
 
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_icon_text_widget.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/animation/opacity_animator.h>
@@ -35,8 +35,8 @@ PlaybackPositionItem::PlaybackPositionItem(WindowContext* windowContext, QGraphi
     m_pauseButton(new PlaybackPositionIconTextWidget()),
     m_positionAndRecording(new PlaybackPositionIconTextWidget())
 {
-    static const QColor kPauseBackgroundColor = colorTheme()->color("timeline.playback.pause");
-    static const QColor kArchiveBackgroundColor = colorTheme()->color("timeline.playback.archive");
+    static const QColor kPauseBackgroundColor = core::colorTheme()->color("timeline.playback.pause");
+    static const QColor kArchiveBackgroundColor = core::colorTheme()->color("timeline.playback.archive");
 
     setAcceptedMouseButtons(Qt::NoButton);
     
@@ -133,8 +133,8 @@ void PlaybackPositionItem::cancelAnimation()
  */
 void PlaybackPositionItem::tick(int deltaMs)
 {
-    static const QColor kPauseBackgroundColor = colorTheme()->color("timeline.playback.pause");
-    static const QColor kArchiveBackgroundColor = colorTheme()->color("timeline.playback.archive");
+    static const QColor kPauseBackgroundColor = core::colorTheme()->color("timeline.playback.pause");
+    static const QColor kArchiveBackgroundColor = core::colorTheme()->color("timeline.playback.archive");
 
     if (m_totalMs == kStopped)
         return;
@@ -196,8 +196,8 @@ void PlaybackPositionItem::blink()
 
 void PlaybackPositionItem::setVisibleButtons(int buttons)
 {
-    static const QColor kPauseBackgroundColor = colorTheme()->color("timeline.playback.pause");
-    static const QColor kArchiveBackgroundColor = colorTheme()->color("timeline.playback.archive");
+    static const QColor kPauseBackgroundColor = core::colorTheme()->color("timeline.playback.pause");
+    static const QColor kArchiveBackgroundColor = core::colorTheme()->color("timeline.playback.archive");
 
     if (buttons & Qn::PauseButton)
     {

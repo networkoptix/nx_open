@@ -5,10 +5,10 @@
 
 #include <QtGui/QMouseEvent>
 
+#include <ui/common/palette.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/workbench/workbench_display.h>
-#include <ui/common/palette.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace nx::vms::client::desktop {
 
@@ -22,10 +22,10 @@ EventPanel::EventPanel(QnWorkbenchContext* context, QWidget* parent):
         setAutoFillBackground(true);
     #endif
 
-    setPaletteColor(this, QPalette::Dark, colorTheme()->color("dark4"));
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark5"));
-    setPaletteColor(this, QPalette::Light, colorTheme()->color("dark8"));
-    setPaletteColor(this, QPalette::Midlight, colorTheme()->color("dark9", 51));
+    setPaletteColor(this, QPalette::Dark, core::colorTheme()->color("dark4"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark5"));
+    setPaletteColor(this, QPalette::Light, core::colorTheme()->color("dark8"));
+    setPaletteColor(this, QPalette::Midlight, core::colorTheme()->color("dark9", 51));
 }
 
 EventPanel::~EventPanel()

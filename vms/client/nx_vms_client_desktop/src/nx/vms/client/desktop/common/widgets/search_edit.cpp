@@ -12,15 +12,15 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QPushButton>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/common/palette.h>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/utils/app_info.h>
 #include <utils/math/color_transformations.h>
 #include <utils/common/event_processors.h>
@@ -388,10 +388,10 @@ void SearchEdit::updatePalette()
         [this]() -> QColor
         {
             if (hasFocus())
-                return colorTheme()->color("dark2");
+                return core::colorTheme()->color("dark2");
 
             return d->hovered
-                ? toTransparent(colorTheme()->color("dark9"), 0.2)
+                ? toTransparent(core::colorTheme()->color("dark9"), 0.2)
                 : QColor(Qt::transparent);
         }();
 
@@ -497,7 +497,7 @@ void SearchEdit::setButtonHovered(bool value)
 {
     if (value)
     {
-        const auto color = toTransparent(colorTheme()->color("dark9"), 0.2);
+        const auto color = toTransparent(core::colorTheme()->color("dark9"), 0.2);
         d->menuButton->setPalette(modifiedPalette(d->menuButton->palette(), color));
     }
     else

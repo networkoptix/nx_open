@@ -4,7 +4,7 @@
 #include "time_slider.h"
 
 #include <ui/common/palette.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 #include <nx/utils/log/assert.h>
 
@@ -24,7 +24,8 @@ QnTimelinePlaceholder::QnTimelinePlaceholder(QGraphicsItem* parent, QnTimeSlider
                 setText(comment);
         });
 
-    setPaletteColor(this, QPalette::WindowText, colorTheme()->color("dark16"));
+    setPaletteColor(this, QPalette::WindowText,
+        nx::vms::client::core::colorTheme()->color("dark16"));
 
     QFont font;
     font.setPixelSize(26);

@@ -6,15 +6,15 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStylePainter>
 
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/tree_view.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_properties/server/widgets/backup_settings_picker_widget.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -263,51 +263,51 @@ BackupSettingsItemDelegate::DropdownStateFlags BackupSettingsItemDelegate::dropd
 void BackupSettingsItemDelegate::initDropdownColorTable()
 {
     m_dropdownColorTable.insert({},
-        colorTheme()->color("dark14"));
+        core::colorTheme()->color("dark14"));
 
     m_dropdownColorTable.insert(
         {DropdownStateFlag::selected},
-        colorTheme()->color("light13"));
+        core::colorTheme()->color("light13"));
 
     m_dropdownColorTable.insert(
         {DropdownStateFlag::hovered},
-        colorTheme()->color("dark14"));
+        core::colorTheme()->color("dark14"));
 
     m_dropdownColorTable.insert(
         {DropdownStateFlag::selected, DropdownStateFlag::hovered},
-        colorTheme()->color("light13"));
+        core::colorTheme()->color("light13"));
 
     m_dropdownColorTable.insert(
         {DropdownStateFlag::enabled},
-        colorTheme()->color("light10"));
+        core::colorTheme()->color("light10"));
 
     m_dropdownColorTable.insert(
         {DropdownStateFlag::enabled, DropdownStateFlag::selected},
-        colorTheme()->color("light7"));
+        core::colorTheme()->color("light7"));
 
     m_dropdownColorTable.insert(
         {DropdownStateFlag::enabled, DropdownStateFlag::hovered},
-        colorTheme()->color("light6"));
+        core::colorTheme()->color("light6"));
 
     m_dropdownColorTable.insert(
         {DropdownStateFlag::enabled, DropdownStateFlag::selected, DropdownStateFlag::hovered},
-        colorTheme()->color("light4"));
+        core::colorTheme()->color("light4"));
 
     m_dropdownColorTable.insert(
         {DropdownStateFlag::enabled, DropdownStateFlag::warning},
-        colorTheme()->color("yellow_d2"));
+        core::colorTheme()->color("yellow_d2"));
 
     m_dropdownColorTable.insert(
         {DropdownStateFlag::enabled, DropdownStateFlag::selected, DropdownStateFlag::warning},
-        colorTheme()->color("yellow_d1"));
+        core::colorTheme()->color("yellow_d1"));
 
     m_dropdownColorTable.insert(
         {DropdownStateFlag::enabled, DropdownStateFlag::hovered, DropdownStateFlag::warning},
-        colorTheme()->color("yellow_core"));
+        core::colorTheme()->color("yellow_core"));
 
     m_dropdownColorTable.insert({DropdownStateFlag::enabled, DropdownStateFlag::selected,
         DropdownStateFlag::hovered, DropdownStateFlag::warning},
-            colorTheme()->color("yellow_core"));
+            core::colorTheme()->color("yellow_core"));
 }
 
 } // namespace nx::vms::client::desktop

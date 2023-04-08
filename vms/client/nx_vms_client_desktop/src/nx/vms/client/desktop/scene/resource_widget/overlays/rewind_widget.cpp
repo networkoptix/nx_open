@@ -7,11 +7,11 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_triangle.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/event_processors.h>
@@ -39,7 +39,7 @@ public:
             return;
 
         const auto pixmapSize = QSize(q->m_size.width() * 0.4, q->m_size.height()) * ratio;
-        const auto m_backgroundColor = colorTheme()->color("light1", kAlpha);
+        const auto m_backgroundColor = core::colorTheme()->color("light1", kAlpha);
 
         painter->setPen(Qt::NoPen);
         painter->setBrush(m_backgroundColor);

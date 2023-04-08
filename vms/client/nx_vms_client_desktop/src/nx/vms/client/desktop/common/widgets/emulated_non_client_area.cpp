@@ -12,10 +12,10 @@
 #include <QtGui/QPen>
 #include <QtWidgets/QAbstractButton>
 
-#include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/palette.h>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 
 #include <nx/utils/log/assert.h>
@@ -225,7 +225,7 @@ EmulatedNonClientArea::EmulatedNonClientArea(QWidget* parent):
     base_type(),
     d(new Private(this))
 {
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark14"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark14"));
     setParent(parent); //< Parent must be set after Private initialization.
     anchorWidgetToParent(this);
 }

@@ -5,7 +5,7 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/branding.h>
 
 namespace nx::vms::client::desktop {
@@ -19,7 +19,7 @@ PasswordDialog::PasswordDialog(QWidget* parent):
     setWindowTitle(nx::branding::vmsName());
 
     ui->captionLabel->setStyleSheet(
-        QString("QLabel { color: %1; }").arg(colorTheme()->color("light10").name()));
+        QString("QLabel { color: %1; }").arg(core::colorTheme()->color("light10").name()));
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Sign In"));
 
     setResizeToContentsMode(Qt::Horizontal | Qt::Vertical);

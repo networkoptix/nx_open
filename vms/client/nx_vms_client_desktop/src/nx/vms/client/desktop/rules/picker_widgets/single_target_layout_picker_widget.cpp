@@ -5,9 +5,9 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/event_rules/layout_selection_dialog.h>
 #include <nx/vms/rules/action_builder_fields/target_user_field.h>
 #include <nx/vms/rules/utils/field.h>
@@ -36,12 +36,12 @@ void SingleTargetLayoutPicker::updateUi()
             iconKey = QnResourceIconCache::Layout | QnResourceIconCache::Locked;
 
         m_selectButton->setIcon(
-            Skin::maximumSizePixmap(qnResIconCache->icon(iconKey), QnIcon::Selected));
+            core::Skin::maximumSizePixmap(qnResIconCache->icon(iconKey), QnIcon::Selected));
     }
     else
     {
         m_selectButton->setText(tr("Select layout..."));
-        m_selectButton->setIcon(Skin::maximumSizePixmap(
+        m_selectButton->setIcon(core::Skin::maximumSizePixmap(
             qnResIconCache->icon(QnResourceIconCache::Layouts), QnIcon::Selected));
         m_selectButton->setForegroundRole(QPalette::ButtonText);
         resetStyle(m_selectButton);

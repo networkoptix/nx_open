@@ -3,8 +3,8 @@
 #include "buttons.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
@@ -45,7 +45,7 @@ QnImageButtonWidget* newActionButton(
 
     button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
     button->setDefaultAction(action);
-    button->setFixedSize(Skin::maximumSize(action->icon()));
+    button->setFixedSize(core::Skin::maximumSize(action->icon()));
 
     if (helpTopicId != Qn::Empty_Help)
         setHelpTopic(button, helpTopicId);
@@ -73,7 +73,7 @@ T* newCustomShowHideButton(
         button->setCheckable(true);
 
     button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
-    button->setFixedSize(Skin::maximumSize(button->icon()));
+    button->setFixedSize(core::Skin::maximumSize(button->icon()));
 
     button->setProperty(Qn::NoHandScrollOver, true);
     button->setProperty(Qn::BlockMotionSelection, true);
@@ -115,7 +115,7 @@ QnImageButtonWidget* newPinTimelineButton(
         button->setDefaultAction(action);
 
     button->setIcon(qnSkin->icon("panel/slide_pin_left.png"));
-    button->setFixedSize(Skin::maximumSize(button->icon()));
+    button->setFixedSize(core::Skin::maximumSize(button->icon()));
 
     button->setProperty(Qn::NoHandScrollOver, true);
     button->setProperty(Qn::BlockMotionSelection, true);
@@ -148,7 +148,7 @@ QnImageButtonWidget* newPinButton(
     else
         button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
 
-    button->setFixedSize(Skin::maximumSize(button->icon()));
+    button->setFixedSize(core::Skin::maximumSize(button->icon()));
 
     setHelpTopic(button, Qn::MainWindow_Pin_Help);
     return button;

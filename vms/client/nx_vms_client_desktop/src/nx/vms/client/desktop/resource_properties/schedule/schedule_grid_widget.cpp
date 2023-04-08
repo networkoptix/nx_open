@@ -12,9 +12,9 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QApplication>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/schedule_cell_painter.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/utils/schedule.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -126,18 +126,18 @@ struct ScheduleGridWidget::Private
     bool active = true;
 
     // Predefined colors.
-    const QColor emptyCellColor = colorTheme()->color("dark5");
-    const QColor emptyCellHoveredColor = colorTheme()->color("dark6");
-    const QColor headerCellHoveredColor = colorTheme()->color("dark9");
+    const QColor emptyCellColor = core::colorTheme()->color("dark5");
+    const QColor emptyCellHoveredColor = core::colorTheme()->color("dark6");
+    const QColor headerCellHoveredColor = core::colorTheme()->color("dark9");
 
-    const QColor gridColor = colorTheme()->color("dark7");
-    const QColor selectionFrameColor = colorTheme()->color("blue13");
+    const QColor gridColor = core::colorTheme()->color("dark7");
+    const QColor selectionFrameColor = core::colorTheme()->color("blue13");
 
-    const QColor cornerHeaderTextColor = colorTheme()->color("light16");
-    const QColor hourHeaderTextColor = colorTheme()->color("light10");
-    const QColor weekdayHeaderTextColor = colorTheme()->color("light10");
-    const QColor weekendHeaderTextColor = colorTheme()->color("red_core");
-    const QColor cellTextColor = colorTheme()->color("light4");
+    const QColor cornerHeaderTextColor = core::colorTheme()->color("light16");
+    const QColor hourHeaderTextColor = core::colorTheme()->color("light10");
+    const QColor weekdayHeaderTextColor = core::colorTheme()->color("light10");
+    const QColor weekendHeaderTextColor = core::colorTheme()->color("red_core");
+    const QColor cellTextColor = core::colorTheme()->color("light4");
 };
 
 std::optional<QRect> ScheduleGridWidget::Private::selectionFrameRect() const

@@ -9,12 +9,12 @@
 #include <QtGui/QWheelEvent>
 
 #include <ui/common/palette.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/trace/trace.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, QWidget* parent):
     QGraphicsView(scene, parent)

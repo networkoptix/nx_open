@@ -4,9 +4,9 @@
 
 #include <QtWidgets/QListWidget>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <ui/dialogs/common/message_box.h>

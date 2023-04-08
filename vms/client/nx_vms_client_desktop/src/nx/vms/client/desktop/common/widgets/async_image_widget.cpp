@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
@@ -22,7 +23,6 @@
 #include <nx/vms/client/desktop/image_providers/image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/utils/blur_image.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -77,10 +77,10 @@ AsyncImageWidget::AsyncImageWidget(QWidget* parent):
     m_placeholder(new AutoscaledPlainText(this)),
     m_indicator(new AutoscaledBusyIndicatorWidget(this))
 {
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark6"));
-    setPaletteColor(this, QPalette::WindowText, colorTheme()->color("light16"));
-    setPaletteColor(this, QPalette::Highlight, colorTheme()->color("brand_core"));
-    setPaletteColor(this, QPalette::AlternateBase, colorTheme()->color("dark1", 110));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark6"));
+    setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light16"));
+    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core"));
+    setPaletteColor(this, QPalette::AlternateBase, core::colorTheme()->color("dark1", 110));
 
     retranslateUi();
     setBackgroundRole(QPalette::Window);

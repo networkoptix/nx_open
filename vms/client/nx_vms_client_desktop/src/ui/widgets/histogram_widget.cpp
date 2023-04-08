@@ -7,9 +7,9 @@
 
 #include <utils/math/linear_combination.h>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnHistogramWidget::QnHistogramWidget(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags)

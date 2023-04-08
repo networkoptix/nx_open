@@ -8,8 +8,8 @@
 
 #include <nx/vms/client/desktop/style/style.h>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/widgets/line_edit_controls.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace
 {
@@ -147,15 +147,15 @@ void PasswordStrengthIndicator::paintEvent(QPaintEvent* /*event*/)
     switch (d->currentInformation.acceptance())
     {
         case utils::PasswordAcceptance::Good:
-            background = colorTheme()->color("green_core");
+            background = core::colorTheme()->color("green_core");
             break;
 
         case utils::PasswordAcceptance::Acceptable:
-            background = colorTheme()->color("yellow_core");
+            background = core::colorTheme()->color("yellow_core");
             break;
 
         default:
-            background = colorTheme()->color("red_core");
+            background = core::colorTheme()->color("red_core");
             break;
     }
 
@@ -169,7 +169,7 @@ void PasswordStrengthIndicator::paintEvent(QPaintEvent* /*event*/)
     painter.drawRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5),
         d->roundingRadius, d->roundingRadius);
 
-    painter.setPen(colorTheme()->color("dark5"));
+    painter.setPen(core::colorTheme()->color("dark5"));
     painter.drawText(rect.marginsRemoved(d->textMargins), Qt::TextSingleLine | Qt::AlignCenter,
         d->currentInformation.text());
 }

@@ -10,7 +10,7 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/qt_helpers.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -419,4 +419,4 @@ ColorTree::ColorGroups ColorTree::createBaseColorGroups() const
     return result;
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

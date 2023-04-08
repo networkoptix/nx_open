@@ -2,6 +2,7 @@
 
 import QtQuick 2.11
 import Nx 1.0
+import Nx.Core 1.0
 import Nx.Utils 1.0
 import Nx.Controls 1.0
 import Nx.Controls.NavigationMenu 1.0

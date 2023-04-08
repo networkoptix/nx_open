@@ -27,6 +27,8 @@
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
@@ -34,10 +36,8 @@
 #include <nx/vms/client/desktop/licensing/license_management_dialogs.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/dialogs/license_deactivation_reason.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/license/license_usage_watcher.h>
@@ -90,7 +90,7 @@ license::DeactivationErrors filterDeactivationErrors(const license::Deactivation
 
 QStringList licenseHtmlDescription(const QnLicensePtr& license)
 {
-    static const auto kLightTextColor = ColorTheme::instance()->color("light10");
+    static const auto kLightTextColor = nx::vms::client::core::colorTheme()->color("light10");
 
     QStringList result;
 

@@ -9,7 +9,7 @@
 
 #include <ui/widgets/common/progress_widget.h>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 
 QnDialogButtonBox::QnDialogButtonBox(QWidget *parent):
     base_type(parent) {}

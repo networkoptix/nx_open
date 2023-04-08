@@ -2,7 +2,7 @@
 
 #include <QtQuick/QQuickImageProvider>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 class SvgIconProvider: public QQuickImageProvider
 {
@@ -12,4 +12,4 @@ public:
     QPixmap requestPixmap(const QString& id, QSize* size, const QSize& requestedSize) override;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

@@ -5,7 +5,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
 
 namespace nx::vms::client::desktop {
@@ -45,7 +45,7 @@ QPixmap ResourceIconProvider::requestPixmap(
         ? ResourceTree::ItemState::normal
         : ResourceTree::ItemState(path.takeFirst().toInt());
 
-    return Skin::maximumSizePixmap(
+    return core::Skin::maximumSizePixmap(
         qnResIconCache->icon(QnResourceIconCache::Key(key)),
         iconMode(state));
 }

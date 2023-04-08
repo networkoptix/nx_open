@@ -2,8 +2,8 @@
 
 #include "footer_widget.h"
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
@@ -122,7 +122,7 @@ void FooterWidget::setupIconsAndColors()
     ui->setScheduleButton->setIcon(qnSkin->pixmap("text_buttons/calendar.png"));
     ui->testActionButton->setIcon(qnSkin->pixmap("text_buttons/forward.png"));
     ui->commitCommentButton->setIcon(
-        Skin::colorize(qnSkin->pixmap("text_buttons/ok.png"),
+        core::Skin::colorize(qnSkin->pixmap("text_buttons/ok.png"),
         QPalette().color(QPalette::BrightText)));
 
     setPaletteColor(

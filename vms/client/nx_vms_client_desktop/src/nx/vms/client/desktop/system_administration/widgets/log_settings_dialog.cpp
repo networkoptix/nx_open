@@ -5,9 +5,9 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/text/human_readable.h>

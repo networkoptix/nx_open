@@ -15,13 +15,13 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
@@ -34,6 +34,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 using namespace std::chrono;
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -93,7 +94,7 @@ constexpr qreal kVisible = 1.0;
 void paintVisualizer(
     QPainter* painter, const QRectF& rect, const VisualizerData& data)
 {
-    static const QColor kVisualizerColor = colorTheme()->color("camera.twoWayAudio.visualizer");
+    static const QColor kVisualizerColor = core::colorTheme()->color("camera.twoWayAudio.visualizer");
 
     if (data.isEmpty())
         return;
@@ -391,10 +392,10 @@ void QnTwoWayAudioWidget::Private::paint(QPainter* painter, const QRectF& source
     path.addRoundedRect(rect, roundness, roundness);
 
     const auto background = m_state == HintState::pressed
-        ? colorTheme()->color("camera.twoWayAudio.background.pressed")
+        ? core::colorTheme()->color("camera.twoWayAudio.background.pressed")
         : (q->isUnderMouse()
-            ? colorTheme()->color("camera.twoWayAudio.background.hovered")
-            : colorTheme()->color("camera.twoWayAudio.background.default"));
+            ? core::colorTheme()->color("camera.twoWayAudio.background.hovered")
+            : core::colorTheme()->color("camera.twoWayAudio.background.default"));
 
     painter->fillPath(path, background);
 

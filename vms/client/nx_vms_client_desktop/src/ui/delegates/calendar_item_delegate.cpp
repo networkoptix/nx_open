@@ -8,9 +8,9 @@
 #include <recording/time_period.h>
 
 #include <nx/vms/client/core/media/time_period_storage.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 using nx::vms::client::core::TimePeriodStorage;
 

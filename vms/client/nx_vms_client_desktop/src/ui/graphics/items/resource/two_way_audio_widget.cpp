@@ -7,15 +7,15 @@
 
 #include <qt_graphics_items/graphics_label.h>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 
 #include "private/two_way_audio_widget_p.h"
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnTwoWayAudioWidget::QnTwoWayAudioWidget(
     const QString& sourceId,

@@ -11,8 +11,7 @@
 #include <QtGui/QPixmapCache>
 
 #include <nx/utils/string.h>
-
-#include "skin.h"
+#include <nx/vms/client/core/skin/skin.h>
 
 namespace nx::vms::client::desktop {
 
@@ -104,7 +103,7 @@ QPixmap SoftwareTriggerPixmaps::colorizedPixmap(const QString& name, const QColo
     if (staticCache.find(key, &result))
         return result;
 
-    result = Skin::colorize(getTriggerPixmap(effectiveName), color);
+    result = core::Skin::colorize(getTriggerPixmap(effectiveName), color);
 
     staticCache.insert(key, result);
     return result;

@@ -13,12 +13,12 @@
 class QStyle;
 class QSvgRenderer;
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 class IconLoader;
 class GenericPalette;
 
-class NX_VMS_CLIENT_DESKTOP_API Skin: public QObject
+class NX_VMS_CLIENT_CORE_API Skin: public QObject
 {
     Q_OBJECT
 
@@ -64,8 +64,6 @@ public:
     static QPixmap maximumSizePixmap(const QIcon& icon, QIcon::Mode mode = QIcon::Normal,
         QIcon::State state = QIcon::Off, bool correctDevicePixelRatio = true);
 
-    static QStyle* newStyle();
-
     static bool isHiDpi();
 
     static QPixmap colorize(const QPixmap& source, const QColor& color);
@@ -83,6 +81,6 @@ private:
     IconLoader* m_iconLoader;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core
 
-#define qnSkin (nx::vms::client::desktop::Skin::instance())
+#define qnSkin (nx::vms::client::core::Skin::instance())

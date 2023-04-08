@@ -5,8 +5,8 @@
 #include <QtGui/QPainter>
 #include <QtGui/QtEvents>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/style/skin.h>
 
 namespace nx::vms::client::desktop {
 

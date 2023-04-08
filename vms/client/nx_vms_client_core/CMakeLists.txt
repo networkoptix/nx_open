@@ -1,10 +1,31 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-find_package(Qt6 COMPONENTS Multimedia Quick ShaderTools)
+find_package(Qt6 COMPONENTS Multimedia Quick ShaderTools Svg)
 
 set(qt_helpers_root "${open_source_root}/artifacts/qt_helpers/src")
 file(GLOB_RECURSE qt_helpers_sources "${qt_helpers_root}/qt_helpers/*")
 file(GLOB_RECURSE qt_helpers_headers "${qt_helpers_root}/qt_helpers/*.h")
+
+set(nx_vms_client_core_external_resources_file
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/client_core_external.dat)
+nx_add_external_resources_target(nx_vms_client_core_external_resources
+    TARGET_FILE
+        ${nx_vms_client_core_external_resources_file}
+    QRC_FILE
+        client_core_external
+    FILES
+        ${CMAKE_CURRENT_LIST_DIR}/external_resources
+)
+
+set(bytedance_iconpark_file ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/bytedance_iconpark.dat)
+nx_add_external_resources_target(bytedance_iconpark
+    TARGET_FILE
+        ${bytedance_iconpark_file}
+    QRC_FILE
+        bytedance_iconpark
+    FILES
+        ${open_source_root}/artifacts/analytics_icons/bytedance_iconpark
+)
 
 nx_add_target(nx_vms_client_core LIBRARY
     ADDITIONAL_SOURCES
@@ -12,6 +33,7 @@ nx_add_target(nx_vms_client_core LIBRARY
     PUBLIC_LIBS
         Qt6::Multimedia
         Qt6::Quick
+        Qt6::Svg
         appserver2
         cloud_db_client
         nx_media
@@ -29,6 +51,8 @@ nx_add_target(nx_vms_client_core LIBRARY
     FOLDER client/libs
 )
 nx_make_target_translatable(nx_vms_client_core)
+add_dependencies(nx_vms_client_core nx_vms_client_core_external_resources)
+add_dependencies(nx_vms_client_core bytedance_iconpark)
 
 target_compile_definitions(nx_vms_client_core
     PRIVATE NX_VMS_CLIENT_CORE_API=${API_EXPORT_MACRO}

@@ -10,8 +10,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/workbench_context.h>
@@ -102,16 +102,16 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
             if (column == VersionColumn)
             {
                 if (item->offline)
-                    return colorTheme()->color("dark11");
+                    return core::colorTheme()->color("dark11");
 
                 if (m_targetVersion.isNull() ||  m_targetVersion <= item->version)
-                    return colorTheme()->color("green_l2");
+                    return core::colorTheme()->color("green_l2");
 
-                return colorTheme()->color("yellow_core");
+                return core::colorTheme()->color("yellow_core");
             }
             else if (column == NameColumn && item->offline)
             {
-                return colorTheme()->color("dark11");
+                return core::colorTheme()->color("dark11");
             }
             break;
 

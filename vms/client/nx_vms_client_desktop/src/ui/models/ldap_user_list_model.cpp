@@ -3,7 +3,7 @@
 #include "ldap_user_list_model.h"
 
 #include <nx/utils/string.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 
 QnLdapUserListModel::QnLdapUserListModel(QObject *parent)
     : base_type(parent)

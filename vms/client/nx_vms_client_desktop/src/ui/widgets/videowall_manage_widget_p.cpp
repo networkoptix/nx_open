@@ -8,9 +8,9 @@
 #include <core/resource/videowall_resource.h>
 #include <nx/build_info.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/videowall_manage_widget.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -20,6 +20,7 @@
 
 using nx::vms::client::core::Geometry;
 using nx::gui::Screens;
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -182,7 +183,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(
 
     if (!name.isEmpty())
     {
-        QPen textPen(colorTheme()->color("videoWall.attach.text"));
+        QPen textPen(core::colorTheme()->color("videoWall.attach.text"));
         QnScopedPainterPenRollback namePenRollback(painter, textPen);
 
         QFont font(painter->font());
@@ -232,7 +233,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintDashBorder(
     QPainter* painter,
     const QPainterPath& path) const
 {
-    QPen pen(colorTheme()->color("videoWall.attach.text"));
+    QPen pen(core::colorTheme()->color("videoWall.attach.text"));
     pen.setWidth(borderWidth);
     pen.setDashPattern(dashPattern);
 
@@ -257,9 +258,9 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintDeleteButton(QPainter* 
 
     QColor color = linearCombine(
         deleteButtonOpacity,
-        colorTheme()->color("videoWall.attach.error"),
+        core::colorTheme()->color("videoWall.attach.error"),
         1.0 - deleteButtonOpacity,
-        colorTheme()->color("videoWall.attach.text"));
+        core::colorTheme()->color("videoWall.attach.text"));
     QnScopedPainterBrushRollback brushRollback(painter, color);
 
     QRect rect = deleteButtonRect();
@@ -292,7 +293,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintResizeAnchors(
     QPainter* painter,
     const QRect& rect) const
 {
-    QPen resizeBorderPen(colorTheme()->color("videoWall.attach.text"));
+    QPen resizeBorderPen(core::colorTheme()->color("videoWall.attach.text"));
     resizeBorderPen.setWidth(resizeBorderWidth);
 
     QnScopedPainterPenRollback penRollback(painter, resizeBorderPen);
@@ -365,7 +366,7 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(
 
 QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const
 {
-    return colorTheme()->color("videoWall.attach.freeSpace");
+    return core::colorTheme()->color("videoWall.attach.freeSpace");
 }
 
 /************************************************************************/
@@ -457,13 +458,13 @@ void QnVideowallManageWidgetPrivate::ModelScreen::paint(
         QPainterPath path;
         path.addRect(targetRect);
 
-        QPen borderPen(colorTheme()->color("videoWall.attach.desktop"));
+        QPen borderPen(core::colorTheme()->color("videoWall.attach.desktop"));
         borderPen.setWidth(screenBorderWidth);
 
         QnScopedPainterPenRollback penRollback(painter, borderPen);
         QnScopedPainterBrushRollback brushRollback(
             painter,
-            colorTheme()->color("videoWall.attach.desktop", 127));
+            core::colorTheme()->color("videoWall.attach.desktop", 127));
 
         QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
 
@@ -524,13 +525,13 @@ void QnVideowallManageWidgetPrivate::ModelItem::paintProposed(
     base_type::paintProposed(painter, proposedGeometry);
 
     QnScopedPainterPenRollback pen(painter, Qt::NoPen);
-    QnScopedPainterBrushRollback brush(painter, colorTheme()->color("videoWall.attach.error"));
+    QnScopedPainterBrushRollback brush(painter, core::colorTheme()->color("videoWall.attach.error"));
     painter->drawPath(bodyPath());
 }
 
 QColor QnVideowallManageWidgetPrivate::ModelItem::baseColor() const
 {
-    return colorTheme()->color("videoWall.attach.item");
+    return core::colorTheme()->color("videoWall.attach.item");
 }
 
 /************************************************************************/

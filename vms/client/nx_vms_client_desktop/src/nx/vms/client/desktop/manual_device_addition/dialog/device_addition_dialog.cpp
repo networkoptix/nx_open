@@ -13,13 +13,13 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/resource_views/views/fake_resource_list_view.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
@@ -242,8 +242,8 @@ void DeviceAdditionDialog::initializeControls()
     handleTabClicked(ui->tabWidget->currentIndex());
     setupSearchResultsPlaceholder();
 
-    setPaletteColor(ui->knownAddressPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
-    setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
+    setPaletteColor(ui->knownAddressPortPlaceholder, QPalette::Text, core::colorTheme()->color("dark14"));
+    setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, core::colorTheme()->color("dark14"));
 
     ui->httpsOnlyBar->setText(
         tr("Searching for devices on the network is restricted to cameras that"

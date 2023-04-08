@@ -7,7 +7,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <ui/common/palette.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 
@@ -21,8 +21,8 @@ RepeatedPasswordDialog::RepeatedPasswordDialog(QWidget *parent):
     ui->setupUi(this);
     setModal(true);
     setHeaderText("");
-    setPaletteColor(ui->headerLabel, QPalette::WindowText, colorTheme()->color("light4"));
-    setPaletteColor(ui->headerBackgroundWidget, QPalette::Window, colorTheme()->color("brand_d5"));
+    setPaletteColor(ui->headerLabel, QPalette::WindowText, core::colorTheme()->color("light4"));
+    setPaletteColor(ui->headerBackgroundWidget, QPalette::Window, core::colorTheme()->color("brand_d5"));
     setWarningStyle(ui->doNotMatchLabel);
     updateMatching();
 

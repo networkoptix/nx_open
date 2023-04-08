@@ -5,7 +5,7 @@
 #include <QtGui/QPainter>
 
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 #include "../models/logs_management_model.h"
 
@@ -77,8 +77,8 @@ void LogsManagementTableDelegate::paintNameColumn(
 
     // Draw text.
     const QString extraInfo = index.data(Model::IpAddressRole).toString();
-    const QColor textColor = colorTheme()->color("light10");
-    const QColor ipAddressColor = colorTheme()->color("dark17");
+    const QColor textColor = core::colorTheme()->color("light10");
+    const QColor ipAddressColor = core::colorTheme()->color("dark17");
 
     const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; //< As in Qt.
     const int textEnd = textRect.right() - textPadding + 1;

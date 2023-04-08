@@ -31,6 +31,7 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/types/event_rule_types.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/thumbnails/abstract_caching_resource_thumbnail.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -53,7 +54,6 @@
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -1704,7 +1704,7 @@ QString RightPanelModelsAdapter::Private::valuesText(const QStringList& values)
 
     return nx::format("%1 <font color=\"%3\">(%2)</font>", displayedValues,
         tr("+%n values", "", remainder),
-        colorTheme()->color("light16").name());
+        core::colorTheme()->color("light16").name());
 }
 
 void RightPanelModelsAdapter::Private::calculatePreviewRects(const QnResourcePtr& resource,

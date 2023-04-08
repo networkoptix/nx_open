@@ -6,10 +6,10 @@
 #include <QtCore/QPointer>
 #include <QtWidgets/QWhatsThis>
 
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/common/palette.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace nx::vms::client::desktop {
 
@@ -203,8 +203,8 @@ DialogTitleBarWidget::DialogTitleBarWidget(QWidget* parent):
     base_type(parent),
     d(new Private(this))
 {
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark12"));
-    setPaletteColor(this, QPalette::Text, colorTheme()->color("light4"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark12"));
+    setPaletteColor(this, QPalette::Text, core::colorTheme()->color("light4"));
 }
 
 DialogTitleBarWidget::~DialogTitleBarWidget()

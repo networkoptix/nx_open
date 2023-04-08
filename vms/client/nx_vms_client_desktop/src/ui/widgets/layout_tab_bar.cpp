@@ -17,21 +17,22 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -64,15 +65,15 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     auto p = palette();
 
     // Active tab:
-    p.setColor(QPalette::Active, QPalette::Text, colorTheme()->color("light4"));
-    p.setColor(QPalette::Active, QPalette::Base, colorTheme()->color("dark10"));
+    p.setColor(QPalette::Active, QPalette::Text, core::colorTheme()->color("light4"));
+    p.setColor(QPalette::Active, QPalette::Base, core::colorTheme()->color("dark10"));
 
     // Inactive tab:
-    p.setColor(QPalette::Inactive, QPalette::Text, colorTheme()->color("light10"));
-    p.setColor(QPalette::Inactive, QPalette::Base, colorTheme()->color("dark10"));
+    p.setColor(QPalette::Inactive, QPalette::Text, core::colorTheme()->color("light10"));
+    p.setColor(QPalette::Inactive, QPalette::Base, core::colorTheme()->color("dark10"));
 
     // Common
-    p.setColor(QPalette::Dark, colorTheme()->color("dark12"));
+    p.setColor(QPalette::Dark, core::colorTheme()->color("dark12"));
     setPalette(p);
 
     connect(this, &QTabBar::currentChanged, this, &QnLayoutTabBar::at_currentChanged);

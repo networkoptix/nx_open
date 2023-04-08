@@ -6,7 +6,7 @@
 #include "button_slider.h"
 #include "hover_button.h"
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 
