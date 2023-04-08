@@ -39,6 +39,8 @@ Rectangle
     readonly property bool hasConfig:
         uri != "" || adminDn != "" || filters.length != 0 || continuousSync
 
+    readonly property bool showSpinners: (syncIsRunning || syncRequested) && !modified
+
     property var self
     property var testState: LdapSettings.TestState.initial
     property string testMessage: ""
@@ -294,8 +296,7 @@ Rectangle
 
                         Spinner
                         {
-                            running: (control.syncIsRunning || control.syncRequested)
-                                && control.continuousSync
+                            running: control.showSpinners && control.continuousSync
                         }
                     }
 
@@ -328,7 +329,7 @@ Rectangle
 
                         Spinner
                         {
-                            running: control.syncIsRunning || control.syncRequested
+                            running: control.showSpinners
                         }
                     }
 
@@ -367,7 +368,7 @@ Rectangle
 
                         Spinner
                         {
-                            running: control.syncIsRunning || control.syncRequested
+                            running: control.showSpinners
                         }
 
                         ImageButton
