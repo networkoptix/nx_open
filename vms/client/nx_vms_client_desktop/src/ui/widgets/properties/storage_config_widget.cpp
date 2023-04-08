@@ -20,17 +20,17 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/time/formatter.h>
 #include <server/server_storage_manager.h>
@@ -172,7 +172,7 @@ public:
         if (index.column() == QnStorageListModel::ActionsColumn)
         {
             if (hasHoverableText && hovered)
-                opt.palette.setColor(QPalette::Text, colorTheme()->color("light14"));
+                opt.palette.setColor(QPalette::Text, vms::client::core::colorTheme()->color("light14"));
             else if (hasHoverableText)
                 opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::WindowText));
             else // Either hidden (has no text) or selected, we can use 'Selected' style for both.
@@ -181,7 +181,7 @@ public:
 
         // Set warning color for inaccessible storages.
         if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
-            opt.palette.setColor(QPalette::Text, colorTheme()->color("red_l2"));
+            opt.palette.setColor(QPalette::Text, vms::client::core::colorTheme()->color("red_l2"));
 
         // Set proper color for hovered storage type column.
         if (!opt.state.testFlag(QStyle::State_Enabled))

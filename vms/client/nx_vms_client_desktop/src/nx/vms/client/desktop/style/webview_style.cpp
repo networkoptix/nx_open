@@ -5,7 +5,7 @@
 #include <QtGui/QPalette>
 #include <QtWidgets/QApplication>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace nx::vms::client::desktop {
 
@@ -61,9 +61,9 @@ QString generateCssStyle()
         .replace("{window}", palette.color(QPalette::Window).name())
         .replace("{link}", palette.color(QPalette::Link).name())
         .replace("{highlight}", palette.color(QPalette::Highlight).name())
-        .replace("{scrollbar-track}", colorTheme()->color("dark9").name())
-        .replace("{scrollbar-thumb}", colorTheme()->color("dark13").name())
-        .replace("{scrollbar-thumb-hover}", colorTheme()->color("dark15").name())
+        .replace("{scrollbar-track}", core::colorTheme()->color("dark9").name())
+        .replace("{scrollbar-thumb}", core::colorTheme()->color("dark13").name())
+        .replace("{scrollbar-thumb-hover}", core::colorTheme()->color("dark15").name())
         .simplified();
 }
 

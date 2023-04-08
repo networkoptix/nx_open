@@ -3,7 +3,7 @@
 #include "failover_priority_column_item_delegate.h"
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 
 namespace {
@@ -70,10 +70,10 @@ QString FailoverPriorityColumnItemDelegate::failoverPriorityToString(
 QColor FailoverPriorityColumnItemDelegate::failoverPriorityToColor(
     FailoverPriority failoverPriority) const
 {
-    static const QColor kNeverColor = colorTheme()->color("failoverPriority.never");
-    static const QColor kLowColor = colorTheme()->color("failoverPriority.low");
-    static const QColor kMediumColor = colorTheme()->color("failoverPriority.medium");
-    static const QColor kHighColor = colorTheme()->color("failoverPriority.high");
+    static const QColor kNeverColor = core::colorTheme()->color("failoverPriority.never");
+    static const QColor kLowColor = core::colorTheme()->color("failoverPriority.low");
+    static const QColor kMediumColor = core::colorTheme()->color("failoverPriority.medium");
+    static const QColor kHighColor = core::colorTheme()->color("failoverPriority.high");
 
     switch (failoverPriority)
     {

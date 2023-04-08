@@ -4,6 +4,7 @@ import QtQuick 2.0
 import QtQml
 
 import Nx 1.0
+import Nx.Core 1.0
 
 Item
 {

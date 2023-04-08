@@ -6,7 +6,7 @@
 
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/palette.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace nx::vms::client::desktop {
 
@@ -28,7 +28,7 @@ NotificationCounterLabel::NotificationCounterLabel(QWidget* parent): base_type(p
     setProperty(style::Properties::kDontPolishFontProperty, true);
 
     setStyleSheet(QStringLiteral("QLabel { color: %1; }")
-        .arg(colorTheme()->color("dark3").name()));
+        .arg(core::colorTheme()->color("dark3").name()));
 
     QFont font(this->font());
     font.setPixelSize(kFontPixelSize);

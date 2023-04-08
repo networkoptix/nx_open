@@ -6,11 +6,11 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/branding.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/common/palette.h>
@@ -44,7 +44,7 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
     connect(ui->helpLabel, &QLabel::linkActivated,
         [](){ QnHelpHandler::openHelpTopic(Qn::HelpTopic::CloudLayoutsIntroduction_help); });
 
-    QColor captionTextColor = colorTheme()->color("light1");
+    QColor captionTextColor = core::colorTheme()->color("light1");
     setPaletteColor(ui->captionLabel, QPalette::WindowText, captionTextColor);
     setPaletteColor(ui->availableActionsLabel, QPalette::WindowText, captionTextColor);
     setPaletteColor(ui->inFutureLabel, QPalette::WindowText, captionTextColor);

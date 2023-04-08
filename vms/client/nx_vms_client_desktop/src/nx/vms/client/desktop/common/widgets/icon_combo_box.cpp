@@ -7,8 +7,8 @@
 #include <QtWidgets/QListView>
 
 #include <ui/common/indents.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 
 #include <nx/vms/client/desktop/common/delegates/styled_combo_box_delegate.h>
 

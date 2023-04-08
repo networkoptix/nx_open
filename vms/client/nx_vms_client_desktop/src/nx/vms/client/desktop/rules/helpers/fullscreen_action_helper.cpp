@@ -7,9 +7,9 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/models/business_rule_view_model.h>
 
@@ -19,7 +19,7 @@ namespace {
 
 QIcon selectedIcon(const QIcon& base)
 {
-    return QIcon(Skin::maximumSizePixmap(base, QIcon::Selected, QIcon::Off, false));
+    return QIcon(core::Skin::maximumSizePixmap(base, QIcon::Selected, QIcon::Off, false));
 }
 
 QIcon invalidIcon()

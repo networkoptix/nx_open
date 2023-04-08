@@ -17,7 +17,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/vms/event/actions/camera_output_action.h>
@@ -31,8 +31,8 @@
 #include "io_module_form_overlay_contents.h"
 #include "io_module_grid_overlay_contents.h"
 
-using namespace nx;
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client;
+using namespace nx::vms::client::core;
 
 namespace {
 
@@ -44,8 +44,8 @@ constexpr int kStateCheckIntervalMs = 1000;
 
 class QnIoModuleOverlayWidgetPrivate:
     public QObject,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+    public CommonModuleAware,
+    public RemoteConnectionAware
 {
     using base_type = QObject;
     using Style = QnIoModuleOverlayWidget::Style;
@@ -321,17 +321,20 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     newState.isActive = !newState.isActive;
     contents->stateChanged(it->config, newState);
 
-    vms::event::EventParameters eventParams;
+    nx::vms::event::EventParameters eventParams;
     eventParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
 
-    vms::event::ActionParameters params;
+    nx::vms::event::ActionParameters params;
     params.relayOutputId = it->config.id;
     params.durationMs = it->config.autoResetTimeoutMs;
 
-    vms::event::CameraOutputActionPtr action(new vms::event::CameraOutputAction(eventParams));
+    nx::vms::event::CameraOutputActionPtr action(
+        new nx::vms::event::CameraOutputAction(eventParams));
     action->setParams(params);
     action->setResources({ module->getId() });
-    action->setToggleState(it->state.isActive ? vms::api::EventState::inactive : vms::api::EventState::active);
+    action->setToggleState(it->state.isActive
+        ? nx::vms::api::EventState::inactive
+        : nx::vms::api::EventState::active);
 
     auto dstPeer = module->getParentId();
     auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(dstPeer);

@@ -137,6 +137,7 @@ def create_client_update_file(config, output_file):
         tools.zip_rdep_package_to(zip, config['fonts_directory'])
 
         zip.write(os.path.join(binaries_dir, 'client_external.dat'), 'client_external.dat')
+        zip.write(os.path.join(binaries_dir, 'client_core_external.dat'), 'client_core_external.dat')
         zip.write(os.path.join(binaries_dir, 'bytedance_iconpark.dat'), 'bytedance_iconpark.dat')
         translations_dir = os.path.join(binaries_dir, 'translations')
         zip.write(os.path.join(translations_dir, 'nx_vms_common.dat'), 'translations/nx_vms_common.dat')

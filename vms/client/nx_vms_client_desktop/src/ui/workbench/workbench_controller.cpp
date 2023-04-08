@@ -29,6 +29,8 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -38,12 +40,10 @@
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_widget.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/animator_group.h>
@@ -104,6 +104,7 @@
 #include "workbench_layout.h"
 #include "workbench_utility.h"
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 using nx::vms::client::core::Geometry;
@@ -204,8 +205,8 @@ QnWorkbenchController::QnWorkbenchController(QObject* parent):
     m_zoomWindowInstrument = new ZoomWindowInstrument(this);
     m_objectTrackingInstrument = new ObjectTrackingInstrument(this);
 
-    m_motionSelectionInstrument->setBrush(colorTheme()->color("camera.motionSelection.brush"));
-    m_motionSelectionInstrument->setPen(colorTheme()->color("camera.motionSelection.pen"));
+    m_motionSelectionInstrument->setBrush(core::colorTheme()->color("camera.motionSelection.brush"));
+    m_motionSelectionInstrument->setPen(core::colorTheme()->color("camera.motionSelection.pen"));
     m_motionSelectionInstrument->setSelectionModifiers(Qt::ShiftModifier);
 
     m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(QnWorkbenchDisplay::EffectsLayer));

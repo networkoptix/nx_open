@@ -9,14 +9,14 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QApplication>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 
 namespace nx::vms::client::desktop {
@@ -49,10 +49,10 @@ void ResourceNodeViewItemDelegate::paint(
 
         const auto textColor = useCustomColor
             ? color.value<QColor>()
-            : colorTheme()->color("resourceTree.mainText");
+            : core::colorTheme()->color("resourceTree.mainText");
         const auto extraColor = useCustomColor
             ? textColor
-            : colorTheme()->color("resourceTree.extraText");
+            : core::colorTheme()->color("resourceTree.extraText");
 
         paintItemText(painter, option, index, textColor, extraColor);
         paintItemIcon(painter, option, index, QIcon::Normal);

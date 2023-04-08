@@ -6,7 +6,7 @@
 
 #include <QtQml/QtQml>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 
 template<> nx::vms::client::desktop::CustomCursors*
     Singleton<nx::vms::client::desktop::CustomCursors>::s_instance = nullptr;
@@ -28,7 +28,7 @@ CustomCursors::Private& CustomCursors::staticData()
     return data;
 }
 
-CustomCursors::CustomCursors(Skin* skin)
+CustomCursors::CustomCursors(core::Skin* skin)
 {
     staticData().sizeAllCursor = QCursor{skin->pixmap("cursors/size_all.png")};
     staticData().crossCursor = QCursor{skin->pixmap("cursors/cross.png")};

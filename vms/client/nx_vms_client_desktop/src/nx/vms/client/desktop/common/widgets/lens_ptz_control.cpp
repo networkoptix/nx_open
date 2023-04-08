@@ -11,8 +11,8 @@
 #include <QtCore/QtMath>
 
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
@@ -447,13 +447,13 @@ void LensPtzControl::drawRotationCircle(QPainter* painter, const QRectF& rect) c
     centered.moveCenter(center);
 
     // Drawing circle with border color.
-    const QColor borderColor = colorTheme()->color("dark5");
+    const QColor borderColor = core::colorTheme()->color("dark5");
     QPen reallyWide(QBrush(borderColor), kLineWidth + 2 * kLineBorderWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     painter->setPen(reallyWide);
     painter->drawArc(centered, 0, 16 * 360);
 
     // Drawing full circle with main color.
-    const QColor mainColor = colorTheme()->color("dark11");
+    const QColor mainColor = core::colorTheme()->color("dark11");
     QPen thinPen(QBrush(mainColor), kLineWidth);
     painter->setPen(thinPen);
     painter->drawArc(centered, 0, 16 * 360);

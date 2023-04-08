@@ -2,6 +2,7 @@
 
 import QtQuick 2.15
 import Nx 1.0
+import Nx.Core 1.0
 import nx.vms.client.core 1.0
 
 import "date_utils.js" as DateUtils

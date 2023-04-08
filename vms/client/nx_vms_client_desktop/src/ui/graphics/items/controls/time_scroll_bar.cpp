@@ -6,14 +6,15 @@
 
 #include <QtWidgets/QStyleOptionSlider>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/style/graphics_style.h>
 #include <nx/vms/client/desktop/style/style.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <qt_graphics_items/graphics_scroll_bar_p.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using std::chrono::milliseconds;
 
@@ -39,10 +40,10 @@ QnTimeScrollBar::QnTimeScrollBar(QGraphicsItem *parent):
 
     setAcceptHoverEvents(true);
 
-    setPaletteColor(this, QPalette::Dark, colorTheme()->color("dark4"));
-    setPaletteColor(this, QPalette::Midlight, colorTheme()->color("dark12"));
-    setPaletteColor(this, QPalette::Light, colorTheme()->color("dark16"));
-    setPaletteColor(this, QPalette::Text, colorTheme()->color("light4"));
+    setPaletteColor(this, QPalette::Dark, core::colorTheme()->color("dark4"));
+    setPaletteColor(this, QPalette::Midlight, core::colorTheme()->color("dark12"));
+    setPaletteColor(this, QPalette::Light, core::colorTheme()->color("dark16"));
+    setPaletteColor(this, QPalette::Text, core::colorTheme()->color("light4"));
 }
 
 QnTimeScrollBar::~QnTimeScrollBar()

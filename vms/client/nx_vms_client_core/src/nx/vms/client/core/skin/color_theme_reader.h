@@ -16,7 +16,7 @@
 
 class QJsonObject;
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 class ColorTree;
 
@@ -153,4 +153,4 @@ private:
     Node::Ptr m_root;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

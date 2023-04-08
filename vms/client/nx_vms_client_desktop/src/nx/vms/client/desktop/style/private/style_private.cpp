@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "style_private.h"
-#include "../skin.h"
 
 #include <limits>
 
@@ -16,9 +15,10 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/slide_switch.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -38,7 +38,7 @@ void paintLabelIcon(QRect* labelRect,
     QIcon::Mode mode = QIcon::Normal,
     QIcon::State state = QIcon::Off)
 {
-    QSize iconSize = Skin::maximumSize(icon, mode, state);
+    QSize iconSize = core::Skin::maximumSize(icon, mode, state);
     QRect iconRect = QStyle::alignedRect(direction, alignment, iconSize, *labelRect);
 
     icon.paint(painter, iconRect, Qt::AlignCenter, mode, state);
@@ -91,13 +91,13 @@ QColor StylePrivate::checkBoxColor(const QStyleOption* option, bool radio) const
     if (checked)
     {
         return hovered && !radio
-            ? colorTheme()->lighter(mainColor, 3)
+            ? core::colorTheme()->lighter(mainColor, 3)
             : mainColor;
     }
 
     return hovered
-        ? colorTheme()->darker(mainColor, 4)
-        : colorTheme()->darker(mainColor, 6);
+        ? core::colorTheme()->darker(mainColor, 4)
+        : core::colorTheme()->darker(mainColor, 6);
 }
 
 bool StylePrivate::isCheckableButton(const QStyleOption* option)
@@ -149,22 +149,22 @@ void StylePrivate::drawSwitch(
     {
         bool hovered = enabled && option->state.testFlag(QStyle::State_MouseOver);
 
-        fillColorOff = hovered ? colorTheme()->color("dark14") : colorTheme()->color("dark13");
+        fillColorOff = hovered ? core::colorTheme()->color("dark14") : core::colorTheme()->color("dark13");
         fillColorOn =
-            hovered ? colorTheme()->color("green_l1") : colorTheme()->color("green_core");
+            hovered ? core::colorTheme()->color("green_l1") : core::colorTheme()->color("green_core");
         frameColorOff = fillColorOff;
         frameColorOn = fillColorOn;
-        signColorOff = colorTheme()->color("dark17");
-        signColorOn = hovered ? colorTheme()->color("green_l3") : colorTheme()->color("green_l2");
+        signColorOff = core::colorTheme()->color("dark17");
+        signColorOn = hovered ? core::colorTheme()->color("green_l3") : core::colorTheme()->color("green_l2");
     }
     else
     {
-        fillColorOff = colorTheme()->color("dark8");
-        fillColorOn = colorTheme()->color("green_core");
-        frameColorOff = colorTheme()->color("dark7");
+        fillColorOff = core::colorTheme()->color("dark8");
+        fillColorOn = core::colorTheme()->color("green_core");
+        frameColorOff = core::colorTheme()->color("dark7");
         frameColorOn = fillColorOn;
-        signColorOff = colorTheme()->color("dark10");
-        signColorOn = colorTheme()->color("green_l2");
+        signColorOff = core::colorTheme()->color("dark10");
+        signColorOn = core::colorTheme()->color("green_l2");
     }
 
     // TODO: Implement animation
@@ -427,7 +427,7 @@ void StylePrivate::drawTextButton(QPainter* painter,
 
     if (hovered && enabled && !pressed)
     {
-        brush.setColor(colorTheme()->lighter(option->palette.color(foregroundRole), 2));
+        brush.setColor(core::colorTheme()->lighter(option->palette.color(foregroundRole), 2));
         iconMode = QIcon::Active;
     }
 

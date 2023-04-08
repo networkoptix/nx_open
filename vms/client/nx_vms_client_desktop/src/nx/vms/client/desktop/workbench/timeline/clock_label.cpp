@@ -8,7 +8,7 @@
 
 #include <ui/common/palette.h>
 #include <nx/vms/time/formatter.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace {
 
@@ -27,7 +27,7 @@ ClockLabel::ClockLabel(QWidget* parent):
     font.setWeight(QFont::DemiBold);
     setFont(font);
 
-    setPaletteColor(this, foregroundRole(), colorTheme()->color("timeline.clockText"));
+    setPaletteColor(this, foregroundRole(), core::colorTheme()->color("timeline.clockText"));
 
     m_timerId = startTimer(kClockUpdatePeriod);
 }

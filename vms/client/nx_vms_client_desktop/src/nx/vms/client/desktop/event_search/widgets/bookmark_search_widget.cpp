@@ -11,9 +11,9 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/event_search/models/bookmark_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>

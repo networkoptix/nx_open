@@ -11,9 +11,9 @@
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <ui/common/indents.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>

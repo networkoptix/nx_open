@@ -20,6 +20,8 @@
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
@@ -29,13 +31,11 @@
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/text/time_strings.h>
 #include <ui/common/palette.h>
@@ -513,7 +513,7 @@ void QnAdvancedSettingsWidget::updateCertificateValidationLevelDescription()
     setPaletteColor(
         label,
         QPalette::WindowText,
-        nx::vms::client::desktop::colorTheme()->color(isWarning ? "red_l2" : "dark14"));
+        nx::vms::client::core::colorTheme()->color(isWarning ? "red_l2" : "dark14"));
 }
 
 void QnAdvancedSettingsWidget::updateLogsManagementWidgetsState()

@@ -6,13 +6,13 @@
 #include <QtWidgets/QMenu>
 
 #include <nx/branding.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -67,7 +67,7 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     setProperty(nx::style::Properties::kDontPolishFontProperty, true);
     setPopupMode(QToolButton::InstantPopup);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark8"));
+    setPaletteColor(this, QPalette::Window, nx::vms::client::core::colorTheme()->color("dark8"));
 
     QFont font = qApp->font();
     font.setPixelSize(kFontPixelSize);

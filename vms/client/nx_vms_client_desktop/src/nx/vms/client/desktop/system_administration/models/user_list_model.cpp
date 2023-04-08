@@ -15,9 +15,9 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/user_group_data.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -412,7 +412,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
 
             // Highlight conflicting users.
             if (user->isLdap() && !d->isUnique(user))
-                return colorTheme()->color("red_l2");
+                return core::colorTheme()->color("red_l2");
 
             break;
         }

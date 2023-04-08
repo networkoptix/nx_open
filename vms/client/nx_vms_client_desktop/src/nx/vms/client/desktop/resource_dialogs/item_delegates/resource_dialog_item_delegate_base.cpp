@@ -5,9 +5,9 @@
 #include <QtGui/QPainter>
 
 #include <client/client_globals.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/indents.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -111,7 +111,7 @@ void ResourceDialogItemDelegateBase::paintSeparator(
     auto point2 = option.rect.center();
     point2.setX(option.rect.right() - indents.right());
 
-    const QColor separatorColor = colorTheme()->color("dark8");
+    const QColor separatorColor = core::colorTheme()->color("dark8");
     QPen pen(separatorColor, 1.0, Qt::SolidLine);
 
     QnScopedPainterPenRollback penRollback(painter, pen);

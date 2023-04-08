@@ -6,6 +6,7 @@ import nx.vms.client.core 1.0
 import nx.vms.client.desktop 1.0
 
 import Nx 1.0
+import Nx.Core 1.0
 import Nx.Core.Animations 1.0
 
 Item

@@ -10,7 +10,7 @@ using namespace nx::vms::client::desktop;
 PtzOverlayWidget::PtzOverlayWidget(QGraphicsItem* parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     m_markersMode(Qt::Horizontal | Qt::Vertical),
-    m_pen(QPen(colorTheme()->color("ptz.main", 192), 0.0))
+    m_pen(QPen(nx::vms::client::core::colorTheme()->color("ptz.main", 192), 0.0))
 {
     setAcceptedMouseButtons(Qt::NoButton);
 

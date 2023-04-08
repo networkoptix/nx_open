@@ -26,6 +26,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
@@ -37,12 +38,10 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
-#include <nx/vms/client/desktop/style/svg_icon_provider.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
@@ -88,7 +87,7 @@ WelcomeScreen::WelcomeScreen(QWidget* parent):
 {
     NX_ASSERT(qnRuntime->isDesktopMode());
 
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark3"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark3"));
 
     rootContext()->setContextProperty("workbench", workbench());
     rootContext()->setContextProperty(lit("context"), this);

@@ -9,9 +9,9 @@
 #include <QtGui/QColor>
 #include <QtGui/QIcon>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_DESKTOP_API SvgIconColorer
+class NX_VMS_CLIENT_CORE_API SvgIconColorer
 {
 public:
     using Substitutions = QMap<QColor, QString>;
@@ -63,4 +63,4 @@ private:
     const IconSubstitutions m_substitutions;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

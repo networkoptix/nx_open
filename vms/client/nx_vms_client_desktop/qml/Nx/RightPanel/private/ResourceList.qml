@@ -37,7 +37,7 @@ ColumnLayout
         id: andMore
         readonly property int remainder: count - displayedCount
 
-        color: resourceList.palette.windowText
+        color: (resourceList.palette && resourceList.palette.windowText) ?? "transparent"
         text: qsTr("...and %n more", "", remainder)
         visible: remainder > 0
         topPadding: 4

@@ -2,6 +2,7 @@
 
 import QtQuick 2.0
 import Nx 1.0
+import Nx.Core 1.0
 
 import "../figure_utils.js" as F
 

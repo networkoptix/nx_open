@@ -18,10 +18,8 @@
 #include <nx/utils/log/log.h>
 
 #include "icon_loader.h"
-#include "old_style.h"
-#include "style.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 static Skin* s_instance = nullptr;
 
@@ -255,12 +253,6 @@ QString Skin::getDpiDependedName(const QString& name) const
     return path(name);
 }
 
-QStyle* Skin::newStyle()
-{
-    auto style = new Style();
-    return new OldStyle(style);
-}
-
 QMovie* Skin::newMovie(const QString& name, QObject* parent)
 {
     return new QMovie(getDpiDependedName(name), QByteArray(), parent);
@@ -303,4 +295,4 @@ QPixmap Skin::colorize(const QPixmap& source, const QColor& color)
     return result;
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

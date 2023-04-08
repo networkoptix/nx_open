@@ -6,15 +6,15 @@
 #include <QtWidgets/QApplication>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/indents.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -86,11 +86,11 @@ void ResourceDialogItemDelegate::initStyleOption(
     const QModelIndex& index) const
 {
 
-    static const auto kTextColor = colorTheme()->color("light7");
-    static const auto kSelectedTextColor = colorTheme()->color("light10");
+    static const auto kTextColor = core::colorTheme()->color("light7");
+    static const auto kSelectedTextColor = core::colorTheme()->color("light10");
 
-    static const auto kExtraTextColor = colorTheme()->color("dark17");
-    static const auto kSelectedExtraTextColor = colorTheme()->color("light13");
+    static const auto kExtraTextColor = core::colorTheme()->color("dark17");
+    static const auto kSelectedExtraTextColor = core::colorTheme()->color("light13");
 
     base_type::initStyleOption(option, index);
 
@@ -108,11 +108,11 @@ void ResourceDialogItemDelegate::initStyleOption(
             : kExtraTextColor);
     }
 
-    static const auto kInvalidTextColor = colorTheme()->color("red_core");
-    static const auto kUncheckedCheckboxColor = colorTheme()->color("dark7");
-    static const auto kCheckedItemTextColor = colorTheme()->color("resourceTree.mainTextSelected");
+    static const auto kInvalidTextColor = core::colorTheme()->color("red_core");
+    static const auto kUncheckedCheckboxColor = core::colorTheme()->color("dark7");
+    static const auto kCheckedItemTextColor = core::colorTheme()->color("resourceTree.mainTextSelected");
     static const auto kCheckedItemExtraTextColor =
-        colorTheme()->color("resourceTree.extraTextSelected");
+        core::colorTheme()->color("resourceTree.extraTextSelected");
 
     const auto isHighlighted = index.data(ResourceDialogItemRole::IsItemHighlightedRole).toBool();
     if (isHighlighted)
@@ -223,9 +223,10 @@ void ResourceDialogItemDelegate::paintItemIcon(
     const auto isValidResourceData = index.data(ResourceDialogItemRole::IsValidResourceRole);
     if (!isValidResourceData.isNull() && !isValidResourceData.toBool() && !option.icon.isNull())
     {
-        const auto invalidIconColor = colorTheme()->color("red_core");
+        const auto invalidIconColor = core::colorTheme()->color("red_core");
         const auto iconSize = option.icon.actualSize(iconRect.size());
-        const auto colorizedIcon = QIcon(Skin::colorize(option.icon.pixmap(iconSize), invalidIconColor));
+        const auto colorizedIcon = QIcon(
+            core::Skin::colorize(option.icon.pixmap(iconSize), invalidIconColor));
         option.icon = colorizedIcon;
     }
 

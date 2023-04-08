@@ -14,16 +14,15 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/avi/avi_resource.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <utils/common/aspect_ratio.h>
 
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/ffmpeg_image_provider.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-
 
 namespace nx::vms::client::desktop {
 
@@ -198,7 +197,7 @@ struct ResourceThumbnailProvider::Private
 
         QPixmap destination(size * pixelRatio);
         destination.setDevicePixelRatio(pixmap.devicePixelRatio());
-        destination.fill(colorTheme()->color("dark6"));
+        destination.fill(core::colorTheme()->color("dark6"));
 
         const auto rect = Geometry::aligned(
             Geometry::scaled(pixmap.size() / pixelRatio, size * kPlaceholderIconFraction).toSize(),

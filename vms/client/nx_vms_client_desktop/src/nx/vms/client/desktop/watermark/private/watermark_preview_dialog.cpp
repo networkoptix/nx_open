@@ -15,8 +15,8 @@
 #include <nx/core/watermark/watermark.h>
 #include <nx/core/watermark/watermark_images.h>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 
 namespace nx::vms::client::desktop {
 

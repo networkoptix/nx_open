@@ -2,12 +2,12 @@
 
 #include "edge_shadow_widget.h"
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <ui/common/palette.h>
 
 #include <nx/utils/log/assert.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnEdgeShadowWidget::QnEdgeShadowWidget(
             QGraphicsItem* parent,

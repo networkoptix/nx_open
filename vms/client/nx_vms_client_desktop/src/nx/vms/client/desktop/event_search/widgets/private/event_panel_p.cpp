@@ -17,6 +17,7 @@
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/animated_compact_tab_widget.h>
 #include <nx/vms/client/desktop/common/widgets/compact_tab_bar.h>
@@ -41,7 +42,6 @@
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>

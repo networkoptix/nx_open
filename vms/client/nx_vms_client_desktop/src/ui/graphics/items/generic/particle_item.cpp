@@ -7,12 +7,12 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 QnParticleItem::QnParticleItem(QGraphicsItem *parent):
     base_type(parent)
 {
-    setColor(nx::vms::client::desktop::colorTheme()->color("blue_core"));
+    setColor(nx::vms::client::core::colorTheme()->color("blue_core"));
 }
 
 QnParticleItem::~QnParticleItem() {

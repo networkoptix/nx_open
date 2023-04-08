@@ -17,14 +17,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/text/human_readable.h>
@@ -33,7 +33,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 
-using namespace nx;
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 const QByteArray QnAuditLogModel::ChildCntParamName("childCnt");
@@ -507,7 +507,7 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
         case Qn::AR_CameraInsert:
         case Qn::AR_CameraUpdate:
         {
-            const QColor linkColor = colorTheme()->color("auditLog.httpLink");
+            const QColor linkColor = core::colorTheme()->color("auditLog.httpLink");
 
             QString txt = QnDeviceDependentStrings::getNumericName(
                 resourcePool(),
@@ -806,40 +806,40 @@ QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
     {
     case Qn::AR_MitmAttack: //< TODO: different color for MitM attack.
     case Qn::AR_UnauthorizedLogin:
-        return colorTheme()->color("auditLog.actions.failedLogin");
+        return core::colorTheme()->color("auditLog.actions.failedLogin");
     case Qn::AR_Login:
-        return colorTheme()->color("auditLog.actions.login");
+        return core::colorTheme()->color("auditLog.actions.login");
     case Qn::AR_UserUpdate:
     case Qn::AR_UserRemove:
-        return colorTheme()->color("auditLog.actions.updateUser");
+        return core::colorTheme()->color("auditLog.actions.updateUser");
     case Qn::AR_ViewLive:
-        return colorTheme()->color("auditLog.actions.watchingLive");
+        return core::colorTheme()->color("auditLog.actions.watchingLive");
     case Qn::AR_ViewArchive:
-        return colorTheme()->color("auditLog.actions.watchingArchive");
+        return core::colorTheme()->color("auditLog.actions.watchingArchive");
     case Qn::AR_ExportVideo:
-        return colorTheme()->color("auditLog.actions.exportVideo");
+        return core::colorTheme()->color("auditLog.actions.exportVideo");
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraRemove:
     case Qn::AR_CameraInsert:
-        return colorTheme()->color("auditLog.actions.updateCamera");
+        return core::colorTheme()->color("auditLog.actions.updateCamera");
     case Qn::AR_SystemNameChanged:
     case Qn::AR_SystemmMerge:
     case Qn::AR_SettingsChange:
     case Qn::AR_DatabaseRestore:
     case Qn::AR_UpdateInstall:
-        return colorTheme()->color("auditLog.actions.system");
+        return core::colorTheme()->color("auditLog.actions.system");
     case Qn::AR_StorageInsert:
     case Qn::AR_StorageUpdate:
     case Qn::AR_StorageRemove:
     case Qn::AR_ServerUpdate:
     case Qn::AR_ServerRemove:
-        return colorTheme()->color("auditLog.actions.updateServer");
+        return core::colorTheme()->color("auditLog.actions.updateServer");
     case Qn::AR_BEventReset:
     case Qn::AR_BEventUpdate:
     case Qn::AR_BEventRemove:
-        return colorTheme()->color("auditLog.actions.rules");
+        return core::colorTheme()->color("auditLog.actions.rules");
     case Qn::AR_EmailSettings:
-        return colorTheme()->color("auditLog.actions.emailSettings");
+        return core::colorTheme()->color("auditLog.actions.emailSettings");
     default:
         return QVariant();
     }

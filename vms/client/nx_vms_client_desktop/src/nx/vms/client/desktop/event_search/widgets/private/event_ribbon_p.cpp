@@ -25,6 +25,7 @@
 #include <nx/utils/metatypes.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/progress_state.h>
@@ -32,7 +33,6 @@
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/private/style_private.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
@@ -1456,7 +1456,7 @@ QWidget* EventRibbon::Private::createFadeCurtain(EventTile* widget, QVariantAnim
     auto curtain = new CustomPainted<QWidget>(widget);
     anchorWidgetToParent(curtain);
 
-    const auto color = colorTheme()->color(kFadeCurtainColorName);
+    const auto color = core::colorTheme()->color(kFadeCurtainColorName);
 
     curtain->setCustomPaintFunction(nx::utils::guarded(animator, true,
         [animator, curtain, color](QPainter* painter, const QStyleOption* /*option*/,

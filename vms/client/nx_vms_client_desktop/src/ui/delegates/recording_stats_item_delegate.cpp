@@ -13,7 +13,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 using RowType = QnRecordingStatsModel::RowType;
 
@@ -33,6 +33,7 @@ QnRecordingStatsModel::RowType rowType(const QModelIndex& index)
 
 } // namespace
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 QnRecordingStatsItemDelegate::QnRecordingStatsItemDelegate(QObject* parent) :
@@ -77,7 +78,7 @@ void QnRecordingStatsItemDelegate::paint(QPainter* painter, const QStyleOptionVi
     if (!isCameraName)
     {
         static const QColor kChartBackgroundColor = withAlpha(
-            colorTheme()->color("brand_core"), 102);
+            core::colorTheme()->color("brand_core"), 102);
 
         /* Draw chart manually: */
         qreal chartData = index.data(QnRecordingStatsModel::ChartData).toReal();
@@ -125,18 +126,18 @@ void QnRecordingStatsItemDelegate::initStyleOption(QStyleOptionViewItem* option,
     {
         case RowType::Normal:
             option->font.setWeight(kFontWeight);
-            option->palette.setColor(QPalette::Text, colorTheme()->color("light10"));
+            option->palette.setColor(QPalette::Text, core::colorTheme()->color("light10"));
             break;
         case RowType::Foreign:
             option->font.setWeight(kForeignCamerasFontWeight);
             option->palette.setColor(QPalette::Text,
                 index.column() == QnRecordingStatsModel::CameraNameColumn
-                    ? colorTheme()->color("dark17")
-                    : colorTheme()->color("light10"));
+                    ? core::colorTheme()->color("dark17")
+                    : core::colorTheme()->color("light10"));
                 break;
         case RowType::Totals:
             option->font.setWeight(kTotalCamerasFontWeight);
-            option->palette.setColor(QPalette::Text, colorTheme()->color("light4"));
+            option->palette.setColor(QPalette::Text, core::colorTheme()->color("light4"));
             break;
     }
 

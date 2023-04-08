@@ -254,7 +254,7 @@ def main():
                 a,
                 target_dir=bin_dir,
                 source_dir=src_bin_dir,
-                file_list=["client_external.dat", "bytedance_iconpark.dat"])
+                file_list=["client_external.dat", "client_core_external.dat", "bytedance_iconpark.dat"])
 
         # Archive VMS external resources.
         if withMediaServer and not parse_boolean(conf.IS_OPEN_SOURCE):

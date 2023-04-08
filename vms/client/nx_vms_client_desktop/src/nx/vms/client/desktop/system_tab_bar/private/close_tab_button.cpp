@@ -6,8 +6,8 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOption>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 
 namespace nx::vms::client::desktop {

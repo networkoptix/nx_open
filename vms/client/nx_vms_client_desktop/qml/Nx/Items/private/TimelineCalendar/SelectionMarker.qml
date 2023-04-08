@@ -2,7 +2,7 @@
 
 import QtQuick
 
-import Nx
+import Nx.Core 1.0
 
 Item
 {

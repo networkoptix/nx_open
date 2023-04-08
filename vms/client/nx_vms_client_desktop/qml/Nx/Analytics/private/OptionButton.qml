@@ -5,6 +5,7 @@ import QtQuick.Controls 2.14
 import QtQuick.Controls.impl 2.14
 
 import Nx 1.0
+import Nx.Core 1.0
 
 import nx.vms.client.desktop 1.0
 

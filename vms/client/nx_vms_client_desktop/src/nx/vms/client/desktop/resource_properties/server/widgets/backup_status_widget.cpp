@@ -13,12 +13,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/palette.h>
@@ -83,7 +83,7 @@ BackupStatusWidget::BackupStatusWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    const auto lightAccentColor = colorTheme()->color("light10");
+    const auto lightAccentColor = core::colorTheme()->color("light10");
     setPaletteColor(ui->backupNotConfiguredStatusLabel, QPalette::WindowText, lightAccentColor);
     setPaletteColor(ui->backupCamerasCountLabel, QPalette::WindowText, lightAccentColor);
     setWarningStyle(ui->storageIssueLabel);
@@ -334,7 +334,7 @@ void BackupStatusWidget::onBackupTimePointCalculated(
     const auto formatDateTime =
         [](const QString& text)
         {
-            static const auto lightAccentColor = colorTheme()->color("light10");
+            static const auto lightAccentColor = core::colorTheme()->color("light10");
             auto result = html::colored(text, lightAccentColor);
             result.prepend(QChar::Nbsp); //< Extra spacing for better visual perception;
             return result;

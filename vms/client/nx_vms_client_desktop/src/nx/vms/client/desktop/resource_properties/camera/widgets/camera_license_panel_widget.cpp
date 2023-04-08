@@ -4,11 +4,11 @@
 #include "ui_camera_license_panel_widget.h"
 
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/utils/background_flasher.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/provided_text_display.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/read_only.h>
 
 #include "../flux/camera_settings_dialog_state.h"
@@ -56,7 +56,7 @@ void CameraLicensePanelWidget::init(
     m_storeConnections << connect(ui->useLicenseCheckBox, &CheckBox::cannotBeToggled, this,
         [this]()
         {
-            BackgroundFlasher::flash(ui->licenseUsageLabel, colorTheme()->color("red_l2"));
+            BackgroundFlasher::flash(ui->licenseUsageLabel, core::colorTheme()->color("red_l2"));
         });
 
     m_storeConnections << connect(store, &CameraSettingsDialogStore::stateChanged,

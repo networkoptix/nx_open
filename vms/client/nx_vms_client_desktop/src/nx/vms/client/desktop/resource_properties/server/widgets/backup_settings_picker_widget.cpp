@@ -11,11 +11,11 @@
 #include <QtWidgets/QMenu>
 
 #include <core/resource/camera_resource.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/backup_settings_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/backup_settings_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <utils/math/color_transformations.h>
 
@@ -49,13 +49,13 @@ BackupSettingsPickerWidget::BackupSettingsPickerWidget(QWidget* parent):
 
     const auto backgroundHighlightAlpha = std::rint(kBackgroundHighlightPercentage / 100.0 * 0xFF);
     const auto backgroundColor = alphaBlend(
-        colorTheme()->color("dark7"),
-        colorTheme()->color("brand_core", backgroundHighlightAlpha));
+        core::colorTheme()->color("dark7"),
+        core::colorTheme()->color("brand_core", backgroundHighlightAlpha));
 
     setPaletteColor(this, QPalette::Window, backgroundColor);
     setAutoFillBackground(true);
 
-    setPaletteColor(ui->horizontalLine, QPalette::Shadow, colorTheme()->color("dark6"));
+    setPaletteColor(ui->horizontalLine, QPalette::Shadow, core::colorTheme()->color("dark6"));
 
     QFont selectionDescriptionLabelFont = ui->selectionDescriptionLabel->font();
     selectionDescriptionLabelFont.setWeight(QFont::DemiBold);

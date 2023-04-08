@@ -11,7 +11,7 @@
 
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/custom_runnable.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace nx::vms::client::desktop {
 
@@ -29,7 +29,7 @@ public:
     Private(FocusFrameItem* parent);
 
 public:
-    QColor color = colorTheme()->color("dark1");
+    QColor color = core::colorTheme()->color("dark1");
     int frameWidth = 1;
     bool textureDirty = true;
     QScopedPointer<QSGTextureMaterial> material;

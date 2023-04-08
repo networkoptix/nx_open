@@ -23,7 +23,7 @@
 #include <ui/graphics/items/generic/resizer_widget.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/processors/hover_processor.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>

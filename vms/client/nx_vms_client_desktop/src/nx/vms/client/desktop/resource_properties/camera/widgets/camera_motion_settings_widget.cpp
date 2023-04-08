@@ -13,11 +13,11 @@
 #include <client_core/client_core_module.h>
 #include <nx/vms/client/core/media/media_player.h>
 #include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_button.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/graphics/opengl/gl_functions.h>
@@ -56,7 +56,7 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
     ui->highResolutionAlertBar->setRetainSpaceWhenNotDisplayed(true);
 
-    const QList<QColor> sensitivityColors = colorTheme()->colors("camera.sensitivityColors");
+    const QList<QColor> sensitivityColors = core::colorTheme()->colors("camera.sensitivityColors");
 
     const auto sensitivityButtonPaintFunction =
         [this, sensitivityColors]

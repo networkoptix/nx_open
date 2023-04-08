@@ -4,10 +4,9 @@
 #include "io_module_grid_overlay_contents_p.h"
 
 #include <ui/common/palette.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
-
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnIoModuleGridOverlayContents::QnIoModuleGridOverlayContents() :
     base_type(),

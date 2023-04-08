@@ -19,6 +19,7 @@
 
 #include <nx/build_info.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/util.h>
@@ -26,7 +27,6 @@
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
 
-#include "skin.h"
 
 namespace nx::vms::client::desktop {
 

@@ -11,13 +11,12 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/string.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 #include "skin.h"
 #include "icon_pixmap_accessor.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -267,7 +266,7 @@ QIcon IconLoader::loadSvgIconInternal(
         }
 
         const QByteArray baseData = source.readAll();
-        const SvgIconColorer colorer(baseData, name, substitutions);
+        const core::SvgIconColorer colorer(baseData, name, substitutions);
         builder.addSvg(colorer, QnIcon::Normal, QIcon::Off);
         for (const auto& modeSubstitutions: substitutions.keys())
             builder.addSvg(colorer, modeSubstitutions, QIcon::Off);
@@ -280,7 +279,7 @@ QIcon IconLoader::loadSvgIconInternal(
         if (NX_ASSERT(source.open(QIODevice::ReadOnly), "Cannot load icon %1", checkedName))
         {
             const QByteArray checkedData = source.readAll();
-            const SvgIconColorer colorer(checkedData, checkedName, substitutions);
+            const core::SvgIconColorer colorer(checkedData, checkedName, substitutions);
             builder.addSvg(colorer, QnIcon::Normal, QIcon::On);
             for (const auto& modeSubstitutions: substitutions.keys())
                 builder.addSvg(colorer, modeSubstitutions, QIcon::On);
@@ -290,4 +289,4 @@ QIcon IconLoader::loadSvgIconInternal(
     return builder.createIcon();
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

@@ -10,8 +10,8 @@
 
 #include <nx/utils/log/assert.h>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 
 namespace {
 

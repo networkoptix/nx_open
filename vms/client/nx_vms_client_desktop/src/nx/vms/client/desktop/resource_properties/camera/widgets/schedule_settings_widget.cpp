@@ -9,13 +9,13 @@
 
 #include <core/resource/device_dependent_strings.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/stream_quality_strings.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_painter.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/camera/camera_bitrate_calculator.h>

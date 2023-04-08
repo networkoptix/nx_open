@@ -10,11 +10,11 @@
 #include <licensing/license.h>
 #include <nx/branding.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/licensing/customer_support.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/license/validator.h>
 #include <nx_ec/ec_api_common.h>
@@ -158,7 +158,7 @@ public:
 
     static QStringList licenseHtmlDescription(const QnLicensePtr& license)
     {
-        static const auto kLightTextColor = ColorTheme::instance()->color("light10");
+        static const auto kLightTextColor = core::colorTheme()->color("light10");
 
         QStringList result;
 
@@ -356,7 +356,7 @@ void LicenseActivationDialogs::freeLicenseNetworkError(QWidget* parent, const QS
         QString(html::kLineBreak);
 
     QString licenseInfoString;
-    static const auto kLightTextColor = ColorTheme::instance()->color("light10");
+    static const auto kLightTextColor = core::colorTheme()->color("light10");
 
     html::Tag tagTable("table", licenseInfoString);
     {

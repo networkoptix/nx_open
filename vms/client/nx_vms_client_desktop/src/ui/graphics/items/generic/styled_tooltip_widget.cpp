@@ -11,7 +11,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/palette.h>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 #include <nx/utils/math/fuzzy.h>
 
@@ -21,7 +21,7 @@ const qreal kDefaultRoundingRadius = 2.0;
 
 } // namespace
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem* parent):
     base_type(parent),

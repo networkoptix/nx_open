@@ -4,7 +4,7 @@
 
 #include "ui_action_type_picker_widget.h"
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/manifest.h>
 #include <ui/common/palette.h>
@@ -16,7 +16,7 @@ ActionTypePickerWidget::ActionTypePickerWidget(QWidget* parent):
     ui(new Ui::ActionTypePickerWidget())
 {
     ui->setupUi(this);
-    setPaletteColor(ui->doLabel, QPalette::WindowText, colorTheme()->color("light1"));
+    setPaletteColor(ui->doLabel, QPalette::WindowText, core::colorTheme()->color("light1"));
 
     connect(ui->actionTypeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
         [this]()

@@ -13,7 +13,7 @@
 #include <QtQuick/QSGMaterialShader>
 
 #include <nx/vms/client/core/motion/motion_grid.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 class QSGNode;
 class QSGMaterial;
@@ -68,7 +68,7 @@ private:
     struct State
     {
         QSize resolution;
-        QColor borderColor = colorTheme()->color("dark1");
+        QColor borderColor = core::colorTheme()->color("dark1");
         float fillOpacity = 0.1;
         QSharedPointer<QSGTexture> texture;
 
@@ -129,7 +129,7 @@ private:
     QSharedPointer<QSGTexture> m_labelsTexture;
     QSizeF m_cellSize;
     QSize m_labelSize;
-    QColor m_labelsColor = colorTheme()->color("dark1");
+    QColor m_labelsColor = core::colorTheme()->color("dark1");
     bool m_labelsTextureDirty = true;
     bool m_labelsDirty = true;
 

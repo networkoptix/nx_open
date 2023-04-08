@@ -5,11 +5,11 @@
 #include "../details/node/view_node_helper.h"
 #include "../details/node/view_node_constants.h"
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace nx::vms::client::desktop {
 namespace node_view {
@@ -58,7 +58,7 @@ namespace {
         if (progress < 0)
             return;
 
-        static const QColor kChartColor = colorTheme()->color("brand_d3");
+        static const QColor kChartColor = core::colorTheme()->color("brand_d3");
 
         const QnScopedPainterPenRollback penRollback(painter, kChartColor);
         const QnScopedPainterBrushRollback brushRollback(painter, kChartColor);

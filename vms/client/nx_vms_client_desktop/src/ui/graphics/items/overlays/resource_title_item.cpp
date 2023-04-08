@@ -5,8 +5,8 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <ui/animation/opacity_animator.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <qt_graphics_items/graphics_label.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
@@ -73,6 +73,7 @@ void QnResourceTitleItem::paint(QPainter* painter,
     const PainterTransformScaleStripper scaleStripper(painter);
     const auto paintRect = scaleStripper.mapRect(rect());
 
+    using namespace nx::vms::client::core;
     QLinearGradient gradient(0, 0, 0, paintRect.height());
     gradient.setColorAt(0, colorTheme()->color("camera.titleGradient.top"));
     gradient.setColorAt(1, colorTheme()->color("camera.titleGradient.bottom"));

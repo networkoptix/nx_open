@@ -18,11 +18,11 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/server_selection_dialog.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
@@ -61,8 +61,8 @@ QIcon iconHelper(QIcon base)
     if (base.isNull())
         return base;
 
-    return QIcon(Skin::maximumSizePixmap(base,
-        QIcon::Selected, QIcon::Off, false));
+    return QIcon(nx::vms::client::core::Skin::maximumSizePixmap(
+        base, QIcon::Selected, QIcon::Off, false));
 }
 
 void setActionResourcesHolderDisplayFromModel(

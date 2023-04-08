@@ -7,7 +7,7 @@
 #include <QtGui/QPainterPath>
 #include <QtWidgets/QApplication>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace nx::vms::client::desktop {
 
@@ -171,8 +171,8 @@ void ExportOverlayWidget::renderContent(QPainter& painter)
         QFontMetrics fontMetrics(d->font);
         path.addText(textMargins(fontMetrics).width(), fontMetrics.ascent(), d->font, d->text);
         painter.setRenderHints(QPainter::Antialiasing);
-        painter.strokePath(path, QPen(colorTheme()->color("dark1"), 2.0));
-        painter.fillPath(path, colorTheme()->color("light1"));
+        painter.strokePath(path, QPen(core::colorTheme()->color("dark1"), 2.0));
+        painter.fillPath(path, core::colorTheme()->color("light1"));
     }
 }
 

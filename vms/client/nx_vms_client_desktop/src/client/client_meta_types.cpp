@@ -19,7 +19,6 @@
 #include <nx/cloud/db/api/result_code.h>
 #include <nx/cloud/db/api/system_data.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/index_list_model.h>
@@ -61,7 +60,6 @@
 #include <nx/vms/client/desktop/thumbnails/roi_camera_thumbnail.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/context_help.h>
 #include <nx/vms/client/desktop/ui/common/cursor_override.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursor.h>
@@ -227,7 +225,6 @@ void QnClientMetaTypes::initialize()
 void QnClientMetaTypes::registerQmlTypes()
 {
     AccessRightsList::registerQmlTypes();
-    ColorTheme::registerQmlType();
     LayoutModel::registerQmlType();
     LinearizationListModel::registerQmlType();
     IndexListModel::registerQmlType();
@@ -314,6 +311,5 @@ void QnClientMetaTypes::registerQmlTypes()
     CursorOverride::registerQmlType();
     utils::WebEngineProfileManager::registerQmlType();
     analytics::TaxonomyManager::registerQmlTypes();
-    analytics::IconManager::registerQmlType();
     workbench::timeline::registerQmlType();
 }

@@ -19,6 +19,7 @@
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/types/dewarping_types.h>
 #include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/common/helpers/texture_size_helper.h>
@@ -29,6 +30,7 @@
 #include <nx/vms/client/core/common/utils/property_update_filter.h>
 #include <nx/vms/client/core/common/utils/validators.h>
 #include <nx/vms/client/core/common/utils/velocity_meter.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 #include <nx/vms/client/core/items/grid_viewport.h>
 #include <nx/vms/client/core/media/abstract_time_period_storage.h>
@@ -146,6 +148,8 @@ void initializeMetaTypes()
     DayHoursModel::registerQmlType();
     AbstractTimePeriodStorage::registerQmlType();
     ChunkProvider::registerQmlType();
+    ColorTheme::registerQmlType();
+    analytics::IconManager::registerQmlType();
 
     MediaPlayer::registerQmlTypes();
 

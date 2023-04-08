@@ -18,6 +18,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
@@ -31,12 +33,10 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_administration/dialogs/user_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <recording/time_period.h>
 #include <ui/common/palette.h>
 #include <ui/delegates/audit_item_delegate.h>
@@ -573,6 +573,8 @@ void QnAuditLogDialog::at_updateDetailModel()
 
 void QnAuditLogDialog::setupCheckboxes()
 {
+    using namespace nx::vms::client::core;
+
     m_filterCheckboxes.clear();
     // TODO: separate MitM attack check box.
     setupFilterCheckbox(

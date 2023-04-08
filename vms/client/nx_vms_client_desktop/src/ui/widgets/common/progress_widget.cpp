@@ -4,7 +4,7 @@
 
 #include <QtWidgets/QBoxLayout>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
 QnProgressWidget::QnProgressWidget(QWidget *parent):

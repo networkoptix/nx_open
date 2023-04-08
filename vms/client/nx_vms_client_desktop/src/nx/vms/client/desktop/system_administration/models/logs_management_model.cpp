@@ -4,9 +4,9 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace nx::vms::client::desktop {
 
@@ -53,8 +53,8 @@ nx::utils::log::Level logLevel(LogsManagementUnitPtr unit)
 QColor logLevelColor(LogsManagementUnitPtr unit)
 {
     return logLevel(unit) == LogsManagementWatcher::defaultLogLevel()
-        ? colorTheme()->color(kNormalLogLevelColor)
-        : colorTheme()->color(kWarningLogLevelColor);
+        ? core::colorTheme()->color(kNormalLogLevelColor)
+        : core::colorTheme()->color(kWarningLogLevelColor);
 }
 
 bool isOnline(LogsManagementUnitPtr unit)

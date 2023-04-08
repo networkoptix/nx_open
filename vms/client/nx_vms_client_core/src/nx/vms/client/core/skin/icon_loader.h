@@ -9,7 +9,7 @@
 #include "icon.h"
 #include "svg_icon_colorer.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 class Skin;
 
@@ -50,4 +50,4 @@ private:
     QSet<qint64> m_cacheKeys;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

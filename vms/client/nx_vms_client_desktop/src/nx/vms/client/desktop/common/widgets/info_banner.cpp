@@ -2,7 +2,7 @@
 
 #include "info_banner.h"
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <utils/math/color_transformations.h>
 
@@ -52,12 +52,12 @@ void InfoBanner::setWarningStyleInternal(bool value)
     )css";
 
     const QColor bgColor = value
-        ? toTransparent(colorTheme()->color("red_l2"), 0.2)
-        : colorTheme()->color("dark10");
+        ? toTransparent(core::colorTheme()->color("red_l2"), 0.2)
+        : core::colorTheme()->color("dark10");
 
     const QColor textColor = value
-        ? colorTheme()->color("red_l2")
-        : colorTheme()->color("light10");
+        ? core::colorTheme()->color("red_l2")
+        : core::colorTheme()->color("light10");
 
     const QString styleSheet = kStyleSheetTemplate.arg(
         bgColor.name(QColor::HexArgb),

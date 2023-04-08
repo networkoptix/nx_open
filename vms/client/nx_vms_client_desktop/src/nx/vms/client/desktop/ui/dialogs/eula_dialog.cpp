@@ -14,12 +14,12 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/webview_style.h>
 
 namespace nx::vms::client::desktop {
@@ -40,7 +40,7 @@ EulaDialog::EulaDialog(QWidget* parent):
     ui->eulaView->controller()->setMenuNavigation(false);
 
     ui->iconLabel->setPixmap(
-        Skin::maximumSizePixmap(style()->standardIcon(QStyle::SP_MessageBoxWarning)));
+        core::Skin::maximumSizePixmap(style()->standardIcon(QStyle::SP_MessageBoxWarning)));
 
     auto font = ui->titleLabel->font();
     font.setPixelSize(font.pixelSize() + 2);

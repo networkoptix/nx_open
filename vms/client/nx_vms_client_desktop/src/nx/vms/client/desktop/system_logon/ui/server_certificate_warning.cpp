@@ -10,8 +10,8 @@
 
 #include <nx/network/ssl/certificate.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/help/help_handler.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
@@ -70,7 +70,7 @@ ServerCertificateWarning::ServerCertificateWarning(
         additionalText->setWordWrap(true);
 
         auto palette = additionalText->palette();
-        palette.setColor(QPalette::WindowText, colorTheme()->color("dark13"));
+        palette.setColor(QPalette::WindowText, core::colorTheme()->color("dark13"));
         additionalText->setPalette(palette);
 
         addCustomWidget(additionalText);

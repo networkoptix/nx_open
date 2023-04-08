@@ -8,7 +8,7 @@
 #include <QtCore/QPointer>
 #include <QtWidgets/QLabel>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -24,7 +24,7 @@ public:
         q(q),
         popup(popup),
         shadow(new QLabel(popup->parentWidget())),
-        color(colorTheme()->color("dark1")),
+        color(core::colorTheme()->color("dark1")),
         offset(10, 10),
         blurRadius(10),
         spread(0),
@@ -228,7 +228,7 @@ public:
     QWidget* popup = nullptr;
     QPointer<QLabel> shadow;
 
-    QColor color = colorTheme()->color("dark1");
+    QColor color = core::colorTheme()->color("dark1");
     QPoint offset = QPoint(10, 10);
     int blurRadius = 10;
     int spread = 0;

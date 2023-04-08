@@ -4,14 +4,14 @@
 
 #include <QFileInfo>
 
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/ui/common/color_substitutions.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/skin/color_substitutions.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 #include "icon.h"
 #include "icon_loader.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -177,4 +177,4 @@ SvgIconColorer::IconSubstitutions SvgIconColorer::IconSubstitutions::operator+(
     return result;
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

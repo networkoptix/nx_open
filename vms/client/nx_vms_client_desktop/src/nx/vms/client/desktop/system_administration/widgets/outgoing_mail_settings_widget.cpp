@@ -18,13 +18,13 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
@@ -154,7 +154,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
 
     // Setup header appearance.
 
-    static const auto kHeaderBackgroundColor = colorTheme()->color("dark8");
+    static const auto kHeaderBackgroundColor = core::colorTheme()->color("dark8");
     setPaletteColor(ui->headerWidget, QPalette::Window, kHeaderBackgroundColor);
     ui->headerWidget->setAutoFillBackground(true);
 
@@ -168,7 +168,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
     statusHintFont.setWeight(kStatusHintLabelFontWeight);
     ui->configurationStatusHintLabel->setFont(statusHintFont);
 
-    static const auto kStatusHintColor = colorTheme()->color("light10");
+    static const auto kStatusHintColor = core::colorTheme()->color("light10");
     setPaletteColor(ui->configurationStatusHintLabel, QPalette::WindowText, kStatusHintColor);
 
     // Fill connection type combo box options.
@@ -343,7 +343,7 @@ void OutgoingMailSettingsWidget::Private::setConfigurationStatus(ConfigurationSt
 
     const auto [text, code] = kStatusRepresentation.value(status);
     ui->configurationStatusLabel->setText(text);
-    setPaletteColor(ui->configurationStatusLabel, QPalette::WindowText, colorTheme()->color(code));
+    setPaletteColor(ui->configurationStatusLabel, QPalette::WindowText, core::colorTheme()->color(code));
 }
 
 void OutgoingMailSettingsWidget::Private::setConfigurationStatusHint(const QString& statusHint)

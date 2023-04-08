@@ -33,14 +33,14 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/manifest_items.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
-#include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/vms/text/human_readable.h>
@@ -1247,7 +1247,7 @@ const nx::analytics::taxonomy::AbstractObjectType*
 
 QString AnalyticsSearchListModel::Private::iconPath(const QString& objectTypeId) const
 {
-    const auto iconManager = analytics::IconManager::instance();
+    const auto iconManager = core::analytics::IconManager::instance();
     const auto objectType = objectTypeById(objectTypeId);
 
     return objectType

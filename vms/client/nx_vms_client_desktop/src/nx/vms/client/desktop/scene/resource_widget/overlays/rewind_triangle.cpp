@@ -4,8 +4,8 @@
 
 #include <QtGui/QPainter>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 
 RewindTriangle::RewindTriangle(bool fastForward, QGraphicsWidget* parent):
     QGraphicsWidget(parent)

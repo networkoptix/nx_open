@@ -54,6 +54,7 @@ copyResources()
 {
     echo "Copying resources"
     cp "$BUILD_DIR/bin/client_external.dat" "$APP_RESOURCES_DIR"
+    cp "$BUILD_DIR/bin/client_core_external.dat" "$APP_RESOURCES_DIR"
     cp "$BUILD_DIR/bin/bytedance_iconpark.dat" "$APP_RESOURCES_DIR"
 }
 

@@ -14,7 +14,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -187,12 +187,12 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(
     if (result)
     {
         message = tr("OK");
-        color = colorTheme()->color("green_core");
+        color = nx::vms::client::core::colorTheme()->color("green_core");
     }
     else
     {
         message = tr("FAILED: %1").arg(errorMessage);
-        color = colorTheme()->color("red_l2");
+        color = nx::vms::client::core::colorTheme()->color("red_l2");
     }
 
     ui->textEdit->append(html::colored(message, color));

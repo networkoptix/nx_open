@@ -7,8 +7,7 @@
 #include <QtWidgets/QLineEdit>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/style/skin.h>
-
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/line_edit_controls.h>
 
 namespace nx::vms::client::desktop {

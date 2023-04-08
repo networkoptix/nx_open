@@ -8,11 +8,11 @@
 
 #include <qt_graphics_items/graphics_widget.h>
 
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/icon.h>
+#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
-#include <nx/vms/client/desktop/style/icon.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/style/svg_icon_colorer.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_panel.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/framed_widget.h>
@@ -28,6 +28,7 @@
 #include "time_slider.h"
 #include "timeline_placeholder.h"
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -52,8 +53,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setCursor(Qt::ArrowCursor);
 
     setAutoFillBackground(true);
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark6"));
-    setPaletteColor(this, QPalette::Shadow, colorTheme()->color("dark1", 38));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark6"));
+    setPaletteColor(this, QPalette::Shadow, core::colorTheme()->color("dark1", 38));
 
     m_navigationWidgetPlaceholder = new GraphicsWidget(this);
     m_controlWidgetPlaceholder = new GraphicsWidget(this);
@@ -83,8 +84,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_sliderInnerShading->setFrameBorders(Qt::LeftEdge | Qt::RightEdge);
     m_sliderInnerShading->setFrameColor(palette().color(QPalette::Shadow));
 
-    const QColor darkSeparatorColor = colorTheme()->color("dark5");
-    const QColor lightSeparatorColor = colorTheme()->color("dark7");
+    const QColor darkSeparatorColor = core::colorTheme()->color("dark5");
+    const QColor lightSeparatorColor = core::colorTheme()->color("dark7");
     const SeparatorAreas separatorAreas = {
         { kDarkSeparatorThickness, darkSeparatorColor },
         { kLightSeparatorThickness, lightSeparatorColor }};
@@ -227,9 +228,9 @@ void QnNavigationItem::createZoomButton(
 
     const auto fileName = QString("slider/buttons/zoom_%1.svg").arg(zoomingName.toLower());
 
-    const QColor background = colorTheme()->color("dark6");
-    const QColor foreground = colorTheme()->color("light16");
-    const SvgIconColorer::IconSubstitutions substitutions = {
+    const QColor background = core::colorTheme()->color("dark6");
+    const QColor foreground = core::colorTheme()->color("light16");
+    const core::SvgIconColorer::IconSubstitutions substitutions = {
         { QnIcon::Active, {{ background, "dark7" }}},
         { QnIcon::Pressed, {{ background, "dark5" }}},
         { QnIcon::Disabled, {{ foreground, "dark9" }}}

@@ -5,7 +5,7 @@
 #include <QtWidgets/QStylePainter>
 #include <QtWidgets/QStyleOptionToolButton>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
@@ -22,7 +22,7 @@ void ToolButton::adjustIconSize()
 
 QSize ToolButton::calculateIconSize() const
 {
-    return Skin::maximumSize(icon());
+    return core::Skin::maximumSize(icon());
 }
 
 void ToolButton::mousePressEvent(QMouseEvent* event)

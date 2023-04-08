@@ -14,7 +14,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/algorithm/index_of.h>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 
 namespace
 {

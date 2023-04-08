@@ -4,10 +4,10 @@
 
 #include <qt_graphics_items/graphics_path_item.h>
 
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/gui_elements_widget.h>
@@ -34,8 +34,8 @@ public:
     {
         setAcceptedMouseButtons(Qt::NoButton);
 
-        setPen(QPen(nx::vms::client::desktop::colorTheme()->color("ptz.main", 192), 0.0));
-        setBrush(nx::vms::client::desktop::colorTheme()->color("ptz.fill", 192));
+        setPen(QPen(nx::vms::client::core::colorTheme()->color("ptz.main", 192), 0.0));
+        setBrush(nx::vms::client::core::colorTheme()->color("ptz.fill", 192));
     }
 
     const QSizeF &size() const {
@@ -114,8 +114,8 @@ public:
         font.setPixelSize(50);
         setFont(font);
 
-        setFrameColor(nx::vms::client::desktop::colorTheme()->color("ptz.main", 192));
-        setWindowColor(nx::vms::client::desktop::colorTheme()->color("ptz.fill", 64));
+        setFrameColor(nx::vms::client::core::colorTheme()->color("ptz.main", 192));
+        setWindowColor(nx::vms::client::core::colorTheme()->color("ptz.fill", 64));
     }
 
     QnMediaResourceWidget *target() const {
@@ -140,8 +140,8 @@ class PtzManipulatorWidget: public GraphicsWidget {
 public:
     PtzManipulatorWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = {}):
         base_type(parent, windowFlags),
-        m_pen(QPen(nx::vms::client::desktop::colorTheme()->color("ptz.main", 192), 0.0)),
-        m_brush(nx::vms::client::desktop::colorTheme()->color("ptz.fill", 64))
+        m_pen(QPen(nx::vms::client::core::colorTheme()->color("ptz.main", 192), 0.0)),
+        m_brush(nx::vms::client::core::colorTheme()->color("ptz.fill", 64))
     {
     }
 
@@ -212,10 +212,10 @@ public:
         if (m_direction.isNull())
             return;
 
-        static const QColor kShadowColor(nx::vms::client::desktop::colorTheme()->color("dark5", 51));
-        static const QBrush kDarkBrush(nx::vms::client::desktop::colorTheme()->color("dark5", 102));
-        static const QBrush kMidlightBrush(nx::vms::client::desktop::colorTheme()->color("light1", 153));
-        static const QBrush kLightBrush(nx::vms::client::desktop::colorTheme()->color("light1"));
+        static const QColor kShadowColor(nx::vms::client::core::colorTheme()->color("dark5", 51));
+        static const QBrush kDarkBrush(nx::vms::client::core::colorTheme()->color("dark5", 102));
+        static const QBrush kMidlightBrush(nx::vms::client::core::colorTheme()->color("light1", 153));
+        static const QBrush kLightBrush(nx::vms::client::core::colorTheme()->color("light1"));
 
         static constexpr qreal kBigRadius = 9.5;
         static constexpr qreal kSmallRadius = 2.5;
@@ -287,7 +287,7 @@ public:
     PtzSplashItem(QGraphicsItem *parent = nullptr):
         base_type(parent)
     {
-        setColor(nx::vms::client::desktop::colorTheme()->color("ptz.main", 128));
+        setColor(nx::vms::client::core::colorTheme()->color("ptz.main", 128));
     }
 };
 
@@ -304,7 +304,7 @@ public:
     PtzSelectionItem(QGraphicsItem *parent = nullptr):
         base_type(parent)
     {
-        setPen(QPen(nx::vms::client::desktop::colorTheme()->color("ptz.main", 192), 0.0));
-        setBrush(nx::vms::client::desktop::colorTheme()->color("ptz.fill", 64));
+        setPen(QPen(nx::vms::client::core::colorTheme()->color("ptz.main", 192), 0.0));
+        setBrush(nx::vms::client::core::colorTheme()->color("ptz.fill", 64));
     }
 };

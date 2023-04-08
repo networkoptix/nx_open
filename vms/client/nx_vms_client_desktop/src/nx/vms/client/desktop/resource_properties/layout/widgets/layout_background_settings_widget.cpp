@@ -11,10 +11,10 @@
 #include <QtGui/QScreen>
 #include <QtWidgets/QApplication>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -186,7 +186,7 @@ void LayoutBackgroundSettingsWidget::setupUi()
 
     installEventFilter(this);
     ui->imageLabel->installEventFilter(this);
-    ui->imageLabel->setFrameColor(colorTheme()->color("layoutBackgroundSettings.frameColor"));
+    ui->imageLabel->setFrameColor(core::colorTheme()->color("layoutBackgroundSettings.frameColor"));
     ui->imageLabel->setAutoScale(true);
 }
 

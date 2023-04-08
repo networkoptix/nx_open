@@ -9,10 +9,10 @@
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <licensing/license.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/widgets/combo_box_field.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/common/widgets/text_edit_field.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
@@ -69,7 +69,7 @@ LicenseDeactivationReason::LicenseDeactivationReason(
     base_type(parent),
     m_info(info)
 {
-    static const auto kLightTextColor = ColorTheme::instance()->color("light10");
+    static const auto kLightTextColor = nx::vms::client::core::colorTheme()->color("light10");
 
     setText(tr("Please complete the following for license deactivation"));
     setInformativeText(

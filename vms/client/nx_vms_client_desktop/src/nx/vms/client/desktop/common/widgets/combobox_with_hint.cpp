@@ -4,8 +4,8 @@
 
 #include <QtWidgets/QStyledItemDelegate>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace nx::vms::client::desktop {
@@ -45,7 +45,7 @@ private:
 
 ComboBoxWithHint::ComboBoxWithHint(QWidget* parent):
     base_type(parent),
-    m_hintColor(colorTheme()->color("light13"))
+    m_hintColor(core::colorTheme()->color("light13"))
 {
     setItemDelegate(new PaintHintItemDelegate(this));
 }

@@ -18,6 +18,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
@@ -25,12 +27,10 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_group_request_chain.h>
 #include <nx/vms/client/desktop/system_administration/models/user_list_model.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/dialogs/force_secure_auth_dialog.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <ui/common/palette.h>
@@ -76,10 +76,10 @@ public:
         {
             case UserListModel::UserWarningColumn:
             case UserListModel::UserTypeColumn:
-                return Skin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>());
+                return core::Skin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>());
 
             case UserListModel::IsCustomColumn:
-                return Skin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>())
+                return core::Skin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>())
                     + QSize(style::Metrics::kStandardPadding * 2, 0);
 
             default:
@@ -109,7 +109,7 @@ public:
 
             const auto rect = QStyle::alignedRect(Qt::LeftToRight,
                 horizontalAlignment | Qt::AlignVCenter,
-                Skin::maximumSize(icon),
+                core::Skin::maximumSize(icon),
                 option.rect.adjusted(padding, 0, -padding, 0));
 
             icon.paint(painter, rect);
@@ -130,14 +130,14 @@ protected:
         if (const bool disabledUser = index.data(Qn::DisabledRole).toBool())
         {
             option->palette.setColor(QPalette::Text, option->checkState == Qt::Unchecked
-                ? colorTheme()->color("dark16")
-                : colorTheme()->color("light14"));
+                ? core::colorTheme()->color("dark16")
+                : core::colorTheme()->color("light14"));
         }
         else
         {
             option->palette.setColor(QPalette::Text, option->checkState == Qt::Unchecked
-                ? colorTheme()->color("light10")
-                : colorTheme()->color("light4"));
+                ? core::colorTheme()->color("light10")
+                : core::colorTheme()->color("light4"));
         }
     }
 };

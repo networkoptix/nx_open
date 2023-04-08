@@ -10,10 +10,10 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QToolTip>
 
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/event_search/widgets/private/notification_bell_widget_p.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 
 #include <nx/utils/log/assert.h>
@@ -270,7 +270,7 @@ void CompactTabBar::Private::paintTab(int index, QPainter* painter)
 
     // Draw side border.
 
-    painter->setPen(colorTheme()->color("dark6"));
+    painter->setPen(core::colorTheme()->color("dark6"));
 
     const QRect tabRect = q->tabRect(index);
 
@@ -280,7 +280,7 @@ void CompactTabBar::Private::paintTab(int index, QPainter* painter)
 
     if (current)
     {
-        painter->setPen(colorTheme()->color("brand_core"));
+        painter->setPen(core::colorTheme()->color("brand_core"));
         // Fine-tuned in order to nicely blend the line into widget border.
         painter->translate(0, 0.5);
         painter->drawLine(tabRect.bottomLeft() + QPoint{1, 0}, tabRect.bottomRight());
@@ -442,15 +442,15 @@ CompactTabBar::CompactTabBar(QWidget* parent):
     setElideMode(Qt::ElideNone);
     setMinimumHeight(style::Metrics::kHeaderSize);
 
-    setPaletteColor(this, QPalette::WindowText, colorTheme()->color("light12"));
-    setPaletteColor(this, QPalette::Light, colorTheme()->color("light10"));
-    setPaletteColor(this, QPalette::Midlight, colorTheme()->color("dark12"));
-    setPaletteColor(this, QPalette::Highlight, colorTheme()->color("brand_core"));
+    setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light12"));
+    setPaletteColor(this, QPalette::Light, core::colorTheme()->color("light10"));
+    setPaletteColor(this, QPalette::Midlight, core::colorTheme()->color("dark12"));
+    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core"));
 
-    setPaletteColor(this, QPalette::Disabled, QPalette::WindowText, colorTheme()->color("dark12"));
-    setPaletteColor(this, QPalette::Disabled, QPalette::Light, colorTheme()->color("dark12"));
-    setPaletteColor(this, QPalette::Disabled, QPalette::Midlight, colorTheme()->color("dark12"));
-    setPaletteColor(this, QPalette::Disabled, QPalette::Highlight, colorTheme()->color("dark12"));
+    setPaletteColor(this, QPalette::Disabled, QPalette::WindowText, core::colorTheme()->color("dark12"));
+    setPaletteColor(this, QPalette::Disabled, QPalette::Light, core::colorTheme()->color("dark12"));
+    setPaletteColor(this, QPalette::Disabled, QPalette::Midlight, core::colorTheme()->color("dark12"));
+    setPaletteColor(this, QPalette::Disabled, QPalette::Highlight, core::colorTheme()->color("dark12"));
 
     connect(this, &QTabBar::tabMoved, [this](int from, int to) { d->tabMoved(from, to); });
     connect(this, &QTabBar::currentChanged, [this]() { d->handleCurrentChanged(); });

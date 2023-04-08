@@ -4,7 +4,7 @@
 
 #include "skin.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 SvgIconProvider::SvgIconProvider(): QQuickImageProvider(QQuickImageProvider::Pixmap)
 {}
@@ -21,4 +21,4 @@ QPixmap SvgIconProvider::requestPixmap(const QString& id, QSize* size, const QSi
     return pixmap;
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

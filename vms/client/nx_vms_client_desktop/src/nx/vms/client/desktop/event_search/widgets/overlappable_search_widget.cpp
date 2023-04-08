@@ -4,9 +4,9 @@
 
 #include <QtWidgets/QStackedLayout>
 
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/cross_system/dialogs/cloud_layouts_intro_dialog.h>
 #include <nx/vms/client/desktop/event_search/widgets/abstract_search_widget.h>
-#include <nx/vms/client/desktop/style/skin.h>
 
 #include "abstract_search_widget.h"
 #include "placeholder_widget.h"

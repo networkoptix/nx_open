@@ -3,13 +3,13 @@
 #include "panel.h"
 
 #include <ui/common/palette.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace nx::vms::client::desktop {
 
 Panel::Panel(QWidget* parent): QWidget(parent)
 {
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark8"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark8"));
     setAutoFillBackground(true);
 }
 

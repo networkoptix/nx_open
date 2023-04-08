@@ -10,7 +10,7 @@
 #include <client/client_globals.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>

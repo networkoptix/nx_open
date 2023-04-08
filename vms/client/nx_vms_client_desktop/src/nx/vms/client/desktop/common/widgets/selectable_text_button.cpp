@@ -5,11 +5,11 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyle>
 
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <utils/common/event_processors.h>
 #include <nx/utils/scope_guard.h>
 
@@ -52,18 +52,18 @@ SelectableTextButton::SelectableTextButton(QWidget* parent):
 {
     QPalette p = palette();
 
-    p.setColor(QPalette::Active, QPalette::Dark, colorTheme()->color("dark5"));
-    p.setColor(QPalette::Active, QPalette::Shadow, colorTheme()->color("dark4"));
-    p.setColor(QPalette::Active, QPalette::WindowText, colorTheme()->color("light10"));
+    p.setColor(QPalette::Active, QPalette::Dark, core::colorTheme()->color("dark5"));
+    p.setColor(QPalette::Active, QPalette::Shadow, core::colorTheme()->color("dark4"));
+    p.setColor(QPalette::Active, QPalette::WindowText, core::colorTheme()->color("light10"));
 
-    p.setColor(QPalette::Inactive, QPalette::Window, colorTheme()->color("dark10"));
+    p.setColor(QPalette::Inactive, QPalette::Window, core::colorTheme()->color("dark10"));
     p.setColor(QPalette::Inactive, QPalette::Shadow, Qt::transparent);
-    p.setColor(QPalette::Inactive, QPalette::Midlight, colorTheme()->color("dark11"));
-    p.setColor(QPalette::Inactive, QPalette::WindowText, colorTheme()->color("light14"));
-    p.setColor(QPalette::Inactive, QPalette::Text, colorTheme()->color("light16"));
-    p.setColor(QPalette::Inactive, QPalette::HighlightedText, colorTheme()->color("light10"));
-    p.setColor(QPalette::Inactive, QPalette::Highlight, colorTheme()->color("brand_core", 102));
-    p.setColor(QPalette::Inactive, QPalette::Light, colorTheme()->color("brand_l1", 102));
+    p.setColor(QPalette::Inactive, QPalette::Midlight, core::colorTheme()->color("dark11"));
+    p.setColor(QPalette::Inactive, QPalette::WindowText, core::colorTheme()->color("light14"));
+    p.setColor(QPalette::Inactive, QPalette::Text, core::colorTheme()->color("light16"));
+    p.setColor(QPalette::Inactive, QPalette::HighlightedText, core::colorTheme()->color("light10"));
+    p.setColor(QPalette::Inactive, QPalette::Highlight, core::colorTheme()->color("brand_core", 102));
+    p.setColor(QPalette::Inactive, QPalette::Light, core::colorTheme()->color("brand_l1", 102));
 
     setPalette(p);
 
@@ -258,7 +258,7 @@ void SelectableTextButton::setDeactivationToolTip(const QString& value)
 QSize SelectableTextButton::sizeHint() const
 {
     const auto textSize = QFontMetrics(font()).size(0, effectiveText());
-    const auto iconSize = Skin::maximumSize(effectiveIcon());
+    const auto iconSize = core::Skin::maximumSize(effectiveIcon());
 
     int extraWidth = iconSize.isValid()
         ? iconSize.width() + kIconIndent + kIconPadding
@@ -360,7 +360,7 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
 
     if (!icon.isNull())
     {
-        const auto iconSize = Skin::maximumSize(icon);
+        const auto iconSize = core::Skin::maximumSize(icon);
         const auto iconRect = QStyle::alignedRect(layoutDirection(),
             Qt::AlignLeft | Qt::AlignVCenter, iconSize, rect);
 

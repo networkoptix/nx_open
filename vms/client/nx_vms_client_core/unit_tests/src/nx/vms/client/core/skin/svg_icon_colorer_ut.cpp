@@ -4,10 +4,10 @@
 
 #include <memory>
 
-#include <nx/vms/client/desktop/style/icon.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/style/svg_icon_colorer.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/icon.h>
+#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <nx/vms/utils/external_resources.h>
 
 namespace {
@@ -111,7 +111,7 @@ const QByteArray kSvgDataError = R"(
 
 } // namespace
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 class SvgIconColorerTest: public testing::Test
 {
@@ -122,12 +122,12 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp() override
     {
-        nx::vms::utils::registerExternalResource("client_external.dat");
+        nx::vms::utils::registerExternalResource("client_core_external.dat");
 
         m_colorer.reset(new SvgIconColorer(kSvgData, "mock_svg"));
         m_colorTheme.reset(new ColorTheme(
             ":/skin/basic_colors.json",
-            ":/svg_icon_colorer_ut/test_skin_colors.json"));
+            ":/unit_tests/svg_icon_colorer_ut/test_skin_colors.json"));
     }
 
     // virtual void TearDown() will be called after each test is run.
@@ -135,7 +135,7 @@ protected:
     {
         m_colorTheme.reset();
 
-        ASSERT_TRUE(nx::vms::utils::unregisterExternalResource("client_external.dat"));
+        ASSERT_TRUE(nx::vms::utils::unregisterExternalResource("client_core_external.dat"));
     }
 
 private:

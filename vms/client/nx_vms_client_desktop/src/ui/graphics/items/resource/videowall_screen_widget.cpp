@@ -15,9 +15,9 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/palette.h>
@@ -53,7 +53,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(
     setAcceptDrops(true);
     setOption(QnResourceWidget::AlwaysShowName);
     setOption(QnResourceWidget::WindowRotationForbidden);
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark4"));
+    setPaletteColor(this, QPalette::Window, nx::vms::client::core::colorTheme()->color("dark4"));
 
     m_layout->setContentsMargins(kMargin, kTopMargin, kMargin, kMargin);
     m_layout->setSpacing(0.0);

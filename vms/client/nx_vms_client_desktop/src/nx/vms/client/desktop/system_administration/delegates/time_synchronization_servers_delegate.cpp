@@ -5,7 +5,7 @@
 #include <cmath>
 
 #include <nx/vms/text/human_readable.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -136,11 +136,11 @@ void TimeSynchronizationServersDelegate::paintName(
     // Draw text
     const QString extraInfo = index.data(Model::IpAddressRole).toString();
     const QColor textColor = selected
-        ? colorTheme()->color("light4")
-        : colorTheme()->color("light10");
+        ? core::colorTheme()->color("light4")
+        : core::colorTheme()->color("light10");
     const QColor ipAddressColor = selected
-        ? colorTheme()->color("light10")
-        : colorTheme()->color("dark17");
+        ? core::colorTheme()->color("light10")
+        : core::colorTheme()->color("dark17");
 
     const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; // As in Qt
     const int textEnd = textRect.right() - textPadding + 1;
@@ -205,8 +205,8 @@ void TimeSynchronizationServersDelegate::paintTime(
 
     // Draw text
     const QColor textColor = selected
-        ? colorTheme()->color("light4")
-        : colorTheme()->color("light10");
+        ? core::colorTheme()->color("light4")
+        : core::colorTheme()->color("light10");
 
     const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; // As in Qt
     const int textEnd = textRect.right() - textPadding + 1;

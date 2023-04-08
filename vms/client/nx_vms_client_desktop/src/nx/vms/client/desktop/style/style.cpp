@@ -45,6 +45,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/delegates/styled_combo_box_delegate.h>
 #include <nx/vms/client/desktop/common/utils/label_selection_manager.h>
@@ -58,7 +60,6 @@
 #include <nx/vms/client/desktop/common/widgets/slide_switch.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
@@ -71,7 +72,6 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
-#include "skin.h"
 #include "webview_style.h"
 #include "private/style_private.h"
 
@@ -592,61 +592,61 @@ void colorize(QWidget* widget)
     else if (qobject_cast<QMenu*>(widget))
     {
         QPalette palette = widget->palette();
-        palette.setColor(QPalette::Window, colorTheme()->color("dark13"));
-        palette.setColor(QPalette::WindowText, colorTheme()->color("light4"));
-        palette.setColor(QPalette::ButtonText, colorTheme()->color("light12"));
-        palette.setColor(QPalette::Highlight, colorTheme()->color("brand_d1"));
-        palette.setColor(QPalette::HighlightedText, colorTheme()->color("brand_contrast"));
-        palette.setColor(QPalette::Midlight, colorTheme()->color("dark11"));
+        palette.setColor(QPalette::Window, core::colorTheme()->color("dark13"));
+        palette.setColor(QPalette::WindowText, core::colorTheme()->color("light4"));
+        palette.setColor(QPalette::ButtonText, core::colorTheme()->color("light12"));
+        palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand_d1"));
+        palette.setColor(QPalette::HighlightedText, core::colorTheme()->color("brand_contrast"));
+        palette.setColor(QPalette::Midlight, core::colorTheme()->color("dark11"));
         palette.setColor(QPalette::Disabled, QPalette::WindowText,
-            colorTheme()->color("light4", 77));
+            core::colorTheme()->color("light4", 77));
         palette.setColor(QPalette::Disabled, QPalette::ButtonText,
-            colorTheme()->color("light12", 77));
+            core::colorTheme()->color("light12", 77));
         widget->setPalette(palette);
     }
     else if (qobject_cast<QSlider*>(widget))
     {
         setPaletteColor(widget, QPalette::Disabled, QPalette::Window,
-            colorTheme()->color("dark7", 77));
+            core::colorTheme()->color("dark7", 77));
     }
     else if (qobject_cast<QComboBox*>(widget))
     {
         QPalette palette = widget->palette();
-        palette.setColor(QPalette::Highlight, colorTheme()->color("brand_d1"));
-        palette.setColor(QPalette::HighlightedText, colorTheme()->color("brand_contrast"));
+        palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand_d1"));
+        palette.setColor(QPalette::HighlightedText, core::colorTheme()->color("brand_contrast"));
         widget->setPalette(palette);
     }
     else if (qobject_cast<QHeaderView*>(widget))
     {
-        setPaletteColor(widget, QPalette::Midlight, colorTheme()->color("dark12", 51));
+        setPaletteColor(widget, QPalette::Midlight, core::colorTheme()->color("dark12", 51));
     }
     else if (qobject_cast<QScrollBar*>(widget))
     {
         QPalette palette = widget->palette();
         setPaletteColor(widget, QPalette::Midlight,
-            colorTheme()->color("dark13"));
+            core::colorTheme()->color("dark13"));
         setPaletteColor(widget, QPalette::Disabled, QPalette::Midlight,
-            colorTheme()->color("dark13", 77));
+            core::colorTheme()->color("dark13", 77));
         widget->setPalette(palette);
     }
     else if (qobject_cast<QListView*>(widget))
     {
         QPalette palette = widget->palette();
         setPaletteColor(widget, QPalette::Base,
-            colorTheme()->color("dark6"));
+            core::colorTheme()->color("dark6"));
         setPaletteColor(widget, QPalette::Disabled, QPalette::Base,
-            colorTheme()->color("dark6", 77));
+            core::colorTheme()->color("dark6", 77));
         widget->setPalette(palette);
     }
     else if (qobject_cast<QCalendarWidget*>(widget))
     {
         QPalette palette = widget->palette();
-        palette.setColor(QPalette::Window, colorTheme()->color("dark13"));
-        palette.setColor(QPalette::WindowText, colorTheme()->color("light12"));
-        palette.setColor(QPalette::Base, colorTheme()->color("dark14"));
-        palette.setColor(QPalette::Highlight, colorTheme()->color("dark13"));
-        palette.setColor(QPalette::HighlightedText, colorTheme()->color("light4"));
-        palette.setColor(QPalette::BrightText, colorTheme()->color("red_l2"));
+        palette.setColor(QPalette::Window, core::colorTheme()->color("dark13"));
+        palette.setColor(QPalette::WindowText, core::colorTheme()->color("light12"));
+        palette.setColor(QPalette::Base, core::colorTheme()->color("dark14"));
+        palette.setColor(QPalette::Highlight, core::colorTheme()->color("dark13"));
+        palette.setColor(QPalette::HighlightedText, core::colorTheme()->color("light4"));
+        palette.setColor(QPalette::BrightText, core::colorTheme()->color("red_l2"));
         widget->setPalette(palette);
     }
     else if (qobject_cast<QAbstractItemView*>(widget))
@@ -654,28 +654,28 @@ void colorize(QWidget* widget)
         QPalette palette = widget->palette();
         if (QString(widget->metaObject()->className()) == "QCalendarView")
         {
-            palette.setColor(QPalette::Text, colorTheme()->color("light4"));
-            palette.setColor(QPalette::Shadow, colorTheme()->color("dark11"));
-            palette.setColor(QPalette::Mid, colorTheme()->color("dark12"));
-            palette.setColor(QPalette::Midlight, colorTheme()->color("dark14"));
-            palette.setColor(QPalette::Highlight, colorTheme()->color("brand_core"));
-            palette.setColor(QPalette::AlternateBase, colorTheme()->color("dark13"));
+            palette.setColor(QPalette::Text, core::colorTheme()->color("light4"));
+            palette.setColor(QPalette::Shadow, core::colorTheme()->color("dark11"));
+            palette.setColor(QPalette::Mid, core::colorTheme()->color("dark12"));
+            palette.setColor(QPalette::Midlight, core::colorTheme()->color("dark14"));
+            palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand_core"));
+            palette.setColor(QPalette::AlternateBase, core::colorTheme()->color("dark13"));
             palette.setColor(QPalette::Base, Qt::transparent);
             palette.setColor(QPalette::Window, Qt::transparent);
-            palette.setColor(QPalette::Disabled, QPalette::Text, colorTheme()->color("light16"));
+            palette.setColor(QPalette::Disabled, QPalette::Text, core::colorTheme()->color("light16"));
         }
         else
         {
             palette.setColor(QPalette::Base, Qt::transparent);
-            palette.setColor(QPalette::Midlight, colorTheme()->color("dark12", 102));
-            palette.setColor(QPalette::Highlight, colorTheme()->color("brand_core", 77));
-            palette.setColor(QPalette::Text, colorTheme()->color("light10"));
-            palette.setColor(QPalette::HighlightedText, colorTheme()->color("light4"));
+            palette.setColor(QPalette::Midlight, core::colorTheme()->color("dark12", 102));
+            palette.setColor(QPalette::Highlight, core::colorTheme()->color("brand_core", 77));
+            palette.setColor(QPalette::Text, core::colorTheme()->color("light10"));
+            palette.setColor(QPalette::HighlightedText, core::colorTheme()->color("light4"));
 
             palette.setColor(QPalette::Disabled, QPalette::Text,
-                colorTheme()->color("light10", 77));
+                core::colorTheme()->color("light10", 77));
             palette.setColor(QPalette::Disabled, QPalette::HighlightedText,
-                colorTheme()->color("light4", 77));
+                core::colorTheme()->color("light4", 77));
         }
         widget->setPalette(palette);
     }
@@ -688,7 +688,7 @@ static const QColor kBackground = "#212a2f"; //< Value of dark7 in default custo
 
 } // namespace
 
-const SvgIconColorer::IconSubstitutions Style::kTitleBarSubstitutions = {
+const core::SvgIconColorer::IconSubstitutions Style::kTitleBarSubstitutions = {
     { QnIcon::Active, {
         { kActiveForeground, "light1" },
         { kInactiveForeground1, "light10" },
@@ -849,30 +849,30 @@ void Style::drawPrimitive(PrimitiveElement element,
 
             if (isWarningStyle(widget))
             {
-                mainColor = colorTheme()->color("red_core");
+                mainColor = core::colorTheme()->color("red_core");
                 if (!enabled)
                     mainColor.setAlphaF(nx::style::Hints::kDisabledBrandedButtonOpacity);
             }
             else if (isAccented(widget))
             {
-                mainColor = colorTheme()->color("brand_core");
+                mainColor = core::colorTheme()->color("brand_core");
                 if (!enabled)
                     mainColor.setAlphaF(nx::style::Hints::kDisabledBrandedButtonOpacity);
             }
 
             QColor buttonColor = mainColor;
-            QColor shadowColor = colorTheme()->darker(mainColor, 2);
+            QColor shadowColor = core::colorTheme()->darker(mainColor, 2);
             int shadowShift = 1;
 
             if (pressed)
             {
-                buttonColor = colorTheme()->darker(mainColor, 1);
+                buttonColor = core::colorTheme()->darker(mainColor, 1);
                 shadowShift = -1;
             }
             else if (hovered)
             {
-                buttonColor = colorTheme()->lighter(mainColor, 1);
-                shadowColor = colorTheme()->darker(mainColor, 1);
+                buttonColor = core::colorTheme()->lighter(mainColor, 1);
+                shadowColor = core::colorTheme()->darker(mainColor, 1);
             }
 
             QRect rect = option->rect.adjusted(0, 0, 0, -1);
@@ -914,36 +914,36 @@ void Style::drawPrimitive(PrimitiveElement element,
                 switch (shape)
                 {
                     case TabShape::Default:
-                        mainColor = colorTheme()->lighter(mainColor, 3);
+                        mainColor = core::colorTheme()->lighter(mainColor, 3);
                         rect.adjust(0, 2, 0, -1);
                         break;
                     case TabShape::Compact:
                         rect.adjust(0, 2, 0, -2);
                         break;
                     case TabShape::Rectangular:
-                        mainColor = colorTheme()->lighter(mainColor, 1);
+                        mainColor = core::colorTheme()->lighter(mainColor, 1);
                         break;
                 }
             }
 
             if (isWarningStyle(widget))
             {
-                mainColor = colorTheme()->color("red_core");
+                mainColor = core::colorTheme()->color("red_core");
                 if (!enabled)
                     mainColor.setAlphaF(nx::style::Hints::kDisabledItemOpacity);
             }
             else if (isAccented(widget))
             {
-                mainColor = colorTheme()->color("brand_core");
+                mainColor = core::colorTheme()->color("brand_core");
                 if (!enabled)
                     mainColor.setAlphaF(nx::style::Hints::kDisabledItemOpacity);
             }
 
             QColor buttonColor = mainColor;
             if (pressed)
-                buttonColor = colorTheme()->darker(mainColor, 1);
+                buttonColor = core::colorTheme()->darker(mainColor, 1);
             else if (hovered)
-                buttonColor = colorTheme()->lighter(mainColor, 1);
+                buttonColor = core::colorTheme()->lighter(mainColor, 1);
 
             painter->fillRect(rect, buttonColor);
 
@@ -951,7 +951,7 @@ void Style::drawPrimitive(PrimitiveElement element,
             {
                 QColor lineColor = (shape == TabShape::Rectangular)
                     ? option->palette.shadow().color()
-                    : colorTheme()->lighter(mainColor, 1);
+                    : core::colorTheme()->lighter(mainColor, 1);
                 lineColor.setAlphaF(1.0);
 
                 QnScopedPainterPenRollback penRollback(painter, lineColor);
@@ -959,7 +959,7 @@ void Style::drawPrimitive(PrimitiveElement element,
 
                 if (arrowType == Qt::LeftArrow && shape != TabShape::Rectangular)
                 {
-                    painter->setPen(colorTheme()->darker(mainColor, 2));
+                    painter->setPen(core::colorTheme()->darker(mainColor, 2));
                     painter->drawLine(rect.topRight(), rect.bottomRight());
                 }
             }
@@ -1031,15 +1031,15 @@ void Style::drawPrimitive(PrimitiveElement element,
             else if (focused)
             {
                 /* Focused input is always drawn as valid: */
-                frameColor = colorTheme()->darker(base, 3);
-                brushColor = colorTheme()->darker(base, 1);
+                frameColor = core::colorTheme()->darker(base, 3);
+                brushColor = core::colorTheme()->darker(base, 1);
             }
             else
             {
                 /* Valid or not valid not focused input: */
                 frameColor = valid
-                    ? colorTheme()->darker(base, 1)
-                    : colorTheme()->color("red_l2");
+                    ? core::colorTheme()->darker(base, 1)
+                    : core::colorTheme()->color("red_l2");
                 brushColor = base;
             }
 
@@ -1103,7 +1103,7 @@ void Style::drawPrimitive(PrimitiveElement element,
                         if (hasHover && selectionOpaque)
                         {
                             selectionBrush.setColor(
-                                colorTheme()->lighter(selectionBrush.color(), 1));
+                                core::colorTheme()->lighter(selectionBrush.color(), 1));
                         }
 
                         painter->fillRect(item->rect, selectionBrush);
@@ -1196,7 +1196,7 @@ void Style::drawPrimitive(PrimitiveElement element,
                     if (hasHover && selectionOpaque)
                     {
                         selectionBrush.setColor(
-                            colorTheme()->lighter(selectionBrush.color(), 1));
+                            core::colorTheme()->lighter(selectionBrush.color(), 1));
                     }
 
                     painter->fillRect(item->rect, selectionBrush);
@@ -1234,7 +1234,7 @@ void Style::drawPrimitive(PrimitiveElement element,
                     QnScopedPainterAntialiasingRollback aaRollback(painter, false);
                     QnScopedPainterPenRollback penRollback(
                         painter,
-                        QPen(colorTheme()->lighter(mainColor, 2), frame->lineWidth));
+                        QPen(core::colorTheme()->lighter(mainColor, 2), frame->lineWidth));
                     painter->drawLine(frame->rect.topLeft(), frame->rect.topRight());
                 }
                 else
@@ -1410,14 +1410,14 @@ void Style::drawPrimitive(PrimitiveElement element,
                 const QColor background = option->palette.color(selected
                     ? QPalette::Midlight
                     : QPalette::Dark);
-                painter->fillRect(option->rect, colorTheme()->darker(background, 1));
+                painter->fillRect(option->rect, core::colorTheme()->darker(background, 1));
             }
             else if (option->state.testFlag(State_MouseOver))
             {
                 const QColor background = option->palette.color(selected
                     ? QPalette::Midlight
                     : QPalette::Dark);
-                painter->fillRect(option->rect, colorTheme()->lighter(background, 1));
+                painter->fillRect(option->rect, core::colorTheme()->lighter(background, 1));
             }
 
             d->drawCross(painter, option->rect, color);
@@ -1474,7 +1474,7 @@ void Style::drawPrimitive(PrimitiveElement element,
                         case TabShape::Default:
                         case TabShape::Compact:
                             size = 14;
-                            color = colorTheme()->darker(option->palette.light().color(), 2);
+                            color = core::colorTheme()->darker(option->palette.light().color(), 2);
                             width = 1.5;
                             break;
                         default:
@@ -1553,9 +1553,9 @@ void Style::drawComplexControl(ComplexControl control,
                     QColor buttonColor;
 
                     if (listOpened || comboBox->state.testFlag(State_Sunken))
-                        buttonColor = colorTheme()->lighter(mainColor, 1);
+                        buttonColor = core::colorTheme()->lighter(mainColor, 1);
                     else if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
-                        buttonColor = colorTheme()->lighter(mainColor, 2);
+                        buttonColor = core::colorTheme()->lighter(mainColor, 2);
 
                     if (buttonColor.isValid())
                     {
@@ -1629,8 +1629,8 @@ void Style::drawComplexControl(ComplexControl control,
                     qreal radius =
                         ((horizontal ? grooveDrawRect.height() : grooveDrawRect.width())) * 0.5;
 
-                    painter->setPen(colorTheme()->darker(mainDark, 1));
-                    painter->setBrush(QBrush(colorTheme()->lighter(mainDark, hovered ? 6 : 5)));
+                    painter->setPen(core::colorTheme()->darker(mainDark, 1));
+                    painter->setBrush(QBrush(core::colorTheme()->lighter(mainDark, hovered ? 6 : 5)));
                     painter->drawRoundedRect(grooveDrawRect, radius, radius);
 
                     const auto features = static_cast<SliderFeatures>(option->styleObject
@@ -1680,12 +1680,12 @@ void Style::drawComplexControl(ComplexControl control,
                     QColor fillColor = mainDark;
 
                     if (enabled && option->activeSubControls.testFlag(SC_SliderHandle))
-                        borderColor = colorTheme()->lighter(mainLight, 4);
+                        borderColor = core::colorTheme()->lighter(mainLight, 4);
                     else if (hovered)
-                        borderColor = colorTheme()->lighter(mainLight, 2);
+                        borderColor = core::colorTheme()->lighter(mainLight, 2);
 
                     if (option->state.testFlag(State_Sunken))
-                        fillColor = colorTheme()->lighter(mainDark, 3);
+                        fillColor = core::colorTheme()->lighter(mainDark, 3);
 
                     fillColor.setAlphaF(1.0);
 
@@ -1832,8 +1832,8 @@ void Style::drawComplexControl(ComplexControl control,
                 auto drawArrowButton =
                     [&](QStyle::SubControl subControl)
                     {
-                        static const auto hoveredColor = colorTheme()->color("dark8");
-                        static const auto pressedColor = colorTheme()->color("dark7");
+                        static const auto hoveredColor = core::colorTheme()->color("dark8");
+                        static const auto pressedColor = core::colorTheme()->color("dark7");
 
                         const QRect buttonRect = subControlRect(control, spinBox, subControl,
                             widget);
@@ -1914,7 +1914,7 @@ void Style::drawComplexControl(ComplexControl control,
                                 sliderRect.adjust(0, kSliderMargin, 0, -kSliderMargin);
                             }
 
-                            sliderColor = colorTheme()->darker(
+                            sliderColor = core::colorTheme()->darker(
                                 scrollBar->palette.color(QPalette::Midlight), 1);
                             break;
                         }
@@ -1947,11 +1947,11 @@ void Style::drawComplexControl(ComplexControl control,
                     {
                         if (scrollBar->state.testFlag(State_Sunken))
                         {
-                            sliderColor = colorTheme()->lighter(sliderColor, 1);
+                            sliderColor = core::colorTheme()->lighter(sliderColor, 1);
                         }
                         else if (scrollBar->state.testFlag(State_MouseOver))
                         {
-                            sliderColor = colorTheme()->lighter(sliderColor,
+                            sliderColor = core::colorTheme()->lighter(sliderColor,
                                 scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
                         }
                     }
@@ -2030,7 +2030,7 @@ void Style::drawControl(ControlElement element,
                 {
                     case QFrame::Box:
                     {
-                        const QColor mainColor = colorTheme()->darker(
+                        const QColor mainColor = core::colorTheme()->darker(
                             option->palette.color(QPalette::Shadow), 1);
                         QnScopedPainterPenRollback penRollback(painter, mainColor);
                         painter->drawRect(frame->rect.adjusted(0, 0, -1, -1));
@@ -2047,12 +2047,12 @@ void Style::drawControl(ControlElement element,
 
                         if (frame->state.testFlag(State_Sunken))
                         {
-                            secondColor = colorTheme()->lighter(mainColor, 4);
+                            secondColor = core::colorTheme()->lighter(mainColor, 4);
                         }
                         else if (frame->state.testFlag(State_Raised))
                         {
                             secondColor = firstColor;
-                            firstColor = colorTheme()->lighter(mainColor, 4);
+                            firstColor = core::colorTheme()->lighter(mainColor, 4);
                         }
 
                         QRect rect = frame->rect;
@@ -2130,7 +2130,7 @@ void Style::drawControl(ControlElement element,
                 {
                     QStyleOptionToolButton optionCopy(*button);
                     optionCopy.state &= ~State_MouseOver;
-                    optionCopy.icon = Skin::maximumSizePixmap(button->icon,
+                    optionCopy.icon = core::Skin::maximumSizePixmap(button->icon,
                         QnIcon::Pressed,
                         button->state.testFlag(State_On) ? QIcon::On : QIcon::Off,
                         false);
@@ -2162,13 +2162,13 @@ void Style::drawControl(ControlElement element,
                     {
                         if (!tab->state.testFlag(State_Selected) && isTabHovered(tab, widget))
                         {
-                            const QColor mainColor = colorTheme()->lighter(
+                            const QColor mainColor = core::colorTheme()->lighter(
                                 option->palette.color(QPalette::Mid), 1);
                             painter->fillRect(rect.adjusted(0, 1, 0, -1), mainColor);
 
                             QnScopedPainterPenRollback penRollback(
                                 painter,
-                                colorTheme()->darker(mainColor, 3));
+                                core::colorTheme()->darker(mainColor, 3));
                             painter->drawLine(rect.topLeft(), tab->rect.topRight());
                         }
                         break;
@@ -2181,7 +2181,7 @@ void Style::drawControl(ControlElement element,
                             : QPalette::Inactive;
                         QColor color = option->palette.color(colorGroup, QPalette::Base);
                         if (isTabHovered(tab, widget))
-                            color = colorTheme()->lighter(color, 1);
+                            color = core::colorTheme()->lighter(color, 1);
                         painter->fillRect(rect, color);
 
                         auto margins = widget->contentsMargins();
@@ -2225,7 +2225,7 @@ void Style::drawControl(ControlElement element,
                 int iconWithPadding = 0;
                 if (!tab->icon.isNull())
                 {
-                    QSize iconSize = Skin::maximumSize(tab->icon);
+                    QSize iconSize = core::Skin::maximumSize(tab->icon);
                     iconWithPadding = iconSize.width() + Metrics::kStandardPadding;
                     if (auto tabWidget = qobject_cast<const QTabBar*>(widget))
                     {
@@ -2260,7 +2260,7 @@ void Style::drawControl(ControlElement element,
                     textFlags |= Qt::AlignCenter;
                     textRect.setLeft(textRect.left() + iconWithPadding);
 
-                    const QColor mainColor = colorTheme()->darker(tab->palette.light().color(), 2);
+                    const QColor mainColor = core::colorTheme()->darker(tab->palette.light().color(), 2);
                     color = mainColor;
 
                     QFontMetrics fm(painter->font());
@@ -2289,14 +2289,14 @@ void Style::drawControl(ControlElement element,
                     {
                         if (shape == TabShape::Compact)
                         {
-                            color = colorTheme()->lighter(mainColor, 2);
+                            color = core::colorTheme()->lighter(mainColor, 2);
                             painter->fillRect(
                                 rect,
-                                colorTheme()->lighter(option->palette.color(QPalette::Mid), 3));
+                                core::colorTheme()->lighter(option->palette.color(QPalette::Mid), 3));
                         }
                         else
                         {
-                            color = colorTheme()->lighter(mainColor, 1);
+                            color = core::colorTheme()->lighter(mainColor, 1);
                         }
                     }
                 }
@@ -2467,7 +2467,7 @@ void Style::drawControl(ControlElement element,
                 if (determined)
                 {
                     QnScopedPainterPenRollback penRollback(painter,
-                        QPen(colorTheme()->lighter(mainColor, 4)));
+                        QPen(core::colorTheme()->lighter(mainColor, 4)));
                     painter->drawLine(progressBar->rect.left(),
                         progressBar->rect.bottom() + 1,
                         progressBar->rect.right(),
@@ -2518,14 +2518,14 @@ void Style::drawControl(ControlElement element,
                 }
                 else
                 {
-                    painter->fillRect(rect, colorTheme()->darker(mainColor, 4));
+                    painter->fillRect(rect, core::colorTheme()->darker(mainColor, 4));
 
                     const qreal kTickWidth = M_PI / 2;
                     const qreal kTickSpace = kTickWidth / 2;
                     const qreal kMaxAngle = M_PI + kTickWidth + kTickSpace;
                     const qreal kSpeed = kMaxAngle * 0.3;
 
-                    const QColor color = colorTheme()->darker(mainColor, 1);
+                    const QColor color = core::colorTheme()->darker(mainColor, 1);
 
                     qreal angle = d->idleAnimator->value(widget);
                     if (angle >= kMaxAngle)
@@ -4225,7 +4225,7 @@ void Style::polish(QWidget* widget)
             effect->setXOffset(-4.0);
             effect->setYOffset(0);
 
-            QColor shadowColor = colorTheme()->color("dark7");
+            QColor shadowColor = core::colorTheme()->color("dark7");
             shadowColor.setAlphaF(0.5);
             effect->setColor(shadowColor);
 

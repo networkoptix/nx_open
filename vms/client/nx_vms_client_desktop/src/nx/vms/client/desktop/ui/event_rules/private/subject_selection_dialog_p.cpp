@@ -10,7 +10,7 @@
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/models/user_roles_model.h>
@@ -390,7 +390,7 @@ void RoleListDelegate::initStyleOption(QStyleOptionViewItem* option,
             ? qnSkin->icon(lit("tree/users.svg"))
             : qnSkin->icon(lit("tree/users_alert.svg"));
 
-        option->decorationSize = Skin::maximumSize(option->icon);
+        option->decorationSize = core::Skin::maximumSize(option->icon);
         option->features |= QStyleOptionViewItem::HasDecoration;
     }
 }

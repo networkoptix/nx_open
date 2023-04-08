@@ -9,9 +9,9 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/text/human_readable.h>

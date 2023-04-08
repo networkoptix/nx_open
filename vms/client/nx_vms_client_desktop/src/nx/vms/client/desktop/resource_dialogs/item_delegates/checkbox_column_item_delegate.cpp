@@ -5,8 +5,8 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QApplication>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/utils/log/assert.h>
 
@@ -33,9 +33,9 @@ void CheckBoxColumnItemDelegate::paintContents(
     const QStyleOptionViewItem& styleOption,
     const QModelIndex& index) const
 {
-    static const auto kUncheckedCheckboxColor = colorTheme()->color("dark10");
-    static const auto kUncheckedHoveredCheckboxColor = colorTheme()->color("dark16");
-    static const auto kCheckedCheckboxColor = colorTheme()->color("resourceTree.mainTextSelected");
+    static const auto kUncheckedCheckboxColor = core::colorTheme()->color("dark10");
+    static const auto kUncheckedHoveredCheckboxColor = core::colorTheme()->color("dark16");
+    static const auto kCheckedCheckboxColor = core::colorTheme()->color("resourceTree.mainTextSelected");
 
     const auto checkStateData = index.data(Qt::CheckStateRole);
     if (checkStateData.isNull())

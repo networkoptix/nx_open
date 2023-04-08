@@ -17,6 +17,7 @@ namespace nx::vms::discovery { class Manager; }
 
 namespace nx::vms::client::core {
 
+class ColorTheme;
 class CloudStatusWatcher;
 class Settings;
 
@@ -40,6 +41,7 @@ public:
         Mode mode,
         PeerType peerType,
         const QString& customCloudHost,
+        const QString& customExternalResourceFile = {},
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 
@@ -64,6 +66,8 @@ public:
     QnVoiceSpectrumAnalyzer* voiceSpectrumAnalyzer() const;
 
     Settings* coreSettings() const;
+
+    ColorTheme* colorTheme() const;
 
 private:
     struct Private;

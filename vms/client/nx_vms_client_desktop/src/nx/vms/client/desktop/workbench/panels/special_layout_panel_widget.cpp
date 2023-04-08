@@ -8,11 +8,11 @@
 #include <QtWidgets/QPushButton>
 
 #include <client/client_globals.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/palette.h>
 
@@ -49,7 +49,7 @@ SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
     ui->captionLabel->setFont(titleFont);
 
     setPaletteColor(this, QPalette::Window,
-        colorTheme()->color("scene.customLayoutBackground"));
+        core::colorTheme()->color("scene.customLayoutBackground"));
     setAutoFillBackground(true);
 
     setWidget(body);

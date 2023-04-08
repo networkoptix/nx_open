@@ -3,9 +3,9 @@
 #include "notification_levels.h"
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnNotificationLevel::Value QnNotificationLevel::convert(nx::vms::event::Level level)
 {

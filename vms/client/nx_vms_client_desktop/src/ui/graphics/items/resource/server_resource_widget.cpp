@@ -13,14 +13,14 @@
 #include <core/resource/resource_display_info.h>
 #include <nx/utils/math/math.h> /* For M_PI. */
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/text/human_readable.h>
@@ -41,6 +41,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -239,7 +240,8 @@ protected:
         QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
         {
             // TODO: #sivanov Text drawing is very slow. Replace with cached textures where possible.
-            QnScopedPainterPenRollback penRollback(painter, QPen(colorTheme()->color("dark1"), 2));
+            QnScopedPainterPenRollback penRollback(painter,
+                QPen(core::colorTheme()->color("dark1"), 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 
             painter->setBrush(m_color);
@@ -318,7 +320,7 @@ protected:
 
         /* Draw grid */
         {
-            static const QColor kGridColor = colorTheme()->color("brand_core", 100);
+            static const QColor kGridColor = core::colorTheme()->color("brand_core", 100);
 
             QPen grid;
             grid.setColor(kGridColor);
@@ -375,7 +377,7 @@ protected:
             QnScopedPainterPenRollback penRollback(painter);
             Q_UNUSED(penRollback)
 
-            static const QColor kFrameColor = colorTheme()->color("brand_core");
+            static const QColor kFrameColor = core::colorTheme()->color("brand_core");
 
             QPen main_pen;
             main_pen.setColor(kFrameColor);
@@ -441,7 +443,7 @@ QnServerResourceWidget::QnServerResourceWidget(
     registerAnimation(m_animationTimerListener);
     m_animationTimerListener->startListening();
 
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark4"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark4"));
 
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     NX_ASSERT(m_resource, "Server resource widget was created with a non-server resource.");
@@ -497,14 +499,14 @@ void QnServerResourceWidget::setCheckedHealthMonitoringButtons(const QnServerRes
 }
 
 QColor QnServerResourceWidget::getColor(Qn::StatisticsDeviceType deviceType, int index) {
-    static const QList<QColor> kHddColors = colorTheme()->colors("server.statistics.hdds");
-    static const QList<QColor> kNetworkColors = colorTheme()->colors("server.statistics.network");
+    static const QList<QColor> kHddColors = core::colorTheme()->colors("server.statistics.hdds");
+    static const QList<QColor> kNetworkColors = core::colorTheme()->colors("server.statistics.network");
 
     switch (deviceType) {
     case Qn::StatisticsCPU:
-        return colorTheme()->color("server.statistics.cpu");
+        return core::colorTheme()->color("server.statistics.cpu");
     case Qn::StatisticsRAM:
-        return colorTheme()->color("server.statistics.ram");
+        return core::colorTheme()->color("server.statistics.ram");
     case Qn::StatisticsHDD:
         return kHddColors[qMod((qsizetype) index, kHddColors.size())];
     case Qn::StatisticsNETWORK:

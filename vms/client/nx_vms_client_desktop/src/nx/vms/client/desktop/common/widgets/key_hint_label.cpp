@@ -5,7 +5,7 @@
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace {
 
@@ -45,7 +45,7 @@ void KeyHintLabel::paintEvent(QPaintEvent* event)
     const auto lineWidth = fontMetrics().lineWidth();
     const auto lineWidthF = QFontMetricsF(font()).lineWidth();
 
-    QPen borderPen(colorTheme()->color(kBorderColorName));
+    QPen borderPen(core::colorTheme()->color(kBorderColorName));
     borderPen.setWidthF(lineWidthF);
     painter.setPen(borderPen);
 

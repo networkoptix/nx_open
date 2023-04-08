@@ -13,10 +13,11 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 using namespace std::chrono;
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -55,7 +56,7 @@ QnActionIndicatorItem::QnActionIndicatorItem(QGraphicsWidget* parent):
 
     d->indicator->dots()->setDotRadius(2);
     d->indicator->dots()->setDotSpacing(3);
-    d->indicator->setIndicatorColor(colorTheme()->color("light1"));
+    d->indicator->setIndicatorColor(core::colorTheme()->color("light1"));
 
     QFont font;
     font.setPixelSize(11);
@@ -99,7 +100,7 @@ void QnActionIndicatorItem::paint(
     QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
     static constexpr qreal kRoundingRadius = 2.0;
-    static const QBrush kBackgroundBrush(colorTheme()->color("dark1", 127));
+    static const QBrush kBackgroundBrush(core::colorTheme()->color("dark1", 127));
 
     QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
     QnScopedPainterBrushRollback brushRollback(painter, kBackgroundBrush);

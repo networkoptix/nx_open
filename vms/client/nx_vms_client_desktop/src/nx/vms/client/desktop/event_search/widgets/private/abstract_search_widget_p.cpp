@@ -22,6 +22,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/common/models/concatenation_list_model.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
@@ -31,8 +33,6 @@
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/palette.h>
@@ -83,12 +83,12 @@ SearchLineEdit* createSearchLineEdit(QWidget* parent)
             "QLineEdit { background-color: %1; border: 1px solid %2; border-radius: 2px; padding-left: 4; } "
             "QLineEdit:hover { background-color: %3; border: 1px solid %4; } "
             "QLineEdit:focus { background-color: %5; border: 1px solid %6; }",
-            colorTheme()->color("dark4").name(),
-            colorTheme()->color("dark6").name(),
-            colorTheme()->color("dark5").name(),
-            colorTheme()->color("dark7").name(),
-            colorTheme()->color("dark3").name(),
-            colorTheme()->color("dark7").name()));
+            core::colorTheme()->color("dark4").name(),
+            core::colorTheme()->color("dark6").name(),
+            core::colorTheme()->color("dark5").name(),
+            core::colorTheme()->color("dark7").name(),
+            core::colorTheme()->color("dark3").name(),
+            core::colorTheme()->color("dark7").name()));
 
     return result;
 }
@@ -151,12 +151,12 @@ AbstractSearchWidget::Private::Private(
 
     ui->setupUi(q);
 
-    setPaletteColor(ui->separatorLine, QPalette::Shadow, colorTheme()->color("dark6"));
+    setPaletteColor(ui->separatorLine, QPalette::Shadow, core::colorTheme()->color("dark6"));
 
     ui->headerWidget->setStyleSheet(
         nx::format("#headerWidget { background-color: %1; border-left: 1px solid %2; }",
-            colorTheme()->color("dark4").name(),
-            colorTheme()->color("dark8").name()));
+            core::colorTheme()->color("dark4").name(),
+            core::colorTheme()->color("dark8").name()));
 
     ui->headerLayout->setContentsMargins(
         kHeaderSideMargin, kTextSearchTopMargin, kHeaderSideMargin, 0);
@@ -296,7 +296,7 @@ void AbstractSearchWidget::Private::setupRibbon()
     ui->ribbon->setFocusPolicy(Qt::NoFocus);
     ui->ribbon->scrollBar()->ensurePolished();
     setPaletteColor(ui->ribbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
-        colorTheme()->color("dark5"));
+        core::colorTheme()->color("dark5"));
 
     setupViewportHeader();
 

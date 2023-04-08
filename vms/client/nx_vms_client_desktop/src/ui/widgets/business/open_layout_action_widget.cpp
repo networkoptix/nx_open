@@ -13,9 +13,9 @@
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/event_rules/layout_selection_dialog.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
@@ -248,7 +248,7 @@ void OpenLayoutActionWidget::updateLayoutsButton()
 
     const auto icon = [](QnResourceIconCache::Key key, QnIcon::Mode mode)
         {
-            return Skin::maximumSizePixmap(qnResIconCache->icon(key), mode);
+            return core::Skin::maximumSizePixmap(qnResIconCache->icon(key), mode);
         };
 
     auto button = ui->selectLayoutButton;

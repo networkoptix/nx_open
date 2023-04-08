@@ -9,9 +9,9 @@
 
 #include <core/resource/videowall_resource.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/animation/animation_timer.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/widgets/videowall_manage_widget_p.h>

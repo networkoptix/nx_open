@@ -6,9 +6,9 @@
 
 #include <client/client_globals.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <ui/common/notification_levels.h>
 #include <ui/workbench/workbench_context.h>

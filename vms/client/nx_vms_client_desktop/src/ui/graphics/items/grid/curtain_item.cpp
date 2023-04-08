@@ -7,18 +7,18 @@
 #include <QtGui/QPainter>
 #include <QtOpenGLWidgets/QOpenGLWidget>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/workaround/gl_native_painting.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 QnCurtainItem::QnCurtainItem(QGraphicsItem* parent):
     base_type(parent),
     m_color(colorTheme()->color("scene.curtain")),
-    m_boundingRect(nx::vms::client::core::Geometry::maxBoundingRect())
+    m_boundingRect(Geometry::maxBoundingRect())
 {
     setAcceptedMouseButtons(Qt::NoButton);
     // Don't disable this item here or it will swallow mouse wheel events.

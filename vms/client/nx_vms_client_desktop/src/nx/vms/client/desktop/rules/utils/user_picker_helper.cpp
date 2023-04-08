@@ -8,7 +8,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
@@ -74,7 +74,7 @@ QIcon UserPickerHelper::icon() const
 {
     if (m_acceptAll)
     {
-        return Skin::maximumSizePixmap(
+        return core::Skin::maximumSizePixmap(
             m_isValid ? qnSkin->icon("tree/users.svg") : qnSkin->icon("tree/users_alert.svg"),
             QIcon::Selected,
             QIcon::Off,
@@ -89,7 +89,7 @@ QIcon UserPickerHelper::icon() const
         ? (m_isValid ? "tree/users.svg" : "tree/users_alert.svg")
         : (m_isValid ? "tree/user.svg" : "tree/user_alert.svg"));
 
-    return Skin::maximumSizePixmap(
+    return core::Skin::maximumSizePixmap(
         icon,
         QIcon::Selected,
         QIcon::Off,

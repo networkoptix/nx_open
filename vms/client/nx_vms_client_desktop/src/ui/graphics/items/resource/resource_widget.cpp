@@ -21,6 +21,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
@@ -31,10 +33,8 @@
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/selection_overlay_widget.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -74,6 +74,7 @@
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using nx::vms::client::core::Geometry;
 
@@ -171,9 +172,9 @@ QnResourceWidget::QnResourceWidget(
     font.setPixelSize(15);
     setFont(font);
 
-    setPaletteColor(this, QPalette::WindowText, colorTheme()->color("light1"));
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark5"));
-    setPaletteColor(this, QPalette::Highlight, colorTheme()->color("brand_core", 110));
+    setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light1"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark5"));
+    setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand_core", 110));
 
     setupHud();
     setupSelectionOverlay();
@@ -308,13 +309,14 @@ QIcon QnResourceWidget::loadSvgIcon(const QString& name) const
     if (sIconCache.contains(name))
         return sIconCache[name];
 
+    using namespace nx::vms::client::core;
     static const QMap<QIcon::Mode, QColor> colors = {
-        {QIcon::Normal, colorTheme()->color("light4")},
-        {QIcon::Active, colorTheme()->color("light1")},
-        {QnIcon::Pressed, colorTheme()->color("light7")},
-        {QIcon::Disabled, colorTheme()->color("light4", /*alpha*/ 77)}};
+        {QIcon::Normal, core::colorTheme()->color("light4")},
+        {QIcon::Active, core::colorTheme()->color("light1")},
+        {QnIcon::Pressed, core::colorTheme()->color("light7")},
+        {QIcon::Disabled, core::colorTheme()->color("light4", /*alpha*/ 77)}};
 
-    static const QColor checkedBgColor = colorTheme()->color("brand_core");
+    static const QColor checkedBgColor = core::colorTheme()->color("brand_core");
 
     QPixmapDropShadowFilter filter;
     filter.setBlurRadius(2.5);

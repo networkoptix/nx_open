@@ -12,13 +12,13 @@
 #include <nx/network/ssl/helpers.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/helpers.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
 
@@ -34,7 +34,7 @@ QString name(const nx::network::ssl::X509Name& subject, const QString& defaultVa
 
 QString highlightedText(const QString& text)
 {
-    const auto color = nx::vms::client::desktop::colorTheme()->color("light10");
+    const auto color = nx::vms::client::core::colorTheme()->color("light10");
     return QString("<span style=\"color: %1;\">%2</span>").arg(color.name()).arg(text);
 }
 
@@ -85,7 +85,7 @@ ServerCertificateViewer::ServerCertificateViewer(
     const int kSubjectFontSize = 22;
 
     // Set up certificate chain part of viewer.
-    const auto color = nx::vms::client::desktop::colorTheme()->color("dark10");
+    const auto color = nx::vms::client::core::colorTheme()->color("dark10");
     const auto kLineStyle = QString("border: none; background-color: %1;").arg(color.name());
     ui->treeTopLine->setStyleSheet(kLineStyle);
     ui->treeBottomLine->setStyleSheet(kLineStyle);
@@ -135,7 +135,7 @@ ServerCertificateViewer::ServerCertificateViewer(
     ui->warningLabel->setForegroundRole(QPalette::Text);
     ui->pinCertificateButton->setIcon(qnSkin->icon("misc/pin_text_icon.svg"));
     ui->viewPinnedButton->setIcon(qnSkin->icon("misc/certificate_text_icon.svg"));
-    setPaletteColor(ui->warningBanner, QPalette::Window, colorTheme()->color("dialog.alertBar"));
+    setPaletteColor(ui->warningBanner, QPalette::Window, core::colorTheme()->color("dialog.alertBar"));
     ui->warningBanner->setAutoFillBackground(true);
 
     // Due to layout flaws caused by QTreeWidgets, dialog size constraints should be set through

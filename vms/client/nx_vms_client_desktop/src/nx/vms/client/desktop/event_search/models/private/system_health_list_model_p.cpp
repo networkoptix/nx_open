@@ -17,6 +17,7 @@
 #include <nx/utils/metatypes.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/progress_state.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
@@ -28,7 +29,6 @@
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_health/system_health_data_helper.h>
 #include <nx/vms/event/actions/abstract_action.h>
@@ -192,7 +192,7 @@ QString SystemHealthListModel::Private::text(int index) const
         {
             using namespace nx::vms::common;
 
-            static const auto kDeviceNameColor = ColorTheme::instance()->color("light10");
+            static const auto kDeviceNameColor = core::ColorTheme::instance()->color("light10");
 
             const auto attributes = item.serverData->getRuntimeParams().attributes;
 
@@ -266,9 +266,9 @@ QString SystemHealthListModel::Private::toolTip(int index) const
             if (!NX_ASSERT(camera))
                 continue;
 
-            result << colored(camera->getName(), colorTheme()->color("light8"))
+            result << colored(camera->getName(), core::colorTheme()->color("light8"))
                 + " "
-                + colored(camera->getHostAddress(), colorTheme()->color("light16"));
+                + colored(camera->getHostAddress(), core::colorTheme()->color("light16"));
         }
         return result.join(kLineBreak);
     }

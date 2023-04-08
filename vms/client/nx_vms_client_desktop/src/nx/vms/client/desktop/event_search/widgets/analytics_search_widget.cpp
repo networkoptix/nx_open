@@ -40,8 +40,9 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
-#include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
@@ -53,7 +54,6 @@
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <ui/dialogs/common/message_box.h>
@@ -343,8 +343,8 @@ void AnalyticsSearchWidget::Private::updateTypeButton()
             ? tr("%1 with %n attributes", "", numFilters).arg(objectType->name())
             : objectType->name());
 
-        m_typeSelectionButton->setIcon(Skin::colorize(qnSkin->pixmap(
-            IconManager::instance()->iconPath(objectType->icon())),
+        m_typeSelectionButton->setIcon(core::Skin::colorize(qnSkin->pixmap(
+            core::analytics::IconManager::instance()->iconPath(objectType->icon())),
             m_typeSelectionButton->palette().color(QPalette::Inactive, QPalette::WindowText)));
 
         m_typeSelectionButton->setState(SelectableTextButton::State::unselected);

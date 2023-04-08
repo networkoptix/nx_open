@@ -4,6 +4,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 import Nx 1.0
+import Nx.Core 1.0
 import Nx.Controls 1.0
 
 Rectangle

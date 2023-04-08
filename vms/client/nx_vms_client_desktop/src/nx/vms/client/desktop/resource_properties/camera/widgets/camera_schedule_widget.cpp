@@ -9,6 +9,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/background_flasher.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
@@ -17,8 +19,6 @@
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_painter.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
@@ -90,7 +90,7 @@ CameraScheduleWidget::CameraScheduleWidget(
         store, &CameraSettingsDialogStore::setRecordingEnabled);
 
     connect(ui->enableRecordingCheckBox, &CheckBox::cannotBeToggled, this,
-        [this] { BackgroundFlasher::flash(ui->licenseUsageLabel, colorTheme()->color("red_l2")); });
+        [this] { BackgroundFlasher::flash(ui->licenseUsageLabel, core::colorTheme()->color("red_l2")); });
 
     // Called when a cell is Alt-clicked. Fetches cell settings as current.
     connect(ui->gridWidget, &ScheduleGridWidget::cellClicked, store,

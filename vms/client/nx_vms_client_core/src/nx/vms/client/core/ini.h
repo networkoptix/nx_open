@@ -17,6 +17,9 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, doNotPingCloudSystems,
         "[Dev] Disable cloud system pings, so desktop client will rely on cloud status only");
 
+    NX_INI_STRING("", dumpGeneratedIconsTo,
+        "[Dev] Dump icons, generated from svg, to a given folder.");
+
     NX_INI_INT(0, systemsHideOptions,
         "[Dev] Hide systems, bitwise combination of flags:\n"
         " * 1 - Incompatible systems.\n"

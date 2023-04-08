@@ -8,14 +8,14 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QToolTip>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/help/help_handler.h>
 #include <ui/help/help_topic_accessor.h>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace {
 
@@ -146,7 +146,7 @@ void HintButton::showTooltip(bool show)
         {
             hintParagraphs.push_back(makeParagraph(
                 makeColoredText(tr("Click on the icon to read more"),
-                    colorTheme()->color("light16"))));
+                    core::colorTheme()->color("light16"))));
         }
 
         QPoint hintSpawnPos = mapToGlobal(rect().bottomLeft());

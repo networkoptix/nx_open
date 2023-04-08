@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx 1.0
+import Nx.Core 1.0
 
 FocusScope
 {

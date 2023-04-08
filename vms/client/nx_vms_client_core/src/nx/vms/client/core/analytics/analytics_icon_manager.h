@@ -6,10 +6,10 @@
 
 #include <nx/utils/impl_ptr.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace analytics {
 
-class NX_VMS_CLIENT_DESKTOP_API IconManager: public QObject
+class NX_VMS_CLIENT_CORE_API IconManager: public QObject
 {
     Q_OBJECT
 
@@ -43,4 +43,4 @@ private:
 };
 
 } // namespace analytics
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

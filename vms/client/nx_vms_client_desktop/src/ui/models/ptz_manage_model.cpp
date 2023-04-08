@@ -8,12 +8,12 @@
 #include <common/common_globals.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/utils/string.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::core::ptz;
-using namespace nx::vms::client::desktop;
 
 QnPtzManageModel::QnPtzManageModel(QObject *parent) :
     base_type(parent),

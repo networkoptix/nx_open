@@ -12,15 +12,16 @@
 #include <utils/common/checked_cast.h>
 #include <utils/math/color_transformations.h>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <ui/common/color_to_vector_converter.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/animation/variant_animator.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 #include "grid_highlight_item.h"
 
 using nx::vms::client::core::Geometry;
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -32,8 +33,8 @@ QnGridItem::QnGridItem(QGraphicsItem *parent):
     base_type(parent),
     m_boundingRect(Geometry::maxBoundingRect())
 {
-    m_colorByState[Allowed] = colorTheme()->color("scene.grid.allowedCell");
-    m_colorByState[Disallowed] = colorTheme()->color("scene.grid.disallowedCell");
+    m_colorByState[Allowed] = core::colorTheme()->color("scene.grid.allowedCell");
+    m_colorByState[Disallowed] = core::colorTheme()->color("scene.grid.disallowedCell");
 
     setAcceptedMouseButtons(Qt::NoButton);
 
@@ -142,7 +143,7 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     );
 
     /* Draw! */
-    const QPen pen(colorTheme()->color("brand_d7"), m_lineWidth);
+    const QPen pen(core::colorTheme()->color("brand_d7"), m_lineWidth);
     QnScopedPainterPenRollback penRollback(painter, pen);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     QPointF topLeft = mapper()->mapFromGrid(gridRect.topLeft()) - QPointF(mapper()->spacing() / 2, mapper()->spacing() / 2);

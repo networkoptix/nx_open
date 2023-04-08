@@ -8,11 +8,11 @@
 
 #include <client/client_globals.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/camera_hotspots_item_model.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
@@ -48,7 +48,8 @@ QPainterPath colorPaletteCheckMarkPath(const QRect& paletteCellRect)
 
 QPen colorPaletteCheckMarkPen()
 {
-    static const auto kCheckMarkColor = colorTheme()->color("camera.hotspots.paletteCheckMark");
+    static const auto kCheckMarkColor = nx::vms::client::core::colorTheme()->color(
+        "camera.hotspots.paletteCheckMark");
 
     QPen checkMarkPen(kCheckMarkColor);
     checkMarkPen.setWidthF(2);
@@ -104,7 +105,7 @@ void CameraHotspotsItemDelegate::setItemViewHoverTracker(ItemViewHoverTracker* h
 
 QList<QColor> CameraHotspotsItemDelegate::hotspotsPalette()
 {
-    static auto kPaletteColors = colorTheme()->colors("camera.hotspots.palette");
+    static auto kPaletteColors = core::colorTheme()->colors("camera.hotspots.palette");
     return kPaletteColors;
 }
 
@@ -231,8 +232,8 @@ void CameraHotspotsItemDelegate::initStyleOption(
 
         if (!cameraIdData.isNull() && cameraResourceData.isNull()) //< Camera no more exists.
         {
-            static const auto kInvalidCameraColor = colorTheme()->color("red_core");
-            static const auto kSelectedInvalidCameraColor = colorTheme()->color("red_l2");
+            static const auto kInvalidCameraColor = core::colorTheme()->color("red_core");
+            static const auto kSelectedInvalidCameraColor = core::colorTheme()->color("red_l2");
             setupStyleOptionColors(option, kInvalidCameraColor, kSelectedInvalidCameraColor);
         }
     }
@@ -240,10 +241,10 @@ void CameraHotspotsItemDelegate::initStyleOption(
     if (index.column() == CameraHotspotsItemModel::DeleteButtonColumn)
     {
         static const auto kColor = option->palette.color(QPalette::WindowText);
-        static const auto kSelectedColor = colorTheme()->color("light10");
+        static const auto kSelectedColor = core::colorTheme()->color("light10");
 
-        static const auto kHoveredColor = colorTheme()->color("light14");
-        static const auto kHoveredSelectedColor = colorTheme()->color("light8");
+        static const auto kHoveredColor = core::colorTheme()->color("light14");
+        static const auto kHoveredSelectedColor = core::colorTheme()->color("light8");
 
         if (m_hoverTracker && m_hoverTracker->hoveredIndex() == index)
             setupStyleOptionColors(option, kHoveredColor, kHoveredSelectedColor);

@@ -10,8 +10,8 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/branding.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 
 namespace nx::vms::client::desktop {
 
@@ -78,7 +78,7 @@ public:
                     return expiryDate.toString("dd.MM.yyyy");
 
                 return expiryDate < QDateTime::currentDateTime()
-                    ? QVariant(colorTheme()->color("red_l2"))
+                    ? QVariant(core::colorTheme()->color("red_l2"))
                     : QVariant();
             }
 
@@ -125,7 +125,7 @@ CertificateSelectionDialog::CertificateSelectionDialog(
     ui->setupUi(this);
 
     ui->captionLabel->setStyleSheet(
-        QString("QLabel { color: %1; }").arg(colorTheme()->color("light10").name()));
+        QString("QLabel { color: %1; }").arg(core::colorTheme()->color("light10").name()));
 
     setWindowTitle(nx::branding::vmsName());
     ui->textLabel->setText(
@@ -136,7 +136,7 @@ CertificateSelectionDialog::CertificateSelectionDialog(
 
     // Set dialog icon.
     const auto pixmap =
-        Skin::maximumSizePixmap(style()->standardIcon(QStyle::SP_MessageBoxWarning));
+        core::Skin::maximumSizePixmap(style()->standardIcon(QStyle::SP_MessageBoxWarning));
     ui->iconLabel->setVisible(!pixmap.isNull());
     ui->iconLabel->setPixmap(pixmap);
     ui->iconLabel->resize(pixmap.size());

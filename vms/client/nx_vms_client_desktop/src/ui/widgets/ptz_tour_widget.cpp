@@ -9,7 +9,7 @@
 
 #include <ui/models/ptz_tour_spots_model.h>
 #include <ui/delegates/ptz_tour_item_delegate.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/core/skin/skin.h>
 
 #include <utils/common/event_processors.h>
 

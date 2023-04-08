@@ -99,6 +99,7 @@ copyResources()
 {
     echo "Copying resources"
     cp "$BUILD_DIR/bin/client_external.dat" "$STAGE_BIN/"
+    cp "$BUILD_DIR/bin/client_core_external.dat" "$STAGE_BIN/"
     cp "$BUILD_DIR/bin/bytedance_iconpark.dat" "$STAGE_BIN/"
 }
 

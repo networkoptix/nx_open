@@ -7,9 +7,9 @@
 
 #include <common/common_globals.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core { class Skin; }
 
-class Skin;
+namespace nx::vms::client::desktop {
 
 /**
  * Old style implementation used in versions 1.0 - 2.6.
@@ -59,7 +59,7 @@ protected:
         const QStyleOption* option, QPainter* painter, const QWidget* widget) const;
 
 private:
-    Skin* m_skin;
+    core::Skin* m_skin;
 };
 
 } // namespace nx::vms::client::desktop
