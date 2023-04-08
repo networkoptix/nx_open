@@ -518,19 +518,35 @@ Rectangle
             wrapMode: Text.WordWrap
         }
 
-        Text
+        RowLayout
         {
-            text: qsTr("LDAP users that have never logged in to the system are not displayed"
-                + " in the list of users. Use groups to configure permissions for such users.")
-            font: Qt.font({pixelSize: 14, weight: Font.Normal})
-            color: ColorTheme.colors.red_core
-            visible: !control.continuousSync && control.continuousSyncEditable
-
             Layout.fillWidth: true
             Layout.leftMargin: 16
             Layout.rightMargin: 16
 
-            wrapMode: Text.WordWrap
+            visible: !control.continuousSync && control.continuousSyncEditable
+
+            spacing: 8
+
+            Image
+            {
+                Layout.alignment: Qt.AlignTop
+                source: "image://svg/skin/user_settings/ldap_warning.svg"
+                sourceSize: Qt.size(20, 20)
+            }
+
+            Text
+            {
+                Layout.fillWidth: true
+                topPadding: 2
+                bottomPadding: 2
+
+                text: qsTr("LDAP users that have never logged in to the system are not displayed"
+                    + " in the list of users. Use groups to configure permissions for such users.")
+                font { pixelSize: 14; weight: Font.Normal }
+                color: ColorTheme.colors.yellow_core
+                wrapMode: Text.WordWrap
+            }
         }
 
         SectionHeader
