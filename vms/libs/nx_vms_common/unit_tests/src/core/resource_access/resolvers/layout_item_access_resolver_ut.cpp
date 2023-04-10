@@ -44,7 +44,7 @@ TEST_F(LayoutItemAccessResolverTest, noAccess)
 
 TEST_F(LayoutItemAccessResolverTest, notApplicableResource)
 {
-    const auto user = createUser(kAdministratorsGroupId);
+    const auto user = createUser(kPowerUsersGroupId);
     manager->setOwnResourceAccessMap(kTestSubjectId, {{user->getId(), AccessRight::view}});
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, user), kNoAccessRights);
 }
@@ -62,7 +62,7 @@ TEST_F(LayoutItemAccessResolverTest, layoutAccess)
 TEST_F(LayoutItemAccessResolverTest, noPrivateLayoutAccess)
 {
     const auto layout = addLayout();
-    const auto user = addUser(kAdministratorsGroupId);
+    const auto user = addUser(kPowerUsersGroupId);
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
     manager->setOwnResourceAccessMap(kTestSubjectId, {{layout->getId(), AccessRight::view}});
@@ -164,7 +164,7 @@ TEST_F(LayoutItemAccessResolverTest, resolvedAccessIsAccumulated)
 TEST_F(LayoutItemAccessResolverTest, noItemAccessViaPrivateLayout)
 {
     auto layout = addLayout();
-    const auto user = addUser(kAdministratorsGroupId);
+    const auto user = addUser(kPowerUsersGroupId);
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
 
@@ -210,7 +210,7 @@ TEST_F(LayoutItemAccessResolverTest, layoutSharingStarted)
 {
     auto layout = addLayout();
 
-    const auto user = addUser(kAdministratorsGroupId);
+    const auto user = addUser(kPowerUsersGroupId);
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
 
@@ -241,7 +241,7 @@ TEST_F(LayoutItemAccessResolverTest, layoutSharingStopped)
     NX_ASSERT_TEST_SUBJECT_CHANGED();
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), testRights);
 
-    const auto user = addUser(kAdministratorsGroupId);
+    const auto user = addUser(kPowerUsersGroupId);
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
     NX_ASSERT_TEST_SUBJECT_CHANGED();
@@ -285,7 +285,7 @@ TEST_F(LayoutItemAccessResolverTest, sharedLayoutItemRemoved)
 
 TEST_F(LayoutItemAccessResolverTest, noAccessToDesktopCameraOnSharedLayout)
 {
-    auto user = addUser(kAdministratorsGroupId);
+    auto user = addUser(kPowerUsersGroupId);
     auto desktopCamera1 = addDesktopCamera(user);
     auto desktopCamera2 = createDesktopCamera(user);
     auto layout = addLayout();
@@ -393,7 +393,7 @@ TEST_F(LayoutItemAccessResolverTest, cameraAddedToVideowallLayout)
 TEST_F(LayoutItemAccessResolverTest, pushMyScreen)
 // Effectively the same as `cameraAddedToVideowallLayout`, but for a desktop camera.
 {
-    auto user = addUser(kAdministratorsGroupId);
+    auto user = addUser(kPowerUsersGroupId);
     auto videowall = addVideoWall();
     auto layout = addLayoutForVideoWall(videowall);
     auto desktopCamera = addDesktopCamera(user);
@@ -565,7 +565,7 @@ TEST_F(LayoutItemAccessResolverTest, sharedLayoutRemoved)
 TEST_F(LayoutItemAccessResolverTest, noSignalsForPrivateLayoutChanges)
 {
     auto layout = createLayout();
-    const auto user = addUser(kAdministratorsGroupId);
+    const auto user = addUser(kPowerUsersGroupId);
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
 

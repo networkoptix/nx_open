@@ -141,9 +141,9 @@ QUrl WatermarkWatcher::watermarkImageUrl(const QnUuid& id) const
         return {};
 
     const auto user = systemContext()->userWatcher()->user();
-    const auto hasAdminPermission = systemContext()->resourceAccessManager()->hasAdminPermissions(
-        user);
-    if (hasAdminPermission)
+    const auto hasPowerUserPermissions =
+        systemContext()->resourceAccessManager()->hasPowerUserPermissions(user);
+    if (hasPowerUserPermissions)
         return {};
 
     return WatermarkImageProvider::makeWatermarkSourceUrl(d->watermark, it->second.size);

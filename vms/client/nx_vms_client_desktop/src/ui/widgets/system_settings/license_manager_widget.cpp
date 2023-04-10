@@ -416,7 +416,7 @@ bool LicenseManagerWidget::canDeactivateLicense(const QnLicensePtr& license) con
         return false;
 
     return license->neverExpire() && m_validator->isValid(license)
-        && context()->user() && context()->user()->isOwner();
+        && context()->user() && context()->user()->isAdministrator();
 }
 
 void LicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRemove force)

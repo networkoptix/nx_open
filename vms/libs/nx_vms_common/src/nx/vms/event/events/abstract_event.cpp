@@ -394,7 +394,7 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
         }
 
         // Only admins should see notifications with servers.
-        const auto hasPermission = context->resourceAccessManager()->hasAdminPermissions(user);
+        const auto hasPermission = context->resourceAccessManager()->hasPowerUserPermissions(user);
         NX_VERBOSE(NX_SCOPE_TAG, "%1 %2 permission for the event from the server %3",
             user, hasPermission ? "has" : "has not", server);
         return hasPermission;

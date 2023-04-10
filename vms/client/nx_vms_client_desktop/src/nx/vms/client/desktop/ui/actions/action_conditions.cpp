@@ -526,9 +526,9 @@ ActionVisibility VideoWallReviewModeCondition::check(const Parameters& /*paramet
         : InvisibleAction;
 }
 
-ActionVisibility RequiresOwnerCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
+ActionVisibility RequiresAdministratorCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
 {
-    if (context->user() && context->user()->isOwner())
+    if (context->user() && context->user()->isAdministrator())
         return EnabledAction;
     return InvisibleAction;
 }
@@ -2288,7 +2288,7 @@ ConditionWrapper allowedToShowServersInResourceTree()
     return new CustomBoolCondition(
         [](const Parameters&, QnWorkbenchContext* context)
         {
-            return context->accessController()->hasAdminPermissions()
+            return context->accessController()->hasPowerUserPermissions()
                 || context->systemSettings()->showServersInTreeForNonAdmins();
         });
 }

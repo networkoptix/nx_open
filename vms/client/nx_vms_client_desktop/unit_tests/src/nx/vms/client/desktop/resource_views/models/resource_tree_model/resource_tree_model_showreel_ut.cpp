@@ -25,7 +25,7 @@ static const auto kUniqueShowreelNameCondition = displayFullMatch(kUniqueShowree
 TEST_F(ResourceTreeModelTest, showreelAdds)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When showreel with certain unique name is added.
     addShowreel(kUniqueShowreelName);
@@ -37,7 +37,7 @@ TEST_F(ResourceTreeModelTest, showreelAdds)
 TEST_F(ResourceTreeModelTest, showreelRemoves)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When showreel with certain unique name is added.
     const auto showreel = addShowreel(kUniqueShowreelName);
@@ -55,7 +55,7 @@ TEST_F(ResourceTreeModelTest, showreelRemoves)
 TEST_F(ResourceTreeModelTest, showreelIconType)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When showreel with certain unique name is added.
     const auto showreel = addShowreel(kUniqueShowreelName);
@@ -70,7 +70,7 @@ TEST_F(ResourceTreeModelTest, showreelIconType)
 TEST_F(ResourceTreeModelTest, showreelIsChildrenOfCorrespondingTopLevelNode)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When showreel with certain unique name is added.
     addShowreel(kUniqueShowreelName);
@@ -88,7 +88,7 @@ TEST_F(ResourceTreeModelTest, showreelIsNotDisplayedIfNotLoggedIn)
     addShowreel(kUniqueShowreelName);
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(displayFullMatch(kUniqueShowreelName)));
@@ -106,7 +106,7 @@ TEST_F(ResourceTreeModelTest, showreelIsNotDisplayedIfNotLoggedIn)
 TEST_F(ResourceTreeModelTest, showreelTooltip)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When showreel with certain unique name is added.
     addShowreel(kUniqueShowreelName);
@@ -124,7 +124,7 @@ TEST_F(ResourceTreeModelTest, showreelDisplayNameMapping)
     auto showreel = addShowreel(kUniqueShowreelName);
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(displayFullMatch(kUniqueShowreelName)));
@@ -136,7 +136,7 @@ TEST_F(ResourceTreeModelTest, showreelDisplayNameMapping)
 TEST_F(ResourceTreeModelTest, showreelItemIsDragEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When showreel with certain unique name is added.
     addShowreel(kUniqueShowreelName);
@@ -151,7 +151,7 @@ TEST_F(ResourceTreeModelTest, showreelItemIsDragEnabled)
 TEST_F(ResourceTreeModelTest, showreelHasItemNeverHasChildrenFlag)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When showreel with certain unique name is added.
     addShowreel(kUniqueShowreelName);
@@ -166,7 +166,7 @@ TEST_F(ResourceTreeModelTest, showreelHasItemNeverHasChildrenFlag)
 TEST_F(ResourceTreeModelTest, showreelItemIsNotDropEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When showreel with certain unique name is added.
     addShowreel(kUniqueShowreelName);

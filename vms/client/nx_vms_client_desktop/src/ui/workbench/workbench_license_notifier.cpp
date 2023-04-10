@@ -50,7 +50,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
     if (!qnRuntime->isDesktopMode())
         return;
 
-    if (!accessController()->hasAdminPermissions())
+    if (!accessController()->hasPowerUserPermissions())
         return;
 
     auto licenseLastWarningTime = systemContext()->localSettings()->licenseLastWarningTime();

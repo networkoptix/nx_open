@@ -46,7 +46,7 @@ const ItemDescriptor& FanErrorEvent::manifest()
         .fields = {
             makeFieldDescriptor<SourceServerField>("serverId", tr("Server")),
         },
-        .permissions = {.globalPermission = GlobalPermission::admin},
+        .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/fan_error.mustache"
     };
     return kDescriptor;

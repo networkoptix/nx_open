@@ -58,7 +58,7 @@ public:
     virtual nx::vms::api::GlobalPermissions globalPermissions(const QnUuid& subjectId) const = 0;
 
     /** Returns whether the subject has admin access rights. */
-    bool hasAdminAccessRights(const QnUuid& subjectId) const;
+    bool hasFullAccessRights(const QnUuid& subjectId) const;
 
     /** An interface to subscribe to access rights change signals. */
     class Notifier;

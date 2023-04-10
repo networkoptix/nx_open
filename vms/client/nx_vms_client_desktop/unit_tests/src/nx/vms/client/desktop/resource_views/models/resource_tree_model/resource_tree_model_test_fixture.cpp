@@ -99,12 +99,13 @@ void ResourceTreeModelTest::setSystemName(const QString& name) const
 }
 
 QnUserResourcePtr ResourceTreeModelTest::addUser(
-    const QString& name, GlobalPermissions globalPermissions) const
+    const QString& name, const std::optional<QnUuid>& groupId) const
 {
     QnUserResourcePtr user(new QnUserResource(nx::vms::api::UserType::local, /*externalId*/ {}));
     user->setIdUnsafe(QnUuid::createUuid());
     user->setName(name);
-    user->setRawPermissions(globalPermissions);
+    if (groupId)
+        user->setGroupIds({*groupId});
     user->addFlags(Qn::remote);
     resourcePool()->addResource(user);
     return user;
@@ -461,7 +462,7 @@ void ResourceTreeModelTest::setupAccessToObjectForUser(
     const QnUuid& resourceOrGroupId,
     nx::vms::api::AccessRights accessRights) const
 {
-    if (!NX_ASSERT(user && !resourceAccessManager()->hasAdminPermissions(user)))
+    if (!NX_ASSERT(user && !resourceAccessManager()->hasPowerUserPermissions(user)))
         return;
 
     const auto userId = user->getId();
@@ -491,14 +492,14 @@ void ResourceTreeModelTest::setupAllVideowallsAccess(
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAs(
-    const QString& name, const QnUuid& groupId) const
+    const QString& name, const std::optional<QnUuid>& groupId) const
 {
     logout();
     const auto users = resourcePool()->getResources<QnUserResource>();
 
-    const std::vector<QnUuid> groupIds = groupId.isNull()
+    const std::vector<QnUuid> groupIds = groupId
         ? std::vector<QnUuid>{}
-        : std::vector<QnUuid>{groupId};
+        : std::vector<QnUuid>{*groupId};
 
     const auto itr = std::find_if(users.cbegin(), users.cend(),
         [this, name, &groupIds](const QnUserResourcePtr& user)
@@ -508,30 +509,22 @@ QnUserResourcePtr ResourceTreeModelTest::loginAs(
 
     QnUserResourcePtr user;
     if (itr != users.cend())
-    {
         user = *itr;
-    }
     else
-    {
-        user = addUser(name, GlobalPermission::none);
-        user->setGroupIds(groupIds);
-
-        if (groupId == api::kOwnersGroupId)
-            user->setOwner(true);
-    }
+        user = addUser(name, groupId);
 
     systemContext()->accessController()->setUser(user);
     return user;
 }
 
-QnUserResourcePtr ResourceTreeModelTest::loginAsOwner(const QString& name) const
-{
-    return loginAs(name, api::kOwnersGroupId);
-}
-
-QnUserResourcePtr ResourceTreeModelTest::loginAsAdmin(const QString& name) const
+QnUserResourcePtr ResourceTreeModelTest::loginAsAdministrator(const QString& name) const
 {
     return loginAs(name, api::kAdministratorsGroupId);
+}
+
+QnUserResourcePtr ResourceTreeModelTest::loginAsPowerUser(const QString& name) const
+{
+    return loginAs(name, api::kPowerUsersGroupId);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsLiveViewer(const QString& name) const
@@ -546,7 +539,7 @@ QnUserResourcePtr ResourceTreeModelTest::loginAsAdvancedViewer(const QString& na
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsCustomUser(const QString& name) const
 {
-    return loginAs(name, {});
+    return loginAs(name);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::currentUser() const

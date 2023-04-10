@@ -19,20 +19,21 @@ class UserManagementHelpersTest: public ContextBasedTest
     virtual void SetUp() override
     {
         ContextBasedTest::SetUp();
-        d.owner = addUser(kOwnersGroupId, "owner");
         d.administrator = addUser(kAdministratorsGroupId, "administrator");
+        d.powerUser = addUser(kPowerUsersGroupId, "power user");
         d.viewer = addUser(kViewersGroupId, "viewer");
 
         d.specialWorkers = createUserGroup(NoGroup, "Special Workers");
-        d.specialAdministrators = createUserGroup(
-            {d.specialWorkers.id, kAdministratorsGroupId}, "Special Administrators");
+        d.specialPowerUsers = createUserGroup(
+            {d.specialWorkers.id, kPowerUsersGroupId}, "Special Power Users");
         d.specialViewers = createUserGroup(
             {d.specialWorkers.id, kViewersGroupId}, "Special Viewers");
 
-        d.specialAdministrator = addUser(d.specialAdministrators.id, "special administrator");
+        d.specialPowerUser = addUser(d.specialPowerUsers.id, "special power user");
         d.specialViewer = addUser(d.specialViewers.id, "special viewer");
 
-        d.specialOwner = addUser({d.specialWorkers.id, kOwnersGroupId}, "special owner");
+        d.specialAdministrator = addUser({d.specialWorkers.id, kAdministratorsGroupId},
+            "special administrator");
     }
 
     virtual void TearDown() override
@@ -44,15 +45,15 @@ class UserManagementHelpersTest: public ContextBasedTest
 protected:
     struct
     {
-        QnUserResourcePtr owner;
         QnUserResourcePtr administrator;
+        QnUserResourcePtr powerUser;
         QnUserResourcePtr viewer;
-        QnUserResourcePtr specialAdministrator;
+        QnUserResourcePtr specialPowerUser;
         QnUserResourcePtr specialViewer;
-        QnUserResourcePtr specialOwner;
+        QnUserResourcePtr specialAdministrator;
 
         UserGroupData specialWorkers;
-        UserGroupData specialAdministrators;
+        UserGroupData specialPowerUsers;
         UserGroupData specialViewers;
     } d;
 };
@@ -62,63 +63,63 @@ TEST_F(UserManagementHelpersTest, getUsersAndGroups)
     const std::vector<QnUuid> requestedIds{{
         QnUuid::createUuid(),
         QnUuid::createUuid(),
-        d.administrator->getId(),
+        d.powerUser->getId(),
         QnUuid{},
         QnUuid::createUuid(),
-        d.specialAdministrators.id,
-        kAdministratorsGroupId,
+        d.specialPowerUsers.id,
+        kPowerUsersGroupId,
         QnUuid::createUuid(),
         QnUuid::createUuid(),
-        d.specialAdministrator->getId(),
+        d.specialPowerUser->getId(),
         QnUuid{},
         QnUuid::createUuid()}};
 
     QnUserResourceList users;
     UserGroupDataList groups;
     getUsersAndGroups(systemContext(), requestedIds, users, groups);
-    EXPECT_EQ(users, QnUserResourceList({d.administrator, d.specialAdministrator}));
+    EXPECT_EQ(users, QnUserResourceList({d.powerUser, d.specialPowerUser}));
     EXPECT_EQ(groups, UserGroupDataList(
-        {d.specialAdministrators, *PredefinedUserGroups::find(kAdministratorsGroupId)}));
+        {d.specialPowerUsers, *PredefinedUserGroups::find(kPowerUsersGroupId)}));
 
     QList<QnUuid> groupIds;
     getUsersAndGroups(systemContext(), requestedIds, users, groupIds);
-    EXPECT_EQ(users, QnUserResourceList({d.administrator, d.specialAdministrator}));
-    EXPECT_EQ(groupIds, QList<QnUuid>({d.specialAdministrators.id, kAdministratorsGroupId}));
+    EXPECT_EQ(users, QnUserResourceList({d.powerUser, d.specialPowerUser}));
+    EXPECT_EQ(groupIds, QList<QnUuid>({d.specialPowerUsers.id, kPowerUsersGroupId}));
 }
 
 TEST_F(UserManagementHelpersTest, allGroupsExist)
 {
     EXPECT_TRUE(allUserGroupsExist(systemContext(), std::initializer_list<QnUuid>({
-        kLiveViewersGroupId, kOwnersGroupId, d.specialAdministrators.id, d.specialViewers.id})));
+        kLiveViewersGroupId, kAdministratorsGroupId, d.specialPowerUsers.id, d.specialViewers.id})));
 
     EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<QnUuid>({
-        d.specialAdministrators.id, /*invalid*/ QnUuid{}})));
+        d.specialPowerUsers.id, /*invalid*/ QnUuid{}})));
 
     EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<QnUuid>({
-        d.specialAdministrators.id, /*unknown*/ QnUuid::createUuid()})));
+        d.specialPowerUsers.id, /*unknown*/ QnUuid::createUuid()})));
 
     EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<QnUuid>({
-        d.specialAdministrators.id, /*user*/ d.specialViewer->getId()})));
+        d.specialPowerUsers.id, /*user*/ d.specialViewer->getId()})));
 }
 
 TEST_F(UserManagementHelpersTest, groupNames)
 {
     EXPECT_EQ(userGroupNames(systemContext(), std::initializer_list<QnUuid>({
-        d.specialWorkers.id, /*invalid*/ QnUuid{}, d.specialAdministrators.id, d.specialViewers.id})),
-        QStringList({d.specialWorkers.name, d.specialAdministrators.name, d.specialViewers.name}));
+        d.specialWorkers.id, /*invalid*/ QnUuid{}, d.specialPowerUsers.id, d.specialViewers.id})),
+        QStringList({d.specialWorkers.name, d.specialPowerUsers.name, d.specialViewers.name}));
 
-    EXPECT_EQ(userGroupNames(d.specialOwner),
-        QStringList({d.specialWorkers.name, PredefinedUserGroups::find(kOwnersGroupId)->name}));
+    EXPECT_EQ(userGroupNames(d.specialAdministrator), QStringList(
+        {d.specialWorkers.name, PredefinedUserGroups::find(kAdministratorsGroupId)->name}));
 }
 
 TEST_F(UserManagementHelpersTest, groupsWithParents)
 {   /*
-          Group 1         *Administrators*        Special Workers          *Viewers*
+          Group 1         *Power Users*          Special Workers          *Viewers*
             |                    |                  |       |                  |
        +----+----+               +---------+--------+       +---------+--------+
        |         |                         |                          |
        v         v                         v                          v
-     Group 2    Group 3         Special Administrators         Special Viewers
+     Group 2    Group 3          Special Power Users          Special Viewers
        |         |  |
        +----+----+  |
             |       |
@@ -133,9 +134,9 @@ TEST_F(UserManagementHelpersTest, groupsWithParents)
     const auto group5 = createUserGroup(group3.id, "Group 5");
 
     EXPECT_EQ(userGroupsWithParents(systemContext(),
-        std::initializer_list<QnUuid>({group4.id, d.specialAdministrators.id})),
+        std::initializer_list<QnUuid>({group4.id, d.specialPowerUsers.id})),
         QSet<QnUuid>({group4.id, group3.id, group2.id, group1.id,
-            d.specialAdministrators.id, d.specialWorkers.id, kAdministratorsGroupId}));
+            d.specialPowerUsers.id, d.specialWorkers.id, kPowerUsersGroupId}));
 
     EXPECT_EQ(userGroupsWithParents(systemContext(),
         std::initializer_list<QnUuid>({group5.id, d.specialViewers.id})),

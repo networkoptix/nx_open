@@ -84,11 +84,11 @@ void initialize(Manager* manager, Action* root)
 
     factory(PreferencesLicensesTabAction)
         .flags(NoTarget)
-        .requiredAdminPermissions();
+        .requiredPowerUserPermissions();
 
     factory(PreferencesSmtpTabAction)
         .flags(NoTarget)
-        .requiredAdminPermissions();
+        .requiredPowerUserPermissions();
 
     factory(PreferencesNotificationTabAction)
         .flags(NoTarget)
@@ -96,7 +96,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(PreferencesCloudTabAction)
         .flags(NoTarget)
-        .requiredAdminPermissions();
+        .requiredPowerUserPermissions();
 
     factory(ConnectAction)
         .flags(NoTarget);
@@ -162,12 +162,12 @@ void initialize(Manager* manager, Action* root)
     factory(OpenBusinessRulesAction)
         .mode(DesktopMode)
         .flags(NoTarget | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
-        .requiredAdminPermissions();
+        .requiredPowerUserPermissions();
 
     factory(OpenFailoverPriorityAction)
         .mode(DesktopMode)
         .flags(NoTarget)
-        .requiredAdminPermissions();
+        .requiredPowerUserPermissions();
 
     factory(AcknowledgeEventAction)
         .mode(DesktopMode)
@@ -193,7 +193,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(SelectTimeServerAction)
         .flags(NoTarget)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .text(ContextMenu::tr("Select Time Server")); //< To be displayed on button tooltip
 
     factory(PtzActivatePresetAction)
@@ -535,7 +535,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(VersionMismatchMessageAction)
         .flags(NoTarget)
-        .requiredAdminPermissions();
+        .requiredPowerUserPermissions();
 
     factory(BetaVersionMessageAction)
         .flags(NoTarget)
@@ -549,7 +549,7 @@ void initialize(Manager* manager, Action* root)
     factory(ConfirmAnalyticsStorageAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .requiredAdminPermissions();
+        .requiredPowerUserPermissions();
 
     factory(BrowseUrlAction)
         .flags(NoTarget)
@@ -561,7 +561,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ContextMenu::tr("System Administration..."))
         .shortcut("Ctrl+Alt+A")
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .condition(
             condition::treeNodeType({ResourceTree::NodeType::currentSystem,
                 ResourceTree::NodeType::servers, ResourceTree::NodeType::camerasAndDevices})
@@ -570,21 +570,21 @@ void initialize(Manager* manager, Action* root)
     factory(SystemUpdateAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("System Update..."))
-        .requiredAdminPermissions();
+        .requiredPowerUserPermissions();
 
     factory(AdvancedUpdateSettingsAction)
         .flags(NoTarget)
-        .requiredAdminPermissions();
+        .requiredPowerUserPermissions();
 
     factory(UserManagementAction)
         .flags(Main | Tree)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .text(ContextMenu::tr("User Management..."))
         .condition(condition::treeNodeType(ResourceTree::NodeType::users));
 
     factory(LogsManagementAction)
         .flags(NoTarget)
-        .requiredGlobalPermission(GlobalPermission::admin);
+        .requiredPowerUserPermissions();
 
     factory(PreferencesGeneralTabAction)
         .flags(Main)
@@ -599,7 +599,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(OpenAuditLogAction)
         .flags(Main)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .text(ContextMenu::tr("Audit Trail..."));
 
     factory(OpenBookmarksSearchAction)
@@ -642,7 +642,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(ChangeDefaultCameraPasswordAction)
         .flags(SingleTarget | MultiTarget | ResourceTarget)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .mode(DesktopMode)
         .text(ContextMenu::tr("Some cameras require passwords to be set"));
 
@@ -657,7 +657,7 @@ void initialize(Manager* manager, Action* root)
     factory(BusinessEventsAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .text(ContextMenu::tr("Event Rules..."))
         .shortcut("Ctrl+E")
         .condition(!condition::showreelIsRunning());
@@ -665,7 +665,7 @@ void initialize(Manager* manager, Action* root)
     factory(CameraListAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .text(QnDeviceDependentStrings::getDefaultNameFromSet(
             manager->resourcePool(),
             ContextMenu::tr("Devices List"),
@@ -685,11 +685,11 @@ void initialize(Manager* manager, Action* root)
         factory(MainMenuAddDeviceManuallyAction)
             .flags(Main)
             .text(ContextMenu::tr("Device..."))
-            .requiredAdminPermissions();
+            .requiredPowerUserPermissions();
 
         factory(NewUserAction)
             .flags(Main | Tree)
-            .requiredAdminPermissions()
+            .requiredPowerUserPermissions()
             .text(ContextMenu::tr("User..."))
             .pulledText(ContextMenu::tr("Add User..."))
             .condition(
@@ -698,12 +698,12 @@ void initialize(Manager* manager, Action* root)
 
         factory(NewVideoWallAction)
             .flags(Main)
-            .requiredAdminPermissions()
+            .requiredPowerUserPermissions()
             .text(ContextMenu::tr("Video Wall..."));
 
         factory(NewIntegrationAction)
             .flags(Main | Tree)
-            .requiredAdminPermissions()
+            .requiredPowerUserPermissions()
             .text(ContextMenu::tr("Integration..."))
             .pulledText(ContextMenu::tr("New Integration..."))
             .condition(
@@ -712,7 +712,7 @@ void initialize(Manager* manager, Action* root)
 
         factory(NewWebPageAction)
             .flags(Main | Tree)
-            .requiredAdminPermissions()
+            .requiredPowerUserPermissions()
             .text(ContextMenu::tr("Web Page..."))
             .pulledText(ini().webPagesAndIntegrations
                 ? ContextMenu::tr("New Web Page...")
@@ -731,7 +731,7 @@ void initialize(Manager* manager, Action* root)
 
         factory(MainMenuAddVirtualCameraAction)
             .flags(Main)
-            .requiredAdminPermissions()
+            .requiredPowerUserPermissions()
             .text(ContextMenu::tr("Virtual Camera..."))
             .pulledText(ContextMenu::tr("Add Virtual Camera..."));
     }
@@ -743,7 +743,7 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::treeNodeType({ResourceTree::NodeType::currentSystem,
                 ResourceTree::NodeType::servers, ResourceTree::NodeType::camerasAndDevices})
-            && ConditionWrapper(new RequiresOwnerCondition())
+            && ConditionWrapper(new RequiresAdministratorCondition())
         );
 
     // TODO: Implement proxy actions to allow the same action to be shown in different locations.
@@ -753,7 +753,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(systemAdministrationAction->text())
         .shortcut("Ctrl+Alt+A")
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .condition(
             condition::treeNodeType({ResourceTree::NodeType::currentSystem,
                 ResourceTree::NodeType::servers, ResourceTree::NodeType::camerasAndDevices})
@@ -1051,7 +1051,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(AttachToVideoWallAction)
         .flags(Tree | SingleTarget | ResourceTarget)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .text(ContextMenu::tr("Attach to Video Wall..."))
         .condition(condition::hasFlags(Qn::videowall, MatchMode::any));
 
@@ -1179,7 +1179,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(DeleteVideoWallItemAction)
         .flags(Tree | SingleTarget | MultiTarget | VideoWallItemTarget | IntentionallyAmbiguous)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .text(ContextMenu::tr("Delete"))
         .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true);
@@ -1321,7 +1321,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Create Group"))
         .shortcut("Ctrl+G")
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .condition(
             (condition::treeNodeType(ResourceTree::NodeType::resource)
             || condition::treeNodeType(ResourceTree::NodeType::customResourceGroup)
@@ -1331,14 +1331,14 @@ void initialize(Manager* manager, Action* root)
     factory(AssignCustomGroupIdAction)
         .mode(DesktopMode)
         .flags(SingleTarget | MultiTarget | ResourceTarget)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .condition(
             ConditionWrapper(new AssignResourceTreeGroupIdCondition()));
 
     factory(MoveToCustomGroupAction)
         .mode(DesktopMode)
         .flags(SingleTarget | MultiTarget | ResourceTarget)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .condition(
             ConditionWrapper(new MoveResourceTreeGroupIdCondition()));
 
@@ -1346,7 +1346,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Rename"))
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .shortcut("F2")
         .condition(
             condition::treeNodeType(ResourceTree::NodeType::customResourceGroup)
@@ -1356,7 +1356,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Remove Group"))
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .shortcut("Del")
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
         .condition(
@@ -1423,14 +1423,14 @@ void initialize(Manager* manager, Action* root)
     {
         factory(IntegrationSettingsAction)
             .flags(Scene | Tree | SingleTarget | ResourceTarget)
-            .requiredAdminPermissions()
+            .requiredPowerUserPermissions()
             .text(ContextMenu::tr("Integration Settings..."))
             .condition(condition::isIntegration() && !condition::showreelIsRunning());
     }
 
     factory(WebPageSettingsAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .text(ContextMenu::tr("Web Page Settings..."))
         .condition(
             (ini().webPagesAndIntegrations
@@ -1467,7 +1467,7 @@ void initialize(Manager* manager, Action* root)
         .conditionalText(
             ContextMenu::tr("Role Settings..."),
             condition::treeNodeType(ResourceTree::NodeType::role))
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .condition(
             condition::treeNodeType(
                 {ResourceTree::NodeType::users, ResourceTree::NodeType::role}));
@@ -1496,7 +1496,7 @@ void initialize(Manager* manager, Action* root)
     factory(ReplaceCameraAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .text(ContextMenu::tr("Replace Camera..."))
         .condition(ConditionWrapper(new ReplaceCameraCondition())
             && condition::isTrue(ini().enableCameraReplacementFeature)
@@ -1506,7 +1506,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(UndoReplaceCameraAction)
         .flags(SingleTarget | ResourceTarget)
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .mode(DesktopMode);
 
     factory(CameraIssuesAction)
@@ -1538,7 +1538,7 @@ void initialize(Manager* manager, Action* root)
                 ContextMenu::tr("Camera Rules..."),
                 ContextMenu::tr("I/O Module Rules...")
             ), manager))
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .condition(
             condition::hasFlags(
                 /*require*/ Qn::live_cam,
@@ -1620,24 +1620,24 @@ void initialize(Manager* manager, Action* root)
         factory(AddDeviceManuallyAction)
             .flags(Tree | SingleTarget | ResourceTarget)
             .text(ContextMenu::tr("Device...")) //< Intentionally hardcode devices here.
-            .requiredAdminPermissions();
+            .requiredPowerUserPermissions();
 
         if (ini().webPagesAndIntegrations)
         {
             factory(AddProxiedIntegrationAction)
                 .flags(Tree | SingleTarget | ResourceTarget)
                 .text(ContextMenu::tr("Proxied Integration..."))
-                .requiredAdminPermissions();
+                .requiredPowerUserPermissions();
         }
 
         factory(AddProxiedWebPageAction)
             .flags(Tree | SingleTarget | ResourceTarget)
             .text(ContextMenu::tr("Proxied Web Page..."))
-            .requiredAdminPermissions();
+            .requiredPowerUserPermissions();
 
         factory(AddVirtualCameraAction)
             .flags(Tree | SingleTarget | ResourceTarget)
-            .requiredAdminPermissions()
+            .requiredPowerUserPermissions()
             .text(ContextMenu::tr("Virtual Camera..."));
     }
     factory.endSubMenu();
@@ -1653,7 +1653,7 @@ void initialize(Manager* manager, Action* root)
             ContextMenu::tr("Devices List by Server..."),
             ContextMenu::tr("Cameras List by Server...")
         ))
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true))
@@ -1666,7 +1666,7 @@ void initialize(Manager* manager, Action* root)
     factory(ServerLogsAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Server Logs..."))
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::showreelIsRunning()
@@ -1687,7 +1687,7 @@ void initialize(Manager* manager, Action* root)
     factory(WebAdminAction)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Server Web Page..."))
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !ConditionWrapper(new CloudServerCondition(MatchMode::any))
@@ -1697,7 +1697,7 @@ void initialize(Manager* manager, Action* root)
     factory(ServerSettingsAction)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Server Settings..."))
-        .requiredAdminPermissions()
+        .requiredPowerUserPermissions()
         .condition(
             condition::hasFlags(
                 /*require*/ Qn::remote_server,
@@ -1713,7 +1713,7 @@ void initialize(Manager* manager, Action* root)
         .condition(
             condition::treeNodeType(ResourceTree::NodeType::resource)
             && ConditionWrapper(new MergeToCurrentSystemCondition())
-            && ConditionWrapper(new RequiresOwnerCondition())
+            && ConditionWrapper(new RequiresAdministratorCondition())
         );
 
     factory()
@@ -2153,7 +2153,7 @@ void initialize(Manager* manager, Action* root)
         factory(OpenEventRulesDialogAction)
             .flags(GlobalHotkey | Main | DevMode)
             .mode(DesktopMode)
-            .requiredAdminPermissions()
+            .requiredPowerUserPermissions()
             .text("New Event Rules...")
             .shortcut("Ctrl+Alt+E")
             .condition(!condition::showreelIsRunning()

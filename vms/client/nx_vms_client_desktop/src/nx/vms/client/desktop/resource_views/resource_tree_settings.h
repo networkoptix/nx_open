@@ -27,7 +27,7 @@ public:
     /**
      * Setting which suggests whether devices displayed in the Resource Tree will be grouped
      * by parent server or will be displayed all together within 'Cameras & Devices' group.
-     * For non-administrator users actual display mode is defined by combination of this
+     * For non-power users actual display mode is defined by combination of this
      * setting and <tt>showServersInTreeForNonAdmins</tt> global setting. Please note that
      * besides main Resource Tree this setting affect device selection dialogs either.
      */

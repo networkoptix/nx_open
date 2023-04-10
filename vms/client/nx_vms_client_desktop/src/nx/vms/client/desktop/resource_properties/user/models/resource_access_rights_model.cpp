@@ -382,12 +382,13 @@ void ResourceAccessRightsModel::Private::updateInfo(bool suppressSignals)
         {
             auto& newInfo = newResourceAccessInfo[i];
 
-            // Visual sugar to not display own admin permissions if they duplicate the inherited.
-            const auto adminParents = context->globalPermissionSource(GlobalPermission::admin);
-            if (!adminParents.empty())
+            // Visual sugar to not display full access rights as own if they come from inherited
+            // global permissions.
+            const auto powerParents = context->globalPermissionSource(GlobalPermission::powerUser);
+            if (!powerParents.empty())
             {
                 newInfo.providedVia = ResourceAccessInfo::ProvidedVia::parentUserGroup;
-                newInfo.providerUserGroups = {adminParents.begin(), adminParents.end()};
+                newInfo.providerUserGroups = {powerParents.begin(), powerParents.end()};
                 continue;
             }
 

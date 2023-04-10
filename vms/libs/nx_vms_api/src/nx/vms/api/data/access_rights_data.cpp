@@ -47,15 +47,15 @@ QnUuid specialResourceGroupId(SpecialResourceGroup group)
 std::map<QnUuid, AccessRights> migrateAccessRights(
     GlobalPermissions permissions, const std::vector<QnUuid>& accessibleResources)
 {
-    if (permissions.testFlag(GlobalPermission::admin))
+    if (permissions.testFlag(GlobalPermission::powerUser))
     {
-        static const std::map<QnUuid, AccessRights> kAdminAccess{
+        static const std::map<QnUuid, AccessRights> kPowerUserAccess{
             {kAllDevicesGroupId, kFullAccessRights},
             {kAllServersGroupId, kViewAccessRights},
             {kAllWebPagesGroupId, kViewAccessRights},
             {kAllVideoWallsGroupId, kViewAccessRights}};
 
-        return kAdminAccess;
+        return kPowerUserAccess;
     }
 
     AccessRights accessRights{};

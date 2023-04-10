@@ -969,13 +969,13 @@ State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State sta
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setUserHasAdminPermissions(
+State CameraSettingsDialogStateReducer::setHasPowerUserPermissions(
     State state,
     bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    state.userHasAdminPermissions = value;
+    state.hasPowerUserPermissions = value;
     return state;
 }
 

@@ -13,12 +13,6 @@ namespace nx {
 namespace vms {
 namespace event {
 
-namespace {
-
-static const QList<QnUuid> kOwnerRoleIds{api::kOwnersGroupId};
-
-} // namespace
-
 const QByteArray koldGuidPostfix("DEFAULT_BUSINESS_RULES");
 const QByteArray Rule::kGuidPostfix("vms_businessrule");
 
@@ -314,23 +308,23 @@ RuleList Rule::getNotificationRules()
         RulePtr(new Rule(6,     30,      false, ActionType::showPopupAction, EventType::serverConflictEvent,   {},        true)),
         RulePtr(new Rule(10023, 30,      false, ActionType::showPopupAction, EventType::licenseIssueEvent,     {},        true)),
 
-        RulePtr(new Rule(7,     6*3600,  false, ActionType::sendMailAction, EventType::cameraDisconnectEvent, kOwnerRoleIds)),
-        RulePtr(new Rule(8,     24*3600, false, ActionType::sendMailAction, EventType::storageFailureEvent,   kOwnerRoleIds)),
-        RulePtr(new Rule(9,     6*3600,  false, ActionType::sendMailAction, EventType::networkIssueEvent,     kOwnerRoleIds)),
-        RulePtr(new Rule(10,    6*3600,  false, ActionType::sendMailAction, EventType::cameraIpConflictEvent, kOwnerRoleIds)),
-        RulePtr(new Rule(11,    6*3600,  false, ActionType::sendMailAction, EventType::serverFailureEvent,    kOwnerRoleIds)),
-        RulePtr(new Rule(12,    6*3600,  false, ActionType::sendMailAction, EventType::serverConflictEvent,   kOwnerRoleIds)),
-        RulePtr(new Rule(10020, 6*3600,  false, ActionType::sendMailAction, EventType::serverStartEvent,      kOwnerRoleIds)),
-        RulePtr(new Rule(10022, 6*3600,  false, ActionType::sendMailAction, EventType::licenseIssueEvent,     kOwnerRoleIds)),
+        RulePtr(new Rule(7,     6*3600, false, ActionType::sendMailAction, EventType::cameraDisconnectEvent, {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(8,    24*3600, false, ActionType::sendMailAction, EventType::storageFailureEvent,   {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(9,     6*3600, false, ActionType::sendMailAction, EventType::networkIssueEvent,     {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(10,    6*3600, false, ActionType::sendMailAction, EventType::cameraIpConflictEvent, {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(11,    6*3600, false, ActionType::sendMailAction, EventType::serverFailureEvent,    {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(12,    6*3600, false, ActionType::sendMailAction, EventType::serverConflictEvent,   {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(10020, 6*3600, false, ActionType::sendMailAction, EventType::serverStartEvent,      {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(10022, 6*3600, false, ActionType::sendMailAction, EventType::licenseIssueEvent,     {api::kAdministratorsGroupId})),
 
-        RulePtr(new Rule(11001, 6*3600,  false, ActionType::pushNotificationAction, EventType::cameraDisconnectEvent, kOwnerRoleIds)),
-        RulePtr(new Rule(11002, 24*3600, false, ActionType::pushNotificationAction, EventType::storageFailureEvent,   kOwnerRoleIds)),
-        RulePtr(new Rule(11003, 6*3600,  false, ActionType::pushNotificationAction, EventType::networkIssueEvent,     kOwnerRoleIds)),
-        RulePtr(new Rule(11004, 6*3600,  false, ActionType::pushNotificationAction, EventType::cameraIpConflictEvent, kOwnerRoleIds)),
-        RulePtr(new Rule(11005, 6*3600,  false, ActionType::pushNotificationAction, EventType::serverFailureEvent,    kOwnerRoleIds)),
-        RulePtr(new Rule(11006, 6*3600,  false, ActionType::pushNotificationAction, EventType::serverConflictEvent,   kOwnerRoleIds)),
-        RulePtr(new Rule(11007, 6*3600,  false, ActionType::pushNotificationAction, EventType::serverStartEvent,      kOwnerRoleIds)),
-        RulePtr(new Rule(11008, 6*3600,  false, ActionType::pushNotificationAction, EventType::licenseIssueEvent,     kOwnerRoleIds)),
+        RulePtr(new Rule(11001, 6*3600,  false, ActionType::pushNotificationAction, EventType::cameraDisconnectEvent, {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(11002, 24*3600, false, ActionType::pushNotificationAction, EventType::storageFailureEvent,   {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(11003, 6*3600,  false, ActionType::pushNotificationAction, EventType::networkIssueEvent,     {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(11004, 6*3600,  false, ActionType::pushNotificationAction, EventType::cameraIpConflictEvent, {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(11005, 6*3600,  false, ActionType::pushNotificationAction, EventType::serverFailureEvent,    {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(11006, 6*3600,  false, ActionType::pushNotificationAction, EventType::serverConflictEvent,   {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(11007, 6*3600,  false, ActionType::pushNotificationAction, EventType::serverStartEvent,      {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(11008, 6*3600,  false, ActionType::pushNotificationAction, EventType::licenseIssueEvent,     {api::kAdministratorsGroupId})),
     };
 }
 
@@ -401,14 +395,14 @@ RuleList Rule::getServerCertificateErrorRules()
             /*isSystem*/ false,
             ActionType::sendMailAction,
             EventType::serverCertificateError,
-            kOwnerRoleIds)),
+            {api::kAdministratorsGroupId})),
         RulePtr(new Rule(
             /*internalId*/ 10026,
             /*aggregationPeriod*/ 6 * 3600,
             /*isSystem*/ false,
             ActionType::pushNotificationAction,
             EventType::serverCertificateError,
-            kOwnerRoleIds)),
+            {api::kAdministratorsGroupId})),
         RulePtr(new Rule(
             /*internalId*/ 900026,
             /*aggregationPeriod*/ 30,

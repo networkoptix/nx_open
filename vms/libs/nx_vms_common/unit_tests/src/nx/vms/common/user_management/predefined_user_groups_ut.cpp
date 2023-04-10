@@ -62,13 +62,13 @@ TEST(PredefinedUserGroups, find)
 
 TEST(PredefinedUserGroups, globalPermissions)
 {
-    EXPECT_EQ(PredefinedUserGroups::find(kOwnersGroupId)->permissions,
-        GlobalPermission::owner
-        | GlobalPermission::admin
+    EXPECT_EQ(PredefinedUserGroups::find(kAdministratorsGroupId)->permissions,
+        GlobalPermission::administrator
+        | GlobalPermission::powerUser
         | GlobalPermission::viewLogs);
 
-    EXPECT_EQ(PredefinedUserGroups::find(kAdministratorsGroupId)->permissions,
-        GlobalPermission::admin
+    EXPECT_EQ(PredefinedUserGroups::find(kPowerUsersGroupId)->permissions,
+        GlobalPermission::powerUser
         | GlobalPermission::viewLogs);
 
     EXPECT_EQ(PredefinedUserGroups::find(kAdvancedViewersGroupId)->permissions,
@@ -83,8 +83,8 @@ TEST(PredefinedUserGroups, globalPermissions)
 
 TEST(PredefinedUserGroups, accessRights)
 {
-    EXPECT_EQ(PredefinedUserGroups::accessRights(kOwnersGroupId), kAdminResourceAccessMap);
-    EXPECT_EQ(PredefinedUserGroups::accessRights(kAdministratorsGroupId), kAdminResourceAccessMap);
+    EXPECT_EQ(PredefinedUserGroups::accessRights(kAdministratorsGroupId), kFullResourceAccessMap);
+    EXPECT_EQ(PredefinedUserGroups::accessRights(kPowerUsersGroupId), kFullResourceAccessMap);
 
     EXPECT_EQ(PredefinedUserGroups::accessRights(kAdvancedViewersGroupId), ResourceAccessMap({
         {kAllDevicesGroupId, AccessRight::view

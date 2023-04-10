@@ -39,8 +39,8 @@ static const auto kUniqueGroupNameCondition = displayFullMatch(kUniqueGroupName)
 
 TEST_F(ResourceTreeModelTest, serverAdds)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server resource with certain unique name is added to the resource pool.
     addServer(kUniqueServerName);
@@ -54,8 +54,8 @@ TEST_F(ResourceTreeModelTest, serverRemoves)
     // When server resource with certain unique name is added to the resource pool.
     const auto server = addServer(kUniqueServerName);
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(kUniqueServerNameCondition));
@@ -98,8 +98,8 @@ TEST_F(ResourceTreeModelTest, serverIconType)
     // When server resource with certain unique name is added to the resource pool.
     addServer(kUniqueServerName);
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto serverIndex = uniqueMatchingIndex(kUniqueServerNameCondition);
@@ -111,7 +111,7 @@ TEST_F(ResourceTreeModelTest, serverIconType)
 TEST_F(ResourceTreeModelTest, serverIconStatus)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server resource with certain unique name is added to the resource pool.
     const auto server = addServer(kUniqueServerName);
@@ -162,8 +162,8 @@ TEST_F(ResourceTreeModelTest, DISABLED_serverControlIconStatus)
     // When server is online and remote GUID is server ID.
     server->setStatus(nx::vms::api::ResourceStatus::online);
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then server icon has Control decoration.
     ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Control)
@@ -181,8 +181,8 @@ TEST_F(ResourceTreeModelTest, reducedEdgeCameraIsDisplayedForAdmin)
     // When server redundancy flag set to false.
     edgeServer->setRedundancy(false);
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then single reduced EDGE camera node found in the resource tree.
     const auto edgeCameraIndex = uniqueMatchingIndex(reducedEdgeCameraCondition());
@@ -278,8 +278,8 @@ TEST_F(ResourceTreeModelTest, edgeServerIsExpandedIfRedundancySetOn)
     // When EDGE camera with certain unique name is added to the EDGE server.
     addEdgeCamera(kUniqueEdgeCameraName, edgeServer);
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server redundancy flag set to true.
     edgeServer->setRedundancy(true);
@@ -304,8 +304,8 @@ TEST_F(ResourceTreeModelTest, edgeServerIsExpandedIfContainsSingleForeignCamera)
     const auto camera = addCamera(kUniqueCameraName, edgeServer->getId());
     EXPECT_EQ(camera->getUrl(), QString());
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server redundancy flag set to true.
     edgeServer->setRedundancy(false);
@@ -332,8 +332,8 @@ TEST_F(ResourceTreeModelTest, edgeServerIsExpandedIfChildVirtualCameraAdded)
     // When EDGE server redundancy flag set to false.
     edgeServer->setRedundancy(false);
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then there is single reduced EDGE camera node in the resource tree.
     ASSERT_TRUE(onlyOneMatches(reducedEdgeCameraCondition()));
@@ -377,8 +377,8 @@ TEST_F(ResourceTreeModelTest, emptyEdgeServerAppearsIfEdgeCameraWasMovedToAnothe
     // When EDGE server redundancy flag set to false.
     edgeServer->setRedundancy(false);
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then there are single reduced EDGE camera node and single server node in the resource tree.
     ASSERT_TRUE(onlyOneMatches(reducedEdgeCameraCondition()));
@@ -497,8 +497,8 @@ TEST_F(ResourceTreeModelTest, accessToServerIsChangedForACustomUserIfAccessibleC
     static constexpr auto kUniqueServerName1 = "unique_server_name_1";
     static constexpr auto kUniqueServerName2 = "unique_server_name_2";
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When two Servers with different unique names are added to the resource pool.
     const auto server1 = addServer(kUniqueServerName1);
@@ -538,8 +538,8 @@ TEST_F(ResourceTreeModelTest, accessToServerIsChangedForACustomUserIfAccessibleC
     static constexpr auto kUniqueServerName1 = "unique_server_name_1";
     static constexpr auto kUniqueServerName2 = "unique_server_name_2";
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When two Servers with different unique names are added to the resource pool.
     const auto server1 = addServer(kUniqueServerName1);
@@ -581,8 +581,8 @@ TEST_F(ResourceTreeModelTest, accessToServerIsChangedForACustomUserIfAccessibleC
 
 TEST_F(ResourceTreeModelTest, hiddenEdgeServerIsDisplayedWhenCameraRemoved)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server resource with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -606,8 +606,8 @@ TEST_F(ResourceTreeModelTest, hiddenEdgeServerIsDisplayedWhenCameraRemoved)
 
 TEST_F(ResourceTreeModelTest, singleServerIsTopLevelNode)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When single server resource with certain unique name is added to the resource pool.
     addServer(kUniqueServerName);
@@ -625,8 +625,8 @@ TEST_F(ResourceTreeModelTest, multipleServersAreChildrenOfServersNodeForAdmin)
     static constexpr auto kUniqueServerName1 = "unique_server_name_1";
     static constexpr auto kUniqueServerName2 = "unique_server_name_2";
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When two Servers with different unique names are added to the resource pool.
     addServer(kUniqueServerName1);
@@ -777,7 +777,7 @@ TEST_F(ResourceTreeModelTest, serversBecameGroupedIfCustomUserGetsAccessToCamera
 TEST_F(ResourceTreeModelTest, serverHelpTopic)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server resource with certain unique name is added to the resource pool.
     addServer(kUniqueServerName);
@@ -792,7 +792,7 @@ TEST_F(ResourceTreeModelTest, serverHelpTopic)
 TEST_F(ResourceTreeModelTest, serverDisplayNameMapping)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server resource with certain unique name is added to the resource pool.
     const auto server = addServer(kUniqueServerName);
@@ -806,8 +806,8 @@ TEST_F(ResourceTreeModelTest, serverDisplayNameMapping)
 
 TEST_F(ResourceTreeModelTest, emptyEdgeServerDisplaysServerName)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -821,8 +821,8 @@ TEST_F(ResourceTreeModelTest, emptyEdgeServerDisplaysServerName)
 
 TEST_F(ResourceTreeModelTest, edgeServerWithBindedCameraDisplaysBindedCameraName)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -842,8 +842,8 @@ TEST_F(ResourceTreeModelTest, edgeServerWithBindedCameraDisplaysBindedCameraName
 
 TEST_F(ResourceTreeModelTest, edgeServerWithBindedCameraRenamedWhenBindedCameraRenamed)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -867,8 +867,8 @@ TEST_F(ResourceTreeModelTest, edgeServerWithBindedCameraRenamedWhenBindedCameraR
 
 TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameIfBindedCameraRenamedOnForeignServer)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -898,8 +898,8 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameIfBindedCameraRenamedO
 
 TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenBindedCameraRemoved)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -922,8 +922,8 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenBindedCameraRemove
 
 TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenMultipleResourcesRemoved)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -955,8 +955,8 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenMultipleResourcesR
 
 TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenBindedCameraMovedToForeignServer)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -980,8 +980,8 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenBindedCameraMovedT
 
 TEST_F(ResourceTreeModelTest, edgeServerDisplaysBindedCameraNameIfCameraMovedFromForeignServer)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server with certain unique name is added to the resource pool.
     const auto server = addServer(kUniqueServerName);
@@ -1007,8 +1007,8 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysBindedCameraNameIfCameraMovedFro
 
 TEST_F(ResourceTreeModelTest, edgeServerWithBindedCameraAndForeignCameraDisplaysBindedCameraName)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -1028,8 +1028,8 @@ TEST_F(ResourceTreeModelTest, edgeServerWithBindedCameraAndForeignCameraDisplays
 
 TEST_F(ResourceTreeModelTest, edgeServerWithBindedCameraAndVirtualCameraDisplaysBindedCameraName)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -1049,8 +1049,8 @@ TEST_F(ResourceTreeModelTest, edgeServerWithBindedCameraAndVirtualCameraDisplays
 
 TEST_F(ResourceTreeModelTest, edgeServerWithSingleForeignCameraDisplaysServerName)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -1070,8 +1070,8 @@ TEST_F(ResourceTreeModelTest, edgeServerWithSingleForeignCameraDisplaysServerNam
 
 TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameIfBindedCameraIsOnForeignServer)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server with certain unique name is added to the resource pool.
     const auto server = addServer(kUniqueServerName);
@@ -1092,8 +1092,8 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameIfBindedCameraIsOnFore
 
 TEST_F(ResourceTreeModelTest, edgeServerWithDuplicatedBindedCamerasAppearsExpandedAndDisplaysServerName)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -1127,8 +1127,8 @@ TEST_F(ResourceTreeModelTest, edgeServerWithDuplicatedBindedCamerasAppearsExpand
 
 TEST_F(ResourceTreeModelTest, edgeServerDisplaysBindedCameraNameIfDuplicateBindedCameraRemoved)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -1162,8 +1162,8 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysBindedCameraNameIfDuplicateBinde
 
 TEST_F(ResourceTreeModelTest, edgeServerDisplaysBindedCameraNameIfDuplicateBindedCameraMovedToForeignServer)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -1213,8 +1213,8 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysBindedCameraNameIfDuplicateBinde
 TEST_F(ResourceTreeModelTest,
     edgeServerExpandsWhenBindedCameraMovesToForeignServerAndCollapsesWhenBindedCameraMovesBack)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -1261,8 +1261,8 @@ TEST_F(ResourceTreeModelTest,
 
 TEST_F(ResourceTreeModelTest, thereIsNoCrashWhenDuplicatedEdgeCamerasAreRemoved)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -1291,7 +1291,7 @@ TEST_F(ResourceTreeModelTest, thereIsNoCrashWhenDuplicatedEdgeCamerasAreRemoved)
 TEST_F(ResourceTreeModelTest, serverNodeProvidesResource)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server resource with certain unique name is added to the resource pool.
     const auto server = addServer(kUniqueServerName);
@@ -1306,8 +1306,8 @@ TEST_F(ResourceTreeModelTest, serverNodeProvidesResource)
 
 TEST_F(ResourceTreeModelTest, serverNodeIsDragEnabled)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server resource with certain unique name is added to the resource pool.
     addServer(kUniqueServerName);
@@ -1321,8 +1321,8 @@ TEST_F(ResourceTreeModelTest, serverNodeIsDragEnabled)
 
 TEST_F(ResourceTreeModelTest, serverHasNotItemNeverHasChildrenFlag)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server resource with certain unique name is added to the resource pool.
     addServer(kUniqueServerName);

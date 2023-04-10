@@ -19,6 +19,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -158,7 +159,7 @@ struct CloudLayoutsManager::Private
         user = QnUserResourcePtr(new QnUserResource(api::UserType::cloud, /*externalId*/ {}));
         user->setIdUnsafe(QnUuid::createUuid());
         user->setName(cloudStatusWatcher->cloudLogin());
-        user->setOwner(true); //< Avoid resources access calculation.
+        user->setGroupIds({api::kAdministratorsGroupId}); //< Avoid resources access calculation.
 
         auto resourcePool = systemContext->resourcePool();
         resourcePool->addResource(user);

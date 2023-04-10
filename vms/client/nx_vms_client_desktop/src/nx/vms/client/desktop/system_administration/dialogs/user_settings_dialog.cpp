@@ -349,7 +349,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.allowInsecure = user->digestAuthorizationEnabled();
     state.allowInsecureEditable = permissions.testFlag(Qn::WriteDigestPermission);
 
-    state.auditAvailable = accessController()->hasAdminPermissions();
+    state.auditAvailable = accessController()->hasPowerUserPermissions();
     state.deleteAvailable = permissions.testFlag(Qn::RemovePermission);
 
     state.parentGroupsEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
@@ -538,7 +538,7 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
 
         connect(user.get(), &QnResource::propertyChanged, this, updateState);
         connect(user.get(), &QnUserResource::digestChanged, this, updateState);
-        connect(user.get(), &QnUserResource::userRolesChanged, this, updateState);
+        connect(user.get(), &QnUserResource::userGroupsChanged, this, updateState);
         connect(user.get(), &QnUserResource::nameChanged, this, updateState);
     }
 

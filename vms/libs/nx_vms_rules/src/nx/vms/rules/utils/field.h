@@ -55,7 +55,7 @@ FieldDescriptor makeTextFormatterFieldDescriptor(
 FieldDescriptor makeTargetUserFieldDescriptor(
     const QString& displayName,
     const QString& description = {},
-    bool isAvailableForAdminsByDefault = true);
+    bool isAvailableForPowerUsersByDefault = true);
 
 template <class T, class E>
 T getFieldValue(const E& event, const char* fieldName, T&& defaultValue = T())

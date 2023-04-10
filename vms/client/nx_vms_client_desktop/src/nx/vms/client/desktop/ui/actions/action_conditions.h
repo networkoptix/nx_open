@@ -127,8 +127,8 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
-/** Condition class for actions, that require owner privileges. */
-class RequiresOwnerCondition: public Condition
+/** Condition class for actions, that require Administrator privileges. */
+class RequiresAdministratorCondition: public Condition
 {
 public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
@@ -701,7 +701,7 @@ ConditionWrapper hasNewEventRulesEngine();
 
 /**
  * Check if current user is allowed to see servers in the resources tree such feature may be
- * restricted for users without administrator permissions by the global setting)
+ * restricted for users without power user permissions by the global setting)
  */
 ConditionWrapper allowedToShowServersInResourceTree();
 

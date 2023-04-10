@@ -32,7 +32,7 @@ static const auto kUniqueVideoWallMatrixNameCondition =
 TEST_F(ResourceTreeModelTest, videoWallAdds)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     addVideoWall(kUniqueVideoWallName);
@@ -44,7 +44,7 @@ TEST_F(ResourceTreeModelTest, videoWallAdds)
 TEST_F(ResourceTreeModelTest, videoWallScreenAdds)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -59,7 +59,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenAdds)
 TEST_F(ResourceTreeModelTest, videoWallMatrixAdds)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -77,7 +77,7 @@ TEST_F(ResourceTreeModelTest, videoWallRemoves)
     const auto videoWall = addVideoWall(kUniqueVideoWallName);
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(kUniqueVideoWallNameCondition));
@@ -98,7 +98,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenRemoves)
     const auto videoWallScreen = addVideoWallScreen(kUniqueVideoWallScreenName, videoWall);
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(kUniqueVideoWallScreenNameCondition));
@@ -119,7 +119,7 @@ TEST_F(ResourceTreeModelTest, videoWallMatrixRemoves)
     const auto videoWallMatrix = addVideoWallMatrix(kUniqueVideoWallMatrixName, videoWall);
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(kUniqueVideoWallMatrixNameCondition));
@@ -134,7 +134,7 @@ TEST_F(ResourceTreeModelTest, videoWallMatrixRemoves)
 TEST_F(ResourceTreeModelTest, videoWallIconType)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     addVideoWall(kUniqueVideoWallName);
@@ -149,7 +149,7 @@ TEST_F(ResourceTreeModelTest, videoWallIconType)
 TEST_F(ResourceTreeModelTest, videoWallScreenIconType)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -167,7 +167,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenIconType)
 TEST_F(ResourceTreeModelTest, videoWallMatrixIconType)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -185,7 +185,7 @@ TEST_F(ResourceTreeModelTest, videoWallMatrixIconType)
 TEST_F(ResourceTreeModelTest, videoWallScreenIconStatus)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -229,7 +229,7 @@ TEST_F(ResourceTreeModelTest, videoWallsAreTopLevelNodes)
     static constexpr auto kUniqueVideoWallName2 = "unique_video_wall_name_2";
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When two video wall with different unique names are added to the resource pool.
     addVideoWall(kUniqueVideoWallName1);
@@ -247,7 +247,7 @@ TEST_F(ResourceTreeModelTest, videoWallsAreTopLevelNodes)
 TEST_F(ResourceTreeModelTest, videoWallScreenIsChildOfVideoWall)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     const auto videoWall = addVideoWall(kUniqueVideoWallName);
@@ -270,7 +270,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenSingleItemRename)
     static constexpr auto kRenamedVideoWallScreenName = "renamed_video_wall_screen_name";
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     const auto videoWall = addVideoWall(kUniqueVideoWallName);
@@ -297,7 +297,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenSingleItemRename)
 TEST_F(ResourceTreeModelTest, videoWallMatrixIsChildOfVideoWall)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     const auto videoWall = addVideoWall(kUniqueVideoWallName);
@@ -320,7 +320,7 @@ TEST_F(ResourceTreeModelTest, videoWallMatrixSingleItemRename)
     static constexpr auto kRenamedVideoWallMatrixName = "renamed_video_wall_matrix_name";
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     const auto videoWall = addVideoWall(kUniqueVideoWallName);
@@ -350,7 +350,7 @@ TEST_F(ResourceTreeModelTest, videoWallIsNotDisplayedIfNotLoggedIn)
     addVideoWall(kUniqueVideoWallName);
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(kUniqueVideoWallNameCondition));
@@ -368,7 +368,7 @@ TEST_F(ResourceTreeModelTest, videoWallIsNotDisplayedIfNotLoggedIn)
 TEST_F(ResourceTreeModelTest, videoWallHelpTopic)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     addVideoWall(kUniqueVideoWallName);
@@ -383,7 +383,7 @@ TEST_F(ResourceTreeModelTest, videoWallHelpTopic)
 TEST_F(ResourceTreeModelTest, videoWallScreenHelpTopic)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -401,7 +401,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenHelpTopic)
 TEST_F(ResourceTreeModelTest, videoWallMatrixHelpTopic)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -419,7 +419,7 @@ TEST_F(ResourceTreeModelTest, videoWallMatrixHelpTopic)
 TEST_F(ResourceTreeModelTest, videoWallTooltip)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     addVideoWall(kUniqueVideoWallName);
@@ -437,7 +437,7 @@ TEST_F(ResourceTreeModelTest, videoWallDisplayNameMapping)
     auto videoWall = addVideoWall(kUniqueVideoWallName);
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto videoWallIndex = uniqueMatchingIndex(kUniqueVideoWallNameCondition);
@@ -449,7 +449,7 @@ TEST_F(ResourceTreeModelTest, videoWallDisplayNameMapping)
 TEST_F(ResourceTreeModelTest, videoWallNodeProvidesResource)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     const auto videoWall = addVideoWall(kUniqueVideoWallName);
@@ -465,7 +465,7 @@ TEST_F(ResourceTreeModelTest, videoWallNodeProvidesResource)
 TEST_F(ResourceTreeModelTest, videoWallScreenNodeProvidesUuid)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -487,7 +487,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenNodeProvidesUuid)
 TEST_F(ResourceTreeModelTest, videoWallMatrixNodeProvidesUuid)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -511,8 +511,8 @@ TEST_F(ResourceTreeModelTest, videoWallNodeIsVisibleAndEditableOnlyByUsersHaveSu
     // When video wall with certain unique name is added to the resource pool.
     addVideoWall(kUniqueVideoWallName);
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     auto videoWallIndex = uniqueMatchingIndex(kUniqueVideoWallNameCondition);
@@ -540,7 +540,7 @@ TEST_F(ResourceTreeModelTest, videoWallNodeIsVisibleAndEditableOnlyByUsersHaveSu
 TEST_F(ResourceTreeModelTest, DISABLED_videoWallModificationMark)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     auto videoWall = addVideoWall(kUniqueVideoWallName);
@@ -564,7 +564,7 @@ TEST_F(ResourceTreeModelTest, DISABLED_videoWallModificationMark)
 TEST_F(ResourceTreeModelTest, videoWallNodeIsDragEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     addVideoWall(kUniqueVideoWallName);
@@ -579,7 +579,7 @@ TEST_F(ResourceTreeModelTest, videoWallNodeIsDragEnabled)
 TEST_F(ResourceTreeModelTest, videoWallScreenNodeIsDragEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -597,7 +597,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenNodeIsDragEnabled)
 TEST_F(ResourceTreeModelTest, videoWallMatrixNodeIsNotDragEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -615,7 +615,7 @@ TEST_F(ResourceTreeModelTest, videoWallMatrixNodeIsNotDragEnabled)
 TEST_F(ResourceTreeModelTest, videoWallHasNotItemNeverHasChildrenFlag)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     addVideoWall(kUniqueVideoWallName);
@@ -630,7 +630,7 @@ TEST_F(ResourceTreeModelTest, videoWallHasNotItemNeverHasChildrenFlag)
 TEST_F(ResourceTreeModelTest, videoWallScreenHasItemNeverHasChildrenFlag)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -648,7 +648,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenHasItemNeverHasChildrenFlag)
 TEST_F(ResourceTreeModelTest, videoWallMatrixHasItemNeverHasChildrenFlag)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -666,7 +666,7 @@ TEST_F(ResourceTreeModelTest, videoWallMatrixHasItemNeverHasChildrenFlag)
 TEST_F(ResourceTreeModelTest, videoWallScreenIsDropEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall with certain unique name is added to the resource pool.
     addVideoWall(kUniqueVideoWallName);
@@ -681,7 +681,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenIsDropEnabled)
 TEST_F(ResourceTreeModelTest, videoWallScreenNodeType)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");
@@ -699,7 +699,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenNodeType)
 TEST_F(ResourceTreeModelTest, videoWallMatrixNodeType)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When video wall is added to the resource pool.
     const auto videoWall = addVideoWall("Video Wall");

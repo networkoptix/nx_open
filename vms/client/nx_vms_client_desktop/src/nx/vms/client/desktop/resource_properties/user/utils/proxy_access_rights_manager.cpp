@@ -18,7 +18,6 @@ struct ProxyAccessRightsManager::Private
     const QPointer<AbstractAccessRightsManager> sourceManager;
     QnUuid currentSubjectId;
     std::optional<ResourceAccessMap> accessMapOverride;
-    std::optional<bool> adminAccessRights;
 };
 
 ProxyAccessRightsManager::ProxyAccessRightsManager(
@@ -72,7 +71,6 @@ void ProxyAccessRightsManager::setCurrentSubjectId(const QnUuid& value)
 
     d->currentSubjectId = value;
     d->accessMapOverride = {};
-    d->adminAccessRights = {};
 
     if (hadChanges)
         emit ownAccessRightsChanged({oldSubjectId});

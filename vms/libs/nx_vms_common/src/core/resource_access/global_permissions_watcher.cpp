@@ -84,7 +84,7 @@ public:
 
         handleUserChanged(user);
 
-        if (user->isOwner())
+        if (user->isAdministrator())
             return;
 
         connect(user.get(), &QnUserResource::permissionsChanged,
@@ -106,11 +106,11 @@ public:
         if (!NX_ASSERT(user))
             return;
 
-        static constexpr GlobalPermissions kOwnerPermissions{
-            GlobalPermission::admin | GlobalPermission::viewLogs};
+        static constexpr GlobalPermissions kAdministratorPermissions{
+            GlobalPermission::administrator | GlobalPermission::powerUser | GlobalPermission::viewLogs};
 
-        const auto permissions = user->isOwner()
-            ? kOwnerPermissions
+        const auto permissions = user->isAdministrator()
+            ? kAdministratorPermissions
             : user->getRawPermissions();
 
         handleSubjectChanged(user->getId(), permissions);

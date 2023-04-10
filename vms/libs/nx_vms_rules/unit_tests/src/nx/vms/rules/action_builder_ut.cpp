@@ -238,13 +238,13 @@ TEST_F(ActionBuilderTest, builderProperlyHandleAllUsersSelection)
 
 TEST_F(ActionBuilderTest, builderProperlyHandleUserRoles)
 {
-    const auto admin = addUser(kAdministratorsGroupId);
+    const auto admin = addUser(kPowerUsersGroupId);
     const auto user = addUser(kLiveViewersGroupId);
 
     const auto camera = addCamera();
 
     UuidSelection selection{
-        .ids = {kAdministratorsGroupId},
+        .ids = {kPowerUsersGroupId},
         .all = false};
 
     auto builder = makeBuilderWithTargetUserField(selection);
@@ -439,7 +439,7 @@ TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
     using nx::vms::event::EventType;
     using namespace std::chrono;
 
-    auto user1 = addUser(kAdministratorsGroupId);
+    auto user1 = addUser(kPowerUsersGroupId);
     auto filterProp = nx::vms::common::BusinessEventFilterResourcePropertyAdaptor();
 
     filterProp.setResource(user1);

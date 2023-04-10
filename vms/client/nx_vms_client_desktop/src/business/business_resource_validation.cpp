@@ -825,7 +825,7 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const QnUuid& rol
     if (m_layout)
     {
         // Admins have access to all layouts.
-        if (nx::vms::api::kAdminGroupIds.contains(roleId))
+        if (nx::vms::api::kAllPowerUserGroupIds.contains(roleId))
             return QValidator::Acceptable;
 
         // For other users access permissions depend on the layout kind.

@@ -65,13 +65,13 @@ MainTreeResourceItemDecorator::Permissions permissionsSummary(
     const QnResourcePtr& resource)
 {
     if (user.isNull())
-        return {.permissions = Qn::NoPermissions, .hasAdminPermissions = false};
+        return {.permissions = Qn::NoPermissions, .hasPowerUserPermissions = false};
 
     const auto accessManager = user->systemContext()->resourceAccessManager();
 
     return {
         .permissions = accessManager->permissions(user, resource),
-        .hasAdminPermissions = accessManager->hasAdminPermissions(user)
+        .hasPowerUserPermissions = accessManager->hasPowerUserPermissions(user)
     };
 }
 
@@ -170,14 +170,14 @@ LayoutItemCreator layoutItemCreator(
 
 ResourceItemCreator webPageItemCreator(
     ResourceTreeItemFactory* factory,
-    bool userHasAdminPersmission)
+    bool hasPowerUserPermissions)
 {
     return
         [=](const QnResourcePtr& resource) -> AbstractItemPtr
         {
             return std::make_unique<WebPageDecorator>(
                 factory->createResourceItem(resource),
-                userHasAdminPersmission);
+                hasPowerUserPermissions);
         };
 }
 
@@ -236,15 +236,15 @@ UserdDefinedGroupIdGetter userDefinedGroupIdGetter()
 
 UserdDefinedGroupItemCreator userDefinedGroupItemCreator(
     ResourceTreeItemFactory* factory,
-    bool hasAdminPermissions)
+    bool hasPowerUserPermissions)
 {
     return
-        [factory, hasAdminPermissions](const QString& compositeGroupId) -> AbstractItemPtr
+        [factory, hasPowerUserPermissions](const QString& compositeGroupId) -> AbstractItemPtr
         {
             Qt::ItemFlags result =
                 {Qt::ItemIsEnabled, Qt::ItemIsSelectable, Qt::ItemIsDragEnabled};
 
-            if (hasAdminPermissions)
+            if (hasPowerUserPermissions)
                 result |= {Qt::ItemIsEditable, Qt::ItemIsDropEnabled};
 
             return factory->createResourceGroupItem(compositeGroupId, result);
@@ -324,10 +324,10 @@ void ResourceTreeEntityBuilder::setUser(const QnUserResourcePtr& user)
     m_user = user;
 }
 
-bool ResourceTreeEntityBuilder::userHasAdminPermissions() const
+bool ResourceTreeEntityBuilder::hasPowerUserPermissions() const
 {
     return !user().isNull()
-        ? systemContext()->resourceAccessManager()->hasAdminPermissions(user())
+        ? systemContext()->resourceAccessManager()->hasPowerUserPermissions(user())
         : false;
 }
 
@@ -358,7 +358,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServersGroupEntity() const
 AbstractEntityPtr ResourceTreeEntityBuilder::createCamerasAndDevicesGroupEntity() const
 {
     Qt::ItemFlags camerasAndDevicesitemFlags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
-    if (userHasAdminPermissions())
+    if (hasPowerUserPermissions())
         camerasAndDevicesitemFlags |= Qt::ItemIsDropEnabled;
 
     return makeFlatteningGroup(
@@ -393,7 +393,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasEntity(
 
     groupingRuleStack.push_back(
         {userDefinedGroupIdGetter(),
-        userDefinedGroupItemCreator(m_itemFactory.get(), /*hasAdminPermissions*/ false),
+        userDefinedGroupItemCreator(m_itemFactory.get(), /*hasPowerUserPermissions*/ false),
         Qn::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
@@ -433,7 +433,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasAndResourcesE
 
     groupingRuleStack.push_back(
         {userDefinedGroupIdGetter(),
-        userDefinedGroupItemCreator(m_itemFactory.get(), /*hasAdminPermissions*/ false),
+        userDefinedGroupItemCreator(m_itemFactory.get(), /*hasPowerUserPermissions*/ false),
         Qn::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
@@ -486,7 +486,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogServerCamerasEntity(
 
     groupingRuleStack.push_back(
         {userDefinedGroupIdGetter(),
-        userDefinedGroupItemCreator(m_itemFactory.get(), /*hasAdminPermissions*/ false),
+        userDefinedGroupItemCreator(m_itemFactory.get(), /*hasPowerUserPermissions*/ false),
         Qn::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
@@ -625,7 +625,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServerCamerasEntity(
 
     groupingRuleStack.push_back(
         {userDefinedGroupIdGetter(),
-        userDefinedGroupItemCreator(m_itemFactory.get(), userHasAdminPermissions()),
+        userDefinedGroupItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
         Qn::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
@@ -741,7 +741,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createShowreelsGroupEntity() const
 AbstractEntityPtr ResourceTreeEntityBuilder::createIntegrationsGroupEntity() const
 {
     auto integrationList = makeKeyList<QnResourcePtr>(
-        webPageItemCreator(m_itemFactory.get(), userHasAdminPermissions()),
+        webPageItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
         numericOrder());
 
     integrationList->installItemSource(m_itemKeySourcePool->integrationsSource(
@@ -749,7 +749,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createIntegrationsGroupEntity() con
 
     Qt::ItemFlags flags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
 
-    if (userHasAdminPermissions())
+    if (hasPowerUserPermissions())
         flags |= Qt::ItemIsDropEnabled;
 
     return makeFlatteningGroup(
@@ -761,7 +761,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createIntegrationsGroupEntity() con
 AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
 {
     ResourceItemCreator itemCreator = ini().webPagesAndIntegrations
-        ? webPageItemCreator(m_itemFactory.get(), userHasAdminPermissions())
+        ? webPageItemCreator(m_itemFactory.get(), hasPowerUserPermissions())
         : resourceItemCreator(m_itemFactory.get(), user());
 
     auto webPagesList = makeKeyList<QnResourcePtr>(itemCreator, numericOrder());
@@ -779,7 +779,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
             user(), /*includeProxied*/ false));
     }
 
-    if (userHasAdminPermissions())
+    if (hasPowerUserPermissions())
         flags |= Qt::ItemIsDropEnabled;
 
     return makeFlatteningGroup(m_itemFactory->createWebPagesItem(flags), std::move(webPagesList));
@@ -931,7 +931,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createOtherSystemsGroupEntity() con
 {
     auto otherSystemsComposition = std::make_unique<CompositionEntity>();
     otherSystemsComposition->addSubEntity(createCloudOtherSystemsEntity());
-    if (user() && user()->isOwner())
+    if (user() && user()->isAdministrator())
         otherSystemsComposition->addSubEntity(createLocalOtherSystemsEntity());
 
     return makeFlatteningGroup(

@@ -31,7 +31,7 @@ public:
     QnUserResourcePtr addAdmin()
     {
         // User must have own admin permissions, not inherited.
-        return addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::admin);
+        return addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::powerUser);
     }
 };
 
@@ -102,33 +102,33 @@ TEST_F(OwnResourceAccessResolverTest, notificationSignals)
 TEST_F(OwnResourceAccessResolverTest, adminAccessToCamera)
 {
     const auto camera = addCamera();
-    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, camera), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, camera), kFullAccessRights);
 }
 
 TEST_F(OwnResourceAccessResolverTest, noAdminAccessToDesktopCamera)
 {
     const auto other = addUser(NoGroup);
     const auto camera = addDesktopCamera(other);
-    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, camera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, camera), AccessRights());
 }
 
 TEST_F(OwnResourceAccessResolverTest, adminAccessToWebPage)
 {
     const auto webPage = addWebPage();
-    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, webPage), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, webPage), kFullAccessRights);
 }
 
 TEST_F(OwnResourceAccessResolverTest, adminAccessToVideowall)
 {
     const auto videowall = addVideoWall();
-    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, videowall), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, videowall), kFullAccessRights);
 }
 
 TEST_F(OwnResourceAccessResolverTest, adminAccessToSharedLayout)
 {
     const auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
-    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, layout), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, layout), kFullAccessRights);
 }
 
 // TODO: Fix resource assess for group-inherited permissions.
@@ -138,7 +138,7 @@ TEST_F(OwnResourceAccessResolverTest, adminAccessToPrivateLayout)
     const auto layout = addLayout();
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
-    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, layout), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, layout), kFullAccessRights);
 }
 
 } // namespace test

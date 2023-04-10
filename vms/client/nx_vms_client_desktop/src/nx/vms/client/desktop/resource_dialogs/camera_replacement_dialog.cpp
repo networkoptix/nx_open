@@ -41,7 +41,7 @@ static constexpr auto kEmDashChar = QChar(0x2014);
 
 bool showServersInTree(const QnWorkbenchContext* context)
 {
-    // No other checks, the dialog is accessible for administrators only.
+    // No other checks, the dialog is accessible for power users only.
     return context->resourceTreeSettings()->showServersInTree();
 }
 

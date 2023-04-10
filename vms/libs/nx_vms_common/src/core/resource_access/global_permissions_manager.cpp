@@ -109,7 +109,7 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const QnResourceAccessSubje
 
 bool QnGlobalPermissionsManager::canSeeAnotherUsers(const Qn::UserAccessData& accessRights) const
 {
-    return hasGlobalPermission(accessRights, nx::vms::api::GlobalPermission::admin);
+    return hasGlobalPermission(accessRights, nx::vms::api::GlobalPermission::powerUser);
 }
 
 bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& accessRights,
@@ -191,10 +191,10 @@ GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
             return {};
         }
 
-        if (user->isOwner() || user->getRawPermissions().testFlag(GlobalPermission::admin))
+        if (user->isAdministrator() || user->getRawPermissions().testFlag(GlobalPermission::powerUser))
         {
-            NX_VERBOSE(this, "%1 is an administrator", user);
-            return GlobalPermission::adminPermissions;
+            NX_VERBOSE(this, "%1 is a power user", user);
+            return GlobalPermission::powerUserPermissions;
         }
 
         const auto raw = filterDependentPermissions(user->getRawPermissions());
@@ -208,7 +208,7 @@ GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
     {
         auto result = permissionsFromGroups(std::vector{subject.id()});
         /* If user belongs to group, he cannot be an admin - by design. */
-        result &= ~GlobalPermissions(GlobalPermission::admin);
+        result &= ~GlobalPermissions(GlobalPermission::powerUser);
         NX_VERBOSE(this, "Role %1 has %3", subject.id(), result);
         return result;
     }
@@ -235,7 +235,7 @@ void QnGlobalPermissionsManager::handleResourceAdded(const QnResourcePtr& resour
 
         connect(user.get(), &QnUserResource::permissionsChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions, Qt::DirectConnection);
-        connect(user.get(), &QnUserResource::userRolesChanged, this,
+        connect(user.get(), &QnUserResource::userGroupsChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions, Qt::DirectConnection);
         connect(user.get(), &QnUserResource::enabledChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions, Qt::DirectConnection);

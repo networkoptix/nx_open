@@ -251,7 +251,7 @@ void RulesDialog::updateControlButtons()
 {
     m_ui->deleteRuleButton->setEnabled(m_readOnly ? false : !m_displayedRule.expired());
 
-    const bool hasPermissions = accessController()->hasAdminPermissions();
+    const bool hasPermissions = accessController()->hasPowerUserPermissions();
     const bool hasChanges = m_rulesTableModel->hasChanges();
     m_ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasPermissions);
     m_ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges && hasPermissions);
@@ -413,7 +413,7 @@ void RulesDialog::rejectChanges()
 
 void RulesDialog::resetToDefaults()
 {
-    if (!accessController()->hasAdminPermissions())
+    if (!accessController()->hasPowerUserPermissions())
         return;
 
     QnMessageBox dialog(

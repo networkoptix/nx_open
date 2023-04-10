@@ -19,7 +19,7 @@ using namespace index_condition;
 void ResourceTreeModelSortingGroupingTest::SetUp()
 {
     base_class::SetUp();
-    const auto user = loginAsAdmin("admin");
+    const auto user = loginAsPowerUser("power_user");
     const auto userId = user->getId();
     createAllKindsOfResources(userId);
 }

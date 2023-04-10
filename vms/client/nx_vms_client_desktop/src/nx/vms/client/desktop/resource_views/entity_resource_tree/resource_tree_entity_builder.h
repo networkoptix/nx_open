@@ -86,7 +86,7 @@ public:
     AbstractEntityPtr addPinnedItem(AbstractEntityPtr baseEntity, AbstractItemPtr pinnedItem) const;
 
 private:
-    bool userHasAdminPermissions() const;
+    bool hasPowerUserPermissions() const;
 
 private:
     QScopedPointer<CameraResourceIndex> m_cameraResourceIndex;

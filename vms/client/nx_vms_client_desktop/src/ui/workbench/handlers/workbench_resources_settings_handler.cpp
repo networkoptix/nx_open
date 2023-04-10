@@ -145,7 +145,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 
     QnMediaServerResourcePtr server = servers.first();
 
-    const bool hasAccess = accessController()->hasAdminPermissions();
+    const bool hasAccess = accessController()->hasPowerUserPermissions();
     NX_ASSERT(hasAccess, "Invalid action condition"); /*< It must be checked on action level. */
     if (!hasAccess)
         return;

@@ -863,7 +863,7 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
     if (statusOverlay != Qn::PasswordRequiredOverlay)
         return QString();
 
-    if (!accessController()->hasAdminPermissions())
+    if (!accessController()->hasPowerUserPermissions())
         return QString();
 
     const auto watcher = windowContext()->workbenchContext()
@@ -2535,7 +2535,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     if (!d->camera || !d->camera->resourcePool())
         return Qn::ResourceOverlayButton::Empty;
 
-    const bool adminPermissions = accessController()->hasAdminPermissions();
+    const bool powerUserPermissions = accessController()->hasPowerUserPermissions();
 
     const bool canChangeSettings = qnRuntime->isDesktopMode()
         && ResourceAccessManager::hasPermissions(d->camera,
@@ -2581,7 +2581,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
 
         case Qn::PasswordRequiredOverlay:
         {
-            if (qnRuntime->isDesktopMode() && adminPermissions)
+            if (qnRuntime->isDesktopMode() && powerUserPermissions)
                 return Qn::ResourceOverlayButton::SetPassword;
 
             break;
@@ -2589,7 +2589,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
 
         case Qn::CannotDecryptMediaOverlay:
         {
-            return adminPermissions
+            return powerUserPermissions
                 ? Qn::ResourceOverlayButton::UnlockEncryptedArchive
                 : Qn::ResourceOverlayButton::Empty;
         }
@@ -3198,7 +3198,7 @@ void QnMediaResourceWidget::updateWatermark()
 
     // First create normal watermark according to current client state.
     if (context->globalSettings()->watermarkSettings().useWatermark
-        && !accessController->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
+        && !accessController->hasGlobalPermission(nx::vms::api::GlobalPermission::powerUser)
         && user
         && !user->getName().isEmpty())
     {
@@ -3226,7 +3226,7 @@ void QnMediaResourceWidget::updateWatermark()
     }
 
     // Do not set watermark for admins but ONLY if it is not embedded in layout.
-    if (accessController->hasAdminPermissions() && !useLayoutWatermark)
+    if (accessController->hasPowerUserPermissions() && !useLayoutWatermark)
         return;
 
     m_watermarkPainter->setWatermark(watermark);

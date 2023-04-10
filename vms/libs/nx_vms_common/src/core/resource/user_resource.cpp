@@ -367,26 +367,10 @@ bool QnUserResource::isBuiltInAdmin() const
     return getId() == kAdminGuid;
 }
 
-bool QnUserResource::isOwner() const
+bool QnUserResource::isAdministrator() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-    return nx::utils::find_if(m_groupIds,
-        [](const auto id) { return id == nx::vms::api::kOwnersGroupId; });
-}
-
-void QnUserResource::setOwner(bool value)
-{
-    if (value == isOwner())
-        return;
-
-    auto ids = groupIds();
-    if (value)
-        ids.insert(ids.begin(), nx::vms::api::kOwnersGroupId);
-    else
-        nx::utils::erase_if(ids, [](const auto id) { return id == nx::vms::api::kOwnersGroupId; });
-
-    setGroupIds(ids);
-    emit permissionsChanged(::toSharedPointer(this));
+    return nx::utils::contains(m_groupIds, nx::vms::api::kAdministratorsGroupId);
 }
 
 std::vector<QnUuid> QnUserResource::groupIds() const
@@ -409,7 +393,7 @@ void QnUserResource::setGroupIds(const std::vector<QnUuid>& value)
     NX_VERBOSE(this, "User groups changed from %1 to %2",
         nx::containerString(previousValue), nx::containerString(value));
 
-    emit userRolesChanged(::toSharedPointer(this), previousValue);
+    emit userGroupsChanged(::toSharedPointer(this), previousValue);
 }
 
 bool QnUserResource::isEnabled() const
@@ -575,7 +559,7 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
             const auto previousGroupIds = m_groupIds;
             m_groupIds = localOther->m_groupIds;
             notifiers << [r = toSharedPointer(this), previousGroupIds]
-                { emit r->userRolesChanged(r, previousGroupIds); };
+                { emit r->userGroupsChanged(r, previousGroupIds); };
         }
 
         if (m_email != localOther->m_email)

@@ -13,10 +13,10 @@ namespace nx::vms::client::desktop::entity_resource_tree {
 
 WebPageDecorator::WebPageDecorator(
     entity_item_model::AbstractItemPtr sourceItem,
-    bool hasAdminPermissions)
+    bool hasPowerUserPermissions)
     :
     m_sourceItem(std::move(sourceItem)),
-    m_hasAdminPermissions(hasAdminPermissions)
+    m_hasPowerUserPermissions(hasPowerUserPermissions)
 {
     m_sourceItem->setDataChangedCallback(
         [this](const QVector<int>& roles) { notifyDataChanged(roles); });
@@ -47,11 +47,11 @@ QVariant WebPageDecorator::data(int role) const
             return QVariant::fromValue(ResourceTree::NodeType::resource);
 
         case Qn::ForceExtraInfoRole:
-            return m_hasAdminPermissions;
+            return m_hasPowerUserPermissions;
 
         case Qn::ExtraInfoRole:
         {
-            if (!m_hasAdminPermissions)
+            if (!m_hasPowerUserPermissions)
                 return {};
 
             const auto webPage = getWebPage();
@@ -74,7 +74,7 @@ Qt::ItemFlags WebPageDecorator::flags() const
     if (!NX_ASSERT(!resource.isNull(), "Resource node expected"))
         return result;
 
-    result.setFlag(Qt::ItemIsEditable, m_hasAdminPermissions);
+    result.setFlag(Qt::ItemIsEditable, m_hasPowerUserPermissions);
     result.setFlag(Qt::ItemIsDragEnabled, true);
     result.setFlag(Qt::ItemIsDropEnabled, false);
 

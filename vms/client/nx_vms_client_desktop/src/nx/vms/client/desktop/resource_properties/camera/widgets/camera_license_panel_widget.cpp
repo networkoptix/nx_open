@@ -80,7 +80,7 @@ void CameraLicensePanelWidget::loadState(const CameraSettingsDialogState& state)
 
 void CameraLicensePanelWidget::updateLicensesButton(const CameraSettingsDialogState& state)
 {
-    ui->moreLicensesButton->setVisible(state.userHasAdminPermissions
+    ui->moreLicensesButton->setVisible(state.hasPowerUserPermissions
         && m_licenseUsageProvider && m_licenseUsageProvider->limitExceeded());
 }
 

@@ -50,7 +50,7 @@ AccessRights AbstractResourceAccessResolver::accessRights(
 
     const bool isDesktopCamera = resource->hasFlags(Qn::desktop_camera);
 
-    if (hasAdminAccessRights(subjectId) && !isDesktopCamera)
+    if (hasFullAccessRights(subjectId) && !isDesktopCamera)
         return kFullAccessRights;
 
     const auto accessMap = resourceAccessMap(subjectId);
@@ -82,9 +82,9 @@ AccessRights AbstractResourceAccessResolver::accessRights(
     return {};
 }
 
-bool AbstractResourceAccessResolver::hasAdminAccessRights(const QnUuid& subjectId) const
+bool AbstractResourceAccessResolver::hasFullAccessRights(const QnUuid& subjectId) const
 {
-    return globalPermissions(subjectId).testFlag(GlobalPermission::admin);
+    return globalPermissions(subjectId).testFlag(GlobalPermission::powerUser);
 }
 
 AbstractResourceAccessResolver::Notifier* AbstractResourceAccessResolver::notifier() const

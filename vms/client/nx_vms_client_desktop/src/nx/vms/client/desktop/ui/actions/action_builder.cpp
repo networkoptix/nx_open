@@ -159,9 +159,9 @@ Builder Builder::mode(ClientModes mode)
     return *this;
 }
 
-Builder Builder::requiredAdminPermissions()
+Builder Builder::requiredPowerUserPermissions()
 {
-    m_action->setAdminRequired();
+    m_action->setPowerUserRequired();
     return *this;
 }
 

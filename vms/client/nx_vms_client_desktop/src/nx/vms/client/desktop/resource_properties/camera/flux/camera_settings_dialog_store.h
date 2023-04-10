@@ -87,7 +87,7 @@ public:
     void setReadOnly(bool value);
     void setSelectedTab(CameraSettingsTab value);
     void setSettingsOptimizationEnabled(bool value);
-    void setUserHasAdminPermissions(bool value);
+    void setHasPowerUserPermissions(bool value);
     void setSingleVirtualCameraState(const VirtualCameraState& value);
     void setSingleCameraUserName(const QString& text);
     void setSingleCameraIsOnline(bool isOnline);

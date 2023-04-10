@@ -75,11 +75,11 @@ protected:
         systemContext()->accessController()->setUser(m_currentUser);
     }
 
-    void loginAsOwner()
+    void loginAsAdministrator()
     {
         logout();
         auto user = addUser(userName1, {});
-        user->setOwner(true);
+        user->setGroupIds({api::kAdministratorsGroupId});
         m_currentUser = user;
         systemContext()->accessController()->setUser(m_currentUser);
     }
@@ -88,7 +88,7 @@ protected:
     {
         logout();
         auto user = addUser(userName1, globalPermissions);
-        ASSERT_FALSE(user->isOwner());
+        ASSERT_FALSE(user->isAdministrator());
         m_currentUser = user;
         systemContext()->accessController()->setUser(m_currentUser);
     }
@@ -217,8 +217,8 @@ TEST_F(WorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
 
     checkPermissions(layout, desired, forbidden);
 
-    /* Make sure nothing changes if logged in as owner. */
-    loginAsOwner();
+    /* Make sure nothing changes if logged in as Administrator. */
+    loginAsAdministrator();
     checkPermissions(layout, desired, forbidden);
 }
 
@@ -237,15 +237,15 @@ TEST_F(WorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
 
     checkPermissions(layout, desired, forbidden);
 
-    /* Make sure nothing changes if logged in as owner. */
-    loginAsOwner();
+    /* Make sure nothing changes if logged in as Administrator. */
+    loginAsAdministrator();
     checkPermissions(layout, desired, forbidden);
 }
 
 /** Check Qn::WriteDigestPermission permission for a new cloud user (should be missing). */
 TEST_F(WorkbenchAccessControllerTest, checkPermissionForNewCloudUser)
 {
-    loginAs(GlobalPermission::adminPermissions);
+    loginAs(GlobalPermission::powerUserPermissions);
 
     QnUserResourcePtr newCloudUser(
         new QnUserResource(nx::vms::api::UserType::cloud, /*externalId*/ {}));

@@ -74,7 +74,7 @@ AbstractEntityPtr ResourceTreeComposer::createDevicesEntity() const
         return m_entityBuilder->createServersGroupEntity();
 
     const bool userCanSeeServers =
-        accessController()->hasAdminPermissions()
+        accessController()->hasPowerUserPermissions()
             || systemSettings()->showServersInTreeForNonAdmins();
 
     const bool showServers = userCanSeeServers
@@ -88,7 +88,7 @@ AbstractEntityPtr ResourceTreeComposer::createDevicesEntity() const
 void ResourceTreeComposer::rebuildEntity()
 {
     const auto currentUser = accessController()->user();
-    const bool isAdmin = accessController()->hasAdminPermissions();
+    const bool isAdmin = accessController()->hasPowerUserPermissions();
 
     if (m_attachedModel)
         m_attachedModel->setRootEntity(nullptr);

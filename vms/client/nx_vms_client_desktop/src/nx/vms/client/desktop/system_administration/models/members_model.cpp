@@ -112,7 +112,7 @@ void MembersModel::subscribeToUser(const QnUserResourcePtr& user)
             updateUser(resource->getId());
         });
 
-    userConnections << connect(user.get(), &QnUserResource::userRolesChanged, this,
+    userConnections << connect(user.get(), &QnUserResource::userGroupsChanged, this,
         [updateUser](
             const QnUserResourcePtr& user,
             const std::vector<QnUuid>&)

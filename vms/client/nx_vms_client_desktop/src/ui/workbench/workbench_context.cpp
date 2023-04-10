@@ -185,7 +185,7 @@ nx::core::Watermark QnWorkbenchContext::watermark() const
 {
     if (systemSettings()->watermarkSettings().useWatermark
         && user()
-        && !accessController()->hasAdminPermissions()
+        && !accessController()->hasPowerUserPermissions()
         && !user()->getName().isEmpty())
     {
         return {systemSettings()->watermarkSettings(), user()->getName()};

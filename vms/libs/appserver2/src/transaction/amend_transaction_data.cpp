@@ -103,7 +103,7 @@ bool amendOutputDataIfNeeded(
     if (url.password().isEmpty())
         return false;
 
-    if (accessData == Qn::kSystemAccess || accessManager->hasAdminPermissions(accessData))
+    if (accessData == Qn::kSystemAccess || accessManager->hasPowerUserPermissions(accessData))
         url.setPassword(nx::crypt::decodeStringFromHexStringAES128CBC((url.password())));
     else
         url.setPassword(kHiddenPasswordFiller);
@@ -151,7 +151,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     if (url.password().isEmpty())
         return false;
 
-    const bool isGranted = accessData == Qn::kSystemAccess || accessManager->hasAdminPermissions(accessData);
+    const bool isGranted = accessData == Qn::kSystemAccess || accessManager->hasPowerUserPermissions(accessData);
     if (isGranted)
         url.setPassword(nx::crypt::decodeStringFromHexStringAES128CBC(url.password()));
     else
@@ -194,7 +194,7 @@ bool amendOutputDataIfNeeded(
     nx::vms::api::ServerFootageData* paramData)
 {
     if (accessData == Qn::kSystemAccess
-        || accessManager->hasGlobalPermission(accessData, GlobalPermission::admin))
+        || accessManager->hasGlobalPermission(accessData, GlobalPermission::powerUser))
     {
         return false;
     }

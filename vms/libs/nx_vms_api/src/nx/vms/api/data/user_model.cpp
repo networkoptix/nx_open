@@ -74,7 +74,7 @@ UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
     if (externalId)
         user.externalId = std::move(*externalId);
     if (isOwner)
-        user.groupIds.push_back(kOwnersGroupId);
+        user.groupIds.push_back(kAdministratorsGroupId);
     if (!userRoleId.isNull())
         user.groupIds.push_back(std::move(userRoleId));
 
@@ -95,7 +95,7 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
         UserModelV1 model;
         static_cast<UserModelBase&>(model) = fromUserData(std::move(baseData));
 
-        model.isOwner = baseData.isOwner();
+        model.isOwner = baseData.isAdministrator();
         if (!baseData.externalId.isEmpty())
             model.externalId = std::move(baseData.externalId);
         for (const auto& id: baseData.groupIds)

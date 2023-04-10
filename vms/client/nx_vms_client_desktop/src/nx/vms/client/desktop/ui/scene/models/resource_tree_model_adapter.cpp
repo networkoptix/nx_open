@@ -471,7 +471,7 @@ bool ResourceTreeModelAdapter::isFilterRelevant(ResourceTree::FilterType type) c
     switch (type)
     {
         case ResourceTree::FilterType::servers:
-            return d->context->accessController()->hasAdminPermissions()
+            return d->context->accessController()->hasPowerUserPermissions()
                 || d->context->systemSettings()->showServersInTreeForNonAdmins();
 
         default:

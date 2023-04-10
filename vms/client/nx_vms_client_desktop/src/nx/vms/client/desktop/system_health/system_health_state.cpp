@@ -65,7 +65,7 @@ private:
     SystemInternetAccessWatcher* internetAccessWatcher() const;
     DefaultPasswordCamerasWatcher* defaultPasswordWatcher() const;
     UserEmailsWatcher* userEmailsWatcher() const;
-    bool hasAdminPermissions() const;
+    bool hasPowerUserPermissions() const;
 
     void updateCamerasWithDefaultPassword();
     void updateCamerasWithInvalidSchedule();
@@ -365,19 +365,19 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
     switch (index)
     {
         case SystemHealthIndex::noInternetForTimeSync:
-            return hasAdminPermissions()
+            return hasPowerUserPermissions()
                 && q->systemSettings()->isTimeSynchronizationEnabled()
                 && q->systemSettings()->primaryTimeServer().isNull()
                 && !internetAccessWatcher()->systemHasInternetAccess();
 
         case SystemHealthIndex::noLicenses:
-            return hasAdminPermissions() && q->systemContext()->licensePool()->isEmpty();
+            return hasPowerUserPermissions() && q->systemContext()->licensePool()->isEmpty();
 
         case SystemHealthIndex::smtpIsNotSet:
-            return hasAdminPermissions() && !q->systemSettings()->emailSettings().isValid();
+            return hasPowerUserPermissions() && !q->systemSettings()->emailSettings().isValid();
 
         case SystemHealthIndex::defaultCameraPasswords:
-            return hasAdminPermissions() && hasResourcesForMessageType(index);
+            return hasPowerUserPermissions() && hasResourcesForMessageType(index);
 
         case SystemHealthIndex::emailIsEmpty:
         {
@@ -391,24 +391,24 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
 
         case SystemHealthIndex::cloudPromo:
             return q->context()->user()
-                && q->context()->user()->isOwner()
+                && q->context()->user()->isAdministrator()
                 && q->systemSettings()->cloudSystemId().isEmpty()
                 && !showOnceSettings()->cloudPromo();
 
         case SystemHealthIndex::storagesNotConfigured:
-            return hasAdminPermissions() && hasResourcesForMessageType(index);
+            return hasPowerUserPermissions() && hasResourcesForMessageType(index);
 
         case SystemHealthIndex::backupStoragesNotConfigured:
-            return hasAdminPermissions() && hasResourcesForMessageType(index);
+            return hasPowerUserPermissions() && hasResourcesForMessageType(index);
 
         case SystemHealthIndex::cameraRecordingScheduleIsInvalid:
             return hasResourcesForMessageType(index);
 
         case SystemHealthIndex::metadataStorageNotSet:
-            return hasAdminPermissions() && hasResourcesForMessageType(index);
+            return hasPowerUserPermissions() && hasResourcesForMessageType(index);
 
         case SystemHealthIndex::metadataOnSystemStorage:
-            return hasAdminPermissions() && hasResourcesForMessageType(index);
+            return hasPowerUserPermissions() && hasResourcesForMessageType(index);
 
         default:
             NX_ASSERT(false, "This system health index is not handled by SystemHealthState");
@@ -456,9 +456,9 @@ void SystemHealthState::Private::setResourcesForMessageType(
     }
 }
 
-bool SystemHealthState::Private::hasAdminPermissions() const
+bool SystemHealthState::Private::hasPowerUserPermissions() const
 {
-    return q->accessController()->hasAdminPermissions();
+    return q->accessController()->hasPowerUserPermissions();
 }
 
 SystemInternetAccessWatcher* SystemHealthState::Private::internetAccessWatcher() const

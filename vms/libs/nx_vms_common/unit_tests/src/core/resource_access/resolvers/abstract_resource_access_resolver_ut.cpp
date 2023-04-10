@@ -58,14 +58,14 @@ public:
 
 TEST_F(AbstractResourceAccessResolverTest, notApplicableResourceAccess)
 {
-    const auto user = addUser(kAdministratorsGroupId);
+    const auto user = addUser(kPowerUsersGroupId);
     testAccessMap[user->getId()] = kFullAccessRights;
     ASSERT_EQ(accessRights({}, user), AccessRights());
 }
 
 TEST_F(AbstractResourceAccessResolverTest, notResourceAccessOutOfPool)
 {
-    testAccessMap = kAdminResourceAccessMap;
+    testAccessMap = kFullResourceAccessMap;
 
     const auto camera = createCamera();
     ASSERT_EQ(accessRights({}, camera), AccessRights());
@@ -102,7 +102,7 @@ TEST_F(AbstractResourceAccessResolverTest, noDesktopCameraAccess)
 {
     testAccessMap[kAllDevicesGroupId] = kFullAccessRights;
 
-    const auto user = createUser(kAdministratorsGroupId);
+    const auto user = createUser(kPowerUsersGroupId);
     const auto camera = addDesktopCamera(user);
     ASSERT_EQ(accessRights({}, camera), AccessRights());
 }

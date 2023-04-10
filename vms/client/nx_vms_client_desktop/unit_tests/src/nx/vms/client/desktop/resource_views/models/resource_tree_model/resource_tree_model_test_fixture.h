@@ -4,10 +4,13 @@
 
 #include <gtest/gtest.h>
 
+#include <optional>
+
 #include <core/resource/client_resource_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
 #include <nx/vms/api/data/showreel_data.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_composer.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
@@ -49,7 +52,8 @@ protected:
 
     void setSystemName(const QString& name) const;
 
-    QnUserResourcePtr addUser(const QString& name, GlobalPermissions globalPermissions) const;
+    QnUserResourcePtr addUser(const QString& name,
+        const std::optional<QnUuid>& groupId = std::nullopt) const;
     QnMediaServerResourcePtr addServer(const QString& name) const;
     QnMediaServerResourcePtr addEdgeServer(const QString& name, const QString& address) const;
     QnMediaServerResourcePtr addFakeServer(const QString& name) const;
@@ -132,9 +136,10 @@ protected:
     void setupAllVideowallsAccess(
         const QnUserResourcePtr& user, nx::vms::api::AccessRights accessRights) const;
 
-    QnUserResourcePtr loginAs(const QString& name, const QnUuid& groupId) const;
-    QnUserResourcePtr loginAsOwner(const QString& name) const;
-    QnUserResourcePtr loginAsAdmin(const QString& name) const;
+    QnUserResourcePtr loginAs(const QString& name,
+        const std::optional<QnUuid>& groupId = std::nullopt) const;
+    QnUserResourcePtr loginAsAdministrator(const QString& name) const;
+    QnUserResourcePtr loginAsPowerUser(const QString& name) const;
     QnUserResourcePtr loginAsLiveViewer(const QString& name) const;
     QnUserResourcePtr loginAsAdvancedViewer(const QString& name) const;
     QnUserResourcePtr loginAsCustomUser(const QString& name) const;

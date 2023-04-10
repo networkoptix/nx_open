@@ -121,15 +121,12 @@ public:
     GlobalPermissions getRawPermissions() const;
     void setRawPermissions(GlobalPermissions permissions);
 
-    /**
-     * Owner user has maxumum permissions. Could be local or cloud user
-     */
-    bool isOwner() const;
-    void setOwner(bool isOwner);
+    /** Administrator has maxumum permissions. Can be a local or Cloud user. */
+    bool isAdministrator() const;
 
     /**
-     * Predefined local owner.
-     * 'isOwner=true' for 'admin' user and can't be reset. Could be disabled for login. Can't be removed.
+     * Predefined local administrator. For the `admin` user, `isAdministrator` is true and can't be
+     * reset. Can be disabled for the login. Can't be removed.
      */
     bool isBuiltInAdmin() const;
 
@@ -165,7 +162,7 @@ public:
 
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
-    void userRolesChanged(const QnUserResourcePtr& user, const std::vector<QnUuid>& previousRoleIds);
+    void userGroupsChanged(const QnUserResourcePtr& user, const std::vector<QnUuid>& previousRoleIds);
 
     void enabledChanged(const QnUserResourcePtr& user);
     void passwordChanged(const QnUserResourcePtr& user);

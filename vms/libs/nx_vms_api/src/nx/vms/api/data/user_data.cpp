@@ -31,9 +31,9 @@ void UserData::fillId()
     }
 }
 
-bool UserData::isOwner() const
+bool UserData::isAdministrator() const
 {
-    return nx::utils::find_if(groupIds, [](const auto id) { return id == kOwnersGroupId; });
+    return nx::utils::find_if(groupIds, [](const auto id) { return id == kAdministratorsGroupId; });
 }
 
 QString toString(UserType type)

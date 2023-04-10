@@ -22,13 +22,19 @@ enum class GlobalPermission
      */
     none = 0,
 
-    /* Admin permissions. */
+    /* Administrative permissions. */
 
-    /**%apidoc
-     * Can edit other non-admins.
-     * %caption GlobalAdminPermission
+    /**%apidoc[unused]
+     * Administrator permissions: full control of the VMS system.
+     * Not directly assignable, only inherited from the Administrators predefined group.
      */
-    admin = 0x00000001,
+    administrator = 0x20000000, //< Former `owner`.
+
+    /**%apidoc[unused]
+     * Management of devices and non-power users.
+     * Not directly assignable, only inherited from the Power Users predefined group.
+     */
+    powerUser = 0x00000001, //< Former `admin`.
 
     /* Manager permissions. */
 
@@ -108,20 +114,14 @@ enum class GlobalPermission
      */
     customUser = 0x10000000,
 
-    /**%apidoc[unused]
-     * Owner permissions. This flag is for API handler registration only. Users in the DB have to
-     * be checked by isOwner().
-     */
-    owner = 0x20000000,
-
     /**%apidoc[unused] */
     requireFreshSession = 0x40000000,
 
     /**%apidoc[unused] */
-    adminWithFreshSession = admin | requireFreshSession,
+    powerUserWithFreshSession = powerUser | requireFreshSession,
 
     /**%apidoc[unused] */
-    ownerWithFreshSession = owner | requireFreshSession,
+    administratorWithFreshSession = administrator | requireFreshSession,
 
     /* Combinations. */
 
@@ -147,7 +147,7 @@ enum class GlobalPermission
     /**%apidoc[unused]
      * An Admin can do everything.
      */
-    adminPermissions = admin | advancedViewerPermissions | controlVideowall | editCameras,
+    powerUserPermissions = powerUser | advancedViewerPermissions | controlVideowall | editCameras,
 
     // Will be deprecated with new user groups.
     /**%apidoc[unused]
@@ -170,7 +170,10 @@ constexpr auto nxReflectVisitAllEnumItems(GlobalPermission*, Visitor&& visitor)
     using Item = nx::reflect::enumeration::Item<GlobalPermission>;
     return visitor(
         Item{GlobalPermission::none, "NoGlobalPermissions"},
-        Item{GlobalPermission::admin, "GlobalAdminPermission"},
+        // For compatibility with existing APIs we should serialize this value to
+        // "GlobalAdminPermission" by default.
+        Item{GlobalPermission::powerUser, "GlobalAdminPermission"},
+        Item{GlobalPermission::powerUser, "GlobalPowerUserPermission"},
         Item{GlobalPermission::editCameras, "GlobalEditCamerasPermission"},
         Item{GlobalPermission::controlVideowall, "GlobalControlVideoWallPermission"},
         Item{GlobalPermission::viewLogs, "GlobalViewLogsPermission"},
@@ -181,7 +184,10 @@ constexpr auto nxReflectVisitAllEnumItems(GlobalPermission*, Visitor&& visitor)
         Item{GlobalPermission::userInput, "GlobalUserInputPermission"},
         Item{GlobalPermission::accessAllMedia, "GlobalAccessAllMediaPermission"},
         Item{GlobalPermission::customUser, "GlobalCustomUserPermission"},
-        Item{GlobalPermission::owner, "GlobalOwnerPermission"},
+        // For compatibility with existing APIs we should serialize this value to
+        // "GlobalOwnerPermission" by default.
+        Item{GlobalPermission::administrator, "GlobalOwnerPermission"},
+        Item{GlobalPermission::administrator, "GlobalAdministratorPermission"},
         Item{GlobalPermission::requireFreshSession, "GlobalRequireFreshSessionPermission"});
 }
 
@@ -189,8 +195,8 @@ Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
 
 constexpr GlobalPermissions kNonDeprecatedGlobalPermissions =
-    GlobalPermission::admin
-    | GlobalPermission::owner
+    GlobalPermission::powerUser
+    | GlobalPermission::administrator
     | GlobalPermission::viewLogs
     | GlobalPermission::customUser
     | GlobalPermission::requireFreshSession;

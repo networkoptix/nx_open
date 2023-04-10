@@ -37,7 +37,7 @@ const ItemDescriptor& BackupFinishedEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<BackupFinishedEvent>(),
         .displayName = tr("Backup Finished"),
-        .permissions = {.globalPermission = GlobalPermission::admin},
+        .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/backup_finished.mustache"
     };
     return kDescriptor;

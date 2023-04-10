@@ -43,7 +43,7 @@ protected:
 
     const UserGroupData group1{QnUuid::createUuid(), "group1"};
     const UserGroupData group2{QnUuid::createUuid(), "group2", {}, {kViewersGroupId}};
-    const UserGroupData group3{QnUuid::createUuid(), "group3", {}, {kAdministratorsGroupId}};
+    const UserGroupData group3{QnUuid::createUuid(), "group3", {}, {kPowerUsersGroupId}};
     const UserGroupData group4{QnUuid::createUuid(), "group4", {}, {group1.id, group2.id}};
 
     const UserGroupDataList testGroups{{group1, group2, group3, group4}};
@@ -210,14 +210,14 @@ TEST_F(UserGroupManagerTest, getGroupsByIds)
         kViewersGroupId,
         QnUuid::createUuid(),
         QnUuid::createUuid(),
-        kOwnersGroupId,
+        kAdministratorsGroupId,
         group4.id,
         QnUuid{},
         QnUuid::createUuid()}};
 
     const UserGroupDataList expectedPredefinedGroups{{
         *PredefinedUserGroups::find(kViewersGroupId),
-        *PredefinedUserGroups::find(kOwnersGroupId)}};
+        *PredefinedUserGroups::find(kAdministratorsGroupId)}};
 
     EXPECT_EQ(manager->getGroupsByIds(requestedIds), expectedPredefinedGroups);
 
@@ -225,7 +225,7 @@ TEST_F(UserGroupManagerTest, getGroupsByIds)
         group1,
         group3,
         *PredefinedUserGroups::find(kViewersGroupId),
-        *PredefinedUserGroups::find(kOwnersGroupId),
+        *PredefinedUserGroups::find(kAdministratorsGroupId),
         group4}};
 
     manager->resetAll(testGroups);

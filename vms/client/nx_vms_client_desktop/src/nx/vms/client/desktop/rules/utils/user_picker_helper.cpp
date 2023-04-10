@@ -61,10 +61,10 @@ QString UserPickerHelper::text() const
             .arg(tr("%n Users", "", m_users.size()));
     }
 
-    if (m_groups.size() == kAdminGroupIds.size() && std::all_of(m_groups.cbegin(), m_groups.cend(),
-        [](const api::UserGroupData& group) { return kAdminGroupIds.contains(group.id); }))
+    if (m_groups.size() == kAllPowerUserGroupIds.size() && std::all_of(m_groups.cbegin(), m_groups.cend(),
+        [](const api::UserGroupData& group) { return kAllPowerUserGroupIds.contains(group.id); }))
     {
-        return tr("All Administrators");
+        return tr("All Power Users");
     }
 
     return tr("%n Groups", "", m_groups.size());
