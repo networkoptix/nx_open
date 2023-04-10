@@ -85,7 +85,7 @@ QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool withReferral) const
         nx::network::SocketGlobals::cloud().cloudHost()));
 
     if (withReferral)
-        uri.setReferral(m_source, m_context);
+        uri.referral = {m_source, m_context};
 
     QUrl result(uri.toString());
     result.setPath(path);

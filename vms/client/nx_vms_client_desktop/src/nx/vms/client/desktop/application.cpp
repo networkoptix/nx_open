@@ -127,11 +127,11 @@ void sendCloudPortalConfirmation(const nx::vms::utils::SystemUri& uri, QObject* 
 
         QUrl url(nx::toQString(nx::network::AppInfo::defaultCloudPortalUrl(
             nx::network::SocketGlobals::cloud().cloudHost())));
-        url.setPath(lit("/api/utils/visitedKey"));
+        url.setPath("/api/utils/visitedKey");
 
-        const QJsonObject data{{lit("key"), uri.authenticator().encode()}};
+        const QJsonObject data{{QString("key"), uri.authKey()}};
         QNetworkRequest request(url);
-        request.setHeader(QNetworkRequest::ContentTypeHeader, lit("application/json"));
+        request.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/json"));
 
         manager->post(request, QJsonDocument(data).toJson(QJsonDocument::Compact));
 }

@@ -63,16 +63,6 @@ void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url)
     qnClientCoreSettings->setRecentLocalConnections(connections);
 }
 
-nx::network::http::Credentials loadCloudPasswordCredentials()
-{
-    const nx::network::http::Credentials credentials = settings()->cloudPasswordCredentials();
-    const bool isValid = (!credentials.username.empty() && !credentials.authToken.empty()
-        && credentials.authToken.isPassword());
-
-    NX_DEBUG(NX_SCOPE_TAG, "Load password cloud credentials: %1", isValid);
-    return isValid ? credentials : nx::network::http::Credentials();
-}
-
 CloudAuthData loadCloudCredentials()
 {
     nx::network::http::Credentials credentials = settings()->cloudCredentials();

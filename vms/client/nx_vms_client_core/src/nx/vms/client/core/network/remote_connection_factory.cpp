@@ -16,6 +16,7 @@
 #include <nx/reflect/to_string.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/thread_util.h>
+#include <nx/vms/api/data/login.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/common/resource/server_host_priority.h>
@@ -635,6 +636,17 @@ struct RemoteConnectionFactory::Private
             {
                 context->setError(RemoteConnectionErrorCode::internalError);
                 return {};
+            }
+
+            // Username may be not passed if logging in as local user by token.
+            if (context->credentials().username.empty())
+            {
+                if (context->credentials().authToken.isBearerToken() &&
+                    context->credentials().authToken.value.starts_with(
+                        nx::vms::api::LoginSession::kTokenPrefix))
+                {
+                    return {.type = nx::vms::api::UserType::local};
+                }
             }
 
             nx::vms::api::LoginUser loginUserData = requestsManager->getUserType(context);

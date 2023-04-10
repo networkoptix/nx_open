@@ -4,11 +4,11 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <nx/branding.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
-
-#include <nx/branding.h>
+#include <nx/vms/api/data/login.h>
 
 using namespace nx::vms::utils;
 
@@ -22,14 +22,13 @@ const QString kResourceIdsKey = "resources";
 const QString kTimestampKey = "timestamp";
 
 const int kDefaultPort = 80;
-const int kMaxPort = 65535;
 
 const int kUuidLength = 36;
 
 const QMap<SystemUri::Scope, QString> scopeToString
 {
-    {SystemUri::Scope::Generic, "generic"},
-    {SystemUri::Scope::Direct, "direct"}
+    {SystemUri::Scope::generic, "generic"},
+    {SystemUri::Scope::direct, "direct"}
 };
 
 const QMap<SystemUri::Protocol, QString> protocolToString
@@ -55,7 +54,8 @@ const QMap<SystemUri::SystemAction, QString> systemActionToString
 const QMap<SystemUri::ReferralSource, QString> referralSourceToString
 {
     {SystemUri::ReferralSource::None,           ""},
-    {SystemUri::ReferralSource::DesktopClient,  "client"}, {SystemUri::ReferralSource::MobileClient,   "mobile"},
+    {SystemUri::ReferralSource::DesktopClient,  "client"},
+    {SystemUri::ReferralSource::MobileClient,   "mobile"},
     {SystemUri::ReferralSource::CloudPortal,    "portal"},
     {SystemUri::ReferralSource::WebAdmin,       "webadmin"}
 };
@@ -70,7 +70,7 @@ const QMap<SystemUri::ReferralContext, QString> referralContextToString
     {SystemUri::ReferralContext::CloudMenu,     "menu"}
 };
 
-QString resourceIdsToString(const SystemUri::ResourceIdList& ids)
+QString resourceIdsToString(const QList<QnUuid>& ids)
 {
     QStringList result;
     for (const auto& id: ids)
@@ -79,9 +79,9 @@ QString resourceIdsToString(const SystemUri::ResourceIdList& ids)
     return result.join(':');
 }
 
-SystemUri::ResourceIdList resourceIdsFromString(const QString& string)
+QList<QnUuid> resourceIdsFromString(const QString& string)
 {
-    SystemUri::ResourceIdList result;
+    QList<QnUuid> result;
     const auto values = string.split(':');
     for (const auto& value: values)
     {
@@ -116,570 +116,317 @@ bool isCloudHostname(const QString& hostname)
     return !uuid.isNull();
 }
 
-
-} // namespace
-
-class nx::vms::utils::SystemUriPrivate
+void parseParameters(const nx::utils::Url& url, SystemUri* uri)
 {
-public:
-    SystemUri::Scope scope = SystemUri::Scope::Generic;
-    SystemUri::Protocol protocol = SystemUri::Protocol::Http;
-    QString domain;
-    SystemUri::ClientCommand clientCommand = SystemUri::ClientCommand::None;
-    QString systemId;
-    SystemUri::SystemAction systemAction = SystemUri::SystemAction::View;
-    SystemUri::Auth authenticator;
-    SystemUri::Referral referral;
-    SystemUri::Parameters parameters;
-    SystemUri::ResourceIdList resourceIds;
-    qint64 timestamp = -1;
+    if (!NX_ASSERT(uri))
+        return;
 
-    SystemUriPrivate()
-    {}
+    QHash<QString, QString> parameters;
 
-    SystemUriPrivate(const SystemUriPrivate &other) :
-        scope(other.scope),
-        protocol(other.protocol),
-        domain(other.domain),
-        clientCommand(other.clientCommand),
-        systemId(other.systemId),
-        systemAction(other.systemAction),
-        authenticator(other.authenticator),
-        referral(other.referral),
-        parameters(other.parameters),
-        resourceIds(other.resourceIds),
-        timestamp(other.timestamp)
-    {}
+    if (!url.hasQuery())
+        return;
 
-    void parse(const nx::utils::Url& url)
+    QUrlQuery query(url.query());
+    for (const auto [key, value]: query.queryItems(QUrl::FullyDecoded))
+        parameters.insert(key.toLower(), value);
+
+    const QString authKey = parameters.take(kAuthKey);
+    if (!authKey.isEmpty())
     {
-        // For now we support parsing of generic links only
-        scope = SystemUri::Scope::Generic;
-        protocol = protocolToString.key(url.scheme().toLower(), SystemUri::Protocol::Native);
-        domain = url.host();
-        int port = url.port(kDefaultPort);
-        if (port != kDefaultPort)
-            domain += ':' + QString::number(port);
-
-        QStringList path = url.path().split('/', Qt::SkipEmptyParts);
-        if (path.isEmpty())
+        if (authKey.toStdString().starts_with(nx::vms::api::LoginSession::kTokenPrefix))
         {
-            clientCommand = SystemUri::ClientCommand::Client;
+            uri->credentials = nx::network::http::BearerAuthToken(authKey.toStdString());
         }
         else
         {
-            QString clientCommandStr = path.takeFirst().toLower();
-            clientCommand = clientCommandToString.key(clientCommandStr, SystemUri::ClientCommand::None);
-        }
-
-        parseParameters(url);
-
-        switch (clientCommand)
-        {
-            // No more parameters are required for these commands
-            case SystemUri::ClientCommand::None:
-            case SystemUri::ClientCommand::LoginToCloud:
-                return;
-
-            // Client opens such links as usual client links
-            case SystemUri::ClientCommand::OpenOnPortal:
-                NX_ASSERT(protocol == SystemUri::Protocol::Native);
-                clientCommand = SystemUri::ClientCommand::Client;
-                break;
-
-            default:
-                break;
-        }
-
-        if (!path.isEmpty())
-        {
-            QString systemIdOrAction = path.takeFirst();
-            if (systemActionToString.values().contains(systemIdOrAction))
+            static const QChar kDelimiter(':');
+            const QString auth = QString::fromUtf8(QByteArray::fromBase64(authKey.toUtf8()));
+            if (auth.contains(kDelimiter))
             {
-                systemId = domain;
-            }
-            else
-            {
-                systemId = systemIdOrAction;
+                QString user;
+                QString password;
+                splitString(auth, kDelimiter, user, password);
+                uri->credentials = nx::network::http::PasswordCredentials(
+                    user.toStdString(),
+                    password.toStdString());
             }
         }
     }
 
-    nx::utils::Url toUrl() const
+    uri->authCode = parameters.take(kAuthCodeKey);
+
+    const auto resourceIdParameters = parameters.take(kResourceIdsKey);
+    uri->resourceIds = resourceIdsFromString(resourceIdParameters);
+
+    const auto timestampParameter = parameters.take(kTimestampKey);
+    uri->timestamp = timestampParameter.isEmpty() ? -1 : timestampParameter.toLongLong();
+
+    QString referralFrom = parameters.take(kReferralSourceKey).toLower();
+    uri->referral.source = referralSourceToString.key(referralFrom);
+
+    QString referralContext = parameters.take(kReferralContextKey).toLower();
+    uri->referral.context = referralContextToString.key(referralContext);
+}
+
+void parse(const nx::utils::Url& url, SystemUri* uri)
+{
+    if (!NX_ASSERT(uri))
+        return;
+
+    // For now we support parsing of generic links only
+    uri->scope = SystemUri::Scope::generic;
+    uri->protocol = protocolToString.key(url.scheme().toLower(), SystemUri::Protocol::Native);
+    uri->cloudHost = url.host();
+    int port = url.port(kDefaultPort);
+    if (port != kDefaultPort)
+        uri->cloudHost += ':' + QString::number(port);
+
+    QStringList path = url.path().split('/', Qt::SkipEmptyParts);
+    if (path.isEmpty())
     {
-        nx::utils::Url result;
-        result.setScheme(protocolToString[protocol]);
-
-        LocalHostName hostname = parseLocalHostname(domain);
-        if (isLocalHostname(hostname))
-        {
-            result.setHost(hostname.first);
-            result.setPort(hostname.second);
-        }
-        else
-        {
-            result.setHost(domain);
-        }
-
-        QString path = '/' + clientCommandToString[clientCommand];
-        if (clientCommand == SystemUri::ClientCommand::Client && isValidSystemId())
-        {
-            if (scope == SystemUri::Scope::Generic)
-                path += '/' + systemId;
-
-            path += '/' + systemActionToString[systemAction];
-        }
-
-        result.setPath(path);
-
-        QUrlQuery query;
-
-        if (!authenticator.user.isEmpty() && !authenticator.password.isEmpty())
-        {
-            query.addQueryItem(kAuthKey, authenticator.encode());
-        }
-
-        if (!authenticator.authCode.isEmpty())
-            query.addQueryItem(kAuthCodeKey, authenticator.authCode);
-
-        if (systemAction == SystemUri::SystemAction::View)
-        {
-            if (!resourceIds.isEmpty())
-                query.addQueryItem(kResourceIdsKey, resourceIdsToString(resourceIds));
-
-            if (timestamp != -1)
-                query.addQueryItem(kTimestampKey, QString::number(timestamp));
-        }
-
-        if (referral.source != SystemUri::ReferralSource::None)
-            query.addQueryItem(kReferralSourceKey, SystemUri::toString(referral.source));
-
-        if (referral.context != SystemUri::ReferralContext::None)
-            query.addQueryItem(kReferralContextKey, SystemUri::toString(referral.context));
-
-        for (auto iter = parameters.cbegin(); iter != parameters.cend(); ++iter)
-            query.addQueryItem(iter.key(), iter.value());
-
-        result.setQuery(query);
-        return result;
+        uri->clientCommand = SystemUri::ClientCommand::Client;
+    }
+    else
+    {
+        QString clientCommandStr = path.takeFirst().toLower();
+        uri->clientCommand = clientCommandToString.key(clientCommandStr,
+            SystemUri::ClientCommand::None);
     }
 
-    nx::utils::Url connectionUrl() const
+    parseParameters(url, uri);
+
+    switch (uri->clientCommand)
     {
-        if (systemId.isEmpty())
-            return nx::utils::Url();
-
-        const auto hostName = parseLocalHostname(systemId);
-
-        nx::utils::Url result;
-        result.setScheme(protocol == SystemUri::Protocol::Native
-            ? QString("https")
-            : protocolToString[protocol]);
-        result.setHost(hostName.first);
-        result.setPort(hostName.second);
-        result.setUserName(authenticator.user);
-        result.setPassword(authenticator.password);
-
-        return result;
-    }
-
-    QString toString() const
-    {
-        return toUrl().toString();
-    }
-
-    bool isNull() const
-    {
-        return protocol == SystemUri::Protocol::Http
-            && clientCommand == SystemUri::ClientCommand::None
-            && domain.isEmpty()
-            && systemId.isEmpty()
-            && authenticator.user.isEmpty()
-            && authenticator.password.isEmpty()
-            && referral.source == SystemUri::ReferralSource::None
-            && referral.context == SystemUri::ReferralContext::None
-            && resourceIds.isEmpty()
-            && parameters.isEmpty()
-            && timestamp == -1;
-    }
-
-    bool isValid() const
-    {
-        switch (scope)
-        {
-            case SystemUri::Scope::Generic:
-                return isValidGenericUri();
-            case SystemUri::Scope::Direct:
-                return isValidDirectUri();
-            default:
-                break;
-        }
-        return false;
-    }
-
-    bool operator==(const SystemUriPrivate& other) const
-    {
-        return protocol == other.protocol
-            && clientCommand == other.clientCommand
-            && domain == other.domain
-            && systemId == other.systemId
-            && authenticator.user == other.authenticator.user
-            && authenticator.password == other.authenticator.password
-            && parameters == other.parameters
-            && resourceIds == other.resourceIds
-            && timestamp == other.timestamp;
-    }
-
-private:
-    bool isValidGenericUri() const
-    {
-        const bool hasDomain = !domain.isEmpty();
-        const bool hasAuth = !authenticator.user.isEmpty() && !authenticator.password.isEmpty();
-        const bool hasSystemId = !systemId.isEmpty();
-        const bool hasOnlyPassword =
-            authenticator.user.isEmpty() && !authenticator.password.isEmpty();
-
-        switch (clientCommand)
-        {
-            case SystemUri::ClientCommand::Client:
-                return hasDomain && !hasOnlyPassword && (hasSystemId ? isValidSystemId() : !hasAuth);
-            case SystemUri::ClientCommand::LoginToCloud:
-                return hasDomain && !hasOnlyPassword;
-            case SystemUri::ClientCommand::OpenOnPortal:
-                return hasDomain
-                    && hasAuth
-                    && isValidSystemId();
-            default:
-                break;
-        }
-
-        return false;
-    }
-
-    bool isValidDirectUri() const
-    {
-        /* Direct links are starting with systemId. */
-        if (systemId.isEmpty())
-            return false;
-
-        bool hasAuth = !authenticator.user.isEmpty() && !authenticator.password.isEmpty();
-
-        /* Checking http/https protocol - only direct link to connect to system is allowed. */
-        switch (clientCommand)
-        {
-            case SystemUri::ClientCommand::Client:
-                return protocol == SystemUri::Protocol::Native && (!hasAuth || isValidSystemId());
-            case SystemUri::ClientCommand::LoginToCloud:
-                return protocol == SystemUri::Protocol::Native
-                    && hasAuth;
-            case SystemUri::ClientCommand::OpenOnPortal:
-                return hasAuth
-                    && isValidSystemId();
-            default:
-                break;
-        }
-        return false;
-    }
-
-    typedef QPair<QString, int> LocalHostName;
-    static LocalHostName parseLocalHostname(const QString& hostname)
-    {
-        QString host, portStr;
-        splitString(hostname, ':', host, portStr);
-        bool ok;
-        int port = portStr.toInt(&ok);
-        if (!ok)
-            port = -1;
-        return LocalHostName(host, port);
-    }
-
-    static bool isLocalHostname(const LocalHostName& hostname)
-    {
-        return !hostname.first.isEmpty()
-            && hostname.second > 0
-            && hostname.second <= kMaxPort;
-    }
-
-    /** Check that system id is in form localhost:7001. Port is mandatory. */
-    static bool isLocalHostname(const QString& hostname)
-    {
-        return isLocalHostname(parseLocalHostname(hostname));
-    }
-
-    bool isValidSystemId() const
-    {
-        if (systemId.isEmpty())
-            return false;
-
-        bool cloudAllowed = scope == SystemUri::Scope::Generic
-            || protocol == SystemUri::Protocol::Native;
-
-        return (cloudAllowed && isCloudHostname(systemId))
-            || isLocalHostname(systemId);
-    }
-
-    void parseParameters(const nx::utils::Url& url)
-    {
-        if (!url.hasQuery())
+        // No more parameters are required for these commands
+        case SystemUri::ClientCommand::None:
+        case SystemUri::ClientCommand::LoginToCloud:
             return;
 
-        QStringList query = url.query(QUrl::FullyDecoded).split('&', Qt::SkipEmptyParts);
-        for (const QString& parameter : query)
-        {
-            QString key, value;
-            splitString(parameter, '=', key, value);
-            parameters.insert(key.toLower(), value);
-        }
+        // Client opens such links as usual client links
+        case SystemUri::ClientCommand::OpenOnPortal:
+            NX_ASSERT(uri->protocol == SystemUri::Protocol::Native);
+            uri->clientCommand = SystemUri::ClientCommand::Client;
+            break;
 
-        QString encodedAuth = parameters.take(kAuthKey);
-        if (!encodedAuth.isEmpty())
-        {
-            QString auth = QString::fromUtf8(QByteArray::fromBase64(encodedAuth.toUtf8()));
-            splitString(auth, ':', authenticator.user, authenticator.password);
-        }
-
-        authenticator.authCode = parameters.take(kAuthCodeKey);
-
-        const auto resourceIdParameters = parameters.take(kResourceIdsKey);
-        resourceIds = resourceIdsFromString(resourceIdParameters);
-
-        const auto timestampParameter = parameters.take(kTimestampKey);
-        timestamp = timestampParameter.isEmpty() ? -1 : timestampParameter.toLongLong();
-
-        QString referralFrom = parameters.take(kReferralSourceKey).toLower();
-        referral.source = referralSourceToString.key(referralFrom);
-
-        QString referralContext = parameters.take(kReferralContextKey).toLower();
-        referral.context = referralContextToString.key(referralContext);
+        default:
+            break;
     }
-};
 
-SystemUri::SystemUri() :
-    d_ptr(new SystemUriPrivate())
-{
-
+    if (!path.isEmpty())
+    {
+        QString systemAddressOrAction = path.takeFirst();
+        if (systemActionToString.values().contains(systemAddressOrAction))
+        {
+            uri->systemAddress = uri->cloudHost;
+        }
+        else
+        {
+            uri->systemAddress = systemAddressOrAction;
+        }
+    }
 }
+
+bool isValidSystemAddress(const SystemUri& uri)
+{
+    if (uri.systemAddress.isEmpty())
+        return false;
+
+    const bool cloudAllowed = uri.scope == SystemUri::Scope::generic
+        || uri.protocol == SystemUri::Protocol::Native;
+
+    const auto isValidLocalAddress =
+        [&uri]()
+        {
+            const auto url = QUrl::fromUserInput(uri.systemAddress);
+            return url.isValid() && url.port() > 0;
+        };
+
+    return (cloudAllowed && isCloudHostname(uri.systemAddress))
+        || isValidLocalAddress();
+}
+
+bool isValidGenericUri(const SystemUri& uri)
+{
+    const bool hasValidAuth =
+        [credentials = uri.credentials]()
+        {
+            if (credentials.authToken.isPassword())
+                return !credentials.username.empty() && !credentials.authToken.empty();
+            else if (credentials.authToken.isBearerToken())
+                return !credentials.authToken.empty();
+            return false;
+        }();
+
+    if (uri.cloudHost.isEmpty())
+        return false;
+
+    const bool hasSystemAddress = !uri.systemAddress.isEmpty();
+
+    switch (uri.clientCommand)
+    {
+        case SystemUri::ClientCommand::Client:
+            return hasSystemAddress ? isValidSystemAddress(uri) && hasValidAuth : !hasValidAuth;
+
+        // Login to Cloud with credentials is not supported anymore.
+        case SystemUri::ClientCommand::LoginToCloud:
+            return !hasValidAuth;
+
+        case SystemUri::ClientCommand::OpenOnPortal:
+            return hasValidAuth && isValidSystemAddress(uri);
+        default:
+            break;
+    }
+
+    return false;
+}
+
+bool isValidDirectUri(const SystemUri& uri)
+{
+    // Universal links cannot be handled for the direct uri, so only native protocol is supported.
+    if (uri.protocol != SystemUri::Protocol::Native)
+        return false;
+
+    // Direct links are starting with system address.
+    if (uri.systemAddress.isEmpty())
+        return false;
+
+    const bool hasAuth = !uri.credentials.authToken.empty();
+
+    switch (uri.clientCommand)
+    {
+        case SystemUri::ClientCommand::Client:
+            // Simply open the client - or login to the System.
+            return !hasAuth || isValidSystemAddress(uri);
+        case SystemUri::ClientCommand::LoginToCloud:
+            return !hasAuth;
+        case SystemUri::ClientCommand::OpenOnPortal:
+            return hasAuth && isValidSystemAddress(uri);
+        default:
+            break;
+    }
+    return false;
+}
+
+QString encodePasswordCredentials(const nx::network::http::Credentials& credentials)
+{
+    return QString(
+        QString::fromStdString(credentials.username)
+        + ':'
+        + QString::fromStdString(credentials.authToken.value))
+        .toUtf8().toBase64();
+}
+
+} // namespace
 
 SystemUri::SystemUri(const nx::utils::Url& url) :
     SystemUri()
 {
-    Q_D(SystemUri);
-    d->parse(url);
+    parse(url, this);
 }
 
-SystemUri::SystemUri(const QString& uri) :
-    SystemUri()
+SystemUri::SystemUri(const QString& uri)
 {
-    Q_D(SystemUri);
-
     nx::utils::Url url(uri);
     if (url.isValid())
-        d->parse(url);
+        parse(url, this);
 }
 
-nx::vms::utils::SystemUri::SystemUri(const SystemUri& other) :
-    d_ptr(other.d_ptr
-          ? new SystemUriPrivate(*other.d_ptr.data())
-          : new SystemUriPrivate()
-    )
+bool SystemUri::hasCloudSystemAddress() const
 {
-    NX_ASSERT(other.d_ptr);
-}
-
-SystemUri& SystemUri::operator=(const SystemUri& other)
-{
-    if (&other == this)
-        return *this;
-
-    NX_ASSERT(other.d_ptr);
-    if (!other.d_ptr)
-        return *this;
-
-    (*d_ptr.data()) = (*other.d_ptr.data());
-    return *this;
-}
-
-SystemUri::~SystemUri()
-{
-
-}
-
-SystemUri::Scope SystemUri::scope() const
-{
-    Q_D(const SystemUri);
-    return d->scope;
-}
-
-void SystemUri::setScope(Scope value)
-{
-    Q_D(SystemUri);
-    d->scope = value;
-}
-
-SystemUri::Protocol SystemUri::protocol() const
-{
-    Q_D(const SystemUri);
-    return d->protocol;
-}
-
-void SystemUri::setProtocol(Protocol value)
-{
-    Q_D(SystemUri);
-    d->protocol = value;
-}
-
-QString SystemUri::domain() const
-{
-    Q_D(const SystemUri);
-    return d->domain;
-}
-
-void SystemUri::setDomain(const QString& value)
-{
-    Q_D(SystemUri);
-    d->domain = value;
-}
-
-SystemUri::ClientCommand SystemUri::clientCommand() const
-{
-    Q_D(const SystemUri);
-    return d->clientCommand;
-}
-
-void SystemUri::setClientCommand(ClientCommand value)
-{
-    Q_D(SystemUri);
-    d->clientCommand = value;
-}
-
-QString SystemUri::systemId() const
-{
-    Q_D(const SystemUri);
-    return d->systemId;
-}
-
-void SystemUri::setSystemId(const QString& value)
-{
-    Q_D(SystemUri);
-    d->systemId = value;
-}
-
-bool SystemUri::hasCloudSystemId() const
-{
-    Q_D(const SystemUri);
-    return d->isValid() && isCloudHostname(d->systemId);
-}
-
-SystemUri::SystemAction SystemUri::systemAction() const
-{
-    Q_D(const SystemUri);
-    return d->systemAction;
-}
-
-void SystemUri::setSystemAction(SystemAction value)
-{
-    Q_D(SystemUri);
-    d->systemAction = value;
-}
-
-const SystemUri::Auth& SystemUri::authenticator() const
-{
-    Q_D(const SystemUri);
-    return d->authenticator;
-}
-
-void SystemUri::setAuthenticator(const Auth& value)
-{
-    Q_D(SystemUri);
-    d->authenticator = value;
-}
-
-void SystemUri::setAuthenticator(const QString& user, const QString& password)
-{
-    Q_D(SystemUri);
-    d->authenticator.user = user;
-    d->authenticator.password = password;
-}
-
-void SystemUri::setResourceIds(const ResourceIdList& resourceIds)
-{
-    Q_D(SystemUri);
-    d->resourceIds = resourceIds;
-}
-
-SystemUri::ResourceIdList SystemUri::resourceIds() const
-{
-    Q_D(const SystemUri);
-    return d->resourceIds;
-}
-
-void SystemUri::setTimestamp(qint64 value)
-{
-    Q_D(SystemUri);
-    d->timestamp = value;
-}
-
-qint64 SystemUri::timestamp() const
-{
-    Q_D(const SystemUri);
-    return d->timestamp;
-}
-
-SystemUri::Referral SystemUri::referral() const
-{
-    Q_D(const SystemUri);
-    return d->referral;
-}
-
-void SystemUri::setReferral(const Referral& value)
-{
-    Q_D(SystemUri);
-    d->referral = value;
-}
-
-void SystemUri::setReferral(ReferralSource source, ReferralContext context)
-{
-    Q_D(SystemUri);
-    d->referral.source = source;
-    d->referral.context = context;
-}
-
-
-SystemUri::Parameters SystemUri::rawParameters() const
-{
-    Q_D(const SystemUri);
-    return d->parameters;
-}
-
-void SystemUri::setRawParameters(const Parameters& value)
-{
-    Q_D(SystemUri);
-    d->parameters = value;
-}
-
-void SystemUri::addParameter(const QString& key, const QString& value)
-{
-    Q_D(SystemUri);
-    d->parameters.insert(key, value);
-}
-
-bool SystemUri::isNull() const
-{
-    Q_D(const SystemUri);
-    return d->isNull();
+    return isValid() && isCloudHostname(systemAddress);
 }
 
 bool SystemUri::isValid() const
 {
-    Q_D(const SystemUri);
-    return d->isValid();
+    switch (scope)
+    {
+        case SystemUri::Scope::generic:
+            return isValidGenericUri(*this);
+        case SystemUri::Scope::direct:
+            return isValidDirectUri(*this);
+        default:
+            NX_ASSERT(false, "Unhandled switch case");
+            break;
+    }
+    return false;
+}
+
+QString SystemUri::authKey() const
+{
+    if (credentials.authToken.isBearerToken())
+        return QString::fromStdString(credentials.authToken.value);
+
+    if (credentials.authToken.isPassword() && !credentials.username.empty())
+        return encodePasswordCredentials(credentials);
+
+    return QString();
 }
 
 QString SystemUri::toString() const
 {
-    Q_D(const SystemUri);
-    return d->toString();
+    return toUrl().toString();
 }
+
+nx::utils::Url SystemUri::toUrl() const
+{
+    nx::utils::Url result;
+    result.setScheme(protocolToString[protocol]);
+
+    if (scope == Scope::direct)
+    {
+        QUrl address = QUrl::fromUserInput(systemAddress);
+        result.setHost(address.host());
+        result.setPort(address.port());
+    }
+    else // Generic url.
+    {
+        result.setHost(cloudHost);
+    }
+
+    QStringList pathSegments;
+    if (scope == Scope::generic)
+        pathSegments.push_back(clientCommandToString[clientCommand]);
+
+    if (clientCommand == SystemUri::ClientCommand::Client && isValidSystemAddress(*this))
+    {
+        if (scope == SystemUri::Scope::generic)
+            pathSegments.push_back(systemAddress);
+
+        pathSegments.push_back(systemActionToString[systemAction]);
+    }
+
+    const QString path = pathSegments.empty() ? QString() : "/" + pathSegments.join('/');
+    result.setPath(path);
+
+    QUrlQuery query;
+
+    const QString authKey = this->authKey();
+    if (!authKey.isEmpty())
+        query.addQueryItem(kAuthKey, authKey);
+
+    if (!authCode.isEmpty())
+        query.addQueryItem(kAuthCodeKey, authCode);
+
+    if (systemAction == SystemUri::SystemAction::View)
+    {
+        if (!resourceIds.isEmpty())
+            query.addQueryItem(kResourceIdsKey, resourceIdsToString(resourceIds));
+
+        if (timestamp != -1)
+            query.addQueryItem(kTimestampKey, QString::number(timestamp));
+    }
+
+    if (referral.source != SystemUri::ReferralSource::None)
+        query.addQueryItem(kReferralSourceKey, SystemUri::toString(referral.source));
+
+    if (referral.context != SystemUri::ReferralContext::None)
+        query.addQueryItem(kReferralContextKey, SystemUri::toString(referral.context));
+
+    result.setQuery(query);
+    return result;
+}
+
+
 
 QString SystemUri::toString(SystemUri::Scope value)
 {
@@ -711,24 +458,4 @@ QString SystemUri::toString(SystemUri::ReferralContext value)
     return referralContextToString[value];
 }
 
-nx::utils::Url SystemUri::toUrl() const
-{
-    Q_D(const SystemUri);
-    return d->toUrl();
-}
 
-nx::utils::Url SystemUri::connectionUrl() const
-{
-    Q_D(const SystemUri);
-    return d->connectionUrl();
-}
-
-bool SystemUri::operator==(const SystemUri& other) const
-{
-    return *d_ptr.data() == *other.d_ptr.data();
-}
-
-QString nx::vms::utils::SystemUri::Auth::encode() const
-{
-    return QString(user + ':' + password).toUtf8().toBase64();
-}
