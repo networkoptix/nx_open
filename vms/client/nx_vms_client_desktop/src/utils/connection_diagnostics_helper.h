@@ -51,8 +51,4 @@ public:
 
 private:
     static bool getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions);
-    /** Pass cloud password when connecting to an older (up to 4.2) system. */
-    static void fixLogonData(
-        const nx::vms::api::ModuleInformation& moduleInformation,
-        nx::vms::client::core::LogonData* logonData);
 };

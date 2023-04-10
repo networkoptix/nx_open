@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <nx/reflect/instrument.h>
 
 #include "data_macros.h"
@@ -85,6 +87,8 @@ NX_VMS_API_DECLARE_STRUCT_EX(LoginSessionFilter, (json))
 
 struct NX_VMS_API LoginSession
 {
+    static constexpr std::string_view kTokenPrefix = "vms-";
+
     QString username;
 
     /**%apidoc The session authorization token to be used as HTTP bearer token or URL parameter. */

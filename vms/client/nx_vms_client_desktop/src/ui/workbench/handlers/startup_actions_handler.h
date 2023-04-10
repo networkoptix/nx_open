@@ -10,7 +10,7 @@
 
 struct QnStartupParameters;
 
-namespace nx::vms::utils { class SystemUri; }
+namespace nx::vms::utils { struct SystemUri; }
 
 namespace nx::vms::client::desktop {
 

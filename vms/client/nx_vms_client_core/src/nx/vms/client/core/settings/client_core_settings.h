@@ -53,9 +53,6 @@ public:
     SecureProperty<SystemAuthenticationData> systemAuthenticationData{
         this, "systemAuthenticationData"};
 
-    /** Password cloud credentials for versions 4.2 and below. */
-    SecureProperty<SerializableCredentials> cloudPasswordCredentials{
-        this, "cloudPasswordCredentials"};
 
     SecureProperty<SerializableCredentials> cloudCredentials{
         this, "cloudCredentials"};

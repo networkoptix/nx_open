@@ -365,8 +365,8 @@ void StartupActionsHandler::handleStartupParameters()
 
     if (connectingToSystem && startupParameters.customUri.isValid())
     {
-        d->delayedDrops.resourceIds = startupParameters.customUri.resourceIds();
-        d->delayedDrops.timeStampMs = startupParameters.customUri.timestamp();
+        d->delayedDrops.resourceIds = startupParameters.customUri.resourceIds;
+        d->delayedDrops.timeStampMs = startupParameters.customUri.timestamp;
     }
 
     if (connectingToSystem && !startupParameters.layoutRef.isEmpty())
@@ -491,29 +491,23 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     if (!uri.isValid())
         return false;
 
-    if (uri.clientCommand() != SystemUri::ClientCommand::Client)
+    if (uri.clientCommand != SystemUri::ClientCommand::Client)
         return false;
 
-    QString systemId = uri.systemId();
-    if (systemId.isEmpty())
+    const QString systemAddress = uri.systemAddress;
+    if (systemAddress.isEmpty())
         return false;
 
-    const SystemUri::Auth& auth = uri.authenticator();
-
-    const auto systemUrl = nx::utils::Url::fromUserInput(systemId);
+    const auto systemUrl = nx::utils::Url::fromUserInput(systemAddress);
     nx::network::SocketAddress address(systemUrl.host(), systemUrl.port());
     NX_DEBUG(this, "Custom URI: Connecting to the system %1", address);
 
-    nx::network::http::Credentials credentials(
-        auth.user.toStdString(),
-        nx::network::http::PasswordAuthToken(auth.password.toStdString()));
-
-    LogonData logonData(core::LogonData{.address = address, .credentials = credentials});
+    LogonData logonData(core::LogonData{.address = address, .credentials = uri.credentials});
     logonData.storeSession = false;
     logonData.secondaryInstance = true;
     logonData.connectScenario = ConnectScenario::connectUsingCommand;
 
-    if (uri.hasCloudSystemId())
+    if (uri.hasCloudSystemAddress())
         logonData.userType = nx::vms::api::UserType::cloud;
 
     if (logonData.userType == nx::vms::api::UserType::cloud
@@ -639,10 +633,10 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
 
     const auto& uri = startupParameters.customUri;
     if (uri.isValid()
-        && (uri.hasCloudSystemId()
-            || uri.clientCommand() == nx::vms::utils::SystemUri::ClientCommand::LoginToCloud))
+        && (uri.hasCloudSystemAddress()
+            || uri.clientCommand == nx::vms::utils::SystemUri::ClientCommand::LoginToCloud))
     {
-        authData.authorizationCode = uri.authenticator().authCode.toStdString();
+        authData.authorizationCode = uri.authCode.toStdString();
         NX_DEBUG(
             this, "Received authorization code, length: %1", authData.authorizationCode.size());
     }

@@ -14,24 +14,25 @@
  * All query parameters are url-encoded.
  */
 
-#include <QtCore/QScopedPointer>
-#include <QtCore/QHash>
+#include <QtCore/QList>
+#include <QtCore/QString>
 
-class QnUuid;
-
-namespace nx::utils { class Url; };
+#include <nx/network/http/auth_tools.h>
+#include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::utils {
 
-class SystemUriPrivate;
-
-class NX_VMS_UTILS_API SystemUri
+struct NX_VMS_UTILS_API SystemUri
 {
 public:
     enum class Scope
     {
-        Generic,            /**< Generic url. */
-        Direct              /**< Direct-access url. */
+        /** Generic url. */
+        generic,
+
+        /** Direct access url for the Web-Admin. */
+        direct
     };
 
     enum class Protocol
@@ -75,90 +76,57 @@ public:
         CloudMenu,          /**< Cloud context menu. */
     };
 
-    SystemUri();
-    SystemUri(const nx::utils::Url& url);
-    SystemUri(const QString& uri);
-    SystemUri(const SystemUri& other);
-    virtual ~SystemUri();
-
-    Scope scope() const;
-    void setScope(Scope value);
-
-    Protocol protocol() const;
-    void setProtocol(Protocol value);
-
-    QString domain() const;
-    void setDomain(const QString& value);
-
-    ClientCommand clientCommand() const;
-    void setClientCommand(ClientCommand value);
-
-    QString systemId() const;
-    void setSystemId(const QString& value);
-
-    bool hasCloudSystemId() const;
-
-    SystemAction systemAction() const;
-    void setSystemAction(SystemAction value);
-
-    struct Auth
-    {
-        QString user;
-        QString password;
-        QString authCode;
-
-        NX_VMS_UTILS_API QString encode() const;
-    };
-    const Auth& authenticator() const;
-    void setAuthenticator(const Auth& value);
-    void setAuthenticator(const QString& user, const QString& password);
-
-    using ResourceIdList = QList<QnUuid>;
-    void setResourceIds(const ResourceIdList& resourceIds);
-    ResourceIdList resourceIds() const;
-
-    void setTimestamp(qint64 value);
-    qint64 timestamp() const;
-
     struct Referral
     {
-        ReferralContext context = ReferralContext::None;
         ReferralSource source = ReferralSource::None;
+        ReferralContext context = ReferralContext::None;
+        bool operator==(const Referral& other) const = default;
     };
-    Referral referral() const;
-    void setReferral(const Referral& value);
-    void setReferral(ReferralSource source, ReferralContext context);
 
-    /** Raw parameters using is strongly discouraged. */
-    typedef QHash<QString, QString> Parameters;
-    Parameters rawParameters() const;
-    void setRawParameters(const Parameters& value);
+    Scope scope = Scope::generic;
+    Protocol protocol = Protocol::Http;
 
-    void addParameter(const QString& key, const QString& value);
+    /** Cloud host for Generic-scope urls. */
+    QString cloudHost;
 
-    bool isNull() const;
+    ClientCommand clientCommand = ClientCommand::None;
+
+    /** Address of the System, either if form of hostname:port or guid for Cloud Systems. */
+    QString systemAddress;
+
+    SystemAction systemAction = SystemAction::View;
+    Referral referral;
+    QList<QnUuid> resourceIds;
+    qint64 timestamp = -1;
+    nx::network::http::Credentials credentials;
+
+    /** Authentication code for Cloud login. */
+    QString authCode;
+
+    SystemUri() = default;
+    SystemUri(const SystemUri& other) = default;
+    SystemUri(const nx::utils::Url& url);
+    SystemUri(const QString& uri);
+
+    bool hasCloudSystemAddress() const;
 
     bool isValid() const;
+
+    /** Bearer token or encoded password credentials. */
+    QString authKey() const;
 
     QString toString() const;
     nx::utils::Url toUrl() const;
 
-    //! QUrl for connection to a given system.
-    nx::utils::Url connectionUrl() const;
-
     // TODO: #sivanov Use nx_reflect.
-    static QString toString(SystemUri::Scope value);
-    static QString toString(SystemUri::Protocol value);
-    static QString toString(SystemUri::ClientCommand value);
-    static QString toString(SystemUri::SystemAction value);
-    static QString toString(SystemUri::ReferralSource value);
-    static QString toString(SystemUri::ReferralContext value);
+    static QString toString(Scope value);
+    static QString toString(Protocol value);
+    static QString toString(ClientCommand value);
+    static QString toString(SystemAction value);
+    static QString toString(ReferralSource value);
+    static QString toString(ReferralContext value);
 
-    SystemUri& operator=(const SystemUri& other);
-    bool operator==(const SystemUri& other) const;
-private:
-    QScopedPointer<SystemUriPrivate> const d_ptr;
-    Q_DECLARE_PRIVATE(SystemUri)
+    bool operator==(const SystemUri& other) const = default;
 };
 
 } // namespace nx::vms::utils

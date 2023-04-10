@@ -244,7 +244,6 @@ void Settings::migrateAllSettingsFrom_v51(Settings* oldSettings)
         {"systemAuthenticationData", "secureSystemAuthenticationData_v50"},
         {"preferredCloudServers", "PreferredCloudServers"},
         {"cloudCredentials", "cloudCredentials_v50"},
-        {"cloudPasswordCredentials", "cloudCredentials"},
         {"lastConnection", "LastConnection"},
         {"digestCloudPassword", "DigestCloudPassword"},
         {"certificateValidationLevel", "CertificateValidationLevel"},
