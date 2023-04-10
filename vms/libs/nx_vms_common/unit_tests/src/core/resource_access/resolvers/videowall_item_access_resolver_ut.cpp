@@ -65,7 +65,7 @@ TEST_F(VideowallItemAccessResolverTest, noAccess)
 
 TEST_F(VideowallItemAccessResolverTest, notApplicableResource)
 {
-    const auto user = createUser(kAdministratorsGroupId);
+    const auto user = createUser(kPowerUsersGroupId);
     manager->setOwnResourceAccessMap(kTestSubjectId, {{user->getId(), AccessRight::view}});
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, user), AccessRights());
 }

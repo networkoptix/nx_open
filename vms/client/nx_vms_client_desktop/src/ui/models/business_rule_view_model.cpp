@@ -247,7 +247,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     for (const auto actionType: lexComparator.lexSortedActions(clientActions))
         addActionItem(actionType);
 
-    m_actionParams.additionalResources = toStdVector(nx::vms::api::kAdminGroupIds);
+    m_actionParams.additionalResources = toStdVector(nx::vms::api::kAllPowerUserGroupIds);
 
     updateActionTypesModel();
     updateEventStateModel();
@@ -770,7 +770,7 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
 
         actionParams.allUsers = false;
         actionParams.additionalResources = additionalUserIsRequired
-            ? toStdVector(nx::vms::api::kAdminGroupIds)
+            ? toStdVector(nx::vms::api::kAllPowerUserGroupIds)
             : std::vector<QnUuid>();
 
         switch (m_actionType)
@@ -794,7 +794,7 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
     m_actionParams = m_cachedActionParams[m_actionType];
 
     if (userIsRequired && !userWasRequired)
-        m_actionResources = nx::utils::toQSet(nx::vms::api::kAdminGroupIds);
+        m_actionResources = nx::utils::toQSet(nx::vms::api::kAllPowerUserGroupIds);
 
     Fields fields = Field::actionType | Field::actionParams | Field::modified;
     if (cameraIsRequired != cameraWasRequired || userIsRequired != userWasRequired)

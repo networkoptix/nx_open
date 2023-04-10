@@ -51,8 +51,8 @@ public:
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr& user);
 
-    /** @returns Whether the current user has admin permissions. */
-    bool hasAdminPermissions() const;
+    /** @returns Whether the current user has Power User permissions. */
+    bool hasPowerUserPermissions() const;
 
     /**
      * @param resource Resource to get permissions for.

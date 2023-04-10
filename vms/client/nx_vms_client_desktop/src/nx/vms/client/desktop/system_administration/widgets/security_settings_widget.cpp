@@ -55,8 +55,8 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
 
     setHelpTopic(ui->displayWatermarkCheckBox, Qn::UserWatermark_Help);
     ui->displayWatermarkCheckBox->setHint(tr(
-        "Watermarks will be displayed over live, archive and exported videos for non-admin users"
-        " only. You and other administrators will not see them."));
+        "Watermarks will be displayed over live, archive and exported videos for non-power users"
+        " only. You and other power users will not see them."));
 
     setHelpTopic(ui->auditTrailCheckBox, Qn::AuditTrail_Help);
     ui->auditTrailCheckBox->setHint(tr("Tracks and logs all user actions."));

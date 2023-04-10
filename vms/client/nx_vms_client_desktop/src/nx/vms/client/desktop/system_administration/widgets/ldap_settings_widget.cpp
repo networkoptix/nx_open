@@ -233,7 +233,7 @@ struct LdapSettingsWidget::Private
         const auto systemContext = q->systemContext();
 
         return systemContext
-            && systemContext->resourceAccessManager()->hasAdminPermissions(
+            && systemContext->resourceAccessManager()->hasPowerUserPermissions(
                 systemContext->userWatcher()->user());
     }
 };

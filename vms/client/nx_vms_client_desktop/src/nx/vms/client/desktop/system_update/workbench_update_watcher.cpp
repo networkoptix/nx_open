@@ -298,7 +298,7 @@ void WorkbenchUpdateWatcher::notifyUserAboutWorkbenchUpdate(
     if (!updateNotificationId.isNull())
         return;
 
-    if (!accessController()->hasAdminPermissions())
+    if (!accessController()->hasPowerUserPermissions())
         return;
     
     NX_VERBOSE(this, "Showing a notification about Workbench update feature.");

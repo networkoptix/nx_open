@@ -31,7 +31,7 @@ static const auto kUniqueLayoutNameCondition = displayFullMatch(kUniqueLayoutNam
 TEST_F(ResourceTreeModelTest, layoutAdds)
 {
     // When user is logged in.
-    const auto user = loginAsAdmin("admin");
+    const auto user = loginAsPowerUser("power_user");
 
     // When layout resource with certain unique name is added to the resource pool.
     const auto camera = addLayout(kUniqueLayoutName, user->getId());
@@ -43,7 +43,7 @@ TEST_F(ResourceTreeModelTest, layoutAdds)
 TEST_F(ResourceTreeModelTest, layoutRemoves)
 {
     // When user is logged in.
-    const auto user = loginAsAdmin("admin");
+    const auto user = loginAsPowerUser("power_user");
 
     // When layout with certain unique name is added to the resource pool.
     const auto layout = addLayout(kUniqueLayoutName, user->getId());
@@ -61,7 +61,7 @@ TEST_F(ResourceTreeModelTest, layoutRemoves)
 TEST_F(ResourceTreeModelTest, layoutIconType)
 {
     // When user is logged in.
-    const auto user = loginAsAdmin("admin");
+    const auto user = loginAsPowerUser("power_user");
 
     // When owned layout with certain unique name is added to the resource pool.
     const auto layout = addLayout(kUniqueLayoutName, user->getId());
@@ -76,7 +76,7 @@ TEST_F(ResourceTreeModelTest, layoutIconType)
 TEST_F(ResourceTreeModelTest, sharedLayoutIconType)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When non-owned layout with certain unique name is added to the resource pool.
     const auto layout = addLayout(kUniqueLayoutName);
@@ -91,7 +91,7 @@ TEST_F(ResourceTreeModelTest, sharedLayoutIconType)
 TEST_F(ResourceTreeModelTest, lockedLayoutIconType)
 {
     // When user is logged in.
-    const auto user = loginAsAdmin("admin");
+    const auto user = loginAsPowerUser("power_user");
 
     // When owned layout with certain unique name is added to the resource pool.
     const auto layout = addLayout(kUniqueLayoutName, user->getId());
@@ -120,10 +120,10 @@ TEST_F(ResourceTreeModelTest, lockedLayoutIconType)
 TEST_F(ResourceTreeModelTest, layoutIsChildOfLayoutsNode)
 {
     // When user is logged in.
-    const auto adminUser = loginAsAdmin("admin");
+    const auto powerUser = loginAsPowerUser("power_user");
 
     // When layout with certain unique name is added to the resource pool.
-    const auto layout = addLayout(kUniqueLayoutName, adminUser->getId());
+    const auto layout = addLayout(kUniqueLayoutName, powerUser->getId());
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
@@ -134,11 +134,11 @@ TEST_F(ResourceTreeModelTest, layoutIsChildOfLayoutsNode)
 
 TEST_F(ResourceTreeModelTest, ownLayoutIsEditableByAdmin)
 {
-    // When user with administrator permissions is logged in.
-    const auto adminUser = loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    const auto powerUser = loginAsPowerUser("power_user");
 
     // When layout with unique name owned by user is added to the resource pool.
-    const auto layout = addLayout(kUniqueLayoutName, adminUser->getId());
+    const auto layout = addLayout(kUniqueLayoutName, powerUser->getId());
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
@@ -149,8 +149,8 @@ TEST_F(ResourceTreeModelTest, ownLayoutIsEditableByAdmin)
 
 TEST_F(ResourceTreeModelTest, sharedLayoutIsEditableByAdmin)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When shared layout with unique name is added to the resource pool.
     const auto layout = addLayout(kUniqueLayoutName, QnUuid());
@@ -164,7 +164,7 @@ TEST_F(ResourceTreeModelTest, sharedLayoutIsEditableByAdmin)
 
 TEST_F(ResourceTreeModelTest, sharedLayoutIsNotEditableByNonAdmin)
 {
-    // When user without administrator permissions is logged in.
+    // When user without power user permissions is logged in.
     const auto liveViewerUser = loginAsLiveViewer("live_viever");
 
     // When shared layout with unique name is added to the resource pool.
@@ -182,7 +182,7 @@ TEST_F(ResourceTreeModelTest, sharedLayoutIsNotEditableByNonAdmin)
 
 TEST_F(ResourceTreeModelTest, ownLayoutIsEditableByNonAdmin)
 {
-    // When user without administrator permissions is logged in.
+    // When user without power user permissions is logged in.
     const auto liveViewerUser = loginAsLiveViewer("live_viever");
 
     // When layout with unique name owned by mentioned user is added to the resource pool.
@@ -198,7 +198,7 @@ TEST_F(ResourceTreeModelTest, ownLayoutIsEditableByNonAdmin)
 TEST_F(ResourceTreeModelTest, layoutHelpTopic)
 {
     // When user is logged in.
-    const auto user = loginAsAdmin("admin");
+    const auto user = loginAsPowerUser("power_user");
 
     // When owned layout with certain unique name is added to the resource pool.
     const auto layout = addLayout(kUniqueLayoutName, user->getId());
@@ -213,7 +213,7 @@ TEST_F(ResourceTreeModelTest, layoutHelpTopic)
 TEST_F(ResourceTreeModelTest, layoutProvidesResource)
 {
     // When user is logged in.
-    const auto user = loginAsAdmin("admin");
+    const auto user = loginAsPowerUser("power_user");
 
     // When owned layout with certain unique name is added to the resource pool.
     const auto layout = addLayout(kUniqueLayoutName, user->getId());
@@ -229,7 +229,7 @@ TEST_F(ResourceTreeModelTest, layoutProvidesResource)
 TEST_F(ResourceTreeModelTest, DISABLED_layoutModificationMark)
 {
     // When user is logged in.
-    const auto user = loginAsAdmin("admin");
+    const auto user = loginAsPowerUser("power_user");
 
     // When owned layout with certain unique name is added to the resource pool.
     const auto layout = addLayout(kUniqueLayoutName, user->getId());
@@ -248,7 +248,7 @@ TEST_F(ResourceTreeModelTest, DISABLED_layoutModificationMark)
 TEST_F(ResourceTreeModelTest, layoutNodeIsDragEnabled)
 {
     // When user is logged in.
-    const auto user = loginAsAdmin("admin");
+    const auto user = loginAsPowerUser("power_user");
 
     // When owned layout with certain unique name is added to the resource pool.
     const auto layout = addLayout(kUniqueLayoutName, user->getId());
@@ -272,7 +272,7 @@ TEST_F(ResourceTreeModelTest, dontShowServiceLayoutsWhileInLayoutSearchMode)
     addVideoWallMatrix("video_wall_matrix", videoWall);
 
     // When user is logged in.
-    const auto user = loginAsAdmin("admin");
+    const auto user = loginAsPowerUser("power_user");
 
     // When "Layouts" search filter is selected.
     setFilterMode(entity_resource_tree::ResourceTreeComposer::FilterMode::allLayoutsFilter);
@@ -288,22 +288,22 @@ TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderAdmin)
     static constexpr auto kIntercomCameraName = "intercom_camera_name";
 
     // When user is logged in.
-    const auto admin = loginAsAdmin("admin");
+    const auto powerUser = loginAsPowerUser("power_user");
 
     // When intercom camera is added to the resource pool.
-    const auto intercom = addIntercomCamera(kIntercomCameraName, admin->getId());
+    const auto intercom = addIntercomCamera(kIntercomCameraName, powerUser->getId());
 
     // When intercom layout is added to the resource pool.
     const auto layout = addIntercomLayout(kUniqueLayoutName, intercom->getId());
 
-    // When non-admin user is added to the resource pool.
-    const auto otherUser = addUser(kUniqueUserName, GlobalPermission::userInput);
+    // When non-power user is added to the resource pool.
+    const auto otherUser = addUser(kUniqueUserName, api::kAdvancedViewersGroupId);
 
-    // When intercom is not accessible for non-admin user.
+    // When intercom is not accessible for non-power user.
     // Then a single copy of intercom layout appears in the resource tree.
     ASSERT_EQ(allMatchingIndexes(kUniqueLayoutNameCondition).size(), 1);
 
-    // When intercom is accessible for non-admin user.
+    // When intercom is accessible for non-power user.
     setupAccessToResourceForUser(otherUser, intercom, true);
 
     // Then still a single copy of intercom layout appears in the resource tree.
@@ -316,19 +316,19 @@ TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderUser)
     static constexpr auto kUniqueUserName = "unique_user_name";
     static constexpr auto kIntercomCameraName = "intercom_camera_name";
 
-    // When user with unique name and administrator permissions is added to the resource pool.
-    const auto admin = addUser("admin", GlobalPermission::adminPermissions);
+    // When user with unique name and power user permissions is added to the resource pool.
+    const auto powerUser = addUser("power_user", api::kPowerUsersGroupId);
 
     // When intercom camera is added to the resource pool.
-    const auto intercom = addIntercomCamera(kIntercomCameraName, admin->getId());
+    const auto intercom = addIntercomCamera(kIntercomCameraName, powerUser->getId());
 
     // When intercom layout is added to the resource pool.
     const auto layout = addIntercomLayout(kUniqueLayoutName, intercom->getId());
 
-    // When non-admin user is logged in.
+    // When non-power user is logged in.
     const auto otherUser = loginAsCustomUser(kUniqueUserName);
 
-    // When intercom is accessible for non-admin user.
+    // When intercom is accessible for non-power user.
     setupAccessToResourceForUser(otherUser, intercom, true);
 
     // Then exactly one node with corresponding layout display text appears in the resource tree.
@@ -341,16 +341,16 @@ TEST_F(ResourceTreeModelTest, intercomLayoutNodeNotVisibleUnderUser)
     static constexpr auto kUniqueUserName = "unique_user_name";
     static constexpr auto kIntercomCameraName = "intercom_camera_name";
 
-    // When user with unique name and administrator permissions is added to the resource pool.
-    const auto admin = addUser("admin", GlobalPermission::adminPermissions);
+    // When user with unique name and power user permissions is added to the resource pool.
+    const auto powerUser = addUser("power_user", api::kPowerUsersGroupId);
 
     // When intercom camera is added to the resource pool.
-    const auto intercom = addIntercomCamera(kIntercomCameraName, admin->getId());
+    const auto intercom = addIntercomCamera(kIntercomCameraName, powerUser->getId());
 
     // When intercom layout is added to the resource pool.
     const auto layout = addIntercomLayout(kUniqueLayoutName, intercom->getId());
 
-    // When non-admin user is logged in.
+    // When non-power user is logged in.
     const auto otherUser = loginAsCustomUser(kUniqueUserName);
 
     // And intercom node doesn't appear in the resource tree.
@@ -368,13 +368,13 @@ TEST_F(ResourceTreeModelTest, intercomLayoutLayoutTypeCheck)
     static constexpr auto kIntercomCameraName = "intercom_camera_name";
 
     // When user is logged in.
-    const auto admin = loginAsAdmin("admin");
+    const auto powerUser = loginAsPowerUser("power_user");
 
     // When layout is created.
     const auto layout = addIntercomLayout(kUniqueLayoutName);
 
     // When user is added to the resource pool.
-    auto user = addUser(kUserName, nx::vms::api::GlobalPermission::adminPermissions);
+    auto user = addUser(kUserName, api::kPowerUsersGroupId);
 
     // When user is the layout parent.
     layout->setParentId(user->getId());
@@ -394,7 +394,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutLayoutTypeCheck)
     ASSERT_TRUE(!layout->isIntercomLayout());
 
     // When intercom camera is added to the resource pool.
-    const auto intercom = addIntercomCamera(kIntercomCameraName, admin->getId());
+    const auto intercom = addIntercomCamera(kIntercomCameraName, powerUser->getId());
 
     // When intercom is the layout parent.
     layout->setParentId(intercom->getId());

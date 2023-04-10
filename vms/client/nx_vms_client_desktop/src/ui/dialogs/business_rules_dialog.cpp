@@ -553,7 +553,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked()
 
 void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
 {
-    if (!accessController()->hasAdminPermissions())
+    if (!accessController()->hasPowerUserPermissions())
         return;
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
@@ -653,7 +653,7 @@ void QnBusinessRulesDialog::createActions() {
 
 bool QnBusinessRulesDialog::hasEditPermissions() const
 {
-    return accessController()->hasAdminPermissions();
+    return accessController()->hasPowerUserPermissions();
 }
 
 bool QnBusinessRulesDialog::hasChanges() const

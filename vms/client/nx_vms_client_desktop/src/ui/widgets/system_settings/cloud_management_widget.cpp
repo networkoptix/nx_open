@@ -126,9 +126,9 @@ void QnCloudManagementWidget::loadDataToUi()
         ui->stackedWidget->setCurrentWidget(ui->notLinkedPage);
     }
 
-    auto isOwner = context()->user() && context()->user()->isOwner();
-    ui->linkButton->setVisible(isOwner);
-    ui->unlinkButton->setVisible(isOwner);
+    const auto isAdministrator = context()->user() && context()->user()->isAdministrator();
+    ui->linkButton->setVisible(isAdministrator);
+    ui->unlinkButton->setVisible(isAdministrator);
 }
 
 void QnCloudManagementWidget::applyChanges()
@@ -156,8 +156,8 @@ void QnCloudManagementWidget::connectToCloud()
 
 void QnCloudManagementWidget::disconnectFromCloud()
 {
-    const bool isOwner = context()->user() && context()->user()->isOwner();
-    if (!NX_ASSERT(isOwner, "Button must be unavailable for non-owner"))
+    const bool isAdministrator = context()->user() && context()->user()->isAdministrator();
+    if (!NX_ASSERT(isAdministrator, "Button must be unavailable for non-administrator"))
         return;
 
     if (!confirmCloudDisconnect())

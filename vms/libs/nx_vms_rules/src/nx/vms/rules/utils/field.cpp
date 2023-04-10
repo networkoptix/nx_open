@@ -3,6 +3,7 @@
 #include "field.h"
 
 #include <nx/vms/api/data/user_group_data.h>
+#include <nx/utils/qt_helpers.h>
 
 #include "../action_builder_fields/extract_detail_field.h"
 #include "../action_builder_fields/optional_time_field.h"
@@ -104,7 +105,7 @@ FieldDescriptor makeTextFormatterFieldDescriptor(
 FieldDescriptor makeTargetUserFieldDescriptor(
     const QString& displayName,
     const QString& description,
-    bool isAvailableForAdminsByDefault)
+    bool isAvailableForPowerUsersByDefault)
 {
     return makeFieldDescriptor<TargetUserField>(
         utils::kUsersFieldName,
@@ -113,8 +114,8 @@ FieldDescriptor makeTargetUserFieldDescriptor(
         {
             {
                 "ids",
-                QVariant::fromValue(isAvailableForAdminsByDefault
-                    ? QnUuidSet{vms::api::kOwnersGroupId, vms::api::kAdministratorsGroupId}
+                QVariant::fromValue(isAvailableForPowerUsersByDefault
+                    ? nx::utils::toQSet(vms::api::kAllPowerUserGroupIds)
                     : QnUuidSet{})
             }
         });

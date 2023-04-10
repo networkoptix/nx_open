@@ -22,7 +22,7 @@ public:
     struct Permissions
     {
         Qn::Permissions permissions;
-        bool hasAdminPermissions = false;
+        bool hasPowerUserPermissions = false;
     };
 
 public:

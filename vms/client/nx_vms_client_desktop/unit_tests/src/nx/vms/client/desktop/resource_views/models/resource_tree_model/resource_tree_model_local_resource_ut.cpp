@@ -124,7 +124,7 @@ TEST_F(ResourceTreeModelTest, fileLayoutItemRemoves)
 TEST_F(ResourceTreeModelTest, mediaResourcesIcons)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When QnAviResource with certain unique image url is added to the resource pool.
     const auto imageResource = addLocalMedia(kUniqueImageUrl);
@@ -197,7 +197,7 @@ TEST_F(ResourceTreeModelTest, mediaResourcesAreChildrenOfCorrespondingTopLevelNo
 TEST_F(ResourceTreeModelTest, fileLayoutsAreChildrenOfCorrespondingTopLevelNodeWhenLoggedIn)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When both kinds of file layout resources with different unique urls are added to the
     // resource pool.
@@ -222,8 +222,8 @@ TEST_F(ResourceTreeModelTest, mediaResourceIsDisplayedToAnyUser)
     // When QnAviResource with certain unique image url is added to the resource pool.
     const auto imageResource = addLocalMedia(kUniqueImageUrl);
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the Resource Tree.
     ASSERT_TRUE(onlyOneMatches(displayFullMatch(imageResource->getName())));
@@ -241,7 +241,7 @@ TEST_F(ResourceTreeModelTest, mediaResourceIsDisplayedIfNotLoggedIn)
     const auto imageResource = addLocalMedia(kUniqueImageUrl);
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the Resource Tree.
     ASSERT_TRUE(onlyOneMatches(displayFullMatch(imageResource->getName())));
@@ -295,7 +295,7 @@ TEST_F(ResourceTreeModelTest, fileLayoutResourceHelpTopic)
 TEST_F(ResourceTreeModelTest, mediaResourceTooltip)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When QnAviResource with certain unique image url is added to the resource pool.
     const auto imageResource = addLocalMedia(kUniqueImageUrl);
@@ -313,8 +313,8 @@ TEST_F(ResourceTreeModelTest, mediaResourceItemIsAlwaysEditable)
     // When QnAviResource with certain unique image url is added to the resource pool.
     const auto imageResource = addLocalMedia(kUniqueImageUrl);
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the Resource Tree.
     // And that node is can be edited.
@@ -337,7 +337,7 @@ TEST_F(ResourceTreeModelTest, mediaResourceItemIsAlwaysEditable)
 TEST_F(ResourceTreeModelTest, mediaResourceItemIsDragEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When QnAviResource with certain unique image url is added to the resource pool.
     const auto imageResource = addLocalMedia(kUniqueImageUrl);
@@ -352,7 +352,7 @@ TEST_F(ResourceTreeModelTest, mediaResourceItemIsDragEnabled)
 TEST_F(ResourceTreeModelTest, mediaResourceHasItemNeverHasChildrenFlag)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When QnAviResource with certain unique image url is added to the resource pool.
     const auto imageResource = addLocalMedia(kUniqueImageUrl);
@@ -367,7 +367,7 @@ TEST_F(ResourceTreeModelTest, mediaResourceHasItemNeverHasChildrenFlag)
 TEST_F(ResourceTreeModelTest, mediaResourceItemIsNotDropEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When QnAviResource with certain unique image url is added to the resource pool.
     const auto imageResource = addLocalMedia(kUniqueImageUrl);
@@ -382,7 +382,7 @@ TEST_F(ResourceTreeModelTest, mediaResourceItemIsNotDropEnabled)
 TEST_F(ResourceTreeModelTest, offlineMediaResourcesAreNotDisplayed)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When different kind local resources with offline status are added to the resource pool.
     addLocalMedia(kUniqueImageUrl)->setStatus(nx::vms::api::ResourceStatus::offline);

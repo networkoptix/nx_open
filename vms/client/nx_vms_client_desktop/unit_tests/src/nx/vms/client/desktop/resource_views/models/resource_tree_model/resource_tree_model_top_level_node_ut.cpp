@@ -22,11 +22,11 @@ TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
 {
     // String constants.
     static constexpr auto kSystemName = "test_system";
-    static constexpr auto kUserName = "test_admin";
+    static constexpr auto kUserName = "test_power_user";
 
     // Set up environment.
     setSystemName(kSystemName);
-    loginAsAdmin(kUserName);
+    loginAsPowerUser(kUserName);
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
@@ -58,8 +58,8 @@ TEST_F(ResourceTreeModelTest, localFilesNodeVisibility)
     // There is no "Local Files" group node found in the tree.
     ASSERT_TRUE(noneMatches(localFilesNodeCondition()));
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then "Local Files" group node appears in the tree.
     ASSERT_TRUE(onlyOneMatches(localFilesNodeCondition()));
@@ -76,8 +76,8 @@ TEST_F(ResourceTreeModelTest, emptyIntegrationsNodeIsHiddenIfLoggedIn)
     if (!ini().webPagesAndIntegrations)
         return;
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then there is no "Integrations" node in the tree.
     ASSERT_TRUE(noneMatches(integrationsNodeCondition()));
@@ -97,8 +97,8 @@ TEST_F(ResourceTreeModelTest, emptyIntegrationsNodeIsHiddenIfLoggedIn)
 
 TEST_F(ResourceTreeModelTest, webPagesNodeAreAlwaysDisplayedIfLoggedIn)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then there is single "Web Pages" node in the tree with no children.
     ASSERT_TRUE(onlyOneMatches(webPagesNodeCondition()));
@@ -121,7 +121,7 @@ TEST_F(ResourceTreeModelTest, webPagesNodeAreAlwaysDisplayedIfLoggedIn)
 TEST_F(ResourceTreeModelTest, layoutsNodeAreDisplayedOnlyIfLayotsExist)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then there is no "Layouts" node in the tree.
     ASSERT_TRUE(noneMatches(layoutsNodeCondition()));
@@ -139,7 +139,7 @@ TEST_F(ResourceTreeModelTest, layoutsNodeAreDisplayedOnlyIfLayotsExist)
 TEST_F(ResourceTreeModelTest, showreelsNodeIsDisplayedOnlyIfShowreelsExist)
 {
     // When user is logged in.
-    const auto user = loginAsAdmin("admin");
+    const auto user = loginAsPowerUser("power_user");
 
     // Then there is no "Showreels" node in the tree.
     ASSERT_TRUE(noneMatches(showreelsNodeCondition()));
@@ -166,7 +166,7 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
 
     // Set up environment.
     setSystemName(kSystemName);
-    const auto user = loginAsOwner(kUserName);
+    const auto user = loginAsAdministrator(kUserName);
     const auto userId = user->getId();
     addServer(kServerName);
     addFakeServer(kFakeServerName);

@@ -525,7 +525,7 @@ static Result checkExistingResourceAccess(
     // System settings are stored as admin user properties
     if ((resourceId.isNull() || resourceId == QnUserResource::kAdminGuid)
         && userResource
-        && systemContext->resourceAccessManager()->hasAdminPermissions(userResource))
+        && systemContext->resourceAccessManager()->hasPowerUserPermissions(userResource))
     {
         return Result();
     }
@@ -763,16 +763,16 @@ struct SaveUserAccess
                 "Won't save new user with empty name.")));
         }
 
-        if (!existingUser && param.isOwner())
+        if (!existingUser && param.isAdministrator())
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                "Creating an owner user is not allowed.")));
+                "Creating an Administrator user is not allowed.")));
         }
 
         if (!nx::vms::common::allUserGroupsExist(systemContext, param.groupIds))
         {
             return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
-                "User Role does not exist.")));
+                "User Group does not exist.")));
         }
 
         if (param.type == nx::vms::api::UserType::cloud
@@ -844,7 +844,7 @@ void applyColumnFilter(
     SystemContext* systemContext, const Qn::UserAccessData& accessData, api::StorageData& data)
 {
     if (!hasSystemAccess(accessData)
-        && !systemContext->resourceAccessManager()->hasAdminPermissions(accessData))
+        && !systemContext->resourceAccessManager()->hasPowerUserPermissions(accessData))
     {
         data.url = QnStorageResource::urlWithoutCredentials(data.url);
     }
@@ -903,7 +903,7 @@ struct ReadResourceParamAccess
         const auto accessManager = systemContext->resourceAccessManager();
         if (accessData == Qn::kSystemAccess
             || accessData.access == Qn::UserAccessData::Access::ReadAllResources
-            || accessManager->hasAdminPermissions(accessData))
+            || accessManager->hasPowerUserPermissions(accessData))
         {
             return Result();
         }
@@ -986,11 +986,11 @@ struct ModifyResourceParamAccess
         }
 
         const auto accessManager = systemContext->resourceAccessManager();
-        const auto hasAdminPermissions = accessManager->hasAdminPermissions(accessData);
+        const auto hasPowerUserPermissions = accessManager->hasPowerUserPermissions(accessData);
 
         // System properties are stored in resource unrelated places and should be handled
         // differently.
-        if (hasAdminPermissions)
+        if (hasPowerUserPermissions)
         {
             // Null resource Id can not be handled by permissions engine, since there is no such resource.
             if (param.resourceId.isNull())
@@ -1039,7 +1039,7 @@ struct ModifyResourceParamAccess
             }
         }
 
-        if (isNewApiCompoundTransaction && hasAdminPermissions)
+        if (isNewApiCompoundTransaction && hasPowerUserPermissions)
             return Result();
 
         Qn::Permissions permissions = Qn::SavePermission;
@@ -1150,7 +1150,7 @@ struct ModifyCameraAttributesAccess
 
             if (param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)
             {
-                if (accessManager->hasAdminPermissions(accessData))
+                if (accessManager->hasPowerUserPermissions(accessData))
                     return Result();
             }
         }
@@ -1274,7 +1274,7 @@ struct ModifyServerAttributesAccess
         }
         else if (param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)
         {
-            if (accessManager->hasAdminPermissions(accessData))
+            if (accessManager->hasPowerUserPermissions(accessData))
                 return Result();
         }
 
@@ -1368,7 +1368,7 @@ struct AdminOnlyAccess
     Result operator()(
         SystemContext* systemContext, const Qn::UserAccessData& accessData, const Param&)
     {
-        return userHasGlobalAccess(systemContext, accessData, GlobalPermission::admin);
+        return userHasGlobalAccess(systemContext, accessData, GlobalPermission::powerUser);
     }
 };
 
@@ -1378,7 +1378,7 @@ struct AdminOnlyAccessOut
     RemotePeerAccess operator()(
         SystemContext* systemContext, const Qn::UserAccessData& accessData, const Param&)
     {
-        return userHasGlobalAccess(systemContext, accessData, GlobalPermission::admin)
+        return userHasGlobalAccess(systemContext, accessData, GlobalPermission::powerUser)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -1503,7 +1503,7 @@ struct ModifyAccessRightsChecker
         if (sharedResourceRights == param.resourceRights)
             return Result();
 
-        return systemContext->resourceAccessManager()->hasAdminPermissions(accessData)
+        return systemContext->resourceAccessManager()->hasPowerUserPermissions(accessData)
             ? Result()
             : Result(ErrorCode::forbidden, ServerApiErrors::tr("Admin permissions required."));
     }

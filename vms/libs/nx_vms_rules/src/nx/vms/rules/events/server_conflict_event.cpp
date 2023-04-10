@@ -70,7 +70,7 @@ const ItemDescriptor& ServerConflictEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ServerConflictEvent>(),
         .displayName = tr("Server Conflict"),
-        .permissions = {.globalPermission = GlobalPermission::admin},
+        .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/mediaserver_conflict.mustache"
     };
 

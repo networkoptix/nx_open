@@ -323,7 +323,7 @@ QVariant ResourceItem::resourceExtraInfoData() const
             if (auto userResource = m_resource.objectCast<QnUserResource>())
             {
                 m_connectionsGuard.add(userResource->connect(userResource.get(),
-                    &QnUserResource::userRolesChanged, discardExtraInfo));
+                    &QnUserResource::userGroupsChanged, discardExtraInfo));
 
                 m_connectionsGuard.add(userResource->connect(userResource.get(),
                     &QnUserResource::permissionsChanged, discardExtraInfo));

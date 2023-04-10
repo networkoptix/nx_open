@@ -19,7 +19,7 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
     const QnLayoutResourcePtr& layout,
     const QnResourceList& removedResources) const
 {
-    if (!NX_ASSERT(accessController()->user()) || accessController()->hasAdminPermissions())
+    if (!NX_ASSERT(accessController()->user()) || accessController()->hasPowerUserPermissions())
         return true;
 
     const auto videowall = layout->getParentResource().objectCast<QnVideoWallResource>();

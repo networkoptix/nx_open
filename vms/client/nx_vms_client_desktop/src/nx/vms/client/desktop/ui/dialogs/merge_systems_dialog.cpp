@@ -182,7 +182,7 @@ void MergeSystemsDialog::at_urlComboBox_editingFinished()
 
 void MergeSystemsDialog::at_testConnectionButton_clicked()
 {
-    if (!NX_ASSERT(context()->user()->isOwner()))
+    if (!NX_ASSERT(context()->user()->isAdministrator()))
         return;
 
     m_mergeContextId = QnUuid();

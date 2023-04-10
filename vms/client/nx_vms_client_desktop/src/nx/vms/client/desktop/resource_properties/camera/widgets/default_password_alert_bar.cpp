@@ -74,7 +74,7 @@ void DefaultPasswordAlertBar::updateState()
     static const auto kAskAdministratorText = ' ' +
         tr("Ask your system administrator to do it.");
 
-    const bool hasAdminAccess = accessController()->hasAdminPermissions();
+    const bool hasAdminAccess = accessController()->hasPowerUserPermissions();
     const auto suffix = hasAdminAccess ? QString() : kAskAdministratorText;
     if (m_cameras.empty())
         setText(QString());

@@ -46,7 +46,7 @@ void PermissionConverter::extractFromResourceAccessRights(
     GlobalPermissions* permissions,
     std::optional<std::vector<QnUuid>>* accessibleResources)
 {
-    if (permissions->testFlag(GlobalPermission::admin))
+    if (permissions->testFlag(GlobalPermission::powerUser))
         return;
 
     auto accessRights =

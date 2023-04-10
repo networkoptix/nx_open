@@ -148,9 +148,9 @@ bool QnWorkbenchAccessController::anyResourceHasPermissions(
         });
 }
 
-bool QnWorkbenchAccessController::hasAdminPermissions() const
+bool QnWorkbenchAccessController::hasPowerUserPermissions() const
 {
-    return hasGlobalPermission(GlobalPermission::admin);
+    return hasGlobalPermission(GlobalPermission::powerUser);
 }
 
 GlobalPermissions QnWorkbenchAccessController::globalPermissions() const
@@ -275,7 +275,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
             if (user->isCloud())
                 permissions = permissions & ~Qn::WriteDigestPermission;
 
-            return hasGlobalPermission(GlobalPermission::admin) ? permissions : Qn::NoPermissions;
+            return hasGlobalPermission(GlobalPermission::powerUser) ? permissions : Qn::NoPermissions;
         }
     }
 

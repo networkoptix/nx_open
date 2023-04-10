@@ -428,29 +428,29 @@ TEST_F(InheritedResourceAccessResolverTest, inheritedDesktopCameraAccessViaVideo
 
 TEST_F(InheritedResourceAccessResolverTest, inheritedAdminAccessRights)
 {
-    auto group = createUserGroup(GlobalPermission::admin);
-    subjects->setId("Admin Group", group.id);
-    subjects->addOrUpdate("Group 2", {"Group 1", "Admin Group"});
+    auto group = createUserGroup(GlobalPermission::powerUser);
+    subjects->setId("Power User Group", group.id);
+    subjects->addOrUpdate("Group 2", {"Group 1", "Power User Group"});
 
-    ASSERT_FALSE(resolver->hasAdminAccessRights(subjects->id("Group 1")));
-    ASSERT_TRUE(resolver->hasAdminAccessRights(subjects->id("Admin Group")));
-    ASSERT_TRUE(resolver->hasAdminAccessRights(subjects->id("Group 2")));
-    ASSERT_FALSE(resolver->hasAdminAccessRights(subjects->id("Group 3")));
-    ASSERT_TRUE(resolver->hasAdminAccessRights(subjects->id("User 1")));
-    ASSERT_FALSE(resolver->hasAdminAccessRights(subjects->id("User 2")));
+    ASSERT_FALSE(resolver->hasFullAccessRights(subjects->id("Group 1")));
+    ASSERT_TRUE(resolver->hasFullAccessRights(subjects->id("Power User Group")));
+    ASSERT_TRUE(resolver->hasFullAccessRights(subjects->id("Group 2")));
+    ASSERT_FALSE(resolver->hasFullAccessRights(subjects->id("Group 3")));
+    ASSERT_TRUE(resolver->hasFullAccessRights(subjects->id("User 1")));
+    ASSERT_FALSE(resolver->hasFullAccessRights(subjects->id("User 2")));
 
     auto camera = addCamera();
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 1"), camera), AccessRights());
-    ASSERT_EQ(resolver->accessRights(subjects->id("Admin Group"), camera), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(subjects->id("Power User Group"), camera), kFullAccessRights);
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 2"), camera), kFullAccessRights);
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 3"), camera), AccessRights());
     ASSERT_EQ(resolver->accessRights(subjects->id("User 1"), camera), kFullAccessRights);
     ASSERT_EQ(resolver->accessRights(subjects->id("User 2"), camera), AccessRights());
 
-    auto user = addUser(kAdministratorsGroupId);
+    auto user = addUser(kPowerUsersGroupId);
     auto desktopCamera = addDesktopCamera(user);
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 1"), desktopCamera), AccessRights());
-    ASSERT_EQ(resolver->accessRights(subjects->id("Admin Group"), desktopCamera), AccessRights());
+    ASSERT_EQ(resolver->accessRights(subjects->id("Power User Group"), desktopCamera), AccessRights());
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 2"), desktopCamera), AccessRights());
     ASSERT_EQ(resolver->accessRights(subjects->id("Group 3"), desktopCamera), AccessRights());
     ASSERT_EQ(resolver->accessRights(subjects->id("User 1"), desktopCamera), AccessRights());

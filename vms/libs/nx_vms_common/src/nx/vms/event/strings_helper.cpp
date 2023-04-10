@@ -1026,8 +1026,8 @@ QString StringsHelper::actionSubjects(
     for (const auto& group: groups)
         groupIds.insert(group.id);
 
-    if (groupIds == kAdminGroupIds)
-        return tr("All Administrators");
+    if (groupIds == kAllPowerUserGroupIds)
+        return tr("All Power Users");
 
     return tr("%n Groups", "", groups.size());
 }

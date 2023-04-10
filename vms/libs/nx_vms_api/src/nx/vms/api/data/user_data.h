@@ -72,8 +72,8 @@ struct NX_VMS_API UserData: ResourceData
     /**%apidoc[opt] List of groups to inherit permissions. */
     std::vector<QnUuid> groupIds;
 
-    /** Checks if this user is a member of the owner group. */
-    bool isOwner() const;
+    /** Checks if this user is a member of the Administrators group. */
+    bool isAdministrator() const;
 
     /**%apidoc[readonly] External identification data (currently used for LDAP only). */
     UserExternalId externalId;

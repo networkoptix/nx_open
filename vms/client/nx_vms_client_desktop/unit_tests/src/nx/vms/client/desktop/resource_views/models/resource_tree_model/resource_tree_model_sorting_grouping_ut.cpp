@@ -84,7 +84,7 @@ const auto kServerMonitorCondition = iconTypeMatch(QnResourceIconCache::HealthMo
 
 TEST_F(ResourceTreeModelSortingGroupingTest, compatibleServersSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Compatible Servers under "Servers" node
     // should be sorted alphanumerically and case-insensitive.
@@ -93,7 +93,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, compatibleServersSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, incompatibleServersSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Incompatible Servers under "Servers" node
     // should be sorted alphanumerically and case-insensitive.
@@ -102,7 +102,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, incompatibleServersSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, serversGrouping)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Check that "Servers" children are grouped exactly in the following order:
     // 1. Compatible Servers
@@ -112,7 +112,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, serversGrouping)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, webPagesSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Children of "Web Pages" node should be sorted alphanumerically and case-insensitive.
     ASSERT_TRUE(sortingIsAlphanumericCaseInsensitive(directChildOf(webPagesNodeCondition())));
@@ -123,7 +123,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, integrationsSorting)
     if (!ini().webPagesAndIntegrations)
         return;
 
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Children of "Web Pages" node should be sorted alphanumerically and case-insensitive.
     ASSERT_TRUE(sortingIsAlphanumericCaseInsensitive(directChildOf(integrationsNodeCondition())));
@@ -131,7 +131,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, integrationsSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, showreelsSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Children of "Showreels" node should be sorted alphanumerically and case-insensitive.
     ASSERT_TRUE(sortingIsAlphanumericCaseInsensitive(directChildOf(showreelsNodeCondition())));
@@ -139,7 +139,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, showreelsSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, fileLayoutsSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // File Layouts under "Local Resources" node
     // should be sorted alphanumerically and case-insensitive.
@@ -148,7 +148,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, fileLayoutsSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, localVideosSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Local video items under "Local Resources" node
     // should be sorted alphanumerically and case-insensitive.
@@ -157,7 +157,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, localVideosSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, localImagesSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Local image items under "Local Resources" node
     // should be sorted alphanumerically and case-insensitive.
@@ -166,7 +166,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, localImagesSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, localResourcesGrouping)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Check that "Local Resources" children are grouped exactly in the following order:
     // 1. File Layouts
@@ -180,7 +180,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, localResourcesGrouping)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, layoutsSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Non-shared Layouts under "Layouts" node
     // should be sorted alphanumerically and case-insensitive.
@@ -189,7 +189,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, layoutsSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, sharedLayoutsSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Shared Layouts under "Layouts" node
     // should be sorted alphanumerically and case-insensitive.
@@ -198,7 +198,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, sharedLayoutsSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, layoutsGrouping)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Check that "Layouts" children are grouped exactly in the following order:
     // 1. Shared Layouts
@@ -208,7 +208,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, layoutsGrouping)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, videoWallsSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Video Walls should be sorted alphanumerically and case-insensitive.
     ASSERT_TRUE(sortingIsAlphanumericCaseInsensitive(videoWallNodeCondition()));
@@ -216,7 +216,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, videoWallsSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, videoWallScreensSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Video Wall node.
     const auto videoWallIndex =
@@ -231,7 +231,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, videoWallScreensSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, videoWallMatricesSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Video Wall node.
     const auto videoWallIndex =
@@ -246,7 +246,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, videoWallMatricesSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, videoWallChildrenGrouping)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Video Wall node.
     const auto videoWallIndex =
@@ -270,7 +270,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, videoWallChildrenGrouping)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, serverCamerasIoModulesVirtualCamerasSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Server.
     const auto serverIndex = firstMatchingIndex(allOf(kCompatibleServerCondition, hasChildren()));
@@ -288,7 +288,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, serverCamerasIoModulesVirtualCamera
 
 TEST_F(ResourceTreeModelSortingGroupingTest, serverRecordersMultisensorCamerasSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Server.
     const auto serverIndex = firstMatchingIndex(allOf(kCompatibleServerCondition, hasChildren()));
@@ -308,7 +308,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, proxiedWebResourcesSorting)
     if (ini().webPagesAndIntegrations)
         return;
 
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Server.
     const auto serverIndex = firstMatchingIndex(allOf(kCompatibleServerCondition, hasChildren()));
@@ -325,7 +325,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, proxiedWebResourcesSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, serverChildrenGrouping)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Server.
     const auto serverIndex = firstMatchingIndex(allOf(kCompatibleServerCondition, hasChildren()));
@@ -369,7 +369,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, serverChildrenGrouping)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, layoutItemsSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Layout.
     const auto layoutIndex = firstMatchingIndex(allOf(kLayoutCondition, hasChildren()));
@@ -391,7 +391,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, layoutItemsSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, layoutServerMonitorsSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Layout.
     const auto layoutIndex = firstMatchingIndex(allOf(kLayoutCondition, hasChildren()));
@@ -408,7 +408,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, layoutServerMonitorsSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, layoutWebPagesSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Layout.
     const auto layoutIndex = firstMatchingIndex(allOf(kLayoutCondition, hasChildren()));
@@ -428,7 +428,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, layoutIntegrationsSorting)
     if (!ini().webPagesAndIntegrations)
         return;
 
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Layout.
     const auto layoutIndex = firstMatchingIndex(allOf(kLayoutCondition, hasChildren()));
@@ -445,7 +445,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, layoutIntegrationsSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, layoutChildrenGrouping)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some non-empty Layout.
     const auto layoutIndex = firstMatchingIndex(allOf(kLayoutCondition, hasChildren()));
@@ -518,7 +518,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, layoutChildrenGrouping)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, multisensorCameraChildrenSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some Multisensor Camera.
     const auto multisensorCameraIndex = firstMatchingIndex(kMulisensorCameraCondition);
@@ -535,7 +535,7 @@ TEST_F(ResourceTreeModelSortingGroupingTest, multisensorCameraChildrenSorting)
 
 TEST_F(ResourceTreeModelSortingGroupingTest, recorderChildrenSorting)
 {
-    // When user with administrator permissions is logged in.
+    // When user with power user permissions is logged in.
 
     // Get index of some Recorder.
     const auto recorderIndex = firstMatchingIndex(kRecorderCondition);

@@ -278,7 +278,7 @@
          <item>
           <widget class="QCheckBox" name="showServersInTreeCheckBox">
            <property name="text">
-            <string>Display servers in tree for non-administrator users</string>
+            <string>Display servers in tree for non-power users</string>
            </property>
           </widget>
          </item>

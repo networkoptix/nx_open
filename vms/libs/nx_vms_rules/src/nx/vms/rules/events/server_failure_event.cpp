@@ -73,7 +73,7 @@ const ItemDescriptor& ServerFailureEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ServerFailureEvent>(),
         .displayName = tr("Server Failure"),
-        .permissions = {.globalPermission = GlobalPermission::admin},
+        .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/mediaserver_failure.mustache"
     };
     return kDescriptor;

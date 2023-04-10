@@ -45,7 +45,7 @@ const ItemDescriptor& ServerCertificateErrorEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ServerCertificateErrorEvent>(),
         .displayName = tr("Server Certificate Error"),
-        .permissions = {.globalPermission = GlobalPermission::admin},
+        .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/server_certificate_error.mustache"
     };
     return kDescriptor;

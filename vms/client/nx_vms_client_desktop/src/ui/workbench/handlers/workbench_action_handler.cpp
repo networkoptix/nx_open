@@ -1249,7 +1249,7 @@ void ActionHandler::moveResourcesToServer(
     const auto webPages = resources.filtered<QnWebPageResource>();
 
     // Only admin can move webpages.
-    if (webPages.count() > 0 && !accessController()->hasAdminPermissions())
+    if (webPages.count() > 0 && !accessController()->hasPowerUserPermissions())
     {
         resultCallback({});
         return;

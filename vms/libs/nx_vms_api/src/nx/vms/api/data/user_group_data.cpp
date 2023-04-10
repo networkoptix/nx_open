@@ -36,8 +36,8 @@ QString UserGroupData::toString() const
     return QJson::serialized(*this);
 }
 
-const QnUuid kOwnersGroupId{"00000000-0000-0000-0000-100000000000"};
-const QnUuid kAdministratorsGroupId{"00000000-0000-0000-0000-100000000001"};
+const QnUuid kAdministratorsGroupId{"00000000-0000-0000-0000-100000000000"};
+const QnUuid kPowerUsersGroupId{"00000000-0000-0000-0000-100000000001"};
 const QnUuid kAdvancedViewersGroupId{"00000000-0000-0000-0000-100000000002"};
 const QnUuid kViewersGroupId{"00000000-0000-0000-0000-100000000003"};
 const QnUuid kLiveViewersGroupId{"00000000-0000-0000-0000-100000000004"};
@@ -45,15 +45,15 @@ const QnUuid kLiveViewersGroupId{"00000000-0000-0000-0000-100000000004"};
 const QnUuid kDefaultLdapGroupId{"00000000-0000-0000-0000-100100000000"};
 
 const std::set<QnUuid> kPredefinedGroupIds{
-    kOwnersGroupId,
     kAdministratorsGroupId,
+    kPowerUsersGroupId,
     kAdvancedViewersGroupId,
     kViewersGroupId,
     kLiveViewersGroupId };
 
-const std::set<QnUuid> kAdminGroupIds{
-    kOwnersGroupId,
-    kAdministratorsGroupId};
+const std::set<QnUuid> kAllPowerUserGroupIds{
+    kAdministratorsGroupId,
+    kPowerUsersGroupId};
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     UserGroupData, (ubjson)(json)(xml)(sql_record)(csv_record), UserRoleData_Fields)

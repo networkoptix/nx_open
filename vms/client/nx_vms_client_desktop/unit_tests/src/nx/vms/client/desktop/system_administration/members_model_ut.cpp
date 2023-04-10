@@ -40,8 +40,8 @@ public:
         // "user3",
         // "user4",
         // "user5",
-        // "Owners",
         // "Administrators",
+        // "Power Users",
         // "Advanced Viewers",
         // "Viewers",
         // "Live Viewers",
@@ -78,7 +78,7 @@ public:
         // "    group5",
         // "group5",
 
-        m_admin = addUser("admin", {api::kOwnersGroupId});
+        m_admin = addUser("admin", {api::kAdministratorsGroupId});
         const auto admin =
             systemContext()->resourcePool()->getResourceById<QnUserResource>(m_admin);
 
@@ -246,8 +246,8 @@ TEST_F(MembersModelTest, prerequisiteCheckPredefinedGroupNames)
 {
     using nx::vms::common::PredefinedUserGroups;
 
-    ASSERT_EQ(PredefinedUserGroups::find(api::kOwnersGroupId)->name, "Owners");
     ASSERT_EQ(PredefinedUserGroups::find(api::kAdministratorsGroupId)->name, "Administrators");
+    ASSERT_EQ(PredefinedUserGroups::find(api::kPowerUsersGroupId)->name, "Power Users");
     ASSERT_EQ(PredefinedUserGroups::find(api::kAdvancedViewersGroupId)->name, "Advanced Viewers");
     ASSERT_EQ(PredefinedUserGroups::find(api::kViewersGroupId)->name, "Viewers");
     ASSERT_EQ(PredefinedUserGroups::find(api::kLiveViewersGroupId)->name, "Live Viewers");
@@ -398,8 +398,8 @@ TEST_F(MembersModelTest, allowedParents)
     m_model->setGroupId(m_group2);
 
     static const QStringList kAllowedParents = {
-        "Owners",
         "Administrators",
+        "Power Users",
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
@@ -483,8 +483,8 @@ TEST_F(MembersModelTest, removeUserResource)
         "user2",
         "user3",
         "user4",
-        "Owners",
         "Administrators",
+        "Power Users",
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
@@ -528,8 +528,8 @@ TEST_F(MembersModelTest, addUserResource)
         "user3",
         "user4",
         "user5",
-        "Owners",
         "Administrators",
+        "Power Users",
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
@@ -576,8 +576,8 @@ TEST_F(MembersModelTest, addGroup)
         "user3",
         "user4",
         "user5",
-        "Owners",
         "Administrators",
+        "Power Users",
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
@@ -623,8 +623,8 @@ TEST_F(MembersModelTest, removeGroup)
         "user3",
         "user4",
         "user5",
-        "Owners",
         "Administrators",
+        "Power Users",
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
@@ -664,8 +664,8 @@ TEST_F(MembersModelTest, renameGroup)
         "user3",
         "user4",
         "user5",
-        "Owners",
         "Administrators",
+        "Power Users",
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
@@ -709,8 +709,8 @@ TEST_F(MembersModelTest, renameUser)
         "user2",
         "user4",
         "user5",
-        "Owners",
         "Administrators",
+        "Power Users",
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",

@@ -51,8 +51,8 @@ ResourceAccessMap OwnResourceAccessResolver::resourceAccessMap(const QnUuid& sub
     if (!NX_ASSERT(d->accessRightsManager))
         return {};
 
-    if (hasAdminAccessRights(subjectId))
-        return kAdminResourceAccessMap;
+    if (hasFullAccessRights(subjectId))
+        return kFullResourceAccessMap;
 
     return d->accessRightsManager->ownResourceAccessMap(subjectId);
 }

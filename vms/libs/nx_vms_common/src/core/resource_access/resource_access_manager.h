@@ -46,8 +46,8 @@ public:
         QObject* parent = nullptr);
 
     // Helper functions to avoid direct GlobalPermissions checking.
-    bool hasAdminPermissions(const Qn::UserAccessData& accessData) const;
-    bool hasAdminPermissions(const QnResourceAccessSubject& subject) const;
+    bool hasPowerUserPermissions(const Qn::UserAccessData& accessData) const;
+    bool hasPowerUserPermissions(const QnResourceAccessSubject& subject) const;
 
     // TODO: #vkutin
     // Think whether we need these two versions or one `accessRights(subject, resourceOrGroupId)`
@@ -184,7 +184,7 @@ public:
         else if constexpr (std::is_same_v<ApiDataType, WebPageData>)
             return canCreateWebPage(subject, data);
         else
-            return hasGlobalPermission(subject, GlobalPermission::admin);
+            return hasGlobalPermission(subject, GlobalPermission::powerUser);
     }
 
     template <typename ResourceSharedPointer, typename ApiDataType>

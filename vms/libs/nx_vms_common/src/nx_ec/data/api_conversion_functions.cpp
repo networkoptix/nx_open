@@ -567,12 +567,10 @@ void fromApiToResource(const UserData& src, QnUserResourcePtr& dst, bool setPass
 
     fromApiToResource(static_cast<const ResourceData&>(src), dst.data());
 
-    dst->setOwner(src.isOwner());
     dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
     dst->setGroupIds(src.groupIds);
     dst->setFullName(src.fullName);
-
     dst->setRawPermissions(src.permissions);
 
     if (setPasswordHashes)

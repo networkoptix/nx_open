@@ -14,7 +14,7 @@ using namespace nx::vms::api;
 
 namespace nx::core::access {
 
-ResourceAccessMap kAdminResourceAccessMap{
+ResourceAccessMap kFullResourceAccessMap{
     {kAllDevicesGroupId, kFullAccessRights},
     {kAllWebPagesGroupId, kViewAccessRights},
     {kAllServersGroupId, kViewAccessRights},

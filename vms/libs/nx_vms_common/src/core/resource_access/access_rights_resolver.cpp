@@ -104,9 +104,9 @@ nx::vms::api::AccessRights AccessRightsResolver::availableAccessRights(
     return d->inheritedResourceAccessResolver->availableAccessRights(subjectId);
 }
 
-bool AccessRightsResolver::hasAdminAccessRights(const QnUuid& subjectId) const
+bool AccessRightsResolver::hasFullAccessRights(const QnUuid& subjectId) const
 {
-    return d->inheritedResourceAccessResolver->hasAdminAccessRights(subjectId);
+    return d->inheritedResourceAccessResolver->hasFullAccessRights(subjectId);
 }
 
 ResourceAccessDetails AccessRightsResolver::accessDetails(

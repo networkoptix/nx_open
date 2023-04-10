@@ -68,7 +68,7 @@ public:
     nx::vms::api::AccessRights availableAccessRights(const QnUuid& subjectId) const;
 
     /** Returns whether the subject has admin access rights. */
-    bool hasAdminAccessRights(const QnUuid& subjectId) const;
+    bool hasFullAccessRights(const QnUuid& subjectId) const;
 
     /**
      * Returns all ways in which the specified subject gains specified access right to

@@ -100,7 +100,7 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
             utils::makeStateFieldDescriptor(tr("State")),
             makeFieldDescriptor<SourceServerField>(utils::kServerIdFieldName, tr("Server")),
         },
-        .permissions = {.globalPermission = GlobalPermission::admin},
+        .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/poe_over_budget.mustache"
     };
     return kDescriptor;

@@ -50,7 +50,7 @@ static const auto kServer2NameCondition = displayFullMatch(kServer2Name);
 TEST_P(ResourceTreeModelTest, webPageAdds)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When web page with certain unique name is added to the resource pool.
     auto webPage = addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
@@ -62,7 +62,7 @@ TEST_P(ResourceTreeModelTest, webPageAdds)
 TEST_P(ResourceTreeModelTest, webPageRemoves)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When web page with certain unique name is added to the resource pool.
     auto webPage = addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
@@ -84,7 +84,7 @@ TEST_F(ResourceTreeModelTest, webPageIconTypes)
     static constexpr auto kClientApiWebPageName = "client_api_web_page_name";
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When web page with unique name and WebPageSubtype::none subtype added to the resource pool.
     const auto regularWebPage = addWebPage(kRegularWebPageName, WebPageSubtype::none);
@@ -116,7 +116,7 @@ TEST_F(ResourceTreeModelTest, webPageIconTypes)
 TEST_P(ResourceTreeModelTest, webPageIsChildOfCorrespondingTopLevelNode)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When web page with certain unique name is added to the resource pool.
     auto webPage = addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
@@ -141,8 +141,8 @@ TEST_P(ResourceTreeModelTest, webPageIsDisplayedToAnyUser)
     // When web page with certain unique name is added to the resource pool.
     addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(displayFullMatch(kUniqueWebPageName)));
@@ -160,7 +160,7 @@ TEST_P(ResourceTreeModelTest, webPageIsNotDisplayedIfNotLoggedIn)
     addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(displayFullMatch(kUniqueWebPageName)));
@@ -178,7 +178,7 @@ TEST_P(ResourceTreeModelTest, webPageIsNotDisplayedIfNotLoggedIn)
 TEST_P(ResourceTreeModelTest, webPageHelpTopic)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When web page with certain unique name is added to the resource pool.
     addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
@@ -193,7 +193,7 @@ TEST_P(ResourceTreeModelTest, webPageHelpTopic)
 TEST_P(ResourceTreeModelTest, webPageTooltip)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When web page with certain unique name is added to the resource pool.
     addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
@@ -211,7 +211,7 @@ TEST_P(ResourceTreeModelTest, webPageDisplayNameMapping)
     auto webPage = addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto webPageIndex = uniqueMatchingIndex(kUniqueWebPageNameCondition);
@@ -225,8 +225,8 @@ TEST_P(ResourceTreeModelTest, webPageItemIsEditableOnlyByAdmin)
     // When web page with certain unique name is added to the resource pool.
     addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     // And that node is can be edited.
@@ -251,8 +251,8 @@ TEST_P(ResourceTreeModelTest, webPageExtraInfoIsVisibleOnlyForAdmin)
     // When proxied web resource with certain unique name is added to the resource pool.
     addProxiedWebPage(kUniqueWebPageName, /*subtype*/ GetParam(), server->getId());
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text and extra info appears in the resource
     // tree.
@@ -269,7 +269,7 @@ TEST_P(ResourceTreeModelTest, webPageExtraInfoIsVisibleOnlyForAdmin)
 TEST_P(ResourceTreeModelTest, webPageItemIsDragEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When web page with certain unique name is added to the resource pool.
     addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
@@ -284,7 +284,7 @@ TEST_P(ResourceTreeModelTest, webPageItemIsDragEnabled)
 TEST_P(ResourceTreeModelTest, webPageHasItemNeverHasChildrenFlag)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When web page with certain unique name is added to the resource pool.
     addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
@@ -299,7 +299,7 @@ TEST_P(ResourceTreeModelTest, webPageHasItemNeverHasChildrenFlag)
 TEST_P(ResourceTreeModelTest, webPageItemIsNotDropEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When web page with certain unique name is added to the resource pool.
     addWebPage(kUniqueWebPageName, /*subtype*/ GetParam());
@@ -314,7 +314,7 @@ TEST_P(ResourceTreeModelTest, webPageItemIsNotDropEnabled)
 TEST_P(ResourceTreeModelTest, webPageEnableProxyThroughServer)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When single server resource with certain unique name is added to the resource pool.
     const auto server = addServer(kUniqueServerName);
@@ -345,7 +345,7 @@ TEST_P(ResourceTreeModelTest, webPageEnableProxyThroughServer)
 TEST_P(ResourceTreeModelTest, webPageDisableProxy)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When single server resource with certain unique name is added to the resource pool.
     const auto server = addServer(kUniqueServerName);
@@ -385,7 +385,7 @@ TEST_P(ResourceTreeModelTest, webPageMovesBetweenServers)
         addProxiedWebPage(kUniqueWebPageName, /*subtype*/ GetParam(), server1->getId());
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // Then there is exactly one web page in the Resource Tree and that node is a child of server 1.
     auto webPageIndex = uniqueMatchingIndex(kUniqueWebPageNameCondition);

@@ -20,7 +20,7 @@ using ResourceAccessMap = QHash<QnUuid /*resourceId*/, AccessRights>;
 NX_VMS_COMMON_API ResourceAccessMap& operator+=(
     ResourceAccessMap& destination, const ResourceAccessMap& source);
 
-extern NX_VMS_COMMON_API ResourceAccessMap kAdminResourceAccessMap;
+extern NX_VMS_COMMON_API ResourceAccessMap kFullResourceAccessMap;
 
 NX_VMS_COMMON_API QString toString(const ResourceAccessMap& accessMap,
     QnResourcePool* resourcePool = nullptr, bool multiLine = false);

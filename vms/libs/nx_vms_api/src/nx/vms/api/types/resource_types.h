@@ -225,7 +225,7 @@ constexpr auto nxReflectVisitAllEnumItems(CameraBackupQuality*, Visitor&& visito
 // TODO: #rvasilenko Write comments.
 /**
  * ATTENTION: When removing unneeded Server Flags, their constants must be renamed to
- * SF_Obsolete_... instead of being deleted, and a manual deserialization code must be added to_char_type
+ * SF_Obsolete_... instead of being deleted, and a manual deserialization code must be added to
  * be able to deserialize the flag from its original name - this is needed to make new Clients,
  * including a Mobile Client, compatible with the old Servers which may produce these flags.
  */
@@ -276,7 +276,7 @@ enum ServerFlag
     /**%apidoc Server has a buzzer that can produce sound. */
     SF_HasBuzzer = 0x10000000,
 
-    SF_OwnerApiForAdmins = 0x20000000,
+    SF_AdminApiForPowerUsers = 0x20000000,
 };
 Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
@@ -303,7 +303,10 @@ constexpr auto nxReflectVisitAllEnumItems(ServerFlag*, Visitor&& visitor)
         Item{ServerFlag::SF_HasPoeManagementCapability, "SF_HasPoeManagementCapability"},
         Item{ServerFlag::SF_HasFanMonitoringCapability, "SF_HasFanMonitoringCapability"},
         Item{ServerFlag::SF_HasBuzzer, "SF_HasBuzzer"},
-        Item{ServerFlag::SF_OwnerApiForAdmins, "SF_OwnerApiForAdmins"}
+        // For compatibility with existing APIs we should serialize this value to
+        // "SF_OwnerApiForAdmins" by default.
+        Item{ServerFlag::SF_AdminApiForPowerUsers, "SF_OwnerApiForAdmins"},
+        Item{ServerFlag::SF_AdminApiForPowerUsers, "SF_AdminApiForPowerUsers"}
     );
 }
 

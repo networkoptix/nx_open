@@ -68,9 +68,9 @@ protected:
         m_currentUser.clear();
     }
 
-    void loginAsOwner()
+    void loginAsAdministrator()
     {
-        loginAs(kOwnersGroupId);
+        loginAs(kAdministratorsGroupId);
     }
 
     void loginAsCustom()
@@ -82,7 +82,7 @@ protected:
     {
         logout();
         auto user = addUser(groupIds);
-        ASSERT_EQ(user->isOwner(), (groupIds.data == std::vector<QnUuid>{kOwnersGroupId}));
+        ASSERT_EQ(user->isAdministrator(), (groupIds.data == std::vector<QnUuid>{kAdministratorsGroupId}));
         m_currentUser = user;
     }
 
@@ -144,12 +144,12 @@ protected:
         checkCanModifyUserDigestAuthorizationEnabled(source, m_currentUser, allowed);
     }
 
-    void checkCanGrantUserAdminPermissions(
+    void checkCanGrantPowerUserPermissions(
         const QnUserResourcePtr& source, QnUserResourcePtr target, bool allowed)
     {
         UserData data;
         ec2::fromResourceToApi(target, data);
-        data.permissions = target->getRawPermissions() | GlobalPermission::admin;
+        data.permissions = target->getRawPermissions() | GlobalPermission::powerUser;
 
         auto info = nx::format("check: %1 -> %2 (direct)", source->getName(), target->getName())
             .toStdString();
@@ -160,13 +160,13 @@ protected:
             ASSERT_FALSE(resourceAccessManager()->canModifyUser(source, target, data)) << info;
     }
 
-    void checkCanGrantUserAdminPermissionsViaInheritance(const QnUserResourcePtr& source,
-        QnUserResourcePtr target, const QnUuid& adminGroupId, bool allowed)
+    void checkCanGrantPowerUserPermissionsViaInheritance(const QnUserResourcePtr& source,
+        QnUserResourcePtr target, const QnUuid& powerUserGroupId, bool allowed)
     {
         UserData data;
         ec2::fromResourceToApi(target, data);
         data.groupIds = target->groupIds();
-        data.groupIds.push_back(adminGroupId);
+        data.groupIds.push_back(powerUserGroupId);
 
         auto info = nx::format("check: %1 -> %2 (inheritance)", source->getName(), target->getName())
             .toStdString();
@@ -181,13 +181,13 @@ protected:
 };
 
 /************************************************************************/
-/* Checking layouts as admin                                            */
+/* Checking layouts as Power User                                       */
 /************************************************************************/
 
-/** Check permissions for common layout when the user is logged in as admin. */
-TEST_F(ResourceAccessManagerTest, checkLayoutAsAdmin)
+/** Check permissions for common layout when the user is logged in as Power User. */
+TEST_F(ResourceAccessManagerTest, checkLayoutAsPowerUser)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
 
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
@@ -198,10 +198,10 @@ TEST_F(ResourceAccessManagerTest, checkLayoutAsAdmin)
     checkPermissions(layout, desired, forbidden);
 }
 
-/** Check permissions for locked common layout when the user is logged in as admin. */
-TEST_F(ResourceAccessManagerTest, checkLockedLayoutAsAdmin)
+/** Check permissions for locked common layout when the user is logged in as Power User. */
+TEST_F(ResourceAccessManagerTest, checkLockedLayoutAsPowerUser)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
 
     auto layout = createLayout(Qn::remote, true);
     resourcePool()->addResource(layout);
@@ -280,10 +280,10 @@ TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsViewer)
     checkPermissions(layout, desired, forbidden);
 }
 
-/** Check permissions for another viewer's layout when the user is logged in as admin. */
-TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsAdmin)
+/** Check permissions for another viewer's layout when the user is logged in as Power User. */
+TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsPowerUser)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
 
     auto anotherUser = addUser(kLiveViewersGroupId, QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
@@ -294,12 +294,12 @@ TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsAdmin)
     checkPermissions(layout, desired, forbidden);
 }
 
-/** Check permissions for another admin's layout when the user is logged in as admin. */
-TEST_F(ResourceAccessManagerTest, checkNonOwnAdminsLayoutAsAdmin)
+/** Check permissions for another Power User's layout when the user is logged in as Power User. */
+TEST_F(ResourceAccessManagerTest, checkNonOwnPowerUsersLayoutAsPowerUser)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
 
-    auto anotherUser = addUser(kAdministratorsGroupId, QnResourcePoolTestHelper::kTestUserName2);
+    auto anotherUser = addUser(kPowerUsersGroupId, QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     resourcePool()->addResource(layout);
 
@@ -310,12 +310,12 @@ TEST_F(ResourceAccessManagerTest, checkNonOwnAdminsLayoutAsAdmin)
     checkPermissions(layout, desired, forbidden);
 }
 
-/** Check permissions for another admin's layout when the user is logged in as owner. */
-TEST_F(ResourceAccessManagerTest, checkNonOwnAdminsLayoutAsOwner)
+/** Check permissions for another power user's layout when the user is logged in as administrator. */
+TEST_F(ResourceAccessManagerTest, checkNonOwnPowerUsersLayoutAsAdministrator)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
-    auto anotherUser = addUser(kAdministratorsGroupId, QnResourcePoolTestHelper::kTestUserName2);
+    auto anotherUser = addUser(kPowerUsersGroupId, QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     resourcePool()->addResource(layout);
 
@@ -344,10 +344,10 @@ TEST_F(ResourceAccessManagerTest, checkSharedLayoutAsViewer)
     checkPermissions(layout, desired, forbidden);
 }
 
-/** Check permissions for shared layout when the user is logged in as admin. */
-TEST_F(ResourceAccessManagerTest, checkSharedLayoutAsAdmin)
+/** Check permissions for shared layout when the user is logged in as Power User. */
+TEST_F(ResourceAccessManagerTest, checkSharedLayoutAsPowerUser)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
 
     auto layout = createLayout(Qn::remote);
     layout->setParentId(QnUuid());
@@ -355,30 +355,30 @@ TEST_F(ResourceAccessManagerTest, checkSharedLayoutAsAdmin)
 
     ASSERT_TRUE(layout->isShared());
 
-    /* Admin has full access to shared layouts. */
+    /* PowerUser has full access to shared layouts. */
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = Qn::NoPermissions;
     checkPermissions(layout, desired, forbidden);
 }
 
-/** Check permissions for new shared layout when the user is logged in as admin. */
-TEST_F(ResourceAccessManagerTest, checkNewSharedLayoutAsAdmin)
+/** Check permissions for new shared layout when the user is logged in as Power User. */
+TEST_F(ResourceAccessManagerTest, checkNewSharedLayoutAsPowerUser)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
 
-    auto owner = addUser(kOwnersGroupId);
+    auto administrator = addUser(kAdministratorsGroupId);
 
-    auto layout = createLayout(Qn::remote, false, owner->getId());
+    auto layout = createLayout(Qn::remote, false, administrator->getId());
     resourcePool()->addResource(layout);
 
-    /* Admin cannot modify owner's layout. */
+    /* PowerUser cannot modify administrator's layout. */
     Qn::Permissions desired = Qn::ModifyLayoutPermission;
     Qn::Permissions forbidden = Qn::WriteNamePermission | Qn::SavePermission;
     checkPermissions(layout, desired, forbidden);
 
     layout->setParentId(QnUuid());
 
-    /* Admin has full access to shared layouts. */
+    /* PowerUser has full access to shared layouts. */
     checkPermissions(layout, Qn::FullLayoutPermissions, Qn::NoPermissions);
 }
 
@@ -416,10 +416,10 @@ TEST_F(ResourceAccessManagerTest, checkIntercomLayoutPermissions)
 //-------------------------------------------------------------------------------------------------
 // Checking videowall-based layouts
 
-/** Admin can do anything with layout on videowall. */
-TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsAdmin)
+/** PowerUser can do anything with layout on videowall. */
+TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsPowerUser)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
 
     auto videowall = addVideoWall();
     auto layout = createLayout(Qn::remote, false, videowall->getId());
@@ -504,9 +504,9 @@ TEST_F(ResourceAccessManagerTest, canAccessMyScreenOnVideoWallAsViewer)
     ASSERT_TRUE(hasPermission(m_currentUser, camera, Qn::ViewLivePermission));
 }
 
-TEST_F(ResourceAccessManagerTest, cannotAccessAnyScreenAsOwner)
+TEST_F(ResourceAccessManagerTest, cannotAccessAnyScreenAsAdministrator)
 {
-    loginAsOwner();
+    loginAsAdministrator();
     auto camera = addDesktopCamera(m_currentUser);
     // User cannot see anybody's else screen, even his own.
     ASSERT_FALSE(hasPermission(m_currentUser, camera, Qn::ViewLivePermission));
@@ -556,7 +556,7 @@ TEST_F(ResourceAccessManagerTest, canPushMyScreenOnExistingLayout)
 // Pushing screen is allowed only if layout belongs to videowall.
 TEST_F(ResourceAccessManagerTest, cannotPushMyScreenNotOnVideoWall)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto ownScreen = addDesktopCamera(m_currentUser);
     auto layout = QnResourcePoolTestHelper::createLayout();
@@ -576,7 +576,7 @@ TEST_F(ResourceAccessManagerTest, cannotPushMyScreenNotOnVideoWall)
 // Pushing screen is allowed only if layout belongs to video wall.
 TEST_F(ResourceAccessManagerTest, cannotPushMyScreenOnExistingLayoutNotOnVideowall)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto ownScreen = addDesktopCamera(m_currentUser);
     auto layout = addLayout();
@@ -634,7 +634,7 @@ TEST_F(ResourceAccessManagerTest, viewerCannotPushOwnScreenOnExistingLayout)
 // Pushing screen is allowed only for own screen.
 TEST_F(ResourceAccessManagerTest, cannotPushOtherUsersScreen)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto anotherUser = addUser(kViewersGroupId);
     auto videoWall = addVideoWall();
@@ -655,7 +655,7 @@ TEST_F(ResourceAccessManagerTest, cannotPushOtherUsersScreen)
 // Pushing screen is allowed only for own screen.
 TEST_F(ResourceAccessManagerTest, cannotPushOtherUsersScreenOnExistingLayout)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto anotherUser = addUser(kViewersGroupId);
     auto videoWall = addVideoWall();
@@ -679,7 +679,7 @@ TEST_F(ResourceAccessManagerTest, cannotPushOtherUsersScreenOnExistingLayout)
 // Pushing screen is allowed only if it is the only camera on layout.
 TEST_F(ResourceAccessManagerTest, cannotPushScreenWithCameras)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto videoWall = addVideoWall();
     auto ownScreen = addDesktopCamera(m_currentUser);
@@ -699,7 +699,7 @@ TEST_F(ResourceAccessManagerTest, cannotPushScreenWithCameras)
 // Pushing screen is allowed only if it is the only camera on layout.
 TEST_F(ResourceAccessManagerTest, cannotPushScreenWithCamerasOnExistingLayout)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto videoWall = addVideoWall();
     auto ownScreen = addDesktopCamera(m_currentUser);
@@ -732,7 +732,7 @@ TEST_F(ResourceAccessManagerTest, cannotPushScreenWithCamerasOnExistingLayout)
 // Check user can edit himself (but cannot rename, remove and change access rights).
 TEST_F(ResourceAccessManagerTest, checkUserEditHimself)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     Qn::Permissions desired = Qn::FullUserPermissions;
     Qn::Permissions forbidden = Qn::WriteNamePermission | Qn::RemovePermission | Qn::WriteAccessRightsPermission;
@@ -741,50 +741,50 @@ TEST_F(ResourceAccessManagerTest, checkUserEditHimself)
     checkPermissions(m_currentUser, desired, forbidden);
 }
 
-TEST_F(ResourceAccessManagerTest, checkEditDisabledAdmin)
+TEST_F(ResourceAccessManagerTest, checkEditDisabledPowerUser)
 {
-    loginAs(kAdministratorsGroupId);
-    auto otherAdmin = createUser(kAdministratorsGroupId);
-    otherAdmin->setEnabled(false);
-    resourcePool()->addResource(otherAdmin);
-    ASSERT_FALSE(hasPermission(m_currentUser, otherAdmin, Qn::WriteAccessRightsPermission));
+    loginAs(kPowerUsersGroupId);
+    auto otherPowerUser = createUser(kPowerUsersGroupId);
+    otherPowerUser->setEnabled(false);
+    resourcePool()->addResource(otherPowerUser);
+    ASSERT_FALSE(hasPermission(m_currentUser, otherPowerUser, Qn::WriteAccessRightsPermission));
 }
 
-TEST_F(ResourceAccessManagerTest, checkEditDisabledOwner)
+TEST_F(ResourceAccessManagerTest, checkEditDisabledAdministrator)
 {
-    const auto localOwner = createUser(kOwnersGroupId, "admin", UserType::local);
-    localOwner->setEnabled(false);
-    resourcePool()->addResource(localOwner);
+    const auto localAdministrator = createUser(kAdministratorsGroupId, "admin", UserType::local);
+    localAdministrator->setEnabled(false);
+    resourcePool()->addResource(localAdministrator);
 
-    const auto cloudOwner = createUser(kOwnersGroupId, "user@mail.com", UserType::cloud);
-    resourcePool()->addResource(cloudOwner);
+    const auto cloudAdministrator = createUser(kAdministratorsGroupId, "user@mail.com", UserType::cloud);
+    resourcePool()->addResource(cloudAdministrator);
 
-    ASSERT_FALSE(hasPermission(cloudOwner, localOwner, Qn::WriteAccessRightsPermission));
+    ASSERT_FALSE(hasPermission(cloudAdministrator, localAdministrator, Qn::WriteAccessRightsPermission));
 
     UserData data;
-    ec2::fromResourceToApi(localOwner, data);
+    ec2::fromResourceToApi(localAdministrator, data);
     data.isEnabled = true;
-    ASSERT_FALSE(resourceAccessManager()->canModifyUser(cloudOwner, localOwner, data));
+    ASSERT_FALSE(resourceAccessManager()->canModifyUser(cloudAdministrator, localAdministrator, data));
 }
 
-TEST_F(ResourceAccessManagerTest, checkOwnerCanNotEditOtherOwner)
+TEST_F(ResourceAccessManagerTest, checkAdministratorCanNotEditOtherAdministrator)
 {
-    const auto localOwner = createUser(kOwnersGroupId, "admin", UserType::local);
-    resourcePool()->addResource(localOwner);
+    const auto localAdministrator = createUser(kAdministratorsGroupId, "admin", UserType::local);
+    resourcePool()->addResource(localAdministrator);
 
-    const auto cloudOwner = createUser(kOwnersGroupId, "user@mail.com", UserType::cloud);
-    resourcePool()->addResource(cloudOwner);
+    const auto cloudAdministrator = createUser(kAdministratorsGroupId, "user@mail.com", UserType::cloud);
+    resourcePool()->addResource(cloudAdministrator);
 
-    EXPECT_FALSE(hasPermission(localOwner, cloudOwner, Qn::WriteDigestPermission));
-    EXPECT_TRUE(hasPermission(cloudOwner, localOwner, Qn::WriteDigestPermission));
+    EXPECT_FALSE(hasPermission(localAdministrator, cloudAdministrator, Qn::WriteDigestPermission));
+    EXPECT_TRUE(hasPermission(cloudAdministrator, localAdministrator, Qn::WriteDigestPermission));
 
     for (const auto& permission: {
         Qn::WritePasswordPermission, Qn::WriteAccessRightsPermission,
         Qn::WriteEmailPermission, Qn::WriteFullNamePermission})
     {
         const auto label = QJson::serialized(permission).toStdString();
-        EXPECT_FALSE(hasPermission(localOwner, cloudOwner, permission)) << label;
-        EXPECT_FALSE(hasPermission(cloudOwner, localOwner, permission)) << label;
+        EXPECT_FALSE(hasPermission(localAdministrator, cloudAdministrator, permission)) << label;
+        EXPECT_FALSE(hasPermission(cloudAdministrator, localAdministrator, permission)) << label;
     }
 }
 
@@ -793,10 +793,10 @@ TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabledHi
     loginAs(kLiveViewersGroupId);
     checkCanModifyUserDigestAuthorizationEnabled(m_currentUser, /*allowed*/ false);
 
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
     checkCanModifyUserDigestAuthorizationEnabled(m_currentUser, /*allowed*/ false);
 
-    loginAsOwner();
+    loginAsAdministrator();
     checkCanModifyUserDigestAuthorizationEnabled(m_currentUser, /*allowed*/ true);
 
     UserData data;
@@ -806,44 +806,44 @@ TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabledHi
     ASSERT_FALSE(resourceAccessManager()->canModifyUser(m_currentUser, m_currentUser, data));
 }
 
-TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabledAdmin)
+TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabledPowerUser)
 {
-    auto admin = createUser(kAdministratorsGroupId);
-    admin->removeFlags(Qn::remote); //< Prevent removing of this user by loginAs();
-    resourcePool()->addResource(admin);
+    auto powerUser = createUser(kPowerUsersGroupId);
+    powerUser->removeFlags(Qn::remote); //< Prevent removing of this user by loginAs();
+    resourcePool()->addResource(powerUser);
 
     loginAs(kLiveViewersGroupId);
-    checkCanModifyUserDigestAuthorizationEnabled(admin, /*allowed*/ true);
+    checkCanModifyUserDigestAuthorizationEnabled(powerUser, /*allowed*/ true);
 
-    loginAs(kAdministratorsGroupId);
-    checkCanModifyUserDigestAuthorizationEnabled(admin, /*allowed*/ false);
+    loginAs(kPowerUsersGroupId);
+    checkCanModifyUserDigestAuthorizationEnabled(powerUser, /*allowed*/ false);
 
-    loginAsOwner();
-    checkCanModifyUserDigestAuthorizationEnabled(admin, /*allowed*/ false);
+    loginAsAdministrator();
+    checkCanModifyUserDigestAuthorizationEnabled(powerUser, /*allowed*/ false);
 }
 
 TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabled)
 {
-    auto owner = addUser(kOwnersGroupId, "owner");
+    auto administrator = addUser(kAdministratorsGroupId, "administrator");
     auto cloud = addUser(NoGroup, "cloud", UserType::cloud);
-    auto cloudOwner =
-        addUser(kOwnersGroupId, "cloud owner", UserType::cloud);
-    auto admin = addUser(kAdministratorsGroupId, "admin");
+    auto cloudAdministrator =
+        addUser(kAdministratorsGroupId, "cloud administrator", UserType::cloud);
+    auto powerUser = addUser(kPowerUsersGroupId, "powerUser");
     auto ldap = addUser(NoGroup, "ldap", UserType::ldap, GlobalPermission::none, "cn=ldap");
     auto other = addUser(NoGroup, "other");
 
-    QnUserResourceList users = {owner, cloudOwner, admin, cloud, ldap, other};
+    QnUserResourceList users = {administrator, cloudAdministrator, powerUser, cloud, ldap, other};
     QVector<std::pair<QnUserResourcePtr, QnUserResourcePtr>> allowedScenarios = {
-        {owner, owner},
-        {owner, admin},
-        {owner, ldap},
-        {owner, other},
-        {cloudOwner, owner},
-        {cloudOwner, admin},
-        {cloudOwner, ldap},
-        {cloudOwner, other},
-        {admin, other},
-        {admin, ldap},
+        {administrator, administrator},
+        {administrator, powerUser},
+        {administrator, ldap},
+        {administrator, other},
+        {cloudAdministrator, administrator},
+        {cloudAdministrator, powerUser},
+        {cloudAdministrator, ldap},
+        {cloudAdministrator, other},
+        {powerUser, other},
+        {powerUser, ldap},
     };
 
     for (const auto source: users)
@@ -856,64 +856,65 @@ TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabled)
     }
 }
 
-TEST_F(ResourceAccessManagerTest, checkCanGrantUserAdminPermissions)
+TEST_F(ResourceAccessManagerTest, checkCanGrantPowerUserPermissions)
 {
-    const auto admins = kAdministratorsGroupId;
-    const auto adminsToo = createUserGroup(kAdministratorsGroupId);
-    const auto owner = addUser(kOwnersGroupId, "owner");
+    const auto powerUsers = kPowerUsersGroupId;
+    const auto powerUsersToo = createUserGroup(kPowerUsersGroupId);
+    const auto administrator = addUser(kAdministratorsGroupId, "administrator");
     const auto cloud = addUser(NoGroup, "cloud", UserType::cloud);
-    const auto cloudOwner = addUser(kOwnersGroupId, "cloud owner", UserType::cloud);
-    const auto admin = addUser(kAdministratorsGroupId, "admin");
-    const auto transitivelyInheritedAdmin = addUser(adminsToo.id, "transitively inherited admin");
+    const auto cloudAdministrator = addUser(kAdministratorsGroupId, "cloud administrator", UserType::cloud);
+    const auto powerUser = addUser(kPowerUsersGroupId, "power user");
+    const auto transitivelyInheritedPowerUser = addUser(
+        powerUsersToo.id, "transitively inherited power user");
     const auto ldap = addUser(NoGroup, "ldap", UserType::ldap, GlobalPermission::none, "cn=ldap");
     const auto other = addUser(NoGroup, "other");
 
-    // Compatibility direct admin.
-    const auto directAdmin = addUser(
-        NoGroup, "direct admin", UserType::local, GlobalPermission::admin);
+    // Compatibility direct power user.
+    const auto directPowerUser = addUser(
+        NoGroup, "direct power user", UserType::local, GlobalPermission::powerUser);
 
-    const QnUserResourceList users = {
-        owner, cloudOwner, admin, transitivelyInheritedAdmin, directAdmin, cloud, ldap, other};
+    const QnUserResourceList users = {administrator, cloudAdministrator, powerUser, transitivelyInheritedPowerUser,
+        directPowerUser, cloud, ldap, other};
 
     const QVector<std::pair<QnUserResourcePtr, QnUserResourcePtr>> allowedScenarios = {
-        {directAdmin, directAdmin}, //< No change, considered allowed.
-        {owner, admin},
-        {owner, directAdmin},
-        {owner, transitivelyInheritedAdmin},
-        {owner, ldap},
-        {owner, other},
-        {owner, cloud},
-        {cloudOwner, admin},
-        {cloudOwner, directAdmin},
-        {cloudOwner, transitivelyInheritedAdmin},
-        {cloudOwner, cloud},
-        {cloudOwner, ldap},
-        {cloudOwner, other}};
+        {directPowerUser, directPowerUser}, //< No change, considered allowed.
+        {administrator, powerUser},
+        {administrator, directPowerUser},
+        {administrator, transitivelyInheritedPowerUser},
+        {administrator, ldap},
+        {administrator, other},
+        {administrator, cloud},
+        {cloudAdministrator, powerUser},
+        {cloudAdministrator, directPowerUser},
+        {cloudAdministrator, transitivelyInheritedPowerUser},
+        {cloudAdministrator, cloud},
+        {cloudAdministrator, ldap},
+        {cloudAdministrator, other}};
 
     const QVector<std::pair<QnUserResourcePtr, QnUserResourcePtr>> allowedScenariosViaInheritance = {
-        {admin, admin}, //< No change, considered allowed.
-        {owner, admin},
-        {owner, directAdmin},
-        {owner, transitivelyInheritedAdmin},
-        {owner, ldap},
-        {owner, other},
-        {owner, cloud},
-        {cloudOwner, admin},
-        {cloudOwner, directAdmin},
-        {cloudOwner, transitivelyInheritedAdmin},
-        {cloudOwner, cloud},
-        {cloudOwner, ldap},
-        {cloudOwner, other}};
+        {powerUser, powerUser}, //< No change, considered allowed.
+        {administrator, powerUser},
+        {administrator, directPowerUser},
+        {administrator, transitivelyInheritedPowerUser},
+        {administrator, ldap},
+        {administrator, other},
+        {administrator, cloud},
+        {cloudAdministrator, powerUser},
+        {cloudAdministrator, directPowerUser},
+        {cloudAdministrator, transitivelyInheritedPowerUser},
+        {cloudAdministrator, cloud},
+        {cloudAdministrator, ldap},
+        {cloudAdministrator, other}};
 
     for (const auto editor: users)
     {
         for (const auto editee: users)
         {
-            checkCanGrantUserAdminPermissionsViaInheritance(editor, editee, admins,
+            checkCanGrantPowerUserPermissionsViaInheritance(editor, editee, powerUsers,
                 allowedScenariosViaInheritance.contains({editor, editee}));
 
-            // GlobalPermission::admin is still directly assignable for backward compatibility.
-            checkCanGrantUserAdminPermissions(editor, editee,
+            // GlobalPermission::powerUser is still directly assignable for backward compatibility.
+            checkCanGrantPowerUserPermissions(editor, editee,
                 allowedScenarios.contains({editor, editee}));
         }
     }
@@ -927,70 +928,70 @@ TEST_F(ResourceAccessManagerTest, checkWhatUsersCanViewerCreate)
     ASSERT_FALSE(resourceAccessManager()->canCreateUser(
         m_currentUser, GlobalPermission::none, {kViewersGroupId}));
 
-    // Cannot create admins.
+    // Cannot create power users.
     ASSERT_FALSE(resourceAccessManager()->canCreateUser(
-        m_currentUser, GlobalPermission::admin, {}));
+        m_currentUser, GlobalPermission::powerUser, {}));
+
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::none, {kPowerUsersGroupId}));
+
+    // Cannot create administrators.
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::administrator, {}));
 
     ASSERT_FALSE(resourceAccessManager()->canCreateUser(
         m_currentUser, GlobalPermission::none, {kAdministratorsGroupId}));
-
-    // Cannot create owners.
-    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
-        m_currentUser, GlobalPermission::owner, {}));
-
-    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
-        m_currentUser, GlobalPermission::none, {kOwnersGroupId}));
 }
 
-TEST_F(ResourceAccessManagerTest, checkWhatUsersCanAdminCreate)
+TEST_F(ResourceAccessManagerTest, checkWhatUsersCanPowerUserCreate)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
 
     // Can create viewers.
     ASSERT_TRUE(resourceAccessManager()->canCreateUser(
         m_currentUser, GlobalPermission::none, {kViewersGroupId}));
 
-    // Cannot create admins.
+    // Cannot create power users.
     ASSERT_FALSE(resourceAccessManager()->canCreateUser(
-        m_currentUser, GlobalPermission::admin, {}));
+        m_currentUser, GlobalPermission::powerUser, {}));
+
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::none, {kPowerUsersGroupId}));
+
+    // Cannot create administrators.
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::administrator, {}));
 
     ASSERT_FALSE(resourceAccessManager()->canCreateUser(
         m_currentUser, GlobalPermission::none, {kAdministratorsGroupId}));
-
-    // Cannot create owners.
-    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
-        m_currentUser, GlobalPermission::owner, {}));
-
-    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
-        m_currentUser, GlobalPermission::none, {kOwnersGroupId}));
 }
 
-TEST_F(ResourceAccessManagerTest, checkWhatUsersCanOwnerCreate)
+TEST_F(ResourceAccessManagerTest, checkWhatUsersCanAdministratorCreate)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     // Can create viewers.
     ASSERT_TRUE(resourceAccessManager()->canCreateUser(
         m_currentUser, GlobalPermission::none, {kViewersGroupId}));
 
-    // Can create admins. Direct permissions are allowed for backward compatibility.
+    // Can create power users. Direct permissions are allowed for backward compatibility.
     ASSERT_TRUE(resourceAccessManager()->canCreateUser(
-        m_currentUser, GlobalPermission::admin, {}));
+        m_currentUser, GlobalPermission::powerUser, {}));
 
     ASSERT_TRUE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::none, {kPowerUsersGroupId}));
+
+    // Cannot create administrators.
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::administrator, {}));
+
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
         m_currentUser, GlobalPermission::none, {kAdministratorsGroupId}));
-
-    // Cannot create owners.
-    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
-        m_currentUser, GlobalPermission::owner, {}));
-
-    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
-        m_currentUser, GlobalPermission::none, {kOwnersGroupId}));
 }
 
 TEST_F(ResourceAccessManagerTest, checkParentGroupsValidity)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     const auto predefinedId = kViewersGroupId;
     const auto customId = createUserGroup(kAdvancedViewersGroupId).id;
@@ -1026,63 +1027,63 @@ TEST_F(ResourceAccessManagerTest, checkParentGroupsValidity)
 
 TEST_F(ResourceAccessManagerTest, checkNoAccessToInvalidGroup)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, UserGroupData{}),
         Qn::Permissions());
 }
 
-TEST_F(ResourceAccessManagerTest, checkOwnerAccessToGroups)
+TEST_F(ResourceAccessManagerTest, checkAdministratorAccessToGroups)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
-    const auto adminsGroup = createUserGroup(kAdministratorsGroupId);
-    const auto nonAdminsGroup = createUserGroup(kViewersGroupId);
+    const auto powerUsersGroup = createUserGroup(kPowerUsersGroupId);
+    const auto nonPowerUsersGroup = createUserGroup(kViewersGroupId);
 
-    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, adminsGroup),
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, powerUsersGroup),
         kFullGroupPermissions);
 
-    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, nonAdminsGroup),
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, nonPowerUsersGroup),
         kFullGroupPermissions);
 }
 
-TEST_F(ResourceAccessManagerTest, checkAdminAccessToGroups)
+TEST_F(ResourceAccessManagerTest, checkPowerUserAccessToGroups)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
 
-    const auto adminsGroup = createUserGroup(kAdministratorsGroupId);
-    const auto nonAdminsGroup = createUserGroup(kViewersGroupId);
+    const auto powerUsersGroup = createUserGroup(kPowerUsersGroupId);
+    const auto nonPowerUsersGroup = createUserGroup(kViewersGroupId);
 
-    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, adminsGroup),
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, powerUsersGroup),
         kReadGroupPermissions);
 
-    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, nonAdminsGroup),
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, nonPowerUsersGroup),
         kFullGroupPermissions);
 }
 
-// Non-admins have no access to user groups, even no Qn::ReadPermission.
-TEST_F(ResourceAccessManagerTest, checkNonAdminAccessToGroups)
+// Non-power users have no access to user groups, even no Qn::ReadPermission.
+TEST_F(ResourceAccessManagerTest, checkNonPowerUserAccessToGroups)
 {
     loginAs(kAdvancedViewersGroupId);
 
-    const auto adminsGroup = createUserGroup(kAdministratorsGroupId);
-    const auto nonAdminsGroup = createUserGroup(kViewersGroupId);
+    const auto powerUsersGroup = createUserGroup(kPowerUsersGroupId);
+    const auto nonPowerUsersGroup = createUserGroup(kViewersGroupId);
 
-    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, adminsGroup),
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, powerUsersGroup),
         Qn::Permissions());
 
-    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, nonAdminsGroup),
+    ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, nonPowerUsersGroup),
         Qn::Permissions());
 }
 
 TEST_F(ResourceAccessManagerTest, checkAccessToLdapGroups)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     nx::vms::api::UserGroupData ldapGroup(QnUuid::createUuid(),
         "group name",
         GlobalPermission::none,
-        {kAdministratorsGroupId});
+        {kPowerUsersGroupId});
 
     ldapGroup.type = UserType::ldap;
     addOrUpdateUserGroup(ldapGroup);
@@ -1093,7 +1094,7 @@ TEST_F(ResourceAccessManagerTest, checkAccessToLdapGroups)
 
 TEST_F(ResourceAccessManagerTest, checkAccessToPredefinedGroups)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     const auto predefinedGroup = PredefinedUserGroups::find(kLiveViewersGroupId);
     ASSERT_TRUE(!!predefinedGroup);
@@ -1108,7 +1109,7 @@ TEST_F(ResourceAccessManagerTest, checkAccessToPredefinedGroups)
 // Nobody can view desktop camera footage.
 TEST_F(ResourceAccessManagerTest, checkDesktopCameraFootage)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto camera = createCamera();
     camera->addFlags(Qn::desktop_camera);
@@ -1118,10 +1119,10 @@ TEST_F(ResourceAccessManagerTest, checkDesktopCameraFootage)
         Qn::ViewFootagePermission));
 }
 
-/** Check owner can remove non-owned desktop camera, but cannot view it. */
+/** Check administrator can remove non-owned desktop camera, but cannot view it. */
 TEST_F(ResourceAccessManagerTest, checkDesktopCameraRemove)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto camera = createCamera();
     camera->addFlags(Qn::desktop_camera);
@@ -1134,9 +1135,9 @@ TEST_F(ResourceAccessManagerTest, checkDesktopCameraRemove)
     checkPermissions(camera, desired, forbidden);
 }
 
-TEST_F(ResourceAccessManagerTest, checkRemoveCameraAsAdmin)
+TEST_F(ResourceAccessManagerTest, checkRemoveCameraAsPowerUser)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
     const auto target = addCamera();
     ASSERT_TRUE(hasPermission(m_currentUser, target, Qn::RemovePermission));
 }
@@ -1157,7 +1158,7 @@ TEST_F(ResourceAccessManagerTest, checkRemoveCameraAsEditor)
 
 TEST_F(ResourceAccessManagerTest, checkViewCameraPermission)
 {
-    auto admin = addUser(kAdministratorsGroupId);
+    auto powerUser = addUser(kPowerUsersGroupId);
     auto advancedViewer = addUser(kAdvancedViewersGroupId);
     auto viewer = addUser(kViewersGroupId);
     auto live = addUser(kLiveViewersGroupId);
@@ -1168,7 +1169,7 @@ TEST_F(ResourceAccessManagerTest, checkViewCameraPermission)
         | Qn::ViewLivePermission;
     auto viewPermission = viewLivePermission | Qn::ViewFootagePermission;
 
-    ASSERT_TRUE(hasPermission(admin, target, viewPermission));
+    ASSERT_TRUE(hasPermission(powerUser, target, viewPermission));
     ASSERT_TRUE(hasPermission(advancedViewer, target, viewPermission));
     ASSERT_TRUE(hasPermission(viewer, target, viewPermission));
     ASSERT_TRUE(hasPermission(live, target, viewLivePermission));
@@ -1177,7 +1178,7 @@ TEST_F(ResourceAccessManagerTest, checkViewCameraPermission)
 
 TEST_F(ResourceAccessManagerTest, checkExportCameraPermission)
 {
-    auto admin = addUser(kAdministratorsGroupId);
+    auto powerUser = addUser(kPowerUsersGroupId);
     auto advancedViewer = addUser(kAdvancedViewersGroupId);
     auto viewer = addUser(kViewersGroupId);
     auto live = addUser(kLiveViewersGroupId);
@@ -1188,7 +1189,7 @@ TEST_F(ResourceAccessManagerTest, checkExportCameraPermission)
         | Qn::ViewFootagePermission
         | Qn::ExportPermission;
 
-    ASSERT_TRUE(hasPermission(admin, target, exportPermission));
+    ASSERT_TRUE(hasPermission(powerUser, target, exportPermission));
     ASSERT_TRUE(hasPermission(advancedViewer, target, exportPermission));
     ASSERT_TRUE(hasPermission(viewer, target, exportPermission));
     ASSERT_FALSE(hasPermission(live, target, exportPermission));
@@ -1196,7 +1197,7 @@ TEST_F(ResourceAccessManagerTest, checkExportCameraPermission)
 
 TEST_F(ResourceAccessManagerTest, checkUserRemoved)
 {
-    auto user = addUser(kAdministratorsGroupId);
+    auto user = addUser(kPowerUsersGroupId);
     auto camera = addCamera();
 
     ASSERT_TRUE(hasPermission(user, camera, Qn::RemovePermission));
@@ -1392,7 +1393,7 @@ TEST_F(ResourceAccessManagerTest, checkRoleRemoved)
 
 TEST_F(ResourceAccessManagerTest, checkCameraOnVideoWall)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
     auto target = addCamera();
     auto videoWall = addVideoWall();
 
@@ -1414,7 +1415,7 @@ TEST_F(ResourceAccessManagerTest, checkCameraOnVideoWall)
 
 TEST_F(ResourceAccessManagerTest, checkShareLayoutToRole)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
 
     auto target = addCamera();
 
@@ -1444,7 +1445,7 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToRole)
 
 TEST_F(ResourceAccessManagerTest, checkShareLayoutToParentRole)
 {
-    loginAs(kAdministratorsGroupId);
+    loginAs(kPowerUsersGroupId);
 
     auto target = addCamera();
 
@@ -1481,7 +1482,7 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToParentRole)
  */
 TEST_F(ResourceAccessManagerTest, checkVMaxWithoutLicense)
 {
-    auto user = addUser(kAdministratorsGroupId);
+    auto user = addUser(kPowerUsersGroupId);
     auto camera = addCamera();
 
     // Camera is detected as VMax
@@ -1510,7 +1511,7 @@ TEST_F(ResourceAccessManagerTest, checkVMaxWithoutLicense)
  */
 TEST_F(ResourceAccessManagerTest, checkNvrWithoutLicense)
 {
-    auto user = addUser(kAdministratorsGroupId);
+    auto user = addUser(kPowerUsersGroupId);
     auto camera = addCamera();
 
     // Camera is detected as NVR
@@ -1534,7 +1535,7 @@ TEST_F(ResourceAccessManagerTest, checkNvrWithoutLicense)
 */
 TEST_F(ResourceAccessManagerTest, checkDefaultAuthCamera)
 {
-    auto user = addUser(kAdministratorsGroupId);
+    auto user = addUser(kPowerUsersGroupId);
     auto camera = addCamera();
 
     camera->setCameraCapabilities(
@@ -1559,7 +1560,7 @@ TEST_F(ResourceAccessManagerTest, checkDefaultAuthCamera)
 */
 TEST_F(ResourceAccessManagerTest, checkDefaultAuthCameraNonChangeable)
 {
-    auto user = addUser(kAdministratorsGroupId);
+    auto user = addUser(kPowerUsersGroupId);
     auto camera = addCamera();
 
     camera->setCameraCapabilities(DeviceCapability::isDefaultPassword);
@@ -1573,10 +1574,10 @@ TEST_F(ResourceAccessManagerTest, checkDefaultAuthCameraNonChangeable)
 /* Checking servers access rights                                       */
 /************************************************************************/
 
-/* Admin must have full permissions for servers. */
-TEST_F(ResourceAccessManagerTest, checkServerAsAdmin)
+/* PowerUser must have full permissions for servers. */
+TEST_F(ResourceAccessManagerTest, checkServerAsPowerUser)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto server = addServer();
 
@@ -1617,10 +1618,10 @@ TEST_F(ResourceAccessManagerTest, checkServerAsLiveViewer)
 /* Checking storages access rights                                       */
 /************************************************************************/
 
-/* Admin must have full permissions for storages. */
-TEST_F(ResourceAccessManagerTest, checkStoragesAsAdmin)
+/* PowerUser must have full permissions for storages. */
+TEST_F(ResourceAccessManagerTest, checkStoragesAsPowerUser)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto server = addServer();
     auto storage = addStorage(server);
@@ -1631,7 +1632,7 @@ TEST_F(ResourceAccessManagerTest, checkStoragesAsAdmin)
     checkPermissions(storage, desired, forbidden);
 }
 
-/* Non-admin users should not have access to storages. */
+/* Non-power users should not have access to storages. */
 TEST_F(ResourceAccessManagerTest, checkStoragesAsCustom)
 {
     loginAsCustom();
@@ -1646,7 +1647,7 @@ TEST_F(ResourceAccessManagerTest, checkStoragesAsCustom)
     checkPermissions(storage, desired, forbidden);
 }
 
-/* Non-admin users should not have access to storages. */
+/* Non-power users should not have access to storages. */
 TEST_F(ResourceAccessManagerTest, checkStoragesAsLiveViewer)
 {
     loginAs(kLiveViewersGroupId);
@@ -1665,10 +1666,10 @@ TEST_F(ResourceAccessManagerTest, checkStoragesAsLiveViewer)
 /* Checking videowall access rights                                     */
 /************************************************************************/
 
-/* Admin must have full permissions for videowalls. */
-TEST_F(ResourceAccessManagerTest, checkVideowallAsAdmin)
+/* PowerUser must have full permissions for videowalls. */
+TEST_F(ResourceAccessManagerTest, checkVideowallAsPowerUser)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto videowall = addVideoWall();
 
@@ -1710,7 +1711,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallAsViewer)
 
 TEST_F(ResourceAccessManagerTest, checkPermissionsById)
 {
-    loginAsOwner();
+    loginAsAdministrator();
 
     auto camera = addCamera();
     auto server = addServer();

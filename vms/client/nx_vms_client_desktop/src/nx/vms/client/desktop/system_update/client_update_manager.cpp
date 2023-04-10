@@ -190,7 +190,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
         this,
         [this](const QnUuid& notificationId)
         {
-            if (!accessController()->hasAdminPermissions())
+            if (!accessController()->hasPowerUserPermissions())
                 return;
 
             if (notificationId == errorNotificationId
@@ -327,7 +327,7 @@ void ClientUpdateManager::Private::notifyUserAboutClientAutoUpdate()
     if (!autoUpdateFeatureNotificationId.isNull())
         return;
 
-    if (!accessController()->hasAdminPermissions())
+    if (!accessController()->hasPowerUserPermissions())
         return;
 
     NX_VERBOSE(this, "Showing a notification about Client-only auto-update feature.");

@@ -35,7 +35,7 @@ bool hasItemIsDropEnabledFlag(const QnResourcePtr& resource, Permissions permiss
     if ((resource->hasFlags(Qn::server) || resource->hasFlags(Qn::user))
         && !resource->hasFlags(Qn::fake))
     {
-        return permissions.hasAdminPermissions;
+        return permissions.hasPowerUserPermissions;
     }
 
     if (resource->hasFlags(Qn::videowall))
@@ -67,11 +67,11 @@ bool hasItemIsEditableFlag(
     if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::exported))
     {
         const auto layout = resource.staticCast<QnLayoutResource>();
-        return permissions.hasAdminPermissions || !layout->isShared();
+        return permissions.hasPowerUserPermissions || !layout->isShared();
     }
 
     if (resource->hasFlags(Qn::web_page) || resource->hasFlags(Qn::server))
-        return permissions.hasAdminPermissions;
+        return permissions.hasPowerUserPermissions;
 
     if (resource.dynamicCast<QnVirtualCameraResource>()
         || resource->hasFlags(Qn::videowall))

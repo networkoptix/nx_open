@@ -24,7 +24,7 @@ SystemHealthAction::SystemHealthAction(
     setRuntimeParams(runtimeParams);
 
     ActionParameters actionParams;
-    actionParams.additionalResources = {api::kAdminGroupIds.begin(), api::kAdminGroupIds.end()};
+    actionParams.additionalResources = {api::kAllPowerUserGroupIds.begin(), api::kAllPowerUserGroupIds.end()};
     setParams(actionParams);
 }
 

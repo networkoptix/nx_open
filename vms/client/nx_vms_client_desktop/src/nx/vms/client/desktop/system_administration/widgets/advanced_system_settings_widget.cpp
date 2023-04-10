@@ -98,13 +98,13 @@ void AdvancedSystemSettingsWidget::Private::setCurrentTab(int idx)
 
 bool AdvancedSystemSettingsWidget::Private::backupAndRestoreIsVisible() const
 {
-    const auto isOwner = q->accessController()->hasGlobalPermission(GlobalPermission::owner);
-    const auto isAdministrator = q->accessController()->hasGlobalPermission(GlobalPermission::admin);
+    const auto isAdministrator = q->accessController()->hasGlobalPermission(GlobalPermission::administrator);
+    const auto isPowerUser = q->accessController()->hasGlobalPermission(GlobalPermission::powerUser);
 
     const auto hasOwnerApiForAdmins = q->context()->currentServer()->getServerFlags().testFlag(
-        nx::vms::api::SF_OwnerApiForAdmins);
+        nx::vms::api::SF_AdminApiForPowerUsers);
 
-    return isOwner || (isAdministrator && hasOwnerApiForAdmins);
+    return isAdministrator || (isPowerUser && hasOwnerApiForAdmins);
 }
 
 void AdvancedSystemSettingsWidget::Private::updateBackupAndRestoreTabVisibility()

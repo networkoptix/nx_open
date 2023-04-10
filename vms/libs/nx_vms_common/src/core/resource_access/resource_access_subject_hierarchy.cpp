@@ -43,7 +43,7 @@ public:
             };
 
         connect(
-            user.get(), &QnUserResource::userRolesChanged, this, updateUser, Qt::DirectConnection);
+            user.get(), &QnUserResource::userGroupsChanged, this, updateUser, Qt::DirectConnection);
 
         updateUser(user);
     }

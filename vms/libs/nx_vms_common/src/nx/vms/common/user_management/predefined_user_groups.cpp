@@ -18,11 +18,11 @@ struct PredefinedUserGroups::Private
 {
     static QString name(const QnUuid& groupId)
     {
-        if (groupId == kOwnersGroupId)
-            return tr("Owners");
-
         if (groupId == kAdministratorsGroupId)
             return tr("Administrators");
+
+        if (groupId == kPowerUsersGroupId)
+            return tr("Power Users");
 
         if (groupId == kAdvancedViewersGroupId)
             return tr("Advanced Viewers");
@@ -39,14 +39,13 @@ struct PredefinedUserGroups::Private
 
     static QString description(const QnUuid& groupId)
     {
-        if (groupId == kOwnersGroupId)
-            return tr("This user has unlimited System privileges."
-                " Can create and modify other Owners, and can merge Systems and link"
-                " or unlink to Nx Cloud accounts.");
-
         if (groupId == kAdministratorsGroupId)
+            return tr("This user has unlimited System privileges."
+                " Can merge Systems and link or unlink to Nx Cloud accounts.");
+
+        if (groupId == kPowerUsersGroupId)
             return tr("Has full control of System configuration, but cannot create or modify"
-                " other Administrators.");
+                " other Power Users.");
 
         if (groupId == kAdvancedViewersGroupId)
             return tr("Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate"
@@ -64,16 +63,16 @@ struct PredefinedUserGroups::Private
 
     static GlobalPermissions globalPermissions(const QnUuid& groupId)
     {
-        if (groupId == kOwnersGroupId)
+        if (groupId == kAdministratorsGroupId)
         {
-            return GlobalPermission::owner
-                | GlobalPermission::admin
+            return GlobalPermission::administrator
+                | GlobalPermission::powerUser
                 | GlobalPermission::viewLogs;
         }
 
-        if (groupId == kAdministratorsGroupId)
+        if (groupId == kPowerUsersGroupId)
         {
-            return GlobalPermission::admin
+            return GlobalPermission::powerUser
                 | GlobalPermission::viewLogs;
         }
 
@@ -98,8 +97,8 @@ struct PredefinedUserGroups::Private
             | AccessRight::manageBookmarks
             | AccessRight::userInput;
 
-        if (groupId == kOwnersGroupId || groupId == kAdministratorsGroupId)
-            return kAdminResourceAccessMap;
+        if (groupId == kAdministratorsGroupId || groupId == kPowerUsersGroupId)
+            return kFullResourceAccessMap;
 
         if (groupId == kAdvancedViewersGroupId)
         {

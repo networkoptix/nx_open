@@ -114,18 +114,18 @@ QnResourceAccessManager::QnResourceAccessManager(
         this, &QnResourceAccessManager::resourceAccessReset, Qt::DirectConnection);
 }
 
-bool QnResourceAccessManager::hasAdminPermissions(const Qn::UserAccessData& accessData) const
+bool QnResourceAccessManager::hasPowerUserPermissions(const Qn::UserAccessData& accessData) const
 {
     if (accessData == Qn::kSystemAccess)
         return true;
 
-    return m_accessRightsResolver->hasAdminAccessRights(accessData.userId);
+    return m_accessRightsResolver->hasFullAccessRights(accessData.userId);
 }
 
-bool QnResourceAccessManager::hasAdminPermissions(const QnResourceAccessSubject& subject) const
+bool QnResourceAccessManager::hasPowerUserPermissions(const QnResourceAccessSubject& subject) const
 {
     return subject.isValid() && (subject.isRole() || subject.user()->isEnabled())
-        ? m_accessRightsResolver->hasAdminAccessRights(subject.id())
+        ? m_accessRightsResolver->hasFullAccessRights(subject.id())
         : false;
 }
 
@@ -177,8 +177,8 @@ GlobalPermissions QnResourceAccessManager::globalPermissions(
     auto permissions = m_accessRightsResolver->globalPermissions(subject.id());
 
     // TODO: #vkutin Remove when transition to the new access rights is over.
-    if (permissions.testFlag(GlobalPermission::admin))
-        permissions |= GlobalPermission::adminPermissions;
+    if (permissions.testFlag(GlobalPermission::powerUser))
+        permissions |= GlobalPermission::powerUserPermissions;
 
     return permissions;
 }
@@ -358,7 +358,7 @@ bool QnResourceAccessManager::canCreateResourceInternal(
     if (const auto webPage = target.dynamicCast<QnWebPageResource>())
         return canCreateWebPage(subject);
 
-    return hasAdminPermissions(subject);
+    return hasPowerUserPermissions(subject);
 }
 
 Qn::Permissions QnResourceAccessManager::calculatePermissions(
@@ -411,7 +411,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     Qn::Permissions result = Qn::NoPermissions;
 
     // Admins must be able to remove any cameras to delete servers.
-    if (hasAdminPermissions(subject))
+    if (hasPowerUserPermissions(subject))
         result |= Qn::RemovePermission;
 
     const auto accessRights = this->accessRights(subject, camera);
@@ -491,7 +491,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
     result |= Qn::ViewContentPermission;
 
-    if (hasAdminPermissions(subject))
+    if (hasPowerUserPermissions(subject))
         result |= Qn::FullServerPermissions;
 
     return result;
@@ -505,7 +505,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     //< Cloud storage isn't tied to any server and is readable for all.
     if (!parentServer)
     {
-        if (hasAdminPermissions(subject))
+        if (hasPowerUserPermissions(subject))
             return Qn::ReadWriteSavePermission;
 
         return Qn::ReadPermission;
@@ -534,7 +534,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         | Qn::SavePermission
         | Qn::WriteNamePermission;
 
-    if (hasAdminPermissions(subject))
+    if (hasPowerUserPermissions(subject))
         result |= Qn::RemovePermission;
 
     return result;
@@ -598,8 +598,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const auto base =
         [&]() -> Qn::Permissions
         {
-            // Owner can do anything.
-            if (subject.user() && subject.user()->isOwner())
+            // Administrator can do anything.
+            if (subject.user() && subject.user()->isAdministrator())
                 return Qn::FullLayoutPermissions;
 
             // Access to global layouts.
@@ -610,7 +610,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                     return Qn::NoPermissions;
 
                 // Global layouts editor.
-                if (hasAdminPermissions(subject))
+                if (hasPowerUserPermissions(subject))
                     return Qn::FullLayoutPermissions;
 
                 return Qn::ModifyLayoutPermission;
@@ -658,7 +658,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                         }
 
                         // Layout of user, which we don't know of.
-                        return hasAdminPermissions(subject)
+                        return hasPowerUserPermissions(subject)
                             ? Qn::FullLayoutPermissions
                             : Qn::NoPermissions;
                     }
@@ -686,7 +686,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnUserResourcePtr& targetUser) const
 {
-    const bool isSubjectOwner = subject.user() && subject.user()->isOwner();
+    const bool isSubjectAdministrator = subject.user() && subject.user()->isAdministrator();
 
     const auto filterByUserType =
         [targetUser](Qn::Permissions permissions)
@@ -723,7 +723,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         Qn::Permissions result = Qn::ReadWriteSavePermission | Qn::WritePasswordPermission
             | Qn::WriteEmailPermission | Qn::WriteFullNamePermission;
 
-        if (isSubjectOwner)
+        if (isSubjectAdministrator)
             result |= Qn::WriteDigestPermission;
 
         return filterByUserType(result);
@@ -731,18 +731,18 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
     // Permissions on others.
 
-    if (!hasAdminPermissions(subject))
+    if (!hasPowerUserPermissions(subject))
         return Qn::NoPermissions;
 
-    if (targetUser->isOwner())
+    if (targetUser->isAdministrator())
     {
-        if (isSubjectOwner && !targetUser->isCloud())
+        if (isSubjectAdministrator && !targetUser->isCloud())
             return Qn::ReadWriteSavePermission | Qn::WriteDigestPermission;
 
         return Qn::ReadPermission;
     }
 
-    if (isSubjectOwner || !m_accessRightsResolver->hasAdminAccessRights(targetUser->getId()))
+    if (isSubjectAdministrator || !m_accessRightsResolver->hasFullAccessRights(targetUser->getId()))
         return filterByUserType(Qn::FullUserPermissions);
 
     return Qn::ReadPermission;
@@ -755,16 +755,16 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         return Qn::NoPermissions;
 
     Qn::Permissions result = Qn::NoPermissions;
-    const bool isSubjectOwner = subject.user() && subject.user()->isOwner();
+    const bool isSubjectAdministrator = subject.user() && subject.user()->isAdministrator();
 
-    if (hasAdminPermissions(subject))
+    if (hasPowerUserPermissions(subject))
     {
         result = Qn::ReadPermission;
 
         if (!targetGroup.isPredefined)
         {
-            // Admins can only be edited by owner, other groups - by all admins.
-            if (isSubjectOwner || !m_accessRightsResolver->hasAdminAccessRights(targetGroup.id))
+            // Power Users can only be edited by Administrators, other groups - by all Power Users.
+            if (isSubjectAdministrator || !m_accessRightsResolver->hasFullAccessRights(targetGroup.id))
                 result |= Qn::FullGenericPermissions | Qn::WriteAccessRightsPermission;
 
             if (targetGroup.type == UserType::ldap)
@@ -795,9 +795,9 @@ bool QnResourceAccessManager::canCreateLayout(
     if (subject.user() && data.parentId == subject.user()->getId())
         return true;
 
-    // Only admins can create global layouts.
+    // Only power users can create global layouts.
     if (data.parentId.isNull())
-        return hasAdminPermissions(subject);
+        return hasPowerUserPermissions(subject);
 
     // Users with access to video walls can create layouts on them.
     if (const auto videoWall = resourcePool->getResourceById<QnVideoWallResource>(data.parentId))
@@ -913,16 +913,16 @@ bool QnResourceAccessManager::canCreateUser(
 
     const auto effectivePermissions = accumulatePermissions(newPermissions, targetGroups);
 
-    // No one can create owners.
-    if (effectivePermissions.testFlag(GlobalPermission::owner))
+    // No one can create Administrators.
+    if (effectivePermissions.testFlag(GlobalPermission::administrator))
         return false;
 
-    // Only owner can create admins.
-    if (effectivePermissions.testFlag(GlobalPermission::admin))
-        return subject.user() && subject.user()->isOwner();
+    // Only Administrator can create Power Users.
+    if (effectivePermissions.testFlag(GlobalPermission::powerUser))
+        return subject.user() && subject.user()->isAdministrator();
 
-    // Admins can create other users.
-    return hasAdminPermissions(subject);
+    // Power Users can create other users.
+    return hasPowerUserPermissions(subject);
 }
 
 bool QnResourceAccessManager::canModifyUser(
@@ -955,17 +955,17 @@ bool QnResourceAccessManager::canModifyUser(
     if (subject.user() == target && permissionsChanged)
         return false;
 
-    // Admin permissions can be granted or revoked only by an owner.
-    if (oldPermissions.testFlag(GlobalPermission::admin)
-        != newPermissions.testFlag(GlobalPermission::admin))
+    // Power User permissions can be granted or revoked only by an Administrator.
+    if (oldPermissions.testFlag(GlobalPermission::powerUser)
+        != newPermissions.testFlag(GlobalPermission::powerUser))
     {
-        if (!(subject.user() && subject.user()->isOwner()))
+        if (!(subject.user() && subject.user()->isAdministrator()))
             return false;
     }
 
-    // Owner permissions cannot be granted or revoked.
-    if (oldPermissions.testFlag(GlobalPermission::owner)
-        != newPermissions.testFlag(GlobalPermission::owner))
+    // Administrator permissions cannot be granted or revoked.
+    if (oldPermissions.testFlag(GlobalPermission::administrator)
+        != newPermissions.testFlag(GlobalPermission::administrator))
     {
         return false;
     }
@@ -1031,8 +1031,8 @@ bool QnResourceAccessManager::canCreateVideoWall(const QnResourceAccessSubject& 
     if (!subject.isValid())
         return false;
 
-    /* Only admins can create new videowalls (and attach new screens). */
-    return hasAdminPermissions(subject);
+    // Only power users can create new Videowalls (and attach new screens).
+    return hasPowerUserPermissions(subject);
 }
 
 bool QnResourceAccessManager::canModifyVideoWall(
@@ -1061,11 +1061,11 @@ bool QnResourceAccessManager::canModifyVideoWall(
         return false;
     };
 
-    /* Only admin can add and remove videowall items. */
+    // Only power users can add and remove Videowall items.
     if (hasItemsChange())
-        return hasAdminPermissions(subject);
+        return hasPowerUserPermissions(subject);
 
-    /* Otherwise - default behavior. */
+    // Otherwise - default behavior.
     return hasPermission(subject, target, Qn::SavePermission);
 }
 
@@ -1083,6 +1083,6 @@ bool QnResourceAccessManager::canCreateWebPage(const QnResourceAccessSubject& su
     if (!subject.isValid())
         return false;
 
-    /* Only admins can add new web pages. */
-    return hasAdminPermissions(subject);
+    /* Only power users can add new web pages. */
+    return hasPowerUserPermissions(subject);
 }

@@ -26,8 +26,8 @@ static const auto kUniqueGroupNameCondition = displayFullMatch(kUniqueGroupName)
 
 TEST_F(ResourceTreeModelTest, cameraAdds)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -47,8 +47,8 @@ TEST_F(ResourceTreeModelTest, cameraRemoves)
     // When camera with certain unique name is added to the server.
     const auto camera = addCamera(kUniqueCameraName, server->getId());
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     ASSERT_TRUE(onlyOneMatches(kUniqueCameraNameCondition));
@@ -62,8 +62,8 @@ TEST_F(ResourceTreeModelTest, cameraRemoves)
 
 TEST_F(ResourceTreeModelTest, cameraIconType)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -80,8 +80,8 @@ TEST_F(ResourceTreeModelTest, cameraIconType)
 
 TEST_F(ResourceTreeModelTest, ioModuleIconType)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -98,8 +98,8 @@ TEST_F(ResourceTreeModelTest, ioModuleIconType)
 
 TEST_F(ResourceTreeModelTest, multisensorCameraIconType)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -116,8 +116,8 @@ TEST_F(ResourceTreeModelTest, multisensorCameraIconType)
 
 TEST_F(ResourceTreeModelTest, recorderIconType)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -151,8 +151,8 @@ TEST_F(ResourceTreeModelTest, recorderNameIsNotDefaultIfUserDefinedNameExists)
     // When user defined group name is set to the first camera;
     cameraList.first()->setUserDefinedGroupName(kUserGroupName);
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // Then exactly one node with user group name display text appears in the resource tree and
     // there are no other group names appear in the resource tree.
@@ -166,7 +166,7 @@ TEST_F(ResourceTreeModelTest, recorderNameIsNotDefaultIfUserDefinedNameExists)
     cameraList.first()->setUserDefinedGroupName({});
     cameraList.last()->setUserDefinedGroupName(kUserGroupName);
 
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
     ASSERT_TRUE(onlyOneMatches(displayFullMatch(kUserGroupName)));
     ASSERT_TRUE(noneMatches(displayFullMatch(kUniqueGroupName)));
     ASSERT_TRUE(noneMatches(displayFullMatch(kDefaultGroupName)));
@@ -174,8 +174,8 @@ TEST_F(ResourceTreeModelTest, recorderNameIsNotDefaultIfUserDefinedNameExists)
 
 TEST_F(ResourceTreeModelTest, virtualCameraIconType)
 {
-    // When User with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When User with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -194,8 +194,8 @@ TEST_F(ResourceTreeModelTest, cameraIconStatus)
 {
     using namespace nx::vms::api;
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -244,8 +244,8 @@ TEST_F(ResourceTreeModelTest, cameraIconStatus)
 
 TEST_F(ResourceTreeModelTest, cameraScheduledExtraStatus)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -267,8 +267,8 @@ TEST_F(ResourceTreeModelTest, cameraBuggyExtraStatus)
 {
     using namespace nx::vms::api;
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -309,8 +309,8 @@ TEST_F(ResourceTreeModelTest, cameraBuggyExtraStatus)
 
 TEST_F(ResourceTreeModelTest, cameraIsEditableByAdmin)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -388,8 +388,8 @@ TEST_F(ResourceTreeModelTest, cameraIsNotEditableByAdvancedViewer)
 
 TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByAdmin)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -467,8 +467,8 @@ TEST_F(ResourceTreeModelTest, recorderGroupIsNotEditableByAdvancedViewer)
 
 TEST_F(ResourceTreeModelTest, singleCameraRecorderGroupExtraStatus)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -502,8 +502,8 @@ TEST_F(ResourceTreeModelTest, twoCamerasRecorderGroupExtraStatus)
     static constexpr auto kUniqueCameraName1 = "unique_camera_name_1";
     static constexpr auto kUniqueCameraName2 = "unique_camera_name_2";
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -552,8 +552,8 @@ TEST_F(ResourceTreeModelTest, twoCamerasOnTwoServersRecorderGroupsExtraStatus)
     static constexpr auto kUniqueCameraName1 = "unique_camera_name_1";
     static constexpr auto kUniqueCameraName2 = "unique_camera_name_2";
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When two servers are added to the resource pool.
     const auto server1 = addServer("server_1");
@@ -590,8 +590,8 @@ TEST_F(ResourceTreeModelTest, twoCamerasOnTwoServersRecorderGroupsExtraStatus)
 
 TEST_F(ResourceTreeModelTest, cameraIsTopLevelNodeOnHiddenEdgeServer)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When edge server is added to the resource pool.
     const auto server = addEdgeServer("server", "192.168.0.0");
@@ -614,8 +614,8 @@ TEST_F(ResourceTreeModelTest, cameraIsTopLevelNodeOnHiddenEdgeServer)
 
 TEST_F(ResourceTreeModelTest, reducedEdgeCameraNodeType)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When edge server is added to the resource pool.
     const auto server = addEdgeServer("server", "192.168.0.0");
@@ -635,8 +635,8 @@ TEST_F(ResourceTreeModelTest, reducedEdgeCameraNodeType)
 
 TEST_F(ResourceTreeModelTest, expandedEdgeCameraNodeType)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When edge server is added to the resource pool.
     const auto server = addEdgeServer("server", "192.168.0.0");
@@ -658,8 +658,8 @@ TEST_F(ResourceTreeModelTest, expandedEdgeCameraNodeType)
 
 TEST_F(ResourceTreeModelTest, edgeServerWithVirtualCameraIsNotHidden)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When edge server is added to the resource pool.
     const auto server = addEdgeServer("server", "192.168.0.0");
@@ -685,8 +685,8 @@ TEST_F(ResourceTreeModelTest, edgeServerWithVirtualCameraIsNotHidden)
 
 TEST_F(ResourceTreeModelTest, virtualCameraOnExpandedEdgeServerIsChildOfServerNodeForAdmin)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When edge server is added to the resource pool.
     const auto server = addEdgeServer("edge_server", "192.168.0.0");
@@ -715,8 +715,8 @@ TEST_F(ResourceTreeModelTest, cameraIsChildOfServerNodeForAdmin)
     // String constants.
     static constexpr auto kUniqueServerName = "unique_server_name";
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server with certain unique name is added to the resource pool.
     const auto server = addServer(kUniqueServerName);
@@ -733,8 +733,8 @@ TEST_F(ResourceTreeModelTest, cameraIsChildOfServerNodeForAdmin)
 
 TEST_F(ResourceTreeModelTest, recorderCameraIsChildOfRecorderNode)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -755,8 +755,8 @@ TEST_F(ResourceTreeModelTest, recorderCameraMovesToAnotherRecorder)
     static constexpr auto kUniqueGroupName1 = "unique_group_name_1";
     static constexpr auto kUniqueGroupName2 = "unique_group_name_2";
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -790,8 +790,8 @@ TEST_F(ResourceTreeModelTest, singleRecorderCameraMovesToAnotherRecorder)
     static constexpr auto kUniqueGroupName1 = "unique_group_name_1";
     static constexpr auto kUniqueGroupName2 = "unique_group_name_2";
 
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -815,8 +815,8 @@ TEST_F(ResourceTreeModelTest, singleRecorderCameraMovesToAnotherRecorder)
 
 TEST_F(ResourceTreeModelTest, recorderGroupHidesWhenSingleRecorderCameraRemoved)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -836,8 +836,8 @@ TEST_F(ResourceTreeModelTest, recorderGroupHidesWhenSingleRecorderCameraRemoved)
 
 TEST_F(ResourceTreeModelTest, subCameraIsChildOfMultisensorCameraNode)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -855,7 +855,7 @@ TEST_F(ResourceTreeModelTest, subCameraIsChildOfMultisensorCameraNode)
 TEST_F(ResourceTreeModelTest, cameraHelpTopic)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -873,7 +873,7 @@ TEST_F(ResourceTreeModelTest, cameraHelpTopic)
 TEST_F(ResourceTreeModelTest, ioModuleHelpTopic)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -891,7 +891,7 @@ TEST_F(ResourceTreeModelTest, ioModuleHelpTopic)
 TEST_F(ResourceTreeModelTest, recorderHelpTopic)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -908,8 +908,8 @@ TEST_F(ResourceTreeModelTest, recorderHelpTopic)
 
 TEST_F(ResourceTreeModelTest, cameraNodeProvidesResource)
 {
-    // When user with administrator permissions is logged in.
-    loginAsAdmin("admin");
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -930,7 +930,7 @@ TEST_F(ResourceTreeModelTest, cameraNodeProvidesResource)
 TEST_F(ResourceTreeModelTest, resourceEditActionAffectsTree)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -957,7 +957,7 @@ TEST_F(ResourceTreeModelTest, recorderDisplayNameMapping)
     static constexpr auto kUserDefinedGroupName = "unique_user_defined_group_name";
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -991,7 +991,7 @@ TEST_F(ResourceTreeModelTest, recorderGroupRenamedWhenGroupNameSetToTheLastAdded
     static constexpr auto kUserDefinedGroupName = "unique_user_defined_group_name";
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -1022,7 +1022,7 @@ TEST_F(ResourceTreeModelTest, multisensorCameraDisplayNameMapping)
     static constexpr auto kUserDefinedGroupName = "unique_user_defined_group_name";
 
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -1053,7 +1053,7 @@ TEST_F(ResourceTreeModelTest, multisensorCameraDisplayNameMapping)
 TEST_F(ResourceTreeModelTest, cameraNodeIsDragEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -1071,7 +1071,7 @@ TEST_F(ResourceTreeModelTest, cameraNodeIsDragEnabled)
 TEST_F(ResourceTreeModelTest, recorderNodeIsDragEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When Server is added to the resource pool.
     const auto server = addServer("server");
@@ -1089,7 +1089,7 @@ TEST_F(ResourceTreeModelTest, recorderNodeIsDragEnabled)
 TEST_F(ResourceTreeModelTest, multisensorCameraNodeIsDragEnabled)
 {
     // When user is logged in.
-    loginAsAdmin("admin");
+    loginAsPowerUser("power_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");

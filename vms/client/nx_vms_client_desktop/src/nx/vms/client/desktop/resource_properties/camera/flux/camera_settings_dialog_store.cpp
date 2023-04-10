@@ -186,10 +186,10 @@ void CameraSettingsDialogStore::setSettingsOptimizationEnabled(bool value)
         });
 }
 
-void CameraSettingsDialogStore::setUserHasAdminPermissions(bool value)
+void CameraSettingsDialogStore::setHasPowerUserPermissions(bool value)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setUserHasAdminPermissions(std::move(state), value); });
+        [&](State state) { return Reducer::setHasPowerUserPermissions(std::move(state), value); });
 }
 
 void CameraSettingsDialogStore::setSingleVirtualCameraState(const VirtualCameraState& value)
