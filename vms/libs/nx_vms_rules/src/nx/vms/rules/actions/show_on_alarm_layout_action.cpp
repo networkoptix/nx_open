@@ -4,7 +4,6 @@
 
 #include "../action_builder_fields/event_devices_field.h"
 #include "../action_builder_fields/event_id_field.h"
-#include "../action_builder_fields/flag_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -22,7 +21,8 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
             utils::makeIntervalFieldDescriptor("Interval of action"),
             utils::makePlaybackFieldDescriptor(tr("Playback Time")),
             utils::makeTargetUserFieldDescriptor(tr("For")),
-            makeFieldDescriptor<ActionFlagField>("forceOpen", tr("Force Alarm Layout opening")),
+            utils::makeActionFlagFieldDescriptor(
+                "forceOpen", tr("Force Alarm Layout opening"), {}, /*defaultValue*/ true),
 
             makeFieldDescriptor<EventIdField>("id", "Event ID"),
             makeFieldDescriptor<EventDevicesField>("eventDeviceIds", "Event devices"),

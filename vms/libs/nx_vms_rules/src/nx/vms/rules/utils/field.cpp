@@ -6,6 +6,7 @@
 #include <nx/utils/qt_helpers.h>
 
 #include "../action_builder_fields/extract_detail_field.h"
+#include "../action_builder_fields/flag_field.h"
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_user_field.h"
 #include "../action_builder_fields/text_with_fields.h"
@@ -119,6 +120,16 @@ FieldDescriptor makeTargetUserFieldDescriptor(
                     : QnUuidSet{})
             }
         });
+}
+
+FieldDescriptor makeActionFlagFieldDescriptor(
+    const QString& fieldName,
+    const QString& displayName,
+    const QString& description,
+    bool defaultValue)
+{
+    return makeFieldDescriptor<ActionFlagField>(
+        fieldName, displayName, description, {{"value", defaultValue}});
 }
 
 QnUuidList getDeviceIds(const AggregatedEventPtr& event)
