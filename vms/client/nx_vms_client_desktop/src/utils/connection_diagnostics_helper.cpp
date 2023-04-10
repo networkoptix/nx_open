@@ -237,16 +237,8 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
     if (!isInstalled && !agreeToDownloadVersion(moduleInformation, engineVersion, parentWidget))
         return false;
 
-    fixLogonData(moduleInformation, &logonData);
     const QString authString = QnStartupParameters::createAuthenticationString(
         logonData, moduleInformation.version);
-
-    // Recreate System URI for older client, may be dropped with 4.2 compatibility.
-    const auto systemUri = (logonData.userType == nx::vms::api::UserType::cloud
-        && moduleInformation.version < kCloudTokenVersion
-        && logonData.credentials.authToken.isPassword())
-        ? QnStartupParameters::createSystemUri(logonData, moduleInformation.cloudHost).toString()
-        : QString();
 
     // Version is installed, trying to run.
     while (true)
@@ -264,7 +256,7 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
         if (needToConfirmRestart && !confirmRestart(moduleInformation, engineVersion, parentWidget))
             return false;
 
-        switch (restartClient(moduleInformation.version, authString, systemUri))
+        switch (restartClient(moduleInformation.version, authString))
         {
             case ResultType::ok:
             {
@@ -290,20 +282,6 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
     // Suppressing compiler warning, should never get here.
     NX_ASSERT(false, "Should never get here");
     return false;
-}
-
-void QnConnectionDiagnosticsHelper::fixLogonData(
-    const nx::vms::api::ModuleInformation& moduleInformation,
-    nx::vms::client::core::LogonData* logonData)
-{
-    const auto& authToken = logonData->credentials.authToken;
-    if (logonData->userType == nx::vms::api::UserType::cloud
-        && moduleInformation.version < kCloudTokenVersion
-        && (authToken.empty() || !authToken.isPassword()))
-    {
-        logonData->credentials =
-            nx::vms::client::core::helpers::loadCloudPasswordCredentials();
-    }
 }
 
 void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(

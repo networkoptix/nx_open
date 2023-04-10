@@ -29,9 +29,6 @@ NX_VMS_CLIENT_CORE_API void removePasswords(
     const QnUuid& localSystemId,
     const QString& userName = QString());
 
-/** Try to load password cloud credentials from older versions, 4.2 and below.*/
-NX_VMS_CLIENT_CORE_API nx::network::http::Credentials loadCloudPasswordCredentials();
-
 NX_VMS_CLIENT_CORE_API CloudAuthData loadCloudCredentials();
 NX_VMS_CLIENT_CORE_API void saveCloudCredentials(const CloudAuthData& credentials);
 
