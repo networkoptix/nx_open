@@ -4,6 +4,7 @@ nx_add_target(nx_vms_utils LIBRARY
     PUBLIC_LIBS
         nx_utils
         nx_vms_api
+        nx_network
     FOLDER common/libs
 )
 
