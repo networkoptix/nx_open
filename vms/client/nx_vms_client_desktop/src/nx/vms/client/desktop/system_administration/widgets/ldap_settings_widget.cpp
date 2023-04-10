@@ -674,6 +674,7 @@ void LdapSettingsWidget::testOnline(
                 }
 
                 d->online = success && std::get_if<std::vector<QString>>(&errorOrData);
+                d->updateUserAndGroupCount();
             }),
         thread());
 }

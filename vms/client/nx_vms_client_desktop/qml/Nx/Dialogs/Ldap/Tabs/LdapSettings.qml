@@ -23,8 +23,8 @@ Rectangle
     property string adminDn
     property string password
     property alias filters: filtersModel.filters
-    property bool continuousSync
-    property bool continuousSyncEditable
+    property bool continuousSync: true
+    property bool continuousSyncEditable: true
     property bool isValid
     property string loginAttribute
     property string groupObjectClass
@@ -37,7 +37,7 @@ Rectangle
     property bool modified
 
     readonly property bool hasConfig:
-        uri != "" || adminDn != "" || filters.length != 0 || continuousSync
+        uri != "" || adminDn != "" || filters.length != 0
 
     readonly property bool showSpinners: (syncIsRunning || syncRequested) && !modified
 
@@ -91,6 +91,12 @@ Rectangle
 
             onAccepted:
             {
+                if (!control.hasConfig)
+                {
+                    control.continuousSync = true
+                    control.continuousSyncEditable = true
+                }
+
                 control.uri = ldapScheme + hostAndPort
                 control.adminDn = adminDn
                 control.password = password
