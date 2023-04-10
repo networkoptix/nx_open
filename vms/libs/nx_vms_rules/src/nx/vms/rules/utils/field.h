@@ -57,6 +57,12 @@ FieldDescriptor makeTargetUserFieldDescriptor(
     const QString& description = {},
     bool isAvailableForPowerUsersByDefault = true);
 
+FieldDescriptor makeActionFlagFieldDescriptor(
+    const QString& fieldName,
+    const QString& displayName,
+    const QString& description = {},
+    bool defaultValue = false);
+
 template <class T, class E>
 T getFieldValue(const E& event, const char* fieldName, T&& defaultValue = T())
 {
