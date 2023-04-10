@@ -24,6 +24,7 @@
 #include "manifest.h"
 #include "router.h"
 #include "rule.h"
+#include "utils/field.h"
 #include "utils/serialization.h"
 #include "utils/type.h"
 
@@ -275,6 +276,29 @@ bool Engine::registerAction(const ItemDescriptor& descriptor, const ActionConstr
     {
         NX_ERROR(this, "Register action failed: % is already registered", descriptor.id);
         return false;
+    }
+
+    if (descriptor.flags.testFlag(ItemFlag::prolonged))
+    {
+        bool hasIntervalField{false};
+        bool hasDurationField{false};
+        for (const auto& fieldDescriptor: descriptor.fields)
+        {
+            if (fieldDescriptor.fieldName == utils::kIntervalFieldName)
+                hasIntervalField = true;
+
+            if (fieldDescriptor.fieldName == utils::kDurationFieldName)
+                hasDurationField = true;
+
+            if (hasIntervalField && hasDurationField)
+                break;
+        }
+
+        if (hasIntervalField && !hasDurationField)
+        {
+            NX_ERROR(this, "Interval of action is not supported by the prolonged only action");
+            return false;
+        }
     }
 
     for (const auto& field: descriptor.fields)

@@ -28,8 +28,8 @@
 #include "engine.h"
 #include "rule.h"
 #include "utils/action.h"
+#include "utils/event.h"
 #include "utils/field.h"
-#include "utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -307,12 +307,21 @@ void ActionBuilder::process(const EventPtr& event)
 
 void ActionBuilder::processEvent(const EventPtr& event)
 {
-    bool isAggregationByTypeSupported{false};
     const auto actionDescriptor = engine()->actionDescriptor(m_actionType);
-    const auto eventDescriptor = engine()->actionDescriptor(event->type());
+    const auto eventDescriptor = engine()->eventDescriptor(event->type());
+    if (!NX_ASSERT(eventDescriptor) || !NX_ASSERT(actionDescriptor))
+        return;
 
-    if (actionDescriptor && eventDescriptor
-        && actionDescriptor->flags.testFlag(ItemFlag::aggregationByTypeSupported)
+    if (isProlonged() && !rules::isProlonged(event))
+    {
+        // Prolonged action without fixed duration must be started and stopped according to the
+        // event state. As instant event does not have such states and not supported.
+        NX_ASSERT(false, "Only prolonged events are supported by the prolonged actions");
+        return;
+    }
+
+    bool isAggregationByTypeSupported{false};
+    if (actionDescriptor->flags.testFlag(ItemFlag::aggregationByTypeSupported)
         && eventDescriptor->flags.testFlag(ItemFlag::aggregationByTypeSupported))
     {
         isAggregationByTypeSupported = true;
@@ -325,11 +334,11 @@ void ActionBuilder::processEvent(const EventPtr& event)
         && m_aggregator->aggregate(
             event, (isAggregationByTypeSupported ? eventType : aggregationKey)))
     {
-        NX_VERBOSE(this, "Event %1 occurred and was aggregated", event->type());
+        NX_VERBOSE(this, "Event %1(%2) occurred and was aggregated", event->type(), event->state());
     }
     else
     {
-        NX_VERBOSE(this, "Event %1 occurred and was sent to execution", event->type());
+        NX_VERBOSE(this, "Event %1(%2) occurred and was sent to execution", event->type(), event->state());
         buildAndEmitAction(AggregatedEventPtr::create(event));
     }
 }

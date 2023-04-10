@@ -37,6 +37,7 @@ public:
 
     virtual void registerActions() const override
     {
+        registerAction<TestAction>();
         registerAction<TestProlongedAction>();
     }
 };

@@ -6,6 +6,7 @@
 #include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
+#include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/manifest.h>
@@ -435,6 +436,40 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
     ASSERT_EQ(actionBuilder->fields()["testField1"]->metatype(), actionFieldType);
     ASSERT_TRUE(actionBuilder->fields().contains("testField2"));
     ASSERT_EQ(actionBuilder->fields()["testField2"]->metatype(), actionFieldType);
+}
+
+TEST_F(EngineTest, onlyValidProlongedActionRegistered)
+{
+    ASSERT_TRUE(engine->registerActionField(
+        fieldMetatype<OptionalTimeField>(), []{ return new OptionalTimeField{}; }));
+
+    ItemDescriptor withoutFields{
+        .id = "nx.actions.withoutFields",
+        .displayName = "Test Name",
+        .flags = ItemFlag::prolonged,
+    };
+    ASSERT_TRUE(engine->registerAction(withoutFields, testActionConstructor));
+
+    ItemDescriptor withIntervalField{
+        .id = "nx.actions.withIntervalField",
+        .displayName = "Test Name",
+        .flags = ItemFlag::prolonged,
+        .fields = {
+            makeFieldDescriptor<OptionalTimeField>(utils::kIntervalFieldName, "Interval", {})
+        }
+    };
+    ASSERT_FALSE(engine->registerAction(withIntervalField, testActionConstructor));
+
+    ItemDescriptor withIntervalAndDurationFields{
+        .id = "nx.actions.withIntervalAndDurationFields",
+        .displayName = "Test Name",
+        .flags = ItemFlag::prolonged,
+        .fields = {
+            makeFieldDescriptor<OptionalTimeField>(utils::kIntervalFieldName, "Interval", {}),
+            makeFieldDescriptor<OptionalTimeField>(utils::kDurationFieldName, "Duration", {})
+        }
+    };
+    ASSERT_TRUE(engine->registerAction(withIntervalAndDurationFields, testActionConstructor));
 }
 
 } // namespace nx::vms::rules::test

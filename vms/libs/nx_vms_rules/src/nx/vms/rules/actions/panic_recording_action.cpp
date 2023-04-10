@@ -2,7 +2,7 @@
 
 #include "panic_recording_action.h"
 
-#include "../utils/field.h"
+#include "../manifest.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -15,7 +15,6 @@ const ItemDescriptor& PanicRecordingAction::manifest()
         .description = tr("Panic Recording mode switches recording settings for all cameras"
             " to maximum FPS and quality."),
         .flags = ItemFlag::prolonged,
-        .fields = {utils::makeIntervalFieldDescriptor(tr("Interval of action"))},
     };
     return kDescriptor;
 }
