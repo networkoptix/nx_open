@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 
 import Nx
+import Nx.Core
 import Nx.Controls
 
 Column

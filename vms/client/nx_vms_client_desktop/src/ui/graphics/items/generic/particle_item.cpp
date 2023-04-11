@@ -12,7 +12,7 @@
 QnParticleItem::QnParticleItem(QGraphicsItem *parent):
     base_type(parent)
 {
-    setColor(nx::vms::client::core::colorTheme()->color("blue_core"));
+    setColor(nx::vms::client::core::colorTheme()->color("particleItem"));
 }
 
 QnParticleItem::~QnParticleItem() {
