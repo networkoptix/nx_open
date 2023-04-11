@@ -330,7 +330,7 @@ void NotificationListModel::Private::onNotificationActionBase(
         onNotificationAction(action.dynamicCast<NotificationAction>(), {});
     else if (actionType == rules::utils::type<RepeatSoundAction>())
         onRepeatSoundAction(action.dynamicCast<RepeatSoundAction>());
-    else if (actionType == rules::utils::type<RepeatSoundAction>())
+    else if (actionType == rules::utils::type<ShowOnAlarmLayoutAction>())
         onAlarmLayoutAction(action.dynamicCast<ShowOnAlarmLayoutAction>());
     else
         NX_ASSERT(false, "Unexpected action type: %1", actionType);
