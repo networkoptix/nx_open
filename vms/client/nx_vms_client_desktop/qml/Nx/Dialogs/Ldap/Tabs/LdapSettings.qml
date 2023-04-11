@@ -290,10 +290,11 @@ Rectangle
 
                         Text
                         {
-                            text: control.userCount >= 0 && statusTag.online
+                            text: control.userCount > 0 && statusTag.online
                                 ? control.userCount
-                                : (control.checkingStatus ? "" : "-")
+                                : (control.showSpinners ? "" : "-")
 
+                            visible: !!text
                             font: Qt.font({pixelSize: 14, weight: Font.Normal})
                             color: ColorTheme.colors.light16
                             verticalAlignment: Text.AlignVCenter
@@ -323,10 +324,11 @@ Rectangle
 
                         Text
                         {
-                            text: control.groupCount >= 0 && statusTag.online
+                            text: control.groupCount > 0 && statusTag.online
                                 ? control.groupCount
-                                : (control.checkingStatus ? "" : "-")
+                                : (control.showSpinners ? "" : "-")
 
+                            visible: !!text
                             font: Qt.font({pixelSize: 14, weight: Font.Normal})
                             color: ColorTheme.colors.light16
                             verticalAlignment: Text.AlignVCenter
@@ -364,7 +366,9 @@ Rectangle
                         {
                             text: statusTag.online && control.lastSync
                                 ? control.lastSync
-                                : (control.checkingStatus ? "" : "-")
+                                : (control.showSpinners ? "" : "-")
+
+                            visible: !!text
 
                             font: Qt.font({pixelSize: 14, weight: Font.Normal})
                             color: ColorTheme.colors.light16
