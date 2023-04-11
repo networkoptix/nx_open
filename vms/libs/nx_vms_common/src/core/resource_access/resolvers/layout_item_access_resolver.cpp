@@ -276,7 +276,8 @@ ResourceAccessMap LayoutItemAccessResolver::Private::ensureAccessMap(const QnUui
 
         for (const auto& item: layoutItems)
         {
-            if (!item.resource.id.isNull()
+            if (!item.transient
+                && !item.resource.id.isNull()
                 && (allowDesktopCameras || !desktopCameraIds.contains(item.resource.id)))
             {
                 accessMap[item.resource.id] |= accessRights;

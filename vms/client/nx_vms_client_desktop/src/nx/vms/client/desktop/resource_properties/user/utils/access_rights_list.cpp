@@ -51,7 +51,7 @@ AccessRightsList::AccessRightsList(QObject* parent):
         AccessRightDescriptor{
             .accessRight = AccessRight::edit,
             .name = tr("Edit Settings"),
-            .description = tr("Can edit device settings"),
+            .description = tr("Can edit device settings and video wall layouts"),
             .icon = QUrl(kIconsDir + "edit_settings.svg")}})
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

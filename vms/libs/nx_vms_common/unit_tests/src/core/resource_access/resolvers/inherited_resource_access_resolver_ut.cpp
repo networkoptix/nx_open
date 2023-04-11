@@ -414,7 +414,7 @@ TEST_F(InheritedResourceAccessResolverTest, inheritedDesktopCameraAccessViaVideo
     addToLayout(layout, camera);
 
     manager->setOwnResourceAccessMap(subjects->id("Group 1"),
-        {{videowall->getId(), AccessRight::view}});
+        {{videowall->getId(), AccessRight::edit}});
 
     const AccessRights expectedRights = AccessRight::view;
 

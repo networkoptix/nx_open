@@ -516,9 +516,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnVideoWallResourcePtr& videoWall) const
 {
-    // `AccessRight::view` for a videowall grants the subject with videowall control permissions.
-
-    if (!hasAccessRights(subject, videoWall, AccessRight::view))
+    if (!hasAccessRights(subject, videoWall, AccessRight::edit))
         return Qn::NoPermissions;
 
     Qn::Permissions result =
@@ -617,10 +615,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             const auto videowall = resourcePool()->getResourceById<QnVideoWallResource>(ownerId);
             if (videowall)
             {
-                // Videowall layout.
-                // TODO: #vkutin
-                // We shouldn't need to do this check.
-                return hasAccessRights(subject, videowall, AccessRight::view)
+                return hasAccessRights(subject, videowall, AccessRight::edit)
                     ? Qn::FullLayoutPermissions
                     : Qn::NoPermissions;
             }
@@ -796,7 +791,7 @@ bool QnResourceAccessManager::canCreateLayout(
 
     // Users with access to video walls can create layouts on them.
     if (const auto videoWall = resourcePool->getResourceById<QnVideoWallResource>(data.parentId))
-        return hasAccessRights(subject, videoWall, AccessRight::view);
+        return hasAccessRights(subject, videoWall, AccessRight::edit);
 
     // Showreel owner can create layouts in it.
     const auto showreel = m_context->showreelManager()->showreel(data.parentId);
@@ -830,7 +825,9 @@ bool QnResourceAccessManager::canModifyLayout(
     const QnResourcePtr& target,
     const nx::vms::api::LayoutData& update) const
 {
-    NX_ASSERT(target.dynamicCast<QnLayoutResource>());
+    const auto layout = target.dynamicCast<QnLayoutResource>();
+    if (!NX_ASSERT(layout))
+        return false;
 
     // If we are changing layout parent, it is equal to creating new layout.
     if (target->getParentId() != update.parentId)
@@ -840,8 +837,35 @@ bool QnResourceAccessManager::canModifyLayout(
     if (!verifyDesktopCameraOnLayout(resourcePool(), subject, update))
         return false;
 
-    // Otherwise - default behavior.
-    return hasPermission(subject, target, Qn::SavePermission);
+    // Check if the user has permission to save this layout.
+    if (!hasPermission(subject, target, Qn::SavePermission))
+        return false;
+
+    // If the layout is not owned by the subject, check there are no items being placed to which
+    // the subject would gain new access rights.
+    if (layout->getParentId() != subject.id() && !hasPowerUserPermissions(subject))
+    {
+        const auto layoutAccessRights = accessRights(subject, layout);
+
+        QSet<QnUuid> oldResourceIds;
+        for (const auto& item: layout->getItems())
+            oldResourceIds.insert(item.resource.id);
+
+        for (const auto& item: update.items)
+        {
+            if (oldResourceIds.contains(item.resourceId))
+                continue;
+
+            const auto resource = resourcePool()->getResourceById(item.resourceId);
+            if (!resource || resource->hasFlags(Qn::local))
+                continue; //< TODO: #vkutin #muskov Is it OK?
+
+            if (!hasAccessRights(subject, resource, layoutAccessRights))
+                return false;
+        }
+    }
+
+    return true;
 }
 
 //-------------------------------------------------------------------------------------------------

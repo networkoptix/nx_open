@@ -65,6 +65,7 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -126,6 +127,7 @@
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <platform/environment.h>
 #include <recording/time_period_list.h>
 #include <ui/delegates/resource_item_delegate.h>
@@ -437,6 +439,13 @@ void ActionHandler::addToLayout(
     if (!layout)
         return;
 
+    if (accessController()->hasPermissions(layout, Qn::SavePermission)
+        && !canAddToLayout(layout, resource))
+    {
+        m_accessDeniedMessage = SceneBanner::show(tr("Not enough access rights"));
+        return;
+    }
+
     if (qnRuntime->lightMode().testFlag(Qn::LightModeSingleItem))
     {
         while (!layout->getItems().isEmpty())
@@ -518,6 +527,8 @@ void ActionHandler::addToLayout(
         data.combinedGeometry = QRectF(params.position, params.position); /* Desired position is encoded into a valid rect. */
     else
         data.combinedGeometry = QRectF(QPointF(0.5, 0.5), QPointF(-0.5, -0.5)); /* The fact that any position is OK is encoded into an invalid rect. */
+
+    data.transient = true;
     layout->addItem(data);
 
     if (resource.dynamicCast<QnAviResource>() && layoutSize == 0)
@@ -3274,6 +3285,22 @@ void ActionHandler::deleteDialogs() {
 
     if (systemAdministrationDialog())
         delete systemAdministrationDialog();
+}
+
+bool ActionHandler::canAddToLayout(
+    const QnLayoutResourcePtr& layout, const QnResourcePtr& resource) const
+{
+    if (!NX_ASSERT(layout && resource))
+        return false;
+
+    api::LayoutData data;
+    ec2::fromResourceToApi(layout, data);
+
+    api::LayoutItemData item;
+    item.resourceId = resource->getId();
+    data.items.push_back(item);
+
+    return resourceAccessManager()->canModifyLayout(accessController()->user(), layout, data);
 }
 
 } // namespace workbench

@@ -60,7 +60,7 @@ void PermissionConverter::extractFromResourceAccessRights(
     {
         if (id == kAllVideoWallsGroupId)
         {
-            if (resourceRight.testFlag(AccessRight::view))
+            if (resourceRight.testFlag(AccessRight::edit))
                 permissions->setFlag(GlobalPermission::controlVideowall);
             continue;
         }

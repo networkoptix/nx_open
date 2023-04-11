@@ -16,6 +16,13 @@
 
 namespace nx::core::access {
 
+namespace {
+
+constexpr AccessRight kRequiredAccessRight = AccessRight::edit;
+constexpr AccessRight kGrantedAccessRight = AccessRight::view;
+
+} // namespace
+
 using namespace nx::vms::api;
 using namespace nx::vms::common;
 
@@ -105,18 +112,18 @@ ResourceAccessDetails VideowallItemAccessResolver::accessDetails(
     if (!hasAccess)
         return {};
 
-    QnResourcePtr target = resource;
-    if (const auto layout = resource.objectCast<QnLayoutResource>())
+    const auto layout = resource.objectCast<QnLayoutResource>();
+    if (layout && accessRight == kGrantedAccessRight)
     {
         if (const auto videowall = d->videowallWatcher->layoutVideowall(layout))
         {
             NX_MUTEX_LOCKER lk(&d->mutex);
             if (d->subjectVideowalls.value(subjectId).contains(videowall))
-                target = videowall;
+                return d->baseResolver->accessDetails(subjectId, videowall, kRequiredAccessRight);
         }
     }
 
-    return d->baseResolver->accessDetails(subjectId, target, accessRight);
+    return d->baseResolver->accessDetails(subjectId, resource, accessRight);
 }
 
 // -----------------------------------------------------------------------------------------------
@@ -202,7 +209,7 @@ ResourceAccessMap VideowallItemAccessResolver::Private::ensureAccessMap(
             cachedAccessMapRef.remove(layoutId);
 
         const auto accessRights = baseResolver->accessRights(subjectId, videowall);
-        if (!accessRights)
+        if (!accessRights.testFlag(kRequiredAccessRight))
             continue;
 
         videowallSubjects[videowall].insert(subjectId);
@@ -215,7 +222,7 @@ ResourceAccessMap VideowallItemAccessResolver::Private::ensureAccessMap(
         for (const auto& layout: layouts)
         {
             if (layout->getParentId() == videowallId)
-                accessMap[layout->getId()] = accessRights;
+                accessMap[layout->getId()] = kGrantedAccessRight;
         }
     }
 

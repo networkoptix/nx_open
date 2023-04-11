@@ -286,6 +286,8 @@ private:
     void openInBrowser(const QnMediaServerResourcePtr& server,
         nx::utils::Url targetUrl, std::string auth, AuthMethod authMethod) const;
 
+    bool canAddToLayout(const QnLayoutResourcePtr& layout, const QnResourcePtr& resource) const;
+
 private:
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
@@ -322,6 +324,7 @@ private:
 
     std::multimap<nx::utils::Url, ServerRequest> m_serverRequests;
     QPointer<nx::vms::client::desktop::SceneBanner> m_layoutIsFullMessage;
+    QPointer<nx::vms::client::desktop::SceneBanner> m_accessDeniedMessage;
 
     QList<action::Parameters> m_queuedDropParameters;
     bool m_inDropResourcesAction = false;
