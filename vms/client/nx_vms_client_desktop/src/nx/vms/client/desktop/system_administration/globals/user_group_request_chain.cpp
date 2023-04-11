@@ -59,7 +59,6 @@ void UserGroupRequestChain::requestModifyGroupParents(
     auto groupData = fromGroupId(mod.id);
     if (groupData.id.isNull())
     {
-        NX_ASSERT(false, "Group %1 does not exist", mod.id);
         requestComplete(false, tr("Group does not exist"));
         return;
     }
@@ -97,7 +96,6 @@ void UserGroupRequestChain::requestModifyUserParents(
     nx::vms::api::UserModelV3 userData = fromUserId(mod.id);
     if (userData.id.isNull())
     {
-        NX_ASSERT(false, "User %1 does not exist", mod.id);
         requestComplete(false, tr("User does not exist"));
         return;
     }
@@ -218,7 +216,6 @@ void UserGroupRequestChain::requestUpdateUser(const UserGroupRequest::UpdateUser
     nx::vms::api::UserModelV3 userData = fromUserId(data.id);
     if (userData.id.isNull())
     {
-        NX_ASSERT(false, "User %1 does not exist", data.id);
         requestComplete(false, tr("User does not exist"));
         return;
     }
