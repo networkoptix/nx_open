@@ -197,6 +197,10 @@ NX_VMS_COMMON_API void PrintTo(const QnTimePeriod& period, ::std::ostream* os);
 NX_VMS_COMMON_API QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 NX_VMS_COMMON_API std::string toString(const QnTimePeriod& period);
 
+// QDataStream operators for QVariant serialization.
+NX_VMS_COMMON_API QDataStream& operator<<(QDataStream& out, const QnTimePeriod& value);
+NX_VMS_COMMON_API QDataStream& operator>>(QDataStream& in, QnTimePeriod& value);
+
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
 
 QN_FUSION_DECLARE_FUNCTIONS(QnTimePeriod,
