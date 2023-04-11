@@ -119,4 +119,7 @@ NX_VMS_COMMON_API QString getFormatString(
 
 NX_VMS_COMMON_API bool is24HoursTimeFormat(FormatterPtr formatter = Formatter::system());
 
+// Formats relative time in the past in human readable form like "just now", "3 minutes ago" etc.
+NX_VMS_COMMON_API QString fromNow(std::chrono::seconds duration);
+
 } // namespace nx::vms::time

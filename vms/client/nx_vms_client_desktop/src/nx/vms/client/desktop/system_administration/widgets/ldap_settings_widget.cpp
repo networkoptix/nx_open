@@ -301,24 +301,9 @@ void LdapSettingsWidget::checkStatus()
                 NX_ASSERT(success);
 
                 d->online = status->state == nx::vms::api::LdapStatus::State::online;
-
-                if (status->timeSinceSyncS)
-                {
-                    using namespace std::chrono;
-                    const auto syncTimeMs = nx::utils::millisSinceEpoch()
-                        - duration_cast<milliseconds>(*status->timeSinceSyncS);
-
-                    const auto timeWatcher = systemContext()->serverTimeWatcher();
-                    const auto dateTime = timeWatcher->displayTime(syncTimeMs.count());
-
-                    d->lastSync = nx::vms::time::toString(
-                        dateTime,
-                        nx::vms::time::dd_MM_yyyy_hh_mm_ss);
-                }
-                else
-                {
-                    d->lastSync = "";
-                }
+                d->lastSync = status->timeSinceSyncS
+                    ? nx::vms::time::fromNow(*status->timeSinceSyncS)
+                    : QString();
 
                 d->syncIsRunning = status->isRunning;
 
