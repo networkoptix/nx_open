@@ -83,6 +83,8 @@ RewindOverlay::RewindOverlay(WindowContext* windowContext, QGraphicsItem* parent
     WindowContextAware(windowContext),
     d(new Private(this))
 {
+    setAcceptedMouseButtons(Qt::NoButton);
+
     d->fastForward->setVisible(false);
     d->rewind->setVisible(false);
     const auto fastForward =
