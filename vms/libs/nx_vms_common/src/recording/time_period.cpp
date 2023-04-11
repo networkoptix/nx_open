@@ -271,6 +271,16 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnTimePeriod *targ
     return detail::deserialize(ctx, value, target);
 }
 
+QDataStream& operator<<(QDataStream& out, const QnTimePeriod& value)
+{
+    return out << value.startTimeMs << value.durationMs; //< QDataStream takes care of endianness.
+}
+
+QDataStream& operator>>(QDataStream& in, QnTimePeriod& value)
+{
+    return in >> value.startTimeMs >> value.durationMs; //< QDataStream takes care of endianness.
+}
+
 QnTimePeriod variantMapToTimePeriod(const QVariantMap& map)
 {
     const auto startTimeIt = map.find("startTime");
