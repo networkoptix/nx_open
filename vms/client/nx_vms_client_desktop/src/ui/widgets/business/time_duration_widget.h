@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <limits>
+
 #include <QtWidgets/QWidget>
 
 #include <nx/vms/text/time_strings.h>
@@ -27,7 +29,8 @@ public:
     void setValue(int secs);
     int value() const;
 
-    void setMaximum(int value);
+    void setMaximum(int secs);
+    void setMinimum(int secs);
 
     QWidget *lastTabItem() const;
 
@@ -36,10 +39,13 @@ signals:
 
 private:
     void updateMinimumValue();
+    void updateMaximumValue();
 
 private:
     QScopedPointer<Ui::TimeDurationWidget> ui;
     QWidget* myWidget = nullptr;
+    int m_min = 1;
+    int m_max = std::numeric_limits<int>::max();
 };
 
 } // namespace nx::vms::client::desktop

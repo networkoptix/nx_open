@@ -2,12 +2,15 @@
 
 #include "bookmark_action.h"
 
+#include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/text_field.h"
 #include "../action_builder_fields/time_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
+
+using namespace std::chrono_literals;
 
 namespace nx::vms::rules {
 
@@ -19,13 +22,21 @@ const ItemDescriptor& BookmarkAction::manifest()
         .flags = ItemFlag::prolonged,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
-            utils::makeDurationFieldDescriptor(tr("Fixed duration")),
-            makeFieldDescriptor<TimeField>(
-                vms::rules::utils::kRecordBeforeFieldName, tr("Pre-recording")),
-            makeFieldDescriptor<TimeField>(
-                vms::rules::utils::kRecordAfterFieldName, tr("Post-recording"),
+            utils::makeTimeFieldDescriptor<OptionalTimeField>(
+                utils::kDurationFieldName,
+                tr("Fixed duration"),
                 {},
+                {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 600s, .minimumValue = 5s}),
+            utils::makeTimeFieldDescriptor<TimeField>(
+                vms::rules::utils::kRecordBeforeFieldName,
+                tr("Pre-recording"),
                 {},
+                {.initialValue = 1s, .maximumValue = 600s, .minimumValue = 0s}),
+            utils::makeTimeFieldDescriptor<TimeField>(
+                vms::rules::utils::kRecordAfterFieldName,
+                tr("Post-recording"),
+                {},
+                {.initialValue = 0s, .maximumValue = 600s, .minimumValue = 0s},
                 {utils::kDurationFieldName}),
             makeFieldDescriptor<ActionTextField>("tags", tr("Tags")),
 

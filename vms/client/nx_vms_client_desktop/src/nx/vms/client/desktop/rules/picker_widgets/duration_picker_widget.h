@@ -48,6 +48,20 @@ protected:
     PICKER_WIDGET_COMMON_USINGS
     TimeDurationWidget* m_timeDurationWidget{nullptr};
 
+    virtual void onDescriptorSet() override
+    {
+        FieldPickerWidget<F>::onDescriptorSet();
+
+        auto maxIt = m_fieldDescriptor->properties.constFind("max");
+        if (maxIt != m_fieldDescriptor->properties.constEnd())
+            m_timeDurationWidget->setMaximum(maxIt->template value<std::chrono::seconds>().count());
+
+        auto minIt = m_fieldDescriptor->properties.constFind("min");
+        m_timeDurationWidget->setMinimum(minIt == m_fieldDescriptor->properties.constEnd()
+            ? 0
+            : minIt->template value<std::chrono::seconds>().count());
+    }
+
     virtual void updateUi()
     {
         auto field = theField();
@@ -130,10 +144,6 @@ private:
             m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
             m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
         }
-
-        auto maxIt = m_fieldDescriptor->properties.constFind("max");
-        if (maxIt != m_fieldDescriptor->properties.constEnd())
-            m_timeDurationWidget->setMaximum(maxIt->template value<std::chrono::seconds>().count());
     }
 
     void updateUi() override

@@ -27,11 +27,43 @@ static constexpr auto kStateFieldName = "state";
 static constexpr auto kTextFieldName = "text";
 static constexpr auto kUsersFieldName = "users";
 
-FieldDescriptor makeIntervalFieldDescriptor(
-    const QString& displayName,
-    const QString& description = {});
+struct TimeFieldProperties
+{
+    /* Value that used by the action builder to make a field. */
+    std::chrono::seconds initialValue = std::chrono::seconds::zero();
 
-FieldDescriptor makeDurationFieldDescriptor(
+    /* Value that used by the OptionalTimeField on switching from 'no duration' to 'has duration'. */
+    std::chrono::seconds defaultValue = initialValue;
+
+    /* Maximum duration value. */
+    std::chrono::seconds maximumValue = std::chrono::weeks{1};
+
+    /* Minimum duration value. */
+    std::chrono::seconds minimumValue = std::chrono::seconds::zero();
+};
+
+template <class T>
+FieldDescriptor makeTimeFieldDescriptor(
+    const QString& fieldName,
+    const QString& displayName,
+    const QString& description = {},
+    const TimeFieldProperties& properties = {},
+    const QStringList& linkedFields = {})
+{
+    return makeFieldDescriptor<T>(
+        fieldName,
+        displayName,
+        description,
+        {
+            {"value", QVariant::fromValue(properties.initialValue)},
+            {"default", QVariant::fromValue(properties.defaultValue)},
+            {"min", QVariant::fromValue(properties.minimumValue)},
+            {"max", QVariant::fromValue(properties.maximumValue)}
+        },
+        linkedFields);
+}
+
+FieldDescriptor makeIntervalFieldDescriptor(
     const QString& displayName,
     const QString& description = {});
 
