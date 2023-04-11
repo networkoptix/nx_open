@@ -31,6 +31,7 @@ public:
 protected:
     virtual void showEvent(QShowEvent* event) override;
     virtual void closeEvent(QCloseEvent* event) override;
+    virtual bool eventFilter(QObject* object, QEvent* event) override;
 
 private:
     void setupRuleTableView();
@@ -51,6 +52,7 @@ private:
     void applyChanges();
     void rejectChanges();
     void resetToDefaults();
+    void deleteCurrentRule();
 
 private:
     std::unique_ptr<Ui::RulesDialog> m_ui;

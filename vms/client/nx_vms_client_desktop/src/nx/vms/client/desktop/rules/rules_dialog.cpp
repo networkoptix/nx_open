@@ -65,12 +65,7 @@ RulesDialog::RulesDialog(QWidget* parent):
                 QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
         });
 
-    connect(m_ui->deleteRuleButton, &QPushButton::clicked, this,
-        [this]
-        {
-            m_rulesTableModel->removeRule(
-                m_rulesFilterModel->mapToSource(m_ui->tableView->selectionModel()->currentIndex()));
-        });
+    connect(m_ui->deleteRuleButton, &QPushButton::clicked, this, &RulesDialog::deleteCurrentRule);
 
     connect(m_ui->eventTypePicker, &EventTypePickerWidget::eventTypePicked, this,
         [this](const QString& eventType)
@@ -156,6 +151,27 @@ void RulesDialog::closeEvent(QCloseEvent* event)
         m_displayedRule.reset();
 }
 
+bool RulesDialog::eventFilter(QObject* object, QEvent* event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        auto pKeyEvent = static_cast<QKeyEvent*>(event);
+        switch (pKeyEvent->key())
+        {
+            case Qt::Key_Delete:
+#if defined(Q_OS_MAC)
+            case Qt::Key_Backspace:
+#endif
+                deleteCurrentRule();
+                return true;
+            default:
+                break;
+        }
+    }
+
+    return QnSessionAwareButtonBoxDialog::eventFilter(object, event);
+}
+
 void RulesDialog::accept()
 {
     applyChanges();
@@ -173,6 +189,7 @@ void RulesDialog::reject()
 
 void RulesDialog::setupRuleTableView()
 {
+    m_ui->tableView->installEventFilter(this);
     m_ui->tableView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(
         QnIndents(style::Metrics::kStandardPadding, style::Metrics::kStandardPadding)));
 
@@ -439,6 +456,12 @@ void RulesDialog::resetToDefaults()
         };
 
     m_rulesTableModel->resetToDefaults(errorHandler);
+}
+
+void RulesDialog::deleteCurrentRule()
+{
+    m_rulesTableModel->removeRule(
+        m_rulesFilterModel->mapToSource(m_ui->tableView->selectionModel()->currentIndex()));
 }
 
 } // namespace nx::vms::client::desktop::rules
