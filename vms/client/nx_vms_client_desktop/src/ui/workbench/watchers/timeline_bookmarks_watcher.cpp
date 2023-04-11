@@ -17,9 +17,11 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/utils/bookmark_merge_helper.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/camera/bookmark_helpers.h>
@@ -76,6 +78,16 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
             const auto& resource = widget->resource();
             if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
                 ensureStaticQueryForCamera(camera);
+        });
+
+    connect(accessController(), &QnWorkbenchAccessController::permissionsReset,
+        this, &QnTimelineBookmarksWatcher::updatePermissions);
+
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (resource == m_currentCamera)
+                updatePermissions();
         });
 
     // FIXME: #sivanov Actually we must listen for all system contexts here.
@@ -232,6 +244,18 @@ void QnTimelineBookmarksWatcher::tryUpdateTimelineBookmarks(
     setTimelineBookmarks(m_aggregation->bookmarkList());
 }
 
+void QnTimelineBookmarksWatcher::updatePermissions()
+{
+    if (!m_currentCamera || !navigator()->timeSlider())
+        return;
+
+    navigator()->timeSlider()->bookmarksViewer()->setReadOnly(!accessController()->hasPermissions(
+        m_currentCamera, Qn::ManageBookmarksPermission));
+
+    navigator()->timeSlider()->bookmarksViewer()->setAllowExport(accessController()->hasPermissions(
+        m_currentCamera, Qn::ViewFootagePermission | Qn::ExportPermission));
+}
+
 void QnTimelineBookmarksWatcher::setTimelineBookmarks(const QnCameraBookmarkList& bookmarks)
 {
     if (m_textFilter.isEmpty())
@@ -265,6 +289,7 @@ void QnTimelineBookmarksWatcher::setCurrentCamera(const QnVirtualCameraResourceP
         return;
 
     m_currentCamera = camera;
+    updatePermissions();
 
     if (m_timelineWindowQuery)
         m_timelineWindowQuery->disconnect(this);

@@ -65,6 +65,8 @@ private:
     /** Create static query, which will request 5000 bookmarks at once for the given camera. */
     void ensureStaticQueryForCamera(const QnVirtualCameraResourcePtr& camera);
 
+    void updatePermissions();
+
 private:
     typedef QScopedPointer<QTimer> TimerPtr;
     typedef QScopedPointer<QnBookmarkQueriesCache> QnBookmarkQueriesCachePtr;
