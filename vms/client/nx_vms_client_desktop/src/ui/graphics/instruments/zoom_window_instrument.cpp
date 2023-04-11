@@ -565,15 +565,15 @@ void ZoomWindowInstrument::ensureSelectionItem()
 void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget)
 {
     connect(widget, &QnResourceWidget::zoomRectChanged, this,
-        &ZoomWindowInstrument::at_widget_zoomRectChanged);
+        [this, widget]() { updateWindowFromWidget(widget); });
     connect(widget->item(), &QnWorkbenchItem::dataChanged, this,
-        [this](Qn::ItemDataRole role)
+        [this, guard = QPointer<QnMediaResourceWidget>(widget)](Qn::ItemDataRole role)
         {
-            if (role == Qn::ItemFrameDistinctionColorRole)
-                at_widget_frameColorChanged();
+            if (guard && role == Qn::ItemFrameDistinctionColorRole)
+                updateWindowFromWidget(guard.data());
         });
     connect(widget, &QnResourceWidget::optionsChanged, this,
-        &ZoomWindowInstrument::at_widget_optionsChanged);
+        [this, widget]() { updateOverlayMode(widget); });
 
     /* Initialize frame color if zoom window was loaded from a layout and
      * not created through this instrument. */
@@ -953,21 +953,6 @@ void ZoomWindowInstrument::finishDrag(DragInfo* /*info*/)
 void ZoomWindowInstrument::finishDragProcess(DragInfo* /*info*/)
 {
     emit zoomWindowProcessFinished(target());
-}
-
-void ZoomWindowInstrument::at_widget_zoomRectChanged()
-{
-    updateWindowFromWidget(checked_cast<QnMediaResourceWidget*>(sender()));
-}
-
-void ZoomWindowInstrument::at_widget_frameColorChanged()
-{
-    updateWindowFromWidget(checked_cast<QnMediaResourceWidget*>(sender()));
-}
-
-void ZoomWindowInstrument::at_widget_optionsChanged()
-{
-    updateOverlayMode(checked_cast<QnMediaResourceWidget*>(sender()));
 }
 
 void ZoomWindowInstrument::at_windowWidget_geometryChanged()
