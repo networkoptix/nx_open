@@ -3,11 +3,14 @@
 #include "device_recording_action.h"
 
 #include "../action_builder_fields/fps_field.h"
+#include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/stream_quality_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/time_field.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
+
+using namespace std::chrono_literals;
 
 namespace nx::vms::rules {
 
@@ -22,15 +25,22 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<StreamQualityField>("quality", tr("Quality")),
             makeFieldDescriptor<FpsField>("fps", tr("FPS"), {}, {}, {utils::kDeviceIdsFieldName}),
-            utils::makeDurationFieldDescriptor(tr("Fixed duration")),
-            makeFieldDescriptor<TimeField>(
-                vms::rules::utils::kRecordBeforeFieldName, tr("Pre-recording")),
-            makeFieldDescriptor<TimeField>(
+            utils::makeTimeFieldDescriptor<OptionalTimeField>(
+                utils::kDurationFieldName,
+                tr("Fixed duration"),
+                {},
+                {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 9999h, .minimumValue = 5s}),
+            utils::makeTimeFieldDescriptor<TimeField>(
+                vms::rules::utils::kRecordBeforeFieldName,
+                tr("Pre-recording"),
+                {},
+                {.initialValue = 1s, .maximumValue = 600s, .minimumValue = 10s}),
+            utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordAfterFieldName,
                 tr("Post-recording"),
                 {},
-                {},
-                {utils::kDurationFieldName}),
+                {.initialValue = 0s, .maximumValue = 600s, .minimumValue = 10s},
+                {utils::kDurationFieldName})
         }
     };
     return kDescriptor;

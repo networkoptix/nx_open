@@ -22,37 +22,32 @@ TimeDurationWidget::TimeDurationWidget(QWidget *parent):
     ui->periodComboBox->addItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Seconds), kSeconds);
     ui->periodComboBox->setVisible(false); //< Have sense to be visible only when more than 1 item is added.
     ui->prefixLabel->setText(QnTimeStrings::fullSuffix(QnTimeStrings::Suffix::Seconds, /*count*/ 0));
+    ui->valueSpinBox->setMinimum(m_min);
+    ui->valueSpinBox->setMaximum(m_max);
 
     connect(ui->periodComboBox, QnComboboxCurrentIndexChanged, this,
         [this]
         {
             updateMinimumValue();
+            updateMaximumValue();
             emit valueChanged();
         });
 
     connect(ui->valueSpinBox, QnSpinboxIntValueChanged, this,
         [this](int value)
         {
-            if (value == 0)
+            if (value == 0 && ui->periodComboBox->currentIndex() > 0)
             {
                 int index = ui->periodComboBox->currentIndex();
-                NX_ASSERT(index >= 0, "Invalid minimum value for the minimal period.");
-                if (index == 0)
                 {
-                    ui->valueSpinBox->setValue(1);
+                    QSignalBlocker blocker(ui->periodComboBox);
+                    ui->periodComboBox->setCurrentIndex(index - 1);
+                    updateMinimumValue();
                 }
-                else
-                {
-                    {
-                        QSignalBlocker blocker(ui->periodComboBox);
-                        ui->periodComboBox->setCurrentIndex(index - 1);
-                        updateMinimumValue();
-                    }
 
-                    int intervalSec = ui->periodComboBox->itemData(index).toInt();
-                    int value = intervalSec / ui->periodComboBox->itemData(index - 1).toInt();
-                    ui->valueSpinBox->setValue(value - 1);
-                }
+                int intervalSec = ui->periodComboBox->itemData(index).toInt();
+                int value = intervalSec / ui->periodComboBox->itemData(index - 1).toInt();
+                ui->valueSpinBox->setValue(value - 1);
             }
             emit valueChanged();
         });
@@ -62,9 +57,33 @@ TimeDurationWidget::~TimeDurationWidget()
 {
 }
 
-void TimeDurationWidget::setMaximum(int value)
+void TimeDurationWidget::setMaximum(int secs)
 {
-    ui->valueSpinBox->setMaximum(value);
+    if (!NX_ASSERT(secs >= m_min))
+        return;
+
+    m_max = secs;
+
+    const auto periodsCount = ui->periodComboBox->count();
+    for (auto i = periodsCount - 1; i > 0; --i)
+    {
+        if (ui->periodComboBox->itemData(i).toInt() > m_max)
+            break;
+
+        ui->periodComboBox->removeItem(i);
+    }
+
+    updateMaximumValue();
+}
+
+void TimeDurationWidget::setMinimum(int secs)
+{
+    if (!NX_ASSERT(secs <= m_max))
+        return;
+
+    m_min = secs;
+
+    updateMinimumValue();
 }
 
 void TimeDurationWidget::addDurationSuffix(QnTimeStrings::Suffix suffix)
@@ -84,9 +103,12 @@ void TimeDurationWidget::addDurationSuffix(QnTimeStrings::Suffix suffix)
         period = kSecondsInDay;
         break;
     default:
-        NX_ASSERT(false, "Suffix is not supported");
+        NX_ASSERT(false, "Suffix '%1' is not supported", suffixName);
         return;
     }
+
+    if (period > m_max)
+        return;
 
     ui->periodComboBox->addItem(suffixName, period);
     ui->prefixLabel->setVisible(false);
@@ -95,19 +117,20 @@ void TimeDurationWidget::addDurationSuffix(QnTimeStrings::Suffix suffix)
 
 void TimeDurationWidget::setValue(int secs)
 {
-    if (secs > 0)
-    {
-        int idx = 0;
-        while (idx < ui->periodComboBox->count() - 1
-               && secs >= ui->periodComboBox->itemData(idx + 1).toInt()
-               && secs  % ui->periodComboBox->itemData(idx + 1).toInt() == 0)
-        {
-            idx++;
-        }
+    secs = std::clamp(secs, m_min, m_max);
+    if (value() == secs)
+        return;
 
-        ui->periodComboBox->setCurrentIndex(idx);
-        ui->valueSpinBox->setValue(secs / ui->periodComboBox->itemData(idx).toInt());
+    int idx = 0;
+    while (idx < ui->periodComboBox->count() - 1
+        && secs >= ui->periodComboBox->itemData(idx + 1).toInt()
+        && secs % ui->periodComboBox->itemData(idx + 1).toInt() == 0)
+    {
+        idx++;
     }
+
+    ui->periodComboBox->setCurrentIndex(idx);
+    ui->valueSpinBox->setValue(secs / ui->periodComboBox->itemData(idx).toInt());
 }
 
 int TimeDurationWidget::value() const
@@ -122,7 +145,24 @@ QWidget* TimeDurationWidget::lastTabItem() const
 
 void TimeDurationWidget::updateMinimumValue()
 {
-    ui->valueSpinBox->setMinimum(ui->periodComboBox->currentIndex() == 0 ? 1 : 0);
+    const auto currentIndex = ui->periodComboBox->currentIndex();
+
+    if (currentIndex == 0) //< seconds
+        ui->valueSpinBox->setMinimum(m_min);
+    else if (m_min < ui->periodComboBox->itemData(currentIndex).toInt())
+        ui->valueSpinBox->setMinimum(m_min / ui->periodComboBox->itemData(currentIndex).toInt());
+    else
+        ui->valueSpinBox->setMinimum(0);
+}
+
+void TimeDurationWidget::updateMaximumValue()
+{
+    const auto currentIndex = ui->periodComboBox->currentIndex();
+
+    if (currentIndex == 0) //< seconds
+        ui->valueSpinBox->setMaximum(m_max);
+    else
+        ui->valueSpinBox->setMaximum(m_max / ui->periodComboBox->itemData(currentIndex).toInt());
 }
 
 } // namespace nx::vms::client::desktop

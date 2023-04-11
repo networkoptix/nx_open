@@ -14,59 +14,30 @@
 #include "../basic_action.h"
 #include "../event_filter_fields/state_field.h"
 
+using namespace std::chrono_literals;
+
 namespace nx::vms::rules::utils {
-
-namespace {
-
-constexpr auto kInitialDurationValue = std::chrono::seconds{5};
-constexpr auto kInitialIntervalValue = std::chrono::seconds{60};
-constexpr auto kInitialPlaybackValue = std::chrono::seconds{0};
-constexpr auto kMaxPlaybackTime = std::chrono::seconds{300};
-constexpr auto kDefaultPlaybackValue = std::chrono::seconds{1};
-
-} // namespace
 
 FieldDescriptor makeIntervalFieldDescriptor(
     const QString& displayName,
     const QString& description)
 {
-    return makeFieldDescriptor<OptionalTimeField>(
+    return makeTimeFieldDescriptor<OptionalTimeField>(
         kIntervalFieldName,
         displayName,
         description,
-        {
-            {"value", QVariant::fromValue(kInitialIntervalValue)},
-            {"default", QVariant::fromValue(kInitialIntervalValue)}
-        });
-}
-
-FieldDescriptor makeDurationFieldDescriptor(
-    const QString& displayName,
-    const QString& description)
-{
-    return makeFieldDescriptor<OptionalTimeField>(
-        kDurationFieldName,
-        displayName,
-        description,
-        {
-            {"value", QVariant::fromValue(kInitialDurationValue)},
-            {"default", QVariant::fromValue(kInitialDurationValue)}
-        });
+        {.initialValue = 1min, .defaultValue = 1min, .minimumValue = 1s});
 }
 
 FieldDescriptor makePlaybackFieldDescriptor(
     const QString& displayName,
     const QString& description)
 {
-    return makeFieldDescriptor<OptionalTimeField>(
+    return makeTimeFieldDescriptor<OptionalTimeField>(
         kPlaybackTimeFieldName,
         displayName,
         description,
-        {
-            {"value", QVariant::fromValue(kInitialPlaybackValue)},
-            {"default", QVariant::fromValue(kDefaultPlaybackValue)},
-            {"max", QVariant::fromValue(kMaxPlaybackTime)},
-        });
+        {.initialValue = 0s, .defaultValue = 1s, .maximumValue = 300s, .minimumValue = 0s});
 }
 
 FieldDescriptor makeStateFieldDescriptor(
