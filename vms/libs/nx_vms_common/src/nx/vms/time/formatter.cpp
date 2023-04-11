@@ -58,6 +58,10 @@ bool isDurationFormat(nx::vms::time::Format format)
         && format < nx::vms::time::Format::duration_formats_end;
 }
 
+struct TimeFormat
+{
+    Q_DECLARE_TR_FUNCTIONS(TimeFormat);
+};
 
 //--------------------------------------------------------------------------------------------------
 
@@ -325,6 +329,41 @@ QString getFormatString(Format format, FormatterPtr formatter)
 bool is24HoursTimeFormat(FormatterPtr formatter)
 {
     return formatter->is24HoursTimeFormat();
+}
+
+QString fromNow(std::chrono::seconds duration)
+{
+    using namespace std::chrono;
+
+    const auto numSeconds = duration_cast<seconds>(duration);
+    if (numSeconds.count() < 60)
+        return TimeFormat::tr("just now");
+
+    const auto numMinutes = duration_cast<minutes>(duration);
+    if (numMinutes.count() < 60)
+        return TimeFormat::tr("%n minute(s) ago", "", numMinutes.count());
+
+    const auto numHours = duration_cast<hours>(duration);
+    if (numHours.count() < 24)
+        return TimeFormat::tr("%n hour(s) ago", "", numHours.count());
+
+    const auto numDays = duration_cast<days>(duration);
+    if (numDays.count() < 2)
+        return TimeFormat::tr("yesterday");
+
+    if (numDays.count() < 7)
+        return TimeFormat::tr("%n day(s) ago", "", numDays.count());
+
+    if (numDays.count() == 7)
+        return TimeFormat::tr("a week ago");
+
+    const auto msecsSinceEpoch =
+        QDateTime::currentMSecsSinceEpoch() - duration_cast<milliseconds>(duration).count();
+
+    if (msecsSinceEpoch < 0) //< This should not happen but we still need to show correct time.
+        return TimeFormat::tr("%n day(s) ago", "", numDays.count());
+
+    return toString(QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch), Format::d_MMMM_yyyy);
 }
 
 } // namespace nx::vms::time
