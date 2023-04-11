@@ -345,7 +345,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
         return;
     }
 
-    if (!isModified())
+    if (d->dialogType == editGroup && !isModified())
     {
         saveStateComplete(state);
         return;

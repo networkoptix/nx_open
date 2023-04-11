@@ -378,7 +378,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
     if (!NX_ASSERT(d->user))
         return;
 
-    if (!isModified())
+    if (d->dialogType == EditUser && !isModified())
     {
         saveStateComplete(state);
         return;
