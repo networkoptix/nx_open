@@ -166,7 +166,7 @@
             "selection": "#2fa2db.setAlpha(192)",
             "separator": "#121517",
             "primaryRecording": "#208020",
-            "secondaryRecording":"#20ff20",
+            "secondaryRecording": "#20ff20",
             "primaryMotion": "#800000",
             "secondaryMotion": "#ff0000",
             "primaryBookmark": "#3775c4",
@@ -220,7 +220,7 @@
             "pen": "#980000",
             "brush": "#c80000.setAlpha(128)"
         },
-        "motionGrid:": {
+        "motionGrid": {
             "background": "#ffffff.setAlpha(16)",
             "foreground": "#ff0000.setAlpha(128)"
         },
