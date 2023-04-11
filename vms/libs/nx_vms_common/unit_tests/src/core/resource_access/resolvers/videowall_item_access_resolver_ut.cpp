@@ -23,7 +23,9 @@ namespace {
 
 AccessRights videowallItemAccessRights(AccessRights videowallAccessRights)
 {
-    return videowallAccessRights;
+    return videowallAccessRights.testFlag(AccessRight::edit)
+        ? AccessRights{AccessRight::view}
+        : AccessRights{};
 }
 
 } // namespace
@@ -39,7 +41,7 @@ public:
     }
 
     const AccessRights kTestAccessRights =
-        AccessRight::view | AccessRight::viewArchive;
+        AccessRight::edit | AccessRight::viewArchive;
 };
 
 TEST_F(VideowallItemAccessResolverTest, noAccess)
@@ -239,7 +241,7 @@ TEST_F(VideowallItemAccessResolverTest, dynamicAccessRightsChange)
         videowallItemAccessRights(kTestAccessRights));
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
-    const auto testAccessRights2 = kTestAccessRights | AccessRight::userInput;
+    const auto testAccessRights2 = AccessRights{};
     manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideoWallsGroupId, testAccessRights2}});
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, videowall), testAccessRights2);
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout),
@@ -303,28 +305,28 @@ TEST_F(VideowallItemAccessResolverTest, accessDetails)
 
     manager->setOwnResourceAccessMap(kTestSubjectId, {{videowall->getId(), kTestAccessRights}});
 
-    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, videowall, AccessRight::view),
+    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, videowall, AccessRight::edit),
         ResourceAccessDetails({{kTestSubjectId, {videowall}}}));
 
     ASSERT_EQ(resolver->accessDetails(kTestSubjectId, layout, AccessRight::view),
         ResourceAccessDetails({{kTestSubjectId, {videowall}}}));
 
-    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, videowall, AccessRight::edit),
+    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, videowall, AccessRight::manageBookmarks),
         ResourceAccessDetails());
 
-    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, layout, AccessRight::edit),
+    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, layout, AccessRight::manageBookmarks),
         ResourceAccessDetails());
 
     // Direct access rights given to a videowall layout should be ignored.
 
     manager->setOwnResourceAccessMap(kTestSubjectId, {
         {videowall->getId(), kTestAccessRights},
-        {layout->getId(), kTestAccessRights | AccessRight::edit}});
+        {layout->getId(), kTestAccessRights | AccessRight::manageBookmarks}});
 
     ASSERT_EQ(resolver->accessDetails(kTestSubjectId, layout, AccessRight::view),
         ResourceAccessDetails({{kTestSubjectId, {videowall}}}));
 
-    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, layout, AccessRight::edit),
+    ASSERT_EQ(resolver->accessDetails(kTestSubjectId, layout, AccessRight::manageBookmarks),
         ResourceAccessDetails());
 }
 

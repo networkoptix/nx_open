@@ -528,7 +528,7 @@ TEST_F(ResourceTreeModelTest, videoWallNodeIsVisibleAndEditableOnlyByUsersHaveSu
 
     // When custom user with videowall control is logged in.
     loginAsCustomUser("customUser");
-    setupAllVideowallsAccess(currentUser(), nx::vms::api::AccessRight::view);
+    setupControlAllVideoWallsAccess(currentUser());
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     videoWallIndex = uniqueMatchingIndex(kUniqueVideoWallNameCondition);

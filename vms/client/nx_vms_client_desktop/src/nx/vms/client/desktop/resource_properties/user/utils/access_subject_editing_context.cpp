@@ -424,7 +424,7 @@ AccessRights AccessSubjectEditingContext::relevantAccessRights(SpecialResourceGr
             return kFullAccessRights;
 
         case SpecialResourceGroup::allVideowalls:
-            return AccessRight::view;
+            return AccessRight::edit;
 
         default:
             return AccessRight::view;

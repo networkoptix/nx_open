@@ -81,7 +81,7 @@ std::map<QnUuid, AccessRights> migrateAccessRights(
     }
 
     if (permissions.testFlag(GlobalPermission::controlVideowall))
-        accessMap.emplace(kAllVideoWallsGroupId, AccessRight::view);
+        accessMap.emplace(kAllVideoWallsGroupId, AccessRight::edit);
 
     for (const auto& id: accessibleResources)
         accessMap.emplace(id, accessRights);

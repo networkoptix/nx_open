@@ -485,10 +485,9 @@ void ResourceTreeModelTest::setupAllMediaAccess(
     setupAccessToObjectForUser(user, kAllServersGroupId, accessRights & AccessRight::view);
 }
 
-void ResourceTreeModelTest::setupAllVideowallsAccess(
-    const QnUserResourcePtr& user, AccessRights accessRights) const
+void ResourceTreeModelTest::setupControlAllVideoWallsAccess(const QnUserResourcePtr& user) const
 {
-    setupAccessToObjectForUser(user, kAllVideoWallsGroupId, accessRights);
+    setupAccessToObjectForUser(user, kAllVideoWallsGroupId, AccessRight::edit);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAs(

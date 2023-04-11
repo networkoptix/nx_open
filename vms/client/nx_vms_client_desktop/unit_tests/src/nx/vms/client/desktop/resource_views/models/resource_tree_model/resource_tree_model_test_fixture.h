@@ -133,8 +133,7 @@ protected:
     void setupAllMediaAccess(
         const QnUserResourcePtr& user, nx::vms::api::AccessRights accessRights) const;
 
-    void setupAllVideowallsAccess(
-        const QnUserResourcePtr& user, nx::vms::api::AccessRights accessRights) const;
+    void setupControlAllVideoWallsAccess(const QnUserResourcePtr& user) const;
 
     QnUserResourcePtr loginAs(const QString& name,
         const std::optional<QnUuid>& groupId = std::nullopt) const;
