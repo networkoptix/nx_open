@@ -80,33 +80,6 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
 
     const QPointer<QnBookmarksViewer> bookmarksViewer(navigator()->timeSlider()->bookmarksViewer());
 
-    const auto updateBookmarkActionsAvailability =
-        [this, bookmarksViewer]()
-        {
-            if (!bookmarksViewer)
-                return;
-
-            const auto bookmarks = bookmarksViewer->getDisplayedBookmarks();
-            const bool readonly = std::none_of(bookmarks.begin(), bookmarks.end(),
-                [this](auto bookmark)
-                {
-                    const auto camera =
-                        resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
-                    if (!camera)
-                        return false;
-
-                    return accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission);
-                });
-
-            bookmarksViewer->setReadOnly(readonly);
-        };
-
-    setupBookmarksExport();
-
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
-        updateBookmarkActionsAvailability);
-    connect(context(), &QnWorkbenchContext::userChanged, this, updateBookmarkActionsAvailability);
-
     connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this,
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
@@ -156,43 +129,6 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
             menu()->triggerIfPossible(action::OpenBookmarksSearchAction,
                 {Qn::BookmarkTagRole, tag});
         });
-}
-
-void QnWorkbenchBookmarksHandler::setupBookmarksExport()
-{
-    auto calculateExportAbility =
-        [this]()
-        {
-            const auto currentWidget = navigator()->currentWidget();
-            if (!currentWidget)
-                return false;
-
-            return ResourceAccessManager::hasPermissions(
-                currentWidget->resource(), Qn::ExportPermission);
-        };
-
-    const auto updateExportAbility =
-        [this, calculateExportAbility]()
-        {
-            // QnWorkbenchNavigator is controlled by QnWorkbenchContext that can live longer than
-            // MainWindow. QnTimeSlider cannot exist longer than MainWindow, because MainWindow is
-            // the top level parent of QnTimeSlider. Therefore, sometimes there may be situations
-            // that the slider will not be valid here.
-            if (const auto slider = navigator()->timeSlider())
-                slider->bookmarksViewer()->setAllowExport(calculateExportAbility());
-        };
-
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
-        [this, updateExportAbility](const QnResourcePtr& resource)
-        {
-            const auto currentWidget = navigator()->currentWidget();
-            const auto currentResource = currentWidget ? currentWidget->resource() : QnResourcePtr();
-            if (resource == currentResource)
-                updateExportAbility();
-        });
-
-    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
-        this, updateExportAbility);
 }
 
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
