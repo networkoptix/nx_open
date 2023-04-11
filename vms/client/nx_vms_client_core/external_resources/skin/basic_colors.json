@@ -35,7 +35,6 @@
     "light16":      "#698796",
     "light17":      "#5f7f8f",
 
-    "blue_core":    "#0000ff",
     "blue8":        "#43c2ff",
     "blue9":        "#39b2ef",
     "blue10":       "#2fa2db",
@@ -94,6 +93,8 @@
         "alertBar": "#61282b",
         "infoBar": "brand_d5"
     },
+
+    "particleItem": "#0000ff",
 
     "detectedObject": [
         "#65991c",
