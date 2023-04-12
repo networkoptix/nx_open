@@ -81,7 +81,7 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
         }
         else if (systemHasInitialServerOnly)
         {
-            url = helpers::serverCloudHost(system->id(), result.expectedServerId.value());
+            url.setHost(helpers::serverCloudHost(system->id(), result.expectedServerId.value()));
             NX_DEBUG(NX_SCOPE_TAG, "Trying to connect to stored preferred cloud server %1 (%2)",
                 result.expectedServerId->toString(), url);
         }
@@ -158,6 +158,9 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
         NX_WARNING(NX_SCOPE_TAG, "No connection to the system %1 is found", system->id());
         return std::nullopt;
     }
+
+    if (!NX_ASSERT(!url.host().isEmpty(), "Invalid system url %1", url))
+        return std::nullopt;
 
     result.address = nx::network::SocketAddress(url.host(), url.port());
     result.userType = nx::vms::api::UserType::cloud;
