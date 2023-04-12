@@ -16,8 +16,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
+#include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/client/core/network/network_module.h>
-#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -691,20 +691,15 @@ bool ClientUpdateTool::shouldRestartTo(const nx::utils::SoftwareVersion& version
     return version != appContext()->version();
 }
 
-QString ClientUpdateTool::getServerAuthString() const
-{
-    if (const auto connection = this->connection())
-        return QnStartupParameters::createAuthenticationString(connection->createLogonData());
-    return {};
-}
-
-bool ClientUpdateTool::restartClient()
+bool ClientUpdateTool::restartClient(std::optional<nx::vms::client::core::LogonData> logonData)
 {
     /* Try to run Applauncher if it is not running. */
     if (!applauncher::api::checkOnline())
         return false;
 
-    const QString authString = getServerAuthString();
+    const QString authString = logonData
+        ? QnStartupParameters::createAuthenticationString(*logonData)
+        : QString();
 
     int triesLeft = 5;
     do
