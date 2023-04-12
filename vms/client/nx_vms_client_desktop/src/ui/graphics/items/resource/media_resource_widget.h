@@ -210,7 +210,7 @@ public:
 
     bool isAnalyticsModeEnabled() const;
 
-    bool hotspotsAvailable() const;
+    bool canDisplayHotspots() const;
 
     bool hotspotsVisible() const;
     void setHotspotsVisible(bool visible);
