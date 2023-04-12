@@ -34,6 +34,20 @@ bool QnCameraBookmarksQuery::isValid() const
     return m_filter.isValid();
 }
 
+bool QnCameraBookmarksQuery::active() const
+{
+    return m_active;
+}
+
+void QnCameraBookmarksQuery::setActive(bool active)
+{
+    if (m_active == active)
+        return;
+
+    m_active = active;
+    emit queryChanged();
+}
+
 const std::set<QnUuid>& QnCameraBookmarksQuery::cameras() const
 {
     return m_filter.cameras;

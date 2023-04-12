@@ -29,13 +29,26 @@ public:
     /**
      * Check if query is valid. Invalid queries cannot be executed. If the query become invalid
      * because of some changes, bookmarksChanged with empty list will be called.
-     * @returns True if cameras is not empty and filter is valid.
+     * @return True if cameras is not empty and filter is valid.
      */
     bool isValid() const;
 
     /**
+     * @return True if query is in active state. Unless query is active it won't be updated
+     *     perpetually by the timer event or when the filter changed. Query isn't active by
+     *     default.
+     */
+    bool active() const;
+
+    /**
+     * Changes the active state of a query. Actual data will be forcefully updated if query is
+     * valid and becomes active.
+     */
+    void setActive(bool active);
+
+    /**
      * Query loads bookmarks only for the given set of cameras.
-     * @returns List of cameras.
+     * @return List of cameras.
      */
     const std::set<QnUuid>& cameras() const;
 
@@ -56,7 +69,7 @@ public:
     /**
      * Adds camera to the stored set of cameras for which the bookmarks should be loaded.
      * @param value Single camera.
-     * @returns True if camera actually was added, i.e it wasn't already in the stored set.
+     * @return True if camera actually was added, i.e it wasn't already in the stored set.
      */
     bool addCamera(const QnUuid& value);
 
@@ -64,13 +77,13 @@ public:
      * Remove camera from the target cameras set. Actual data will be forcefully updated if the
      * new camera set value differs from current.
      * @param value Single camera. If the resulting set is empty, query will become invalid.
-     * @returns True if camera was really removed, false otherwise.
+     * @return True if camera was really removed, false otherwise.
      */
     bool removeCamera(const QnUuid& value);
 
     /**
      * Query loads bookmarks filtered by the given filter.
-     * @returns Current filter.
+     * @return Current filter.
      */
     QnCameraBookmarkSearchFilter filter() const;
 
@@ -93,7 +106,8 @@ public:
     void executeRemoteAsync(BookmarksCallbackType callback);
 
     /**
-     * Refreshes bookmark data using current parameters.
+     * Refreshes bookmark data using current parameters. Does nothing if query is not in the active
+     * state.
      */
     void refresh();
 
@@ -114,4 +128,5 @@ private:
 private:
     const QUuid m_id;
     QnCameraBookmarkSearchFilter m_filter;
+    bool m_active = false;
 };
