@@ -19,6 +19,7 @@
 #include <network/system_helpers.h>
 #include <nx/branding.h>
 #include <nx/utils/app_info.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -2086,26 +2087,32 @@ void MultiServerUpdatesWidget::processInstallingState()
 
 void MultiServerUpdatesWidget::completeClientInstallation(bool clientUpdated)
 {
-    auto updatedProtocol = m_stateTracker->serversWithChangedProtocol();
-    bool clientInstallerRequired = false;
-    if (clientUpdated && !clientInstallerRequired)
+    std::optional<nx::vms::client::core::LogonData> logonData;
+    if (const auto connection = this->connection(); NX_ASSERT(connection))
+        logonData = connection->createLogonData();
+
+    // Client must be forcefully disconnected before restarting to make sure all components
+    // are deinitialized correctly.
+    qnClientMessageProcessor->setHoldConnection(false);
+
+    const QnUuidSet incompatibleServers = m_stateTracker->serversWithChangedProtocol();
+    if (clientUpdated || !incompatibleServers.empty())
+    {
+        NX_INFO(this, "completeInstallation() - servers %1 have new protocol. Forcing reconnect",
+            incompatibleServers);
+
+        menu()->trigger(action::DisconnectAction, {Qn::ForceRole, true});
+    }
+
+    if (clientUpdated)
     {
         NX_INFO(this, "completeInstallation() - restarting the client");
-        if (m_clientUpdateTool->restartClient())
+        if (m_clientUpdateTool->restartClient(logonData))
             return;
 
         NX_ERROR(this, "completeInstallation(%1) - failed to run restart command",
             clientUpdated);
         QnConnectionDiagnosticsHelper::failedRestartClientMessage(this);
-    }
-
-    qnClientMessageProcessor->setHoldConnection(false);
-
-    if (!updatedProtocol.empty())
-    {
-        NX_INFO(this, "completeInstallation() - servers %1 have new protocol. Forcing reconnect",
-            updatedProtocol);
-        menu()->trigger(action::DisconnectAction, {Qn::ForceRole, true});
     }
 
     setUpdateSourceMode(UpdateSourceType::internet);
