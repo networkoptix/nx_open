@@ -14,38 +14,66 @@ public:
     void reload();
     void reset();
 
-    /** Promo dialog for Cloud Layouts. */
+    /**
+     * Promo dialog for Cloud Layouts. Displayed on the first Cloud Layout creation (drop Cross-
+     * System Camera on the scene and save the Layout).
+     */
     Property<bool> cloudLayoutsPromo{this, "cloudLayoutsPromo"};
+
+    /**
+     * Cloud Promo informer. Displayed for Administrators if the System is not connected to the
+     * Cloud.
+     */
     Property<bool> cloudPromo{this, "cloudPromo"};
+
+    /**
+     * Warning which is displayed when forcing secure authentication for the digest-enabled user.
+     */
     Property<bool> digestDisableNotification{this, "digestDisableNotification"};
 
-    /** Edit shared layout. */
+    /**
+     * Warning which is displayed when a Shared Layout is modified the way which will make some
+     * Devices accessible or unaccessible for some Users.
+     */
     Property<bool> sharedLayoutEdit{this, "sharedLayoutEdit"};
-    /** Removing multiple items from layout. */
+
+    /** Warning which is displayed when removing multiple items from a Layout or a Showreel. */
     Property<bool> removeItemsFromLayout{this, "removeItemsFromLayout"};
-    /** Remove multiple items from Showreel. */
-    Property<bool> removeItemsFromShowreel{this, "removeItemsFromShowreel"};
-    /**  Batch delete resources. */
+
+    /** Warning which is displayed when a User, a Device or a Server is removed from the System. */
     Property<bool> deleteResources{this, "deleteResources"};
-    /**  Merge resource groups. */
+
+    /**
+     * Warning which is displayed when two Device Groups are merged (one is renamed into another).
+     */
     Property<bool> mergeResourceGroups{this, "mergeResourceGroups"};
-    /** Move proxied webpages to another server. */
+
+    /**
+     * Warning which is displayed when a WebPage with "Proxy all content" option is moved onto
+     * another Server.
+     */
     Property<bool> moveProxiedWebpageWarning{this, "moveProxiedWebpageWarning"};
-    /** Delete personal (not shared) layout. */
+
+    /** Warning which is displayed when a Power User deletes layout, belonging to another User. */
     Property<bool> deleteLocalLayouts{this, "deleteLocalLayouts"};
 
-    /** Delete ptz preset which is used in the tour. */
+    /** Warning which is displayed when deleting saved PTZ Position which is used in a PTZ Tour. */
     Property<bool> ptzPresetInUse{this, "ptzPresetInUse"};
+
+    /** Promo overlay for PTZ Cameras with new mechanic description. */
     Property<bool> newPtzMechanicPromo{this, "newPtzMechanicPromo"};
+
+    /** Promo overlay for PTZ Cameras with auto-tracking feature description. */
     Property<bool> autoTrackingPromo{this, "autoTrackingPromo"};
 
-    /** Asking for update all outdated servers to the last version. */
+    /** Suggestion to update all outdated Servers in the System to the latest version. */
     Property<bool> versionMismatch{this, "versionMismatch"};
 
-    /** Delete groups. */
+    /** Warning which is displayed when a User Group is removed from the System. */
     Property<bool> deleteUserGroups{this, "deleteUserGroups"};
 
 private:
+    /** Flag whether settings were successfully migrated from the 5.1 settings format. */
     Property<bool> migrationDone{this, "migrationDone"};
 
     void migrate();
