@@ -27,7 +27,7 @@ struct NX_VMS_API DeviceAgentSettingsRequest
     QnUuid analyticsEngineId;
 
     /**%apidoc
-     * Index of the stream that should be used for analytics purposes.
+     * Index of the stream that should be used for the analytics purposes.
      */
     StreamIndex analyzedStreamIndex = StreamIndex::undefined;
 

@@ -37,7 +37,7 @@ QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsSession, (json), NX_VMS_API)
 struct NX_VMS_API DeviceAgentSettingsResponse
 {
     /**%apidoc
-     * Index of the stream that should be used for analytics purposes.
+     * Index of the stream that should be used for the analytics purposes.
      */
     StreamIndex analyzedStreamIndex = StreamIndex::undefined;
 

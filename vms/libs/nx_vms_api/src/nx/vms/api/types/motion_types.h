@@ -18,20 +18,16 @@ NX_REFLECTION_ENUM_CLASS(MotionType,
      */
     default_ = 0,
 
-    /**%apidoc Use motion detection grid implemented by the camera.
-     */
+    /**%apidoc Use motion detection grid implemented by the camera. */
     hardware = 1 << 0,
 
-    /**%apidoc Use motion detection grid implemented by the server.
-     */
+    /**%apidoc Use motion detection grid implemented by the server. */
     software = 1 << 1,
 
-    /**%apidoc Use motion detection window implemented by the camera.
-     */
+    /**%apidoc Use motion detection window implemented by the camera. */
     window = 1 << 2,
 
-    /**%apidoc Do not perform motion detection.
-     */
+    /**%apidoc Do not perform motion detection. */
     none = 1 << 3
 );
 
