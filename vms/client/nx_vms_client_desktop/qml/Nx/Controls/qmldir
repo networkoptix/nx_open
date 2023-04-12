@@ -28,7 +28,6 @@ DoubleSpinBox 1.0 DoubleSpinBox.qml
 DropArea 1.0 DropArea.qml
 DropdownMenu 1.0 DropdownMenu.qml
 Fader 1.0 Fader.qml
-FlatButton 1.0 FlatButton.qml
 GroupBox 1.0 GroupBox.qml
 ImageButton 1.0 ImageButton.qml
 Label 1.0 Label.qml

@@ -23,6 +23,7 @@
 #include <nx/analytics/taxonomy/state_watcher.h>
 #include <nx/metrics/metrics_storage.h>
 #include <nx/vms/common/license/license_usage_watcher.h>
+#include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
@@ -58,6 +59,7 @@ struct SystemContext::Private
     std::unique_ptr<QnGlobalPermissionsManager> globalPermissionsManager;
     std::unique_ptr<QnResourceAccessManager> resourceAccessManager;
     std::unique_ptr<ShowreelManager> showreelManager;
+    std::unique_ptr<LookupListManager> lookupListManager;
     std::unique_ptr<nx::vms::event::RuleManager> eventRuleManager;
     std::unique_ptr<taxonomy::DescriptorContainer> analyticsDescriptorContainer;
     std::unique_ptr<taxonomy::AbstractStateWatcher> analyticsTaxonomyStateWatcher;
@@ -124,7 +126,11 @@ SystemContext::SystemContext(
     d->metrics = std::make_shared<nx::metrics::Storage>();
     switch (mode)
     {
+        case Mode::server:
+            d->lookupListManager = std::make_unique<LookupListManager>();
+            break;
         case Mode::client:
+            d->lookupListManager = std::make_unique<LookupListManager>();
             d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(this);
             d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
             break;
@@ -296,6 +302,11 @@ ResourceAccessSubjectHierarchy* SystemContext::accessSubjectHierarchy() const
 ShowreelManager* SystemContext::showreelManager() const
 {
     return d->showreelManager.get();
+}
+
+LookupListManager* SystemContext::lookupListManager() const
+{
+    return d->lookupListManager.get();
 }
 
 nx::vms::event::RuleManager* SystemContext::eventRuleManager() const

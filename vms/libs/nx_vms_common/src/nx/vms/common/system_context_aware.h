@@ -17,6 +17,7 @@ namespace ec2 { class AbstractECConnection; }
 
 namespace nx::vms::common {
 
+class LookupListManager;
 class ShowreelManager;
 class SystemContext;
 class SystemSettings;
@@ -84,6 +85,12 @@ public:
      * Manages Showreels.
      */
     ShowreelManager* showreelManager() const;
+
+    /**
+     * Manages Lookup Lists. Initialized on the server side by default, on the desktop client only
+     * after first use.  While not initialized, it is accessible but contains no data.
+     */
+    LookupListManager* lookupListManager() const;
 
     /**
      * List of all peers, connected to the System.

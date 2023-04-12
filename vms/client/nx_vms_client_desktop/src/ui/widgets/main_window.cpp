@@ -31,6 +31,7 @@
 #include <nx/vms/client/desktop/debug_utils/menu/debug_actions_handler.h>
 #include <nx/vms/client/desktop/export/workbench/workbench_export_handler.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/lookup_lists/lookup_list_action_handler.h>
 #include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
 #include <nx/vms/client/desktop/radass/radass_action_handler.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -285,6 +286,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<CloudActionsHandler>();
     context->instance<QnWorkbenchVirtualCameraHandler>();
     context->instance<ShowreelActionsHandler>();
+    context->instance<LookupListActionHandler>();
     context->instance<RadassActionHandler>();
     context->instance<StartupActionsHandler>();
     context->instance<ui::workbench::ResourceGroupingActionHandler>();

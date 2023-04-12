@@ -152,9 +152,10 @@ Item
                 onClicked: buttonClicked()
             }
 
-            FlatButton
+            Button
             {
                 id: secondaryButton
+                flat: true // TODO: Probably TextButton should be used here instead.
 
                 height: 16
                 anchors.horizontalCenter: parent.horizontalCenter

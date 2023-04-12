@@ -240,6 +240,12 @@ public:
     ShowreelManager* showreelManager() const;
 
     /**
+     * Manages Lookup Lists. Initialized on the server side by default, on the desktop client only
+     * after first use. While not initialized, it is accessible but contains no data.
+     */
+    LookupListManager* lookupListManager() const;
+
+    /**
      * Manages old event rules.
      */
     nx::vms::event::RuleManager* eventRuleManager() const;
