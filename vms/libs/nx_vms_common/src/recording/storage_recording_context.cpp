@@ -204,8 +204,12 @@ AVMediaType StorageRecordingContext::streamAvMediaType(
             ? m_recordingContext.metadataStream->index : -1;
     }
 
-    if (streamIndex < 0 || streamIndex >= (int) m_recordingContext.formatCtx->nb_streams)
+    if (!m_recordingContext.formatCtx ||
+        streamIndex < 0 ||
+        streamIndex >= (int) m_recordingContext.formatCtx->nb_streams)
+    {
         return AVMEDIA_TYPE_UNKNOWN;
+    }
 
     return m_recordingContext.formatCtx->streams[streamIndex]->codecpar->codec_type;
 }
