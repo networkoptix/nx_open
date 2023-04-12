@@ -97,9 +97,9 @@ struct NX_VMS_API MediaStreamSettings
      */
     bool accurateSeek = false;
 
-    /**%apidoc [opt] Open high quality stream if parameter is 0 or low quality stream
-     * if parameter is 1. By default Server auto detects preferred stream index based on
-     * destination resolution.
+    /**%apidoc[opt]
+     * %value undefined The Server auto-detects the preferred stream index based on the destination
+     * resolution.
      */
     StreamIndex stream = nx::vms::api::StreamIndex::undefined;
 
