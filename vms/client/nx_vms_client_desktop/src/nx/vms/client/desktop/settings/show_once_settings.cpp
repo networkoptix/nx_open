@@ -16,6 +16,7 @@ ShowOnceSettings::ShowOnceSettings():
             + "/settings/show_once"
     ))
 {
+    load();
     migrate();
 }
 
@@ -48,15 +49,13 @@ void ShowOnceSettings::migrate()
     digestDisableNotification = readValue("DigestDisableNotification");
     sharedLayoutEdit = readValue("SharedLayoutEdit");
     removeItemsFromLayout = readValue("RemoveItemsFromLayout");
-    removeItemsFromShowreel = readValue("RemoveItemsFromShowreel");
     deleteResources = readValue("DeleteResources");
     mergeResourceGroups = readValue("MergeResourceGroups");
     moveProxiedWebpageWarning = readValue("MoveProxiedWebpageWarning");
     deleteLocalLayouts = readValue("DeleteLocalLayouts");
     ptzPresetInUse = readValue("PtzPresetInUse");
     newPtzMechanicPromo = readValue("NewPtzMechanicPromoBlock");
-    autoTrackingPromo = readValue("AutoTrackingPromoBlock");
-    versionMismatch = readValue("NewPtzMechanicPromoBlock");
+    versionMismatch = readValue("VersionMismatch");
 
     migrationDone = true;
 }

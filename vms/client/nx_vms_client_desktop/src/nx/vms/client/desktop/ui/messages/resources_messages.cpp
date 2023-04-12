@@ -178,8 +178,8 @@ bool Resources::removeItemsFromLayout(QWidget* parent,
 
 bool Resources::removeItemsFromShowreel(QWidget* parent, const QnResourceList& resources)
 {
-    /* Check if user have already silenced this warning. */
-    if (showOnceSettings()->removeItemsFromShowreel())
+    /* Check if user have already silenced this warning. Used the same warning as for layouts. */
+    if (showOnceSettings()->removeItemsFromLayout())
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
@@ -191,7 +191,7 @@ bool Resources::removeItemsFromShowreel(QWidget* parent, const QnResourceList& r
     messageBox.setCheckBoxEnabled();
     const auto result = messageBox.exec();
     if (messageBox.isChecked())
-        showOnceSettings()->removeItemsFromShowreel = true;
+        showOnceSettings()->removeItemsFromLayout = true;
 
     return result != QDialogButtonBox::Cancel;
 }
