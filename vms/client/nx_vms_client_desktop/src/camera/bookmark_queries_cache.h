@@ -46,6 +46,8 @@ public:
 
     void refreshQueries();
 
+    void setQueriesActive(bool active);
+
 private:
     bool updateFilterTimeWindow(QnCameraBookmarkSearchFilter &filter
         , qint64 startTimeMs

@@ -372,7 +372,9 @@ bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId
 
     const QueryInfo info = m_queries[queryId];
     QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
-    NX_ASSERT(query, "Interface does not allow query to be null");
+
+    if (!NX_ASSERT(query, "Interface does not allow query to be null") || !query->active())
+        return false;
 
     switch (info.state)
     {

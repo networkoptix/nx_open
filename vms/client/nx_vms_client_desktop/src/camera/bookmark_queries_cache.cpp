@@ -125,6 +125,12 @@ void QnBookmarkQueriesCache::refreshQueries()
     }
 }
 
+void QnBookmarkQueriesCache::setQueriesActive(bool active)
+{
+    for (const auto& queryData: m_queries)
+        queryData.second->setActive(active);
+}
+
 bool QnBookmarkQueriesCache::updateFilterTimeWindow(QnCameraBookmarkSearchFilter &filter
     , qint64 startTimeMs
     , qint64 endTimeMs)

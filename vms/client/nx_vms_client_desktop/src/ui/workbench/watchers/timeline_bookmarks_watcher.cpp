@@ -69,8 +69,19 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &QnTimelineBookmarksWatcher::updateCurrentCamera);
-    connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
-        &QnTimelineBookmarksWatcher::updateCurrentCamera);
+
+    connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged,
+        [this]()
+        {
+            const auto bookmarksModeEnabled = navigator()->bookmarksModeEnabled();
+
+            if (m_timelineWindowQuery)
+                m_timelineWindowQuery->setActive(bookmarksModeEnabled);
+
+            m_queriesCache->setQueriesActive(bookmarksModeEnabled);
+
+            updateCurrentCamera();
+        });
 
     connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
         [this](QnResourceWidget* widget)
@@ -102,6 +113,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
     m_updateStaticQueriesTimer->setInterval(kUpdateStaticQueriesInterval);
     connect(m_updateStaticQueriesTimer.get(), &QTimer::timeout, m_queriesCache.get(),
         &QnBookmarkQueriesCache::refreshQueries);
+
     m_updateStaticQueriesTimer->start();
 }
 
@@ -126,6 +138,7 @@ QnCameraBookmarkList QnTimelineBookmarksWatcher::rawBookmarksAtPosition(
         return helpers::bookmarksAtPosition(m_aggregation->bookmarkList(), positionMs);
 
     const auto& query = m_queriesCache->getOrCreateQuery(camera);
+    query->setActive(navigator()->bookmarksModeEnabled());
     const auto& bookmarks = query->cachedBookmarks();
 
     return helpers::bookmarksAtPosition(bookmarks, positionMs);
@@ -234,6 +247,7 @@ void QnTimelineBookmarksWatcher::tryUpdateTimelineBookmarks(
     }
 
     const auto staticQuery = m_queriesCache->getOrCreateQuery(m_currentCamera);
+    staticQuery->setActive(navigator()->bookmarksModeEnabled());
     m_aggregation->setBookmarkList(staticQuery->cachedBookmarks());
     m_aggregation->mergeBookmarkList(m_timelineWindowQuery->cachedBookmarks());
 
@@ -303,6 +317,8 @@ void QnTimelineBookmarksWatcher::setCurrentCamera(const QnVirtualCameraResourceP
         m_timelineWindowQuery = SystemContext::fromResource(m_currentCamera)
             ->cameraBookmarksManager()->createQuery(filter);
 
+        m_timelineWindowQuery->setActive(navigator()->bookmarksModeEnabled());
+
         connect(m_timelineWindowQuery.get(), &QnCameraBookmarksQuery::bookmarksChanged, this,
             [this](const QnCameraBookmarkList& bookmarks)
             {
@@ -322,6 +338,8 @@ void QnTimelineBookmarksWatcher::ensureStaticQueryForCamera(
         return;
 
     const auto query = m_queriesCache->getOrCreateQuery(camera);
+    query->setActive(navigator()->bookmarksModeEnabled());
+
     connect(query.get(), &QnCameraBookmarksQuery::bookmarksChanged, this,
         [this, camera](const QnCameraBookmarkList& bookmarks)
         {
