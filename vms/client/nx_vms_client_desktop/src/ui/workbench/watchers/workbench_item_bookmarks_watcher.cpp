@@ -19,6 +19,7 @@
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <utils/camera/bookmark_helpers.h>
 #include <utils/common/scoped_timer.h>
 #include <utils/common/synctime.h>
@@ -194,6 +195,14 @@ QnWorkbenchItemBookmarksWatcher::WidgetData::WidgetData(
 
     connect(m_mediaWidget, &QnMediaResourceWidget::positionChanged,
         this, &WidgetData::updatePos);
+
+    m_query->setActive(m_parent->navigator()->bookmarksModeEnabled());
+    connect(m_parent->navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged,
+        [this]()
+        {
+            const auto bookmarksModeEnabled = m_parent->navigator()->bookmarksModeEnabled();
+            m_query->setActive(bookmarksModeEnabled);
+        });
 }
 
 QnWorkbenchItemBookmarksWatcher::WidgetData::~WidgetData()
