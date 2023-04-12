@@ -265,7 +265,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Feature] Enable double layer tab bar.");
 
     // VMS-34514
-    NX_INI_FLAG(false, enableCameraHotspotsFeature,
+    NX_INI_FLAG(true, enableCameraHotspotsFeature,
         "[Feature] Makes Camera Hotspots feature available in the client.");
 
     // VMS-32420
