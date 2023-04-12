@@ -7,8 +7,8 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QTimer>
-#include <QtWidgets/QAction>
 #include <QtQml/QtQml>
+#include <QtWidgets/QAction>
 
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
@@ -18,6 +18,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/vms/api/protocol_version.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -161,8 +162,14 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
 
     connect(restartAction.data(),
         &QAction::triggered,
-        clientUpdateTool,
-        &ClientUpdateTool::restartClient);
+        this,
+        [this]()
+        {
+            std::optional<nx::vms::client::core::LogonData> logonData;
+            if (const auto connection = this->connection())
+                logonData = connection->createLogonData();
+            clientUpdateTool->restartClient(logonData);
+        });
 
     connect(settingsAction.data(),
         &QAction::triggered,

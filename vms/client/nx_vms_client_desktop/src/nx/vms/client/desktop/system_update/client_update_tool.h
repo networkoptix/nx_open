@@ -130,9 +130,10 @@ public:
     /**
      * Restart client to the new version.
      * Works only in state State::complete.
+     * @param logonData Target System to connect to and its credentials.
      * @return true if command was successful.
      */
-    bool restartClient();
+    bool restartClient(std::optional<nx::vms::client::core::LogonData> logonData);
 
     /**
      * Check if client should be restarted to this version.
@@ -212,7 +213,6 @@ private:
     void setError(const Error& error);
     void clearDownloadFolder();
     void verifyUpdateFile();
-    QString getServerAuthString() const;
 
     /**
      * Converts applauncher::api::ResultType to a readable string.
