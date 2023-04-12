@@ -290,6 +290,8 @@ def main():
         if os.path.islink(join(conf.BUILD_DIR, lib_dir, "ffmpeg")):
             archiveFiles(a, lib_dir, join(conf.BUILD_DIR, lib_dir), ["ffmpeg"])
 
+        archiveFiles(a, "", join(conf.BUILD_DIR, "distrib"), [conf.CONAN_REFS_FILE])
+
 
 if __name__ == "__main__":
     try:
