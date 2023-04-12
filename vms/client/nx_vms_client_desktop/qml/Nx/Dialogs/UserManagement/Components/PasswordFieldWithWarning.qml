@@ -24,6 +24,23 @@ TextFieldWithValidator
 
     property var strength: UserSettingsGlobal.passwordStrength(text)
 
+    property bool showFakePassword: false
+
+    textField.placeholderTextColor: showFakePassword
+        ? (textField.focus ? textField.selectedTextColor : textField.color)
+        : ""
+    textField.placeholderText: !showFakePassword
+        ? ""
+        : textField.passwordCharacter.repeat(10)
+    textField.hidePlaceholderOnFocus: !showFakePassword
+    textField.selectPlaceholderOnFocus: showFakePassword
+
+    Connections
+    {
+        target: control.textField
+        function onTextEdited() { control.showFakePassword = false }
+    }
+
     Rectangle
     {
         id: indicator
