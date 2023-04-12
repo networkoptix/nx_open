@@ -34,11 +34,12 @@ NX_REFLECTION_ENUM_CLASS(MotionType,
 Q_DECLARE_FLAGS(MotionTypes, MotionType)
 Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes)
 
+/**%apidoc Index of the stream that is requested from the camera. */
 enum class StreamIndex
 {
     undefined = -1,
-    primary = 0,
-    secondary = 1
+    primary = 0, /**<%apidoc High-resolution stream. */
+    secondary = 1, /**<%apidoc Low-resolution stream. */
 };
 
 template<typename Visitor>
