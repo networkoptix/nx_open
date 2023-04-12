@@ -162,7 +162,8 @@ struct Workbench::Private
     std::array<QnWorkbenchItem*, Qn::ItemRoleCount> itemByRole = {};
 
     /** Stored dummy layout. It is used to ensure that current layout is never nullptr. */
-    QnWorkbenchLayout* dummyLayout = new WorkbenchLayout(LayoutResourcePtr(new LayoutResource()));
+    std::unique_ptr<QnWorkbenchLayout> dummyLayout =
+        std::make_unique<WorkbenchLayout>(LayoutResourcePtr(new LayoutResource()));
 
     /** Whether current layout is being changed. */
     bool inLayoutChangeProcess = false;
@@ -235,7 +236,7 @@ Workbench::Workbench(QObject* parent):
     QnWorkbenchContextAware(parent),
     d(new Private())
 {
-    setCurrentLayout(d->dummyLayout);
+    setCurrentLayout(d->dummyLayout.get());
 
     d->stateDelegate = std::make_shared<StateDelegate>(this);
     appContext()->clientStateHandler()->registerDelegate(kWorkbenchDataKey, d->stateDelegate);
@@ -257,15 +258,7 @@ Workbench::Workbench(QObject* parent):
 
 Workbench::~Workbench()
 {
-    QSignalBlocker blocker(this);
-
-    // Avoid processing current layout signals while it is destroyed.
-    setCurrentLayout(nullptr);
-
     appContext()->clientStateHandler()->unregisterDelegate(kWorkbenchDataKey);
-    delete d->dummyLayout;
-    d->dummyLayout = nullptr;
-    d->layouts.clear();
 }
 
 WindowContext* Workbench::windowContext() const
@@ -520,7 +513,7 @@ void Workbench::removeSystem(const QString& systemId)
 void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
 {
     if (!layout)
-        layout = d->dummyLayout;
+        layout = d->dummyLayout.get();
 
     if (d->currentLayout == layout)
         return;
@@ -582,10 +575,10 @@ void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
 
     /* Prepare new layout. */
     d->currentLayout = layout;
-    if (d->currentLayout == nullptr && NX_ASSERT(d->dummyLayout))
+    if (!d->currentLayout)
     {
         d->dummyLayout->clear();
-        d->currentLayout = d->dummyLayout;
+        d->currentLayout = d->dummyLayout.get();
     }
 
     // Set up a new layout.
