@@ -726,7 +726,7 @@ void QnMediaResourceWidget::initStatusOverlayController()
 
 void QnMediaResourceWidget::initCameraHotspotsOverlay()
 {
-    if (!ini().enableCameraHotspotsFeature)
+    if (!canDisplayHotspots())
         return;
 
     m_cameraHotspotsOverlayWidget = new CameraHotspotsOverlayWidget(this);
@@ -2365,7 +2365,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
             result |= Qn::ScreenshotButton;
     }
 
-    if (hotspotsAvailable())
+    if (canDisplayHotspots() && d->camera->cameraHotspotsEnabled())
         result |= Qn::HotspotsButton;
 
     if (isZoomWindow())
@@ -3142,23 +3142,25 @@ bool QnMediaResourceWidget::isAnalyticsModeEnabled() const
     return d->isAnalyticsEnabledInStream();
 }
 
-bool QnMediaResourceWidget::hotspotsAvailable() const
+bool QnMediaResourceWidget::canDisplayHotspots() const
 {
+    const auto workbenchContext = windowContext()->workbenchContext();
+
     return ini().enableCameraHotspotsFeature
         && d->camera
-        && d->camera->cameraHotspotsEnabled()
-        && !tourIsRunning(windowContext()->workbenchContext());
+        && !tourIsRunning(workbenchContext);
 }
 
 bool QnMediaResourceWidget::hotspotsVisible() const
 {
-    return hotspotsAvailable()
+    return canDisplayHotspots()
+        && d->camera->cameraHotspotsEnabled()
         && titleBar()->rightButtonsBar()->button(Qn::HotspotsButton)->isChecked();
 }
 
 void QnMediaResourceWidget::setHotspotsVisible(bool visible)
 {
-    if (!NX_ASSERT(hotspotsAvailable()))
+    if (!NX_ASSERT(canDisplayHotspots() && d->camera->cameraHotspotsEnabled()))
         return;
 
     titleBar()->rightButtonsBar()->button(Qn::HotspotsButton)->setChecked(visible);
