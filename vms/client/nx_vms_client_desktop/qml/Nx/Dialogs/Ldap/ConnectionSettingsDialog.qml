@@ -34,6 +34,7 @@ Dialog
     property alias password: passwordTextField.text
     property alias useStarTls: starTlsCheckbox.checked
     property alias ignoreCertErrors: ignoreCertErrorsCheckbox.checked
+    property alias showFakePassword: passwordTextField.showFakePassword
 
     property var self
     property var testState: LdapSettings.TestState.initial
@@ -146,12 +147,13 @@ Dialog
             PasswordFieldWithWarning
             {
                 id: passwordTextField
+
                 showStrength: false
                 width: parent.width
 
                 validateFunc: (text) =>
                 {
-                    return passwordTextField.text
+                    return passwordTextField.text || passwordTextField.showFakePassword
                         ? ""
                         : qsTr("Password cannot be empty.")
                 }

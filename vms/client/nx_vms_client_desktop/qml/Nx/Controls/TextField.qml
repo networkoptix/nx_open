@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Controls 2.15
 import QtQuick.Controls.impl 2.15
 import QtQuick.Templates 2.15 as T
@@ -19,6 +20,7 @@ T.TextField
     property bool warningState: false
     placeholderTextColor: ColorTheme.transparent(color, 0.5)
     property bool hidePlaceholderOnFocus: false
+    property bool selectPlaceholderOnFocus: false
 
     property int prevSelectionStart: 0
     property int prevSelectionEnd: 0
@@ -68,23 +70,42 @@ T.TextField
         control: parent
     }
 
-    PlaceholderText
+    RowLayout
     {
-        id: placeholder
+        readonly property alias effectiveHorizontalAlignment: control.horizontalAlignment 
 
-        anchors.fill: control
-        leftPadding: control.leftPadding
-        rightPadding: control.rightPadding
-        topPadding: control.topPadding
-        bottomPadding: control.bottomPadding
+        anchors
+        {
+            fill: control
+            leftMargin: control.leftPadding
+            rightMargin: control.rightPadding
+            topMargin: control.topPadding
+            bottomMargin: control.bottomPadding
+        }
 
-        text: control.placeholderText
-        font: control.font
-        color: placeholderTextColor
-        horizontalAlignment: control.horizontalAlignment
-        verticalAlignment: control.verticalAlignment
-        renderType: control.renderType
-        elide: Text.ElideRight
+        PlaceholderText
+        {
+            id: placeholder
+
+            Layout.alignment: control.horizontalAlignment | control.verticalAlignment
+
+            text: control.placeholderText
+            font: control.font
+            color: control.placeholderTextColor
+            renderType: control.renderType
+            elide: Text.ElideRight
+
+            Rectangle
+            {
+                anchors.fill: parent
+                anchors.bottomMargin: 1
+
+                z: -1
+
+                color: control.selectionColor
+                visible: control.selectPlaceholderOnFocus && control.activeFocus
+            }
+        }
 
         visible: !control.length && !control.preeditText
             && (!control.activeFocus
