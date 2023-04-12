@@ -1456,6 +1456,9 @@ enum IDType
      */
     UndoReplaceCameraAction,
 
+    /** Opens Lookup Lists dialog. */
+    OpenLookupListsDialogAction,
+
     ActionCount,
 
     NoAction = -1

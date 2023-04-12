@@ -89,6 +89,11 @@ ShowreelManager* SystemContextAware::showreelManager() const
     return systemContext()->showreelManager();
 }
 
+LookupListManager* SystemContextAware::lookupListManager() const
+{
+    return systemContext()->lookupListManager();
+}
+
 QnRuntimeInfoManager* SystemContextAware::runtimeInfoManager() const
 {
     return systemContext()->runtimeInfoManager();

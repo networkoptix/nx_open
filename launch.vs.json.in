@@ -11,6 +11,19 @@
     {
       "type": "default",
       "project": "CMakeLists.txt",
+      "projectTarget": "@customization.vmsId@.exe (bin\\@customization.vmsId@.exe)",
+      "name": "Client with local QML",
+      "args": [
+        "--qml-root",
+        "${projectDir}/open/vms/client/nx_vms_client_desktop/qml",
+        "--qml-import-paths",
+        "${projectDir}/open/vms/client/nx_vms_client_core/static-resources/qml"
+      ],
+      "env": "PATH=${env.qtdir};${env.PATH}"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
       "projectTarget": "nx_vms_client_desktop_ut.exe (bin\\nx_vms_client_desktop_ut.exe)",
       "name": "nx_vms_client_desktop_ut.exe (bin\\nx_vms_client_desktop_ut.exe)",
       "args": [

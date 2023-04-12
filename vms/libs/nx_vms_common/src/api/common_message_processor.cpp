@@ -33,6 +33,7 @@
 #include <nx/vms/api/data/hardware_id_mapping.h>
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/rules/event_info.h>
+#include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -49,6 +50,7 @@
 #include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_license_manager.h>
+#include <nx_ec/managers/abstract_lookup_list_manager.h>
 #include <nx_ec/managers/abstract_media_server_manager.h>
 #include <nx_ec/managers/abstract_misc_manager.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
@@ -481,6 +483,18 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &ec2::AbstractShowreelNotificationManager::removed,
         m_context->showreelManager(),
         &ShowreelManager::removeShowreel,
+        connectionType);
+
+    const auto lookupListNotificationManager = connection->lookupListNotificationManager().get();
+    connect(lookupListNotificationManager,
+        &ec2::AbstractLookupListNotificationManager::addedOrUpdated,
+        m_context->lookupListManager(),
+        &LookupListManager::addOrUpdate,
+        connectionType);
+    connect(lookupListNotificationManager,
+        &ec2::AbstractLookupListNotificationManager::removed,
+        m_context->lookupListManager(),
+        &LookupListManager::remove,
         connectionType);
 
     const auto analyticsManager = connection->analyticsNotificationManager();

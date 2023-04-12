@@ -14,6 +14,9 @@
 
 namespace nx::vms::api {
 
+// TODO: Use it in the LookupListData::entries as soon as apidoctool support is implemented.
+using LookupListEntry = std::map<QString, QString>;
+
 /**
  * List of analytics object lookup entries, intended for the VMS Rules usage in the first place.
  * It is used to check whether found analytics object matches one of the entries (e.g. to maintain
@@ -22,11 +25,11 @@ namespace nx::vms::api {
  * differ between entries, e.g. one entry can allow all Cars with subtype "Bus" while other will
  * contain allowed license plate numbers.
  */
-struct LookupListData: IdData
+struct NX_VMS_API LookupListData: IdData
 {
     /**%apidoc
      * User-defined name of the list.
-     * %example Parking Allow-list.
+     * %example Parking Allow-list
      */
     QString name;
 
@@ -59,6 +62,15 @@ struct LookupListData: IdData
      * ]
      */
     std::vector<std::map<QString, QString>> entries;
+
+    bool operator==(const LookupListData& other) const = default;
+
+private:
+    Q_GADGET
+    Q_PROPERTY(QString name MEMBER name)
+    Q_PROPERTY(QString objectTypeId MEMBER objectTypeId)
+    Q_PROPERTY(std::vector<QString> attributeNames MEMBER attributeNames)
+    Q_PROPERTY(std::vector<std::map<QString, QString>> entries MEMBER entries)
 };
 #define LookupListData_Fields IdData_Fields(name)(objectTypeId)(attributeNames) (entries)
 NX_REFLECTION_INSTRUMENT(LookupListData, LookupListData_Fields)

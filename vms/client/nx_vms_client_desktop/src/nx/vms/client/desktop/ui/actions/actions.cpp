@@ -582,6 +582,12 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("User Management..."))
         .condition(condition::treeNodeType(ResourceTree::NodeType::users));
 
+    factory(OpenLookupListsDialogAction)
+        .flags(Main)
+        .requiredPowerUserPermissions()
+        .text(ContextMenu::tr("Lookup Lists..."))
+        .condition(condition::isTrue(ini().lookupLists));
+
     factory(LogsManagementAction)
         .flags(NoTarget)
         .requiredPowerUserPermissions();
@@ -1999,7 +2005,7 @@ void initialize(Manager* manager, Action* root)
     factory(FastForwardAction)
         .flags(NoTarget)
         .condition(new TimelineVisibleCondition());
-    
+
     factory(RewindAction)
         .flags(NoTarget)
         .condition(new TimelineVisibleCondition());

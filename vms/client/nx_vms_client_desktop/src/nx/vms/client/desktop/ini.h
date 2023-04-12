@@ -267,7 +267,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Feature] Enables MetadataApi feature.");
 
     // VMS-36874
-    NX_INI_FLAG(false, webPagesAndIntegrations, "[Feature] Separates Web Pages and Integrations");
+    NX_INI_FLAG(false, webPagesAndIntegrations, "[Feature] Separates Web Pages and Integrations.");
+
+    // VMS-37021
+    NX_INI_FLAG(false, lookupLists, "[Feature] Enable Lookup Lists support.");
 
     // ---------------------------------------------------------------------------------------------
     // Support section.

@@ -6,6 +6,8 @@ import Nx.Core 1.0
 
 Rectangle
 {
+    id: control
+
     property bool hovered: false
     property bool pressed: false
     property bool flat: false
@@ -15,13 +17,15 @@ Rectangle
     property color pressedColor: ColorTheme.darker(backgroundColor, 1)
     property color outlineColor: ColorTheme.darker(backgroundColor, 2)
 
-    color: (hovered && !pressed)
+    color: (enabled && hovered && !pressed)
         ? hoveredColor
         : pressed
             ? pressedColor
             : flat
                 ? "transparent"
                 : backgroundColor
+
+    opacity: enabled ? 1.0 : 0.3
 
     radius: 2
 

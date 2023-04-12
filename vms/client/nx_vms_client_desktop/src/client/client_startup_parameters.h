@@ -86,6 +86,15 @@ struct QnStartupParameters
 
     QStringList files; //< File paths passed to the client.
 
+    /**
+     * Debug parameter to develop QML modules without client restart. Should contain absolute path
+     * to the /open/vms/client/nx_vms_client_desktop/qml folder.
+     */
     QString qmlRoot;
+
+    /**
+     * Debug parameter to develop QML modules without client restart. Should contain absolute path
+     * to the /open/vms/client/nx_vms_client_core/static-resources/qml folder.
+     */
     QStringList qmlImportPaths;
 };
