@@ -10,8 +10,6 @@ TabControl
 {
     id: tabControl
 
-    property alias currentTabIndex: tabControl.tabBar.currentIndex
-
     property real dialogLeftPadding: 0
     property real dialogRightPadding: 0
 
