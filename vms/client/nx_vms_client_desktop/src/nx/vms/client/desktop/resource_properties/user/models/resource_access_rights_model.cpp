@@ -15,6 +15,7 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/log/format.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -560,26 +561,53 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
     if (!resource)
         return {};
 
+    QStringList groups, layouts, videoWalls;
     QStringList descriptions;
 
     for (const auto& groupId: accessInfo.providerUserGroups)
     {
         if (const auto group = resource->systemContext()->userGroupManager()->find(groupId))
-            descriptions << tr("Access granted by %1 group").arg(html::bold(group->name));
+            groups << html::bold(group->name);
     }
 
     for (const auto& providerResource: accessInfo.indirectProviders)
     {
         if (auto layout = providerResource.dynamicCast<QnLayoutResource>())
-        {
-            descriptions << tr("Access granted by %1 layout").arg(
-                html::bold(layout->getName()));
-        }
+            layouts << html::bold(layout->getName());
         else if (auto videoWall = providerResource.dynamicCast<QnVideoWallResource>())
+            videoWalls << html::bold(videoWall->getName());
+    }
+
+    const auto makeDescription =
+        [this](const QString& single, const QString& plural, const QStringList& list)
         {
-            descriptions << tr("Access granted by %1 video wall").arg(
-                html::bold(videoWall->getName()));
-        }
+            return list.size() == 1
+                ? nx::format(single, list.front()).toQString()
+                : nx::format(plural, list.join(", ")).toQString();
+        };
+
+    if (!groups.empty())
+    {
+        descriptions << makeDescription(
+            tr("Access granted by %1 group"),
+            tr("Access granted by %n groups: %1", "", groups.size()),
+            groups);
+    }
+
+    if (!layouts.empty())
+    {
+        descriptions << makeDescription(
+            tr("Access granted by %1 layout"),
+            tr("Access granted by %n layouts: %1", "", layouts.size()),
+            layouts);
+    }
+
+    if (!videoWalls.empty())
+    {
+        descriptions << makeDescription(
+            tr("Access granted by %1 video wall"),
+            tr("Access granted by %n video walls: %1", "", videoWalls.size()),
+            videoWalls);
     }
 
     return descriptions.join("<br>");
