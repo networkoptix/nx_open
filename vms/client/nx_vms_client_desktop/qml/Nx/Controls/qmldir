@@ -22,6 +22,7 @@ ContextHintButton 1.0 ContextHintButton.qml
 ContextHintLabel 1.0 ContextHintLabel.qml
 DebugRect 1.0 DebugRect.qml
 DeprecatedIconButton 1.0 DeprecatedIconButton.qml
+DialogBanner 1.0 DialogBanner.qml
 DialogButtonBox 1.0 DialogButtonBox.qml
 DialogPanel 1.0 DialogPanel.qml
 DoubleSpinBox 1.0 DoubleSpinBox.qml

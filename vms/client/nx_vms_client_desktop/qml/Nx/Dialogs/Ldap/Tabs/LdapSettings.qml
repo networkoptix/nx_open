@@ -743,9 +743,11 @@ Rectangle
             }
         }
 
-        LdapInfoBanner
+        DialogBanner
         {
             visible: !control.continuousSyncEditable
+
+            style: DialogBanner.Style.Info
 
             text: qsTr("Continuous import from LDAP is disabled for this system."
                 + " Some settings may be not available.")

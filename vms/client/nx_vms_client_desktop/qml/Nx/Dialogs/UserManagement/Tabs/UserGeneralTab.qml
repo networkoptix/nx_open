@@ -451,16 +451,18 @@ Item
         }
     }
 
-    Informer
+    DialogBanner
     {
-        id: informer
+        id: banner
+
+        style: DialogBanner.Style.Error
 
         visible: false
-        enabled: control.deleteAvailable && control.enabled
+        closeVisible: true
 
         Binding
         {
-            target: informer
+            target: banner
             property: "visible"
             value: control.ldapError
         }
@@ -468,16 +470,12 @@ Item
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 78
-        color: ColorTheme.colors.red_d4
 
         text: qsTr("This user is not found in LDAP database and is not able to log in.")
-        buttonText: qsTr("Delete")
-        buttonIcon.width: 12
-        buttonIcon.height: 14
-        buttonIcon.source: "image://svg/skin/user_settings/user_delete.svg"
+        buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
+        buttonIcon: "image://svg/skin/user_settings/trash.svg"
 
-        onClicked: control.deleteRequested()
-        onCloseClicked: informer.visible = false
+        onButtonClicked: control.deleteRequested()
+        onCloseClicked: banner.visible = false
     }
 }
