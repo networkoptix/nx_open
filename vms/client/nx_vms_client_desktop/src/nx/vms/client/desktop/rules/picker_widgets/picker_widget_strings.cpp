@@ -2,6 +2,17 @@
 
 #include "picker_widget_strings.h"
 
+#include <nx/vms/rules/actions/bookmark_action.h>
+#include <nx/vms/rules/actions/device_output_action.h>
+#include <nx/vms/rules/actions/device_recording_action.h>
+#include <nx/vms/rules/actions/enter_fullscreen_action.h>
+#include <nx/vms/rules/actions/play_sound_action.h>
+#include <nx/vms/rules/actions/repeat_sound_action.h>
+#include <nx/vms/rules/actions/show_on_alarm_layout_action.h>
+#include <nx/vms/rules/actions/speak_action.h>
+#include <nx/vms/rules/actions/text_overlay_action.h>
+#include <nx/vms/rules/utils/type.h>
+
 namespace nx::vms::client::desktop::rules {
 
 QString CommonPickerWidgetStrings::testButtonDisplayText()
@@ -29,8 +40,38 @@ QString ResourcePickerWidgetStrings::selectDevice(QnCameraDeviceType deviceType)
     return deviceStringSet.getString(deviceType);
 }
 
-QString ResourcePickerWidgetStrings::useEventSourceString()
+QString ResourcePickerWidgetStrings::useEventSourceString(const QString& actionType)
 {
+    // TODO: #mmalofeev consider move to the manifest.
+
+    if (!actionType.isEmpty())
+    {
+        if (vms::rules::utils::type<vms::rules::BookmarkAction>() == actionType)
+            return tr("Also set on source camera");
+
+        if (vms::rules::utils::type<vms::rules::DeviceOutputAction>() == actionType)
+            return tr("Also trigger on source camera");
+
+        if (vms::rules::utils::type<vms::rules::DeviceRecordingAction>() == actionType)
+            return tr("Also record source camera");
+
+        if (vms::rules::utils::type<vms::rules::EnterFullscreenAction>() == actionType)
+            return tr("Source camera");
+
+        if (vms::rules::utils::type<vms::rules::PlaySoundAction>() == actionType
+            || vms::rules::utils::type<vms::rules::RepeatSoundAction>() == actionType
+            || vms::rules::utils::type<vms::rules::SpeakAction>() == actionType)
+        {
+            return tr("Also play on source camera");
+        }
+
+        if (vms::rules::utils::type<vms::rules::ShowOnAlarmLayoutAction>() == actionType)
+            return tr("Also show source camera");
+
+        if (vms::rules::utils::type<vms::rules::TextOverlayAction>() == actionType)
+            return tr("Also show on source camera");
+    }
+
     return tr("Use event source camera");
 }
 

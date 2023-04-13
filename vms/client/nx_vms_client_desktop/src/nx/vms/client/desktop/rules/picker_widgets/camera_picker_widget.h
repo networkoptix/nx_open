@@ -76,7 +76,6 @@ public:
         auto contentLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());
 
         m_checkBox = new QCheckBox;
-        m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString());
 
         contentLayout->addWidget(m_checkBox);
 
@@ -88,6 +87,14 @@ public:
     }
 
 protected:
+    void onDescriptorSet() override
+    {
+        CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>::onDescriptorSet();
+
+        m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString(
+            parentParamsWidget()->descriptor().id));
+    }
+
     void updateUi() override
     {
         auto field = theField();

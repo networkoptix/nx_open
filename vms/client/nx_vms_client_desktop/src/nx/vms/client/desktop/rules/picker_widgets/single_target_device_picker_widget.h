@@ -34,7 +34,6 @@ public:
         auto contentLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());
 
         m_checkBox = new QCheckBox;
-        m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString());
 
         contentLayout->addWidget(m_checkBox);
 
@@ -57,6 +56,14 @@ private:
             return;
 
         field->setId(*selectedCameras.begin());
+    }
+
+    void onDescriptorSet() override
+    {
+        ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>::onDescriptorSet();
+
+        m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString(
+            parentParamsWidget()->descriptor().id));
     }
 
     void updateUi() override
