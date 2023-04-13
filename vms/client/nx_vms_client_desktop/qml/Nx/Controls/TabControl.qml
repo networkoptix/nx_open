@@ -11,6 +11,7 @@ Control
     id: tabControl
 
     property alias tabBar: tabBar
+    property alias currentTabIndex: tabBar.currentIndex
 
     spacing: 0 //< Spacing between tabbar and content.
 
