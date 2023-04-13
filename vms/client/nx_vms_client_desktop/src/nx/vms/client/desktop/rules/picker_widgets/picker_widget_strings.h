@@ -26,7 +26,7 @@ public:
     static QString selectServer();
     static QString selectUser();
     static QString selectDevice(QnCameraDeviceType deviceType);
-    static QString useEventSourceString();
+    static QString useEventSourceString(const QString& actionType = {});
 };
 
 class DropdownTextPickerWidgetStrings
