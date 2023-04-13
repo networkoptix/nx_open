@@ -106,7 +106,7 @@ bool Engine::addActionExecutor(const QString& actionType, ActionExecutor* action
 {
     if (m_executors.contains(actionType))
     {
-        NX_DEBUG(this, "Executor for action type %1 already registered", actionType);
+        NX_ASSERT(false, "Executor for action type %1 already registered", actionType);
         return false;
     }
 

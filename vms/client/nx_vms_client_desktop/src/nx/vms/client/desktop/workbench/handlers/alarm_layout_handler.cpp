@@ -35,6 +35,7 @@
 #include <nx/vms/rules/utils/type.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+#include <ui/workbench/handlers/workbench_notifications_executor.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -170,30 +171,35 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
                 openCamerasInAlarmLayout(targetCameras, switchToLayoutNeeded, camerasPositionUs);
         });
 
-    auto engine = systemContext()->vmsRulesEngine();
-    engine->addActionExecutor(rules::utils::type<ShowOnAlarmLayoutAction>(), this);
+    connect(
+        context()->instance<QnWorkbenchNotificationsExecutor>(),
+        &QnWorkbenchNotificationsExecutor::notificationActionReceived,
+        this,
+        &AlarmLayoutHandler::onNotificationActionReceived);
 }
 
 AlarmLayoutHandler::~AlarmLayoutHandler()
 {
 }
 
-void AlarmLayoutHandler::execute(const nx::vms::rules::ActionPtr& abstractAction)
+void AlarmLayoutHandler::onNotificationActionReceived(
+    const QSharedPointer<nx::vms::rules::NotificationActionBase>& action)
 {
-    auto action = abstractAction.dynamicCast<ShowOnAlarmLayoutAction>();
-    if (!NX_ASSERT(action, "Unexpected action type: %1", abstractAction->type()))
+    if (action->type() != rules::utils::type<ShowOnAlarmLayoutAction>())
         return;
 
     if (!context()->user())
         return;
 
+    auto showOnAlarmLayoutAction = action.dynamicCast<ShowOnAlarmLayoutAction>();
+
     const auto targetCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-        action->deviceIds());
+        showOnAlarmLayoutAction->deviceIds());
 
     if (targetCameras.isEmpty())
         return;
 
-    ActionKey key{action->ruleId(), action->timestamp().count()};
+    ActionKey key{showOnAlarmLayoutAction->ruleId(), showOnAlarmLayoutAction->timestamp().count()};
     if (d->processingActions.contains(key))
         return; /* See d->processingActions comment. */
 
@@ -203,13 +209,13 @@ void AlarmLayoutHandler::execute(const nx::vms::rules::ActionPtr& abstractAction
         kProcessingActionTimeout,
         this);
 
-    const auto rewindFor = action->playbackTime();
+    const auto rewindFor = showOnAlarmLayoutAction->playbackTime();
     const auto camerasPositionUs = (rewindFor.count() <= 0)
         ? DATETIME_NOW
-        : (action->timestamp() - rewindFor).count();
+        : (showOnAlarmLayoutAction->timestamp() - rewindFor).count();
 
-    if ((action->forceOpen() && currentInstanceIsMain()) || alarmLayoutExists())
-        openCamerasInAlarmLayout(targetCameras, action->forceOpen(), camerasPositionUs);
+    if ((showOnAlarmLayoutAction->forceOpen() && currentInstanceIsMain()) || alarmLayoutExists())
+        openCamerasInAlarmLayout(targetCameras, showOnAlarmLayoutAction->forceOpen(), camerasPositionUs);
 }
 
 void AlarmLayoutHandler::disableSyncForLayout(QnWorkbenchLayout* layout)

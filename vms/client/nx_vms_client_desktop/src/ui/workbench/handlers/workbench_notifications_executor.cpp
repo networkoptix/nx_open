@@ -7,13 +7,12 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/audio/audiodevice.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
