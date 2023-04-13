@@ -12,14 +12,16 @@
 class QnWorkbenchLayout;
 class QnWorkbenchItem;
 
+namespace nx::vms::rules { class NotificationActionBase; }
+
 namespace nx::vms::client::desktop {
 
 class AlarmLayoutHandler:
-    public nx::vms::rules::ActionExecutor,
+    public QObject,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = nx::vms::rules::ActionExecutor;
+    using base_type = QObject;
 
 public:
     AlarmLayoutHandler(QObject* parent = nullptr);
@@ -40,7 +42,7 @@ private:
         QnWorkbenchItem* item,
         qint64 positionUs);
 
-    virtual void execute(const nx::vms::rules::ActionPtr& action) override;
+    void onNotificationActionReceived(const QSharedPointer<rules::NotificationActionBase>& action);
 
     /**
      *  Check if current client instance is the main one.

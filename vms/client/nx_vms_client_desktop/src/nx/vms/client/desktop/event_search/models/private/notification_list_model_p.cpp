@@ -416,6 +416,7 @@ void NotificationListModel::Private::onAlarmLayoutAction(
         "Unexpected alarm action state: %1", action->state());
 
     EventData eventData;
+    eventData.lifetime = kDisplayTimeout;
     eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::critical);
     eventData.icon = qnSkin->pixmap("events/alarm.png");
     eventData.sourceName = action->sourceName();
