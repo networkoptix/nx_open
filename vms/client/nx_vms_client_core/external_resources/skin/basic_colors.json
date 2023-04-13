@@ -340,5 +340,27 @@
 
     "mainWindow": {
         "customFrame": "light1.setAlpha(64)"
+    },
+
+    "attention": {
+        "yellow": "#dfbf20",
+        "yellow_light": "#e5cc4d",
+        "yellow_dark": "#b2991a",
+        "yellow_bg": "#594c0d",
+
+        "red": "#df2020",
+        "red_light": "#e54d4d",
+        "red_dark": "#b21a1a",
+        "red_bg": "#590d0d",
+
+        "blue": "#208fdf",
+        "blue_light": "#4da6e5",
+        "blue_dark": "#1a73b2",
+        "blue_bg": "#0d3959",
+
+        "green": "#40df20",
+        "green_light": "#66e54d",
+        "green_dark": "#33b21a",
+        "green_bg": "#1a590d"
     }
 }
