@@ -24,13 +24,12 @@ public:
 private:
     void setupCommentLabelInteractions();
     void setupIconsAndColors();
-    void updateUi();
     void displayComment(const QString& comment);
 
 private:
     QScopedPointer<Ui::FooterWidget> ui;
 
-    std::weak_ptr<SimplifiedRule> displayedRule;
+    std::weak_ptr<SimplifiedRule> m_displayedRule;
 };
 
 } // namespace nx::vms::client::desktop::rules

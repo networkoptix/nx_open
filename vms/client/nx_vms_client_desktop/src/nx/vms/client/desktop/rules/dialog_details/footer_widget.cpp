@@ -27,28 +27,26 @@ FooterWidget::FooterWidget(QWidget* parent):
         });
 
     connect(ui->commitCommentButton, &QPushButton::clicked, this,
-        [this] { ui->stackedWidget->setCurrentWidget(ui->mainPage); });
-
-    installEventHandler({ui->commentLineEdit}, {QEvent::FocusOut}, this,
-        [this] { ui->stackedWidget->setCurrentWidget(ui->mainPage); });
-
-    connect(ui->commentLineEdit, &QLineEdit::textEdited, this,
-        [this](const QString& text)
+        [this]
         {
-            const auto comment = text.trimmed();
+            const auto comment = ui->commentLineEdit->text().trimmed();
+            if (auto rule = m_displayedRule.lock())
+                rule->setComment(comment);
 
             displayComment(comment);
 
-            if (auto rule = displayedRule.lock())
-                rule->setComment(comment);
+            ui->stackedWidget->setCurrentWidget(ui->mainPage);
         });
+
+    installEventHandler({ui->commentLineEdit}, {QEvent::FocusOut}, this,
+        [this] { ui->stackedWidget->setCurrentWidget(ui->mainPage); });
 
     setupCommentLabelInteractions();
 
     connect(ui->setScheduleButton, &QPushButton::clicked, this,
         [this]
         {
-            auto rule = displayedRule.lock();
+            auto rule = m_displayedRule.lock();
             if (!rule)
                 return;
 
@@ -68,9 +66,10 @@ FooterWidget::~FooterWidget()
 
 void FooterWidget::setRule(std::weak_ptr<SimplifiedRule> rule)
 {
-    displayedRule = rule;
+    m_displayedRule = std::move(rule);
 
-    updateUi();
+    if (auto rule = m_displayedRule.lock())
+        displayComment(rule->comment());
 }
 
 // Makes comment label clickable like a push button. Comment label is highlighted on mouse hover.
@@ -131,19 +130,12 @@ void FooterWidget::setupIconsAndColors()
         QPalette().color(QPalette::Midlight));
 }
 
-void FooterWidget::updateUi()
-{
-    auto rule = displayedRule.lock();
-    if (!rule)
-        return;
-
-    displayComment(rule->comment());
-}
-
 void FooterWidget::displayComment(const QString& comment)
 {
-    ui->commentDisplayLabel->setText(comment.trimmed());
-    if (!ui->commentDisplayLabel->text().isEmpty())
+    const auto trimmedComment = comment.trimmed();
+    ui->commentDisplayLabel->setText(trimmedComment);
+    ui->commentLineEdit->setText(trimmedComment);
+    if (!trimmedComment.isEmpty())
         ui->commentStackedWidget->setCurrentWidget(ui->commentDisplayPage);
     else
         ui->commentStackedWidget->setCurrentWidget(ui->commentButtonPage);
