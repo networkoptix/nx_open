@@ -144,6 +144,11 @@ QnUuid ServerListModel::serverIdAt(int row) const
     return data(index(row), idRole).value<QnUuid>();
 }
 
+QString ServerListModel::serverName(int row) const
+{
+    return data(index(row), Qt::DisplayRole).toString();
+}
+
 int ServerListModel::rowCount(const QModelIndex& /*parent*/) const
 {
     return d->servers->serversCount() + 1;
