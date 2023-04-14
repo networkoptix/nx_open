@@ -18,7 +18,8 @@
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
-#include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/system_context.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 
 #include "desktop_resource.h"
@@ -317,16 +318,25 @@ void DesktopCameraConnection::run()
             std::swap(d->processor, newProcessor);
         };
 
-    auto certificateVerifier = qnClientCoreModule->networkModule()->certificateVerifier();
     while (!m_needStop)
     {
         QnUuid serverId;
+        RemoteConnectionPtr connection;
         {
             NX_MUTEX_LOCKER lock(&d->mutex);
             if (!d->server)
                 break;
+
             serverId = d->server->getId();
+            auto systemContext = SystemContext::fromResource(d->server);
+            if (NX_ASSERT(systemContext))
+                connection = systemContext->connection();
+
+            if (!connection)
+                break;
         }
+
+        auto certificateVerifier = connection->certificateCache();
         auto newClient = std::make_unique<nx::network::http::HttpClient>(
             certificateVerifier->makeAdapterFunc(serverId));
         setupNetwork(std::move(newClient), nullptr);
