@@ -18,7 +18,8 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/config.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
-#include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/system_context.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 
@@ -27,6 +28,8 @@ static const int KEEP_ALIVE_TIMEOUT = 1000 * 120;
 
 /** Corresponds to the same-name Server setting. */
 static const int kMaxTcpRequestSize = 512 * 1024 * 1024;
+
+using namespace nx::vms::client::core;
 
 class QnDesktopCameraDataConsumer: public QnAbstractDataConsumer
 {
@@ -314,16 +317,25 @@ void QnDesktopCameraConnection::run()
             std::swap(d->processor, newProcessor);
         };
 
-    auto certificateVerifier = qnClientCoreModule->networkModule()->certificateVerifier();
     while (!m_needStop)
     {
         QnUuid serverId;
+        RemoteConnectionPtr connection;
         {
             NX_MUTEX_LOCKER lock(&d->mutex);
             if (!d->server)
                 break;
+
             serverId = d->server->getId();
+            auto systemContext = SystemContext::fromResource(d->server);
+            if (NX_ASSERT(systemContext))
+                connection = systemContext->connection();
+
+            if (!connection)
+                break;
         }
+
+        auto certificateVerifier = connection->certificateCache();
         auto newClient = std::make_unique<nx::network::http::HttpClient>(
             certificateVerifier->makeAdapterFunc(serverId));
         setupNetwork(std::move(newClient), nullptr);
