@@ -24,6 +24,8 @@ public:
     virtual bool hasChanges() const override;
     virtual void discardChanges() override;
 
+    void resetWarnings();
+
     void manageDigestUsers();
 
 private:

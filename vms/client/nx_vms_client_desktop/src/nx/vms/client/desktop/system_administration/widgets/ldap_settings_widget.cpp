@@ -65,6 +65,7 @@ struct LdapSettingsWidget::Private
     QmlProperty<bool> online;
     QmlProperty<bool> syncIsRunning;
     QmlProperty<bool> syncRequested;
+    QmlProperty<bool> hideEmptyLdapWarning;
 
     QmlProperty<bool> modified;
 
@@ -90,6 +91,7 @@ struct LdapSettingsWidget::Private
         online(quickWidget, "online"),
         syncIsRunning(quickWidget, "syncIsRunning"),
         syncRequested(quickWidget, "syncRequested"),
+        hideEmptyLdapWarning(quickWidget, "hideEmptyLdapWarning"),
         modified(quickWidget, "modified"),
         hasConfig(quickWidget, "hasConfig")
     {
@@ -700,6 +702,11 @@ void LdapSettingsWidget::showEvent(QShowEvent* event)
 void LdapSettingsWidget::hideEvent(QHideEvent* event)
 {
     d->statusUpdateTimer.stop();
+}
+
+void LdapSettingsWidget::resetWarnings()
+{
+    d->hideEmptyLdapWarning = false;
 }
 
 } // namespace nx::vms::client::desktop
