@@ -33,6 +33,7 @@ Rectangle
     property bool syncIsRunning
     property bool syncRequested
     property var preferredSyncServer
+    property bool hideEmptyLdapWarning: false
 
     property bool modified
 
@@ -40,6 +41,7 @@ Rectangle
         uri != "" || adminDn != "" || filters.length != 0
 
     readonly property bool showSpinners: (syncIsRunning || syncRequested) && !modified
+    readonly property bool showEmptyLdapWarning: userCount <= 0 && groupCount <= 0 && lastSync
 
     property var self
     property var testState: LdapSettings.TestState.initial
@@ -753,6 +755,22 @@ Rectangle
                 + " Some settings may be not available.")
 
             Layout.fillWidth: true
+        }
+
+        DialogBanner
+        {
+            visible: control.showEmptyLdapWarning && !control.hideEmptyLdapWarning
+            closeVisible: true
+
+            style: DialogBanner.Style.Warning
+
+            text: qsTr("No users or groups match synchronization settings and are added to the"
+                + " system’s DB. Make sure LDAP server parameters and filters are configured "
+                + "correctly. ")
+
+            Layout.fillWidth: true
+
+            onCloseClicked: control.hideEmptyLdapWarning = true
         }
     }
 }

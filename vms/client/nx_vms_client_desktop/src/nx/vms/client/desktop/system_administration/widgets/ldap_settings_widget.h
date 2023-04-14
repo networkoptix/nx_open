@@ -33,6 +33,7 @@ public:
     virtual void applyChanges() override;
     virtual bool hasChanges() const override;
     virtual void discardChanges() override;
+    virtual void resetWarnings() override;
 
     Q_INVOKABLE void testConnection(
         const QString& url,

@@ -76,6 +76,8 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+    virtual void resetWarnings() {}
+
 signals:
     /** Signal is emitted whenever hasChanges() is changed. */
     void hasChangesChanged();

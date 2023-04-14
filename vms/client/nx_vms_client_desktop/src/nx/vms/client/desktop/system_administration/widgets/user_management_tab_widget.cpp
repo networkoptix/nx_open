@@ -101,4 +101,9 @@ void UserManagementTabWidget::manageDigestUsers()
         userList->filterDigestUsers();
 }
 
+void UserManagementTabWidget::resetWarnings()
+{
+    d->forEachTab([](QnAbstractPreferencesWidget* tab) { tab->resetWarnings(); });
+}
+
 } // namespace nx::vms::client::desktop
