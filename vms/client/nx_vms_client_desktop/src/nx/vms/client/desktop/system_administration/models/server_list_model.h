@@ -40,6 +40,7 @@ public:
 
     Q_INVOKABLE QnUuid serverIdAt(int row) const;
     Q_INVOKABLE int indexOf(const QnUuid& serverId);
+    Q_INVOKABLE QString serverName(int row) const;
 
 signals:
     void serverRemoved();
