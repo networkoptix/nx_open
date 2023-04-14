@@ -656,6 +656,9 @@ Window
 
         onSelectedAnalyticsEngineChanged:
         {
+            if (d.filterModel.engines.length === 0)
+                return
+
             updating = true
             analyticsFiltersByEngine[analyticsFilters.engine] = {
                 "objectTypeIds": analyticsFilters.selectedAnalyticsObjectTypeIds,

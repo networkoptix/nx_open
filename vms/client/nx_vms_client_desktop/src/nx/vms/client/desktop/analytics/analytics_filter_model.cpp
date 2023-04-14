@@ -228,6 +228,9 @@ void AnalyticsFilterModel::setActive(bool value)
 
 void AnalyticsFilterModel::rebuild()
 {
+    setObjectTypes({});
+    setEngines({});
+
     m_stateViewBuilder =
         std::make_unique<taxonomy::StateViewBuilder>(m_taxonomyManager->currentTaxonomy());
 
