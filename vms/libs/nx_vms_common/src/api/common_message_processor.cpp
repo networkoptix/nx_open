@@ -150,7 +150,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         connection.get(),
         &ec2::AbstractECConnection::initNotification,
         this,
-        &QnCommonMessageProcessor::on_gotInitialNotification,
+        &QnCommonMessageProcessor::onGotInitialNotification,
         connectionType);
     connect(
         connection.get(),
@@ -541,15 +541,6 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->showreelNotificationManager()->disconnect(this);
 
     m_context->showreelManager()->resetShowreels();
-}
-
-void QnCommonMessageProcessor::on_gotInitialNotification(const FullInfoData& fullData)
-{
-    onGotInitialNotification(fullData);
-
-    // TODO: #sivanov Logic is not perfect, who will clean them on disconnect?
-    resetEventRules(fullData.rules);
-    resetVmsRules(fullData.vmsRules);
 }
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(
@@ -1031,6 +1022,11 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetAccessRights(fullData.accessRights);
     resetUserGroups(fullData.userGroups);
     resetLicenses(fullData.licenses);
+
+    // TODO: #sivanov Logic is not perfect, who will clean them on disconnect?
+    resetEventRules(fullData.rules);
+    resetVmsRules(fullData.vmsRules);
+
     m_context->showreelManager()->resetShowreels(fullData.showreels);
 
     m_context->resourceAccessManager()->endUpdate();

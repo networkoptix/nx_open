@@ -65,14 +65,10 @@ Engine::~Engine()
 {
 }
 
-void Engine::init(const QnUuid &id, const std::vector<api::Rule>& rules)
+void Engine::setId(QnUuid id)
 {
     m_id = id;
     m_router->init(id);
-    for (const auto& rule: rules)
-    {
-        addRule(rule);
-    }
 }
 
 bool Engine::isEnabled() const
