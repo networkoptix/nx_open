@@ -147,12 +147,10 @@ protected:
         ec2::NotificationSource source);
 
 public slots:
-
     void on_licenseChanged(const QnLicensePtr &license);
     void on_licenseRemoved(const QnLicensePtr &license);
 
 private slots:
-    void on_gotInitialNotification(const nx::vms::api::FullInfoData& fullData);
     void on_gotDiscoveryData(const nx::vms::api::DiscoveryData& discoveryData, bool addInformation);
 
     void on_remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);

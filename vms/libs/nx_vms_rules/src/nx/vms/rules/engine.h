@@ -49,7 +49,7 @@ public:
     Engine(std::unique_ptr<Router> router, QObject* parent = nullptr);
     ~Engine();
 
-    void init(const QnUuid& id, const std::vector<api::Rule>& rules);
+    void setId(QnUuid id);
 
     bool isEnabled() const;
     bool isOldEngineEnabled() const;
