@@ -134,7 +134,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Otwórz folder plików</translation>
     </message>
   </context>
   <context>
@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
+      <translation>Użyj źródła zdarzenia</translation>
     </message>
   </context>
   <context>
@@ -647,23 +647,23 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>Ustawienia ONVIF</translation>
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>Nie archiwizuj pierwszego strumienia</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>Nie archiwizuj drugiego strumienia</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>Profil drugiego strumienia</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>Profil strumienia pierwszego</translation>
     </message>
     <message>
       <source>Import From Device</source>
@@ -817,7 +817,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>Nowe urządzenie</translation>
     </message>
   </context>
   <context>
@@ -910,7 +910,7 @@
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>Dostępne akcje</translation>
     </message>
     <message>
       <source>Video Export</source>
