@@ -7673,7 +7673,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
+      <translation>Wideo nagrane na wewnętrznej kamerze &apos; zostanie automatycznie przesłane do głównego archiwum.</translation>
     </message>
   </context>
   <context>

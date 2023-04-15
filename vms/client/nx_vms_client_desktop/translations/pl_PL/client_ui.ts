@@ -620,11 +620,11 @@
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>Nie archiwizuj pierwszego strumienia</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>Nie archiwizuj drugiego strumienia</translation>
     </message>
     <message>
       <source>Import From Device</source>
