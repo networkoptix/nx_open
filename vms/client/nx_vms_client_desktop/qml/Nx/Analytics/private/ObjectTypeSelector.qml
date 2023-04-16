@@ -9,13 +9,17 @@ GenericTypeSelector
     id: control
 
     property alias objectTypes: control.model
-    readonly property var selectedObjectType: objectTypeById[selectedTypeId] || null
-    readonly property var objectTypeById:
-        objectTypes.reduce((result, objectType) =>
-        {
-            result[objectType.id] = objectType
-            return result
-        }, {})
+    readonly property var selectedObjectType: objectTypeById && selectedTypeId
+        ? objectTypeById[selectedTypeId]
+        : null
+
+    readonly property var objectTypeById: objectTypes.length > 0
+        ? objectTypes.reduce((result, objectType) =>
+            {
+                result[objectType.id] = objectType
+                return result
+            }, {})
+        : null
 
     iconRole: "iconSource"
     iconPath: (iconName => Analytics.IconManager.iconUrl(iconName))
