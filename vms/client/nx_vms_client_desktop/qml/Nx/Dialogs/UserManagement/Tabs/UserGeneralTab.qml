@@ -434,7 +434,7 @@ Item
 
                     SectionHeader
                     {
-                        text: qsTr("Custom Permissions")
+                        text: qsTr("Permissions")
                     }
 
                     PermissionSummary
