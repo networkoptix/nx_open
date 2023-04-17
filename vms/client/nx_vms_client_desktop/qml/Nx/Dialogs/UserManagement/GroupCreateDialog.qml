@@ -110,6 +110,7 @@ DialogWithState
                 anchors.fill: parent
 
                 model: membersModel
+                allowAddGroup: false
 
                 enabled: !dialog.isSaving
 
