@@ -9,10 +9,47 @@ from pathlib import Path
 import sys
 
 
+def substitute_msvc_macros(path, file):
+    '''
+    Substitute MSVC macros in the provided path.
+    The following macros can be used in CMakeSettings.json:
+        - ${workspaceRoot} - the full path of the workspace folder
+        - ${workspaceHash} - hash of workspace location; useful for creating a unique identifier
+            for the current workspace (for example, to use in folder paths)
+        - ${projectFile} - the full path of the root CMakeLists.txt file
+        - ${projectDir} - the full path of the folder containing the root CMakeLists.txt file
+        - ${projectDirName} - the name of the folder containing the root CMakeLists.txt file
+        - ${thisFile} - the full path of the CMakeSettings.json file
+        - ${name} - the name of the configuration
+        - ${generator} - the name of the CMake generator used in this configuration
+    We support only ${projectDir} macro as it is used in the our template files.
+    '''
+    PROJECT_DIR_MACRO = '${projectDir}'
+    if PROJECT_DIR_MACRO in path:
+        path = path.replace(PROJECT_DIR_MACRO, Path(file).parent.absolute().as_posix())
+    return path
+
+
+def substitute_env_variables(path):
+    '''
+    Substitute environment variables in the provided path. Visual Studio format is supported:
+    ${env.VARIABLE_NAME}
+    '''
+    START_TOKEN = '${env.'
+    END_TOKEN = '}'
+    while START_TOKEN in path and END_TOKEN in path:
+        start_index = path.index(START_TOKEN)
+        end_index = path.index(END_TOKEN, start_index)
+        var = path[start_index + len(START_TOKEN):end_index]
+        path = path.replace(START_TOKEN + var + END_TOKEN, os.environ.get(var))
+
+    return path
+
+
 def replace_conan_qt_path(file, qtdir, build_root):
-    print("Substitute actual Qt path to the {})".format(file))
+    print(f"Substitute actual Qt path to the {file})")
     if not os.path.exists(file):
-        print("File {} does not exists".format(file))
+        print(f"File {file} does not exists")
         return 1
 
     modified = False
@@ -20,7 +57,12 @@ def replace_conan_qt_path(file, qtdir, build_root):
     with open(file, 'r', encoding='utf-8-sig') as source:
         json_root = json.load(source)
         for json_configuration in json_root['configurations']:
-            if Path(json_configuration['buildRoot']) != build_root:
+            configuration_build_root = Path(substitute_env_variables(substitute_msvc_macros(
+                json_configuration['buildRoot'], file)))
+            if configuration_build_root != build_root:
+                print(
+                    f"Skip configuration {json_configuration['name']} as it's build root "
+                    + f"{json_configuration['buildRoot']} does not match {build_root}")
                 continue
 
             if 'environments' not in json_configuration:
@@ -30,16 +72,17 @@ def replace_conan_qt_path(file, qtdir, build_root):
                 json_environments = json_configuration['environments']
                 for json_environment in json_environments:
                     if 'qtdir' in json_environment and json_environment['qtdir'] == binaries_dir:
+                        print(f"Found existing path {json_environment['qtdir']}")
                         continue
                     modified = True
                     json_environment['qtdir'] = binaries_dir
 
     if modified:
-        print("Storing changes to {}".format(file))
+        print(f"Storing changes to {file}")
         with open(file, 'w', encoding='utf-8') as target:
             json.dump(json_root, target, indent=2)
     else:
-        print("All {} configurations contain valid path".format(len(json_root['configurations'])))
+        print(f"All {len(json_root['configurations'])} configurations contain valid path")
     return 0
 
 
