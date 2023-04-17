@@ -22,7 +22,7 @@ Item
     required property AccessSubjectEditingContext editingContext
 
     readonly property int columnCount: availableAccessRightDescriptors.length
-    readonly property int kColumnWidth: 48
+    readonly property int kColumnWidth: 64
 
     property var buttonBox
 
