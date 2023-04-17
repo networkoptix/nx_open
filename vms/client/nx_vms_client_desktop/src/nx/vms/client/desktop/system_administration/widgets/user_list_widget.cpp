@@ -150,7 +150,6 @@ class UserListWidget::Private: public QObject
     UserListWidget* const q;
     nx::utils::ImplPtr<Ui::UserListWidget> ui{new Ui::UserListWidget()};
     QSet<QnUserResourcePtr> m_visibleSelected;
-    QSet<QnUserResourcePtr> m_visibleLocalUsers;
 
 public:
     UserListModel* const usersModel{new UserListModel(q)};
@@ -324,7 +323,6 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
             m_hasChanges = false;
             emit this->q->hasChangesChanged();
 
-            m_visibleLocalUsers.clear();
             m_visibleSelected.clear();
             if (sortModel->rowCount() > 0)
                 visibleAdded(0, sortModel->rowCount() - 1);
@@ -481,9 +479,6 @@ void UserListWidget::Private::setupPlaceholder()
 
 void UserListWidget::Private::modelUpdated()
 {
-    const bool onlyLocalUsers = m_visibleLocalUsers.count() == sortModel->rowCount();
-    ui->usersTable->setColumnHidden(UserListModel::UserTypeColumn, onlyLocalUsers);
-
     const bool isEmptyModel = !sortModel->rowCount();
     ui->searchWidget->setCurrentWidget(isEmptyModel
         ? ui->nothingFoundPage
@@ -653,9 +648,6 @@ void UserListWidget::Private::visibleAdded(int first, int last)
         const QModelIndex index = sortModel->index(row, UserListModel::CheckBoxColumn);
         const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
 
-        if (user && user->isLocal())
-            m_visibleLocalUsers.insert(user);
-
         const bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
             continue;
@@ -672,9 +664,6 @@ void UserListWidget::Private::visibleAboutToBeRemoved(int first, int last)
         const QModelIndex index = sortModel->index(row, UserListModel::CheckBoxColumn);
         const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
 
-        if (user && user->isLocal())
-            m_visibleLocalUsers.remove(user);
-
         m_visibleSelected.remove(user);
     }
 }
@@ -685,12 +674,6 @@ void UserListWidget::Private::visibleModified(int first, int last)
     {
         const QModelIndex index = sortModel->index(row, UserListModel::CheckBoxColumn);
         const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
-        if (user)
-        {
-            m_visibleLocalUsers.remove(user);
-            if (user->isLocal())
-                m_visibleLocalUsers.insert(user);
-        }
 
         const bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
