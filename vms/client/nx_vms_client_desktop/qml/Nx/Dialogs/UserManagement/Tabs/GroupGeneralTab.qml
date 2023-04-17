@@ -23,6 +23,7 @@ Item
     property alias name: groupNameTextField.text
     property bool nameEditable: true
     property bool isLdap: false
+    property bool isPredefined: false
     property alias description: descriptionTextArea.text
     property var groups: []
     property int userCount: 0
@@ -146,11 +147,14 @@ Item
                 SectionHeader
                 {
                     text: qsTr("Groups")
+                    visible: !control.isPredefined
                 }
 
                 GroupsFlow
                 {
                     id: groupsFlow
+
+                    visible: !control.isPredefined
 
                     width: parent.width
 
@@ -163,7 +167,7 @@ Item
 
                 Text
                 {
-                    visible: control.groups.length === 0
+                    visible: control.groups.length === 0 && !control.isPredefined
                     font: Qt.font({pixelSize: 14, weight: Font.Normal})
                     color: ColorTheme.colors.light16
                     text: qsTr("Not a member of any group")

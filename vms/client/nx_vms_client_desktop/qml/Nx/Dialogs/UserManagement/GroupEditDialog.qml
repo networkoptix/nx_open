@@ -100,6 +100,7 @@ DialogWithState
 
                 nameEditable: !dialog.isLdap && !dialog.isPredefined && !dialog.isSaving
                 isLdap: dialog.isLdap
+                isPredefined: dialog.isPredefined
                 groups: dialog.parentGroups
                 userCount: membersModel.users.length
                 groupCount: membersModel.groups.length
