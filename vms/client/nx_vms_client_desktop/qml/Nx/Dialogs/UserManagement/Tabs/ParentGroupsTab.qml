@@ -16,6 +16,7 @@ MembershipSettings
     id: control
 
     property var model
+    property bool allowAddGroup: true
 
     signal addGroupClicked()
 
@@ -46,7 +47,7 @@ MembershipSettings
 
         AddGroupButton
         {
-            visible: section === UserSettingsGlobal.kCustomGroupsSection
+            visible: section === UserSettingsGlobal.kCustomGroupsSection && control.allowAddGroup
         }
     }
 
@@ -61,6 +62,7 @@ MembershipSettings
 
         AddGroupButton
         {
+            visible: control.allowAddGroup
         }
 
         Text
@@ -98,6 +100,8 @@ MembershipSettings
             Button
             {
                 Layout.alignment: Qt.AlignHCenter
+
+                visible: control.allowAddGroup
 
                 text: qsTr("Add Group")
 
