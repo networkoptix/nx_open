@@ -7,8 +7,8 @@
 
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/buffer.h>
-#include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/url.h>
 
 #include "http_async_client.h"

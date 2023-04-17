@@ -4,8 +4,8 @@
 
 #include <nx/network/aio/timer.h>
 
-#include "abstract_outgoing_tunnel_connection.h"
 #include "../data/connection_parameters.h"
+#include "abstract_outgoing_tunnel_connection.h"
 
 namespace nx::network::cloud {
 

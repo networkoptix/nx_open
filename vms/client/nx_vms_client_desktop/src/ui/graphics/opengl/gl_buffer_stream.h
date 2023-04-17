@@ -11,9 +11,8 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
 
-#include <ui/common/color_to_vector_converter.h>
-
 #include <nx/utils/log/assert.h>
+#include <ui/common/color_to_vector_converter.h>
 
 template<class T>
 class QnGlBufferStream {

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtGui/QOpenGLFunctions>
 #include <QtCore/QSize>
+#include <QtGui/QOpenGLFunctions>
 
 class AbstractVideoSurface;
 

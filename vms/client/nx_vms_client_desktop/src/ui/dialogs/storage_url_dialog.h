@@ -6,12 +6,11 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QDialog>
 
-#include "core/resource/resource_fwd.h"
-
-#include "api/model/storage_status_reply.h"
-
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/models/storage_model_info.h>
+
+#include "api/model/storage_status_reply.h"
+#include "core/resource/resource_fwd.h"
 
 struct QnStorageStatusReply;
 class QnServerStorageManager;

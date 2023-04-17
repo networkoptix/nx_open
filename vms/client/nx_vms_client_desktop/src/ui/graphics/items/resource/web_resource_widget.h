@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <ui/graphics/items/resource/resource_widget.h>
 #include <nx/network/ssl/helpers.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 
 namespace nx::vms::client::desktop { class GraphicsWebEngineView; }
 

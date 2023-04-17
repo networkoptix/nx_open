@@ -8,8 +8,8 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QRect>
-#include <QtCore/QString>
 #include <QtCore/QSize>
+#include <QtCore/QString>
 #include <QtCore/QUrl>
 
 #include "../std/filesystem.h"

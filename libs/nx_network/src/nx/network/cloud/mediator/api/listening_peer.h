@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include <nx/utils/buffer.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/buffer.h>
 
 #include "connection_speed.h"
 

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/connection_server/multi_address_server.h>
+#include <nx/network/http/server/http_stream_socket_server.h>
 
 #include "multi_endpoint_server.h"
 #include "rest/http_server_rest_message_dispatcher.h"

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/reflect/instrument.h>
 #include <nx/network/connection_server/server_statistics.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/math/average_per_period.h>
 #include <nx/utils/math/max_per_period.h>
 #include <nx/utils/math/percentile_per_period.h>

@@ -2,16 +2,15 @@
 
 #pragma once
 
-#include <QtCore/QAtomicInt>
 #include <QSettings>
 
+#include <QtCore/QAtomicInt>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/safe_direct_connection.h>
-
-#include <core/resource/resource_fwd.h>
 
 // TODO: #sivanov Create meta_functions and move json_serializer, lexical_serializer,
 // linear_combinator & magnitude_calculator there.

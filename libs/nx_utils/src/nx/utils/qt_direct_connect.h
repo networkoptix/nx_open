@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "scope_guard.h"
+#include <QtCore/QObject>
 
-#include <QObject>
+#include "scope_guard.h"
 
 namespace nx {
 

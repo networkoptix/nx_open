@@ -7,8 +7,8 @@
 #include <variant>
 
 #include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>

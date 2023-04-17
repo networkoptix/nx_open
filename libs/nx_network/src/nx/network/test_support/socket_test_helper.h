@@ -11,8 +11,8 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/network/socket.h>
 #include <nx/network/system_socket.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/result_counter.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx::network::test {
 

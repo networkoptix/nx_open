@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 #include <nx/utils/latin1_array.h>
 #include <utils/common/id.h>

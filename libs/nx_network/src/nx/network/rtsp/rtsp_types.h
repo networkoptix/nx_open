@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <optional>
 #include <string>
 #include <string_view>
-#include <optional>
+
+#include <stdint.h>
 
 #include <nx/network/http/http_types.h>
 

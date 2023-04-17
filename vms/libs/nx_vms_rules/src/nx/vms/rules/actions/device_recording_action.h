@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <nx/vms/api/types/resource_types.h>
+
 #include "../basic_action.h"
 #include "../data_macros.h"
-
-#include <nx/vms/api/types/resource_types.h>
 
 namespace nx::vms::rules {
 

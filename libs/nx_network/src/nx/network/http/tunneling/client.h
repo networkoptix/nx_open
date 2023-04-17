@@ -4,17 +4,17 @@
 
 #include <chrono>
 #include <functional>
-#include <optional>
 #include <memory>
+#include <optional>
 #include <tuple>
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 
+#include "../http_types.h"
 #include "abstract_tunnel_validator.h"
 #include "detail/base_tunnel_client.h"
-#include "../http_types.h"
 
 namespace nx::network::http::tunneling {
 

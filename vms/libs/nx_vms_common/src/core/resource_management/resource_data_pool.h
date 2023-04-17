@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QJsonObject>
+#include <QtCore/QObject>
 
-#include <nx/utils/thread/mutex.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/thread/mutex.h>
 
 class NX_VMS_COMMON_API QnResourceDataPool: public QObject
 {

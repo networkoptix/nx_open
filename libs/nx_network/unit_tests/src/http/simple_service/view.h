@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "settings.h"
-
 #include <nx/network/http/server/authentication_dispatcher.h>
-#include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/http/server/multi_endpoint_server.h>
+#include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
+
+#include "settings.h"
 
 namespace nx::network::http::server::test {
 class MultiEndpointServer;

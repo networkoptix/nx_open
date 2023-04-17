@@ -2,12 +2,13 @@
 
 #pragma once
 
-#include <chrono>
-#include <set>
-#include <mutex>
-#include <condition_variable>
 #include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <set>
 #include <thread>
+
 #include "common.h"
 
 namespace cf {

@@ -8,10 +8,8 @@
 #include <nx/utils/url.h>
 #include <nx/utils/url_query.h>
 
-#include <nx/utils/log/to_string.h>
-
-#include "url_parse_helper.h"
 #include "../socket_common.h"
+#include "url_parse_helper.h"
 
 namespace nx::network::url {
 

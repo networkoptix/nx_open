@@ -3,12 +3,12 @@
 #pragma once
 
 #include <functional>
-#include <optional>
 #include <map>
+#include <optional>
 #include <vector>
 
-#include "request_matcher.h"
 #include "../http_types.h"
+#include "request_matcher.h"
 
 namespace nx {
 namespace network {

@@ -3,11 +3,13 @@
 #ifndef cl_adaptive_sleep_137
 #define cl_adaptive_sleep_137
 
+#include <QtCore/QTime>
+
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <QtCore/QTime>
+
 #include "sleep.h"
-#include <nx/utils/elapsed_timer.h>
 
 #define MAX_VALID_SLEEP_TIME 5000000
 

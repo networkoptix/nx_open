@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "advanced_system_settings_widget.h"
-
 #include <QtCore/QHash>
 #include <QtCore/QStringList>
 #include <QtCore/QUrl>
+
+#include "advanced_system_settings_widget.h"
 
 class QQuickWidget;
 class QStackedWidget;

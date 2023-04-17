@@ -7,9 +7,8 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_details.h>
 #include <core/resource_access/resource_access_map.h>
-#include <nx/vms/api/types/access_rights_types.h>
-
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/api/types/access_rights_types.h>
 
 class QnResourcePool;
 

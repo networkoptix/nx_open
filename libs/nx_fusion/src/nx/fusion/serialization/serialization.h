@@ -4,17 +4,15 @@
 #define QN_SERIALIZATION_H
 
 #include <cassert>
-
 #include <type_traits> /* For std::enable_if, std::is_base_of, std::integral_constant. */
 
 #include <QtCore/QVariant>
 
-#include <nx/utils/log/assert.h>
-#include <nx/utils/log/log.h>
 #include <nx/utils/conversion_wrapper.h>
 #include <nx/utils/flat_map.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/synchronized_flat_storage.h>
-
 
 namespace QnSerializationDetail {
     template<class Context, class T, class D>

@@ -3,8 +3,8 @@
 #pragma once
 
 #include <nx/network/abstract_socket.h>
-#include <nx/utils/system_error.h>
 #include <nx/utils/std/optional.h>
+#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace network {

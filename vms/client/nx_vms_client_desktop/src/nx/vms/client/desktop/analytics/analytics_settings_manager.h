@@ -4,8 +4,8 @@
 
 #include <memory>
 
-#include <QtCore/QObject>
 #include <QtCore/QJsonObject>
+#include <QtCore/QObject>
 
 #include <api/model/analytics_actions.h>
 #include <api/server_rest_connection_fwd.h>

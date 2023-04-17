@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QString>
+#include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>

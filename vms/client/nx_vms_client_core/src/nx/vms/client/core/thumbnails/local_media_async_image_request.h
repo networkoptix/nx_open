@@ -5,7 +5,6 @@
 #include <chrono>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/impl_ptr.h>
 
 #include "async_image_result.h"

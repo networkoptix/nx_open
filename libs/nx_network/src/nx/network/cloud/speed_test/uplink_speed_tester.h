@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "abstract_speed_tester.h"
-
 #include <nx/network/cloud/mediator/api/connection_speed.h>
 #include <nx/network/http/http_async_client.h>
+
+#include "abstract_speed_tester.h"
 #include "uplink_bandwidth_tester.h"
 
 namespace nx::network::cloud::speed_test {

@@ -5,14 +5,12 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrlQuery>
 
+#include <nx/fusion/model_functions.h>
+#include <nx/network/ssl/helpers.h>
+#include <nx/utils/impl_ptr.h>
+#include <nx_ec/ec_api_common.h>
 #include <rest/request_params.h>
 #include <transaction/transaction.h>
-#include <nx_ec/ec_api_common.h>
-
-#include <nx/fusion/model_functions.h>
-
-#include <nx/utils/impl_ptr.h>
-#include <nx/network/ssl/helpers.h>
 
 namespace nx::vms::common { class AbstractCertificateVerifier; }
 

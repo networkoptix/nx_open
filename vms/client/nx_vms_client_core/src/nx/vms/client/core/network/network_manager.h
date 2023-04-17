@@ -8,7 +8,6 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/string.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/url.h>
 

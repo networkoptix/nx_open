@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <ui/graphics/items/standard/graphics_qml_view.h>
-
 #include <nx/utils/impl_ptr.h>
+#include <ui/graphics/items/standard/graphics_qml_view.h>
 
 namespace nx::vms::client::desktop {
 

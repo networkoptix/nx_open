@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "upnp_device_description.h"
-
 #include <list>
 #include <map>
 #include <set>
@@ -13,10 +11,10 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <nx/network/async_stoppable.h>
 #include <nx/network/aio/aio_event_handler.h>
-#include <nx/network/http/http_types.h>
+#include <nx/network/async_stoppable.h>
 #include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/nettools.h>
 #include <nx/network/socket.h>
 #include <nx/utils/async_operation_guard.h>
@@ -24,6 +22,7 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/timer_manager.h>
 
+#include "upnp_device_description.h"
 #include "upnp_search_handler.h"
 
 namespace nx::network::upnp {

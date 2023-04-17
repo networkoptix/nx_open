@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <core/resource/resource_fwd.h>
+#include <optional>
 
 #include <QtCore/QCoreApplication> // For Q_DECLARE_TR_FUNCTIONS.
 
-#include <optional>
+#include <core/resource/resource_fwd.h>
 
 namespace nx::recording {
 

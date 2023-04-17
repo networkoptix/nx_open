@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/analytics/taxonomy/abstract_state.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/analytics/taxonomy/abstract_state.h>
 
 namespace nx::analytics::taxonomy {
 

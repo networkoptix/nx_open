@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 
 class QnResourcePool;
 

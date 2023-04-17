@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtWidgets/QStyledItemDelegate>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 struct QnAuditRecord;

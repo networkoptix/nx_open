@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/server/abstract_authentication_manager.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_server_connection.h>
-#include <nx/network/http/http_types.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/async_operation_guard.h>
 

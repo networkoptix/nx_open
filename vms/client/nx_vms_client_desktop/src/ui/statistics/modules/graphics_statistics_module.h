@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <statistics/base/base_fwd.h>
 #include <statistics/abstract_statistics_module.h>
+#include <statistics/base/base_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnGraphicsStatisticsModule: public QnAbstractStatisticsModule, public QnWorkbenchContextAware

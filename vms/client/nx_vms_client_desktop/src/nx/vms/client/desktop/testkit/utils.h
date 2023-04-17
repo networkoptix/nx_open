@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QtCore/QModelIndex>
-#include <QtQml/QJSValue>
 #include <QtCore/QPoint>
+#include <QtQml/QJSValue>
 
 class QAbstractItemModel;
 class QAction;

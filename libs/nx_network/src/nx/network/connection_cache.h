@@ -4,10 +4,11 @@
 
 #include <chrono>
 #include <memory>
+
 #include <stddef.h>
 
-#include <nx/network/socket_common.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/network/socket_common.h>
 
 namespace nx::network {
 

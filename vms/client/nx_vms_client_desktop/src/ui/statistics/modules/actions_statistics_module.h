@@ -3,9 +3,8 @@
 #pragma once
 
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
-
-#include <statistics/base/base_fwd.h>
 #include <statistics/abstract_statistics_module.h>
+#include <statistics/base/base_fwd.h>
 
 class AbstractMultimetric;
 

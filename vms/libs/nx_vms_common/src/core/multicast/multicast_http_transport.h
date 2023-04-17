@@ -3,16 +3,16 @@
 #pragma once
 
 #include <list>
-
-#include <QtCore/QElapsedTimer>
-#include <QtNetwork/QUdpSocket>
-#include <QTimer>
-#include "multicast_http_fwd.h"
 #include <memory>
-#include <QCache>
+
+#include <QtCore/QCache>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QTimer>
+#include <QtNetwork/QUdpSocket>
 
 #include <nx/utils/thread/mutex.h>
 
+#include "multicast_http_fwd.h"
 
 namespace QnMulticast
 {

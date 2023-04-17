@@ -6,8 +6,8 @@
 #include <vector>
 
 #include <nx/network/abstract_socket.h>
-#include <nx/network/cloud/cloud_connect_version.h>
 #include <nx/network/cloud/cloud_connect_options.h>
+#include <nx/network/cloud/cloud_connect_version.h>
 #include <nx/network/stun/message.h>
 
 #include "stun_message_data.h"

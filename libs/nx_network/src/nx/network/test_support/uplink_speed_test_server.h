@@ -4,8 +4,8 @@
 
 #include "../cloud/speed_test/http_api_paths.h"
 #include "../http/http_types.h"
-#include "../http/server/rest/http_server_rest_message_dispatcher.h"
 #include "../http/server/request_processing_types.h"
+#include "../http/server/rest/http_server_rest_message_dispatcher.h"
 
 namespace nx::network::cloud::speed_test::test {
 

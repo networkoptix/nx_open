@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "log_logger.h"
-
 #include <nx/utils/system_error.h>
+
+#include "log_logger.h"
 
 namespace nx {
 namespace utils {

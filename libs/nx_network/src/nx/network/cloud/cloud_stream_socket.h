@@ -11,8 +11,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
-#include "tunnel/tunnel_attributes.h"
 #include "detail/cloud_stream_socket_connector.h"
+#include "tunnel/tunnel_attributes.h"
 
 namespace nx::network::cloud {
 

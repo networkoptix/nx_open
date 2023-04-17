@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QUrl>
 #include <QtCore/QBitArray>
+#include <QtCore/QUrl>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>

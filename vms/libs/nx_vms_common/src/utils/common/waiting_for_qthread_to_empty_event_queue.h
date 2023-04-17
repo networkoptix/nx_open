@@ -2,13 +2,12 @@
 
 #pragma once
 
-#include <QObject>
-#include <QThread>
+#include <QtCore/QObject>
+#include <QtCore/QThread>
 
 #include <nx/utils/thread/joinable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-
 
 //!Waits until QThread processes all events already-posted to its event loop
 /*!

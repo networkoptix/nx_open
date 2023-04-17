@@ -10,9 +10,9 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/pollable.h>
 #include <nx/network/async_stoppable.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/interruption_flag.h>
 #include <nx/utils/std/optional.h>
 
 #include "stream_socket_server.h"

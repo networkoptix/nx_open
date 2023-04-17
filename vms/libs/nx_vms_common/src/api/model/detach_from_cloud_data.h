@@ -3,7 +3,6 @@
 #pragma once
 
 #include <api/model/password_data.h>
-
 #include <nx/fusion/model_functions_fwd.h>
 
 struct NX_VMS_COMMON_API DetachFromCloudData:

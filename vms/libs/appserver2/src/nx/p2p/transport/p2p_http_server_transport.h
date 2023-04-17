@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <nx/p2p/transport/i_p2p_transport.h>
-#include <nx/network/websocket/websocket_common_types.h>
-#include <nx/network/http/http_parser.h>
 #include <nx/network/aio/timer.h>
+#include <nx/network/http/http_parser.h>
+#include <nx/network/websocket/websocket_common_types.h>
+#include <nx/p2p/transport/i_p2p_transport.h>
 #include <nx/utils/interruption_flag.h>
 
 namespace nx::p2p {

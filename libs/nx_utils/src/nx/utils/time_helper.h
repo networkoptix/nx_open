@@ -4,9 +4,9 @@
 
 #include <memory>
 
-#include <nx/utils/thread/mutex.h>
-
 #include <QtCore/QElapsedTimer>
+
+#include <nx/utils/thread/mutex.h>
 
 #include "datetime.h"
 #include "timestamp_adjustment_history.h"

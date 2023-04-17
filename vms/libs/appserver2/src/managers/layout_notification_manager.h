@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <transaction/transaction.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 

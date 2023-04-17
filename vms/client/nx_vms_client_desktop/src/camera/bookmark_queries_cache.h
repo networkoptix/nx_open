@@ -1,15 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #pragma once
 
 #include <map>
 
-#include <QObject>
+#include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
-#include <core/resource/camera_bookmark_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
+#include <core/resource/camera_bookmark_fwd.h>
+#include <core/resource/resource_fwd.h>
 
 /// Class holds queries for the specified camera
 

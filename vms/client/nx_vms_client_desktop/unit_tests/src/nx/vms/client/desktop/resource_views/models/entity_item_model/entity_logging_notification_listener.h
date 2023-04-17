@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <queue>
 #include <iostream>
 #include <optional>
+#include <queue>
 
 #include <gtest/gtest.h>
 

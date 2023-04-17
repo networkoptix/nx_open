@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
 
 namespace nx::core::resource {

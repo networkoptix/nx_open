@@ -6,10 +6,10 @@
 #include <memory>
 #include <tuple>
 
-#include <nx/utils/std/cpp14.h>
-#include <nx/utils/log/log.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_factory.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "server_statistics.h"
 

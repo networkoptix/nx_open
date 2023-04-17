@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QList>
+#include <QtCore/QString>
 
 #include <nx/reflect/instrument.h>
 

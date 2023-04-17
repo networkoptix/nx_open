@@ -4,8 +4,8 @@
 
 #include <array>
 
-#include <QtWidgets/QWidget>
 #include <QtCore/QVariant>
+#include <QtWidgets/QWidget>
 
 #include <nx/utils/impl_ptr.h>
 

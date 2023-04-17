@@ -3,7 +3,9 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
+
 #include <ui/widgets/business/abstract_business_params_widget.h>
+
 #include "core/ptz/ptz_fwd.h"
 
 namespace Ui {

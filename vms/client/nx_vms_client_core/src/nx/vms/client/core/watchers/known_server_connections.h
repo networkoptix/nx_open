@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <QtCore/QUrl>
 #include <QtCore/QList>
 #include <QtCore/QObject>
+#include <QtCore/QUrl>
 
 #include <nx/reflect/instrument.h>
-#include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 
 class QTimer;
 

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/types/resource_types.h>
 
 class NX_VMS_COMMON_API QnResourceStatusDictionary

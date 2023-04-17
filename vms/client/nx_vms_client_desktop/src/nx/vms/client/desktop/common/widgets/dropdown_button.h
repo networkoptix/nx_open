@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+
 #include <QtWidgets/QPushButton>
 
 /**

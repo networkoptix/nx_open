@@ -5,10 +5,10 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/reflect/instrument.h>
 #include <nx/reflect/enum_instrument.h>
-#include <nx/vms/api/data/analytics_data.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/analytics_data.h>
 
 namespace nx::vms::api::analytics {
 

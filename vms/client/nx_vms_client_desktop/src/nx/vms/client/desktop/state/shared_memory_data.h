@@ -13,10 +13,10 @@
 #include <array>
 #include <functional>
 
+#include <range/v3/view/filter.hpp>
+
 #include <QtCore/QByteArray>
 #include <QtCore/QSet>
-
-#include <range/v3/view/filter.hpp>
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>

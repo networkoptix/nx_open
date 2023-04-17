@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <optional>
 #include <chrono>
+#include <optional>
 
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/elapsed_timer.h>
 
 namespace nx::utils {
 

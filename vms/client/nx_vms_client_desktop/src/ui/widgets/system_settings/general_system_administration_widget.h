@@ -4,14 +4,14 @@
 
 #include <array>
 
+#include <ui_general_system_administration_widget.h>
+
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui_general_system_administration_widget.h>
-
-#include <nx/vms/client/desktop/common/utils/custom_painted.h>
 
 class QPushButton;
 

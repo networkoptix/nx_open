@@ -4,9 +4,7 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
-
 #include <QtGui/QStandardItem>
-
 #include <QtWidgets/QDialog>
 
 #include <api/model/audit/audit_record.h>

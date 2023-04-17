@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <optional>
-#include <vector>
 #include <deque>
+#include <optional>
 #include <unordered_map>
+#include <vector>
 
 #include <common/common_globals.h>
 #include <nx/core/core_fwd.h>

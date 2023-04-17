@@ -3,13 +3,13 @@
 #ifndef QN_SERIALIZATION_XML_FUNCTIONS_H
 #define QN_SERIALIZATION_XML_FUNCTIONS_H
 
-#include <type_traits>
-#include <set>
 #include <map>
+#include <set>
+#include <type_traits>
 #include <vector>
 
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/tuple/enum.hpp>
+    #include <boost/preprocessor/tuple/enum.hpp>
 #endif
 
 #include <collection.h>
@@ -19,18 +19,16 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QUrl>
 
-#include <nx/utils/uuid.h>
-
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/reflect/to_string.h>
 #include <nx/utils/latin1_array.h>
+#include <nx/utils/uuid.h>
 
 #include "collection_fwd.h"
+#include "enum.h"
+#include "lexical_functions.h"
 #include "xml.h"
 #include "xml_macros.h"
-#include "lexical_functions.h"
-#include "enum.h"
-
 
 namespace QnXmlDetail {
 

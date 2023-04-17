@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <nx/utils/uuid.h>
+#include <QtCore/QObject>
+
 #include <nx/utils/async_handler_executor.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/api/rules/rule.h>
-
-#include <QtCore/QObject>
 
 #include "../ec_api_common.h"
 

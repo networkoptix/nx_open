@@ -6,8 +6,8 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include "http_server_base_authentication_manager.h"
 #include "../auth_tools.h"
+#include "http_server_base_authentication_manager.h"
 
 namespace nx::network::http::server {
 

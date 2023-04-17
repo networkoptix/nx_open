@@ -4,9 +4,8 @@
 
 #include <QtCore/QPointer>
 
-#include <utils/media/externaltimesource.h>
-
 #include <nx/streaming/abstract_archive_delegate.h>
+#include <utils/media/externaltimesource.h>
 
 class QnAbstractArchiveStreamReader;
 class QnArchiveSyncPlayWrapper;

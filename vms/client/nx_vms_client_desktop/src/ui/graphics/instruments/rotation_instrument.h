@@ -5,7 +5,6 @@
 
 #include "drag_processing_instrument.h"
 
-
 class QGraphicsWidget;
 
 class RotationItem;

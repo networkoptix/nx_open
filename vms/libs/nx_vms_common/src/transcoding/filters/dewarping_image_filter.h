@@ -4,14 +4,13 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QVector>
-#include <QtGui/QVector2D>
-#include <QtGui/QVector3D>
 #include <QtGui/QMatrix3x3>
 #include <QtGui/QMatrix4x4>
-
-#include <utils/media/frame_info.h>
+#include <QtGui/QVector2D>
+#include <QtGui/QVector3D>
 
 #include <nx/vms/api/data/dewarping_data.h>
+#include <utils/media/frame_info.h>
 
 #include "abstract_image_filter.h"
 

@@ -4,10 +4,10 @@
 
 #include <QtCore/QVariant>
 
-#include "node_view_state.h"
-#include "node/view_node_path.h"
-
 #include <nx/utils/scope_guard.h>
+
+#include "node/view_node_path.h"
+#include "node_view_state.h"
 
 namespace nx::vms::client::desktop {
 namespace node_view {

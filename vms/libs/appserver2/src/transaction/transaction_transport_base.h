@@ -6,26 +6,26 @@
 #include <deque>
 #include <map>
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QSet>
 #include <QtNetwork/QAuthenticator>
-#include <QSet>
 
-#include <nx/utils/log/log.h>
-#include <nx/utils/uuid.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/auth_cache.h>
-#include <nx/network/http/http_stream_reader.h>
 #include <nx/network/http/http_message_stream_parser.h>
+#include <nx/network/http/http_stream_reader.h>
 #include <nx/network/http/multipart_content_parser.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/uuid.h>
 
-#include "connection_guard.h"
 #include "abstract_transaction_transport.h"
+#include "connection_guard.h"
 
 namespace ec2
 {

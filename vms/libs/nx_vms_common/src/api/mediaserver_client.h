@@ -3,36 +3,34 @@
 #pragma once
 
 #include <chrono>
-#include <map>
 #include <list>
+#include <map>
 
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
 
+#include <analytics/db/analytics_db_types.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/fusion_data_http_client.h>
+#include <nx/network/rest/result.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/network/rest/result.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/sync_call.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/sync_call.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/type_utils.h>
-#include <nx/vms/api/data/database_dump_data.h>
 #include <nx/vms/api/data/camera_data.h>
-#include <nx/vms/api/data/resource_data.h>
-#include <nx/vms/api/data/module_information.h>
-#include <nx/vms/api/data/user_data.h>
+#include <nx/vms/api/data/database_dump_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/merge_status_reply.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/system_merge_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
-
-#include <analytics/db/analytics_db_types.h>
+#include <nx/vms/api/data/user_data.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/common/nxfusion_wrapper.h>
 

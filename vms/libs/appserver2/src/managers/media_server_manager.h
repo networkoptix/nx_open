@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <transaction/transaction.h>
-
 #include <nx_ec/managers/abstract_media_server_manager.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 

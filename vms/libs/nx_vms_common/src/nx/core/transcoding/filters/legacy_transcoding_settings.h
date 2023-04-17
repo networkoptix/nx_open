@@ -5,15 +5,11 @@
 #include <QtCore/QRect>
 
 #include <core/resource/resource_fwd.h>
-
+#include <nx/core/transcoding/filters/timestamp_params.h>
 #include <nx/core/watermark/watermark.h>
-
-#include <utils/common/aspect_ratio.h>
-
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
-
-#include <nx/core/transcoding/filters/timestamp_params.h>
+#include <utils/common/aspect_ratio.h>
 
 namespace nx {
 namespace core {

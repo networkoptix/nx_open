@@ -4,7 +4,6 @@
 
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/utils.h>
-
 #include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx::analytics::taxonomy {

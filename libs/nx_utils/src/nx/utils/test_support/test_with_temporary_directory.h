@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QDir>
+#include <QtCore/QString>
 
 namespace nx::utils::test {
 

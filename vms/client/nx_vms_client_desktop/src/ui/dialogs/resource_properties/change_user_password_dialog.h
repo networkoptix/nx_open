@@ -3,7 +3,6 @@
 #pragma once
 
 #include <ui/dialogs/common/button_box_dialog.h>
-
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui

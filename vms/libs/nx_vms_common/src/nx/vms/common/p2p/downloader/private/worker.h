@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <thread>
 #include <chrono>
+#include <thread>
 
 #include <QtCore/QBitArray>
 #include <QtCore/QElapsedTimer>

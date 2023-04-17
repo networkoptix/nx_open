@@ -2,29 +2,29 @@
 
 #pragma once
 
+#include "system_network_headers.h"
+
 #ifdef _WIN32
-    #include <winsock2.h>
     #include <in6addr.h>
     #include <ws2ipdef.h>
-    #include <ws2tcpip.h>
 
     // Windows does not support this flag, so we emulate it
     #define MSG_DONTWAIT 0x01000000
 #else
-    #include <sys/socket.h>
     #include <netinet/in.h>
-    #include <arpa/inet.h>
+    #include <sys/socket.h>
 #endif
 
 #include <chrono>
-#include <stdint.h>
 #include <optional>
 #include <string>
 #include <string_view>
 
+#include <stdint.h>
+
+#include <QtCore/QString>
 #include <QtCore/QtEndian>
 #include <QtCore/QtGlobal>
-#include <QtCore/QString>
 #include <QtNetwork/QHostAddress>
 
 #include <nx/reflect/instrument.h>

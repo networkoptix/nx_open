@@ -13,7 +13,7 @@
 #include <vector>
 
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/tuple/enum.hpp>
+    #include <boost/preprocessor/tuple/enum.hpp>
 #endif
 
 #include <collection.h>
@@ -27,8 +27,8 @@
 #include <QtCore/QRectF>
 #include <QtCore/QSize>
 #include <QtCore/QSizeF>
-#include <QtCore/QtNumeric>
 #include <QtCore/QUrl>
+#include <QtCore/QtNumeric>
 #include <QtGui/QColor>
 #include <QtGui/QFont>
 #include <QtGui/QRegion>

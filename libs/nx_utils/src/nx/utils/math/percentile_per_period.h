@@ -7,8 +7,8 @@
 #include <memory>
 #include <optional>
 
-#include "percentile.h"
 #include "../time.h"
+#include "percentile.h"
 
 namespace nx::utils::math {
 

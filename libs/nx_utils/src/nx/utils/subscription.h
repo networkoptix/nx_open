@@ -8,11 +8,11 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/thread_util.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/thread_util.h>
+#include <nx/utils/thread/wait_condition.h>
 
 namespace nx::utils {
 

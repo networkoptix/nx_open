@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <set>
 #include <optional>
+#include <set>
 
 #include <QtCore/QString>
 

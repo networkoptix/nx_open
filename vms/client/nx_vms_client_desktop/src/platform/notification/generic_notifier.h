@@ -3,10 +3,10 @@
 #ifndef QN_GENERIC_NOTIFIER_H
 #define QN_GENERIC_NOTIFIER_H
 
-#include "platform_notifier.h"
-
 #include <QtCore/QBasicTimer>
 #include <QtCore/QElapsedTimer>
+
+#include "platform_notifier.h"
 
 class QnGenericNotifier: public QnPlatformNotifier {
     Q_OBJECT

@@ -8,9 +8,9 @@
 
 #include <nx/utils/uuid.h>
 
+#include "enum.h"
 #include "sql.h"
 #include "sql_macros.h"
-#include "enum.h"
 
 namespace QnSqlDetail {
     template<class T>

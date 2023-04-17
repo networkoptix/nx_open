@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/client/core/media/analytics_metadata_provider_factory.h>
 #include <nx/utils/singleton.h>
+#include <nx/vms/client/core/media/analytics_metadata_provider_factory.h>
 
 namespace nx::vms::client::desktop {
 

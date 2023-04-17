@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "http_statistics.h"
 #include "http_message_dispatcher.h"
+#include "http_statistics.h"
 
 namespace nx::network::http::server {
 

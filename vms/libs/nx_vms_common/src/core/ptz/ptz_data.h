@@ -6,16 +6,15 @@
 
 #include <core/ptz/ptz_constants.h>
 #include <nx/utils/serialization/qt_core_types.h>
-
-#include "ptz_fwd.h"
-#include "ptz_limits.h"
-#include "ptz_preset.h"
-#include "ptz_tour.h"
-#include "ptz_object.h"
-#include "ptz_auxiliary_trait.h"
-
 #include <nx/vms/common/ptz/datafield.h>
 #include <nx/vms/common/ptz/vector.h>
+
+#include "ptz_auxiliary_trait.h"
+#include "ptz_fwd.h"
+#include "ptz_limits.h"
+#include "ptz_object.h"
+#include "ptz_preset.h"
+#include "ptz_tour.h"
 
 struct QnPtzData
 {

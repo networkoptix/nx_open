@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "message_bus_adapter.h"
-
 #include <nx/utils/thread/mutex.h>
+
+#include "message_bus_adapter.h"
 
 namespace ec2 {
 

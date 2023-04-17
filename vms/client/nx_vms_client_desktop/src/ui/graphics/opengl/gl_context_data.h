@@ -4,6 +4,7 @@
 
 #include <QHash>
 #include <QSharedPointer>
+
 #include <nx/utils/thread/mutex.h>
 
 class QOpenGLWidget;

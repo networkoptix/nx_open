@@ -3,10 +3,10 @@
 #ifndef QN_WEAK_GRAPHICS_ITEM_POINTER_H
 #define QN_WEAK_GRAPHICS_ITEM_POINTER_H
 
-#include <QtCore/QWeakPointer>
+#include <QtCore/QList>
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
-#include <QtCore/QList>
+#include <QtCore/QWeakPointer>
 
 class QGraphicsItem;
 

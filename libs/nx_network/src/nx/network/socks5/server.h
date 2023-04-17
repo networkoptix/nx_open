@@ -2,13 +2,12 @@
 
 #pragma once
 
-#include <nx/network/connection_server/stream_socket_server.h>
+#include <nx/network/aio/abstract_async_connector.h>
+#include <nx/network/aio/async_channel_bridge.h>
+#include <nx/network/aio/stream_socket_connector.h>
 #include <nx/network/connection_server/base_server_connection.h>
 #include <nx/network/connection_server/detail/connection_statistics.h>
-
-#include <nx/network/aio/abstract_async_connector.h>
-#include <nx/network/aio/stream_socket_connector.h>
-#include <nx/network/aio/async_channel_bridge.h>
+#include <nx/network/connection_server/stream_socket_server.h>
 
 namespace nx::network::socks5 {
 

@@ -3,30 +3,30 @@
 #ifndef QN_SERIALIZATION_CSV_FUNCTIONS_H
 #define QN_SERIALIZATION_CSV_FUNCTIONS_H
 
-#include <type_traits>
-#include <map>
-#include <vector>
-#include <set>
 #include <iterator> /* For std::iterator_traits. */
+#include <map>
+#include <set>
+#include <type_traits>
+#include <vector>
 
 #ifndef Q_MOC_RUN
-#include <boost/range/mutable_iterator.hpp>
-#include <boost/preprocessor/tuple/enum.hpp>
+    #include <boost/preprocessor/tuple/enum.hpp>
+    #include <boost/range/mutable_iterator.hpp>
 #endif
 
-#include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
 
 #include <nx/reflect/to_string.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 
-#include "enum.h"
 #include "collection_fwd.h"
 #include "csv.h"
-#include "csv_macros.h"
-#include "lexical.h"
 #include "csv_from_json.h"
+#include "csv_macros.h"
+#include "enum.h"
+#include "lexical.h"
 
 namespace QnCsvDetail {
     template<class Collection, class Output>

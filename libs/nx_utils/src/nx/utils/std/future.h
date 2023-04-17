@@ -4,12 +4,13 @@
 
 #include <chrono>
 #include <condition_variable>
-#include <future>    //for some enums
-#include <optional>
+#include <future> //for some enums
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <stdexcept>
 #include <system_error>
+
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {

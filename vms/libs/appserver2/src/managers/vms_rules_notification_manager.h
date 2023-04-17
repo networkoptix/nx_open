@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "transaction/transaction.h"
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
+
+#include "transaction/transaction.h"
 
 namespace ec2 {
 

@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "session_state.h"
-
 #include <map>
 #include <optional>
 
-#include <QDir>
+#include <QtCore/QDir>
+
+#include "session_state.h"
 
 namespace nx::vms::client::desktop {
 

@@ -5,8 +5,8 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/utils/url.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/url.h>
 #include <utils/merge_systems_common.h>
 
 #include "merge_system_requests.h"

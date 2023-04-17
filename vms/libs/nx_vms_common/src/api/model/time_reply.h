@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/fusion/model_functions_fwd.h>
-
 #include <nx/utils/uuid.h>
 
 /**%apidoc Time-related data. */

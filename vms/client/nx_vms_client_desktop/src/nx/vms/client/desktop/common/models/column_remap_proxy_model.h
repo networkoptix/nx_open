@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QVector>
 #include <QtCore/QSortFilterProxyModel>
+#include <QtCore/QVector>
 
 namespace nx::vms::client::desktop {
 

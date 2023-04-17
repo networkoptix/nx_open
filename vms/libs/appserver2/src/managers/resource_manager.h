@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <transaction/transaction.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_access/user_access_data.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/utils/log/log.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/ec_api_common.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
-#include <nx_ec/data/api_conversion_functions.h>
-#include <nx/utils/log/log.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 

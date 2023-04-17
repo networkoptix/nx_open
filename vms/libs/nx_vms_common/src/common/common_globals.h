@@ -8,11 +8,11 @@
 #include <QtCore/QStringList>
 
 #include <nx/reflect/enum_instrument.h>
+#include <nx/string.h>
 #include <nx/utils/serialization/flags.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/resource_types.h>
-#include <nx/string.h>
 
 namespace Qn {
     Q_NAMESPACE_EXPORT(NX_VMS_COMMON_API)

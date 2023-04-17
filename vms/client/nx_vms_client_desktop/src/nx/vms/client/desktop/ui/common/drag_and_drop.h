@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <QtCore/QModelIndex>
 #include <QtCore/QObject>
 #include <QtCore/QPointF>
-#include <QtCore/QModelIndex>
 #include <QtCore/QUrl>
 
 class QAbstractItemModel;

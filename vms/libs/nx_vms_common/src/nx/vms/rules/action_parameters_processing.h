@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/event_fwd.h>
 
 namespace nx::vms::common { class SystemContext; }
 

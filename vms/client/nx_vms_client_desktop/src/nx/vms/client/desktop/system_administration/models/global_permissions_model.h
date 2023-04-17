@@ -7,7 +7,6 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 
-
 namespace nx::vms::client::desktop {
 
 /**

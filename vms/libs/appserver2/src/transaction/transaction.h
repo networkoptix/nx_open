@@ -6,7 +6,6 @@
 
 #include <QtCore/QString>
 
-#include <nx_ec/abstract_ec_connection.h>
 #include <nx/fusion/serialization/csv.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/ubjson.h>
@@ -25,6 +24,7 @@
 #include <nx/vms/api/data/timestamp.h>
 #include <nx/vms/api/data/update_sequence_data.h>
 #include <nx/vms/api/data/user_data_deprecated.h>
+#include <nx_ec/abstract_ec_connection.h>
 
 namespace ec2 {
 

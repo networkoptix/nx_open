@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <vector>
 #include <map>
+#include <vector>
 
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>

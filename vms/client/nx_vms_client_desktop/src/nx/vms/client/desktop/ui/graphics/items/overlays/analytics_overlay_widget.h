@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <nx/utils/uuid.h>
-#include <nx/utils/impl_ptr.h>
 #include <qt_graphics_items/graphics_widget.h>
+
+#include <nx/utils/impl_ptr.h>
+#include <nx/utils/uuid.h>
 
 #include "figure/types.h"
 

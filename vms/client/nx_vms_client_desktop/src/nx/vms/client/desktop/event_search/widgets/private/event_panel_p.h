@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "../event_panel.h"
-
 #include <QtCore/QHash>
 
 #include <nx/utils/scoped_connections.h>
+
+#include "../event_panel.h"
 
 class QTabWidget;
 class AnimationTimer;

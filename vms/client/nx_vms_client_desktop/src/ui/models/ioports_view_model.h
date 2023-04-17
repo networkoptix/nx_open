@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
-#include <QtCore/QVariant>
 #include <QtCore/QList>
+#include <QtCore/QVariant>
 
 #include <api/model/api_ioport_data.h>
 

@@ -4,9 +4,9 @@
 
 #include <vector>
 
-#include "abstract_node.h"
-
 #include <nx/utils/impl_ptr.h>
+
+#include "abstract_node.h"
 
 namespace nx::analytics::taxonomy { class AbstractObjectType; }
 

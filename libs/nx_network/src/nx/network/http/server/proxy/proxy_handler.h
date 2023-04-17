@@ -8,8 +8,8 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/ssl/helpers.h>
 
-#include "proxy_worker.h"
 #include "../abstract_http_request_handler.h"
+#include "proxy_worker.h"
 
 namespace nx::network::http::server::proxy {
 

@@ -2,11 +2,12 @@
 
 #pragma once
 
-#include "password_data.h"
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/vms/api/data/media_server_data.h>
-#include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/timestamp.h>
+#include <nx/vms/api/data/user_data.h>
+
+#include "password_data.h"
 
 struct NX_VMS_COMMON_API ConfigureSystemData: public PasswordData
 {

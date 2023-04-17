@@ -3,10 +3,11 @@
 #pragma once
 
 #include <functional>
+
 #include <QtCore/QScopedPointer>
 
-#include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/common/generic_tabbed_dialog.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui
 {

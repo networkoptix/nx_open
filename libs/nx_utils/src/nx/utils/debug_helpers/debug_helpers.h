@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QString>
+
 #include <nx/kit/ini_config.h>
 
 namespace nx::utils::debug_helpers {

@@ -5,11 +5,11 @@
 #include <map>
 #include <vector>
 
-#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QCheckBox>
-#include <QtWidgets/QSpinBox>
-#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QSpinBox>
 
 class QnSystemBasedCustomDialog: public QFileDialog
 {

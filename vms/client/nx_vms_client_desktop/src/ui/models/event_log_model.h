@@ -7,15 +7,12 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtGui/QBrush>
 
-#include <utils/common/id.h>
-
 #include <core/resource/resource_fwd.h>
-
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/action_parameters.h>
-
+#include <nx/vms/event/event_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <utils/common/id.h>
 
 namespace nx {
 namespace vms {

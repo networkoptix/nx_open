@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "binary_stream_fwd.h"
-
 #include <QtCore/QByteArray>
+
+#include "binary_stream_fwd.h"
 
 template<>
 class QnInputBinaryStream<QByteArray>

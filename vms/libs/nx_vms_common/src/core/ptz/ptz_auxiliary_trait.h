@@ -4,8 +4,8 @@
 
 #include <QtCore/QString>
 
-#include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_constants.h>
+#include <core/ptz/ptz_fwd.h>
 
 class NX_VMS_COMMON_API QnPtzAuxiliaryTrait
 {

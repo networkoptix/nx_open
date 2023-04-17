@@ -15,8 +15,7 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <plugins/plugin_tools.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/opt.h>

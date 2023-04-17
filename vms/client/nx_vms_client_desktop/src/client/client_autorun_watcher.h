@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QObject>
+#include <QtCore/QObject>
 
 class QnClientAutoRunWatcher: public QObject
 {

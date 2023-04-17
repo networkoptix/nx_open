@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <memory>
 #include <tuple>
 #include <utility>
-#include <memory>
 
 #include <nx/utils/move_only_func.h>
 

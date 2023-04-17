@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <module_name.h>
+
 #include <gtest/gtest.h>
 
 #include <QtCore/QString>
@@ -12,8 +14,6 @@
 #include <nx/utils/std/filesystem.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/test_support/utils.h>
-
-#include <module_name.h>
 
 namespace nx::sql::test {
 

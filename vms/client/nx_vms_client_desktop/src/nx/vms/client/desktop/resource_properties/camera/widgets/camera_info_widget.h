@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include <ui/widgets/common/abstract_preferences_widget.h>
-
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/common/widgets/panel.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace Ui { class CameraInfoWidget; }
 

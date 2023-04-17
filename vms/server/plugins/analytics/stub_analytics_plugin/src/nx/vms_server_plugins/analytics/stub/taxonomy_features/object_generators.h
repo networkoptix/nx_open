@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx {
 namespace vms_server_plugins {

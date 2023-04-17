@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <nx/sdk/interface.h>
-#include <nx/sdk/i_plugin.h>
-#include <nx/sdk/result.h>
 #include <camera/camera_plugin.h>
+#include <nx/sdk/i_plugin.h>
+#include <nx/sdk/interface.h>
+#include <nx/sdk/result.h>
 
 #include "i_media_data_packet.h"
 

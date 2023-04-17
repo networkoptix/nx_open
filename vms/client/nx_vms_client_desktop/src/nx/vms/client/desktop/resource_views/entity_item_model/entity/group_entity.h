@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+
 #include <QtCore/QVector>
 
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>

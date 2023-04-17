@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <vector>
 #include <QJsonValue>
+#include <vector>
 
 class QnJsonContext;
 

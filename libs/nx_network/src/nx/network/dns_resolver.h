@@ -8,17 +8,17 @@
 #include <functional>
 #include <memory>
 #include <set>
+#include <thread>
 #include <unordered_map>
 #include <unordered_set>
-#include <thread>
 
 #include <nx/utils/data_structures/time_out_cache.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/singleton.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include "resolve/abstract_resolver.h"
 #include "socket_common.h"

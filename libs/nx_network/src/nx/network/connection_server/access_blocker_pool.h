@@ -5,9 +5,9 @@
 #include <chrono>
 #include <deque>
 #include <map>
-#include <vector>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include <nx/utils/data_structures/time_out_cache.h>
 #include <nx/utils/thread/mutex.h>

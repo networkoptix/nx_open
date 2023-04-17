@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
 class QnNotificationSoundManagerDialog;

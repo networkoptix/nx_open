@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/sdk/interface.h>
 #include <nx/sdk/i_attribute.h>
+#include <nx/sdk/interface.h>
 
 namespace nx::sdk::analytics {
 

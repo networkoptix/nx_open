@@ -6,7 +6,6 @@
 
 #include <core/resource/resource.h>
 #include <nx/utils/value_cache.h>
-
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/data/analytics_integration_model.h>

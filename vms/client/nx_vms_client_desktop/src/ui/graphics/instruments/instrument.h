@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include <QtCore/QScopedPointer>
-#include <QtCore/QObject>
 #include <QtCore/QEvent> /* For QEvent::Type. */
-#include <QtCore/QSet>
 #include <QtCore/QList>
-
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QSet>
 
 #include <ui/common/scene_transformations.h>
 

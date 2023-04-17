@@ -3,8 +3,8 @@
 #pragma once
 
 #include <atomic>
-#include <optional>
 #include <memory>
+#include <optional>
 
 #include <nx/utils/thread/thread.h>
 

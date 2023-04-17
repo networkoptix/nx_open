@@ -6,7 +6,9 @@
 #include <QtCore/QRect>
 #include <QtCore/QSet>
 #include <QtGui/QTransform>
+
 #include <ui/animation/animation_timer.h>
+
 #include "instrument.h"
 
 class BoundingInstrument: public Instrument

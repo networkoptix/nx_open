@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QVector>
-#include <vector>
 #include <functional>
+#include <vector>
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {

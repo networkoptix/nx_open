@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <condition_variable>
 #include <mutex>
 #include <shared_mutex>
-#include <condition_variable>
 
 #include <nx/utils/std/optional.h>
 

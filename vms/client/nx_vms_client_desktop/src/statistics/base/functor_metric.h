@@ -1,12 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #pragma once
 
 #include <functional>
 
-#include <statistics/base/base_fwd.h>
 #include <statistics/base/abstract_metric.h>
+#include <statistics/base/base_fwd.h>
 
 class QnFunctorMetric: public QnAbstractMetric
 {

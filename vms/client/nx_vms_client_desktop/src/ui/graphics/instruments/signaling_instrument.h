@@ -3,7 +3,8 @@
 #ifndef QN_SIGNALING_INSTRUMENT_H
 #define QN_SIGNALING_INSTRUMENT_H
 
-#define QnSignalingInstrumentActivated  static_cast<void (SignalingInstrument::*)(QWidget *, QEvent *)>(&SignalingInstrument::activated)
+#define QnSignalingInstrumentActivated \
+    static_cast<void (SignalingInstrument::*)(QWidget*, QEvent*)>(&SignalingInstrument::activated)
 
 #include "instrument.h"
 

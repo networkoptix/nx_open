@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include <transaction/transaction.h>
-
+#include <core/resource_access/user_access_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
-#include <core/resource_access/user_access_data.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 

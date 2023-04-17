@@ -4,8 +4,8 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QVariant>
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QGraphicsOpacityEffect>
+#include <QtWidgets/QWidget>
 
 class QEvent;
 

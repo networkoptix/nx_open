@@ -6,10 +6,9 @@
 #include <vector>
 
 #include <nx/sdk/analytics/i_event_metadata.h>
-
-#include <nx/sdk/ptr.h>
-#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/attribute.h>
+#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx::sdk::analytics {
 

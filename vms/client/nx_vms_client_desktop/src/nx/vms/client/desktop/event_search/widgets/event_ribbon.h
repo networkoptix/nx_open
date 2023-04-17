@@ -8,7 +8,6 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/interval.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>

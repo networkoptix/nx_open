@@ -6,14 +6,13 @@
 #include <memory>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
-
 #include <nx/utils/thread/joinable.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/stoppable.h>
+#include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
-#include "query_queue.h"
 #include "query_executor.h"
+#include "query_queue.h"
 
 namespace nx::sql::detail {
 

@@ -2,14 +2,13 @@
 
 #pragma once
 
-#include "abstract_event_list_model.h"
-
 #include <core/resource/resource_fwd.h>
-#include <recording/time_period.h>
-
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
+#include <recording/time_period.h>
+
+#include "abstract_event_list_model.h"
 
 namespace nx::vms::client::desktop {
 

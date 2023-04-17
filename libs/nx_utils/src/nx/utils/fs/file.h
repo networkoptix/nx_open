@@ -6,10 +6,11 @@
 #include <optional>
 #include <string>
 
-#include <QtCore/QtGlobal>
+#include <fcntl.h>
+
 #include <QtCore/QIODevice>
 #include <QtCore/QString>
-#include <fcntl.h>
+#include <QtCore/QtGlobal>
 
 #include <nx/utils/system_error.h>
 

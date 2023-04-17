@@ -4,11 +4,10 @@
 
 #include <algorithm>
 
-#include <nx/reflect/instrument.h>
-
-#include <nx/network/connection_server/server_statistics.h>
 #include <nx/network/cloud/data/connection_result_data.h>
+#include <nx/network/connection_server/server_statistics.h>
 #include <nx/network/http/server/http_statistics.h>
+#include <nx/reflect/instrument.h>
 
 namespace nx::hpm::api {
 

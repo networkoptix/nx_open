@@ -3,9 +3,8 @@
 #ifndef QN_CURTAIN_ANIMATOR_H
 #define QN_CURTAIN_ANIMATOR_H
 
-#include <QtGui/QColor>
 #include <QtCore/QObject>
-
+#include <QtGui/QColor>
 
 #include "animator_group.h"
 

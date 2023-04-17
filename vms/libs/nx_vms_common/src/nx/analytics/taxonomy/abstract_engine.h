@@ -4,9 +4,8 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/api/analytics/engine_manifest.h>
-
 #include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 namespace nx::analytics::taxonomy {
 

@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <nx/sdk/analytics/helpers/consuming_device_agent.h>
-
 #include <nx/kit/json.h>
+#include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 
 #include "active_settings_builder.h"
 #include "engine.h"

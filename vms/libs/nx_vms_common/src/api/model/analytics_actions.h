@@ -4,9 +4,8 @@
 
 #include <optional>
 
-#include <nx/fusion/model_functions_fwd.h>
-
 #include <analytics/db/analytics_db_types.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 struct NX_VMS_COMMON_API AnalyticsActionResult
 {

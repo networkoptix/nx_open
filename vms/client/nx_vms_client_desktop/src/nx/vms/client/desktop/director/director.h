@@ -5,8 +5,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QVariant>
-#include <QtQml/QJSValue>
 #include <QtQml/QJSEngine>
+#include <QtQml/QJSValue>
 
 #include <nx/utils/singleton.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>

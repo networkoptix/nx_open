@@ -4,9 +4,9 @@
 
 #include <memory>
 
-#include <QtWidgets/QWidget>
 #include <QtCore/QModelIndexList>
 #include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QWidget>
 
 #include <ui/common/indents.h>
 

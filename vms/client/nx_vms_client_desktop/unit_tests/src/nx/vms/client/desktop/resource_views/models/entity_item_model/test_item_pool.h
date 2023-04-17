@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <unordered_set>
-#include <unordered_map>
 #include <optional>
+#include <unordered_map>
+#include <unordered_set>
 
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>

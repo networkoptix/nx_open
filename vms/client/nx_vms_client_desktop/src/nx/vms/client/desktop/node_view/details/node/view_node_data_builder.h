@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "view_node_fwd.h"
 #include "view_node_data.h"
+#include "view_node_fwd.h"
 
 namespace nx::vms::client::desktop {
 namespace node_view {

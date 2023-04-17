@@ -5,9 +5,9 @@
 #include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
 
-#include <nx/utils/singleton.h>
-#include <nx/utils/scoped_connections.h>
 #include <finders/abstract_systems_finder.h>
+#include <nx/utils/scoped_connections.h>
+#include <nx/utils/singleton.h>
 
 class ConnectionsHolder;
 class QnSystemDescriptionAggregator;

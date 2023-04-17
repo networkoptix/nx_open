@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <nx/sdk/interface.h>
-
 #include <nx/sdk/i_active_setting_changed_action.h>
 #include <nx/sdk/i_active_setting_changed_response.h>
+#include <nx/sdk/interface.h>
 
 #include "i_data_packet.h"
 #include "i_device_agent.h"

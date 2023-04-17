@@ -7,9 +7,8 @@
 
 #include <QtCore/QString>
 
-#include <nx/utils/scope_guard.h>
-
 #include <analytics/common/object_metadata.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx::analytics::db {
 

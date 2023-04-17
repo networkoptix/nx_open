@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <functional>
 #include <deque>
+#include <functional>
 
 namespace nx::utils {
 

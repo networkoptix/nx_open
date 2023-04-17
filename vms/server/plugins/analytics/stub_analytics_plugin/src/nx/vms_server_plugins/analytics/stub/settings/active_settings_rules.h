@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "active_settings_builder.h"
-
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/i_string_map.h>
+
+#include "active_settings_builder.h"
 
 namespace nx {
 namespace vms_server_plugins {

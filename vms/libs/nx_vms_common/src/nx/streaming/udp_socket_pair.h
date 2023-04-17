@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QString>
+#include <QtCore/QString>
 
 #include <nx/network/abstract_socket.h>
 

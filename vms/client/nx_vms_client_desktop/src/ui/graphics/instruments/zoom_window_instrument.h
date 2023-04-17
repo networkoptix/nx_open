@@ -3,9 +3,7 @@
 #pragma once
 
 #include <client/client_globals.h>
-
 #include <core/resource/resource_fwd.h>
-
 #include <ui/graphics/instruments/drag_processing_instrument.h>
 #include <ui/workbench/workbench_context_aware.h>
 

@@ -3,7 +3,6 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/vms/client/desktop/export/tools/export_storage_stream_recorder.h>
 
 namespace nx::vms::client::desktop {

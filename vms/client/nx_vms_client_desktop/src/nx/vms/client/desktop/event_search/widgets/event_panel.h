@@ -6,9 +6,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/reflect/enum_instrument.h>
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <nx/utils/impl_ptr.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace QnNotificationLevel { enum class Value; }
 

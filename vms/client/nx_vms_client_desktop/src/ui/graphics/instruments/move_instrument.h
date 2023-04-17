@@ -4,8 +4,10 @@
 #define QN_MOVE_INSTRUMENT_H
 
 #include <QtCore/QPoint>
-#include "drag_processing_instrument.h"
+
 #include <ui/common/weak_graphics_item_pointer.h>
+
+#include "drag_processing_instrument.h"
 
 Q_MOC_INCLUDE("QtWidgets/QGraphicsItem")
 

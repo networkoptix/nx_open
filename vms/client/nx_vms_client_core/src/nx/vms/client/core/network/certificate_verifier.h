@@ -7,11 +7,10 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/common/network/abstract_certificate_verifier.h>
-
 #include <nx/network/ssl/helpers.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/common/network/abstract_certificate_verifier.h>
 
 #include "server_certificate_validation_level.h"
 

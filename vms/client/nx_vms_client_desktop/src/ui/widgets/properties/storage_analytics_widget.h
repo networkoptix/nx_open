@@ -2,20 +2,17 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
-#include <QtGui/QStandardItem>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
+#include <QtGui/QStandardItem>
+#include <QtWidgets/QWidget>
 
 #include <api/model/recording_stats_reply.h>
 #include <api/model/storage_space_reply.h>
-
 #include <core/resource/resource_fwd.h>
-
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-#include <nx/vms/client/desktop/common/widgets/hint_button.h>
 
 class QnRecordingStatsModel;
 

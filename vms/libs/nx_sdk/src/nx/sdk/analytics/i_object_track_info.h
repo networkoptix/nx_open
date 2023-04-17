@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include <nx/sdk/interface.h>
-#include <nx/sdk/i_list.h>
-
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
 #include <nx/sdk/analytics/i_timestamped_object_metadata.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
-#include <nx/sdk/analytics/i_compressed_video_packet.h>
+#include <nx/sdk/i_list.h>
+#include <nx/sdk/interface.h>
 
 namespace nx::sdk::analytics {
 

@@ -3,8 +3,8 @@
 #pragma once
 
 #include "async_http_requests_executor.h"
-#include "include/nx/cloud/db/api/two_factor_auth_manager.h"
 #include "data/two_factor_auth_data.h"
+#include "include/nx/cloud/db/api/two_factor_auth_manager.h"
 
 namespace nx::cloud::db::client {
 

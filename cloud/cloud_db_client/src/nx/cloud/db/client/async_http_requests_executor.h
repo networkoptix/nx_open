@@ -11,8 +11,8 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/stoppable.h>
 
 #include "data/account_data.h"

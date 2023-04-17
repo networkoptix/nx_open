@@ -4,8 +4,8 @@
 
 #include <array>
 
-#include <QtCore/QObject>
 #include <QtCore/QEasingCurve>
+#include <QtCore/QObject>
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/singleton.h>

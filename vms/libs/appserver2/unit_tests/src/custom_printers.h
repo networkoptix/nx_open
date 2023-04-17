@@ -4,8 +4,6 @@
 
 #include <iostream>
 
-#include <QByteArray>
-
 #include <nx_ec/ec_api_fwd.h>
 
 namespace ec2 {

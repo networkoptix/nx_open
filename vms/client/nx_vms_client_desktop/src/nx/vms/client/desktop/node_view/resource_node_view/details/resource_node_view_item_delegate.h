@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <QtCore/QScopedPointer>
+
 #include "../../details/node/view_node_fwd.h"
 #include "../../node_view/node_view_item_delegate.h"
-
-#include <QtCore/QScopedPointer>
 
 class QnTextPixmapCache;
 

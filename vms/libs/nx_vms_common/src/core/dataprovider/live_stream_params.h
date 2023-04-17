@@ -4,8 +4,8 @@
 
 #include <QtCore/QSize>
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <common/common_globals.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 struct NX_VMS_COMMON_API QnLiveStreamParams
 {

@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QHash>
+#include <QtCore/QString>
 
-#include <core/resource/resource_fwd.h>
 #include <api/model/statistics_reply.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 

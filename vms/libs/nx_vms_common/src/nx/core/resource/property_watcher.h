@@ -2,14 +2,13 @@
 
 #pragma once
 
-#include <set>
 #include <functional>
+#include <set>
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/thread/mutex.h>
 
 class QnResourcePool;

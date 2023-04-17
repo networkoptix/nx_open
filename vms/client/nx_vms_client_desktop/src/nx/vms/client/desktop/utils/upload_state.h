@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QString>
+
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {

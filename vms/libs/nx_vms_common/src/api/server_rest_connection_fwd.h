@@ -5,7 +5,7 @@
 #include <functional>
 #include <memory>
 
-#include <nx/vms/event//event_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
 namespace nx::network::http { class AsyncHttpClientPtr; }
 namespace nx::network::rest { struct JsonResult; }

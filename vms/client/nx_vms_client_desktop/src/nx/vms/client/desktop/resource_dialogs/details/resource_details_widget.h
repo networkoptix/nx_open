@@ -5,7 +5,6 @@
 #include <memory>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/vms/client/desktop/common/widgets/panel.h>
 
 namespace Ui { class ResourceDetailsWidget; }

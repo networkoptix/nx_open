@@ -2,14 +2,13 @@
 
 #pragma once
 
-#include "io_module_overlay_widget.h"
-
 #include <functional>
 
 #include <QtWidgets/QGraphicsLayout>
 
 #include <ui/processors/clickable.h>
 
+#include "io_module_overlay_widget.h"
 
 class QnIoModuleOverlayContentsPrivate: public QObject
 {

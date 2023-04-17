@@ -4,12 +4,11 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSize>
-
 #include <QtGui/QImage>
 
-#include "../threaded_image_loader.h"
-
 #include <utils/common/aspect_ratio.h>
+
+#include "../threaded_image_loader.h"
 
 namespace nx::vms::client::desktop {
 

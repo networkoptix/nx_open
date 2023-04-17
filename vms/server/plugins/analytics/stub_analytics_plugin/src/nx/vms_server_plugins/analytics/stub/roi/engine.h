@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/helpers/engine.h>
+#include <nx/sdk/analytics/helpers/plugin.h>
 
 namespace nx {
 namespace vms_server_plugins {

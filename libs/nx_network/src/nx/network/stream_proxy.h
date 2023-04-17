@@ -12,8 +12,8 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_stream_socket_acceptor.h"
-#include "async_stoppable.h"
 #include "aio/async_channel_bridge.h"
+#include "async_stoppable.h"
 
 namespace nx::network {
 

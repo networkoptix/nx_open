@@ -9,9 +9,8 @@
 #include <QtGui/QImage>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/common/aspect_ratio.h>
-
 #include <nx/utils/impl_ptr.h>
+#include <utils/common/aspect_ratio.h>
 
 Q_MOC_INCLUDE("core/resource/resource.h")
 

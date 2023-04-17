@@ -13,8 +13,8 @@
 #include <nx/network/stun/message.h>
 #include <nx/utils/buffer.h>
 
-#include "stun_message_parser_buffer.h"
 #include "../connection_server/base_protocol_message_types.h"
+#include "stun_message_parser_buffer.h"
 
 namespace nx::network::stun {
 

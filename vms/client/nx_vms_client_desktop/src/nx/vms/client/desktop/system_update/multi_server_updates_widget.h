@@ -2,24 +2,23 @@
 
 #pragma once
 
-#include <memory>
 #include <future>
+#include <memory>
+
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-
-#include <ui/workbench/workbench_state_manager.h>
-#include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/delegates/resource_item_delegate.h>
-
-#include <utils/common/id.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
+#include <ui/delegates/resource_item_delegate.h>
+#include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_state_manager.h>
+#include <utils/common/id.h>
 
-#include "server_update_tool.h"
 #include "client_update_tool.h"
 #include "server_status_delegate.h"
+#include "server_update_tool.h"
 
 namespace Ui { class MultiServerUpdatesWidget; }
 

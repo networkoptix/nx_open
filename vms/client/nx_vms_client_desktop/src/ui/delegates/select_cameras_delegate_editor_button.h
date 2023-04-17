@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <ui/delegates/select_resources_delegate_editor_button.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
+#include <ui/delegates/select_resources_delegate_editor_button.h>
 
 class QnSelectCamerasDialogButton: public QnSelectResourcesDialogButton
 {

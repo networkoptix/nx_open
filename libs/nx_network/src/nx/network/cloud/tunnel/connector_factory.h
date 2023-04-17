@@ -10,10 +10,10 @@
 #include <nx/network/address_resolver.h>
 #include <nx/utils/basic_factory.h>
 
-#include "abstract_cross_nat_connector.h"
-#include "abstract_tunnel_connector.h"
 #include "../cloud_connect_type.h"
 #include "../data/connect_data.h"
+#include "abstract_cross_nat_connector.h"
+#include "abstract_tunnel_connector.h"
 
 namespace nx::network::cloud {
 

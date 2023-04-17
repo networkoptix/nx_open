@@ -9,10 +9,10 @@
 #include <QtCore/QThread>
 
 #include "move_only_func.h"
-#include "thread/mutex.h"
-#include "thread/wait_condition.h"
 #include "singleton.h"
 #include "std/optional.h"
+#include "thread/mutex.h"
+#include "thread/wait_condition.h"
 
 namespace nx {
 namespace utils {

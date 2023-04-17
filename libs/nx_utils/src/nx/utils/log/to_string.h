@@ -3,10 +3,10 @@
 #pragma once
 
 #include <bitset>
-#include <memory>
 #include <chrono>
-#include <type_traits>
+#include <memory>
 #include <optional>
+#include <type_traits>
 
 #include <QtCore/QString>
 #include <QtCore/QtDebug>

@@ -4,6 +4,7 @@
 
 #include <array>
 #include <cstring>
+
 #include <stdint.h>
 
 namespace nx::sdk {

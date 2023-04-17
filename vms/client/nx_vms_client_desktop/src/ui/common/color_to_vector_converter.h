@@ -3,10 +3,10 @@
 #ifndef QN_COLOR_TO_VECTOR_CONVERTER_H
 #define QN_COLOR_TO_VECTOR_CONVERTER_H
 
-#include "converter.h"
-
-#include <QtGui/QVector4D>
 #include <QtGui/QColor>
+#include <QtGui/QVector4D>
+
+#include "converter.h"
 
 void convert(const QVector4D &source, QColor *target);
 void convert(const QColor &source, QVector4D *target);

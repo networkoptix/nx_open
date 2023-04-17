@@ -4,12 +4,11 @@
 
 #include <optional>
 
+#include <core/resource/avi/avi_archive_metadata.h>
 #include <core/resource/resource_media_layout.h>
+#include <nx/vms/api/data/dewarping_data.h>
 #include <recording/stream_recorder_data.h>
 #include <utils/common/aspect_ratio.h>
-#include <core/resource/avi/avi_archive_metadata.h>
-
-#include <nx/vms/api/data/dewarping_data.h>
 
 namespace nx {
 

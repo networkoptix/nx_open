@@ -2,15 +2,14 @@
 
 #pragma once
 
-extern "C"
-{
-    #include <libavformat/avformat.h>
+extern "C" {
+#include <libavformat/avformat.h>
 }
 
 #include <QtCore/QSize>
 
-#include <nx/vms/api/types/motion_types.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/api/types/motion_types.h>
 
 class NX_VMS_COMMON_API CameraMediaStreamInfo
 {

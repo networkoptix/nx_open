@@ -4,9 +4,9 @@
 
 #include <vector>
 
+#include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/attribute.h>
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
 
 namespace nx::sdk::analytics {
 

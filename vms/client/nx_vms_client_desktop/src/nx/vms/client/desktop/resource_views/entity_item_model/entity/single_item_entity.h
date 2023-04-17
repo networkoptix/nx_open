@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "abstract_entity.h"
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
+
+#include "abstract_entity.h"
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {

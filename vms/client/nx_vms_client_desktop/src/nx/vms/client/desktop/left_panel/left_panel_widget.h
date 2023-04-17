@@ -4,13 +4,12 @@
 
 #include <QtQuickWidgets/QQuickWidget>
 
-#include <ui/common/help_topic_queryable.h>
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
-#include <nx/vms/client/desktop/ui/actions/action_types.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/actions/action_types.h>
+#include <ui/common/help_topic_queryable.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
 

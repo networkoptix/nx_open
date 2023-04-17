@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
+
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {

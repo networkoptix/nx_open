@@ -3,8 +3,8 @@
 #ifndef QN_UBJSON_DETAIL_H
 #define QN_UBJSON_DETAIL_H
 
-#include <QtCore/QtGlobal>
 #include <QtCore/QtEndian>
+#include <QtCore/QtGlobal>
 
 #include "binary_stream.h"
 #include "ubjson_fwd.h"

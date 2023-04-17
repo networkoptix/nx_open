@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QHash>
+#include <QtCore/QString>
 
 #include <nx/utils/buffer.h>
 

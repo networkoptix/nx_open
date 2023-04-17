@@ -4,10 +4,10 @@
 #define __MOTION_WINDOW_H__
 
 #include <QtCore/QMultiMap>
-#include <nx/utils/thread/mutex.h>
-#include <QtGui/QRegion>
 #include <QtGui/QPainterPath>
+#include <QtGui/QRegion>
 
+#include <nx/utils/thread/mutex.h>
 
 /*!
     Copy-constructor and assignment operator perform deep-copy of object

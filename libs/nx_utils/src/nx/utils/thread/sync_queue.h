@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <atomic>
 #include <algorithm>
+#include <atomic>
 #include <deque>
 #include <functional>
 #include <optional>

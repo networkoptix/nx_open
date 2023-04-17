@@ -3,7 +3,6 @@
 #include "io_module_grid_overlay_contents.h"
 #include "io_module_overlay_contents_p.h"
 
-
 class QnIoModuleGridOverlayContentsPrivate: public QnIoModuleOverlayContentsPrivate
 {
     Q_OBJECT

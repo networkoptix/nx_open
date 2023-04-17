@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <nx/reflect/instrument.h>
-
 #include <nx/cloud/db/api/module_info.h>
+#include <nx/reflect/instrument.h>
 
 namespace nx::cloud::db::api {
 

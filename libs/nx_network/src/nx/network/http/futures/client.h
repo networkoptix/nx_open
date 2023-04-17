@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/utils/thread/cf/cfuture.h>
+
 #include "../http_async_client.h"
 
 namespace nx::network::http::futures {

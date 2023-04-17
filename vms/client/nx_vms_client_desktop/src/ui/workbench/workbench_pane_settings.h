@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QMap>
+
 #include <client/client_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>

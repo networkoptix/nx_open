@@ -4,7 +4,6 @@
 
 #include <QtCore/QObject>
 
-
 #include "radass_fwd.h"
 #include "utils/abstract_timers.h"
 

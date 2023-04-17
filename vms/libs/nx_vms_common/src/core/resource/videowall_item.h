@@ -5,9 +5,8 @@
 #include <QtCore/QHash>
 #include <QtCore/QList>
 
-#include <nx/utils/uuid.h>
-
 #include <core/misc/screen_snap.h>
+#include <nx/utils/uuid.h>
 
 class QMimeData;
 

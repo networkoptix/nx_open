@@ -3,9 +3,8 @@
 #ifndef QN_PTZ_MAPPER_H
 #define QN_PTZ_MAPPER_H
 
-#include <utils/math/space_mapper.h>
-
 #include <nx/vms/common/ptz/vector.h>
+#include <utils/math/space_mapper.h>
 
 #include "ptz_fwd.h"
 #include "ptz_limits.h"

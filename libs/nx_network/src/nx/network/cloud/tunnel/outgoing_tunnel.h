@@ -8,8 +8,8 @@
 #include <nx/network/system_socket.h>
 #include <nx/utils/basic_factory.h>
 
-#include "abstract_tunnel_connector.h"
 #include "abstract_cross_nat_connector.h"
+#include "abstract_tunnel_connector.h"
 #include "tunnel.h"
 #include "tunnel_attributes.h"
 

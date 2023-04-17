@@ -4,11 +4,11 @@
 
 #ifdef _WIN32
 
-#include <d3d9.h>
-#include <dxva2api.h>
-#include <dxva.h>
-#include <windows.h>
 #include <atlbase.h>
+#include <d3d9.h>
+#include <dxva.h>
+#include <dxva2api.h>
+#include <windows.h>
 
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>

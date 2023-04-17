@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <QtCore/QtGlobal>
-#include <QtCore/QObject>
-#include <QtCore/QVariant>
-#include <QtCore/QScopedValueRollback>
-
 #include <type_traits>
+
+#include <QtCore/QObject>
+#include <QtCore/QScopedValueRollback>
+#include <QtCore/QVariant>
+#include <QtCore/QtGlobal>
 
 #include "typed_accessors.h"
 

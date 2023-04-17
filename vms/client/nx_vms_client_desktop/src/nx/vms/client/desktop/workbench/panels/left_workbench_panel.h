@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "abstract_workbench_panel.h"
-
-#include <nx/vms/client/desktop/ui/actions/action_types.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/actions/action_types.h>
+
+#include "abstract_workbench_panel.h"
 
 class QnResizerWidget;
 class QnControlBackgroundWidget;

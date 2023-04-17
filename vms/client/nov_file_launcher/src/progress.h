@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <Windows.h>
 #include <string>
+
+#include <Windows.h>
 
 class QnLauncherProgress
 {

@@ -8,7 +8,6 @@
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 
-
 namespace nx::vms::client::desktop {
 
 /**

@@ -6,8 +6,8 @@
 #include <deque>
 #include <vector>
 
-#include <nx/utils/time.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/time.h>
 
 namespace nx::utils {
 

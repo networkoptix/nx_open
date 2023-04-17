@@ -4,9 +4,9 @@
 #define QN_WORKBENCH_GRID_MAPPER_H
 
 #include <QtCore/QObject>
-#include <QtCore/QSize>
-#include <QtCore/QRect>
 #include <QtCore/QPoint>
+#include <QtCore/QRect>
+#include <QtCore/QSize>
 
 /**
  * Convenience class that stores grid parameters.

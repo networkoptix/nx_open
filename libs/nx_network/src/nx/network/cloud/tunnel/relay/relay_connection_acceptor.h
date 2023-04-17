@@ -13,8 +13,8 @@
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
 
-#include "api/relay_api_client.h"
 #include "../../cloud_abstract_connection_acceptor.h"
+#include "api/relay_api_client.h"
 
 namespace nx::network::cloud::relay {
 

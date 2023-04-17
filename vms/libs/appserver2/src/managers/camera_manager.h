@@ -2,12 +2,10 @@
 
 #pragma once
 
-#include <rest/request_type_wrappers.h>
-
-#include <transaction/transaction.h>
-
-#include <nx_ec/managers/abstract_camera_manager.h>
 #include <api/model/audit/auth_session.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
+#include <rest/request_type_wrappers.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 

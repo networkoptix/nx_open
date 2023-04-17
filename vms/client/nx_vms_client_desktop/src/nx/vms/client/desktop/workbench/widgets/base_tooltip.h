@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QtCore/QPoint>
-#include <QtCore/QRect>
 #include <QtCore/QPointer>
+#include <QtCore/QRect>
 #include <QtWidgets/QWidget>
 
 #include <ui/utils/widget_opacity_mixin.h>

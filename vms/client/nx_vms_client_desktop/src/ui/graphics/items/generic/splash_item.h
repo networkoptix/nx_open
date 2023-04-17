@@ -6,7 +6,6 @@
 #include <QtWidgets/QGraphicsObject>
 
 #include <nx/utils/log/assert.h>
-
 #include <ui/animation/animated.h>
 #include <ui/animation/animation_timer_listener.h>
 

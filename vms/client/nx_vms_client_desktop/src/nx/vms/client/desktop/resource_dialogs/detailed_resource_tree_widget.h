@@ -2,13 +2,12 @@
 
 #pragma once
 
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <core/resource/resource_fwd.h>
-
-#include <ui/dialogs/common/session_aware_dialog.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui { class DetailedResourceTreeWidget; }
 

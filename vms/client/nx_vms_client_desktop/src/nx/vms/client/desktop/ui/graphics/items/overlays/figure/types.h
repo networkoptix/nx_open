@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QVector>
 #include <QtCore/QPointF>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QVector>
 
 #include <nx/utils/uuid.h>
 

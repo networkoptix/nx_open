@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <optional>
+
+#include <gtest/gtest.h>
 
 #include <core/resource/client_resource_fwd.h>
 #include <core/resource/resource_fwd.h>

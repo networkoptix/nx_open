@@ -4,8 +4,8 @@
 
 #include <string>
 
-#include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
 #include <nx/reflect/basic_serializer.h>
 #include <nx/reflect/type_utils.h>

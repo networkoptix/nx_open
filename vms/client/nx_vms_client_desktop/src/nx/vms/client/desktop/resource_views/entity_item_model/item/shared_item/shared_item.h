@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include <set>
+
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/shared_item/shared_item_origin.h>
-#include <set>
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {

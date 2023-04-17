@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <utils/media/frame_info.h>
-
 #include <QtGui/QOpenGLContext>
 #include <QtMultimedia/QVideoFrame>
+
+#include <utils/media/frame_info.h>
 
 namespace nx::media::quick_sync { class QuickSyncVideoDecoderImpl; }
 

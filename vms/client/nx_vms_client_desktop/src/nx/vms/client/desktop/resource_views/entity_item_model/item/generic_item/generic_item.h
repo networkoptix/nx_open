@@ -4,11 +4,11 @@
 
 #include <functional>
 
-#include <QtCore/Qt>
 #include <QtCore/QVariant>
+#include <QtCore/Qt>
 
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {

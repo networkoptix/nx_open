@@ -10,8 +10,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <nx/media/video_data_packet.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavformat/avio.h>
 }
 

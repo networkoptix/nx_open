@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "p2p_fwd.h"
-
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
 #include <nx/vms/api/data/tran_state_data.h>
+
+#include "p2p_fwd.h"
 
 namespace ec2 { struct QnAbstractTransaction; }
 

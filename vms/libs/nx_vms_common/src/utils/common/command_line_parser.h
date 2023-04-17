@@ -3,12 +3,12 @@
 #ifndef QN_COMMAND_LINE_PARSER_H
 #define QN_COMMAND_LINE_PARSER_H
 
-#include <QtCore/QString>
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
-#include <QtCore/QVariant>
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 
 // TODO: #sivanov Rework with QCommandLineParser.
 

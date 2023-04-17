@@ -3,18 +3,18 @@
 #pragma once
 
 #include <future>
-#include <variant>
 #include <utility>
+#include <variant>
 
-#include <QtCore/QString>
 #include <QtCore/QMultiMap>
+#include <QtCore/QString>
 
 #include <nx/utils/os_info.h>
-#include <nx/utils/url.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/url.h>
 
-#include "releases_info.h"
 #include "publication_info.h"
+#include "releases_info.h"
 
 namespace nx::vms::update {
 

@@ -2,13 +2,12 @@
 
 #pragma once
 
-#include "../event_list_model.h"
-
 #include <QtCore/QList>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/data_structures/keyed_list.h>
+
+#include "../event_list_model.h"
 
 namespace nx::vms::client::desktop {
 

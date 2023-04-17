@@ -3,6 +3,7 @@
 #pragma once
 
 #include <algorithm>
+
 #include <nx/utils/math/arithmetic.h>
 #include <nx/utils/std/optional.h>
 

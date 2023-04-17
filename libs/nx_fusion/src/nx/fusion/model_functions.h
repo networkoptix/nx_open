@@ -2,11 +2,9 @@
 
 #pragma once
 
-#include <nx/utils/uuid.h>
-#include <nx/utils/string.h>
 #include <nx/fusion/fusion/fusion_adaptor.h>
-#include <nx/fusion/serialization/debug_macros.h>
 #include <nx/fusion/serialization/csv_functions.h>
+#include <nx/fusion/serialization/debug_macros.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 #include <nx/fusion/serialization/sql_functions.h>
@@ -14,6 +12,8 @@
 #include <nx/fusion/serialization/xml_functions.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/serialization/format.h>
+#include <nx/utils/string.h>
+#include <nx/utils/uuid.h>
 
 namespace QnHashAutomation {
     struct Visitor {

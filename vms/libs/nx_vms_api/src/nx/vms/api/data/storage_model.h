@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <tuple>
 #include <optional>
+#include <tuple>
 #include <type_traits>
 
 #include <nx/fusion/model_functions_fwd.h>

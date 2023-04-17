@@ -5,11 +5,11 @@
 #include <tuple>
 
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/stringize.hpp>
+    #include <boost/preprocessor/stringize.hpp>
 #endif
 
-#include <QtCore/QObject>
 #include <QtCore/QByteArray>
+#include <QtCore/QObject>
 
 namespace nx::vms::client::core::graphics {
 

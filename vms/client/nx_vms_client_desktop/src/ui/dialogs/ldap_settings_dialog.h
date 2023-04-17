@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <ui/dialogs/common/session_aware_dialog.h>
-
 #include <nx/vms/api/data/ldap.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
     class LdapSettingsDialog;

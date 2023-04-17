@@ -5,10 +5,10 @@
 
 #include <chrono>
 
-#include <QtCore/QObject>
 #include <QtCore/QCache>
-#include <QtGui/QPixmap>
+#include <QtCore/QObject>
 #include <QtGui/QFont>
+#include <QtGui/QPixmap>
 
 #include "time_step.h"
 

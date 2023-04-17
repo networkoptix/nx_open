@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <nx/utils/uuid.h>
+#include <QtCore/QObject>
+
 #include <nx/utils/async_handler_executor.h>
-#include <nx/vms/api/data/timestamp.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/data/misc_data.h>
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
-
-#include <QtCore/QObject>
+#include <nx/vms/api/data/timestamp.h>
 
 #include "../ec_api_common.h"
 

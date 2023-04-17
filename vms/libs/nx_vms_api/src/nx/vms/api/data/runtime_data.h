@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <QtCore/QtGlobal>
 #include <QtCore/QSet>
 #include <QtCore/QString>
 #include <QtCore/QVector>
+#include <QtCore/QtGlobal>
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/connection_types.h>

@@ -6,8 +6,9 @@
 
 #include <memory>
 
-#include <mfx/mfxvideo++.h>
 #include <QtMultimedia/QVideoFrame>
+
+#include <mfx/mfxvideo++.h>
 
 extern "C" {
 

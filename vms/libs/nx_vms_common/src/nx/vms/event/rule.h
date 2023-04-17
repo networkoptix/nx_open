@@ -2,12 +2,11 @@
 
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/event_fwd.h>
-
-#include <core/resource/resource_fwd.h>
+#include <nx/vms/event/events/abstract_event.h>
 
 namespace nx {
 namespace vms {

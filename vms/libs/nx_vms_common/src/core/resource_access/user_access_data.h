@@ -2,12 +2,11 @@
 
 #pragma once
 
+#include <api/model/audit/auth_session.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/literal.h>
 #include <nx/utils/time.h>
 #include <nx/utils/uuid.h>
-#include <core/resource/resource_fwd.h>
-
-#include <nx/utils/literal.h>
-#include <api/model/audit/auth_session.h>
 
 namespace Qn {
 

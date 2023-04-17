@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "active_settings_builder.h"
-
-#include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/helpers/engine.h>
+#include <nx/sdk/analytics/helpers/plugin.h>
+
+#include "active_settings_builder.h"
 
 namespace nx {
 namespace vms_server_plugins {

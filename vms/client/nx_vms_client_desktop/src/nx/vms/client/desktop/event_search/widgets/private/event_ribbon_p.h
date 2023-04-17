@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "../event_ribbon.h"
-
 #include <array>
 #include <chrono>
 #include <deque>
@@ -11,23 +9,24 @@
 #include <stack>
 
 #include <QtCore/QDeadlineTimer>
+#include <QtCore/QHash>
 #include <QtCore/QPersistentModelIndex>
 #include <QtCore/QPointer>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QTimer>
 #include <QtCore/QVariantAnimation>
-#include <QtCore/QHash>
-#include <QtCore/QSharedPointer>
-
-#include <ui/common/notification_levels.h>
-#include <nx/vms/client/desktop/style/helper.h>
 
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/interval.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/utils/scoped_connections.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/common/utils/volatile_unique_ptr.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <ui/common/notification_levels.h>
+
+#include "../event_ribbon.h"
 
 class QScrollBar;
 class QVariantAnimation;

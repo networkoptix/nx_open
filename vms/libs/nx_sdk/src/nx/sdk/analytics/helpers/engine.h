@@ -2,19 +2,17 @@
 
 #pragma once
 
-#include <string>
 #include <map>
 #include <mutex>
+#include <string>
 
-#include <nx/sdk/i_string_map.h>
 #include <nx/sdk/analytics/i_engine.h>
-
+#include <nx/sdk/helpers/log_utils.h>
+#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/i_string_map.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/result.h>
 #include <nx/sdk/uuid.h>
-
-#include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/ptr.h>
-#include <nx/sdk/helpers/log_utils.h>
 
 namespace nx::sdk::analytics {
 

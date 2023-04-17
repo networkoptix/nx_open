@@ -5,8 +5,8 @@
 #include <string>
 #include <type_traits>
 
-#include "type_utils.h"
 #include "enum_string_conversion.h"
+#include "type_utils.h"
 
 namespace nx::reflect {
 

@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include <commdlg.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <memory>
 #include <shellapi.h>
 #include <windows.h>
 

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "p2p_fwd.h"
-
 #include <QtCore/QMap>
+
+#include "p2p_fwd.h"
 
 namespace nx {
 namespace p2p {

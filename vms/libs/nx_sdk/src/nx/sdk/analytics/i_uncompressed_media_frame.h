@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <nx/sdk/interface.h>
-
 #include <nx/sdk/analytics/i_data_packet.h>
+#include <nx/sdk/interface.h>
 
 namespace nx::sdk::analytics {
 

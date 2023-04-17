@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <nx_ec/managers/abstract_stored_file_manager.h>
 #include <nx/vms/api/data/stored_file_data.h>
+#include <nx_ec/managers/abstract_stored_file_manager.h>
+
 #include "transaction/transaction.h"
 
 namespace ec2 {

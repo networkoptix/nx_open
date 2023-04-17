@@ -3,13 +3,11 @@
 #pragma once
 
 #include <api/model/api_model_fwd.h>
-
-#include <core/resource/resource_fwd.h>
-
-#include <nx/fusion/model_functions_fwd.h>
-#include <utils/common/id.h>
 #include <common/common_globals.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/vms/api/data/storage_space_data.h>
+#include <utils/common/id.h>
 
 /**%apidoc Details about the requested folder. */
 struct NX_VMS_COMMON_API QnStorageStatusReply

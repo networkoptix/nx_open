@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include <QtCore/QIODevice>
+
 #include <nx/utils/move_only_func.h>
 
 namespace nx::utils {

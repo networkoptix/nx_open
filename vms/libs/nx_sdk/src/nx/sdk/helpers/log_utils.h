@@ -5,9 +5,9 @@
 #include <map>
 #include <string>
 
-namespace nx { namespace sdk { class IStringMap; } }
-
 namespace nx::sdk {
+
+class IStringMap;
 
 /**
  * Plugin utils providing convenience for using NX_PRINT/NX_OUTPUT with their settings

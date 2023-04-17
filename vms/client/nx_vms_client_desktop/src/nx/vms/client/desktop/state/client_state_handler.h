@@ -4,15 +4,15 @@
 
 #include <optional>
 
-#include <QtCore/QString>
 #include <QtCore/QJsonValue>
+#include <QtCore/QString>
 
-#include <nx/vms/client/core/network/logon_data.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/network/logon_data.h>
 
+#include "client_process_execution_interface.h"
 #include "session_id.h"
 #include "session_state.h"
-#include "client_process_execution_interface.h"
 #include "startup_parameters.h"
 
 class QnStatisticsManager;

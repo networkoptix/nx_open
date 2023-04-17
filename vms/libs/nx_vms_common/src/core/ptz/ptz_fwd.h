@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QSharedPointer>
 #include <QtCore/QList>
+#include <QtCore/QSharedPointer>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/vms/common/ptz/types_fwd.h>

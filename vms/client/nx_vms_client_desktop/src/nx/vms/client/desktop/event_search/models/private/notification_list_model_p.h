@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include "../notification_list_model.h"
-
 #include <QtCore/QHash>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 
 #include <nx/vms/event/event_fwd.h>
+
+#include "../notification_list_model.h"
 
 class AudioPlayer;
 

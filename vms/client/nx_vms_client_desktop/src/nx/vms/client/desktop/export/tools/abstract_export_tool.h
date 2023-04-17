@@ -6,7 +6,6 @@
 
 #include <nx/vms/client/desktop/export/data/export_types.h>
 
-
 namespace nx::vms::client::desktop {
 
 class AbstractExportTool: public QObject

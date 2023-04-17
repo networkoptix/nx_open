@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include <nx/sdk/ptr.h>
 #include <nx/sdk/i_string_map.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx {
 namespace vms_server_plugins {

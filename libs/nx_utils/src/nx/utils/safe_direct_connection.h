@@ -9,9 +9,9 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/singleton.h>
 
 #include "functor_proxy_helper.h"
 

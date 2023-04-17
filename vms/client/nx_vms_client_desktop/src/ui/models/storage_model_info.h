@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <core/resource/resource_fwd.h>
 #include <api/model/api_model_fwd.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 
 struct QnStorageModelInfo

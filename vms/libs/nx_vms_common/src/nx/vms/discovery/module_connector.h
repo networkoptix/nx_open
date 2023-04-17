@@ -8,9 +8,9 @@
 
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/retry_timer.h>
+#include <nx/string.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/string.h>
 
 namespace nx {
 namespace vms {

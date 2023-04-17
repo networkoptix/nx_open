@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <QJsonObject>
 #include <map>
 #include <vector>
-#include <QJsonObject>
 
 class QnJsonContext;
 

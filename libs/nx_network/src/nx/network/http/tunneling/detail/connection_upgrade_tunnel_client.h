@@ -4,8 +4,8 @@
 
 #include <nx/utils/std/optional.h>
 
-#include "base_tunnel_client.h"
 #include "../../http_async_client.h"
+#include "base_tunnel_client.h"
 
 namespace nx::network::http::tunneling::detail {
 

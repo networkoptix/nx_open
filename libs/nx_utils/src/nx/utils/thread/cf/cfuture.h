@@ -2,24 +2,24 @@
 
 #pragma once
 
-#include <mutex>
-#include <thread>
+#include <atomic>
 #include <chrono>
 #include <condition_variable>
-#include <memory>
-#include <type_traits>
-#include <stdexcept>
 #include <functional>
-#include <atomic>
-#include <vector>
 #include <iterator>
-#include <tuple>
+#include <memory>
+#include <mutex>
+#include <stdexcept>
 #include <system_error>
+#include <thread>
+#include <tuple>
+#include <type_traits>
+#include <vector>
 
 #include "common.h"
 
-#if !defined(__clang__) && defined (__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)
-#include "cpp14_type_traits.h"
+#if !defined(__clang__) && defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ <= 8)
+    #include "cpp14_type_traits.h"
 #endif
 
 namespace cf {

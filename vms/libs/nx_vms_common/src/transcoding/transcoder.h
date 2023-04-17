@@ -6,8 +6,7 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 }
 

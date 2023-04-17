@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QCoreApplication>
 #include <QtCore/QAbstractItemModel>
+#include <QtCore/QCoreApplication>
 
 class QWidget;
 

@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <nx/utils/move_only_func.h>
-
+#include <QTimer>
 #include <chrono>
 #include <mutex>
 
-#include <QTimer>
 #include <QtCore/QObject>
+
+#include <nx/utils/move_only_func.h>
 
 namespace nx::utils {
 

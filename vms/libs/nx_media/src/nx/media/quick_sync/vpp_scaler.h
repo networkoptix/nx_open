@@ -4,11 +4,12 @@
 
 #include <memory>
 #include <vector>
-#include <mfx/mfxvideo++.h>
-
-#include <QSize>
 
 #include <base_allocator.h>
+
+#include <QtCore/QSize>
+
+#include <mfx/mfxvideo++.h>
 
 namespace nx::media::quick_sync {
 

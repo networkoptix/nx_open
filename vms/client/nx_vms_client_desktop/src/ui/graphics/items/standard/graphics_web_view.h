@@ -4,8 +4,8 @@
 
 #include <functional>
 
-#include <ui/graphics/items/standard/graphics_qml_view.h>
 #include <core/resource/resource.h>
+#include <ui/graphics/items/standard/graphics_qml_view.h>
 
 namespace nx::vms::client::desktop { class WebViewController; }
 

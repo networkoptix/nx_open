@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QVector>
 #include <QtCore/QVariantList>
+#include <QtCore/QVector>
 
 #include <analytics/common/object_metadata.h>
 #include <nx/utils/impl_ptr.h>

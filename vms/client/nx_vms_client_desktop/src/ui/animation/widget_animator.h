@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QEasingCurve>
+#include <QtCore/QObject>
 
 #include "animator_group.h"
 

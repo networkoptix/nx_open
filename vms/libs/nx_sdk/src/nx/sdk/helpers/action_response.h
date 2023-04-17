@@ -4,9 +4,8 @@
 
 #include <string>
 
-#include <nx/sdk/i_action_response.h>
-
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/i_action_response.h>
 
 namespace nx::sdk {
 

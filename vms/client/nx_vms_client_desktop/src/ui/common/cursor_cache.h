@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtGui/QCursor>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+#include <QtGui/QCursor>
 
 class QnCursorCachePrivate;
 

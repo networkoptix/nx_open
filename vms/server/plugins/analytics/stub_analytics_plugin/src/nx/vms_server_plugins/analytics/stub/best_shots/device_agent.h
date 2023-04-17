@@ -5,10 +5,8 @@
 #include <vector>
 
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
-
-#include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
-
+#include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
 #include <nx/sdk/analytics/rect.h>
 
 namespace nx {

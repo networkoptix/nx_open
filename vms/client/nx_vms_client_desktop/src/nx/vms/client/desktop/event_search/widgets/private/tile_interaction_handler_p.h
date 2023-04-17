@@ -11,9 +11,8 @@
 #include <QtGui/QPixmap>
 
 #include <core/resource/resource_fwd.h>
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <nx/utils/scope_guard.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QJsonObject;
 namespace nx::utils { class PendingOperation; }

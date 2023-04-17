@@ -3,8 +3,8 @@
 #ifndef QN_OVERLAYED_H
 #define QN_OVERLAYED_H
 
-#include <QtWidgets/QGraphicsItem>
 #include <QtCore/QEvent>
+#include <QtWidgets/QGraphicsItem>
 
 #include <ui/common/fixed_rotation.h>
 #include <utils/common/forward.h>

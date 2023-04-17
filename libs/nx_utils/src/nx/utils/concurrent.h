@@ -8,8 +8,8 @@
 #include <utility>
 #include <vector>
 
-#include <QtCore/QThreadPool>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QThreadPool>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>

@@ -8,17 +8,16 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource.h>
-#include <nx/utils/value_cache.h>
-
-#include <nx/network/socket_common.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/socket_common.h>
+#include <nx/utils/os_info.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/software_version.h>
 #include <nx/utils/url.h>
-#include <nx/utils/os_info.h>
+#include <nx/utils/value_cache.h>
+#include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/os_information.h>
-#include <nx/vms/api/data/media_server_data.h>
 
 namespace nx::network::http { class AsyncHttpClientPtr; }
 namespace nx::core::resource::edge { class EdgeServerStateTracker; }

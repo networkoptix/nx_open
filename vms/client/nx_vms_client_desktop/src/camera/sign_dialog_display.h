@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <export/signer.h>
-
 #include <camera/cam_display.h>
+#include <export/signer.h>
 
 class QnArchiveStreamReader;
 

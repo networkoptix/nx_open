@@ -11,8 +11,8 @@
 #include <nx/network/stun/async_client.h>
 #include <nx/network/stun/async_client_delegate.h>
 #include <nx/network/stun/async_client_with_http_tunneling.h>
-#include <nx/utils/subscription.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/subscription.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
 #include "mediator_client_connections.h"

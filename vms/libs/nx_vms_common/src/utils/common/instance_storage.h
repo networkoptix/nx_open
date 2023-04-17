@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <nx/utils/log/assert.h>
-
+#include <QtCore/QHash>
+#include <QtCore/QList>
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
-#include <QtCore/QList>
-#include <QtCore/QHash>
+
+#include <nx/utils/log/assert.h>
 
 class NX_VMS_COMMON_API QnInstanceStorage
 {

@@ -4,8 +4,8 @@
 
 #include <qt_graphics_items/graphics_widget.h>
 
-#include <nx/utils/impl_ptr.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
 
 class QnResourceWidget;
 

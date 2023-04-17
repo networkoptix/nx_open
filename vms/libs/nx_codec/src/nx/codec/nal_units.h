@@ -3,8 +3,9 @@
 #ifndef __NAL_UNITS_H
 #define __NAL_UNITS_H
 
-#include <inttypes.h>
 #include <map>
+
+#include <inttypes.h>
 #include <memory.h>
 
 #include <QtCore/QMap>

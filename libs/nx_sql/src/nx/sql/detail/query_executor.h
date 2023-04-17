@@ -13,8 +13,8 @@
 #include "../abstract_db_connection.h"
 #include "../db_connection_holder.h"
 #include "../db_statistics_collector.h"
-#include "../types.h"
 #include "../query_context.h"
+#include "../types.h"
 
 namespace nx::sql::detail {
 

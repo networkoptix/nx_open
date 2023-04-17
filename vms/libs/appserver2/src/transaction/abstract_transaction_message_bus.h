@@ -5,11 +5,12 @@
 #include <QtCore/QThread>
 #include <QtNetwork/QHostAddress>
 
+#include <common/common_module_aware.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/ssl/helpers.h>
-#include <common/common_module_aware.h>
-#include "connection_guard_shared_state.h"
 #include <utils/common/enable_multi_thread_direct_connection.h>
+
+#include "connection_guard_shared_state.h"
 #include "transport_connection_info.h"
 
 namespace nx { namespace network { class SocketAddress; }}

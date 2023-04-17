@@ -5,9 +5,9 @@
 #include <functional>
 #include <memory>
 
-#include "mutex.h"
 #include "../move_only_func.h"
 #include "../std/future.h"
+#include "mutex.h"
 
 namespace nx {
 namespace utils {

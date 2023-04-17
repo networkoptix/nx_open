@@ -3,7 +3,6 @@
 #pragma once
 
 #include "abstract_msg_body_source.h"
-
 #include "multipart_body_serializer.h"
 #include "writable_message_body.h"
 

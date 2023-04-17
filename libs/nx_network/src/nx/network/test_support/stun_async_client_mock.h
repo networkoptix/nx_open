@@ -3,6 +3,7 @@
 #pragma once
 
 #include <gmock/gmock.h>
+
 #include <nx/network/stun/async_client.h>
 
 namespace nx {

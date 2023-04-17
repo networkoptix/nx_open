@@ -9,8 +9,7 @@
 
 #include <QtNetwork/QAuthenticator>
 
-extern "C"
-{
+extern "C" {
 // For const AV_NOPTS_VALUE.
 #include <libavutil/avutil.h>
 }

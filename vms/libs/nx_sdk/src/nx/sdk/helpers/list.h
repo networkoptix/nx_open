@@ -5,10 +5,9 @@
 #include <vector>
 
 #include <nx/kit/debug.h>
-
-#include <nx/sdk/ptr.h>
-#include <nx/sdk/i_list.h>
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/i_list.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx::sdk {
 

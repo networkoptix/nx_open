@@ -6,7 +6,6 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/vms/api/data/image_correction_data.h>
-
 #include <utils/color_space/image_correction.h>
 
 class QnHistogramWidget: public QWidget, public QnHistogramConsumer {

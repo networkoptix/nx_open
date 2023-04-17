@@ -4,12 +4,11 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/uuid.h>
-
-#include <core/resource/resource_fwd.h>
 #include <api/model/api_model_fwd.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_fwd.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchVirtualCameraHandler:
     public QObject,

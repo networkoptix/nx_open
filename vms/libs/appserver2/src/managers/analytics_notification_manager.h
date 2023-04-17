@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <transaction/transaction.h>
 #include <nx_ec/managers/abstract_analytics_manager.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 

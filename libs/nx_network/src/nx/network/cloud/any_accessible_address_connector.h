@@ -7,9 +7,9 @@
 #include <list>
 #include <optional>
 
+#include <nx/network/address_resolver.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
-#include <nx/network/address_resolver.h>
 #include <nx/network/socket_attributes_cache.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/move_only_func.h>

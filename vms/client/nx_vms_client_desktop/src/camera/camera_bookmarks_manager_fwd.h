@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
+#include <core/resource/resource_fwd.h>
 
 class QnCameraBookmarksQuery;
 class QnCameraBookmarksManager;

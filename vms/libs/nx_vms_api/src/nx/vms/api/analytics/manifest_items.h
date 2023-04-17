@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QString>
-
 #include <optional>
+
+#include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>

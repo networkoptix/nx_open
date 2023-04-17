@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <queue>
+
+#include <stdint.h>
 
 #include "ffmpeg_audio_buffer.h"
 

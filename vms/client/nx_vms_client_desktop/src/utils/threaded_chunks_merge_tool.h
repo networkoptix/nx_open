@@ -4,10 +4,8 @@
 
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
-
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
-
 
 class QnThreadedChunksMergeTool: public QnLongRunnable {
     Q_OBJECT

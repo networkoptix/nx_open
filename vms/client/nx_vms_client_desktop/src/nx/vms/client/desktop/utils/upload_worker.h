@@ -6,8 +6,8 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/vms/common/p2p/downloader/result_code.h>
+
 #include "upload_state.h"
 
 namespace nx::network::rest { struct JsonResult; }

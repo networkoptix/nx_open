@@ -5,14 +5,12 @@
 #include <string>
 #include <type_traits>
 
-#ifdef _WIN32
-#   include <winsock2.h>
-#   include <WS2tcpip.h>
-#else
-#   include <sys/socket.h>
-#   include <sys/types.h>
-#   include <netinet/in.h>
-#   include <arpa/inet.h>
+#include "system_network_headers.h"
+
+#ifndef _WIN32
+    #include <netinet/in.h>
+    #include <sys/socket.h>
+    #include <sys/types.h>
 #endif
 
 #include <nx/utils/access_tracker.h>

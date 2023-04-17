@@ -5,7 +5,7 @@
 #include <set>
 #include <vector>
 
-#include <QString>
+#include <QtCore/QString>
 
 #include "abstract_attribute.h"
 

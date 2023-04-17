@@ -4,10 +4,10 @@
 
 #include <vector>
 
+#include <nx/analytics/taxonomy/abstract_attribute.h>
+
 #include "abstract_attribute.h"
 #include "abstract_state_view_filter.h"
-
-#include <nx/analytics/taxonomy/abstract_attribute.h>
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 

@@ -4,7 +4,6 @@
 #define VIDEOWALL_SETTINGS_DIALOG_H
 
 #include <core/resource/resource_fwd.h>
-
 #include <ui/dialogs/common/button_box_dialog.h>
 
 namespace Ui {

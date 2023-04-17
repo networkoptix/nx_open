@@ -4,13 +4,12 @@
 
 #include <atomic>
 
-#include <nx/utils/uuid.h>
-#include <nx/utils/scrypt.h>
-#include <nx/vms/api/data/user_data.h>
-
-#include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/scrypt.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/analytics/integration_request.h>
+#include <nx/vms/api/data/user_data.h>
 
 struct PasswordHashes;
 

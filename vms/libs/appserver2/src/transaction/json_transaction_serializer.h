@@ -4,11 +4,10 @@
 
 #include <QtCore/QCache>
 
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/utils/singleton.h>
 #include <transaction/transaction.h>
 #include <transaction/transaction_transport_header.h>
-
-#include <nx/utils/singleton.h>
-#include <nx/fusion/serialization/json_functions.h>
 
 namespace ec2
 {

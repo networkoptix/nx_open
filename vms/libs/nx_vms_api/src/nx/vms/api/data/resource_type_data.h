@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "id_data.h"
-
 #include <vector>
 
 #include <QtCore/QString>
+
+#include "id_data.h"
 
 namespace nx {
 namespace vms {

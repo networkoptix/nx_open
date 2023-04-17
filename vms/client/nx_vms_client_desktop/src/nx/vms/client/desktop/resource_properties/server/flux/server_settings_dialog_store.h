@@ -6,7 +6,6 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/analytics_data.h>
 

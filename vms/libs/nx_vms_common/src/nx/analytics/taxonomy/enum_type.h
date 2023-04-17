@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/analytics/taxonomy/abstract_enum_type.h>
-
 #include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx::analytics::taxonomy {

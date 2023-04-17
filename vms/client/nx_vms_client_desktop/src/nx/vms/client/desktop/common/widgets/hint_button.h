@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtWidgets/QAbstractButton>
 #include <QtCore/QPointer>
+#include <QtWidgets/QAbstractButton>
 
 class QGroupBox;
 

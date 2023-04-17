@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <ui/graphics/shaders/base_shader_program.h>
-
 #include <nx/vms/api/types/dewarping_types.h>
+#include <ui/graphics/shaders/base_shader_program.h>
 
 struct ImageCorrectionResult;
 

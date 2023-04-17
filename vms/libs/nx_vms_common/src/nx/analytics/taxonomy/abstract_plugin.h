@@ -4,8 +4,8 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/api/analytics/descriptors.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx::analytics::taxonomy {
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QtGlobal>
+
 #include <nx/utils/std/optional.h>
 
 class QSpinBox;

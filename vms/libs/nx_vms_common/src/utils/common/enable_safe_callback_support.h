@@ -5,7 +5,6 @@
 #include <condition_variable>
 #include <mutex>
 
-
 //!This class is to be used to help to subscribe/unsubscribe/deliver direct events to objects living in different thread
 template<class EventReceiverType>
 class EnableSafeCallbackSupport

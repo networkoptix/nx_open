@@ -2,17 +2,16 @@
 
 #pragma once
 
-#include "../scene_banners.h"
-
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
 
 #include <client_core/client_core_module.h>
+#include <nx/utils/log/assert.h>
 #include <utils/common/event_processors.h>
 
-#include <nx/utils/log/assert.h>
+#include "../scene_banners.h"
 
 namespace nx::vms::client::desktop {
 

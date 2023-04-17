@@ -4,9 +4,9 @@
 
 #include <memory>
 #include <stack>
-#include <tuple>
 #include <string>
 #include <string_view>
+#include <tuple>
 
 #include <QtCore/QXmlStreamAttributes>
 

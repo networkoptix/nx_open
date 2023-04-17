@@ -5,16 +5,16 @@
 
 #include <typeinfo>
 
-#include <QtCore/QObject>
-#include <QtCore/QSet>
-#include <QtCore/QList>
-#include <QtCore/QHash>
 #include <QtCore/QEvent> /* For QEvent::Type. */
+#include <QtCore/QHash>
+#include <QtCore/QList>
+#include <QtCore/QObject>
 #include <QtCore/QPair>
+#include <QtCore/QSet>
 
+#include "installation_mode.h"
 #include "instrument.h"
 #include "scene_event_filter.h"
-#include "installation_mode.h"
 
 template<class T>
 class InstrumentEventDispatcherBase: public QObject {

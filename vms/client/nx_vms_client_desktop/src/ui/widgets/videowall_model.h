@@ -4,8 +4,8 @@
 
 #include <QtCore/QVector>
 
-#include <nx/utils/uuid.h>
 #include <core/misc/screen_snap.h>
+#include <nx/utils/uuid.h>
 
 /**
 * Defines types for "raw" video wall model.

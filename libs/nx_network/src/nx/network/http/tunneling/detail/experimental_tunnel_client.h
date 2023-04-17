@@ -8,10 +8,10 @@
 #include <nx/network/aio/timer.h>
 #include <nx/utils/std/optional.h>
 
-#include "base_tunnel_client.h"
-#include "request_paths.h"
 #include "../../http_async_client.h"
 #include "../../http_types.h"
+#include "base_tunnel_client.h"
+#include "request_paths.h"
 
 namespace nx::network::http::tunneling::detail {
 

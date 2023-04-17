@@ -2,12 +2,12 @@
 
 #pragma once
 
+#include <chrono>
 #include <string>
 #include <vector>
-#include <chrono>
 
-#include <nx/utils/uuid.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::api {
 

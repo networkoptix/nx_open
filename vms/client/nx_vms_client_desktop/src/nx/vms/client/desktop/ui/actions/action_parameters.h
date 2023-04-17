@@ -5,9 +5,7 @@
 #include <QtCore/QVariant>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
-
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 
 class QGraphicsItem;

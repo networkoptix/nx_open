@@ -6,8 +6,8 @@
 #include <memory>
 #include <unordered_map>
 
-#include <nx/utils/singleton.h>
 #include <nx/network/async_stoppable.h>
+#include <nx/utils/singleton.h>
 
 #include "abstract_message_handler.h"
 #include "abstract_server_connection.h"

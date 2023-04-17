@@ -2,17 +2,18 @@
 
 #pragma once
 
-#include <thread>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <queue>
 #include <set>
+#include <thread>
+
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #if defined(__APPLE__)
-#include <TargetConditionals.h>
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#define NX_UTILS_FILESYSTEM_FILEWATCHER_IOS
-#endif // TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+    #include <TargetConditionals.h>
+    #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+        #define NX_UTILS_FILESYSTEM_FILEWATCHER_IOS
+    #endif // TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #endif // defined(__APPLE__)
 
 #include "elapsed_timer_pool.h"

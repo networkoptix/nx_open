@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QTranslator>
 #include <QtCore/QStringList>
+#include <QtCore/QTranslator>
 
 #include <nx/utils/thread/mutex.h>
 

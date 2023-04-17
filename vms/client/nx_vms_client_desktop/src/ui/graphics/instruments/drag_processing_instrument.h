@@ -3,8 +3,9 @@
 #ifndef QN_DRAG_PROCESSING_INSTRUMENT_H
 #define QN_DRAG_PROCESSING_INSTRUMENT_H
 
-#include "instrument.h"
 #include <ui/processors/drag_processor.h>
+
+#include "instrument.h"
 
 /**
  * This instrument sets up drag processor on construction and implements default

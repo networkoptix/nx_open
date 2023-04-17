@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtWidgets/QGraphicsWidget>
 #include <QtQuickWidgets/QQuickWidget>
+#include <QtWidgets/QGraphicsWidget>
 
 class QQmlEngine;
 class QQuickWindow;

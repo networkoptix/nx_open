@@ -6,20 +6,13 @@
 #include <QtCore/QObject>
 
 #include <common/common_globals.h>
-
 #include <core/resource/resource_fwd.h>
-
-#include <ui/workbench/workbench_context_aware.h>
-
-
-#include <nx/vms/client/desktop/image_providers/image_provider.h>
-
+#include <nx/core/transcoding/filters/timestamp_params.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
-
+#include <nx/vms/client/desktop/image_providers/image_provider.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/aspect_ratio.h>
-
-#include <nx/core/transcoding/filters/timestamp_params.h>
 
 class QPainter;
 class QnMediaResourceWidget;

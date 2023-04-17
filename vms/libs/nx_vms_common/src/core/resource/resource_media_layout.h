@@ -4,10 +4,10 @@
 
 #include <optional>
 
-#include <QtCore/QVector>
-#include <QtCore/QStringList>
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
+#include <QtCore/QStringList>
+#include <QtCore/QVector>
 
 #include <core/resource/audio_layout.h>
 

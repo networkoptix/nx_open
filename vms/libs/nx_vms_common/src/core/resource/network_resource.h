@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "resource.h"
-
 #include <nx/utils/mac_address.h>
 #include <nx/utils/url.h>
 #include <nx/utils/value_cache.h>
+
+#include "resource.h"
 
 class QAuthenticator;
 

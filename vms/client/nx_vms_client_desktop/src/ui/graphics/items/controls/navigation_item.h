@@ -3,6 +3,7 @@
 #pragma once
 
 #include <qt_graphics_items/graphics_widget.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsLinearLayout;

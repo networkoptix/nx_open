@@ -3,8 +3,9 @@
 #ifndef QN_DRAG_INSTRUMENT_H
 #define QN_DRAG_INSTRUMENT_H
 
-#include "drag_processing_instrument.h"
 #include <ui/common/weak_graphics_item_pointer.h>
+
+#include "drag_processing_instrument.h"
 
 class DragInstrument: public DragProcessingInstrument {
     Q_OBJECT;

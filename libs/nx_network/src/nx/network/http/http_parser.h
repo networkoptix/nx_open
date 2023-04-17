@@ -4,9 +4,9 @@
 
 #include <nx/utils/buffer.h>
 
+#include "../connection_server/base_protocol_message_types.h"
 #include "http_stream_reader.h"
 #include "http_types.h"
-#include "../connection_server/base_protocol_message_types.h"
 
 namespace nx::network::http {
 

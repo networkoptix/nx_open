@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/node_view/details/node_view_state_patch.h>
-
 #include <nx/utils/std/optional.h>
+#include <nx/vms/client/desktop/node_view/details/node_view_state_patch.h>
 
 namespace nx::vms::client::desktop {
 

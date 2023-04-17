@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
-#include <QtCore/QElapsedTimer>
 
 #include <recording/stream_recorder_data.h>
 #include <ui/workbench/workbench_context_aware.h>

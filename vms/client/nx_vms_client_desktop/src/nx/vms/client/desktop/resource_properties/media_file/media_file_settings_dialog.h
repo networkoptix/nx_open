@@ -5,11 +5,9 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
-
+#include <nx/utils/impl_ptr.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-#include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop {
 

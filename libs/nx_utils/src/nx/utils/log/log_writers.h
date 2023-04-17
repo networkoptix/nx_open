@@ -5,13 +5,13 @@
 #include <fstream>
 #include <future>
 
-#include <nx/utils/log/log_level.h>
-#include <nx/utils/thread/cf/cfuture.h>
-#include <nx/utils/thread/mutex.h>
-
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
 #include <QtCore/QLockFile>
+
+#include <nx/utils/log/log_level.h>
+#include <nx/utils/thread/cf/cfuture.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace utils {

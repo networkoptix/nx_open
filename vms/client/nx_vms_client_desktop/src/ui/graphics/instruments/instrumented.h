@@ -4,7 +4,7 @@
 #define QN_INSTRUMENTED_H
 
 #ifndef Q_MOC_RUN
-#include <boost/type_traits/is_base_of.hpp>
+    #include <boost/type_traits/is_base_of.hpp>
 #endif
 
 #include <QtWidgets/QGraphicsItem>

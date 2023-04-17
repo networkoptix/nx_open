@@ -4,12 +4,12 @@
 
 #include <memory>
 
-#include <nx/vms/api/metrics.h>
 #include <nx/utils/dot_notation_string.h>
 #include <nx/utils/value_history.h>
+#include <nx/vms/api/metrics.h>
 
-#include "value_monitors.h"
 #include "rule_monitors.h"
+#include "value_monitors.h"
 
 namespace nx::vms::utils::metrics {
 

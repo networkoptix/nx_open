@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "abstract_workbench_panel.h"
-
-#include <QtCore/QScopedPointer>
 #include <QtCore/QRect>
+#include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
+
+#include "abstract_workbench_panel.h"
 
 class QnControlBackgroundWidget;
 class QnBlinkingImageButtonWidget;

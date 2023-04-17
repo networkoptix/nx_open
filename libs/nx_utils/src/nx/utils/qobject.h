@@ -4,9 +4,9 @@
 
 #include <type_traits>
 
-#include <QtCore/QObject>
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaProperty>
+#include <QtCore/QObject>
 
 #include <nx/utils/log/assert.h>
 

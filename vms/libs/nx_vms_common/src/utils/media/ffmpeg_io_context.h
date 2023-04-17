@@ -6,8 +6,7 @@
 
 #include "core/resource/resource_fwd.h"
 
-extern "C"
-{
+extern "C" {
 #include <libavformat/avio.h>
 
 } // extern "C"

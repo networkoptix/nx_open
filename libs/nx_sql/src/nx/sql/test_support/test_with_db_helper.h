@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/std/optional.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include "../types.h"
 

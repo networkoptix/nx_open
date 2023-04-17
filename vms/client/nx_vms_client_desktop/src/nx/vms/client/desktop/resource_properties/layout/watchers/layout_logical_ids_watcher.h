@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/impl_ptr.h>
 
 class QnCommonMessageProcessor;

@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <QJsonValue>
 #include <QJsonArray>
-#include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 
-#include <nx/reflect/json/serializer.h>
 #include <nx/reflect/json/deserializer.h>
+#include <nx/reflect/json/serializer.h>
 
 namespace nx::reflect::json_detail {
 

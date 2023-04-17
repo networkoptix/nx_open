@@ -4,6 +4,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QVector>
+
 #include <core/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop {

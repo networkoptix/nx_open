@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <string>
 #include <string_view>
+
+#include <QtCore/QMetaType>
 
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 

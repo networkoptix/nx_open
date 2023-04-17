@@ -3,10 +3,10 @@
 #pragma once
 
 #include <camera/camera_plugin.h>
-#include <nx/sdk/interface.h>
-#include <nx/sdk/i_list.h>
-#include <nx/sdk/cloud_storage/i_media_data_packet.h>
 #include <nx/sdk/cloud_storage/i_codec_info.h>
+#include <nx/sdk/cloud_storage/i_media_data_packet.h>
+#include <nx/sdk/i_list.h>
+#include <nx/sdk/interface.h>
 
 namespace nx::sdk::cloud_storage {
 

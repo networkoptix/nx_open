@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QString>
-#include <QtCore/QFlags>
 #include <QtCore/QDir>
+#include <QtCore/QFlags>
+#include <QtCore/QString>
 
 namespace nx {
 namespace utils {

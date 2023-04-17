@@ -7,10 +7,8 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrlQuery>
 
-#include "p2p_fwd.h"
-
-#include <core/resource_access/user_access_data.h>
 #include <core/resource/shared_resource_pointer.h>
+#include <core/resource_access/user_access_data.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/websocket/websocket.h>
@@ -20,6 +18,8 @@
 #include <transaction/abstract_transaction_transport.h>
 #include <transaction/connection_guard.h>
 #include <utils/common/from_this_to_shared.h>
+
+#include "p2p_fwd.h"
 
 namespace ec2 {
 struct QnAbstractTransaction;

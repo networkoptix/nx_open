@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QObject>
-
 #include <vector>
+
+#include <QtCore/QObject>
 
 Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/taxonomy/abstract_attribute.h")
 

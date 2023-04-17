@@ -6,21 +6,19 @@
 #include <optional>
 #include <set>
 
-extern "C"
-{
-    struct SwsContext;
-}
-
-#include <set>
-
 #include <QtCore/QQueue>
 
-#include "decoders/video/abstract_video_decoder.h"
-#include <nx/utils/thread/stoppable.h>
-#include <nx/utils/thread/mutex.h>
-#include "frame_scaler.h"
-#include "transcoding/filters/filter_helper.h"
+#include <decoders/video/abstract_video_decoder.h>
 #include <nx/media/abstract_metadata_consumer.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/stoppable.h>
+#include <transcoding/filters/filter_helper.h>
+
+#include "frame_scaler.h"
+
+extern "C" {
+struct SwsContext;
+}
 
 class QnAbstractVideoDecoder;
 class QnCompressedVideoData;

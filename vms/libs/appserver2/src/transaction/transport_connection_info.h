@@ -7,8 +7,8 @@
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/api/data/p2p_statistics_data.h>
+#include <nx/vms/api/data/peer_data.h>
 
 namespace ec2
 {

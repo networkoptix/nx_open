@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtGui/QMouseEvent>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QMouseEvent>
 #include <QtQml/QtQml>
 
 namespace nx::vms::client::desktop {

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "base_stream_protocol_connection.h"
 #include "base_protocol_message_types.h"
+#include "base_stream_protocol_connection.h"
 
 namespace nx::network::server {
 

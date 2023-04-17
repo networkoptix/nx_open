@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "input_field.h"
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/common/utils/password_information.h>
+
+#include "input_field.h"
 
 namespace nx::vms::client::desktop {
 

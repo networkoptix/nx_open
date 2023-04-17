@@ -3,8 +3,8 @@
 #pragma once
 
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/api/data/showreel_data.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::common { class ShowreelManager; }
 

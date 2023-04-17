@@ -4,8 +4,8 @@
 
 #include <memory>
 
-#include <QtWidgets/QGraphicsItem>
 #include <QtGui/QFont>
+#include <QtWidgets/QGraphicsItem>
 
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/types.h>
 #include <nx/vms/client/desktop/ui/graphics/painters/highlighted_area_text_painter.h>

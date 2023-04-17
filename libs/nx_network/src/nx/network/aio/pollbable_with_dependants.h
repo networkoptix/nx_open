@@ -4,8 +4,8 @@
 
 #include <type_traits>
 
-#include <nx/utils/move_only_func.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/move_only_func.h>
 
 #include "basic_pollable.h"
 

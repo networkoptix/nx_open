@@ -7,9 +7,8 @@
 #include <mutex>
 #include <string>
 
-#include <nx/sdk/i_string_map.h>
-
 #include <nx/sdk/helpers/i_ref_countable_registry.h>
+#include <nx/sdk/i_string_map.h>
 
 namespace nx::sdk {
 

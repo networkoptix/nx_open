@@ -4,9 +4,8 @@
 
 #include <QtCore/QObject>
 
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QWidget;
 

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "abstract_state_view.h"
-
 #include <nx/utils/impl_ptr.h>
+
+#include "abstract_state_view.h"
 
 namespace nx::analytics::taxonomy { class AbstractState; }
 

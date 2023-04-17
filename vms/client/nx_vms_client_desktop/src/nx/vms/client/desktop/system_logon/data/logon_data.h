@@ -4,8 +4,8 @@
 
 #include <optional>
 
-#include <nx/vms/client/core/network/logon_data.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/vms/client/core/network/logon_data.h>
 
 namespace nx::vms::client::desktop {
 

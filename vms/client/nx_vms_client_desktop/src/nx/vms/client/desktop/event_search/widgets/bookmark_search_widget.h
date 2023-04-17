@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "abstract_search_widget.h"
-
 #include <nx/utils/impl_ptr.h>
+
+#include "abstract_search_widget.h"
 
 namespace nx::vms::client::desktop {
 

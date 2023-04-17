@@ -4,8 +4,8 @@
 
 #include <set>
 
-#include <nx/analytics/taxonomy/utils.h>
 #include <nx/analytics/taxonomy/error_handler.h>
+#include <nx/analytics/taxonomy/utils.h>
 
 namespace nx::analytics::taxonomy {
 

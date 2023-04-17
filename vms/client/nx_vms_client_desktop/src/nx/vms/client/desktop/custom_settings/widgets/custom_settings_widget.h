@@ -4,7 +4,6 @@
 
 #include <QtWidgets/QWidget>
 
-
 namespace Ui { class CustomSettingsWidget; }
 
 struct QnCameraAdvancedParams;

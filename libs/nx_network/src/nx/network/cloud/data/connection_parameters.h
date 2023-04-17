@@ -4,9 +4,9 @@
 
 #include <chrono>
 
-#include <nx/reflect/instrument.h>
-#include <nx/network/retry_timer.h>
 #include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/network/retry_timer.h>
+#include <nx/reflect/instrument.h>
 
 #include "stun_message_data.h"
 

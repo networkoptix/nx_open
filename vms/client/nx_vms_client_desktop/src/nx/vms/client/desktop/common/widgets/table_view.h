@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QHash>
 #include <QtCore/QEvent>
+#include <QtCore/QHash>
 #include <QtCore/QPointer>
 #include <QtWidgets/QTableView>
 

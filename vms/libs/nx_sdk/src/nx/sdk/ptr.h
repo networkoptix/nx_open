@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <utility>
 #include <cstddef>
 #include <type_traits>
+#include <utility>
 
 namespace nx {
 namespace sdk {

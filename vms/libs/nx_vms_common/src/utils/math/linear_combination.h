@@ -3,10 +3,11 @@
 #ifndef QN_LINEAR_COMBINATION_H
 #define QN_LINEAR_COMBINATION_H
 
-#include <nx/utils/log/assert.h>
-
 #include <typeinfo>
+
 #include <QtCore/QVariant>
+
+#include <nx/utils/log/assert.h>
 
 class QPointF;
 class QSizeF;

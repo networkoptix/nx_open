@@ -15,8 +15,8 @@
 #include "mediator_connector.h"
 #include "mediator_server_connections.h"
 #include "tunnel/incoming_tunnel_pool.h"
-#include "tunnel/tunnel_acceptor_factory.h"
 #include "tunnel/relay/relay_connection_acceptor.h"
+#include "tunnel/tunnel_acceptor_factory.h"
 
 namespace nx::network::cloud {
 

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/utils/uuid.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/uuid.h>
 
 /**
  * Wrapper to be used for overloading as a distinct type for camera-related API requests.

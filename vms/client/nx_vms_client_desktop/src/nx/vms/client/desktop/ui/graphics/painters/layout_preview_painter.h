@@ -3,12 +3,11 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
-
 #include <QtGui/QPainter>
 
+#include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_pool.h>
-#include <client/client_globals.h>
 
 class CameraThumbnailManager;
 class QnResourcePool;

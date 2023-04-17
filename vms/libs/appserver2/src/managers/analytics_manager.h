@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <transaction/transaction.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx_ec/managers/abstract_analytics_manager.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 

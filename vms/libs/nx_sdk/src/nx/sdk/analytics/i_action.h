@@ -4,11 +4,10 @@
 
 #include <stdint.h>
 
-#include <nx/sdk/interface.h>
-
-#include <nx/sdk/uuid.h>
-#include <nx/sdk/i_string_map.h>
 #include <nx/sdk/analytics/i_object_track_info.h>
+#include <nx/sdk/i_string_map.h>
+#include <nx/sdk/interface.h>
+#include <nx/sdk/uuid.h>
 
 namespace nx::sdk::analytics {
 

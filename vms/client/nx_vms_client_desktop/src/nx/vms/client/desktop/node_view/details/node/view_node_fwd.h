@@ -5,8 +5,8 @@
 #include <QtCore/QList>
 #include <QtCore/QSharedPointer>
 
-#include <nx/utils/uuid.h>
 #include <nx/utils/std/optional.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
 namespace node_view::details {

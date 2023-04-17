@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "../details/node/view_node_fwd.h"
-
 #include <core/resource/resource_fwd.h>
+
+#include "../details/node/view_node_fwd.h"
 
 namespace nx::vms::client::desktop {
 namespace node_view {

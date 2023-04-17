@@ -15,9 +15,9 @@
 #include "auth_provider.h"
 #include "maintenance_manager.h"
 #include "module_info.h"
+#include "oauth_manager.h"
 #include "result_code.h"
 #include "system_manager.h"
-#include "oauth_manager.h"
 #include "two_factor_auth_manager.h"
 
 namespace nx::network::aio { class AbstractAioThread; }

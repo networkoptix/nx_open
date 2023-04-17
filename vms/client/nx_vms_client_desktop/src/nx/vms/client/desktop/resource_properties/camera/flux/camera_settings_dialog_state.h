@@ -19,6 +19,7 @@
 #include <nx/reflect/instrument.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/data/device_profile.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/core/utils/rotation.h>
@@ -26,16 +27,15 @@
 #include <nx/vms/client/desktop/common/flux/abstract_flux_state.h>
 #include <nx/vms/client/desktop/common/flux/flux_types.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/common/resource/camera_hotspots_data.h>
-#include <nx/vms/common/resource/remote_archive_types.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_data.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
+#include <nx/vms/common/resource/camera_hotspots_data.h>
+#include <nx/vms/common/resource/remote_archive_types.h>
 #include <utils/common/aspect_ratio.h>
 
-#include "../data/recording_period.h"
-#include "../data/analytics_engine_info.h"
 #include "../camera_settings_tab.h"
-#include <nx/vms/api/data/device_profile.h>
+#include "../data/analytics_engine_info.h"
+#include "../data/recording_period.h"
 
 namespace nx::vms::client::desktop {
 

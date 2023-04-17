@@ -4,8 +4,8 @@
 
 #include <QtWidgets/QDialog>
 
-#include <ui/dialogs/common/button_box_dialog.h>
 #include <core/resource/resource_fwd.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 
 namespace Ui { class ReconnectInfoDialog; }
 

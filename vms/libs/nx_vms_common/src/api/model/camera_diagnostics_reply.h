@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <utils/camera/camera_diagnostics.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <utils/camera/camera_diagnostics.h>
 
 struct NX_VMS_COMMON_API QnCameraDiagnosticsReply
 {

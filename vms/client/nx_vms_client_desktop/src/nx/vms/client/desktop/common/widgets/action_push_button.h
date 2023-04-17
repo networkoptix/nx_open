@@ -7,8 +7,8 @@
 #include <QtGui/QAction>
 #include <QtWidgets/QPushButton>
 
-#include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/common/utils/command_action.h>
 
 namespace nx::vms::client::desktop {
 

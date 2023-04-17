@@ -11,12 +11,12 @@
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/log/log.h>
 
+#include "../../http_types.h"
+#include "../../server/rest/http_server_rest_message_dispatcher.h"
+#include "../abstract_tunnel_authorizer.h"
 #include "basic_custom_tunnel_server.h"
 #include "get_post_tunnel_server_worker.h"
 #include "request_paths.h"
-#include "../abstract_tunnel_authorizer.h"
-#include "../../http_types.h"
-#include "../../server/rest/http_server_rest_message_dispatcher.h"
 
 namespace nx::network::http::tunneling::detail {
 

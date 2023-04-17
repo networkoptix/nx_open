@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QRadioButton>
-#include "private/widget_with_hint_p.h"
-
 #include <type_traits>
 
 #include <QtCore/QScopedPointer>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QWidget>
+
+#include "private/widget_with_hint_p.h"
 
 namespace nx::vms::client::desktop {
 

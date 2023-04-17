@@ -2,16 +2,16 @@
 
 #pragma once
 
+#include <QtCore/QJsonValue>
 #include <QtCore/QList>
 #include <QtCore/QPair>
-#include <QtCore/QJsonValue>
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
 
 #include <nx/network/http/http_types.h>
+#include <nx/string.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/serialization/format.h>
-#include <nx/string.h>
 
 namespace nx::network::rest {
 

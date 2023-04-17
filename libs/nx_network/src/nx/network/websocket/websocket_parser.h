@@ -3,11 +3,11 @@
 #pragma once
 
 #include <nx/utils/buffer.h>
-#include "websocket_common_types.h"
-#include <nx/utils/move_only_func.h>
-
 #include <nx/utils/byte_stream/custom_output_stream.h>
 #include <nx/utils/gzip/gzip_uncompressor.h>
+#include <nx/utils/move_only_func.h>
+
+#include "websocket_common_types.h"
 
 namespace nx::network::websocket {
 

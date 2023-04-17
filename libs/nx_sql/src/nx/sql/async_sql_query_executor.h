@@ -5,24 +5,24 @@
 #include <atomic>
 #include <chrono>
 #include <deque>
-#include <future>
 #include <functional>
+#include <future>
 #include <memory>
 
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/thread.h>
-#include <nx/utils/type_traits.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
+#include <nx/utils/type_traits.h>
 
 #include "detail/base_query_executor.h"
 #include "detail/cursor_handler.h"
-#include "detail/query_queue.h"
 #include "detail/query_executor.h"
-#include "types.h"
+#include "detail/query_queue.h"
 #include "query.h"
 #include "query_context.h"
+#include "types.h"
 
 namespace nx::sql {
 

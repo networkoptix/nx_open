@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QVector>
 #include <QtCore/QVariant>
+#include <QtCore/QVector>
 #include <QtGui/QPainterPath>
 
 namespace nx::vms::client::core {

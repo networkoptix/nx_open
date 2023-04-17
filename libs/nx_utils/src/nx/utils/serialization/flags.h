@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <cctype>
 #include <charconv>
 #include <type_traits>
 #include <typeinfo>
-#include <cctype>
 
 #include <QtCore/QFlags>
 

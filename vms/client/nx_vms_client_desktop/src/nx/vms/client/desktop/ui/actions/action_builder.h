@@ -3,15 +3,13 @@
 #pragma once
 
 #include <QtCore/QString>
-
 #include <QtGui/QAction>
 
 #include <client/client_globals.h>
 #include <common/common_globals.h>
-
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 #include <nx/vms/client/desktop/ui/actions/action_types.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {

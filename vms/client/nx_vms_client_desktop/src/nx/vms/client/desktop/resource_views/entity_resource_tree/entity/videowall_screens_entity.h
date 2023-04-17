@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_list_entity.h>
-#include <core/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {

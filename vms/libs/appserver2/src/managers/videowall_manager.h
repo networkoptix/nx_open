@@ -3,9 +3,10 @@
 #pragma once
 
 #include <memory>
-#include <transaction/transaction.h>
-#include <nx_ec/managers/abstract_videowall_manager.h>
+
 #include <core/resource_access/user_access_data.h>
+#include <nx_ec/managers/abstract_videowall_manager.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 

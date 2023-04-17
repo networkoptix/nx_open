@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/utils/thread/semaphore.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/semaphore.h>
 
 namespace nx {
 namespace utils {

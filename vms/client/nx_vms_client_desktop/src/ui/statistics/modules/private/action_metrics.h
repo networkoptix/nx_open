@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
-
 #include <statistics/base/base_fwd.h>
 #include <statistics/base/statistics_values_provider.h>
 

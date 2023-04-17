@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <nx/vms/api/data/system_id_data.h>
 #include <nx_ec/managers/abstract_misc_manager.h>
 #include <transaction/transaction.h>
-#include <nx/vms/api/data/system_id_data.h>
 
 namespace ec2 {
 

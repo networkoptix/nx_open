@@ -4,8 +4,8 @@
 
 #include <QtCore/QString>
 
-#include <nx/vms/event/events/instant_event.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/event/events/instant_event.h>
 
 namespace nx {
 namespace vms {

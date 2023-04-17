@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QObject>
+#include <QtCore/QObject>
 
 #include <api/model/camera_diagnostics_reply.h>
 #include <core/resource/resource_fwd.h>

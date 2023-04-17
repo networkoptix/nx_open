@@ -4,13 +4,13 @@
 #define QN_FLAT_MAP_H
 
 #include <cassert>
+#include <type_traits> /* For std::is_empty and std::is_unsigned. */
+#include <vector>
+
 #include <nx/utils/log/assert.h>
 
-#include <vector>
-#include <type_traits> /* For std::is_empty and std::is_unsigned. */
-
 #ifndef Q_MOC_RUN
-#include <boost/functional/value_factory.hpp>
+    #include <boost/functional/value_factory.hpp>
 #endif
 
 namespace QnFlatMapDetail {

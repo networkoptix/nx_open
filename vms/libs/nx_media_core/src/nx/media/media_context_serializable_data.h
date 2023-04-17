@@ -4,8 +4,7 @@
 
 #include <vector>
 
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 } // extern "C"
 

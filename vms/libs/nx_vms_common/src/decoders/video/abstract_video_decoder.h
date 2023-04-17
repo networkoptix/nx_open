@@ -8,8 +8,7 @@
 
 #include "decoder_types.h"
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/pixfmt.h>
 }
 

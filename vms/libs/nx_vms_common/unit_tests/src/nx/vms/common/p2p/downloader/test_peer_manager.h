@@ -8,8 +8,8 @@
 #include <QtCore/QHash>
 #include <QtCore/QQueue>
 
-#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include <nx/utils/thread/long_runnable.h>
+#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 
 namespace nx::vms::common::p2p::downloader {
 

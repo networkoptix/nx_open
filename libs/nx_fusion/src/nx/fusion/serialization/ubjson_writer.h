@@ -8,12 +8,12 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
-#include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
+#include <QtCore/QtGlobal>
 
 #include "binary_stream.h"
-#include "ubjson_fwd.h"
 #include "ubjson_detail.h"
+#include "ubjson_fwd.h"
 
 template<class Output>
 class QnUbjsonWriter: private QnUbjsonDetail::ReaderWriterBase

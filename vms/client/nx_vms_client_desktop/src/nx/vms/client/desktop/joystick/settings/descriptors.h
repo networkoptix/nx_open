@@ -10,7 +10,6 @@
 #include <QtCore/QStringList>
 
 #include <nx/reflect/instrument.h>
-
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 

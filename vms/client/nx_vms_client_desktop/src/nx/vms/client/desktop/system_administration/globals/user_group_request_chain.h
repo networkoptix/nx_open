@@ -10,7 +10,6 @@
 
 #include "request_chain.h"
 
-
 namespace nx::vms::client::desktop {
 
 struct UserGroupRequest

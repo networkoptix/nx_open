@@ -8,6 +8,7 @@
 #include <platform/core_platform_abstraction.h>
 #include <platform/images/platform_images.h>
 #include <platform/shortcuts/platform_shortcuts.h>
+
 #include "notification/platform_notifier.h"
 
 class QnPlatformAbstraction:

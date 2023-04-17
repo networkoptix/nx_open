@@ -7,9 +7,8 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/long_runnable.h>
-
+#include <nx/utils/thread/mutex.h>
 #include <utils/common/threadqueue.h>
 
 class QnResourceWidgetRenderer;

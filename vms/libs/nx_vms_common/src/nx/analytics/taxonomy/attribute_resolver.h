@@ -4,11 +4,10 @@
 
 #include <vector>
 
-#include <nx/vms/api/analytics/descriptors.h>
-
 #include <nx/analytics/taxonomy/attribute.h>
 #include <nx/analytics/taxonomy/internal_state.h>
 #include <nx/analytics/taxonomy/utils.h>
+#include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx::analytics::taxonomy {
 

@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <vector>
+
+#include <stdint.h>
 
 #include <nx/utils/bit_stream.h>
 

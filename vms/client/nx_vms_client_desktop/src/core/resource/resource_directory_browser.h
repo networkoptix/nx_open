@@ -5,6 +5,7 @@
 #include <mutex>
 
 #include <QtCore/QPointer>
+
 #include <core/resource/client_resource_fwd.h>
 #include <nx/vms/common/system_context_aware.h>
 

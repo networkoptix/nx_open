@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/sdk/helpers/media_stream_statistics.h>
-
 #include <memory>
+
+#include <nx/sdk/helpers/media_stream_statistics.h>
 
 struct QnAbstractMediaData;
 using QnAbstractMediaDataPtr = std::shared_ptr<QnAbstractMediaData>;

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QSharedPointer>
+
 #include "base_shader_program.h"
 
 /**

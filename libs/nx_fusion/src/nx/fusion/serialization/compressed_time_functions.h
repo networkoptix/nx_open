@@ -3,21 +3,21 @@
 #ifndef QN_COMPRESSED_TIME_FUNCTIONS_H
 #define QN_COMPRESSED_TIME_FUNCTIONS_H
 
-#include <type_traits> /* For std::enable_if. */
 #include <array>
-#include <vector>
-#include <set>
 #include <map>
+#include <set>
+#include <type_traits> /* For std::enable_if. */
+#include <vector>
 
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/tuple/enum.hpp>
-#include <boost/preprocessor/cat.hpp>
+    #include <boost/preprocessor/cat.hpp>
+    #include <boost/preprocessor/tuple/enum.hpp>
 #endif
 
 #include <collection.h>
 
-#include <QtCore/QString>
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
 #include <QtCore/QUrl>
 
 #include <nx/utils/latin1_array.h>
@@ -27,7 +27,6 @@
 #include "compressed_time.h"
 #include "compressed_time_macros.h"
 #include "enum.h"
-
 
 namespace QnCompressedTimeDetail {
     template<class Element, class Output, class Tag>

@@ -3,9 +3,10 @@
 #ifndef QN_RECT_SET_H
 #define QN_RECT_SET_H
 
-#include <QtCore/QRect>
-#include <QtCore/QPoint>
 #include <set>
+
+#include <QtCore/QPoint>
+#include <QtCore/QRect>
 
 /**
  * Rectangle set is an abstraction of a set of rectangles with fast

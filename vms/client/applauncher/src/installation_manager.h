@@ -6,14 +6,15 @@
 #include <future>
 #include <mutex>
 
-#include <QtCore/QObject>
-#include <QtCore/QMap>
 #include <QtCore/QDir>
+#include <QtCore/QMap>
+#include <QtCore/QObject>
 #include <QtCore/QStringList>
 
-#include <client_installation.h>
-#include <nx/vms/applauncher/api/applauncher_api.h>
 #include <nx/utils/software_version.h>
+#include <nx/vms/applauncher/api/applauncher_api.h>
+
+#include "client_installation.h"
 
 namespace nx::zip { class Extractor; }
 

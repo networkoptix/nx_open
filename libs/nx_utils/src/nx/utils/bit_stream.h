@@ -2,17 +2,18 @@
 
 #pragma once
 
-#include <limits.h>
 #include <stdexcept>
+
+#include <limits.h>
 
 #include <QtCore/QString>
 
 #include <nx/utils/log/assert.h>
 
 #ifdef Q_OS_WIN
-#include <WinSock2.h>
+    #include <WinSock2.h>
 #else
-#include <arpa/inet.h>
+    #include <arpa/inet.h>
 #endif
 
 namespace nx::utils {

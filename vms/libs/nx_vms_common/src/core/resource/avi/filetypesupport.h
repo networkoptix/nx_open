@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QEvent>
+#include <QtCore/QString>
 
 class NX_VMS_COMMON_API FileTypeSupport
 {

@@ -2,14 +2,13 @@
 
 #pragma once
 
+#include <QtCore/QJsonObject>
 #include <QtCore/QList>
 #include <QtCore/QStringList>
-#include <QtCore/QJsonObject>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/analytics/manifest_error.h>
 #include <nx/vms/api/analytics/manifest_error.h>
 
 namespace nx::vms::api::analytics {

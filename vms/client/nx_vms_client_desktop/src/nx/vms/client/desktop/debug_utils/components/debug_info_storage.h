@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include <QObject>
-#include <QString>
+#include <QtCore/QObject>
+#include <QtCore/QString>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/singleton.h>
-
 
 namespace nx::vms::client::desktop {
 

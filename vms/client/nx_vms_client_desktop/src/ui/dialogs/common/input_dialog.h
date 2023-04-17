@@ -3,13 +3,12 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
-
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QLineEdit>
 
-#include <ui/dialogs/common/session_aware_dialog.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
 class InputDialog;

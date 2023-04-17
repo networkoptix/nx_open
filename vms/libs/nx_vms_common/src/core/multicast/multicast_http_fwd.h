@@ -2,11 +2,12 @@
 
 #pragma once
 
-#include <QUuid>
-#include <QUrl>
-#include <QtNetwork/QAuthenticator>
-#include <QQueue>
 #include <functional>
+
+#include <QtCore/QQueue>
+#include <QtCore/QUrl>
+#include <QtCore/QUuid>
+#include <QtNetwork/QAuthenticator>
 
 namespace QnMulticast
 {

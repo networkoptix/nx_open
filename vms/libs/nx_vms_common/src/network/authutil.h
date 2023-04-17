@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <QtCore/QMap>
-#include <QtCore/QByteArray>
 #include <QStringList>
+
+#include <QtCore/QByteArray>
+#include <QtCore/QMap>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/http_types.h>

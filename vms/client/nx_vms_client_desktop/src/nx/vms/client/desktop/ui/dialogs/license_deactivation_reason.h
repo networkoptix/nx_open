@@ -3,8 +3,8 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <ui/dialogs/common/message_box.h>
 #include <nx/vms/client/desktop/license/license_helpers.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace nx::vms::client::desktop {

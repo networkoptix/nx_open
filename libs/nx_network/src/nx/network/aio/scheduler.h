@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <set>
 #include <chrono>
+#include <set>
 
 #include <nx/utils/interruption_flag.h>
 #include <nx/utils/move_only_func.h>

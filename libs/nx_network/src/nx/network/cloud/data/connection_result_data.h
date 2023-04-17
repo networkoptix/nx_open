@@ -5,11 +5,11 @@
 #include <string>
 #include <string_view>
 
-#include "stun_message_data.h"
-
 #include <nx/network/cloud/cloud_connect_type.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/system_error.h>
+
+#include "stun_message_data.h"
 
 namespace nx::hpm::api {
 

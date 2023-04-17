@@ -6,7 +6,6 @@
 #include <QtWidgets/QStyledItemDelegate>
 
 #include <common/common_globals.h>
-
 #include <ui/common/text_pixmap_cache.h>
 
 namespace nx::vms::client::desktop { class Workbench; }

@@ -3,8 +3,8 @@
 #pragma once
 
 #include <chrono>
-#include <optional>
 #include <functional>
+#include <optional>
 
 #include <nx/utils/elapsed_timer.h>
 

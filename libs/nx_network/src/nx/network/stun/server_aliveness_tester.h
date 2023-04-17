@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "message.h"
 #include "../abstract_aliveness_tester.h"
+#include "message.h"
 
 namespace nx::network::stun {
 

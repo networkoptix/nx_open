@@ -10,9 +10,9 @@
 
 #include <rapidjson/document.h>
 
-#include <nx/reflect/instrument.h>
-#include <nx/reflect/generic_visitor.h>
 #include <nx/reflect/from_string.h>
+#include <nx/reflect/generic_visitor.h>
+#include <nx/reflect/instrument.h>
 #include <nx/reflect/type_utils.h>
 
 #include "utils.h"

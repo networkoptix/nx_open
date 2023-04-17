@@ -7,9 +7,9 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QScopedPointer>
 
-#include <nx/vms/client/desktop/common/models/abstract_mapping_model.h>
-#include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/utils/scoped_model_operations.h>
+#include <nx/vms/client/desktop/common/models/abstract_mapping_model.h>
 
 namespace nx::vms::client::desktop {
 

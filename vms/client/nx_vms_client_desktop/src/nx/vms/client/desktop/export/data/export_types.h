@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <recording/stream_recorder_data.h>
-
 #include <optional>
+
+#include <recording/stream_recorder_data.h>
 
 namespace nx::vms::client::desktop {
 

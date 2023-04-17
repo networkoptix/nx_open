@@ -7,9 +7,8 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <nx/utils/impl_ptr.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui { class LicenseWidget; }
 

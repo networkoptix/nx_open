@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QJsonObject>
+#include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>

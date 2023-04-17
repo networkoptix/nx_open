@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-
 #include <ui/workbench/workbench_state_manager.h>
 
 namespace nx::vms::api { struct ShowreelData; }

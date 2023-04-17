@@ -3,19 +3,15 @@
 #pragma once
 
 #include <QtCore/QPointer>
-
 #include <QtGui/QAction>
 
+#include <client/client_globals.h>
 #include <common/common_globals.h>
-
+#include <nx/vms/client/desktop/ui/actions/action_conditions.h>
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 #include <nx/vms/client/desktop/ui/actions/action_types.h>
-
-#include <ui/workbench/workbench_context_aware.h>
-#include <client/client_globals.h>
-
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_conditions.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsItem;
 

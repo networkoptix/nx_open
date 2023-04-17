@@ -8,7 +8,6 @@
 
 #include <analytics/common/object_metadata.h>
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>

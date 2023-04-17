@@ -6,9 +6,8 @@
 
 #include <QtCore/QAbstractListModel>
 
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <nx/utils/scoped_model_operations.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
 

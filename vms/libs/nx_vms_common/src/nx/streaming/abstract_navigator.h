@@ -4,8 +4,7 @@
 
 #include <QtCore/QtGlobal>
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/avutil.h>
 }
 

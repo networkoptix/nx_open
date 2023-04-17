@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "abstract_event_list_model.h"
-
 #include <nx/utils/impl_ptr.h>
+
+#include "abstract_event_list_model.h"
 
 namespace nx::vms::client::desktop {
 

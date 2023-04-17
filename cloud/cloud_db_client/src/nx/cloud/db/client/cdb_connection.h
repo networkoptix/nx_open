@@ -5,11 +5,11 @@
 #include <include/nx/cloud/db/api/connection.h>
 
 #include "account_manager.h"
-#include "auth_provider.h"
 #include "async_http_requests_executor.h"
+#include "auth_provider.h"
 #include "maintenance_manager.h"
-#include "system_manager.h"
 #include "oauth_manager.h"
+#include "system_manager.h"
 #include "two_factor_auth_manager.h"
 
 namespace nx::cloud::db::client {

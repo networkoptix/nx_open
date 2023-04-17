@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include "id_data.h"
-
-#include <QtCore/QString>
 #include <QtCore/QSet>
+#include <QtCore/QString>
 
 #include <nx/utils/serialization/format.h>
 #include <nx/vms/api/types/connection_types.h>
+
+#include "id_data.h"
 
 namespace nx {
 namespace vms {

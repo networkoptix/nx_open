@@ -7,8 +7,8 @@
 
 #include <nx/utils/atomic_unique_ptr.h>
 
-#include "abstract_async_channel.h"
 #include "../protocol_detector.h"
+#include "abstract_async_channel.h"
 
 namespace nx {
 namespace network {

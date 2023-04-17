@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include <QByteArray>
-#include <QString>
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 #include <nx/network/ssl/certificate.h>
 

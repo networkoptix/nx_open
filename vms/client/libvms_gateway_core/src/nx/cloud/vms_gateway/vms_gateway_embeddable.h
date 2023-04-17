@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "vms_gateway_process_public.h"
-
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 
+#include "vms_gateway_process_public.h"
 
 namespace nx {
 namespace cloud {

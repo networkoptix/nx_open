@@ -5,9 +5,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
-
+#include <core/resource/resource_fwd.h>
 
 class QnIOPortsViewModel;
 

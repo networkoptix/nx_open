@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "showreel_data.h"
-
 #include <QtCore/QString>
+
+#include "showreel_data.h"
 
 namespace nx::vms::api {
 

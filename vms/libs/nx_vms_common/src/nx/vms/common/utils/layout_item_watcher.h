@@ -5,11 +5,9 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-
-#include <utils/common/counter_hash.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <utils/common/counter_hash.h>
 
 namespace nx::vms::common {
 

@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QSlider>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 
 namespace nx::vms::client::desktop {
 

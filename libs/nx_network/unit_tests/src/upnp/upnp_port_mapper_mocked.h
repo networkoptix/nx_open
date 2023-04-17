@@ -5,8 +5,8 @@
 #include <nx/network/upnp/upnp_async_client.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
 #include <nx/utils/std/thread.h>
-#include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
 namespace network {

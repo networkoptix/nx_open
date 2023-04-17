@@ -16,8 +16,8 @@
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
-#include "http_types.h"
 #include "../app_info.h"
+#include "http_types.h"
 
 namespace nx::network::http {
 

@@ -2,23 +2,18 @@
 
 #pragma once
 
-#include <QtWidgets/QDialog>
-#include <QtGui/QStandardItem>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
 #include <QtCore/QTimer>
+#include <QtGui/QStandardItem>
+#include <QtWidgets/QDialog>
 
 #include <api/server_rest_connection_fwd.h>
-
+#include <core/resource/resource_fwd.h>
 #include <nx/vms/api/analytics/descriptors.h>
-
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
-
-#include <core/resource/resource_fwd.h>
-
 #include <ui/dialogs/common/session_aware_dialog.h>
-
 
 class QnEventLogModel;
 namespace nx { namespace vms { namespace event { class StringsHelper; }}}

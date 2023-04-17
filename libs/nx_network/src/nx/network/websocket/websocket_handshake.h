@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/utils/buffer.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
+#include <nx/utils/buffer.h>
 
 #include "websocket_common_types.h"
 

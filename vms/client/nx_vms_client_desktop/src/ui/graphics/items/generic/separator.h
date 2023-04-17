@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QVector>
+
 #include <QtWidgets/QGraphicsWidget>
 
 struct SeparatorAreaProperties

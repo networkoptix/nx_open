@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <QtCore/QSize>
 #include <QtCore/QPoint>
-#include <QtCore/QString>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSize>
+#include <QtCore/QString>
 
 #include <nx/vms/client/core/media/media_player.h>
 #include <nx/vms/client/core/resource/media_dewarping_params.h>

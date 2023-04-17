@@ -6,7 +6,8 @@
 #include <string>
 
 #include <openssl/hmac.h>
-#include <QByteArray>
+
+#include <QtCore/QByteArray>
 
 #include <nx/utils/type_utils.h>
 

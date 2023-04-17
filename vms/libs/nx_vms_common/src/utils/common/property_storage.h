@@ -4,13 +4,12 @@
 #define QN_PROPERTY_STORAGE_H
 
 #include <QtCore/QObject>
-#include <QtCore/QVariant>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSet>
 #include <QtCore/QStringList>
+#include <QtCore/QVariant>
 
 #include <nx/utils/thread/mutex.h>
-
 
 class QSettings;
 class QTextStream;

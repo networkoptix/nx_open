@@ -3,9 +3,9 @@
 #pragma once
 
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/seq/for_each.hpp>
-#include <boost/preprocessor/tuple/enum.hpp>
-#include <boost/preprocessor/cat.hpp>
+    #include <boost/preprocessor/cat.hpp>
+    #include <boost/preprocessor/seq/for_each.hpp>
+    #include <boost/preprocessor/tuple/enum.hpp>
 #endif // Q_MOC_RUN
 
 #include <boost_pp_variadic_seq/variadic_seq_for_each.h>

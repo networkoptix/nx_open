@@ -5,7 +5,6 @@
 
 #include <QtCore/QString>
 
-
 /**
   * Max ICMP packet size
   */

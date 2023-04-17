@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/vms/client/desktop/export/tools/abstract_export_tool.h>
-
 #include <recording/stream_recorder.h>
 
 namespace nx::vms::client::desktop {

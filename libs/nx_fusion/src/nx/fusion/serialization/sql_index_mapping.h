@@ -6,6 +6,7 @@
 #include <cassert>
 
 #include <QtCore/QVector>
+
 #include <nx/utils/log/assert.h>
 
 namespace QnSqlDetail {

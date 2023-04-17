@@ -4,9 +4,8 @@
 
 #include <memory>
 
-#include <nx/vms/client/desktop/state/shared_memory_manager.h>
-
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/state/shared_memory_manager.h>
 
 #include "mock_client_process_execution_interface.h"
 

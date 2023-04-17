@@ -2,10 +2,8 @@
 
 #pragma once
 
-#include <nx/utils/uuid.h>
-
 #include <nx/fusion/model_functions_fwd.h>
-
+#include <nx/utils/uuid.h>
 
 //!mediaserver's response to \a ping request
 class QnCameraListReply

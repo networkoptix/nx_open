@@ -8,8 +8,7 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QSize>
 
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 
 } // extern "C"

@@ -5,18 +5,16 @@
 #include <map>
 #include <memory>
 
-#include <QCoreApplication>
-#include <QElapsedTimer>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QElapsedTimer>
+
+#include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/core/transcoding/filters/filter_chain.h>
+#include <utils/media/frame_info.h>
 
 #include "transcoder.h"
 
-namespace nx { namespace metrics { struct Storage; } }
-
-#include <nx/core/transcoding/filters/filter_chain.h>
-
-#include "utils/media/frame_info.h"
-
-#include "decoders/video/ffmpeg_video_decoder.h"
+namespace nx::metrics { struct Storage; }
 
 NX_VMS_COMMON_API AVCodecID findVideoEncoder(const QString& codecName);
 

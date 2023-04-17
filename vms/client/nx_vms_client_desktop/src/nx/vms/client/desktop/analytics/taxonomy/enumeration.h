@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "abstract_enumeration.h"
-
 #include <nx/utils/impl_ptr.h>
+
+#include "abstract_enumeration.h"
 
 namespace nx::analytics::taxonomy { class AbstractEnumType; }
 

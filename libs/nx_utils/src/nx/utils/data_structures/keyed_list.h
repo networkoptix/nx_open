@@ -4,8 +4,8 @@
 
 #include <type_traits>
 
-#include <QtCore/QList>
 #include <QtCore/QHash>
+#include <QtCore/QList>
 
 #include <nx/utils/log/assert.h>
 

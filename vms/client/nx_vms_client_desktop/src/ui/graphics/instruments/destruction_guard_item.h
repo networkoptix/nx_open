@@ -5,8 +5,8 @@
 
 #include <QtWidgets/QGraphicsObject>
 #include <QtWidgets/QGraphicsScene>
-#include <ui/common/weak_graphics_item_pointer.h>
 
+#include <ui/common/weak_graphics_item_pointer.h>
 
 class DestructionGuardItem: public QGraphicsObject {
     Q_OBJECT;

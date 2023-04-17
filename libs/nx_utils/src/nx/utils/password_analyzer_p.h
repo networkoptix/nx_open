@@ -7,12 +7,13 @@
  */
 
 #include <array>
-#include <nx/utils/log/assert.h>
 
+#include <QtCore/QFile>
 #include <QtCore/QSet>
 #include <QtCore/QString>
-#include <QtCore/QFile>
 #include <QtCore/QTextStream>
+
+#include <nx/utils/log/assert.h>
 
 namespace {
 

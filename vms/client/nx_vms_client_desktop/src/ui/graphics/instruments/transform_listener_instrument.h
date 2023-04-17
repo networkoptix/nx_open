@@ -3,9 +3,11 @@
 #ifndef QN_TRANSFORM_LISTENER_INSTRUMENT_H
 #define QN_TRANSFORM_LISTENER_INSTRUMENT_H
 
-#include "instrument.h"
 #include <QHash>
+
 #include <QtGui/QTransform>
+
+#include "instrument.h"
 
 /**
  * This instrument listens to view transformation and size changes and notifies 

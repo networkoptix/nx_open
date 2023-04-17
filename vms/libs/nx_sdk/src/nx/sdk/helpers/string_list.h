@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include <nx/sdk/i_string_list.h>
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/i_string_list.h>
 
 namespace nx::sdk {
 

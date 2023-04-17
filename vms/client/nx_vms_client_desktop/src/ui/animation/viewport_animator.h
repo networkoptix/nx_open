@@ -2,10 +2,12 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QMargins>
+#include <QtCore/QObject>
 #include <QtCore/QRect>
+
 #include <client/client_globals.h>
+
 #include "rect_animator.h"
 #include "viewport_geometry_accessor.h"
 

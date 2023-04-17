@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/utils/buffer.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/buffer.h>
 
 namespace nx::cloud::relay::api {
 

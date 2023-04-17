@@ -4,9 +4,8 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/client/desktop/export/data/export_types.h>
-
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/export/data/export_types.h>
 
 namespace nx::vms::client::desktop {
 

@@ -8,7 +8,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/system_context.h>
 
-#include "system_context_aware.h"  //< Forward declarations.
+#include "system_context_aware.h" //< Forward declarations.
 
 class QnCameraBookmarksManager;
 class QnCameraDataManager;

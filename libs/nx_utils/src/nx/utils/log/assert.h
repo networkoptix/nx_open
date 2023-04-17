@@ -4,17 +4,17 @@
 
 #include <atomic>
 #include <chrono>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <mutex>
 #include <sstream>
 #include <string>
-#include <functional>
-
-#include "format.h"
 
 #include <nx/utils/general_macros.h>
 #include <nx/utils/nx_utils_ini.h>
+
+#include "format.h"
 
 // Uncomment to enable NX_CHECK condition time measurements:
 //#define NX_CHECK_MEASURE_TIME

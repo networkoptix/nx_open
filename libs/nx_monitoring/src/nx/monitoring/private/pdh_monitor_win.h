@@ -2,12 +2,13 @@
 
 #pragma once
 
-#include <pdh.h>
 #include <chrono>
 #include <tuple>
 
-#include <QtCore/QList>
+#include <pdh.h>
+
 #include <QtCore/QHash>
+#include <QtCore/QList>
 
 #include "../activity_monitor.h"
 

@@ -6,6 +6,7 @@
 #include <limits>
 
 #include <analytics/common/object_metadata.h>
+
 #include "analytics_fwd.h"
 
 namespace nx::vms::client::core {

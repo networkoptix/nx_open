@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include <nx/reflect/instrument.h>
 

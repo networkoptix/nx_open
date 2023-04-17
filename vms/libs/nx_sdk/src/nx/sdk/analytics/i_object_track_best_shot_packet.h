@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include <nx/sdk/interface.h>
-
 #include <nx/sdk/analytics/i_metadata_packet.h>
 #include <nx/sdk/analytics/rect.h>
 #include <nx/sdk/i_attribute.h>
+#include <nx/sdk/interface.h>
 
 namespace nx::sdk::analytics {
 

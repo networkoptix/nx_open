@@ -6,12 +6,11 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
-
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/entity_common.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_list_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_group_list_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/base_notification_observer.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/entity_common.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_group_list_entity.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_list_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 
 namespace nx::vms::client::desktop {

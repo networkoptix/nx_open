@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QFile>
+#include <QtCore/QString>
 
 #include <nx/utils/thread/mutex.h>
 
-#include "layout_storage_stream.h"
 #include "layout_storage_resource.h"
+#include "layout_storage_stream.h"
 
 // This layout storage stream is used when no encryption is involved.
 class QnLayoutPlainStream:

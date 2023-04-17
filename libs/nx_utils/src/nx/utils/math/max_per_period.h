@@ -4,8 +4,8 @@
 
 #include <optional>
 
-#include "../time.h"
 #include "../data_structures/top_queue.h"
+#include "../time.h"
 
 namespace nx::utils::math {
 

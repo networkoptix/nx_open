@@ -17,7 +17,7 @@ private:
     void* m_libraryHandle = nullptr;
 };
 
-} // nx::media::nvidia
+} // namespace nx::media::nvidia
 
 #elif defined(_WIN32)
 

@@ -4,10 +4,10 @@
 
 #include <memory>
 
-#include <nx/sdk/uuid.h>
-#include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/helpers/engine.h>
+#include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
+#include <nx/sdk/uuid.h>
 
 namespace nx {
 namespace vms_server_plugins {

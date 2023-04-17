@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <nx/vms/client/desktop/ui/actions/action_builder.h>
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_builder.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtWidgets/QTabBar>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>

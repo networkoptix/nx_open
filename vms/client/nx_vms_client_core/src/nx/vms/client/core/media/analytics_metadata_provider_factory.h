@@ -8,6 +8,7 @@
 #include <QtCore/QHash>
 
 #include <core/resource/resource_fwd.h>
+
 #include "abstract_analytics_metadata_provider.h"
 
 namespace nx::vms::client::core {

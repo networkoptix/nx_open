@@ -1,9 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QVariantMap>
+#include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QVariantMap>
 
 #include <nx/monitoring/activity_monitor.h>
 #include <nx/utils/impl_ptr.h>

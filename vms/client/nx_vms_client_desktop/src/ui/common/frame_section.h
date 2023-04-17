@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/Qt>
 #include <QtCore/QRectF>
+#include <QtCore/Qt>
 
 #include <common/common_globals.h>
 

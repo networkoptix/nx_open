@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QWidget>
 
 #include <nx/vms/client/desktop/common/utils/validators.h>
-
 #include <nx/vms/client/desktop/common/widgets/detail/base_input_field.h>
 
 class AbstractAccessor;

@@ -4,12 +4,10 @@
 
 #include <QtCore/QObject>
 
+#include <common/common_module_aware.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/uuid.h>
-
 #include <nx/vms/auth/abstract_user_data_provider.h>
-
-#include <common/common_module_aware.h>
 
 class NX_VMS_COMMON_API GenericUserDataProvider:
     public QObject,

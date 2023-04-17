@@ -4,8 +4,8 @@
 
 #include <memory>
 
-#include <QtCore/QSize>
 #include <QtCore/QMap>
+#include <QtCore/QSize>
 
 namespace nx {
 namespace media {

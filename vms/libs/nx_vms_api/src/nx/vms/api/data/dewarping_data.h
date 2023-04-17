@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QtMath>
 #include <QtCore/QList>
+#include <QtCore/QtMath>
 
 #include <nx/reflect/instrument.h>
 #include <nx/vms/api/types/dewarping_types.h>

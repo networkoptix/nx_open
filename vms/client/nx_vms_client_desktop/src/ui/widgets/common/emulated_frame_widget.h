@@ -6,8 +6,8 @@
 #include <QtCore/QBasicTimer>
 #include <QtWidgets/QWidget>
 
-#include <ui/processors/drag_processor.h>
 #include <ui/processors/drag_process_handler.h>
+#include <ui/processors/drag_processor.h>
 
 class QnEmulatedFrameWidget: public QWidget, protected DragProcessHandler {
     Q_OBJECT;

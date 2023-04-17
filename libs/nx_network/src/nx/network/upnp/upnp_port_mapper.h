@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <chrono>
-
 #include <QWaitCondition>
+#include <chrono>
 
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/timer_manager.h>

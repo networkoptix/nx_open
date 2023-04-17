@@ -7,18 +7,16 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx_ec/ec_api_fwd.h>
-#include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/lockable.h>
-#include <utils/common/aspect_ratio.h>
-
 #include <core/resource/resource_fwd.h>
 #include <core/resource/security_cam_resource.h>
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/lockable.h>
 #include <nx/utils/url.h>
-
 #include <nx/vms/api/analytics/device_agent_manifest.h>
-#include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/data/device_profile.h>
+#include <nx/vms/api/types/rtp_types.h>
+#include <nx_ec/ec_api_fwd.h>
+#include <utils/common/aspect_ratio.h>
 
 class CameraMediaStreams;
 class CameraMediaStreamInfo;

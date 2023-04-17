@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QRectF>
 #include <QSharedPointer>
+
+#include <QtCore/QRectF>
 
 class CLVideoDecoderOutput;
 using CLVideoDecoderOutputPtr = QSharedPointer<CLVideoDecoderOutput>;

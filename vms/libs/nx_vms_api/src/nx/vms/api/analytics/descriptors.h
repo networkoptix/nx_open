@@ -9,8 +9,8 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
-#include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/api/analytics/manifest_items.h>
 
 namespace nx::vms::api::analytics {
 

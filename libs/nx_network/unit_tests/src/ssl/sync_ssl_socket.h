@@ -4,7 +4,7 @@
 
 #include <openssl/ssl.h>
 
-#include <QObject>
+#include <QtCore/QObject>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/socket_common.h>

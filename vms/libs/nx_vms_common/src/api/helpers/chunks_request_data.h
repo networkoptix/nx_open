@@ -8,8 +8,8 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/reflect/enum_instrument.h>
 #include <nx/network/rest/params.h>
+#include <nx/reflect/enum_instrument.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/serialization/format.h>
 #include <nx/vms/api/types/storage_location.h>

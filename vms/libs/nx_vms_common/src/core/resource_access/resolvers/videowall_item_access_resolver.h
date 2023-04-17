@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "abstract_resource_access_resolver.h"
-
 #include <nx/utils/impl_ptr.h>
+
+#include "abstract_resource_access_resolver.h"
 
 class QnResourcePool;
 

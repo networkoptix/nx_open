@@ -4,9 +4,9 @@
 
 #include <chrono>
 #include <functional>
+#include <map>
 #include <optional>
 #include <ostream>
-#include <map>
 #include <string>
 #include <vector>
 
@@ -16,10 +16,9 @@
 #include <nx/utils/buffer.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/utils/string.h>
 #include <nx/utils/type_utils.h>
-#include <nx/utils/software_version.h>
-#include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/utils/url.h>
 
 /**

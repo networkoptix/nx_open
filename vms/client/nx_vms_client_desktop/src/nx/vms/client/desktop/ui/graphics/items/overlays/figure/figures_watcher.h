@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include "types.h"
-
 #include <QtCore/QObject>
 
-#include <nx/utils/uuid.h>
-#include <nx/utils/impl_ptr.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
+#include <nx/utils/uuid.h>
+
+#include "types.h"
 
 namespace nx::vms::client::desktop::figure {
 

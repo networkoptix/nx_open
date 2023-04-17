@@ -4,8 +4,8 @@
 
 #include <memory>
 
-#include <QtCore/QVector>
 #include <QtCore/QVariant>
+#include <QtCore/QVector>
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {

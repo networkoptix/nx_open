@@ -5,7 +5,6 @@
 #include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/serialization/format.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/event/event_fwd.h>

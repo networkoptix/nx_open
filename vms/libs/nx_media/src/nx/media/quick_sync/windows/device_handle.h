@@ -4,10 +4,11 @@
 
 #ifdef _WIN32
 
-#include <mfx/mfxvideo++.h>
-#include <d3d9.h>
 #include <atlbase.h>
+#include <d3d9.h>
 #include <dxva2api.h>
+
+#include <mfx/mfxvideo++.h>
 
 #include "renderer.h"
 

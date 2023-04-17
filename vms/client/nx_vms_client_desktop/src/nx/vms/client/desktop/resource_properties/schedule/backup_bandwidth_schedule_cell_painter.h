@@ -4,8 +4,8 @@
 
 #include <memory>
 
-#include <nx/vms/client/desktop/resource_properties/schedule/schedule_cell_painter.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/resource_properties/schedule/schedule_cell_painter.h>
 
 namespace nx::vms::client::desktop {
 

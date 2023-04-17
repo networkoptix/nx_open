@@ -5,7 +5,6 @@
 #include <QtCore/QSet>
 
 #include <nx/utils/log/assert.h>
-
 #include <nx/vms/client/desktop/state/client_process_execution_interface.h>
 #include <nx/vms/client/desktop/state/startup_parameters.h>
 

@@ -2,18 +2,17 @@
 
 #pragma once
 
-#include "workbench_layout_info_p.h"
-
 #include <QtCore/QItemSelectionModel>
 #include <QtQuick/QQuickItem>
-
-#include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
+#include <ui/workbench/workbench_context_aware.h>
+
+#include "workbench_layout_info_p.h"
 
 using namespace nx::vms::client::core;
 

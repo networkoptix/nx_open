@@ -6,8 +6,8 @@
 
 #include <QtCore/QSet>
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/common/system_context.h>

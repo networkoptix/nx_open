@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QJsonValue>
+#include <QtCore/QString>
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/resource_types.h>

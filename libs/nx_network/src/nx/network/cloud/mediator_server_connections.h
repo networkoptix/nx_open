@@ -9,9 +9,9 @@
 #include "abstract_cloud_system_credentials_provider.h"
 #include "base_mediator_client.h"
 #include "data/bind_data.h"
-#include "data/get_connection_state_data.h"
 #include "data/connection_ack_data.h"
 #include "data/connection_requested_event_data.h"
+#include "data/get_connection_state_data.h"
 #include "data/listen_data.h"
 
 namespace nx::hpm::api {

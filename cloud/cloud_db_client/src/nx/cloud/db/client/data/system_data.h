@@ -2,16 +2,15 @@
 
 #pragma once
 
-#include <QtCore/QUrlQuery>
-
 #include <string>
 #include <vector>
 
+#include <QtCore/QUrlQuery>
+
+#include <nx/cloud/db/api/system_data.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/uuid.h>
-
-#include <nx/cloud/db/api/system_data.h>
 
 namespace nx::cloud::db::api {
 

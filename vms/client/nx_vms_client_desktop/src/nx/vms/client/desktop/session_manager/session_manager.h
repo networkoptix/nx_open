@@ -3,13 +3,14 @@
 #pragma once
 
 #include <functional>
-#include <QtCore/QSharedMemory>
-#include <QtCore/QJsonValue>
-#include <QtCore/QDir>
 
+#include <QtCore/QDir>
+#include <QtCore/QJsonValue>
+#include <QtCore/QSharedMemory>
+
+#include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
-#include <nx/fusion/serialization/json_functions.h>
 
 namespace nx::vms::client::desktop::session {
 

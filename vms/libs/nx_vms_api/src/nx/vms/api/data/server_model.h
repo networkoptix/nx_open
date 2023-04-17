@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include <tuple>
 #include <optional>
+#include <tuple>
 #include <type_traits>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 
-#include "storage_model.h"
-#include "module_information.h" //< For nx::utils::OsInfo fusion.
 #include "media_server_data.h"
+#include "module_information.h" //< For nx::utils::OsInfo fusion.
+#include "storage_model.h"
 
 namespace nx::vms::api {
 
