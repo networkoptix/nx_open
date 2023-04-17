@@ -57,6 +57,12 @@ enum class GlobalPermission
      */
     viewLogs = 0x00000010,
 
+    /**%apidoc
+     * Can access System Health Monitoring information.
+     * %caption GlobalSystemHealthPermission
+     */
+     systemHealth = 0x00000020, //< New flag, shouldn't be copied to DeprecatedGlobalPermission.
+
     /* Viewer permissions. */
 
     // Will be superseded by AccessRight::viewArchive.
@@ -176,6 +182,7 @@ constexpr auto nxReflectVisitAllEnumItems(GlobalPermission*, Visitor&& visitor)
         Item{GlobalPermission::editCameras, "GlobalEditCamerasPermission"},
         Item{GlobalPermission::controlVideowall, "GlobalControlVideoWallPermission"},
         Item{GlobalPermission::viewLogs, "GlobalViewLogsPermission"},
+        Item{GlobalPermission::systemHealth, "GlobalSystemHealthPermission"},
         Item{GlobalPermission::viewArchive, "GlobalViewArchivePermission"},
         Item{GlobalPermission::exportArchive, "GlobalExportPermission"},
         Item{GlobalPermission::viewBookmarks, "GlobalViewBookmarksPermission"},
@@ -197,6 +204,7 @@ constexpr GlobalPermissions kNonDeprecatedGlobalPermissions =
     GlobalPermission::powerUser
     | GlobalPermission::administrator
     | GlobalPermission::viewLogs
+    | GlobalPermission::systemHealth
     | GlobalPermission::customUser
     | GlobalPermission::requireFreshSession;
 

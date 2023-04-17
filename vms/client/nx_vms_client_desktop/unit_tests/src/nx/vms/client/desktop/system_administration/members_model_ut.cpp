@@ -45,6 +45,7 @@ public:
         // "Advanced Viewers",
         // "Viewers",
         // "Live Viewers",
+        // "System Health Viewers",
         // "group1",
         // "    group3",
         // "        user1",
@@ -251,6 +252,8 @@ TEST_F(MembersModelTest, prerequisiteCheckPredefinedGroupNames)
     ASSERT_EQ(PredefinedUserGroups::find(api::kAdvancedViewersGroupId)->name, "Advanced Viewers");
     ASSERT_EQ(PredefinedUserGroups::find(api::kViewersGroupId)->name, "Viewers");
     ASSERT_EQ(PredefinedUserGroups::find(api::kLiveViewersGroupId)->name, "Live Viewers");
+    ASSERT_EQ(PredefinedUserGroups::find(api::kSystemHealthViewersGroupId)->name,
+        "System Health Viewers");
 }
 
 TEST_F(MembersModelTest, removeAndAddParentForGroup)
@@ -403,6 +406,7 @@ TEST_F(MembersModelTest, allowedParents)
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
+        "System Health Viewers",
         "group1"
     };
 
@@ -488,6 +492,7 @@ TEST_F(MembersModelTest, removeUserResource)
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
+        "System Health Viewers",
         "group1",
         "group2",
         "group3",
@@ -533,6 +538,7 @@ TEST_F(MembersModelTest, addUserResource)
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
+        "System Health Viewers",
         "group1",
         "group2",
         "group3",
@@ -581,6 +587,7 @@ TEST_F(MembersModelTest, addGroup)
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
+        "System Health Viewers",
         "group1",
         "group2",
         "group3",
@@ -628,6 +635,7 @@ TEST_F(MembersModelTest, removeGroup)
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
+        "System Health Viewers",
         "group1",
         "group2",
         "group3",
@@ -669,6 +677,7 @@ TEST_F(MembersModelTest, renameGroup)
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
+        "System Health Viewers",
         "group1",
         "group2",
         "group3",
@@ -714,6 +723,7 @@ TEST_F(MembersModelTest, renameUser)
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
+        "System Health Viewers",
         "group1",
         "group2",
         "group3",

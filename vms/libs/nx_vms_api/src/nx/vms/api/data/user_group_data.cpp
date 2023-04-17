@@ -41,6 +41,7 @@ const QnUuid kPowerUsersGroupId{"00000000-0000-0000-0000-100000000001"};
 const QnUuid kAdvancedViewersGroupId{"00000000-0000-0000-0000-100000000002"};
 const QnUuid kViewersGroupId{"00000000-0000-0000-0000-100000000003"};
 const QnUuid kLiveViewersGroupId{"00000000-0000-0000-0000-100000000004"};
+const QnUuid kSystemHealthViewersGroupId{"00000000-0000-0000-0000-100000000005"};
 
 const QnUuid kDefaultLdapGroupId{"00000000-0000-0000-0000-100100000000"};
 
@@ -49,7 +50,8 @@ const std::set<QnUuid> kPredefinedGroupIds{
     kPowerUsersGroupId,
     kAdvancedViewersGroupId,
     kViewersGroupId,
-    kLiveViewersGroupId };
+    kLiveViewersGroupId,
+    kSystemHealthViewersGroupId};
 
 const std::set<QnUuid> kAllPowerUserGroupIds{
     kAdministratorsGroupId,
