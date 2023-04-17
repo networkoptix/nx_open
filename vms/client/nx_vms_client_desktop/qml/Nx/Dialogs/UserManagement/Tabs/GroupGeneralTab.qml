@@ -64,7 +64,9 @@ Item
                 height: 64
                 source: control.isLdap
                     ? "image://svg/skin/user_settings/group_type_ldap.svg"
-                    : "image://svg/skin/user_settings/group_type_local.svg"
+                    : (control.isPredefined
+                        ? "image://svg/skin/user_settings/group_type_built_in.svg"
+                        : "image://svg/skin/user_settings/group_type_local.svg")
                 sourceSize: Qt.size(width, height)
             }
 
