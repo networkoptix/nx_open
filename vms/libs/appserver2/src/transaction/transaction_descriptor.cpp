@@ -314,8 +314,7 @@ struct UserNotificationManagerHelper
 
     // This is required for proper transaction handling on mobile client when it's connected to the
     // old VMS server.
-    template<>
-    void operator ()<nx::vms::api::UserDataDeprecated>(
+    void operator ()(
         const QnTransaction<nx::vms::api::UserDataDeprecated>& tran,
         const NotificationParams& notificationParams)
     {
