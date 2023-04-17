@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <memory>
 #include <chrono>
+#include <memory>
 
 #include <QtCore/QObject>
 

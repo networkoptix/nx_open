@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "abstract_stream_socket_acceptor.h"
 #include "abstract_socket.h"
+#include "abstract_stream_socket_acceptor.h"
 
 namespace nx {
 namespace network {

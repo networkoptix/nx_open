@@ -5,7 +5,6 @@
 #include <map>
 
 #include <nx/sdk/helpers/ref_countable.h>
-
 #include <nx/sdk/i_string_map.h>
 
 namespace nx::sdk {

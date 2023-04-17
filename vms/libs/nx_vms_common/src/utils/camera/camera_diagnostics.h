@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QList>
-#include <QString>
+#include <QtCore/QList>
+#include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/media/stream_event.h>

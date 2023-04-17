@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/common/widgets/panel.h>
-
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
+#include <nx/vms/client/desktop/common/widgets/panel.h>
 
 namespace Ui {
 class FilenamePanel;

@@ -6,8 +6,8 @@
 
 #include <atomic>
 #include <memory>
-#include <regex>
 #include <optional>
+#include <regex>
 #include <string_view>
 
 #include <openssl/ssl.h>

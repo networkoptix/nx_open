@@ -5,8 +5,8 @@
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 
-#include <nx/analytics/taxonomy/abstract_enum_type.h>
 #include <nx/analytics/taxonomy/abstract_color_type.h>
+#include <nx/analytics/taxonomy/abstract_enum_type.h>
 
 Q_MOC_INCLUDE("nx/analytics/taxonomy/abstract_object_type.h")
 

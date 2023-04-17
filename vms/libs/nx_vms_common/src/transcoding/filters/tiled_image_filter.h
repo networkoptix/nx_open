@@ -4,9 +4,9 @@
 
 #include <QtGui/QFont>
 
-#include "abstract_image_filter.h"
-
 #include <core/resource/resource_media_layout.h>
+
+#include "abstract_image_filter.h"
 
 class NX_VMS_COMMON_API QnTiledImageFilter: public QnAbstractImageFilter
 {

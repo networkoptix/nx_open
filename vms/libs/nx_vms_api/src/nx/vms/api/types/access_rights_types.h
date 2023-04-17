@@ -2,7 +2,6 @@
 
 #pragma once
 
-
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
 

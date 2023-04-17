@@ -4,14 +4,14 @@
 
 #include <cassert>
 
+#include <QtCore/QHash>
+#include <QtCore/QPair>
 #include <QtCore/QPoint>
 #include <QtCore/QRect>
-#include <QtCore/QHash>
 #include <QtCore/QSet>
-#include <QtCore/QPair>
 
-#include <utils/common/hash.h>
 #include <nx/utils/log/assert.h>
+#include <utils/common/hash.h>
 
 /**
  * Matrix map is an abstraction of an infinite two-dimensional sparse array.

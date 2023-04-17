@@ -4,8 +4,8 @@
 
 #include <functional>
 
-#include <QtGui/QTransform>
 #include <QtGui/QMatrix4x4>
+#include <QtGui/QTransform>
 
 QTransform sharpTransform(const QTransform &transform, bool *corrected = nullptr);
 

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtWidgets/QLabel>
 #include <QtCore/QTimer>
+#include <QtWidgets/QLabel>
 
 #include <nx/utils/thread/mutex.h>
 

@@ -7,11 +7,11 @@
 
 #include <nx/network/url/url_parse_helper.h>
 
-#include "basic_custom_tunnel_server.h"
-#include "request_paths.h"
-#include "../abstract_tunnel_authorizer.h"
 #include "../../server/http_server_connection.h"
 #include "../../server/rest/http_server_rest_message_dispatcher.h"
+#include "../abstract_tunnel_authorizer.h"
+#include "basic_custom_tunnel_server.h"
+#include "request_paths.h"
 
 namespace nx::network::http::tunneling::detail {
 

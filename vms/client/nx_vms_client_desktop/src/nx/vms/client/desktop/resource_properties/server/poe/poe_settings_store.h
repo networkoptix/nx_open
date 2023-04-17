@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "poe_settings_state.h"
-
 #include <QtCore/QObject>
 
-#include <nx/vms/client/desktop/node_view/details/node_view_fwd.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/node_view/details/node_view_fwd.h>
+
+#include "poe_settings_state.h"
 
 class QnResourcePool;
 namespace nx::vms::api { struct NetworkBlockData; };

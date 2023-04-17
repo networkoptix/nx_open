@@ -3,9 +3,10 @@
 #pragma once
 
 #include <deque>
+#include <vector>
+
 #include <stddef.h>
 #include <stdint.h>
-#include <vector>
 
 namespace nx::rtp {
 

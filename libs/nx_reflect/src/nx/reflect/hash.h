@@ -5,10 +5,11 @@
 #include <iomanip>
 #include <memory>
 #include <sstream>
-#include <stddef.h>
-#include <stdint.h>
 #include <string>
 #include <type_traits>
+
+#include <stddef.h>
+#include <stdint.h>
 
 #include <nx/reflect/basic_serializer.h>
 #include <nx/reflect/generic_visitor.h>

@@ -4,8 +4,8 @@
 
 #include <memory>
 
-#include <QtCore/QtGlobal>
 #include <QtCore/QStringList>
+#include <QtCore/QtGlobal>
 
 namespace nx::vms::client::desktop {
 

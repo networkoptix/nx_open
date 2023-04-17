@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "../advanced_search_dialog.h"
-
 #include <optional>
 
 #include <QtCore/QSize>
 
 #include <nx/utils/singleton.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+
+#include "../advanced_search_dialog.h"
 
 namespace nx::vms::client::desktop {
 

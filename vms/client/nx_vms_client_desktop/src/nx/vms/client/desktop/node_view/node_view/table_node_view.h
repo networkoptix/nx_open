@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/common/widgets/table_view.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/common/widgets/table_view.h>
 
 #include "../details/node_view_fwd.h"
 

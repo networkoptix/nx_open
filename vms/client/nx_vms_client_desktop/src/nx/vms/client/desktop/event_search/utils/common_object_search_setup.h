@@ -5,10 +5,9 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <recording/time_period.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
+#include <recording/time_period.h>
 
 Q_MOC_INCLUDE("core/resource/camera_resource.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/text_filter_setup.h")

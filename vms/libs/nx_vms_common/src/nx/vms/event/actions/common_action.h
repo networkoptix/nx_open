@@ -5,8 +5,8 @@
 // 11 dec 2012    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/event_fwd.h>
 
 namespace nx {
 namespace vms {

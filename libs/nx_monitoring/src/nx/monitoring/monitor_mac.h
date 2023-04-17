@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "activity_monitor.h"
-
 #include <QtCore/QScopedPointer>
+
+#include "activity_monitor.h"
 
 namespace nx::monitoring {
 

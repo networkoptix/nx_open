@@ -3,12 +3,11 @@
 #ifndef QN_CLICKABLE_WIDGETS_H
 #define QN_CLICKABLE_WIDGETS_H
 
-#include <ui/processors/clickable.h>
-
 #include <qt_graphics_items/graphics_widget.h>
 
 #include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
+#include <ui/processors/clickable.h>
 
 /**
  * Graphics widget that provides signals for mouse click and double click events.

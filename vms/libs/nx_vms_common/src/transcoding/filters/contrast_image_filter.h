@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/vms/api/data/image_correction_data.h>
-
 #include <utils/color_space/image_correction.h>
 
 #include "abstract_image_filter.h"

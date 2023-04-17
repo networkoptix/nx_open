@@ -12,9 +12,9 @@
 #include <core/resource/shared_resource_pointer.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
-#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace QnBusiness {
 

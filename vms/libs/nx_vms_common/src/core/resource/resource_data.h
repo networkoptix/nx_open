@@ -3,9 +3,9 @@
 #ifndef QN_RESOURCE_DATA_H
 #define QN_RESOURCE_DATA_H
 
-#include <QtCore/QVariant>
 #include <QtCore/QHash>
 #include <QtCore/QJsonValue>
+#include <QtCore/QVariant>
 
 class QnJsonContext;
 

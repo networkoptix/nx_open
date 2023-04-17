@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <QObject>
 #include <memory>
+
+#include <QtCore/QObject>
 
 #include <nx/utils/system_error.h>
 

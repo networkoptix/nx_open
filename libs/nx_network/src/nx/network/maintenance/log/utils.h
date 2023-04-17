@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/utils/log/log_settings.h>
 #include <nx/utils/log/abstract_logger.h>
+#include <nx/utils/log/log_settings.h>
 
 #include "logger.h"
 

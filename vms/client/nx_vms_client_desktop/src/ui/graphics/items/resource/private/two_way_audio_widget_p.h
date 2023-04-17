@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include "../two_way_audio_widget.h"
-
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
-#include <QtCore/QElapsedTimer>
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/license/usage_helper.h>
 #include <utils/media/voice_spectrum_analyzer.h>
+
+#include "../two_way_audio_widget.h"
 
 class QnImageButtonWidget;
 class GraphicsLabel;

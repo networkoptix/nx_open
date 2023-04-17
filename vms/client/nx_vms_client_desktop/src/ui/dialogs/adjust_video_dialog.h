@@ -3,14 +3,13 @@
 #ifndef QN_ADJUST_VIDEO_DIALOG_H
 #define QN_ADJUST_VIDEO_DIALOG_H
 
-#include <QtWidgets/QDialog>
 #include <QtWidgets/QAbstractButton>
+#include <QtWidgets/QDialog>
 
 #include <nx/vms/api/data/image_correction_data.h>
-
-#include <utils/color_space/image_correction.h>
-#include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/workbench/workbench_context_aware.h>
+#include <utils/color_space/image_correction.h>
 
 class QnMediaResourceWidget;
 

@@ -11,8 +11,8 @@
 #include <nx/network/socket_factory.h>
 #include <nx/network/stream_proxy.h>
 #include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
-#include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/abstract_async_client.h>
+#include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>

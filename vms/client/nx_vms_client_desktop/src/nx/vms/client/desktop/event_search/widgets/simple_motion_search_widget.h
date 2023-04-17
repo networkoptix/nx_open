@@ -5,8 +5,8 @@
 #include <QtCore/QList>
 #include <QtGui/QRegion>
 
-#include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/common/data/motion_selection.h>
 
 #include "abstract_search_widget.h"
 

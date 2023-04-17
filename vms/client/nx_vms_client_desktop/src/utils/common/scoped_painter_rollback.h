@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "scoped_value_rollback.h"
-
 #include <utility>
 
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
+
+#include "scoped_value_rollback.h"
 
 template<class T, class Accessor>
 class QnGenericScopedPainterRollback: public QnGenericScopedValueRollback<T, QPainter, Accessor, Accessor>

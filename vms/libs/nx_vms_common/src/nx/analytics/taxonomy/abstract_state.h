@@ -6,14 +6,14 @@
 
 #include <QtCore/QString>
 
-#include <nx/vms/api/analytics/descriptors.h>
-#include <nx/analytics/taxonomy/abstract_plugin.h>
+#include <nx/analytics/taxonomy/abstract_color_type.h>
 #include <nx/analytics/taxonomy/abstract_engine.h>
+#include <nx/analytics/taxonomy/abstract_enum_type.h>
+#include <nx/analytics/taxonomy/abstract_event_type.h>
 #include <nx/analytics/taxonomy/abstract_group.h>
 #include <nx/analytics/taxonomy/abstract_object_type.h>
-#include <nx/analytics/taxonomy/abstract_event_type.h>
-#include <nx/analytics/taxonomy/abstract_enum_type.h>
-#include <nx/analytics/taxonomy/abstract_color_type.h>
+#include <nx/analytics/taxonomy/abstract_plugin.h>
+#include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx::analytics::taxonomy {
 

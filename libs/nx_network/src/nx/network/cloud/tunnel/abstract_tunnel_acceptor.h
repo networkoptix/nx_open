@@ -4,9 +4,9 @@
 
 #include <string>
 
-#include "abstract_incoming_tunnel_connection.h"
-
 #include <nx/network/cloud/mediator_server_connections.h>
+
+#include "abstract_incoming_tunnel_connection.h"
 
 namespace nx::network::cloud {
 

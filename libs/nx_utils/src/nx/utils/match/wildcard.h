@@ -5,10 +5,10 @@
 #include <cctype>
 #include <cstring>
 #include <iterator>
-#include <type_traits>
 #include <string_view>
+#include <type_traits>
 
-#include <QString>
+#include <QtCore/QString>
 
 enum class MatchMode
 {

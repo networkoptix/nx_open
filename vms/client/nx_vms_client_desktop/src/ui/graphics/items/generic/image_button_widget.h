@@ -5,17 +5,18 @@
 #include <array>
 
 #include <QtCore/QPointer>
-#include <QtGui/QPixmap>
 #include <QtGui/QIcon>
-#include <QtOpenGL/QOpenGLBuffer>
 #include <QtGui/QOpenGLFunctions>
-#include <QtOpenGL/QOpenGLVertexArrayObject>
+#include <QtGui/QPixmap>
+#include <QtOpenGL/QOpenGLBuffer>
 #include <QtOpenGL/QOpenGLTexture>
+#include <QtOpenGL/QOpenGLVertexArrayObject>
 
-#include <ui/processors/clickable.h>
-#include <ui/animation/animated.h>
 #include <qt_graphics_items/graphics_widget.h>
+
+#include <ui/animation/animated.h>
 #include <ui/graphics/items/generic/framed_widget.h>
+#include <ui/processors/clickable.h>
 
 class QAction;
 class QMenu;

@@ -3,10 +3,10 @@
 #pragma once
 
 #ifdef _WIN32
-#include <WinSock2.h>
+    #include <WinSock2.h>
 #else
-#include <errno.h>
-#include <netdb.h>
+    #include <errno.h>
+    #include <netdb.h>
 #endif
 
 #include <string>

@@ -7,12 +7,12 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 
-#include <nx/reflect/json.h>
-#include <nx/reflect/to_string.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/server/api_request_result.h>
+#include <nx/reflect/json.h>
+#include <nx/reflect/to_string.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/serialization/format.h>
 #include <nx/utils/url.h>

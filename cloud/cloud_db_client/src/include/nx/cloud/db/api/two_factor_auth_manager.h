@@ -4,10 +4,10 @@
 
 #include <functional>
 
+#include <nx/network/http/http_types.h>
+
 #include "result_code.h"
 #include "two_factor_auth_data.h"
-
-#include <nx/network/http/http_types.h>
 
 namespace nx::cloud::db::api {
 

@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <QtCore/QAbstractListModel>
 #include <QtCore/QDate>
 #include <QtCore/QLocale>
-#include <QtCore/QAbstractListModel>
 
 #include <nx/utils/impl_ptr.h>
 

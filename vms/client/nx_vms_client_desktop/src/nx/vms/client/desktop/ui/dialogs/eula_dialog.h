@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <ui/dialogs/common/dialog.h>
-
 #include <nx/utils/impl_ptr.h>
+#include <ui/dialogs/common/dialog.h>
 
 namespace Ui { class EulaDialog; }
 

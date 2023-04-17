@@ -2,16 +2,16 @@
 
 #pragma once
 
+#include <atomic>
 #include <exception>
 #include <optional>
-#include <utility>
 #include <string>
 #include <tuple>
-#include <atomic>
-
-#include <nx/utils/log/format.h>
+#include <utility>
 
 #include <QtCore/QString>
+
+#include <nx/utils/log/format.h>
 
 namespace nx::utils {
 

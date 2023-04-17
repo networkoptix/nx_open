@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "view_node_fwd.h"
-#include  "../node_view_state_patch.h"
-
-#include <QtCore/QVariant>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QVariant>
+
+#include "../node_view_state_patch.h"
+#include "view_node_fwd.h"
 
 namespace nx::vms::client::desktop {
 namespace node_view {

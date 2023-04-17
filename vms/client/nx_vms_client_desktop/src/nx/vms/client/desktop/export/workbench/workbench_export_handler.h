@@ -2,16 +2,14 @@
 
 #pragma once
 
-#include <QtCore/QObject>
+#include <variant>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <QtCore/QObject>
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/export/data/export_layout_settings.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
-
-#include <variant>
-
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
 

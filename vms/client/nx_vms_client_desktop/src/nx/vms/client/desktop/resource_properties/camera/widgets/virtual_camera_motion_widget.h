@@ -5,9 +5,8 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <nx/utils/scoped_connections.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui { class VirtualCameraMotionWidget; }
 

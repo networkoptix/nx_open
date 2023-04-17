@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/utils/time.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/time.h>
 
 namespace nx {
 namespace utils {

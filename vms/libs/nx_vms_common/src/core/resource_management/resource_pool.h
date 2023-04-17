@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <vector>
 #include <functional>
+#include <vector>
 
-#include <QtCore/QList>
 #include <QtCore/QHash>
+#include <QtCore/QList>
 #include <QtCore/QObject>
 
 #include <api/helpers/camera_id_helper.h>

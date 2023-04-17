@@ -5,8 +5,8 @@
 #include <atomic>
 #include <map>
 #include <mutex>
-#include <typeinfo>
 #include <type_traits>
+#include <typeinfo>
 
 #include <nx/utils/log/to_string.h>
 

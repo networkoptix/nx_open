@@ -4,12 +4,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
-
 #include <nx/core/transcoding/filters/transcoding_settings.h>
-
-#include <transcoding/filters/abstract_image_filter.h>
-
 #include <nx/vms/api/data/dewarping_data.h>
+#include <transcoding/filters/abstract_image_filter.h>
 
 class CLVideoDecoderOutput;
 using CLVideoDecoderOutputPtr = QSharedPointer<CLVideoDecoderOutput>;

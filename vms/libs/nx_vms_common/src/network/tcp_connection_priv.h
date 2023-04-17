@@ -2,21 +2,21 @@
 
 #pragma once
 
+#include <QDateTime>
 #include <chrono>
 #include <optional>
 
-#include <QDateTime>
 #include <QtCore/QByteArray>
 
-#include "tcp_connection_processor.h"
-
+#include <core/resource_access/user_access_data.h>
 #include <nx/kit/utils.h>
+#include <nx/network/http/http_stream_reader.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/nx_network_ini.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
-#include <nx/network/http/http_types.h>
-#include <nx/network/http/http_stream_reader.h>
-#include <nx/network/nx_network_ini.h>
-#include <core/resource_access/user_access_data.h>
+
+#include "tcp_connection_processor.h"
 
 static const int TCP_READ_BUFFER_SIZE = 65536;
 

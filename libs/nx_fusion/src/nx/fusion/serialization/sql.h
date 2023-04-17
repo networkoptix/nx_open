@@ -5,8 +5,8 @@
 
 #include <cassert>
 
-#include <QtSql/QSqlRecord>
 #include <QtSql/QSqlQuery>
+#include <QtSql/QSqlRecord>
 
 #include <nx/utils/conversion_wrapper.h>
 #include <nx/utils/log/assert.h>

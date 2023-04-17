@@ -4,9 +4,9 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/enums.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
-#include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop {
 

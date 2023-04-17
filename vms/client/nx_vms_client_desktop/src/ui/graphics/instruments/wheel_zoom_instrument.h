@@ -3,10 +3,10 @@
 #ifndef QN_WHEEL_ZOOM_INSTRUMENT_H
 #define QN_WHEEL_ZOOM_INSTRUMENT_H
 
-#include "instrument.h"
-
 #include <ui/processors/kinetic_processor.h>
 #include <ui/workbench/workbench_context_aware.h>
+
+#include "instrument.h"
 
 /**
  * Wheel zoom instrument implements scene zooming with a mouse wheel.

@@ -5,14 +5,12 @@
 
 #include <array>
 
-#include <QtCore/QVariant>
-#include <QtCore/QStringList>
 #include <QtCore/QSharedPointer>
-
+#include <QtCore/QStringList>
+#include <QtCore/QVariant>
 #include <QtGui/QVector3D>
 
 #include "interpolator.h"
-
 
 template<class T>
 class QnSpaceMapper {

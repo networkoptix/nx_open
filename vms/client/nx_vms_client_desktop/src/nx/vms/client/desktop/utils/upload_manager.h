@@ -6,8 +6,8 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
+#include <core/resource/resource_fwd.h>
 
 #include "upload_state.h"
 

@@ -4,8 +4,8 @@
 
 #include <string>
 
-#include <nx/sdk/i_attribute.h>
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/i_attribute.h>
 
 namespace nx::sdk {
 

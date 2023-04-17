@@ -4,7 +4,6 @@
 
 #include <QtCore/QStringListModel>
 
-
 class AbstractSystemsController;
 class QnSystemsModelPrivate;
 

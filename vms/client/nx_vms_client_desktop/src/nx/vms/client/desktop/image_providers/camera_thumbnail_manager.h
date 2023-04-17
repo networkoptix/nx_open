@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QObject>
 #include <QtGui/QImage>
 
 #include <api/server_rest_connection_fwd.h>

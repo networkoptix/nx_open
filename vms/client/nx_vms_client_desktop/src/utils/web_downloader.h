@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QFileInfo>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QFileInfo>
 #include <QtCore/QPointer>
 #include <QtWebEngineCore/QWebEngineDownloadRequest>
 

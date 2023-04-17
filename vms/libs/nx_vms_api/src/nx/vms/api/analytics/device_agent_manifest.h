@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include <QtCore/QJsonObject>
-
 #include <vector>
 
-#include <nx/vms/api/analytics/manifest_error.h>
-#include <nx/vms/api/analytics/manifest_items.h>
-#include <nx/vms/api/analytics/type_library.h>
+#include <QtCore/QJsonObject>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/analytics/manifest_error.h>
+#include <nx/vms/api/analytics/manifest_items.h>
+#include <nx/vms/api/analytics/type_library.h>
 
 namespace nx::vms::api::analytics {
 

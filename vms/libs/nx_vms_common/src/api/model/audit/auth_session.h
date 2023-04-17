@@ -3,9 +3,9 @@
 #ifndef __QN_AUTH_SESSION_H__
 #define __QN_AUTH_SESSION_H__
 
-#include <nx/utils/uuid.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/string.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::network { class HostAddress; }
 namespace nx::network::http { class Request; }

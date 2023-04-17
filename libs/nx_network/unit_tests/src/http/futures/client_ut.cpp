@@ -4,16 +4,17 @@
 #include <optional>
 #include <system_error>
 
-#include <nx/utils/url.h>
-#include <nx/network/url/url_builder.h>
+#include <gtest/gtest.h>
+
+#include <QtCore/QString>
+
+#include <nx/network/http/buffer_source.h>
 #include <nx/network/http/futures/client.h>
 #include <nx/network/http/test_http_server.h>
-#include <nx/network/http/buffer_source.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/system_socket.h>
-
-#include <QString>
-#include <gtest/gtest.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/utils/url.h>
 
 namespace nx::network::http::futures::test {
 

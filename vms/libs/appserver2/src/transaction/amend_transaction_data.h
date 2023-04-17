@@ -2,13 +2,13 @@
 
 #pragma once
 
+#include <vector>
+
 #include <core/resource/resource_property_key.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <transaction/transaction.h>
-
-#include <vector>
 
 class QnResourceAccessManager;
 

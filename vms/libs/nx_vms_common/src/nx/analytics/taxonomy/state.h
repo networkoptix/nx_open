@@ -4,10 +4,9 @@
 
 #include <map>
 
+#include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/internal_state.h>
-#include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
-
 #include <nx/utils/thread/mutex.h>
 
 namespace nx::analytics::taxonomy {

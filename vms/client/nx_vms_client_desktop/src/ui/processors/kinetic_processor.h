@@ -5,13 +5,13 @@
 
 #include <limits>
 
+#include <QtCore/QDateTime>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
-#include <QtCore/QDateTime>
 
 #include <ui/animation/animation_timer_listener.h>
-#include <utils/math/magnitude.h>
 #include <utils/math/linear_combination.h>
+#include <utils/math/magnitude.h>
 
 #include "kinetic_process_handler.h"
 

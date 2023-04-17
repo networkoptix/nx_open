@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "workbench_grid_mapper.h"
 #include <utils/math/magnitude.h>
+
+#include "workbench_grid_mapper.h"
 
 /**
  * Simple magnitude calculator for finding the best place for an item.

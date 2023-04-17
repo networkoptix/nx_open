@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/utils/server_file_cache.h>
-
 #include <QtGui/QImage>
+
+#include <nx/vms/client/desktop/utils/server_file_cache.h>
 #include <utils/common/aspect_ratio.h>
 
 namespace nx::vms::client::desktop {

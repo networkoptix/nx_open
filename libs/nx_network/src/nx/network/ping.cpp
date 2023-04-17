@@ -2,20 +2,18 @@
 
 #include "ping.h"
 
-#ifdef Q_OS_WIN
-#    include <winsock2.h>
-#    include <ws2tcpip.h>
-#    include <iphlpapi.h>
-#else
-#   include <stdlib.h>
-#   include <sys/types.h>
-#   include <sys/socket.h>
-#   include <arpa/inet.h>
-#   include <netinet/ip.h>
-#   include <unistd.h>
-#   ifndef Q_OS_IOS
-#      include <netinet/ip_icmp.h>
-#   endif
+#include "system_network_headers.h"
+
+#ifndef Q_OS_WIN
+    #include <stdlib.h>
+    #include <unistd.h>
+
+    #include <netinet/ip.h>
+    #include <sys/socket.h>
+    #include <sys/types.h>
+    #ifndef Q_OS_IOS
+        #include <netinet/ip_icmp.h>
+    #endif
 #endif
 
 #include <QtCore/QProcess>

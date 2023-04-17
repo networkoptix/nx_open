@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <string>
 #include <ostream>
+#include <string>
 
-#include <nx/sdk/result.h>
+#include <nx/sdk/i_device_info.h>
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/i_string_map.h>
-#include <nx/sdk/i_device_info.h>
+#include <nx/sdk/result.h>
 
 namespace nx::sdk {
 

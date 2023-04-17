@@ -7,11 +7,11 @@
 #include <QtCore/QIdentityProxyModel>
 
 // Squish does not handle forward declarations well, so resource_tree_squish_facade.h is included.
-#include <nx/vms/client/desktop/ui/scene/models/resource_tree_squish_facade.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/scoped_model_operations.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/scene/models/resource_tree_squish_facade.h>
 
 Q_MOC_INCLUDE("ui/workbench/workbench_context.h")
 

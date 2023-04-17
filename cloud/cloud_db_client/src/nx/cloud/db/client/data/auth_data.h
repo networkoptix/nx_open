@@ -4,9 +4,8 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <nx/reflect/instrument.h>
-
 #include <nx/cloud/db/api/auth_provider.h>
+#include <nx/reflect/instrument.h>
 
 namespace nx::cloud::db::api {
 

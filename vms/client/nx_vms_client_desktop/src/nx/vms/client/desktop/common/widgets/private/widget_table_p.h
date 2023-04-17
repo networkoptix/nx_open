@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include "../widget_table.h"
-
 #include <QtCore/QHash>
 #include <QtCore/QList>
-#include <QtCore/QVector>
-#include <QtCore/QTimer>
 #include <QtCore/QPointer>
+#include <QtCore/QTimer>
+#include <QtCore/QVector>
+
+#include "../widget_table.h"
 
 namespace nx::vms::client::desktop {
 

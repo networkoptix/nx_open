@@ -6,10 +6,9 @@
 #include <random>
 
 #include <nx/network/http/server/abstract_authentication_manager.h>
-
-#include <nx/utils/stree/stree_manager.h>
-#include <nx/utils/std/optional.h>
 #include <nx/utils/random_cryptographic_device.h>
+#include <nx/utils/std/optional.h>
+#include <nx/utils/stree/stree_manager.h>
 
 namespace nx {
 namespace network {

@@ -5,11 +5,10 @@
 #include <QtCore/QHashFunctions>
 #include <QtCore/QString>
 
-#include <nx/utils/uuid.h>
 #include <core/resource/shared_resource_pointer.h>
-
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {

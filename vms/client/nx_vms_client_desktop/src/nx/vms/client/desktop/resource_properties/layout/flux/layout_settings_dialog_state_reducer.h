@@ -4,10 +4,10 @@
 
 #include <set>
 
-#include "layout_settings_dialog_state.h"
-
 #include <core/resource/resource_fwd.h>
 #include <utils/common/aspect_ratio.h>
+
+#include "layout_settings_dialog_state.h"
 
 namespace nx::vms::client::desktop {
 

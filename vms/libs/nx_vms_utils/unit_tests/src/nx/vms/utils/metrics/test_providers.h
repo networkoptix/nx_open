@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/utils/metrics/resource_controller_impl.h>
-
 #include <nx/utils/std/cppnx.h>
+#include <nx/vms/utils/metrics/resource_controller_impl.h>
 
 namespace nx::vms::utils::metrics::test {
 namespace {

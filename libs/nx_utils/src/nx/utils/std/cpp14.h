@@ -10,9 +10,9 @@
 
 #ifndef __clang__
 
-#ifdef __GNUC__
-    #include <features.h>
-#endif
+    #ifdef __GNUC__
+        #include <features.h>
+    #endif
 
 namespace std {
 

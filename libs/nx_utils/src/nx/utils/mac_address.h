@@ -5,8 +5,8 @@
 #include <array>
 #include <string_view>
 
-#include <QtCore/QString>
 #include <QtCore/QHash>
+#include <QtCore/QString>
 
 namespace nx::utils {
 

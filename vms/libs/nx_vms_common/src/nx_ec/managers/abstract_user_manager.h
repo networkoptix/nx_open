@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <nx/utils/uuid.h>
+#include <QtCore/QObject>
+
 #include <nx/utils/async_handler_executor.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/user_data_ex.h>
 #include <nx/vms/api/data/user_group_data.h>
-
-#include <QtCore/QObject>
 
 #include "../ec_api_common.h"
 

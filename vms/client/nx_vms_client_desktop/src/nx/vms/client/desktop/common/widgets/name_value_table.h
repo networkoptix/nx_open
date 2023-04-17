@@ -7,7 +7,6 @@
 #include <QtWidgets/QWidget>
 
 #include <analytics/common/object_metadata.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 

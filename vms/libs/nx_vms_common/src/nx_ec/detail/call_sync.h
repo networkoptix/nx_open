@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <memory>
 #include <future>
+#include <memory>
 
 #include <nx/utils/log/log.h>
 

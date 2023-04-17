@@ -6,16 +6,13 @@
 
 #include <QtWidgets/QWidget>
 
-#include <nx/vms/event/event_fwd.h>
-#include <nx/vms/event/rule.h>
-#include <nx/vms/event/events/abstract_event.h>
-
-#include <ui/models/business_rules_view_model.h>
-
-#include <ui/widgets/business/abstract_business_params_widget.h>
 #include <nx/vms/client/desktop/common/widgets/panel.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/rule.h>
+#include <ui/models/business_rules_view_model.h>
+#include <ui/widgets/business/abstract_business_params_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
-
 
 class QStandardItemModel;
 

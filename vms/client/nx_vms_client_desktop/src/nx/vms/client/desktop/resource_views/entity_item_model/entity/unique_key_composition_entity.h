@@ -2,12 +2,14 @@
 
 #pragma once
 
-#include "abstract_entity.h"
-#include <nx/utils/log/assert.h>
-#include <client/client_globals.h>
+#include <numeric>
 #include <unordered_map>
 #include <vector>
-#include <numeric>
+
+#include <client/client_globals.h>
+#include <nx/utils/log/assert.h>
+
+#include "abstract_entity.h"
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {

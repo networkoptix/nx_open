@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "node_view_base_sort_model.h"
 #include <QtCore/QCollator>
+
+#include "node_view_base_sort_model.h"
 
 namespace nx::vms::client::desktop {
 namespace node_view {

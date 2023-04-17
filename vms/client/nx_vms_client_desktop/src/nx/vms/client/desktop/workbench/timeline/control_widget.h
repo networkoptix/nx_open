@@ -7,7 +7,6 @@
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-
 namespace nx::vms::client::desktop::workbench::timeline {
 
 class VolumeSlider;

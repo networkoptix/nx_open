@@ -7,13 +7,13 @@
 #include <typeinfo>
 #include <unordered_set>
 
-#include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
-#include <nx/utils/exception.h>
-#include <nx/utils/log/log_main.h>
 #include <nx/fusion/serialization/serialization.h>
 #include <nx/utils/buffer.h>
+#include <nx/utils/exception.h>
+#include <nx/utils/log/log_main.h>
 
 #include "json_fwd.h"
 

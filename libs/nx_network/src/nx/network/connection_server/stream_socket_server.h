@@ -21,8 +21,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include "detail/server_statistics_calculator.h"
 #include "detail/connection_statistics.h"
+#include "detail/server_statistics_calculator.h"
 
 namespace nx {
 namespace network {

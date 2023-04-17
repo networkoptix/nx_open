@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/api/data/module_information.h>
-
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/api/data/module_information.h>
 
 namespace nx::vms::utils {
 

@@ -3,13 +3,13 @@
 #pragma once
 
 #include <QtCore/QPointF>
-#include <QtCore/QSizeF>
 #include <QtCore/QRectF>
+#include <QtCore/QSizeF>
 #include <QtCore/QtNumeric>
+#include <QtGui/QMatrix4x4>
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
-#include <QtGui/QMatrix4x4>
 
 #if QT_VERSION == 0x050201
 quint32 NX_UTILS_API qFloatDistance(float a, float b);

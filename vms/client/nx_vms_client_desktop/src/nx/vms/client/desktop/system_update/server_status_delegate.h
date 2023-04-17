@@ -2,8 +2,9 @@
 
 #pragma once
 
+#include <memory> //< for shared_ptr
 #include <vector>
-#include <memory>   //< for shared_ptr
+
 #include <QtWidgets/QStyledItemDelegate>
 
 namespace nx::vms::client::desktop {

@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <type_traits>
 #include <memory>
-
+#include <type_traits>
 
 /* Abstract access interfaces */
 /* -------------------------- */

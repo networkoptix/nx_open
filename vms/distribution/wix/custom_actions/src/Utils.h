@@ -3,7 +3,10 @@
 #ifndef _CUSTOM_ACTIONS_UTILS_H_
 #define _CUSTOM_ACTIONS_UTILS_H_
 
-#include "Windows.h"
+// windows.h must be included before other atl / msi libraries.
+#include <windows.h>
+
+// Other libraries follow here.
 #include <atlstr.h>
 #include <Msi.h>
 

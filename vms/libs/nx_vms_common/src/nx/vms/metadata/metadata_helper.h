@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QDate>
+#include <QtCore/QObject>
 
 namespace nx::vms::metadata {
 

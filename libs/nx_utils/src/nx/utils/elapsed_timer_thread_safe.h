@@ -4,9 +4,10 @@
 
 #include <chrono>
 #include <shared_mutex>
-#include <nx/utils/thread/mutex.h>
 
 #include <QtCore/QElapsedTimer>
+
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace utils {

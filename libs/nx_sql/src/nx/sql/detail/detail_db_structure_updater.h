@@ -11,8 +11,8 @@
 #include <nx/utils/std/optional.h>
 
 #include "../async_sql_query_executor.h"
-#include "../types.h"
 #include "../query_context.h"
+#include "../types.h"
 
 namespace nx::sql::detail {
 

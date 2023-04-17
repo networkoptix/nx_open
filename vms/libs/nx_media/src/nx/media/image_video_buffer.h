@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <nx/media/media_fwd.h>
 #include <QtMultimedia/private/qabstractvideobuffer_p.h>
+
+#include <nx/media/media_fwd.h>
 
 namespace nx::media {
 

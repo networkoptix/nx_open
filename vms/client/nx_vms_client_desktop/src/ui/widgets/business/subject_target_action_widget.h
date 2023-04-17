@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <QtCore/QSet>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSet>
 #include <QtGui/QValidator>
 
 #include <core/resource/resource_fwd.h>
-#include <ui/widgets/business/abstract_business_params_widget.h>
-#include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <ui/widgets/business/abstract_business_params_widget.h>
 
 class QPushButton;
 

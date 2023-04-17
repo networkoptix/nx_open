@@ -2,7 +2,6 @@
 
 #pragma once
 
-
 #include "abstract_workbench_panel.h"
 
 class QnImageButtonWidget;

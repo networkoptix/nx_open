@@ -4,9 +4,9 @@
 
 #include <algorithm>
 #include <chrono>
-#include <optional>
-#include <map>
 #include <limits>
+#include <map>
+#include <optional>
 #include <vector>
 
 #include <nx/utils/time.h>

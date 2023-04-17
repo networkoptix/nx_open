@@ -2,11 +2,10 @@
 
 #pragma once
 
+#include <nx/sdk/i_plugin.h>
+#include <nx/sdk/i_string.h>
 #include <nx/sdk/interface.h>
 #include <nx/sdk/result.h>
-
-#include <nx/sdk/i_string.h>
-#include <nx/sdk/i_plugin.h>
 
 #include "i_engine.h"
 

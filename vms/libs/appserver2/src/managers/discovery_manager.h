@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx_ec/managers/abstract_discovery_manager.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx_ec/managers/abstract_discovery_manager.h>
 #include <transaction/transaction.h>
 
 namespace ec2 {

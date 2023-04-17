@@ -4,9 +4,9 @@
 
 #include <QtCore/QCoreApplication>
 
+#include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <client/client_globals.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {

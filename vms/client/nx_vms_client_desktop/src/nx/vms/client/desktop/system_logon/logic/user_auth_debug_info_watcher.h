@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include <QObject>
+#include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
 #include <ui/workbench/workbench_context_aware.h>

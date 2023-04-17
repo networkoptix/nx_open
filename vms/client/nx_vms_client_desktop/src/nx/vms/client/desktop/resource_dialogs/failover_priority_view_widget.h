@@ -4,10 +4,9 @@
 
 #include <QtCore/QHash>
 
-#include <nx/vms/client/desktop/resource_dialogs/detailed_resource_tree_widget.h>
-
-#include <nx/vms/api/types/resource_types.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/client/desktop/resource_dialogs/detailed_resource_tree_widget.h>
 
 namespace nx::vms::client::desktop {
 

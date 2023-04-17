@@ -3,6 +3,7 @@
 #pragma once
 
 #include <deque>
+
 #include <nx/utils/buffer.h>
 
 namespace nx::network::websocket {

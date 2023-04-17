@@ -6,7 +6,6 @@
 #include <QtCore/QVector>
 
 #include <analytics/db/analytics_db_types.h>
-
 #include <nx/utils/scoped_connections.h>
 
 #include "abstract_search_synchronizer.h"

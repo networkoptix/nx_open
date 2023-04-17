@@ -6,14 +6,15 @@
 #define QN_TIME_PERIODS_STD
 
 #ifdef QN_TIME_PERIODS_STD
-#include <vector>
+    #include <vector>
 #else
-#include <QtCore/QVector>
+    #include <QtCore/QVector>
 #endif
 
-#include "time_period.h"
-#include <nx/utils/uuid.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/uuid.h>
+
+#include "time_period.h"
 
 /**
  * A sorted list of time periods that basically is an implementation of

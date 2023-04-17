@@ -11,8 +11,8 @@
 #include <QtQml/QJSValue>
 #include <QtQuickWidgets/QQuickWidget>
 
-#include <nx/utils/impl_ptr.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
 
 class QQuickWebEngineProfile;
 class QWebEngineCertificateError;

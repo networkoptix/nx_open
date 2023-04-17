@@ -7,8 +7,8 @@
 #include <list>
 #include <memory>
 
-#include "aio/protocol_detecting_async_channel.h"
 #include "aio/async_channel_adapter.h"
+#include "aio/protocol_detecting_async_channel.h"
 #include "buffered_stream_socket.h"
 #include "socket_delegate.h"
 

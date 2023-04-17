@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QVariant>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QVariant>
 
 namespace nx::vms::client::desktop {
 

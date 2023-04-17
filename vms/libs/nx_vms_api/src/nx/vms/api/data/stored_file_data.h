@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 #include "data_macros.h"
 

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtGui/QPen>
 #include <QtGui/QBrush>
 #include <QtGui/QFont>
+#include <QtGui/QPen>
 
 #include "framed_widget.h"
 

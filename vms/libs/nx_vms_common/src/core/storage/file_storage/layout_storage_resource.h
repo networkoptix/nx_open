@@ -10,9 +10,8 @@
 
 #include "layout_storage_stream.h"
 
-extern "C"
-{
-    #include <libavformat/avio.h>
+extern "C" {
+#include <libavformat/avio.h>
 }
 
 class QnLayoutPlainStream;

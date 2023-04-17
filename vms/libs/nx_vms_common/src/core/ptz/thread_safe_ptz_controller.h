@@ -3,7 +3,6 @@
 #pragma once
 
 #include <core/ptz/proxy_ptz_controller.h>
-
 #include <nx/utils/thread/mutex.h>
 
 namespace nx::vms::common::ptz {

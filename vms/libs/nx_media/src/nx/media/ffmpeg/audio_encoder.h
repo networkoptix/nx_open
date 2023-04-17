@@ -5,8 +5,7 @@
 #include <nx/media/audio_data_packet.h>
 #include <nx/media/codec_parameters.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 }
 

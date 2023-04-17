@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
 

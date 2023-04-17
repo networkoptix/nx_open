@@ -5,7 +5,6 @@
 #include <QtCore/QAbstractListModel>
 
 #include <client/client_globals.h>
-
 #include <nx/utils/scoped_model_operations.h>
 
 namespace nx::vms::client::desktop {

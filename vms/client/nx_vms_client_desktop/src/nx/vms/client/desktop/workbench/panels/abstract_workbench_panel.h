@@ -6,7 +6,6 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-
 class AnimationTimer;
 class QGraphicsWidget;
 struct QnPaneSettings;

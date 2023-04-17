@@ -8,8 +8,7 @@
 
 #include <nx/utils/bit_stream.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/avutil.h>
 }
 

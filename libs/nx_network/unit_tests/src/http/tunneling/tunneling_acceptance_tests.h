@@ -9,12 +9,12 @@
 
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/http/tunneling/client.h>
-#include <nx/network/http/tunneling/server.h>
 #include <nx/network/http/tunneling/detail/client_factory.h>
 #include <nx/network/http/tunneling/detail/connection_upgrade_tunnel_client.h>
-#include <nx/network/http/tunneling/detail/get_post_tunnel_client.h>
 #include <nx/network/http/tunneling/detail/experimental_tunnel_client.h>
+#include <nx/network/http/tunneling/detail/get_post_tunnel_client.h>
 #include <nx/network/http/tunneling/detail/ssl_tunnel_client.h>
+#include <nx/network/http/tunneling/server.h>
 #include <nx/network/nx_network_ini.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>

@@ -4,8 +4,8 @@
 
 #include <hidapi/hidapi.h>
 
-#include <QtCore/QObject>
 #include <QtCore/QBitArray>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QTimer>
 

@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "drag_processing_instrument.h"
-
 #include <common/common_globals.h>
 #include <ui/processors/kinetic_process_handler.h>
+
+#include "drag_processing_instrument.h"
 
 class HandScrollInstrument:
     public DragProcessingInstrument,

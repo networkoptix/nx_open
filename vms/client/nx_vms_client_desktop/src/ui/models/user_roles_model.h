@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include <QtCore/QScopedPointer>
 #include <QtCore/QAbstractItemModel>
+#include <QtCore/QScopedPointer>
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>

@@ -4,9 +4,9 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/uuid.h>
 #include <api/server_rest_connection_fwd.h>
 #include <nx/network/rest/params.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::core {
 

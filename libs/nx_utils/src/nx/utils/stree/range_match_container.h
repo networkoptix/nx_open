@@ -6,8 +6,8 @@
 #include <string>
 #include <string_view>
 
-#include <nx/utils/string.h>
 #include <nx/reflect/string_conversion.h>
+#include <nx/utils/string.h>
 
 namespace nx::utils::stree {
 

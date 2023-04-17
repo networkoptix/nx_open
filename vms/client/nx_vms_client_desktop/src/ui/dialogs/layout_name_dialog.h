@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtWidgets/QDialog>
 #include <QtCore/QScopedPointer>
+#include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 
 #include <ui/dialogs/common/session_aware_dialog.h>

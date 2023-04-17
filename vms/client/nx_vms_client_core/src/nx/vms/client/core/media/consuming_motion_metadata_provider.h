@@ -4,8 +4,8 @@
 
 #include <QtCore/QSharedPointer>
 
-#include "abstract_motion_metadata_provider.h"
 #include "abstract_metadata_consumer_owner.h"
+#include "abstract_motion_metadata_provider.h"
 
 namespace nx::vms::client::core {
 

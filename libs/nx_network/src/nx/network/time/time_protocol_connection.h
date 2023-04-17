@@ -6,7 +6,6 @@
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/connection_server/detail/connection_statistics.h>
-
 #include <nx/utils/interruption_flag.h>
 
 namespace nx {

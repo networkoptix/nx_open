@@ -2,15 +2,14 @@
 
 #pragma once
 
-#include <QtCore/QVector>
-#include <QtCore/QMetaType>
 #include <QtCore/QMargins>
+#include <QtCore/QMetaType>
+#include <QtCore/QVector>
 #include <QtGui/QColor>
 #include <QtGui/QValidator>
 
-#include <common/common_meta_types.h>
 #include <client_core/client_core_meta_types.h>
-
+#include <common/common_meta_types.h>
 #include <nx/utils/uuid.h>
 
 /**

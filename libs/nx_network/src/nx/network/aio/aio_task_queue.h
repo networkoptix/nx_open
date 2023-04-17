@@ -10,11 +10,11 @@
 #include <nx/utils/math/abnormal_value_detector.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "../common_socket_impl.h"
+#include "../detail/socket_sequence.h"
 #include "abstract_pollset.h"
 #include "aio_event_handler.h"
 #include "pollable.h"
-#include "../common_socket_impl.h"
-#include "../detail/socket_sequence.h"
 
 namespace nx::network::aio::detail {
 

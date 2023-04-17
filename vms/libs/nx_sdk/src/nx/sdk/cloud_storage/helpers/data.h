@@ -9,9 +9,9 @@
 
 #include <camera/camera_plugin.h>
 #include <nx/kit/json.h>
-#include <nx/sdk/i_device_info.h>
-#include <nx/sdk/cloud_storage/i_plugin.h>
 #include <nx/sdk/cloud_storage/i_media_data_packet.h>
+#include <nx/sdk/cloud_storage/i_plugin.h>
+#include <nx/sdk/i_device_info.h>
 
 namespace nx::sdk::cloud_storage {
 

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "http_server_base_authentication_manager.h"
-
 #include <string>
+
+#include "http_server_base_authentication_manager.h"
 
 namespace nx::network::http::server {
 

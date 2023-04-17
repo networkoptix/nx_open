@@ -4,8 +4,8 @@
 
 #include <utility>
 
-#include <QtCore/QObject>
 #include <QtCore/QEvent>
+#include <QtCore/QObject>
 #include <QtCore/QVector>
 
 #include <nx/utils/log/assert.h>

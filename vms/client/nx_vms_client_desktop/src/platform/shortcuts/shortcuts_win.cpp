@@ -2,14 +2,12 @@
 
 #include "shortcuts_win.h"
 
-#include <winsock2.h>
-#include <windows.h> //< You HAVE to include winsock2.h BEFORE windows.h.
-
 #include <objbase.h>
 #include <objidl.h>
 #include <shlguid.h>
 #include <shobjidl.h>
 #include <wchar.h>
+#include <windows.h>
 #include <winnls.h>
 
 #define _WIN32_DCOM

@@ -5,12 +5,10 @@
 #include <QtCore/QPointer>
 #include <QtGui/QVector3D>
 
-#include <core/resource/resource_fwd.h>
 #include <core/ptz/basic_ptz_controller.h>
-
-#include <nx/vms/api/data/dewarping_data.h>
 #include <core/ptz/ptz_constants.h>
-
+#include <core/resource/resource_fwd.h>
+#include <nx/vms/api/data/dewarping_data.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <utils/common/aspect_ratio.h>
 

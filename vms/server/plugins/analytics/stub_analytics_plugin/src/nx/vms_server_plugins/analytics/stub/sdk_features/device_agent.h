@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <thread>
 #include <atomic>
-#include <memory>
 #include <condition_variable>
-#include <vector>
-#include <string>
 #include <deque>
+#include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 

@@ -7,10 +7,10 @@
 
 #include <nx/utils/buffer.h>
 
+#include "serialization.h"
 #include "ubjson_fwd.h"
 #include "ubjson_reader.h"
 #include "ubjson_writer.h"
-#include "serialization.h"
 
 namespace QnUbjson {
     template<class T, class Output>

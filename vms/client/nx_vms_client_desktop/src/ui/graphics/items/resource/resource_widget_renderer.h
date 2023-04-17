@@ -7,13 +7,12 @@
 #include <QtCore/QObject>
 #include <QtCore/QVector>
 
-#include <nx/utils/thread/stoppable.h>
-#include <nx/utils/thread/mutex.h>
-
 #include <client/client_globals.h>
-#include <utils/media/frame_info.h>
-#include <utils/color_space/image_correction.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/stoppable.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
+#include <utils/color_space/image_correction.h>
+#include <utils/media/frame_info.h>
 
 class QOpenGLWidget;
 class DecodedPictureToOpenGLUploader;

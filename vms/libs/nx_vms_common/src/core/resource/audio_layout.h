@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <QString>
 #include <memory>
 #include <vector>
+
+#include <QtCore/QString>
 
 #include <nx/media/codec_parameters.h>
 

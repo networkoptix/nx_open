@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/vms/time_sync/time_sync_manager.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/time_sync/time_sync_manager.h>
 
 namespace nx::vms::client::core {
 

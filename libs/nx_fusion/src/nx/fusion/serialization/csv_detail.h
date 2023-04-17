@@ -3,20 +3,19 @@
 #ifndef QN_SERIALIZATION_CSV_DETAIL_H
 #define QN_SERIALIZATION_CSV_DETAIL_H
 
-#include <utility> /* For std::declval. */
-#include <type_traits> /* For std::integral_constant. */
 #include <optional>
+#include <type_traits> /* For std::integral_constant. */
+#include <utility> /* For std::declval. */
 
 #ifndef Q_MOC_RUN
-#include <boost/range/has_range_iterator.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/or.hpp>
+    #include <boost/mpl/if.hpp>
+    #include <boost/mpl/or.hpp>
+    #include <boost/range/has_range_iterator.hpp>
 #endif // Q_MOC_RUN
 
 #include <nx/utils/type_traits.h>
 
 #include "csv_fwd.h"
-
 
 namespace QnCsvDetail {
     using namespace QnTypeTraits;

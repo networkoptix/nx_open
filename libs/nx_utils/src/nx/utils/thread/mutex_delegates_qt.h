@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include <memory>
-
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QWaitCondition>
+#include <memory>
 
 #include "mutex.h"
 

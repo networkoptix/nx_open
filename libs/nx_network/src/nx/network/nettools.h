@@ -5,8 +5,8 @@
 #include <set>
 
 #include <QtNetwork/QHostAddress>
-#include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QNetworkAddressEntry>
+#include <QtNetwork/QUdpSocket>
 
 #include <nx/network/socket_common.h>
 #include <nx/utils/mac_address.h>

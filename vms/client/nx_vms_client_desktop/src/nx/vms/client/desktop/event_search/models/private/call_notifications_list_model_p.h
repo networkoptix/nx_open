@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "../call_notifications_list_model.h"
-
 #include <QtCore/QScopedPointer>
+
+#include "../call_notifications_list_model.h"
 
 namespace nx::vms::client::desktop {
 

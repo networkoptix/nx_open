@@ -4,8 +4,8 @@
 
 #include <QtCore/QtGlobal>
 
-#include <nx/vms/client/core/common/utils/encoded_string.h>
 #include <nx/utils/url.h>
+#include <nx/vms/client/core/common/utils/encoded_string.h>
 
 namespace nx::vms::client::core {
 

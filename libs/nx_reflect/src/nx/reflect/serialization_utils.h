@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <string>
 #include <optional>
+#include <string>
 
 namespace nx::reflect {
 

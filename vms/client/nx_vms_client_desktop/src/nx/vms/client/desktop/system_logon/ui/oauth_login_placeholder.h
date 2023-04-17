@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
-
 #include <memory>
+
+#include <QtWidgets/QWidget>
 
 namespace Ui { class OauthLoginPlaceholder; }
 

@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QVector>
 #include <functional>
+
+#include <QtCore/QVector>
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {

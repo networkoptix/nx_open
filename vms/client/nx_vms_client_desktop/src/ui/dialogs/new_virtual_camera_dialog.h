@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <ui/dialogs/common/session_aware_dialog.h>
 #include <core/resource/resource_fwd.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui { class NewVirtualCameraDialog; }
 

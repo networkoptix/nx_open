@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "id_data.h"
-
 #include <QtCore/QString>
+
+#include "id_data.h"
 
 namespace nx::vms::api {
 

@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/utils/impl_ptr.h>
-
 #include <nx/vms/client/desktop/analytics/taxonomy/abstract_color_set.h>
 
 namespace nx::analytics::taxonomy { class AbstractColorType; }

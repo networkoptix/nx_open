@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/node_view/node_view/table_node_view.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/node_view/node_view/table_node_view.h>
 
 namespace nx::vms::client::desktop {
 

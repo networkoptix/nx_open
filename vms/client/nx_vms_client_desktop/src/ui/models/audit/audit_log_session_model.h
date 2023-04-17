@@ -5,9 +5,8 @@
 
 #include <QtCore/QAbstractItemModel>
 
-#include <utils/common/id.h>
-
 #include <core/resource/resource_fwd.h>
+#include <utils/common/id.h>
 
 #include "audit_log_model.h"
 

@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <QtCore/QSize>
-#include <QtCore/QSizeF>
-#include <QtCore/QRect>
-#include <QtCore/QRectF>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
+#include <QtCore/QRect>
+#include <QtCore/QRectF>
+#include <QtCore/QSize>
+#include <QtCore/QSizeF>
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>

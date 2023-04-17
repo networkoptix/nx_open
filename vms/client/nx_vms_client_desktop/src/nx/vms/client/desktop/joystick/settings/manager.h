@@ -3,16 +3,16 @@
 #pragma once
 
 #include <QtCore/QDir>
-#include <QtCore/QObject>
 #include <QtCore/QMap>
+#include <QtCore/QObject>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 #include <QtCore/QTimer>
-#include <QtCore/QSharedPointer>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/thread/mutex.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <nx/utils/impl_ptr.h>
 
 #include "device.h"
 

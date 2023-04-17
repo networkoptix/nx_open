@@ -5,9 +5,9 @@
 
 #include <utility> /* For std::move. */
 
-#include "compressed_time.h"
-
 #include <nx/fusion/fusion/fusion_serialization.h>
+
+#include "compressed_time.h"
 
 namespace QnCompressedTimeDetail {
     template<class Output>

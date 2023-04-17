@@ -4,8 +4,8 @@
 
 #include <initializer_list>
 
-#include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 

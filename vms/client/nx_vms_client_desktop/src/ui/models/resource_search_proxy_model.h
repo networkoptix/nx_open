@@ -2,13 +2,12 @@
 
 #pragma once
 
+#include <QtCore/QCollator>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSortFilterProxyModel>
-#include <QtCore/QCollator>
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-
 #include <nx/vms/client/desktop/common/models/filter_proxy_model.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 

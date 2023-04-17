@@ -2,13 +2,12 @@
 
 #pragma once
 
-extern "C"
-{
+extern "C" {
 // For declarations.
 #include <libavformat/avformat.h>
 }
 
-#include <QString>
+#include <QtCore/QString>
 
 /**
  * Utilities for ffmpeg data types which do not depend on ffmpeg implementation.

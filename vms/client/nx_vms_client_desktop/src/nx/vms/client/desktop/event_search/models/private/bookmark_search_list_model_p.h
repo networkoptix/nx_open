@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "../bookmark_search_list_model.h"
-
 #include <deque>
 #include <limits>
 #include <memory>
@@ -12,9 +10,10 @@
 
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
-
 #include <nx/vms/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
 #include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
+
+#include "../bookmark_search_list_model.h"
 
 class QnUuid;
 

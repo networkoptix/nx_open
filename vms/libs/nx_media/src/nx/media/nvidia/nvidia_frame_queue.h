@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <set>
-#include <vector>
+#include <cstdint>
 #include <deque>
 #include <mutex>
-#include <cstdint>
+#include <set>
+#include <vector>
 
 namespace nx::media::nvidia {
 

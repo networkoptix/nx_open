@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QSize>
 #include <QtCore/QThread>
-
 #include <QtGui/QImage>
 
 class QnAspectRatio;

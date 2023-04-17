@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/abstract_navigator.h>
 #include <nx/string.h>
-
 #include <nx/utils/move_only_func.h>
 
 struct QnTimePeriod;

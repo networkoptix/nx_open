@@ -6,13 +6,12 @@
 
 #include <QtCore/QCache>
 
-#include <transaction/transaction.h>
-#include <transaction/transaction_transport_header.h>
-
-#include <nx/utils/singleton.h>
 #include <nx/fusion/serialization/ubjson_functions.h>
 #include <nx/p2p/p2p_fwd.h>
 #include <nx/p2p/p2p_serialization.h>
+#include <nx/utils/singleton.h>
+#include <transaction/transaction.h>
+#include <transaction/transaction_transport_header.h>
 
 namespace ec2
 {

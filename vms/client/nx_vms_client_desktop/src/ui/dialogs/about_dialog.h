@@ -5,9 +5,9 @@
 
 #include <QtCore/QScopedPointer>
 
+#include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <core/resource/resource_fwd.h>
 
 namespace Ui {
     class AboutDialog;

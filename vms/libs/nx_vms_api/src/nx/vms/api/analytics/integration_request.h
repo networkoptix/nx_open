@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QString>
-
 #include <chrono>
+
+#include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>

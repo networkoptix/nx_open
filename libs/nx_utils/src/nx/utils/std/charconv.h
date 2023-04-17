@@ -13,7 +13,7 @@
 
 #if defined(__cpp_lib_to_chars)
 
-#include <charconv>
+    #include <charconv>
 
 namespace nx::utils::charconv {
 
@@ -31,36 +31,36 @@ using std::to_chars;
 
 #else
 
-// NOTE: The partial implementation available on Macosx has some weird problems.
-#if !__has_include(<charconv>) || __APPLE__
-#   define NX_CHARCONV_INTEGER
-#   define NX_CHARCONV_FROM_FLOAT
-#   define NX_CHARCONV_TO_FLOAT
-#elif defined(__GNUG__)
-    // libstdc++ provides partial <charconv> implementation as of gcc 8.1.
-#   define NX_CHARCONV_FROM_FLOAT
-#   define NX_CHARCONV_TO_FLOAT
-#endif
+    // NOTE: The partial implementation available on Macosx has some weird problems.
+    #if !__has_include(<charconv>) || __APPLE__
+        #define NX_CHARCONV_INTEGER
+        #define NX_CHARCONV_FROM_FLOAT
+        #define NX_CHARCONV_TO_FLOAT
+    #elif defined(__GNUG__)
+        // libstdc++ provides partial <charconv> implementation as of gcc 8.1.
+        #define NX_CHARCONV_FROM_FLOAT
+        #define NX_CHARCONV_TO_FLOAT
+    #endif
 
 // NOTE: msvc declares to_chars(..., float, ...) as "=delete" making it impossible
 // to implement them locally.
 // If needed, this <charconv> implementation may be moved to a new namespace.
 // #define NX_CHARCONV_TO_FLOAT
 
-#include <array>
-#include <cstdio>
-#include <cstdlib>
-#include <system_error>
+    #include <array>
+    #include <cstdio>
+    #include <cstdlib>
+    #include <system_error>
 
-#if !defined(NX_CHARCONV_INTEGER)
-#include <charconv>
-#endif
+    #if !defined(NX_CHARCONV_INTEGER)
+        #include <charconv>
+    #endif
 
-#include "../log/assert.h"
+    #include "../log/assert.h"
 
 namespace nx::utils::charconv {
 
-#if defined(NX_CHARCONV_INTEGER)
+    #if defined(NX_CHARCONV_INTEGER)
 
 struct from_chars_result {
     const char* ptr;
@@ -72,14 +72,14 @@ struct to_chars_result {
     std::errc ec;
 };
 
-#else
+    #else
 
 using std::from_chars_result;
 using std::to_chars_result;
 
-#endif // #if defined(NX_CHARCONV_INTEGER)
+    #endif // #if defined(NX_CHARCONV_INTEGER)
 
-#if defined(NX_CHARCONV_FROM_FLOAT) || defined(NX_CHARCONV_TO_FLOAT)
+    #if defined(NX_CHARCONV_FROM_FLOAT) || defined(NX_CHARCONV_TO_FLOAT)
 
 enum class chars_format {
     scientific = 1,
@@ -88,11 +88,11 @@ enum class chars_format {
     general = fixed | scientific
 };
 
-#else
+    #else
 
 using std::chars_format;
 
-#endif // #if defined(NX_CHARCONV_FROM_FLOAT) || defined(NX_CHARCONV_TO_FLOAT)
+    #endif // #if defined(NX_CHARCONV_FROM_FLOAT) || defined(NX_CHARCONV_TO_FLOAT)
 
 //-------------------------------------------------------------------------------------------------
 
@@ -218,7 +218,7 @@ to_chars_result float_to_chars(
 //-------------------------------------------------------------------------------------------------
 // integer types support.
 
-#if defined(NX_CHARCONV_INTEGER)
+    #if defined(NX_CHARCONV_INTEGER)
 
 inline from_chars_result from_chars(
     const char* first, const char* last,
@@ -300,7 +300,7 @@ inline to_chars_result to_chars(char* first, char* last, unsigned int value, int
     return nx::utils::charconv::detail::int_to_chars(first, last, value, base);
 }
 
-#else
+    #else
 
 template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
 // requires std::is_integral_v<T>
@@ -318,9 +318,9 @@ inline to_chars_result to_chars(char* first, char* last, T value, int base = 10)
     return std::to_chars(first, last, value, base);
 }
 
-#endif // #if defined(NX_CHARCONV_INTEGER)
+    #endif // #if defined(NX_CHARCONV_INTEGER)
 
-#if defined(NX_CHARCONV_FROM_FLOAT)
+    #if defined(NX_CHARCONV_FROM_FLOAT)
 
 //-------------------------------------------------------------------------------------------------
 // float support.
@@ -346,7 +346,7 @@ inline from_chars_result from_chars(
     return nx::utils::charconv::detail::from_chars(first, last, value, &strtold);
 }
 
-#else
+    #else
 
 template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 // requires std::is_floating_point_v<T>
@@ -358,11 +358,11 @@ inline from_chars_result from_chars(
     return std::from_chars(first, last, value, fmt);
 }
 
-#endif // #if defined(NX_CHARCONV_FROM_FLOAT)
+    #endif // #if defined(NX_CHARCONV_FROM_FLOAT)
 
 //-------------------------------------------------------------------------------------------------
 
-#if defined(NX_CHARCONV_TO_FLOAT)
+    #if defined(NX_CHARCONV_TO_FLOAT)
 
 inline to_chars_result to_chars(
     char* first, char* last,
@@ -388,7 +388,7 @@ inline to_chars_result to_chars(
     return nx::utils::charconv::detail::float_to_chars(first, last, value, fmt, precision);
 }
 
-#else
+    #else
 
 template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 // requires std::is_floating_point_v<T>
@@ -400,7 +400,7 @@ inline to_chars_result to_chars(
     return std::to_chars(first, last, value, fmt, precision);
 }
 
-#endif // defined(NX_CHARCONV_TO_FLOAT)
+    #endif // defined(NX_CHARCONV_TO_FLOAT)
 
 } // namespace nx::utils::charconv
 

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/utils/buffer.h>
-#include <nx/network/stun/message.h>
 #include <nx/network/stun/extension/stun_extension_types.h>
+#include <nx/network/stun/message.h>
+#include <nx/utils/buffer.h>
 #include <nx/utils/log/format.h>
 #include <nx/utils/string.h>
 

@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QLayout>
+#include <QtWidgets/QWidget>
 
 namespace Ui { class ExportLayoutSettingsWidget; }
 

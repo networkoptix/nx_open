@@ -4,10 +4,10 @@
 
 #include <chrono>
 
-#include <nx/vms/event/events/prolonged_event.h>
-#include <nx/vms/event/events/events_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/event/events/events_fwd.h>
+#include <nx/vms/event/events/prolonged_event.h>
 
 namespace nx::vms::event {
 

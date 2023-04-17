@@ -3,8 +3,9 @@
 #ifndef SENDER_H
 #define SENDER_H
 
-#include "messaging.h"
 #include <nx/network/socket_factory.h>
+
+#include "messaging.h"
 
 namespace nx {
 namespace network {

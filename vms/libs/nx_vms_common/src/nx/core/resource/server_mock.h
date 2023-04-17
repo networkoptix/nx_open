@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/core/resource/resource_with_local_property_storage.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/core/resource/resource_with_local_property_storage.h>
 
 namespace nx::core::resource {
 

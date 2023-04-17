@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QJsonObject>
+#include <QtCore/QObject>
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource_properties/camera/data/analytics_engine_info.h>

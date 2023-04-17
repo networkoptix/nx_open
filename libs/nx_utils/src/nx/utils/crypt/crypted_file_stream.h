@@ -4,8 +4,8 @@
 
 #include <array>
 
-#include <QtCore/QString>
 #include <QtCore/QFile>
+#include <QtCore/QString>
 
 #include <nx/utils/thread/mutex.h>
 

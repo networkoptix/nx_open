@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <nx/vms/api/metrics.h>
-#include <nx/utils/scope_guard.h>
-#include <nx/utils/value_history.h>
-#include <nx/utils/move_only_func.h>
 #include <nx/utils/exception.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/move_only_func.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/value_history.h>
+#include <nx/vms/api/metrics.h>
 
 #include "resource_description.h"
 

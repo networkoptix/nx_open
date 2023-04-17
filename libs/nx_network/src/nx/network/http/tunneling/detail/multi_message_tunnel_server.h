@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include "../../server/rest/http_server_rest_message_dispatcher.h"
 #include "basic_custom_tunnel_server.h"
 #include "experimental_tunnel_server.h"
 #include "request_paths.h"
-#include "../../server/rest/http_server_rest_message_dispatcher.h"
 
 namespace nx::network::http::tunneling::detail {
 

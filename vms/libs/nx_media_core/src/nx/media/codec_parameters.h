@@ -2,8 +2,7 @@
 
 #pragma once
 
-extern "C"
-{
+extern "C" {
 #include <libavformat/avformat.h>
 } // extern "C"
 

@@ -5,7 +5,6 @@
 #include <QtCore/QCoreApplication>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/uuid.h>
 
 class QnBusinessRuleViewModel;

@@ -4,8 +4,8 @@
 
 #include <QtCore/QAbstractItemModel>
 
-#include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark.h>
+#include <core/resource/resource_fwd.h>
 
 class QnSearchBookmarksModelPrivate;
 

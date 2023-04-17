@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include <nx/utils/move_only_func.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/common/threadsafe_item_storage.h>
-#include <nx/utils/move_only_func.h>
 
 class NX_VMS_COMMON_API QnResourcePropertyDictionary:
     public QObject,

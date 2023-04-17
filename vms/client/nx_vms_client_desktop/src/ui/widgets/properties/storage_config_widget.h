@@ -2,24 +2,19 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QDateTime>
 #include <QtCore/QModelIndex>
+#include <QtWidgets/QWidget>
 
 #include <api/model/api_model_fwd.h>
-
 #include <core/resource/resource_fwd.h>
-
+#include <nx/vms/api/types/event_rule_types.h>
+#include <nx/vms/api/types/resource_types.h>
 #include <server/server_storage_manager_fwd.h>
-
 #include <ui/models/storage_model_info.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-
-#include <nx/vms/api/types/event_rule_types.h>
-#include <nx/vms/api/types/resource_types.h>
 
 namespace Ui { class StorageConfigWidget; }
 class QMenu;

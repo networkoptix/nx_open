@@ -4,8 +4,8 @@
 
 #include <QtCore/QSet>
 
-#include <statistics/statistics_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <statistics/statistics_fwd.h>
 
 struct NX_VMS_COMMON_API QnStatisticsSettings
 {

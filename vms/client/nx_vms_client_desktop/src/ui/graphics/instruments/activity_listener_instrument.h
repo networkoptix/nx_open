@@ -3,9 +3,9 @@
 #ifndef QN_ACTIVITY_LISTENER_INSTRUMENT_H
 #define QN_ACTIVITY_LISTENER_INSTRUMENT_H
 
-#include "instrument.h"
-
 #include <QtCore/QBasicTimer>
+
+#include "instrument.h"
 
 /**
  * This instrument makes it possible to listen to user activity.

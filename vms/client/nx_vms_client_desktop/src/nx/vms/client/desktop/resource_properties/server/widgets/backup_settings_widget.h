@@ -4,9 +4,9 @@
 
 #include <memory>
 
+#include <core/resource/resource_fwd.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <core/resource/resource_fwd.h>
 
 namespace Ui { class BackupSettingsWidget; }
 

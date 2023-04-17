@@ -5,9 +5,9 @@
 
 #include <utility> /* For std::move. */
 
-#include "ubjson.h"
-
 #include <nx/fusion/fusion/fusion_serialization.h>
+
+#include "ubjson.h"
 
 namespace QnUbjsonDetail {
     template<class Output>

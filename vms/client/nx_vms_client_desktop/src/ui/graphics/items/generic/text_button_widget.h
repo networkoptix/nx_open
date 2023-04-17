@@ -3,8 +3,8 @@
 #ifndef QN_TEXT_BUTTON_WIDGET_H
 #define QN_TEXT_BUTTON_WIDGET_H
 
-#include "image_button_widget.h"
 #include "framed_widget.h"
+#include "image_button_widget.h"
 
 /**
  * An image button widget that can show text and draw a frame.

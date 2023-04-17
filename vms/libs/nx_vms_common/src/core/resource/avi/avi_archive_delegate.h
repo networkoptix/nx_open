@@ -2,8 +2,7 @@
 
 #pragma once
 
-extern "C"
-{
+extern "C" {
 // For typedef struct AVIOContext.
 #include <libavformat/avio.h>
 };

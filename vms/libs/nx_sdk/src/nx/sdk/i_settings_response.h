@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <nx/sdk/interface.h>
-
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/i_string_map.h>
+#include <nx/sdk/interface.h>
 
 namespace nx::sdk {
 

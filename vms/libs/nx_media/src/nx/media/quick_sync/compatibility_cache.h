@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <QSize>
 #include <deque>
 #include <map>
 #include <mutex>
 #include <vector>
 
-extern "C"
-{
+#include <QtCore/QSize>
+
+extern "C" {
 #include <libavcodec/avcodec.h>
 
 } // extern "C"

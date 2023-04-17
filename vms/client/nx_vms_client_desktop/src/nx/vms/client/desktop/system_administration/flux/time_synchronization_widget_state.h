@@ -5,10 +5,9 @@
 #include <algorithm>
 #include <chrono>
 
-#include <nx/vms/client/desktop/common/flux/abstract_flux_state.h>
-
 #include <common/common_globals.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/common/flux/abstract_flux_state.h>
 
 namespace nx::vms::client::desktop {
 

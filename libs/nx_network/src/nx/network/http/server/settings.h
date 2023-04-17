@@ -5,8 +5,8 @@
 #include <chrono>
 #include <vector>
 
-#include <nx/reflect/instrument.h>
 #include <nx/network/socket_common.h>
+#include <nx/reflect/instrument.h>
 
 class SettingsReader;
 

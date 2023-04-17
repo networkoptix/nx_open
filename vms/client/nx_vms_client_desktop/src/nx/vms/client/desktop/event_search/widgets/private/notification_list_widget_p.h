@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "../notification_list_widget.h"
-
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
@@ -11,6 +9,8 @@
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
+
+#include "../notification_list_widget.h"
 
 class QSortFilterProxyModel;
 class QToolButton;

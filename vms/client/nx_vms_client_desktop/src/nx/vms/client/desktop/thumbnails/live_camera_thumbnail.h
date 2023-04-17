@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/utils/impl_ptr.h>
-
 #include <nx/vms/client/core/thumbnails/abstract_caching_resource_thumbnail.h>
 #include <nx/vms/client/core/thumbnails/camera_async_image_request.h>
 

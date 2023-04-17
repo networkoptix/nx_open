@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <optional>
 #include <map>
+#include <optional>
 
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 #include <nx/network/connection_server/stream_socket_server.h>

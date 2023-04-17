@@ -4,9 +4,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_pc_data.h>
-#include <utils/common/id.h>
-
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <utils/common/id.h>
 
 class QnVideoWallItem;
 class QGraphicsAnchorLayout;

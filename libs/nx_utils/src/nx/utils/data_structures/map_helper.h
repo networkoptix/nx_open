@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <tuple>
 #include <set>
+#include <tuple>
 #include <type_traits>
 
-#include <nx/utils/std/optional.h>
 #include <nx/utils/general_macros.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx::utils::data_structures {
 

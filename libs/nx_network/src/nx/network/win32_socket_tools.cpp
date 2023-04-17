@@ -2,14 +2,12 @@
 
 #ifdef _WIN32
 
-#include <winsock2.h>
-#include <Windows.h> //< You HAVE to include winsock2.h BEFORE windows.h.
-#include <Ws2tcpip.h>
-#include <tcpmib.h>
-#include <iphlpapi.h>
-#include <Tcpestats.h>
-
 #include <memory>
+
+#include "system_network_headers.h"
+
+#include <Tcpestats.h>
+#include <tcpmib.h>
 
 #include <nx/utils/platform/win32_syscall_resolver.h>
 

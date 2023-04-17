@@ -4,10 +4,8 @@
 
 #include <QtCore/QJsonObject>
 
-#include <nx/utils/uuid.h>
-
 #include <nx/fusion/model_functions_fwd.h>
-
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/types/motion_types.h>
 
 #include "settings.h"

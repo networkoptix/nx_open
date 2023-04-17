@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <core/resource/resource_fwd.h>
 #include <core/resource/client_camera.h>
+#include <core/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop::test {
 

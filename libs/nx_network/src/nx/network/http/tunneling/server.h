@@ -7,13 +7,13 @@
 
 #include <nx/utils/move_only_func.h>
 
-#include "abstract_tunnel_authorizer.h"
-#include "detail/connection_upgrade_tunnel_server.h"
-#include "detail/get_post_tunnel_server.h"
-#include "detail/multi_message_tunnel_server.h"
-#include "detail/experimental_tunnel_server.h"
 #include "../http_types.h"
 #include "../server/rest/http_server_rest_message_dispatcher.h"
+#include "abstract_tunnel_authorizer.h"
+#include "detail/connection_upgrade_tunnel_server.h"
+#include "detail/experimental_tunnel_server.h"
+#include "detail/get_post_tunnel_server.h"
+#include "detail/multi_message_tunnel_server.h"
 
 namespace nx::network::http::tunneling {
 

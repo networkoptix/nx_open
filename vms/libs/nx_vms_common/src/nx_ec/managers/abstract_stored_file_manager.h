@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <nx/utils/async_handler_executor.h>
-
+#include <QtCore/QByteArray>
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtCore/QByteArray>
+
+#include <nx/utils/async_handler_executor.h>
 
 #include "../ec_api_common.h"
 

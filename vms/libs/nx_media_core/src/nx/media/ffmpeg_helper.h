@@ -2,8 +2,7 @@
 
 #pragma once
 
-extern "C"
-{
+extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avio.h>
 #include <libavutil/imgutils.h>

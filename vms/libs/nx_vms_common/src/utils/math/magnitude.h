@@ -3,9 +3,9 @@
 #ifndef QN_MAGNITUDE_H
 #define QN_MAGNITUDE_H
 
-#include <nx/utils/log/assert.h>
-
 #include <typeinfo>
+
+#include <nx/utils/log/assert.h>
 
 class QPoint;
 class QPointF;

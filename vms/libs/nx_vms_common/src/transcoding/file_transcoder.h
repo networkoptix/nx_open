@@ -4,21 +4,20 @@
 
 #include <memory>
 
-#include <QtCore/QIODevice>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
-
-namespace nx { namespace metrics { struct Storage; } }
-
-extern "C"
-{
-    #include <libavcodec/avcodec.h>
+extern "C" {
+#include <libavcodec/avcodec.h>
 }
 
-#include <core/resource/avi/avi_archive_delegate.h>
-#include <transcoding/ffmpeg_transcoder.h>
-#include <nx/utils/thread/long_runnable.h>
+#include <QtCore/QIODevice>
+
 #include <common/common_module_aware.h>
+#include <core/resource/avi/avi_archive_delegate.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
+#include <transcoding/ffmpeg_transcoder.h>
+
+namespace nx::metrics { struct Storage; }
 
 class QnAviArchiveDelegate;
 

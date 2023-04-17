@@ -4,8 +4,8 @@
 
 #include <iostream>
 
-#include <core/resource_access/resource_access_map.h>
 #include <core/resource_access/resource_access_details.h>
+#include <core/resource_access/resource_access_map.h>
 #include <nx/vms/api/types/access_rights_types.h>
 
 namespace nx::vms::api {

@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <nx/vms/api/types/resource_types.h>
+
 #include "id_data.h"
 #include "module_information.h"
-
-#include <nx/vms/api/types/resource_types.h>
 
 namespace nx {
 namespace vms {

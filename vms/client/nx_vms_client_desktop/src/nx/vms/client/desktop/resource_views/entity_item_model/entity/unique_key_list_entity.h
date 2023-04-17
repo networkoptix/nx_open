@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>

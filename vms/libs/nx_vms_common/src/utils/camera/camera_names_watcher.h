@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QObject>
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/common/system_context_aware.h>

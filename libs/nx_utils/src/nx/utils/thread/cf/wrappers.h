@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "cfuture.h"
 #include <nx/utils/system_error.h>
+
+#include "cfuture.h"
 
 namespace cf {
 

@@ -7,7 +7,6 @@
 #include <QtGui/QIcon>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 
 /**

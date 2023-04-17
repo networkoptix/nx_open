@@ -3,10 +3,10 @@
 #ifndef QN_ANIMATOR_H
 #define QN_ANIMATOR_H
 
+#include <QtCore/QEasingCurve>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QVariant>
-#include <QtCore/QEasingCurve>
 
 #include <nx/vms/client/desktop/common/utils/accessor.h>
 #include <ui/common/converter.h>

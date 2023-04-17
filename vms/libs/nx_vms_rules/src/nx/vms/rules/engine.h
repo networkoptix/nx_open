@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include <optional>
 #include <memory>
+#include <optional>
 #include <unordered_map>
 
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <QtCore/QSet>
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
+#include <QtCore/QSet>
 
 #include <nx/utils/uuid.h>
 

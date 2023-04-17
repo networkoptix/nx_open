@@ -2,12 +2,11 @@
 
 #pragma once
 
+#include <nx/sdk/helpers/action_response.h>
+#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/i_active_setting_changed_response.h>
 #include <nx/sdk/ptr.h>
-
-#include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/action_response.h>
-#include <nx/sdk/helpers/settings_response.h>
 
 namespace nx::sdk {
 

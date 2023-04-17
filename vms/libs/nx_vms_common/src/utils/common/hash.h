@@ -5,11 +5,12 @@
 
 #include <typeindex>
 
-#include <QtCore/QPoint>
 #include <QtCore/QHash>
-#include <nx/utils/uuid.h>
+#include <QtCore/QPoint>
 #include <QtGui/QColor>
 #include <QtNetwork/QAuthenticator>
+
+#include <nx/utils/uuid.h>
 
 inline size_t qHash(const QColor &color, size_t seed = 0) noexcept
 {

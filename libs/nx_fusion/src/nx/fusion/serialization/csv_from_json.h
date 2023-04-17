@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include <QJsonArray>
-#include <QJsonObject>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 
 #include "csv.h"
+#include "lexical.h"
 
 namespace QnCsvDetail {
 

@@ -3,12 +3,11 @@
 #ifndef PTZ_TOURS_DIALOG_H
 #define PTZ_TOURS_DIALOG_H
 
-#include <core/resource/resource_fwd.h>
 #include <core/ptz/ptz_fwd.h>
-
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/singleton.h>
 #include <ui/dialogs/abstract_ptz_dialog.h>
 #include <ui/models/ptz_manage_model.h>
-#include <nx/utils/singleton.h>
 
 namespace Ui {
     class PtzManageDialog;

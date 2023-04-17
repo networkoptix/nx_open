@@ -3,19 +3,17 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
-#include <QtCore/QPointer>
 
-#include <utils/common/forward.h>
-
-#include <ui/dialogs/common/message_box.h>
-#include <ui/dialogs/common/message_box_helper.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/generic_tabbed_dialog.h>
-
+#include <ui/dialogs/common/message_box.h>
+#include <ui/dialogs/common/message_box_helper.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <utils/common/forward.h>
 
 #define COMMA ,
 #define ID(x) x

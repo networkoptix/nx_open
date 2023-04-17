@@ -5,7 +5,6 @@
 #include <QtCore/QString>
 
 #include <CoreFoundation/CoreFoundation.h>
-
 #include <nx/utils/platform/core_foundation_mac/cf_ref_holder.h>
 #include <nx/utils/platform/core_foundation_mac/cf_string.h>
 

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QObject>
 
 namespace nx::vms::client::desktop {
 

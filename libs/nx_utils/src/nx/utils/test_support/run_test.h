@@ -16,12 +16,12 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/rlimit.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/filesystem.h>
 
 #include "test_options.h"
-#include <nx/utils/nx_utils_ini.h>
 
 namespace nx {
 namespace utils {

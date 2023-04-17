@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <stack>
-
 #include <QMutex>
 #include <QWaitCondition>
+#include <stack>
 
 #include "mutex.h"
 #include "mutex_lock_analyzer.h"

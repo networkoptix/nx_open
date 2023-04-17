@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <ui/delegates/select_resources_delegate_editor_button.h>
-
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <ui/delegates/select_resources_delegate_editor_button.h>
 
 class QnResourceSelectionDialogDelegate;
 class QnSubjectValidationPolicy;

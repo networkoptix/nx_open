@@ -5,9 +5,9 @@
 #include <chrono>
 #include <functional>
 
-#include <nx/utils/thread/cf/cfuture.h>
-#include <nx/utils/move_only_func.h>
 #include <nx/utils/interruption_flag.h>
+#include <nx/utils/move_only_func.h>
+#include <nx/utils/thread/cf/cfuture.h>
 
 #include "aio_event_handler.h"
 #include "basic_pollable.h"

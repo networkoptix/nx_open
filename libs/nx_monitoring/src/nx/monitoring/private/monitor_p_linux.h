@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "../monitor_linux.h"
 #include <nx/utils/elapsed_timer.h>
 #include <sys/times.h>
+
+#include "../monitor_linux.h"
 
 namespace nx::monitoring {
 

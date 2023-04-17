@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 
 namespace nx::vms::client::desktop {

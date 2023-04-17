@@ -5,8 +5,8 @@
 
 #include <exception>
 
-#include <QtCore/QString>
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 class QnException: virtual public std::exception {
 public:

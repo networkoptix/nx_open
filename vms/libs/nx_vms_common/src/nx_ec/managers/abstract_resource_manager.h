@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <nx/utils/uuid.h>
-#include <nx/utils/async_handler_executor.h>
-#include <core/resource/resource_fwd.h>
-#include <common/common_globals.h>
-#include <nx/vms/api/data/resource_data.h>
-
 #include <QtCore/QObject>
 #include <QtCore/QVector>
+
+#include <common/common_globals.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/async_handler_executor.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/api/data/resource_data.h>
 
 #include "../ec_api_common.h"
 

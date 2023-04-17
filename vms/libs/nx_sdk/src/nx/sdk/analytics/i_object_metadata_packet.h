@@ -4,8 +4,8 @@
 
 #include <nx/sdk/interface.h>
 
-#include "i_object_metadata.h"
 #include "i_compound_metadata_packet.h"
+#include "i_object_metadata.h"
 
 namespace nx::sdk::analytics {
 

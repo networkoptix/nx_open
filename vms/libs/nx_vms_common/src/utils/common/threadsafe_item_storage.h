@@ -5,10 +5,8 @@
 #include <QtCore/QHash>
 
 #include <nx/utils/thread/mutex.h>
-
-#include <utils/common/functional.h>
-
 #include <nx/utils/uuid.h>
+#include <utils/common/functional.h>
 
 template <class T> class QnThreadsafeItemStorage;
 

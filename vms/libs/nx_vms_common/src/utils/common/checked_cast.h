@@ -4,10 +4,11 @@
 #define QN_CORE_CHECKED_CAST_H
 
 #include <cassert>
+
 #include <nx/utils/log/assert.h>
 #ifndef Q_MOC_RUN
-#include <boost/type_traits/is_pointer.hpp>
-#include <boost/type_traits/is_reference.hpp>
+    #include <boost/type_traits/is_pointer.hpp>
+    #include <boost/type_traits/is_reference.hpp>
 #endif
 
 #include <QtCore/QSharedPointer>

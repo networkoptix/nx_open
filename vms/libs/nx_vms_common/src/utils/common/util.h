@@ -4,8 +4,8 @@
 
 #include <chrono>
 
-#include <QtCore/QString>
 #include <QtCore/QDateTime>
+#include <QtCore/QString>
 
 NX_VMS_COMMON_API QString strPadLeft(const QString &str, int len, char ch);
 

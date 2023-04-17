@@ -9,11 +9,11 @@
 #include <nx/network/ssl/context.h>
 
 #include "server/authentication_dispatcher.h"
+#include "server/handler/http_server_handler_custom.h"
 #include "server/http_message_dispatcher.h"
 #include "server/http_server_base_authentication_manager.h"
 #include "server/http_server_plain_text_credentials_provider.h"
 #include "server/http_stream_socket_server.h"
-#include "server/handler/http_server_handler_custom.h"
 #include "server/rest/http_server_rest_message_dispatcher.h"
 
 namespace nx::network::http {

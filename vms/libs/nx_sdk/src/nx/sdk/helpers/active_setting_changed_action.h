@@ -4,10 +4,9 @@
 
 #include <string>
 
-#include <nx/sdk/i_active_setting_changed_action.h>
-
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/i_active_setting_changed_action.h>
 
 namespace nx::sdk {
 

@@ -4,8 +4,8 @@
 
 #include <list>
 
-#include <nx/utils/move_only_func.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/move_only_func.h>
 
 namespace nx::network::aio::detail {
 

@@ -5,10 +5,10 @@
 #include <optional>
 
 #include <nx/network/aio/scheduler.h>
-#include <nx/network/http/http_types.h>
-#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/mediator/api/connection_speed.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/speed_test/abstract_speed_tester.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/subscription.h>
 #include <nx/utils/url.h>
 

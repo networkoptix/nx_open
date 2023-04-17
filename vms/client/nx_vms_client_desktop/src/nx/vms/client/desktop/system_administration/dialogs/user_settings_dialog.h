@@ -11,7 +11,6 @@
 #include "../globals/user_settings_global.h"
 #include "../models/members_model.h"
 
-
 namespace nx::vms::client::desktop {
 
 struct UserSettingsDialogState

@@ -5,11 +5,11 @@
 #include <functional>
 
 #include <nx/network/async_stoppable.h>
+#include <nx/network/connection_server/base_stream_protocol_connection.h>
+#include <nx/network/connection_server/stream_socket_server.h>
 #include <nx/network/stun/message.h>
 #include <nx/network/stun/message_parser.h>
 #include <nx/network/stun/message_serializer.h>
-#include <nx/network/connection_server/base_stream_protocol_connection.h>
-#include <nx/network/connection_server/stream_socket_server.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_server_connection.h"

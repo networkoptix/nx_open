@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <optional>
 #include <tuple>
+
+#include <stdint.h>
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/buffer.h>

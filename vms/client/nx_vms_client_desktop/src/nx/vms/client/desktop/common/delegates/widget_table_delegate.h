@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QAbstractItemModel>
+#include <QtCore/QObject>
 
 #include <ui/common/indents.h>
 

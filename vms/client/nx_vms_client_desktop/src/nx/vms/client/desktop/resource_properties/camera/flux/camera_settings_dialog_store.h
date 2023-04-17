@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <QtCore/QJsonObject>
 #include <QtCore/QList>
 #include <QtCore/QObject>
-#include <QtCore/QJsonObject>
 
 #include <api/model/api_ioport_data.h>
 #include <common/common_globals.h>

@@ -5,11 +5,10 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include <recording/time_period.h>
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
+#include <recording/time_period.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QMenu;
 class QLabel;

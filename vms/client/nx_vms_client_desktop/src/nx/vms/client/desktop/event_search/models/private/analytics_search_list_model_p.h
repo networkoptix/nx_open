@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "../analytics_search_list_model.h"
-
 #include <chrono>
 #include <deque>
 #include <functional>
@@ -11,9 +9,9 @@
 #include <memory>
 #include <vector>
 
+#include <QtCore/QHash>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSet>
-#include <QtCore/QHash>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QTimer>
 
@@ -27,6 +25,8 @@
 #include <nx/vms/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
 #include <nx/vms/client/desktop/event_search/utils/live_analytics_receiver.h>
 #include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
+
+#include "../analytics_search_list_model.h"
 
 class QnUuid;
 class QnMediaResourceWidget;

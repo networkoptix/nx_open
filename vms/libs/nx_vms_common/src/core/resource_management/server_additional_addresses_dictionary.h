@@ -3,8 +3,8 @@
 #pragma once
 
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 
 class NX_VMS_COMMON_API QnServerAdditionalAddressesDictionary
 {

@@ -4,7 +4,6 @@
 
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QString>
-
 #include <QtGui/QIcon>
 
 #include <nx/vms/utils/translation/translation.h>

@@ -4,10 +4,10 @@
 
 #include <QtCore/QThread>
 
-#include "abstract_transaction_message_bus.h"
 #include <core/resource_access/user_access_data.h>
-
 #include <nx/vms/api/types/connection_types.h>
+
+#include "abstract_transaction_message_bus.h"
 
 namespace ec2
 {

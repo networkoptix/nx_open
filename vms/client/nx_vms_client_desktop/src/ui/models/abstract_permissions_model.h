@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <core/resource_access/resource_access_subject.h>
-#include <core/resource/resource_fwd.h>
-
 #include <common/common_globals.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource_access/resource_access_subject.h>
 
 class QnAbstractPermissionsModel
 {

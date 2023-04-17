@@ -3,7 +3,6 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/vms/client/desktop/common/dialogs/generic_tabbed_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>

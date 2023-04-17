@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <ui/dialogs/common/button_box_dialog.h>
-
 #include <nx/utils/std/optional.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 
 namespace Ui { class CameraCredentialsDialog; }
 

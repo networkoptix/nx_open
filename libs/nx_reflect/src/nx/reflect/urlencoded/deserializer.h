@@ -2,12 +2,13 @@
 
 #pragma once
 
-#include <unordered_map>
 #include <optional>
+#include <unordered_map>
+
+#include <boost/algorithm/string.hpp>
 
 #include <nx/reflect/generic_visitor.h>
 #include <nx/reflect/instrument.h>
-#include <boost/algorithm/string.hpp>
 
 #include "../from_string.h"
 #include "../type_utils.h"

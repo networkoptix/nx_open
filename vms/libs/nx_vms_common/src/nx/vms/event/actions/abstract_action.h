@@ -6,13 +6,12 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QVector>
 
-#include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
-
-#include <nx/vms/event/event_fwd.h>
-#include <nx/vms/event/action_parameters.h>
-#include <nx/vms/event/event_parameters.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/event_parameters.h>
+#include <utils/common/id.h>
 
 class QnResourcePool;
 

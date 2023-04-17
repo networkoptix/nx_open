@@ -5,9 +5,11 @@
 #ifdef __linux__
 
 #include <memory>
-#include <mfx/mfxvideo++.h>
-#include <QtMultimedia/QVideoFrame>
+
 #include <QtGui/QOpenGLFunctions>
+#include <QtMultimedia/QVideoFrame>
+
+#include <mfx/mfxvideo++.h>
 #include <va/va.h>
 
 extern "C" {

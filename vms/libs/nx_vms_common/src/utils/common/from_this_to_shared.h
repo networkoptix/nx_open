@@ -3,6 +3,7 @@
 #pragma once
 
 #include <cassert>
+
 #include <nx/utils/log/assert.h>
 
 #include "core/resource/shared_resource_pointer.h"

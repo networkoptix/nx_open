@@ -3,10 +3,10 @@
 #ifndef ROUTER_H
 #define ROUTER_H
 
+#include <QMutex>
+
 #include <nx/network/socket_factory.h>
 #include <nx/utils/subscription.h>
-
-#include <QMutex>
 
 namespace nx {
 namespace network {

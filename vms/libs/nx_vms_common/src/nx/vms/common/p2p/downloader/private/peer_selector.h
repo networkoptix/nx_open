@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/utils/uuid.h>
 #include <nx/utils/os_info.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 
 namespace nx::vms::common::p2p::downloader {

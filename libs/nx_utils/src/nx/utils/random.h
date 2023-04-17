@@ -3,8 +3,8 @@
 #pragma once
 
 #include <initializer_list>
-#include <random>
 #include <limits>
+#include <random>
 #include <type_traits>
 
 #include <QtCore/QByteArray>

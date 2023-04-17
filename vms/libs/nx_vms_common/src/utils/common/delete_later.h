@@ -5,6 +5,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QThread>
+
 #include "event_loop.h"
 
 inline void qnDeleteLater(QObject *object)

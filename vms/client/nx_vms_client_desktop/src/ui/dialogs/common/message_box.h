@@ -6,7 +6,6 @@
 #include <QtWidgets/QDialogButtonBox>
 
 #include <client/client_globals.h>
-
 #include <ui/dialogs/common/dialog.h>
 
 namespace Ui { class QnMessageBox; }

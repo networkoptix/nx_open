@@ -4,8 +4,8 @@
 
 #include <string>
 
-#include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 
 #include <nx/reflect/enum_instrument.h>

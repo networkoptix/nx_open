@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "map.h"
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/rebuild_state.h>
+
+#include "map.h"
 
 namespace nx::vms::api {
 

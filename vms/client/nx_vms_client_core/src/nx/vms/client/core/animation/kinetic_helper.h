@@ -5,10 +5,9 @@
 #include <limits>
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore5Compat/QLinkedList>
 #include <QtCore/QPair>
 #include <QtCore/QtMath>
-#include <QDebug>
+#include <QtCore5Compat/QLinkedList>
 
 namespace nx::vms::client::core {
 namespace animation {

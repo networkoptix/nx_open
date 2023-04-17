@@ -4,7 +4,7 @@
 #define QN_FUSION_SERIALIZATION_H
 
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/tuple/enum.hpp>
+    #include <boost/preprocessor/tuple/enum.hpp>
 #endif
 
 #include "fusion.h"

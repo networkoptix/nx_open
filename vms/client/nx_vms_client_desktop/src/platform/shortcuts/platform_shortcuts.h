@@ -3,8 +3,9 @@
 #ifndef QN_PLATFORM_SHORTCUTS_H
 #define QN_PLATFORM_SHORTCUTS_H
 
-#include <QtCore/QObject>
 #include <QVariant>
+
+#include <QtCore/QObject>
 
 /**
  * The <tt>QnPlatformShortcuts</tt> class is intended for access to platform's shortcuts.

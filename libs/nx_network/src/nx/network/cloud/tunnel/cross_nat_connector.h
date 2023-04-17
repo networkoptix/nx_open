@@ -7,18 +7,17 @@
 #include <memory>
 #include <optional>
 
+#include <nx/network/address_resolver.h>
 #include <nx/network/aio/async_operation_wrapper.h>
 #include <nx/network/aio/timer.h>
-#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/data/connect_data.h>
 #include <nx/network/cloud/mediator_client_connections.h>
 #include <nx/network/cloud/mediator_connector.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/result_counter.h>
-#include <nx/utils/type_utils.h>
 #include <nx/utils/system_error.h>
-
-#include <nx/utils/async_operation_guard.h>
+#include <nx/utils/type_utils.h>
 
 #include "abstract_cross_nat_connector.h"
 #include "abstract_outgoing_tunnel_connection.h"

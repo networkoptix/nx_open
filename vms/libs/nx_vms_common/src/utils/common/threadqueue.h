@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include <vector>
 #include <queue>
+#include <vector>
 
 #include <QtCore/QQueue>
 #include <QtCore/QVariant>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/thread/semaphore.h>
 
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/semaphore.h>
+#include <nx/utils/thread/wait_condition.h>
 
 static const qint32 MAX_THREAD_QUEUE_SIZE = 256;
 

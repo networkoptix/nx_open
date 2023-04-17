@@ -3,11 +3,12 @@
 #ifndef QN_INSTRUMENT_MANAGER_H
 #define QN_INSTRUMENT_MANAGER_H
 
+#include <QtCore/QList>
 #include <QtCore/QObject>
 #include <QtCore/QSet>
-#include <QtCore/QList>
-#include "instrument.h"
+
 #include "installation_mode.h"
+#include "instrument.h"
 
 class QGraphicsItem;
 class QGraphicsScene;

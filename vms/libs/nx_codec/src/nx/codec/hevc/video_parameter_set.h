@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <vector>
+
+#include <stdint.h>
 
 #include <nx/codec/hevc/hdr_parameters.h>
 #include <nx/codec/hevc/profile_tier_level.h>

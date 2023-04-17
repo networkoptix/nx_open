@@ -6,9 +6,9 @@
 #include <QtCore/QPointer>
 #include <QtWidgets/QGraphicsObject>
 
-#include <utils/common/hash.h> /* For qHash(QPoint). */
-#include <ui/utils/viewport_scale_watcher.h>
 #include <ui/animation/animated.h>
+#include <ui/utils/viewport_scale_watcher.h>
+#include <utils/common/hash.h> /* For qHash(QPoint). */
 
 class AnimationTimer;
 

@@ -10,8 +10,8 @@
 
 #include <nx/network/debug/object_instance_counter.h>
 
-#include "request_processing_types.h"
 #include "../abstract_msg_body_source.h"
+#include "request_processing_types.h"
 
 namespace nx::network::http {
 

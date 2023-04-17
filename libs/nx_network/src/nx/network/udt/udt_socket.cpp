@@ -2,26 +2,24 @@
 
 #include "udt_socket.h"
 
-#ifdef _WIN32
-#  include <ws2tcpip.h>
-#  include <iphlpapi.h>
-#else
-#  include <netinet/tcp.h>
-#endif
+#include <nx/network/system_network_headers.h>
 
-#include <udt/udt.h>
+#ifndef _WIN32
+    #include <netinet/tcp.h>
+#endif
 
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/system_socket.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std/future.h>
+#include <udt/udt.h>
 
-#include "udt_socket_impl.h"
-#include "../aio/async_socket_helper.h"
 #include "../address_resolver.h"
+#include "../aio/async_socket_helper.h"
+#include "udt_socket_impl.h"
 #ifdef _WIN32
-#include "../win32_socket_tools.h"
+    #include "../win32_socket_tools.h"
 #endif
 #include "../system_socket_address.h"
 

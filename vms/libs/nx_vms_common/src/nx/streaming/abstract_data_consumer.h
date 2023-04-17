@@ -4,8 +4,8 @@
 #define abstract_data_consumer_h_2111
 
 #include <core/dataconsumer/abstract_data_receptor.h>
-#include <nx/utils/thread/long_runnable.h>
 #include <nx/streaming/data_packet_queue.h>
+#include <nx/utils/thread/long_runnable.h>
 
 class NX_VMS_COMMON_API QnAbstractDataConsumer
 :

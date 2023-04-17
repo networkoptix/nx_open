@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <deque>
 #include <map>
 #include <mutex>
+
+#include <stdint.h>
 
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QString>

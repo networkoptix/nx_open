@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QObject>
-
 #include <QtWidgets/QStyledItemDelegate>
 
 #include <ui/common/text_pixmap_cache.h>

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource/resource_media_layout.h>
 #include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 
 /*
 * QnThumbnailsStreamReader gets frame sequence in the selected range with defined step.

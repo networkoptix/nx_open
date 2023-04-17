@@ -5,11 +5,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
 
+#include <nx/reflect/enum_instrument.h>
+
+#include "abstract_attribute_set.h"
 #include "abstract_color_set.h"
 #include "abstract_enumeration.h"
-#include "abstract_attribute_set.h"
-
-#include <nx/reflect/enum_instrument.h>
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 

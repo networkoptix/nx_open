@@ -9,8 +9,8 @@
 #include <nx/network/system_socket.h>
 #include <nx/utils/move_only_func.h>
 
-#include "tunnel_tcp_abstract_endpoint_verificator.h"
 #include "../abstract_tunnel_connector.h"
+#include "tunnel_tcp_abstract_endpoint_verificator.h"
 
 namespace nx::network::cloud::tcp {
 

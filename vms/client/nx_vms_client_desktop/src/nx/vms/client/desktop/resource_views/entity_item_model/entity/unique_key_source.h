@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 

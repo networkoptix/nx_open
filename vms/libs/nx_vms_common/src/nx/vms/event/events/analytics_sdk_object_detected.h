@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/event/events/instant_event.h>
 #include <nx/vms/event/events/events_fwd.h>
+#include <nx/vms/event/events/instant_event.h>
 
 class QnUuid;
 

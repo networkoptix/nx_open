@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QObject>
 #include <QtGui/QVector2D>
 
 namespace nx::vms::client::core {

@@ -2,7 +2,6 @@
 
 #pragma once
 
-
 #include <nx/utils/std/cppnx.h>
 
 #include "value_group_monitor.h"

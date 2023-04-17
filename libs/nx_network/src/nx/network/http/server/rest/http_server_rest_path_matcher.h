@@ -7,8 +7,8 @@
 #include <regex>
 #include <string>
 
-#include "../request_matcher.h"
 #include "../../http_types.h"
+#include "../request_matcher.h"
 
 namespace nx::network::http::server::rest {
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QString>
+#include <QtCore/QString>
 
 namespace nx {
 namespace utils {

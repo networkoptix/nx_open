@@ -3,7 +3,6 @@
 #pragma once
 
 #include <core/ptz/ptz_constants.h>
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/serialization/qt_core_types.h>
 

@@ -7,7 +7,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
 

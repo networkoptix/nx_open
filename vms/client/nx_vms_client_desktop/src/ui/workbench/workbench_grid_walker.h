@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QRect>
 #include <QtCore/QPoint>
+#include <QtCore/QRect>
 
 /**
  * This is a helper class for guided iteration over workbench layout grid.

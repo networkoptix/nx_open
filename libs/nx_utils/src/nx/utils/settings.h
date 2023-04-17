@@ -2,18 +2,15 @@
 
 #pragma once
 
-#include <map>
-#include <functional>
+#include <QJsonObject>
+#include <QSettings>
 #include <chrono>
+#include <functional>
+#include <map>
 
 #include <nx/reflect/instrument.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
-
-#include <QSettings>
-#include <QJsonObject>
-
 
 namespace nx::utils {
 

@@ -2,16 +2,17 @@
 
 #pragma once
 
-#include <vector>
-#include <memory>
 #include <deque>
+#include <memory>
+#include <vector>
 
-#include "quick_sync_video_decoder.h"
+#include <base_allocator.h>
 
 #include <mfx/mfxvideo++.h>
-#include <base_allocator.h>
-#include "vpp_scaler.h"
+
+#include "quick_sync_video_decoder.h"
 #include "utils.h"
+#include "vpp_scaler.h"
 
 namespace nx::media::quick_sync {
 

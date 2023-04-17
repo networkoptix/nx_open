@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/streaming/abstract_stream_data_provider.h>
 
 class NX_VMS_COMMON_API QnDataProviderFactory: public QObject

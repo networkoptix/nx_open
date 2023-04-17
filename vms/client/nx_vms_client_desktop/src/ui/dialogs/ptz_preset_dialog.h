@@ -4,7 +4,6 @@
 #define QN_PTZ_PRESET_DIALOG_H
 
 #include <core/ptz/ptz_fwd.h>
-
 #include <ui/dialogs/abstract_ptz_dialog.h>
 
 namespace Ui {

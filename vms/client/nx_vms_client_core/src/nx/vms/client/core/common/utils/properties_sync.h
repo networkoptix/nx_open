@@ -4,11 +4,11 @@
 
 #include <optional>
 
+#include <QtCore/QMetaProperty>
 #include <QtCore/QObject>
 #include <QtCore/QVector>
-#include <QtCore/QMetaProperty>
-#include <QtQml/QQmlListProperty>
 #include <QtQml/QJSValue>
+#include <QtQml/QQmlListProperty>
 
 namespace nx::vms::client::core {
 

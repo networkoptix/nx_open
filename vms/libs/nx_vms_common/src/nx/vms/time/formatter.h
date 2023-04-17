@@ -4,8 +4,8 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QLocale>
-#include <QtCore/QString>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QString>
 
 namespace nx::vms::time {
 

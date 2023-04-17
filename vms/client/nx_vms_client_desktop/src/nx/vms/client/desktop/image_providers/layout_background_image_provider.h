@@ -6,7 +6,6 @@
 
 #include "image_provider.h"
 
-
 namespace nx::vms::client::desktop {
 
 class LayoutBackgroundImageProvider: public ImageProvider

@@ -5,8 +5,9 @@
 #include <vector>
 
 #include <QtCore/QModelIndex>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 namespace nx::vms::client::desktop {
 namespace test {

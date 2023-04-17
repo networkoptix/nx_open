@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include <QtWidgets/QWidget>
+
 #include <nx/utils/impl_ptr.h>
 
 namespace Ui { class RewindForWidget; }

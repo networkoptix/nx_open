@@ -3,9 +3,10 @@
 #ifndef QN_KINETIC_ZOOM_PROCESSOR_H
 #define QN_KINETIC_ZOOM_PROCESSOR_H
 
-#include "kinetic_processor.h"
-#include <limits>
 #include <cmath>
+#include <limits>
+
+#include "kinetic_processor.h"
 
 /**
  * Kinetic processor that introduces speed cutting threshold 

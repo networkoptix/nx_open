@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <nx/utils/log/assert.h>
-
 #include <QJsonArray>
 #include <QJsonObject>
+
+#include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace utils {

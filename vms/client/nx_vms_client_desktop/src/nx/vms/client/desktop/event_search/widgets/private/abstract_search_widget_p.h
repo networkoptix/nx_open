@@ -2,22 +2,21 @@
 
 #pragma once
 
-#include "../abstract_search_widget.h"
-#include "../placeholder_widget.h"
-
 #include <optional>
 #include <vector>
 
 #include <QtCore/QDate>
-#include <QtCore/QList>
 #include <QtCore/QHash>
+#include <QtCore/QList>
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
+#include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
 #include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
+#include "../abstract_search_widget.h"
+#include "../placeholder_widget.h"
 
 class QMenu;
 class QLabel;

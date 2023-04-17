@@ -3,8 +3,8 @@
 #pragma once
 
 #include <algorithm>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include <nx/utils/match/wildcard.h>
 

@@ -8,8 +8,7 @@
 
 #include <transcoding/filters/abstract_image_filter.h>
 
-extern "C"
-{
+extern "C" {
 #include "libavutil/pixfmt.h"
 } // extern "C"
 

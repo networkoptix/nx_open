@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QSet>
+#include <QtCore/QFileSystemWatcher>
 #include <QtCore/QHash>
 #include <QtCore/QSet>
-#include <QtCore/QFileSystemWatcher>
 #include <QtCore/QTimer>
 
 namespace nx::vms::client::desktop {

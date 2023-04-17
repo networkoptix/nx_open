@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <QtCore/QByteArray>
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
-#include <QtCore/QByteArray>
 
 #include "scoped_value_rollback.h"
 

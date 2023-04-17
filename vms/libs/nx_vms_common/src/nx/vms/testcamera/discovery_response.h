@@ -4,10 +4,10 @@
 
 #include <memory>
 
-#include <QtCore/QString>
 #include <QtCore/QByteArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonParseError>
+#include <QtCore/QString>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/mac_address.h>

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "abstract_resource_source.h"
-
 #include <functional>
+
+#include "abstract_resource_source.h"
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {

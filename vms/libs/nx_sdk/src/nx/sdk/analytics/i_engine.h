@@ -2,20 +2,18 @@
 
 #pragma once
 
+#include <nx/sdk/i_active_setting_changed_action.h>
+#include <nx/sdk/i_active_setting_changed_response.h>
+#include <nx/sdk/i_device_info.h>
+#include <nx/sdk/i_plugin_diagnostic_event.h>
+#include <nx/sdk/i_settings_response.h>
+#include <nx/sdk/i_string.h>
 #include <nx/sdk/interface.h>
 #include <nx/sdk/result.h>
 
-#include <nx/sdk/i_device_info.h>
-#include <nx/sdk/i_string.h>
-#include <nx/sdk/i_plugin_diagnostic_event.h>
-
-#include <nx/sdk/i_active_setting_changed_action.h>
-#include <nx/sdk/i_active_setting_changed_response.h>
-#include <nx/sdk/i_settings_response.h>
-
+#include "i_action.h"
 #include "i_device_agent.h"
 #include "i_engine_info.h"
-#include "i_action.h"
 
 namespace nx::sdk::analytics {
 

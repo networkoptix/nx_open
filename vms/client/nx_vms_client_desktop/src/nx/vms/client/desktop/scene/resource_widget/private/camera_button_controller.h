@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "button_controller.h"
-
 #include <api/model/api_ioport_data.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
+
+#include "button_controller.h"
 
 class QnTwoWayAudioWidget;
 class QnMediaResourceWidget;

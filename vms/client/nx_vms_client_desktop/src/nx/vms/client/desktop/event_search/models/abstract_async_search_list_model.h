@@ -5,11 +5,10 @@
 #include <functional>
 
 #include <core/resource/resource_fwd.h>
-#include <recording/time_period.h>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
+#include <recording/time_period.h>
 
 namespace nx::vms::client::desktop {
 

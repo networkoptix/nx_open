@@ -2,16 +2,14 @@
 
 #pragma once
 
-#include <nx/sdk/interface.h>
-#include <nx/sdk/result.h>
-
-#include <nx/sdk/i_string_map.h>
-#include <nx/sdk/i_string.h>
+#include <nx/sdk/analytics/i_metadata_packet.h>
+#include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/i_plugin_diagnostic_event.h>
 #include <nx/sdk/i_settings_response.h>
-
-#include <nx/sdk/analytics/i_metadata_types.h>
-#include <nx/sdk/analytics/i_metadata_packet.h>
+#include <nx/sdk/i_string.h>
+#include <nx/sdk/i_string_map.h>
+#include <nx/sdk/interface.h>
+#include <nx/sdk/result.h>
 
 namespace nx::sdk::analytics {
 

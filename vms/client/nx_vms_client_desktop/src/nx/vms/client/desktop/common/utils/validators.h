@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+
 #include <QtGui/QValidator>
 
 #include <core/resource/resource_fwd.h>

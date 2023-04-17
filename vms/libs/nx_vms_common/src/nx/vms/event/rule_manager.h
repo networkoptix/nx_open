@@ -5,9 +5,9 @@
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 
-#include <nx/vms/event/event_fwd.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/event/event_fwd.h>
 
 Q_MOC_INCLUDE("nx/vms/event/rule.h")
 

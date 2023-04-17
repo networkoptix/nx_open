@@ -9,15 +9,15 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
-#include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
+#include <QtCore/QtGlobal>
 
 #include <nx/utils/log/assert.h>
 
 #include "binary_stream.h"
+#include "ubjson_detail.h"
 #include "ubjson_fwd.h"
 #include "ubjson_marker.h"
-#include "ubjson_detail.h"
 
 template<class Input>
 class QnUbjsonReader: private QnUbjsonDetail::ReaderWriterBase

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QList>
+#include <QtCore/QObject>
 #include <QtCore/QRect>
 #include <QtCore/QSet>
 

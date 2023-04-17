@@ -3,35 +3,33 @@
 #ifndef QN_UBJSON_FUNCTIONS_H
 #define QN_UBJSON_FUNCTIONS_H
 
-#include <type_traits> /* For std::enable_if. */
-#include <array>
-#include <vector>
-#include <set>
-#include <map>
 #include <array>
 #include <chrono>
+#include <map>
+#include <set>
 #include <string>
+#include <type_traits> /* For std::enable_if. */
+#include <vector>
 
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/tuple/enum.hpp>
-#include <boost/preprocessor/cat.hpp>
+    #include <boost/preprocessor/cat.hpp>
+    #include <boost/preprocessor/tuple/enum.hpp>
 #endif
 
 #include <collection.h>
 
-#include <QtCore/QString>
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
 #include <QtCore/QUrl>
 
 #include <nx/utils/latin1_array.h>
-#include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 
 #include "collection_fwd.h"
+#include "enum.h"
 #include "ubjson.h"
 #include "ubjson_macros.h"
-#include "enum.h"
-
 
 namespace QnUbjsonDetail {
 

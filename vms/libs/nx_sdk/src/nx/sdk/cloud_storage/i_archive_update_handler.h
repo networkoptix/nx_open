@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/sdk/interface.h>
 #include <nx/sdk/i_list.h>
+#include <nx/sdk/interface.h>
 
 #include "i_device_agent.h"
 #include "i_time_periods.h"

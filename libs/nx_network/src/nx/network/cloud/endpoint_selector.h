@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include <nx/network/socket_common.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/socket_common.h>
 
 namespace nx::network::cloud {
 

@@ -7,10 +7,9 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <nx/cloud/db/api/account_data.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
-
-#include <nx/cloud/db/api/account_data.h>
 
 namespace nx::cloud::db::api {
 

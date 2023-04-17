@@ -4,7 +4,7 @@
 #define QN_FUSION_KEYS_H
 
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/cat.hpp>
+    #include <boost/preprocessor/cat.hpp>
 #endif
 
 /**

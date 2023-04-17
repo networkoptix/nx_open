@@ -4,8 +4,8 @@
 
 #include <functional>
 #include <optional>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include <nx/network/socket_factory.h>
 #include <nx/utils/move_only_func.h>

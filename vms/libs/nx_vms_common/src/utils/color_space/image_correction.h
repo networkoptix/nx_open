@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QtGlobal>
 #include <QtCore/QRectF>
+#include <QtCore/QtGlobal>
 
 namespace nx::vms::api { struct ImageCorrectionData; }
 

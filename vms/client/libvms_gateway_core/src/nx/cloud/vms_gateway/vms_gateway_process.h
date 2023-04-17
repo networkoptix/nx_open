@@ -5,14 +5,13 @@
 #include <atomic>
 #include <memory>
 
+#include <nx/network/aio/async_channel_bridge.h>
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/public_ip_discovery.h>
 #include <nx/utils/service.h>
-
-#include <nx/network/aio/async_channel_bridge.h>
 
 #include "http/channel_bridge_to_server_connection_adaptor.h"
 #include "run_time_options.h"

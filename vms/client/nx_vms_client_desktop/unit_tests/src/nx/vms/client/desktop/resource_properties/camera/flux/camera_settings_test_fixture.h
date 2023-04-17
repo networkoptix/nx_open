@@ -6,8 +6,8 @@
 #include <nx/vms/client/desktop/common/flux/flux_state_store.h>
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state_reducer.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
+#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
 namespace nx::vms::client::desktop {
 namespace test {

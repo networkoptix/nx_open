@@ -5,22 +5,22 @@
 #include <atomic>
 #include <exception>
 #include <functional>
-#include <type_traits>
 #include <queue>
+#include <type_traits>
 
 #include <QtCore/QThread>
 
 #include <nx/utils/interruption_flag.h>
-#include <nx/utils/log/log.h>
 #include <nx/utils/log/format.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/future.h>
 
-#include "aio_event_handler.h"
-#include "basic_pollable.h"
 #include "../abstract_socket.h"
 #include "../address_resolver.h"
 #include "../socket_global.h"
+#include "aio_event_handler.h"
+#include "basic_pollable.h"
 
 namespace nx {
 namespace network {

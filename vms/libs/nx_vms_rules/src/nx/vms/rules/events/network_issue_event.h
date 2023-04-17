@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "../basic_event.h"
-#include "../data_macros.h"
-
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/rules/network_issue_info.h>
+
+#include "../basic_event.h"
+#include "../data_macros.h"
 
 namespace nx::vms::rules {
 

@@ -16,8 +16,8 @@
 #include "abstract_http_request_handler.h"
 #include "handler/http_server_handler_custom.h"
 #include "handler/http_server_handler_redirect.h"
-#include "http_server_exact_path_matcher.h"
 #include "http_server_connection.h"
+#include "http_server_exact_path_matcher.h"
 #include "http_statistics.h"
 
 namespace nx::network::http {

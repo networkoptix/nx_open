@@ -4,7 +4,6 @@
 
 #include <QModelIndex>
 
-
 class QCollator;
 
 struct QnResourceCompareHelper

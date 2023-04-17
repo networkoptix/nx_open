@@ -3,10 +3,8 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-
-#include <ui/dialogs/common/session_aware_dialog.h>
-
 #include <nx/utils/impl_ptr.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui { class ServerSettingsDialog; }
 

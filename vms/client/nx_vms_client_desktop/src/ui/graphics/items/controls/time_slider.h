@@ -10,16 +10,17 @@
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
+#include <qt_graphics_items/graphics_slider.h>
+
 #include <core/resource/camera_bookmark_fwd.h>
 #include <nx/vms/client/core/media/time_period_storage.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
 #include <nx/vms/client/desktop/workbench/timeline/time_marker.h>
-#include <qt_graphics_items/graphics_slider.h>
-#include <ui/processors/kinetic_process_handler.h>
-#include <ui/processors/drag_process_handler.h>
-#include <ui/animation/animation_timer_listener.h>
 #include <ui/animation/animated.h>
+#include <ui/animation/animation_timer_listener.h>
 #include <ui/common/help_topic_queryable.h>
+#include <ui/processors/drag_process_handler.h>
+#include <ui/processors/kinetic_process_handler.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/math/functors.h>
 

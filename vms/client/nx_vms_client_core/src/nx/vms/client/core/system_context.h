@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QObject>
-
 #include <optional>
+
+#include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/module_information.h>

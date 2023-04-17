@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QObject>
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>

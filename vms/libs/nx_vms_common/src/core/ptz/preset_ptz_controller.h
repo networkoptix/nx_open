@@ -3,9 +3,9 @@
 #ifndef QN_PRESET_PTZ_CONTROLLER_H
 #define QN_PRESET_PTZ_CONTROLLER_H
 
-#include <nx/utils/thread/mutex.h>
-#include <core/resource/resource_fwd.h>
 #include <api/resource_property_adaptor.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "proxy_ptz_controller.h"
 

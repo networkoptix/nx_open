@@ -6,9 +6,9 @@
 #include <memory>
 #include <optional>
 
-#include <QtCore/QSize>
 #include <QtCore/QPointer>
 #include <QtCore/QRectF>
+#include <QtCore/QSize>
 #include <QtGui/QColor>
 #include <QtGui/QImage>
 #include <QtGui/QPalette>

@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <type_traits>
+
 #include <nx/utils/std/optional.h>
 
 namespace nx {

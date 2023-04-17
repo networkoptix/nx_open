@@ -2,15 +2,14 @@
 
 #pragma once
 
+#include <chrono>
 #include <ctime>
+#include <optional>
 #include <type_traits>
 
+#include <QtCore/QDateTime>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtCore/QDateTime>
-
-#include <chrono>
-#include <optional>
 
 #include "string.h"
 

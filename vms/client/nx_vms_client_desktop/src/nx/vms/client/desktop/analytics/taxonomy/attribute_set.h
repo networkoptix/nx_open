@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include "abstract_attribute_set.h"
-
 #include <nx/analytics/taxonomy/abstract_object_type.h>
-
 #include <nx/utils/impl_ptr.h>
+
+#include "abstract_attribute_set.h"
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 

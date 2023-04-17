@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QSet>
+#include <QtCore/QSortFilterProxyModel>
 
 #include <nx/vms/api/data/ldap.h>
 

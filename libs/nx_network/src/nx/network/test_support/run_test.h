@@ -9,8 +9,8 @@
 #include <nx/network/http/tunneling/detail/client_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/test_support/run_test.h>
 #include <nx/utils/std/thread.h>
+#include <nx/utils/test_support/run_test.h>
 
 namespace nx::network::test {
 

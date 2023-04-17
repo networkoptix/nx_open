@@ -11,10 +11,10 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::discovery {
 

@@ -9,8 +9,8 @@
 
 #include <nx/network/async_stoppable.h>
 #include <nx/network/dns_resolver.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx::network {
 

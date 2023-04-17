@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "../async_sql_query_executor.h"
-
 #include <nx/utils/basic_factory.h>
+
+#include "../async_sql_query_executor.h"
 
 namespace nx::sql {
 

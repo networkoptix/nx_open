@@ -4,13 +4,13 @@
 
 #include <atomic>
 
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/url.h>
 #include <QtCore/QStringList>
 #include <QtNetwork/QAuthenticator>
 
-#include <core/resource/resource_factory.h>
 #include <common/common_module_aware.h>
+#include <core/resource/resource_factory.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/url.h>
 
 enum class DiscoveryMode
 {

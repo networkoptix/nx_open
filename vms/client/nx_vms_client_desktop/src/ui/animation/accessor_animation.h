@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QVariantAnimation>
-#include <QtCore/QScopedPointer>
 #include <QtCore/QPointer>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QVariantAnimation>
 
 #include <nx/vms/client/desktop/common/utils/accessor.h>
 

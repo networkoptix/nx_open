@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QList>
-#include <nx/utils/uuid.h>
+#include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/data/device_search.h>
 
 typedef nx::vms::api::DeviceSearchStatus QnManualResourceSearchStatus;

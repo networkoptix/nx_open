@@ -4,8 +4,8 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/utils/system_uri.h>
 #include <nx/utils/url.h>
+#include <nx/vms/utils/system_uri.h>
 
 namespace nx::vms::client::core {
 

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "../base_fields/simple_type_field.h"
-
 #include <nx/network/http/http_types.h>
+
+#include "../base_fields/simple_type_field.h"
 
 namespace nx::vms::rules {
 

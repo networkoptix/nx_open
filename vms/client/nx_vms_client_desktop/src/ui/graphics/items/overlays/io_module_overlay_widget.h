@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include <qt_graphics_items/graphics_widget.h>
+
 #include <api/model/api_ioport_data.h>
 #include <camera/iomodule/iomodule_monitor.h>
 #include <core/resource/resource_fwd.h>
-#include <qt_graphics_items/graphics_widget.h>
 
 class QnIoModuleOverlayWidgetPrivate;
 class QnIoModuleOverlayContents;

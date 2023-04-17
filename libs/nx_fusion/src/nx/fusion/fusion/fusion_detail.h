@@ -3,11 +3,11 @@
 #ifndef QN_FUSION_DETAIL_H
 #define QN_FUSION_DETAIL_H
 
-#include <utility> /* For std::forward and std::declval. */
 #include <type_traits> /* For std::remove_*, std::enable_if, std::integral_constant. */
+#include <utility> /* For std::forward and std::declval. */
 
 #ifndef Q_MOC_RUN
-#include <boost/mpl/has_xxx.hpp>
+    #include <boost/mpl/has_xxx.hpp>
 #endif
 
 #include <nx/utils/type_traits.h>

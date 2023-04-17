@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <nx/vms/api/types/event_rule_types.h>
-#include <nx/vms/event/events/instant_event.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/event/events/events_fwd.h>
+#include <nx/vms/event/events/instant_event.h>
 
 namespace nx::vms::event {
 

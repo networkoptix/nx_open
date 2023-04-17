@@ -2,14 +2,13 @@
 
 #pragma once
 
-#include <nx/utils/singleton.h>
-
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QStack>
 #include <QtGui/QMatrix4x4>
-
 #include <QtGui/QOpenGLFunctions>
+
+#include <nx/utils/singleton.h>
 
 class QOpenGLWidget;
 class QOpenGLVertexArrayObject;

@@ -2,13 +2,12 @@
 
 #pragma once
 
-#include <QObject>
+#include <QtCore/QObject>
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <nx/utils/software_version.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchVersionMismatchWatcher:
     public QObject,

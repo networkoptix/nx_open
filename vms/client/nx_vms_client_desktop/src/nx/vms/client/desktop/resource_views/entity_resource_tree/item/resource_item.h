@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <core/resource/resource.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
-#include <core/resource/resource.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {

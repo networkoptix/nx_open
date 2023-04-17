@@ -5,6 +5,7 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QList>
+
 #include <nx/utils/uuid.h>
 
 class QnVideoWallMatrix

@@ -3,9 +3,10 @@
 #ifndef QN_INSTRUMENT_MANAGER_P_H
 #define QN_INSTRUMENT_MANAGER_P_H
 
-#include "scene_event_filter.h" /* For SceneDestructionListener and SceneEventFilterItem. */
-#include "installation_mode.h"
 #include <ui/animation/animation_timer.h>
+
+#include "installation_mode.h"
+#include "scene_event_filter.h" /* For SceneDestructionListener and SceneEventFilterItem. */
 
 template<class T>
 class InstrumentEventDispatcher;

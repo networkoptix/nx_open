@@ -2,14 +2,15 @@
 
 #pragma once
 
+#include <future>
+
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
-#include <ui/workbench/workbench_context_aware.h>
 #include <nx/utils/software_version.h>
 #include <nx/utils/url.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
-#include <future>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QTimer;
 

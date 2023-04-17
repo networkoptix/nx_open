@@ -2,13 +2,12 @@
 
 #pragma once
 
+#include <nx/vms/api/data/cleanup_db_data.h>
+#include <nx/vms/api/data/license_overflow_data.h>
+#include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/api/data/videowall_license_overflow_data.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
 #include <transaction/transaction.h>
-
-#include <nx/vms/api/data/resource_data.h>
-#include <nx/vms/api/data/license_overflow_data.h>
-#include <nx/vms/api/data/videowall_license_overflow_data.h>
-#include <nx/vms/api/data/cleanup_db_data.h>
 
 namespace ec2 {
 

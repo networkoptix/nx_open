@@ -4,9 +4,9 @@
 
 #include <string_view>
 
+#include "../http_message_dispatcher.h"
 #include "base_request_handler.h"
 #include "http_server_rest_path_matcher.h"
-#include "../http_message_dispatcher.h"
 
 namespace nx::network::http::server::rest {
 

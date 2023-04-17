@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "sync_marker_record_data.h"
-
 #include <vector>
+
+#include "sync_marker_record_data.h"
 
 namespace nx {
 namespace vms {

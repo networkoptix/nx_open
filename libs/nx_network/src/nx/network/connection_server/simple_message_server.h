@@ -5,10 +5,10 @@
 #include <chrono>
 #include <queue>
 
-#include "stream_socket_server.h"
-#include "detail/connection_statistics.h"
-
 #include <nx/utils/interruption_flag.h>
+
+#include "detail/connection_statistics.h"
+#include "stream_socket_server.h"
 
 namespace nx::network::server {
 

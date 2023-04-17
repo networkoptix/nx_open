@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/vms/client/desktop/ui/actions/action_conditions.h>
+#include <nx/vms/client/desktop/ui/actions/action_text_factories.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {

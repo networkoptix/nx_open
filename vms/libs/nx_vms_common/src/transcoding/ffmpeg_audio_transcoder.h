@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <QCoreApplication>
 #include <stdint.h>
+
+#include <QtCore/QCoreApplication>
 
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/byte_array.h>

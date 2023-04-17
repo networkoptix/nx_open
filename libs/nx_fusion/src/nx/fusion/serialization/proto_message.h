@@ -5,10 +5,9 @@
 
 #include <QtCore/QVector>
 
-#include "proto_value.h"
-#include "proto_record.h"
 #include "proto_parse_error.h"
-
+#include "proto_record.h"
+#include "proto_value.h"
 
 class NX_FUSION_API QnProtoMessage
 {

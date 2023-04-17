@@ -4,10 +4,12 @@
 #define NX_CAMERA_PLUGIN_H
 
 #include <cstring>
+
 #include <stdint.h>
 
-#include "camera_plugin_types.h"
 #include <plugins/plugin_api.h>
+
+#include "camera_plugin_types.h"
 
 //!VMS Camera Integration Plugin API (c++)
 /*!

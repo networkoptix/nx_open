@@ -4,11 +4,11 @@
 
 #include <istream>
 #include <list>
-#include <vector>
 #include <map>
+#include <vector>
 
-#include <QtCore/QString>
 #include <QtCore/QRectF>
+#include <QtCore/QString>
 
 namespace nx::analytics {
 

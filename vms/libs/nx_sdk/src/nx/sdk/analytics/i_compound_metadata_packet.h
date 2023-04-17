@@ -6,8 +6,8 @@
 
 #include <nx/sdk/interface.h>
 
-#include "i_metadata_packet.h"
 #include "i_metadata.h"
+#include "i_metadata_packet.h"
 
 namespace nx::sdk::analytics {
 

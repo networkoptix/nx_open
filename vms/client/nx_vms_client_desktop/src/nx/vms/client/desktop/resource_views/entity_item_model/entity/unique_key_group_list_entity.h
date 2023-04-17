@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/entity_common.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item_order/item_order.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/group_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_source.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/item_order/item_order.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {

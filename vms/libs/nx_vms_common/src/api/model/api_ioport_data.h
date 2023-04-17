@@ -3,10 +3,9 @@
 #pragma once
 
 #include <common/common_globals.h>
-
-#include <nx/utils/uuid.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::api {
 

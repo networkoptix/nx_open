@@ -4,9 +4,9 @@
 
 #include <vector>
 
-#include <nx/network/cloud/mediator_server_connections.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
+#include <nx/network/cloud/mediator_server_connections.h>
 #include <nx/utils/timer_manager.h>
 
 #include "abstract_cloud_system_credentials_provider.h"

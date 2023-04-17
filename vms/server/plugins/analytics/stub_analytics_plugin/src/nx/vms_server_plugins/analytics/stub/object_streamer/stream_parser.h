@@ -8,8 +8,8 @@
 #include <vector>
 
 #include <nx/kit/json.h>
-#include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/rect.h>
+#include <nx/sdk/uuid.h>
 
 namespace nx {
 namespace vms_server_plugins {

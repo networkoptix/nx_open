@@ -4,8 +4,8 @@
 
 #include <unordered_set>
 
-#include <nx/network/async_stoppable.h>
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/async_stoppable.h>
 #include <nx/network/http/http_async_client.h>
 
 namespace nx::network {

@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "resource_fwd.h"
-
-#include <utils/common/id.h>
 #include <nx/utils/log/assert.h>
+#include <utils/common/id.h>
+
+#include "resource_fwd.h"
 
 struct QnResourceParams
 {

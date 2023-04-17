@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "../base_fields/simple_type_field.h"
-
 #include <nx/vms/api/types/resource_types.h>
+
+#include "../base_fields/simple_type_field.h"
 
 namespace nx::vms::rules {
 

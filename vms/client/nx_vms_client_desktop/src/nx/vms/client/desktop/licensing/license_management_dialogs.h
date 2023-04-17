@@ -4,11 +4,10 @@
 
 #include <QtCore/QCoreApplication> //< For Q_DECLARE_TR_FUNCTIONS.
 
-#include <licensing/license_fwd.h>
-#include <nx/vms/license/license_usage_fwd.h>
 #include <common/common_globals.h>
-
+#include <licensing/license_fwd.h>
 #include <nx/vms/client/desktop/license/license_helpers.h>
+#include <nx/vms/license/license_usage_fwd.h>
 
 namespace ec2 { enum class ErrorCode; }
 

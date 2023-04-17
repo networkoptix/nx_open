@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include "plugin.h"
-
-#include "stream_parser.h"
-
 #include <nx/sdk/analytics/helpers/engine.h>
+
+#include "plugin.h"
+#include "stream_parser.h"
 
 namespace nx {
 namespace vms_server_plugins {

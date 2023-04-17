@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QCollator>
+#include <QtCore/QSortFilterProxyModel>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/credentials.h>

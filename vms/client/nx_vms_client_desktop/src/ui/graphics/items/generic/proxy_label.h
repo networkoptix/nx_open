@@ -5,7 +5,6 @@
 
 #include <QtCore/QScopedPointer>
 
-
 #include "masked_proxy_widget.h"
 
 class QLabel;

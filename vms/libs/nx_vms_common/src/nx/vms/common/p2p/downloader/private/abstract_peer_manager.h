@@ -3,15 +3,14 @@
 #pragma once
 
 #include <functional>
-#include <optional>
 #include <future>
 #include <memory>
+#include <optional>
 
-#include <nx/utils/uuid.h>
-#include <nx/utils/url.h>
-#include <nx/network/http/http_async_client.h>
 #include <api/server_rest_connection_fwd.h>
-
+#include <nx/network/http/http_async_client.h>
+#include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 
 namespace nx::vms::common::p2p::downloader {

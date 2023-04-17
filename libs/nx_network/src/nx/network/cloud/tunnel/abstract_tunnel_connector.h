@@ -6,14 +6,14 @@
 #include <functional>
 #include <memory>
 
-#include <nx/network/async_stoppable.h>
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/async_stoppable.h>
 #include <nx/network/cloud/data/connect_data.h>
 #include <nx/utils/move_only_func.h>
 
+#include "../data/connection_result_data.h"
 #include "abstract_outgoing_tunnel_connection.h"
 #include "tunnel.h"
-#include "../data/connection_result_data.h"
 
 namespace nx::network::cloud {
 

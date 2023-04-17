@@ -1,8 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource.h"
-
 #include <nx/fusion/serialization/json_functions.h>
+
+#include "resource.h"
 
 template<typename Value>
 class QnJsonResourceProperty

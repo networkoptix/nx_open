@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <sys/stat.h>
-
 #include <string>
 #include <thread>
 
@@ -13,6 +11,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <sys/stat.h>
 
 class IQnFile;
 

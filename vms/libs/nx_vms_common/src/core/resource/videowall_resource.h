@@ -3,13 +3,12 @@
 #pragma once
 
 #include <QtCore/QRectF>
-#include <nx/utils/uuid.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/videowall_item.h>
-#include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_matrix.h>
-
+#include <core/resource/videowall_pc_data.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/threadsafe_item_storage.h>
 
 class NX_VMS_COMMON_API QnVideoWallResource:

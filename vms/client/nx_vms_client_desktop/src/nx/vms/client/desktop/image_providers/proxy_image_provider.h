@@ -4,10 +4,10 @@
 
 #include <QtCore/QScopedPointer>
 
-#include "image_provider.h"
-
 #include <client/client_globals.h>
 #include <nx/utils/scoped_connections.h>
+
+#include "image_provider.h"
 
 namespace nx::vms::client::desktop {
 

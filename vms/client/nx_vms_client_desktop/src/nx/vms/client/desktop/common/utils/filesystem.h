@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <QtCore/QList>
-#include <QtCore/QString>
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QList>
+#include <QtCore/QString>
 
 namespace nx::vms::client::desktop {
 

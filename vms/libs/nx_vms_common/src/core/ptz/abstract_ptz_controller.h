@@ -4,16 +4,15 @@
 
 #include <QtCore/QObject>
 
+#include <core/ptz/ptz_auxiliary_trait.h>
+#include <core/ptz/ptz_data.h>
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_limits.h>
-#include <core/ptz/ptz_preset.h>
-#include <core/ptz/ptz_tour.h>
-#include <core/ptz/ptz_data.h>
 #include <core/ptz/ptz_math.h>
 #include <core/ptz/ptz_object.h>
-#include <core/ptz/ptz_auxiliary_trait.h>
+#include <core/ptz/ptz_preset.h>
+#include <core/ptz/ptz_tour.h>
 #include <core/resource/resource_fwd.h>
-
 #include <nx/vms/common/ptz/command.h>
 #include <nx/vms/common/ptz/coordinate_space.h>
 #include <nx/vms/common/ptz/datafield.h>

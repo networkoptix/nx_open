@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QString>
 #include <QtCore/QHash>
 #include <QtCore/QQueue>
+#include <QtCore/QString>
 
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>

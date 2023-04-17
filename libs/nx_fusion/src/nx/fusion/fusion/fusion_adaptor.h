@@ -3,21 +3,21 @@
 #ifndef QN_FUSION_ADAPTOR_H
 #define QN_FUSION_ADAPTOR_H
 
-#include <utility>      /* For std::forward. */
-#include <type_traits>  /* For std::integral_constant, std::declval. */
+#include <type_traits> /* For std::integral_constant, std::declval. */
+#include <utility> /* For std::forward. */
 
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/facilities/overload.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
-#include <boost/preprocessor/seq/size.hpp>
-#include <boost/preprocessor/seq/for_each.hpp>
-#include <boost/preprocessor/seq/for_each_i.hpp>
-#include <boost/preprocessor/seq/to_tuple.hpp>
-#include <boost/preprocessor/tuple/size.hpp>
-#include <boost/preprocessor/tuple/elem.hpp>
-#include <boost/preprocessor/variadic/elem.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
+    #include <boost/preprocessor/cat.hpp>
+    #include <boost/preprocessor/facilities/overload.hpp>
+    #include <boost/preprocessor/repetition/repeat.hpp>
+    #include <boost/preprocessor/seq/for_each.hpp>
+    #include <boost/preprocessor/seq/for_each_i.hpp>
+    #include <boost/preprocessor/seq/size.hpp>
+    #include <boost/preprocessor/seq/to_tuple.hpp>
+    #include <boost/preprocessor/stringize.hpp>
+    #include <boost/preprocessor/tuple/elem.hpp>
+    #include <boost/preprocessor/tuple/size.hpp>
+    #include <boost/preprocessor/variadic/elem.hpp>
 #endif // Q_MOC_RUN
 
 #include <boost_pp_variadic_seq/variadic_seq_for_each.h>

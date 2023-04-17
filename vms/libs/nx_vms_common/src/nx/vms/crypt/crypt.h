@@ -9,7 +9,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 
 extern "C" {
-    #include <openssl/evp.h>
+#include <openssl/evp.h>
 }
 
 #include <nx/reflect/instrument.h>

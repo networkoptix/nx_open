@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 
 typedef std::function<bool(const QString&)> ValidateFunction;
 

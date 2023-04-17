@@ -4,9 +4,9 @@
 
 #include <array>
 
-#include <QtCore/QSet>
-#include <QtCore/QRect>
 #include <QtCore/QDebug>
+#include <QtCore/QRect>
+#include <QtCore/QSet>
 
 struct NX_VMS_COMMON_API QnScreenSnap
 {

@@ -3,8 +3,8 @@
 #pragma once
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/uuid.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/data/timestamp.h>
 
 /** Server response to `ping` HTTP API request. */

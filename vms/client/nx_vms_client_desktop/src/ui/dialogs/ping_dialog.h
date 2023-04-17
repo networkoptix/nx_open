@@ -4,8 +4,9 @@
 #define PING_DIALOG_H
 
 #include <QtWidgets/QDialog>
-#include <utils/ping_utility.h>
+
 #include <ui/dialogs/common/dialog.h>
+#include <utils/ping_utility.h>
 
 class QTextEdit;
 

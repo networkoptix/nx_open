@@ -4,8 +4,8 @@
 
 #include <QtCore/QSharedPointer>
 
-#include "analytics_metadata_provider_factory.h"
 #include "abstract_metadata_consumer_owner.h"
+#include "analytics_metadata_provider_factory.h"
 
 namespace nx::vms::client::core {
 

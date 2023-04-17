@@ -6,26 +6,26 @@
 #include <memory>
 #include <type_traits>
 
-#include <nx/utils/system_error.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/platform/win32_syscall_resolver.h>
-
 #ifdef _WIN32
-#  include <iphlpapi.h>
-#  include <Mstcpip.h>
-#  include "win32_socket_tools.h"
+    #include <Mstcpip.h>
+
+    #include "win32_socket_tools.h"
 #else
-#  include <netinet/tcp.h>
+    #include <netinet/tcp.h>
 #endif
 
-#include <QtCore/QElapsedTimer>
 #include <QtCore/QCollator>
+#include <QtCore/QElapsedTimer>
 
+#include <nx/utils/log/log.h>
+#include <nx/utils/platform/win32_syscall_resolver.h>
+#include <nx/utils/system_error.h>
+
+#include "address_resolver.h"
 #include "aio/aio_service.h"
 #include "aio/async_socket_helper.h"
-#include "compat_poll.h"
 #include "common_socket_impl.h"
-#include "address_resolver.h"
+#include "compat_poll.h"
 
 #ifdef _WIN32
     /* Check that the typedef in AbstractSocket is correct. */

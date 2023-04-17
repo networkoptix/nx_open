@@ -5,8 +5,8 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/system_error.h>
 
-#include "basic_pollable.h"
 #include "../socket_common.h"
+#include "basic_pollable.h"
 
 namespace nx {
 namespace network {

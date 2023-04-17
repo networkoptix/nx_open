@@ -6,9 +6,8 @@
 
 #include <QtWidgets/QTreeView>
 
-#include <nx/vms/client/desktop/common/widgets/tree_view.h>
-
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/common/widgets/tree_view.h>
 
 class QSortFilterProxyModel;
 class QnResourceListModel;

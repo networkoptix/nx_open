@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "xml.h"
-
 #include <nx/fusion/fusion/fusion.h>
+
+#include "xml.h"
 
 namespace QnXmlDetail {
 

@@ -7,8 +7,8 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/string.h>
 #include <nx/utils/stree/attribute_dictionary.h>
+#include <nx/utils/string.h>
 
 #include "../abstract_msg_body_source.h"
 

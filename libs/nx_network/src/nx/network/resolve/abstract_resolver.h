@@ -7,8 +7,8 @@
 
 #include <nx/utils/system_error.h>
 
-#include "address_entry.h"
 #include "../socket_common.h"
+#include "address_entry.h"
 
 namespace nx {
 namespace network {

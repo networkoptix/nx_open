@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtSql/QSqlDatabase>
+
 #include <nx/utils/thread/mutex.h>
 
 namespace nx::sql {

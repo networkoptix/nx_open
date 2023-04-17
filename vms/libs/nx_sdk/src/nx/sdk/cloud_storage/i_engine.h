@@ -2,15 +2,13 @@
 
 #pragma once
 
-#include <nx/sdk/interface.h>
-#include <nx/sdk/result.h>
+#include <camera/camera_plugin.h>
 #include <nx/sdk/i_device_info.h>
-
+#include <nx/sdk/i_list.h>
 #include <nx/sdk/i_plugin.h>
+#include <nx/sdk/interface.h>
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/result.h>
-#include <nx/sdk/i_list.h>
-#include <camera/camera_plugin.h>
 
 #include "i_device_agent.h"
 #include "i_time_periods.h"

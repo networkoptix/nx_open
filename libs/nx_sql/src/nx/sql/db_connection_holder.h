@@ -6,9 +6,9 @@
 
 #include <QtSql/QSqlDatabase>
 
-#include "types.h"
-#include "query_context.h"
 #include "qt_db_connection.h"
+#include "query_context.h"
+#include "types.h"
 
 namespace nx::sql {
 

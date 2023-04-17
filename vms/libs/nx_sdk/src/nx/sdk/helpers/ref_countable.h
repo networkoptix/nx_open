@@ -4,8 +4,8 @@
 
 #include <atomic>
 
-#include <nx/sdk/i_ref_countable.h>
 #include <nx/sdk/helpers/lib_context.h>
+#include <nx/sdk/i_ref_countable.h>
 
 namespace nx::sdk {
 

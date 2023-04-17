@@ -4,8 +4,8 @@
 
 #include <memory>
 
-#include <QtCore/QObject>
 #include <QtCore/QMap>
+#include <QtCore/QObject>
 #include <QtGui/QImage>
 
 #include "image_provider.h"

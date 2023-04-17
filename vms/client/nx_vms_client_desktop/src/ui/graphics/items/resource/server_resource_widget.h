@@ -3,11 +3,10 @@
 #ifndef QN_SERVER_RESOURCE_WIDGET_H
 #define QN_SERVER_RESOURCE_WIDGET_H
 
-#include <QtCore/QSharedPointer>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QSharedPointer>
 
 #include <api/model/statistics_reply.h>
-
 #include <ui/animation/animated.h>
 #include <ui/animation/animation_timer_listener.h>
 

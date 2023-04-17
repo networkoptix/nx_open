@@ -7,8 +7,8 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/utils/atomic_unique_ptr.h>
-#include <nx/utils/std/thread.h>
 #include <nx/utils/byte_stream/pipeline.h>
+#include <nx/utils/std/thread.h>
 
 namespace nx {
 namespace network {

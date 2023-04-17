@@ -2,7 +2,7 @@
 
 #include "user_auth_debug_info_watcher.h"
 
-#include <QString>
+#include <QtCore/QString>
 
 #include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>

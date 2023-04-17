@@ -5,8 +5,8 @@
 #include <memory>
 
 #include <QtCore/QHash>
-#include <QtCore/QString>
 #include <QtCore/QPointer>
+#include <QtCore/QString>
 
 class QnAbstractStatisticsModule;
 

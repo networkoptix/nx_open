@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QPoint>
+
 #include <transcoding/filters/abstract_image_filter.h>
 
 namespace nx {

@@ -2,10 +2,9 @@
 
 #pragma once
 
+#include <nx/vms/api/data/license_data.h>
 #include <nx_ec/managers/abstract_license_manager.h>
 #include <transaction/transaction.h>
-
-#include <nx/vms/api/data/license_data.h>
 
 namespace ec2 {
 

@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_user_field.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
-#include <nx/vms/rules/action_builder_fields/target_device_field.h>
-#include <nx/vms/rules/action_builder_fields/target_user_field.h>
 
 #include "test_field.h"
 

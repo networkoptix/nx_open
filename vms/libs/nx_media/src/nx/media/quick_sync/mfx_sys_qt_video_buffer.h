@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include <sysmem_allocator.h>
+
 #include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
 #include <nx/utils/log/log.h>
-#include <sysmem_allocator.h>
 
 namespace nx::media::quick_sync {
 

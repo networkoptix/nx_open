@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate_base.h>
 #include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate_base.h>
 
 class QTreeView;
 

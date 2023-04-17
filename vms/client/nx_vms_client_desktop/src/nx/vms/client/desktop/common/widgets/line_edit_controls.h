@@ -3,6 +3,7 @@
 #pragma once
 
 #include <initializer_list>
+
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 

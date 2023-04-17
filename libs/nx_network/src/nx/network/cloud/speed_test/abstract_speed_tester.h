@@ -3,11 +3,9 @@
 #pragma once
 
 #include <nx/network/aio/basic_pollable.h>
-
-#include <nx/utils/url.h>
-#include <nx/utils/move_only_func.h>
-
 #include <nx/network/cloud/mediator/api/connection_speed.h>
+#include <nx/utils/move_only_func.h>
+#include <nx/utils/url.h>
 
 namespace nx::network::cloud::speed_test {
 

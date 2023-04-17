@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QMap>
 #include <QtCore/QJsonObject>
+#include <QtCore/QMap>
 
 namespace nx::vms::api::analytics {
 

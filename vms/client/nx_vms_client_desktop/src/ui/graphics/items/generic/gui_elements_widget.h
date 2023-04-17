@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QPointer>
-
 #include <QtWidgets/QGraphicsWidget>
 
 #include <qt_graphics_items/graphics_widget.h>

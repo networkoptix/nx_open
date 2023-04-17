@@ -9,14 +9,14 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
+#include <nx/utils/system_error.h>
 #include <nx/utils/test_support/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/barrier_handler.h>
-#include <nx/utils/scope_guard.h>
-#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace network {

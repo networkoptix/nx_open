@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "async_image_result.h"
-
 #include <memory>
+
+#include "async_image_result.h"
 
 namespace nx::vms::client::core {
 

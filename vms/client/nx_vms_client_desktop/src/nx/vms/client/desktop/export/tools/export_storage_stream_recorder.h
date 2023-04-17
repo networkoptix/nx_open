@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <export/signer.h>
 #include <nx/core/transcoding/filters/filter_chain.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
@@ -10,8 +12,6 @@
 #include <recording/stream_recorder.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
-
-#include <optional>
 
 namespace nx::vms::client::desktop {
 

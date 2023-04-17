@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "camera_data.h"
-#include "camera_attributes_data.h"
+#include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
 
-#include <vector>
+#include "camera_attributes_data.h"
+#include "camera_data.h"
 
 namespace nx {
 namespace vms {

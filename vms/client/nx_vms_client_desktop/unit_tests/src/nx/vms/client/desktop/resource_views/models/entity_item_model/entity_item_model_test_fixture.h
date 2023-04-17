@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QSharedPointer>
-
 #include <gtest/gtest.h>
+
+#include <QtCore/QSharedPointer>
 
 #include <nx/vms/client/desktop/test_support/test_context.h>
 

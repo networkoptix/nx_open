@@ -2,14 +2,12 @@
 
 #pragma once
 
-#include <core/resource/resource_fwd.h>
-#include <nx/core/watermark/watermark.h>
-
-#include <recording/time_period.h>
-
-#include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <core/resource/camera_bookmark.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/core/transcoding/filters/transcoding_settings.h>
+#include <nx/core/watermark/watermark.h>
+#include <nx/vms/client/desktop/common/utils/filesystem.h>
+#include <recording/time_period.h>
 
 namespace nx::vms::client::desktop {
 

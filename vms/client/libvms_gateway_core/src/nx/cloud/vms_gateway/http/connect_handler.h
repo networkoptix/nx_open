@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
-
+#include <nx/network/http/server/abstract_http_request_handler.h>
 
 namespace nx {
 

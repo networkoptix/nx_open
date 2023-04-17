@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <string>
 #include <functional>
+#include <string>
 
-#include <nx/sdk/i_utility_provider.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/i_utility_provider.h>
 #include <nx/sdk/ptr.h>
 
 #include "engine.h"

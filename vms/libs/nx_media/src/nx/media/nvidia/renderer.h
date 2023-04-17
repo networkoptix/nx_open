@@ -2,11 +2,12 @@
 
 #pragma once
 
+#include <memory>
+
+#include <cuda.h>
+
 #include <QtCore/QSize>
 #include <QtGui/QOpenGLFunctions>
-
-#include <memory>
-#include <cuda.h>
 
 namespace nx::media::nvidia {
 

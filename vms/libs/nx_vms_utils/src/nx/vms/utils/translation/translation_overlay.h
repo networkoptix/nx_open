@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "translation.h"
-
 #include <chrono>
 #include <memory>
 #include <vector>
@@ -12,6 +10,8 @@
 #include <QtCore/QStringList>
 
 #include <nx/utils/thread/mutex.h>
+
+#include "translation.h"
 
 namespace nx::vms::utils {
 

@@ -4,7 +4,6 @@
 
 #include <mfx/mfxvideo.h>
 
-
 namespace nx::media::quick_sync {
 class QuickSyncVideoDecoderImpl;
 }

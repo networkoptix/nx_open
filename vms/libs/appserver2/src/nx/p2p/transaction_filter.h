@@ -4,13 +4,12 @@
 
 #include <type_traits>
 
-#include <transaction/transaction.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
-#include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/user_data.h>
+#include <nx/vms/api/types/connection_types.h>
+#include <transaction/transaction.h>
 
 namespace nx::p2p {
 

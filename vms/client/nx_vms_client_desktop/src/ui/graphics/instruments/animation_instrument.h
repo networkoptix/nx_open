@@ -3,8 +3,9 @@
 #ifndef QN_ANIMATION_INSTRUMENT_H
 #define QN_ANIMATION_INSTRUMENT_H
 
-#include "instrument.h"
 #include <ui/animation/animation_event.h>
+
+#include "instrument.h"
 
 /**
  * Instrument that is used internally by instrument manager to maintain a 

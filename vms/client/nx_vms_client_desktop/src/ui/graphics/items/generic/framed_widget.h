@@ -3,10 +3,9 @@
 #ifndef QN_FRAMED_WIDGET_H
 #define QN_FRAMED_WIDGET_H
 
-#include <utils/common/forward.h>
-
 #include <qt_graphics_items/graphics_widget.h>
 
+#include <utils/common/forward.h>
 
 namespace Qn
 {

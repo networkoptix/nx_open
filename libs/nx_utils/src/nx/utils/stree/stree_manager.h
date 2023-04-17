@@ -8,8 +8,8 @@
 
 #include <nx/utils/buffer.h>
 
-#include "node.h"
 #include "attribute_dictionary.h"
+#include "node.h"
 
 namespace nx::utils::stree {
 

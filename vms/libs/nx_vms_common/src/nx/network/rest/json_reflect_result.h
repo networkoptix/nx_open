@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "result.h"
-
 #include <nx/reflect/json.h>
+
+#include "result.h"
 
 namespace nx::network::rest {
 

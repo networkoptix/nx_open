@@ -4,9 +4,8 @@
 
 #include <QtWidgets/QWidget>
 
-
-#include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/utils/std/optional.h>
+#include <nx/vms/client/desktop/common/utils/validators.h>
 
 class QLabel;
 class QnWordWrappedLabel;

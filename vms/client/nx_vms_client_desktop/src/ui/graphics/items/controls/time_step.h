@@ -5,9 +5,9 @@
 
 #include <chrono>
 
-#include <QtCore/QtGlobal>
 #include <QtCore/QPair>
 #include <QtCore/QString>
+#include <QtCore/QtGlobal>
 
 class QnTimeStep
 {

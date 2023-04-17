@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <chrono>
+
+#include <QtCore/QObject>
 
 #include "time_synchronization_widget_state.h"
 

@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include "types.h"
-
-#include <QtGui/QColor>
-#include <QtCore/QString>
 #include <QtCore/QRectF>
+#include <QtCore/QString>
+#include <QtGui/QColor>
 
 #include <nx/vms/client/core/utils/rotation.h>
+
+#include "types.h"
 
 namespace nx::vms::client::desktop::figure {
 

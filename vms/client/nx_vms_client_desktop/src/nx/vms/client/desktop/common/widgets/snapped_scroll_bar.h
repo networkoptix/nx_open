@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "scroll_bar_proxy.h"
-
 #include <QtWidgets/QScrollBar>
+
+#include "scroll_bar_proxy.h"
 
 namespace nx::vms::client::desktop {
 

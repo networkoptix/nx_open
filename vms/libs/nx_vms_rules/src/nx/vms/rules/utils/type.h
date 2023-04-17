@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtCore/QMetaObject>
 #include <QtCore/QMetaClassInfo>
+#include <QtCore/QMetaObject>
+#include <QtCore/QObject>
 
 namespace nx::vms::rules::utils {
 

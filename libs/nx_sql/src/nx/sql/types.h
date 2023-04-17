@@ -5,13 +5,13 @@
 #include <chrono>
 #include <optional>
 #include <stdexcept>
-#include <string_view>
 #include <string>
-
-#include <nx/reflect/instrument.h>
+#include <string_view>
 
 #include <QtCore/QString>
 #include <QtSql/QSqlDatabase>
+
+#include <nx/reflect/instrument.h>
 
 class QnSettings;
 

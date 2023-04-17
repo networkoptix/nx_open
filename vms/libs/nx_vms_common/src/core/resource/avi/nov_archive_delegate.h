@@ -3,9 +3,11 @@
 #ifndef __NOV_ARCHIVE_DELEGATE_H
 #define __NOV_ARCHIVE_DELEGATE_H
 
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
+
+#include <recording/time_period_list.h>
+
 #include "avi_archive_delegate.h"
-#include "recording/time_period_list.h"
 
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;

@@ -4,12 +4,11 @@
 
 #include <optional>
 
-#include <nx/utils/uuid.h>
-
 #include <common/common_globals.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/types/access_rights_types.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {

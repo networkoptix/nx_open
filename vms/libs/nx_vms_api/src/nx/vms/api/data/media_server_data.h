@@ -4,10 +4,10 @@
 
 #include <QtCore/QString>
 
-#include <nx/vms/api/types/day_of_week.h>
-#include <nx/vms/api/types/resource_types.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
+#include <nx/vms/api/types/day_of_week.h>
+#include <nx/vms/api/types/resource_types.h>
 
 #include "resource_data.h"
 

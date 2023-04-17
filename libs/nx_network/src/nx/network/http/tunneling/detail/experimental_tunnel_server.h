@@ -13,15 +13,15 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
-#include "basic_custom_tunnel_server.h"
-#include "request_paths.h"
-#include "separate_up_down_channel_delegate.h"
-#include "../abstract_tunnel_authorizer.h"
 #include "../../empty_message_body_source.h"
 #include "../../http_types.h"
 #include "../../server/http_server_connection.h"
 #include "../../server/http_stream_socket_server.h"
 #include "../../server/rest/http_server_rest_message_dispatcher.h"
+#include "../abstract_tunnel_authorizer.h"
+#include "basic_custom_tunnel_server.h"
+#include "request_paths.h"
+#include "separate_up_down_channel_delegate.h"
 
 namespace nx::network::http::tunneling::detail {
 

@@ -4,6 +4,7 @@
 #define QN_WEAK_POINTER_H
 
 #include <QtCore/QWeakPointer>
+
 #include "weak_graphics_item_pointer.h"
 
 /**

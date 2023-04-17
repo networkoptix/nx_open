@@ -3,6 +3,7 @@
 #pragma once
 
 #include <bitset>
+
 #include <core/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop {

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "interface.h"
+
 namespace nx::sdk {
 
 template<typename IItem>

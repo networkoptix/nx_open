@@ -5,8 +5,8 @@
 #include <chrono>
 #include <optional>
 
-#include "sync_queue.h"
 #include "../move_only_func.h"
+#include "sync_queue.h"
 
 namespace nx {
 namespace utils {

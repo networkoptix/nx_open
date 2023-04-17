@@ -3,23 +3,22 @@
 #ifndef QN_FUSION_H
 #define QN_FUSION_H
 
-#include <utility> /* For std::forward and std::declval. */
 #include <type_traits> /* For std::enable_if, std::is_same, std::integral_constant. */
+#include <utility> /* For std::forward and std::declval. */
 
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/seq/for_each.hpp>
-#include <boost/preprocessor/tuple/enum.hpp>
-#include <boost/preprocessor/tuple/elem.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/mpl/if.hpp>
+    #include <boost/mpl/if.hpp>
+    #include <boost/preprocessor/cat.hpp>
+    #include <boost/preprocessor/seq/for_each.hpp>
+    #include <boost/preprocessor/tuple/elem.hpp>
+    #include <boost/preprocessor/tuple/enum.hpp>
 #endif // Q_MOC_RUN
 
 #include <boost_pp_variadic_seq/variadic_seq_for_each.h>
-
 #include <nx/utils/type_traits.h>
 
-#include "fusion_fwd.h"
 #include "fusion_detail.h"
+#include "fusion_fwd.h"
 #include "fusion_keys.h"
 
 namespace QnFusion {

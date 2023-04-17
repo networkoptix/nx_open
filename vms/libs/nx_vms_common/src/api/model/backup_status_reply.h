@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/vms/api/types/event_rule_types.h>
-#include <common/common_globals.h>
 
 struct QnBackupStatusData
 {

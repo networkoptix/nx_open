@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <nx/utils/move_only_func.h>
-
 #include <nx/network/async_stoppable.h>
+#include <nx/utils/move_only_func.h>
 
 namespace nx {
 namespace network {

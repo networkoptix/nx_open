@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <vector>
+
+#include <stdint.h>
 
 #include <nx/codec/hevc/scaling_list_data.h>
 

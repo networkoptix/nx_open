@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <QtCore/QMutex>
+
 #include <nx/network/socket_factory.h>
 #include <nx/utils/subscription.h>
-
-#include <QtCore/QMutex>
 
 namespace nx {
 namespace network {

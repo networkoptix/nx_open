@@ -5,7 +5,6 @@
 #include <QtCore/QList>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/uuid.h>
 
 /**

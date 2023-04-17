@@ -4,9 +4,10 @@
 
 #include <chrono>
 
+#include <qt_graphics_items/graphics_widget.h>
+
 #include <recording/time_period.h>
 #include <ui/common/help_topic_queryable.h>
-#include <qt_graphics_items/graphics_widget.h>
 
 class QnTimeSlider;
 

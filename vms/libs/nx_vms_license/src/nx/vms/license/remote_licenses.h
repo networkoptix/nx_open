@@ -5,9 +5,9 @@
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
-#include <nx/utils/url.h>
-#include <nx/network/socket_factory.h>
 #include <licensing/license.h>
+#include <nx/network/socket_factory.h>
+#include <nx/utils/url.h>
 #include <utils/merge_systems_common.h>
 
 namespace nx::vms::license {

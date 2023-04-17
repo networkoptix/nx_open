@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "../abstract_async_search_list_model.h"
-
 #include <limits>
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
+
+#include "../abstract_async_search_list_model.h"
 
 namespace nx::vms::client::desktop {
 

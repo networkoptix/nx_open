@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <QtCore/QModelIndex>
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <QtCore/QVariant>
-#include <QtCore/QModelIndex>
 #include <QtWidgets/QWidget>
 
 namespace nx::vms::client::desktop::testkit {

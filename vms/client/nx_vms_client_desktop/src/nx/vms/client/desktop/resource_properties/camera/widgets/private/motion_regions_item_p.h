@@ -2,18 +2,16 @@
 
 #pragma once
 
-#include "../motion_regions_item.h"
-
-#include <QtCore/QSharedPointer>
 #include <QtCore/QPointer>
-
+#include <QtCore/QSharedPointer>
 #include <QtGui/QImage>
-
 #include <QtQuick/QSGMaterial>
 #include <QtQuick/QSGMaterialShader>
 
 #include <nx/vms/client/core/motion/motion_grid.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+
+#include "../motion_regions_item.h"
 
 class QSGNode;
 class QSGMaterial;

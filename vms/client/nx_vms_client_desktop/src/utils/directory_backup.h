@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QStringList>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QStringList>
 
 enum class QnDirectoryBackupBehavior
 {

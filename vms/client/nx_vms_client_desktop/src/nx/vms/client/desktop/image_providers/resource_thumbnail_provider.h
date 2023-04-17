@@ -7,7 +7,6 @@
 #include <QtCore/QObject>
 
 #include <client/client_globals.h>
-
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/utils/impl_ptr.h>
 

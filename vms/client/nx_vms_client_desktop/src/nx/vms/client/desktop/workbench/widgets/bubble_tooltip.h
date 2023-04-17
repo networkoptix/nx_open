@@ -5,10 +5,10 @@
 #include <chrono>
 
 #include <QtCore/QPoint>
-#include <QtCore/QRect>
 #include <QtCore/QPointer>
-#include <QtWidgets/QWidget>
+#include <QtCore/QRect>
 #include <QtQuickWidgets/QQuickWidget>
+#include <QtWidgets/QWidget>
 
 #include <nx/utils/impl_ptr.h>
 #include <ui/workbench/workbench_context_aware.h>

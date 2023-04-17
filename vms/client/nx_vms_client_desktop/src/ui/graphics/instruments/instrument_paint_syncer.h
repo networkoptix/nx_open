@@ -4,9 +4,9 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
+
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/pending_operation.h>
-
 #include <ui/animation/animation_timer.h>
 
 class InstrumentPaintSyncer: public QObject, public AnimationTimer

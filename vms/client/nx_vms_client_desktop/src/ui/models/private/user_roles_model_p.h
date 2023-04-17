@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QSet>
 #include <QtCore/QPersistentModelIndex>
+#include <QtCore/QSet>
 
 #include <ui/models/user_roles_model.h>
 #include <ui/workbench/workbench_context_aware.h>

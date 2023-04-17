@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_matrix.h>
+#include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {

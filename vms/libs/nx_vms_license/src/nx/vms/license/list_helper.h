@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/license/license_usage_fwd.h>
 #include <common/common_globals.h>
+#include <nx/vms/license/license_usage_fwd.h>
 
 namespace nx::vms::license {
 

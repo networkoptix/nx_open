@@ -3,10 +3,10 @@
 #pragma once
 
 #include <QtCore/QString>
-#include <QDialogButtonBox>
+#include <QtWidgets/QDialogButtonBox>
 
-#include <ui/dialogs/common/dialog.h>
 #include <nx/utils/impl_ptr.h>
+#include <ui/dialogs/common/dialog.h>
 
 class QAbstractButton;
 

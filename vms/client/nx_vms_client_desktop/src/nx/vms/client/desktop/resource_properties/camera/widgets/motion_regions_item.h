@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QVector>
-#include <QtCore/QScopedPointer>
 #include <QtCore/QAbstractListModel>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QVector>
 #include <QtGui/QColor>
 #include <QtQuick/QQuickItem>
 

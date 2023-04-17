@@ -5,7 +5,6 @@
 
 #include "binary_stream.h"
 
-
 template<class Output>
 class QnCsvStreamWriter {
 public:

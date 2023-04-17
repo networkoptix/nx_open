@@ -3,9 +3,9 @@
 #pragma once
 
 #include <compare>
+#include <cstring>
 #include <iterator>
 #include <optional>
-#include <cstring>
 #include <string>
 #include <string_view>
 

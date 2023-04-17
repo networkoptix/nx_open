@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <memory>
 #include <optional>
+
+#include <stdint.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>

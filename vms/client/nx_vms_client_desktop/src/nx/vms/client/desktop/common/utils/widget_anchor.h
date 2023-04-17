@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QMargins>
+#include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <QtCore/Qt>
 

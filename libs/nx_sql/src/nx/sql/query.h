@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QtCore/QVariant>
-#include <QtSql/QSqlRecord>
 #include <QtSql/QSqlQuery>
+#include <QtSql/QSqlRecord>
 
 #include "types.h"
 

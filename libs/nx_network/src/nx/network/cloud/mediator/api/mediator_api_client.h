@@ -9,10 +9,10 @@
 #include <nx/network/cloud/data/connect_data.h>
 #include <nx/network/http/generic_api_client.h>
 
+#include "../../data/result_code.h"
 #include "connection_speed.h"
 #include "listening_peer.h"
 #include "statistics.h"
-#include "../../data/result_code.h"
 
 namespace nx::hpm::api {
 

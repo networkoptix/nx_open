@@ -2,18 +2,18 @@
 
 #pragma once
 
+#include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/attribute.h>
-#include <nx/analytics/taxonomy/enum_type.h>
+#include <nx/analytics/taxonomy/attribute_resolver.h>
 #include <nx/analytics/taxonomy/color_type.h>
-#include <nx/analytics/taxonomy/scope.h>
 #include <nx/analytics/taxonomy/engine.h>
+#include <nx/analytics/taxonomy/entity_type.h>
+#include <nx/analytics/taxonomy/enum_type.h>
+#include <nx/analytics/taxonomy/error_handler.h>
+#include <nx/analytics/taxonomy/event_type.h>
 #include <nx/analytics/taxonomy/group.h>
 #include <nx/analytics/taxonomy/object_type.h>
-#include <nx/analytics/taxonomy/event_type.h>
-#include <nx/analytics/taxonomy/error_handler.h>
-#include <nx/analytics/taxonomy/attribute_resolver.h>
-#include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
-#include <nx/analytics/taxonomy/entity_type.h>
+#include <nx/analytics/taxonomy/scope.h>
 
 namespace nx::analytics::taxonomy {
 

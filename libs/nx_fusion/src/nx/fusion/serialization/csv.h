@@ -5,9 +5,9 @@
 
 #include <nx/fusion/serialization/serialization.h>
 
+#include "csv_detail.h"
 #include "csv_fwd.h"
 #include "csv_stream.h"
-#include "csv_detail.h"
 
 namespace QnCsv {
 

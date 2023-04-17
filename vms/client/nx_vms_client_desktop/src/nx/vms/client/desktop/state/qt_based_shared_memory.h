@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "shared_memory_manager.h"
-
 #include <nx/utils/impl_ptr.h>
+
+#include "shared_memory_manager.h"
 
 namespace nx::vms::client::desktop {
 

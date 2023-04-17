@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtCore/QLocale>
 #include <QtCore/QDateTime>
+#include <QtCore/QLocale>
+#include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
 

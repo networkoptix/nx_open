@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <nx/network/http/http_types.h>
+
 #include "../basic_action.h"
 #include "../data_macros.h"
-
-#include <nx/network/http/http_types.h>
 
 namespace nx::vms::rules {
 

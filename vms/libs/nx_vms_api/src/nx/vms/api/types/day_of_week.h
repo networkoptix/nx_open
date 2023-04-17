@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <algorithm>
-
 #include <Qt> //< For enum Qt::DayOfWeek.
+#include <algorithm>
 
 #include <nx/reflect/enum_instrument.h>
 

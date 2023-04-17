@@ -3,9 +3,9 @@
 #include "chunked_transfer_encoder.h"
 
 #ifdef Q_OS_WIN
-#   include <winsock2.h>
+    #include <winsock2.h>
 #else
-#   include <arpa/inet.h>
+    #include <arpa/inet.h>
 #endif
 
 #include <nx/network/socket.h>

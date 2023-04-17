@@ -6,8 +6,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
-#include <vector>
 #include <string_view>
+#include <vector>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QMap>

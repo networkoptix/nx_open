@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <QtCore/QtGlobal>
-
 #include <optional>
 #include <variant>
+
+#include <QtCore/QtGlobal>
 
 namespace nx::vms::client::desktop {
 

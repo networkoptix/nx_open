@@ -3,9 +3,8 @@
 #ifndef SCOPED_THREAD_ROLLBACK_H
 #define SCOPED_THREAD_ROLLBACK_H
 
-#include <QtCore/QThreadPool>
 #include <QtCore/QPointer>
-
+#include <QtCore/QThreadPool>
 
 /*!
     Intended for use in thread of thread pool.

@@ -3,10 +3,10 @@
 #ifndef QN_EVALUATOR_H
 #define QN_EVALUATOR_H
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
-#include <QtCore/QCoreApplication>
 
 #include "exception.h"
 

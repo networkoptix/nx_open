@@ -1,8 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include "nettools.h"
+
 #include <iostream>
-#include <sstream>
 #include <memory>
+#include <sstream>
+
+#include "system_network_headers.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
@@ -14,40 +18,38 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
-#include "nettools.h"
 #include "ping.h"
 
 #if defined(Q_OS_LINUX)
-#   include <arpa/inet.h>
-#   include <sys/socket.h>
-#   include <netdb.h>
-#   ifndef Q_OS_ANDROID
-#      include <ifaddrs.h>
-#   endif
-#   include <unistd.h>
-#   include <net/if.h>
-#   include <sys/types.h>
-#   include <sys/socket.h>
-#   include <sys/ioctl.h>
+    #include <netdb.h>
+
+    #include <sys/socket.h>
+    #ifndef Q_OS_ANDROID
+        #include <ifaddrs.h>
+    #endif
+    #include <unistd.h>
+
+    #include <net/if.h>
+    #include <sys/ioctl.h>
+    #include <sys/socket.h>
+    #include <sys/types.h>
 #elif defined(Q_OS_MAC)
-#   include <sys/file.h>
-#   include <sys/socket.h>
-#   include <sys/sysctl.h>
-#   include <net/if.h>
-#   include <net/if_dl.h>
-#   include <netinet/in.h>
-#   include <arpa/inet.h>
-#   include <err.h>
-#   include <stdio.h>
-#   include <stdlib.h>
-#   ifndef Q_OS_IOS
-#      include <net/route.h>
-#      include <netinet/if_ether.h>
-#   endif
-#elif defined(Q_OS_WIN)
-#    include <winsock2.h>
-#    include <ws2tcpip.h>
-#    include <iphlpapi.h>
+    #include <err.h>
+    #include <ifaddrs.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+
+    #include <net/if.h>
+    #include <net/if_dl.h>
+    #include <netinet/in.h>
+    #include <sys/file.h>
+    #include <sys/socket.h>
+    #include <sys/sysctl.h>
+    #include <sys/types.h>
+    #ifndef Q_OS_IOS
+        #include <net/route.h>
+        #include <netinet/if_ether.h>
+    #endif
 #endif
 
 namespace {
@@ -542,12 +544,6 @@ int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
 }
 
 #else    //mac, bsd
-
-#include <arpa/inet.h>
-#include <ifaddrs.h>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 
 int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
 {

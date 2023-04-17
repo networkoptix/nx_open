@@ -3,8 +3,9 @@
 #pragma once
 
 #include <QtCore/QString>
-#include <nx/utils/uuid.h>
+
 #include <nx/analytics/taxonomy/entity_type.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::analytics::taxonomy {
 

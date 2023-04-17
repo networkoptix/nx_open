@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtCore/QHash>
 #include <QtCore/QDir>
 #include <QtCore/QFutureWatcher>
+#include <QtCore/QHash>
+#include <QtCore/QObject>
 
 #include <nx/utils/thread/mutex.h>
 
-#include "../result_code.h"
 #include "../file_information.h"
+#include "../result_code.h"
 
 namespace nx::vms::common::p2p::downloader {
 

@@ -6,9 +6,9 @@
 
 #include <nx/utils/counter.h>
 
-#include "../abstract_tunnel_authorizer.h"
 #include "../../server/http_server_connection.h"
 #include "../../server/rest/http_server_rest_message_dispatcher.h"
+#include "../abstract_tunnel_authorizer.h"
 
 namespace nx::network::http::tunneling::detail {
 

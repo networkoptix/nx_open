@@ -10,8 +10,8 @@
 
 #include "access_rights_data.h"
 #include "user_data.h"
-#include "user_group_data.h"
 #include "user_external_id.h"
+#include "user_group_data.h"
 
 namespace nx::vms::api {
 

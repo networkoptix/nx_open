@@ -2,14 +2,14 @@
 
 #pragma once
 
+#include <QtCore/QDir>
 #include <QtCore/QObject>
 #include <QtCore/QVector>
-#include <QtCore/QDir>
 
 #include <nx/vms/common/system_context_aware.h>
 
-#include "result_code.h"
 #include "file_information.h"
+#include "result_code.h"
 
 namespace nx::vms::common::p2p::downloader {
 

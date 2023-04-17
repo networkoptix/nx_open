@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "include/nx/cloud/db/api/connection.h"
-
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
+
+#include "include/nx/cloud/db/api/connection.h"
 
 namespace nx::cloud::db::client {
 

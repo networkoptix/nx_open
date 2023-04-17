@@ -3,8 +3,8 @@
 #pragma once
 
 #include <atomic>
-#include <memory>
 #include <list>
+#include <memory>
 #include <vector>
 
 #include <nx/network/aio/basic_pollable.h>

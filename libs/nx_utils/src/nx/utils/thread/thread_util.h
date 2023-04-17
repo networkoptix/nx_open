@@ -3,6 +3,7 @@
 #pragma once
 
 #include <string>
+
 #include <stdint.h>
 
 uintptr_t NX_UTILS_API currentThreadSystemId();

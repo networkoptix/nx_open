@@ -5,8 +5,7 @@
 
 class VC1SequenceHeader;
 
-extern "C"
-{
+extern "C" {
 // For enum AVCodecID, struct AVCodecContext.
 #include <libavcodec/avcodec.h>
 }

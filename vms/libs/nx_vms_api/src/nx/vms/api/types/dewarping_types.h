@@ -4,8 +4,8 @@
 
 #include <ostream>
 
-#include <QtCore/QObject>
 #include <QtCore/QMetaType>
+#include <QtCore/QObject>
 
 #include <nx/reflect/enum_instrument.h>
 
