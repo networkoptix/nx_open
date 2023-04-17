@@ -65,11 +65,13 @@ TEST(PredefinedUserGroups, globalPermissions)
     EXPECT_EQ(PredefinedUserGroups::find(kAdministratorsGroupId)->permissions,
         GlobalPermission::administrator
         | GlobalPermission::powerUser
-        | GlobalPermission::viewLogs);
+        | GlobalPermission::viewLogs
+        | GlobalPermission::systemHealth);
 
     EXPECT_EQ(PredefinedUserGroups::find(kPowerUsersGroupId)->permissions,
         GlobalPermission::powerUser
-        | GlobalPermission::viewLogs);
+        | GlobalPermission::viewLogs
+        | GlobalPermission::systemHealth);
 
     EXPECT_EQ(PredefinedUserGroups::find(kAdvancedViewersGroupId)->permissions,
         GlobalPermission::viewLogs);
@@ -79,6 +81,9 @@ TEST(PredefinedUserGroups, globalPermissions)
 
     EXPECT_EQ(PredefinedUserGroups::find(kLiveViewersGroupId)->permissions,
         GlobalPermission::none);
+
+    EXPECT_EQ(PredefinedUserGroups::find(kSystemHealthViewersGroupId)->permissions,
+        GlobalPermission::systemHealth);
 }
 
 TEST(PredefinedUserGroups, accessRights)
@@ -107,6 +112,9 @@ TEST(PredefinedUserGroups, accessRights)
     EXPECT_EQ(PredefinedUserGroups::accessRights(kLiveViewersGroupId), ResourceAccessMap({
         {kAllDevicesGroupId, AccessRight::view},
         {kAllWebPagesGroupId, AccessRight::view},
+        {kAllServersGroupId, AccessRight::view}}));
+
+    EXPECT_EQ(PredefinedUserGroups::accessRights(kSystemHealthViewersGroupId), ResourceAccessMap({
         {kAllServersGroupId, AccessRight::view}}));
 }
 

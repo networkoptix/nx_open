@@ -69,6 +69,7 @@ NX_VMS_API extern const QnUuid kPowerUsersGroupId; //< ex-Administrators.
 NX_VMS_API extern const QnUuid kAdvancedViewersGroupId;
 NX_VMS_API extern const QnUuid kViewersGroupId;
 NX_VMS_API extern const QnUuid kLiveViewersGroupId;
+NX_VMS_API extern const QnUuid kSystemHealthViewersGroupId;
 
 NX_VMS_API extern const std::set<QnUuid> kPredefinedGroupIds;
 NX_VMS_API extern const std::set<QnUuid> kAllPowerUserGroupIds;

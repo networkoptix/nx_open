@@ -33,6 +33,9 @@ struct PredefinedUserGroups::Private
         if (groupId == kLiveViewersGroupId)
             return tr("Live Viewers");
 
+        if (groupId == kSystemHealthViewersGroupId)
+            return tr("System Health Viewers");
+
         NX_ASSERT(false, "Not a predefined user group: %1", groupId);
         return {};
     }
@@ -57,6 +60,9 @@ struct PredefinedUserGroups::Private
         if (groupId == kLiveViewersGroupId)
             return tr("Can view live videos, I/O modules and web pages.");
 
+        if (groupId == kSystemHealthViewersGroupId)
+            return tr("Can view System Health Monitoring information.");
+
         NX_ASSERT(false, "Not a predefined user group: %1", groupId);
         return {};
     }
@@ -67,17 +73,22 @@ struct PredefinedUserGroups::Private
         {
             return GlobalPermission::administrator
                 | GlobalPermission::powerUser
-                | GlobalPermission::viewLogs;
+                | GlobalPermission::viewLogs
+                | GlobalPermission::systemHealth;
         }
 
         if (groupId == kPowerUsersGroupId)
         {
             return GlobalPermission::powerUser
-                | GlobalPermission::viewLogs;
+                | GlobalPermission::viewLogs
+                | GlobalPermission::systemHealth;
         }
 
         if (groupId == kAdvancedViewersGroupId)
             return GlobalPermission::viewLogs;
+
+        if (groupId == kSystemHealthViewersGroupId)
+            return GlobalPermission::systemHealth;
 
         if (groupId == kViewersGroupId || groupId == kLiveViewersGroupId)
             return {};
@@ -128,6 +139,14 @@ struct PredefinedUserGroups::Private
                 {kAllServersGroupId, AccessRight::view}};
 
             return kLiveViewerResourceAccessMap;
+        }
+
+        if (groupId == kSystemHealthViewersGroupId)
+        {
+            static const ResourceAccessMap kSystemHealthViewerResourceAccessMap{
+                {kAllServersGroupId, AccessRight::view}};
+
+            return kSystemHealthViewerResourceAccessMap;
         }
 
         NX_ASSERT(false, "Not a predefined user group: %1", groupId);
