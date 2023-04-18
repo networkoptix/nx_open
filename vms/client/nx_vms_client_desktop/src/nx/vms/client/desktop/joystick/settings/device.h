@@ -6,7 +6,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
-#include <QtCore/QTimer>
+
+class QTimer;
 
 namespace nx::vms::client::desktop::joystick {
 
@@ -115,6 +116,7 @@ protected:
         const AxisDescriptor& descriptor,
         const AxisLimits& oldLimits) const = 0;
     double mapAxisState(int rawValue, const AxisLimits& limits);
+    void processNewState(const State& newState);
     void pollData();
 
     bool axisIsInitialized(AxisIndexes index) const;

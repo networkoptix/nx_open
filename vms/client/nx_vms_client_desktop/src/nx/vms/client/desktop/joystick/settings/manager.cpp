@@ -17,11 +17,11 @@
 #include "descriptors.h"
 
 #if defined(Q_OS_LINUX)
-    #include "manager_linux.h"
+#include "manager_linux.h"
 #elif defined(Q_OS_WINDOWS)
-    #include "manager_win.h"
+#include "manager_win.h"
 #else
-    #include "manager_hid.h"
+#include "manager_hid.h"
 #endif
 
 using namespace std::chrono;
@@ -154,8 +154,6 @@ const JoystickDescriptor& Manager::getDeviceDescription(const QString& modelName
     if (d->deviceConfigs.end() != configIter)
         return *configIter;
 
-    NX_ASSERT(false, "General config hasn't been initialized for the device %1", modelName);
-
     return d->defaultGeneralDeviceConfig;
 }
 
@@ -215,8 +213,15 @@ void Manager::saveConfig(const QString& model)
         return;
     }
 
-    file.write(QByteArray::fromStdString(nx::reflect::json::serialize(
-        getDeviceDescription(model))));
+    const JoystickDescriptor description = getDeviceDescription(model);
+
+    if (isGeneralJoystickConfig(description))
+    {
+        NX_ASSERT(false, "General config hasn't been initialized for the device %1",
+            description.model);
+    }
+
+    file.write(QByteArray::fromStdString(nx::reflect::json::serialize(description)));
 }
 
 void Manager::updateSearchState()
@@ -314,14 +319,11 @@ void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
         updateSearchState();
 }
 
-void Manager::initializeDevice(
-    const DevicePtr& device,
-    const JoystickDescriptor& description,
-    const QString& devicePath)
+void Manager::initializeDevice(const DevicePtr& device, const JoystickDescriptor& description)
 {
     auto factory = ActionFactoryPtr(new ActionFactory(description, this));
 
-    d->deviceConnections[devicePath] <<
+    d->deviceConnections[device->path()] <<
         connect(device.get(), &Device::stateChanged, this,
             [this, factory](const Device::StickPosition& stick, const Device::ButtonStates& buttons)
             {
@@ -329,16 +331,16 @@ void Manager::initializeDevice(
                     factory->handleStateChanged(stick, buttons);
             });
 
-    d->deviceConnections[devicePath] <<
+    d->deviceConnections[device->path()] <<
         connect(factory.get(), &ActionFactory::actionReady, menu(),
             [this](ui::action::IDType id, const ui::action::Parameters& parameters)
             {
                 menu()->triggerIfPossible(id, parameters);
             });
 
-    d->actionFactories[devicePath] = factory;
+    d->actionFactories[device->path()] = factory;
 
-    m_devices[devicePath] = device;
+    m_devices[device->path()] = device;
 }
 
 bool Manager::isGeneralJoystickConfig(const JoystickDescriptor& config)

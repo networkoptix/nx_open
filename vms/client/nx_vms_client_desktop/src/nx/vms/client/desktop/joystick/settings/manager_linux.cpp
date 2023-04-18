@@ -78,7 +78,7 @@ void ManagerLinux::enumerateDevices()
         deviceLinux->setFoundControlsNumber(axesNumber, buttonsNumber);
 
         if (device->isValid())
-            initializeDevice(device, config, path);
+            initializeDevice(device, config);
         else
             NX_VERBOSE(this, "Device is invalid. Model: %1, path: %2", modelAndManufacturer, path);
     }

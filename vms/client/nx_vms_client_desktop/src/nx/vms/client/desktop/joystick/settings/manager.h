@@ -70,7 +70,6 @@ public:
     void setDeviceActionsEnabled(bool enabled);
 
 protected:
-    virtual void enumerateDevices() = 0;
     virtual void updateSearchState();
 
     /** Load config files. */
@@ -84,10 +83,7 @@ protected:
     void loadGeneralConfig(const QDir& searchDir, JoystickDescriptor& destConfig) const;
 
     virtual void removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths);
-    void initializeDevice(
-        const DevicePtr& device,
-        const JoystickDescriptor& description,
-        const QString& devicePath);
+    void initializeDevice(const DevicePtr& device, const JoystickDescriptor& description);
 
     bool isGeneralJoystickConfig(const JoystickDescriptor& config);
 

@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include <hidapi/hidapi.h>
-
 #include <QtCore/QBitArray>
 #include <QtCore/QObject>
 #include <QtCore/QString>
-#include <QtCore/QTimer>
 
 #include "descriptors.h"
 #include "device.h"
@@ -29,15 +26,14 @@ class DeviceHid: public Device
     };
 
 public:
-    DeviceHid(
-        const JoystickDescriptor& modelInfo,
-        const QString& path,
-        QTimer* pollTimer,
-        QObject* parent = 0);
+    DeviceHid(const JoystickDescriptor& modelInfo, const QString& path, QObject* parent = nullptr);
 
     virtual ~DeviceHid() override;
 
     virtual bool isValid() const override;
+
+public slots:
+    void onStateChanged(const QBitArray& newState);
 
 protected:
     virtual State getNewState() override;
@@ -45,17 +41,16 @@ protected:
         const AxisDescriptor& descriptor,
         const AxisLimits& oldLimits) const override;
 
+    friend class ManagerHid;
+
 private:
     ParsedFieldLocation parseLocation(const FieldLocation& location);
     QBitArray parseData(const QBitArray& buffer, const ParsedFieldLocation& location);
+    State parseOsHidLevelState(const QBitArray& osHidLevelState);
 
 private:
-    hid_device* m_dev = nullptr;
-
     int m_bufferSize = 0;
     QScopedArrayPointer<unsigned char> m_buffer;
-
-    QBitArray m_reportData;
 
     int m_bitCount = 0;
     std::vector<ParsedFieldLocation> m_axisLocations;

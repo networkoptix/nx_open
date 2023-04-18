@@ -9,19 +9,14 @@ namespace nx::vms::client::desktop::joystick {
 /** This implementation cannot support general joystick config. */
 class ManagerHid: public Manager
 {
-    Q_OBJECT
-
     using base_type = Manager;
 
 public:
     ManagerHid(QObject* parent = 0);
-    virtual ~ManagerHid() override;
+    virtual ~ManagerHid() override = default;
 
-private:
-    virtual void enumerateDevices() override;
-
-private:
-    QTimer m_enumerateTimer;
+protected:
+    void onHidDeviceListChanged();
 };
 
 } // namespace nx::vms::client::desktop::joystick
