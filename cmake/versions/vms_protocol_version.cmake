@@ -10,6 +10,6 @@
 # ATTENTION: You must change the comment below to make sure it will generate a merge conflict if
 # somebody concurrently updates the Protocol version. Prefer to use the Jira Issue id and title as
 # a comment.
-set(_vmsInVersionProtocolNumber 08) #< VMS-19715: Implement CRUD api for the new rules engine
+set(_vmsInVersionProtocolNumber 09) #< VMS-38956: VMS Server: Add readonly and hidden attributes for Users
 set(vmsProtocolVersion "${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}${_vmsInVersionProtocolNumber}")
 unset(_vmsInVersionProtocolNumber)

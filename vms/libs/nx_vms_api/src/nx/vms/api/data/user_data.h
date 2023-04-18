@@ -26,6 +26,17 @@ NX_REFLECTION_ENUM_CLASS(UserType,
     cloud = 2
 )
 
+NX_REFLECTION_ENUM_CLASS(UserAttribute,
+    /**%apidoc This User can not be managed from VMS side. */
+    readonly = 1 << 0,
+
+    /**%apidoc This User should not be shown in user management by default. */
+    hidden = 1 << 1
+)
+
+Q_DECLARE_FLAGS(UserAttributes, UserAttribute)
+Q_DECLARE_OPERATORS_FOR_FLAGS(UserAttributes)
+
 /**%apidoc User information object.
  * %param[readonly] id Internal user identifier. This identifier can be used as {id} path parameter in
  *     requests related to user.
@@ -78,6 +89,9 @@ struct NX_VMS_API UserData: ResourceData
     /**%apidoc[readonly] External identification data (currently used for LDAP only). */
     UserExternalId externalId;
 
+    /**%apidoc[readonly] */
+    UserAttributes attributes{};
+
     /**%apidoc[proprietary] HA1 digest hash from user password, as per RFC 2069. When modifying an
      * existing user, supply empty string. When creating a new user, calculate the value based on
      * UTF-8 password as follows:
@@ -104,6 +118,7 @@ struct NX_VMS_API UserData: ResourceData
     (permissions) \
     (groupIds) \
     (externalId) \
+    (attributes) \
     (digest) \
     (hash) \
     (cryptSha512Hash)

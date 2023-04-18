@@ -469,6 +469,23 @@ void QnUserResource::setExternalId(const nx::vms::api::UserExternalId& value)
     emit externalIdChanged(::toSharedPointer(this));
 }
 
+nx::vms::api::UserAttributes QnUserResource::attributes() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return m_attributes;
+}
+
+void QnUserResource::setAttributes(nx::vms::api::UserAttributes value)
+{
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        if (m_attributes == value)
+            return;
+        m_attributes = value;
+    }
+    emit attributesChanged(::toSharedPointer(this));
+}
+
 std::optional<IntegrationRequestData> QnUserResource::integrationRequestData() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
@@ -583,6 +600,12 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         {
             m_externalId = localOther->m_externalId;
             notifiers << [r = toSharedPointer(this)]{ emit r->externalIdChanged(r); };
+        }
+
+        if (m_attributes != localOther->m_attributes)
+        {
+            m_attributes = localOther->m_attributes;
+            notifiers << [r = toSharedPointer(this)]{ emit r->attributesChanged(r); };
         }
     }
 }

@@ -145,6 +145,9 @@ public:
     nx::vms::api::UserExternalId externalId() const;
     void setExternalId(const nx::vms::api::UserExternalId& value);
 
+    nx::vms::api::UserAttributes attributes() const;
+    void setAttributes(nx::vms::api::UserAttributes value);
+
     std::optional<nx::vms::api::analytics::IntegrationRequestData> integrationRequestData() const;
     void setIntegrationRequestData(
         std::optional<nx::vms::api::analytics::IntegrationRequestData> integrationRequestData);
@@ -170,6 +173,7 @@ signals:
     void emailChanged(const QnResourcePtr& user);
     void fullNameChanged(const QnResourcePtr& user);
     void externalIdChanged(const QnResourcePtr& user);
+    void attributesChanged(const QnResourcePtr& user);
 
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
@@ -190,4 +194,5 @@ private:
     QString m_email;
     QString m_fullName;
     nx::vms::api::UserExternalId m_externalId;
+    nx::vms::api::UserAttributes m_attributes;
 };

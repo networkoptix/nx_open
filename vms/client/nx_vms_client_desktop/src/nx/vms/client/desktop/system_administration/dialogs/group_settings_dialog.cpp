@@ -298,7 +298,7 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
         state.sharedResources = systemContext()->accessRightsManager()->ownResourceAccessMap(
             groupId);
         state.isLdap = (groupData->type == nx::vms::api::UserType::ldap);
-        state.isPredefined = groupData->isPredefined;
+        state.isPredefined = groupData->attributes.testFlag(nx::vms::api::UserAttribute::readonly);
 
         for (const auto& parentGroupId: groupData->parentGroupIds)
             state.parentGroups.insert(MembersModelGroup::fromId(systemContext(), parentGroupId));

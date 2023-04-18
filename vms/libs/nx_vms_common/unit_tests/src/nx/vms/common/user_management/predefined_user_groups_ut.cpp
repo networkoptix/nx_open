@@ -39,7 +39,7 @@ TEST(PredefinedUserGroups, list)
     for (const auto& group: list)
     {
         EXPECT_TRUE(kPredefinedGroupIds.contains(group.id));
-        EXPECT_TRUE(group.isPredefined);
+        EXPECT_TRUE(group.attributes.testFlag(nx::vms::api::UserAttribute::readonly));
         EXPECT_TRUE(group.parentGroupIds.empty());
         EXPECT_FALSE(group.name.isEmpty());
         EXPECT_FALSE(group.description.isEmpty());

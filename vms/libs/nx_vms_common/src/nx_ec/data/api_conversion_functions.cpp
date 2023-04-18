@@ -572,6 +572,7 @@ void fromApiToResource(const UserData& src, QnUserResourcePtr& dst, bool setPass
     dst->setGroupIds(src.groupIds);
     dst->setFullName(src.fullName);
     dst->setRawPermissions(src.permissions);
+    dst->setAttributes(src.attributes);
 
     if (setPasswordHashes)
     {
@@ -596,6 +597,7 @@ void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
     dst.fullName = src->fullName();
     dst.externalId = src->externalId();
     dst.type = src->userType();
+    dst.attributes = src->attributes();
 }
 
 void fromApiToResource(const VideowallItemData& src, QnVideoWallItem& dst)
