@@ -9049,21 +9049,21 @@ Remember to return the Logging Level to its default setting after you have colle
         <source>Logs downloading canceled</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::LogsManagementWidget</name>
-    <message>
-        <source>Enter your account password</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Apply</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Apply Settings</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enter your account password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
         <source>Select Folder...</source>
         <translation type="unfinished"></translation>

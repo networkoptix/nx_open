@@ -1155,6 +1155,10 @@
         <comment>%1 is name, %2 is value.</comment>
         <translation></translation>
     </message>
+    <message>
+        <source>Session authorization required.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SystemHelpers</name>
@@ -2303,6 +2307,34 @@
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also show source camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also show on source camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also set on source camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also trigger on source camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also record source camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also play on source camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
