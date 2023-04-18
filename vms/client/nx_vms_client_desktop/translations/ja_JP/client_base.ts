@@ -8923,9 +8923,10 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>Logs downloading canceled</source>
       <translation>ログのダウンロードがキャンセルされました</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Apply Settings</source>
+      <translation>設定を適用</translation>
+    </message>
     <message>
       <source>Enter your account password</source>
       <translation>アカウントのパスワードを入力してください</translation>
@@ -8934,10 +8935,9 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>Apply</source>
       <translation>適用</translation>
     </message>
-    <message>
-      <source>Apply Settings</source>
-      <translation>設定を適用</translation>
-    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
       <translation>フォルダー選択...</translation>

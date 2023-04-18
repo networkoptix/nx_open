@@ -9057,9 +9057,10 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>Logs downloading canceled</source>
       <translation type="unfinished">Logs downloading canceled</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Apply Settings</source>
+      <translation type="unfinished">Apply Settings</translation>
+    </message>
     <message>
       <source>Enter your account password</source>
       <translation>Passwort für Ihr Konto eingeben</translation>
@@ -9068,10 +9069,9 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>Apply</source>
       <translation>Anwenden</translation>
     </message>
-    <message>
-      <source>Apply Settings</source>
-      <translation type="unfinished">Apply Settings</translation>
-    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
       <translation type="unfinished">Select Folder...</translation>
