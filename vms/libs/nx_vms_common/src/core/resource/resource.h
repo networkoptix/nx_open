@@ -228,6 +228,9 @@ protected:
     */
     virtual void initializationDone();
 
+    //!Called just after initInternal() started
+    virtual void initializationStarted() {}
+
     virtual void emitPropertyChanged(
         const QString& key, const QString& prevValue, const QString& newValue);
 
@@ -252,6 +255,7 @@ private:
 
     friend class InitAsyncTask;
 
+protected:
     enum InitState
     {
         initNone,
@@ -260,7 +264,7 @@ private:
         initDone
     };
     bool switchState(InitState from, InitState to);
-protected:
+
     /** Mutex that is to be used when accessing a set of all consumers. */
     mutable nx::Mutex m_consumersMtx;
 

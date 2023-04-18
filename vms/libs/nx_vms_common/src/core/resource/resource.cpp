@@ -658,6 +658,7 @@ bool QnResource::init()
 
     if (!switchState(initNone, initInProgress))
         return false; //< Already initializing
+    initializationStarted();
 
     // Prevent to call two init() at the same time. This mutex is not used any more in other places.
     // The potential race condition is possible after switchState(none) call,
