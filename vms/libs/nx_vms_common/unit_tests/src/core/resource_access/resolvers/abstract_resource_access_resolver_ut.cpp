@@ -15,8 +15,6 @@
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
 
-#include "../access_rights_types_testing.h"
-
 namespace nx::core::access {
 namespace test {
 

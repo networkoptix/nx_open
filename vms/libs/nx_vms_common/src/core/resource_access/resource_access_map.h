@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include <QtCore/QHash>
 
 #include <nx/utils/uuid.h>
@@ -24,5 +26,8 @@ extern NX_VMS_COMMON_API ResourceAccessMap kFullResourceAccessMap;
 
 NX_VMS_COMMON_API QString toString(const ResourceAccessMap& accessMap,
     QnResourcePool* resourcePool = nullptr, bool multiLine = false);
+
+// GoogleTest printer.
+NX_VMS_COMMON_API void PrintTo(const ResourceAccessMap& map, std::ostream* os);
 
 } // namespace nx::core::access

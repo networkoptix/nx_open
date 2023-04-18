@@ -68,4 +68,9 @@ QString toString(const ResourceAccessMap& accessMap, QnResourcePool* resourcePoo
         : nx::format("{%1}", result.join(", "));
 }
 
+void PrintTo(const ResourceAccessMap& map, std::ostream* os)
+{
+    *os << toString(map, /*resourcePool*/ nullptr, /*multiline*/ true);
+}
+
 } // namespace nx::core::access

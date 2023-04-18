@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include <QtCore/QHash>
 
 #include <core/resource/resource_fwd.h>
@@ -16,5 +18,8 @@ using ResourceAccessDetails = QHash<
 /** Merges two resource access detail sets. */
 NX_VMS_COMMON_API ResourceAccessDetails& operator+=(
     ResourceAccessDetails& destination, const ResourceAccessDetails& source);
+
+// GoogleTest printer.
+NX_VMS_COMMON_API void PrintTo(const ResourceAccessDetails& details, std::ostream* os);
 
 } // namespace nx::core::access

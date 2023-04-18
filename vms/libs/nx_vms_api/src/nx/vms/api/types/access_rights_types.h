@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
 
@@ -277,5 +279,12 @@ NX_REFLECTION_ENUM_CLASS(SpecialResourceGroup,
     allServers,
     allVideowalls
 )
+
+// GoogleTest printers.
+NX_VMS_API void PrintTo(GlobalPermission value, std::ostream* os);
+NX_VMS_API void PrintTo(GlobalPermissions value, std::ostream* os);
+NX_VMS_API void PrintTo(AccessRight value, std::ostream* os);
+NX_VMS_API void PrintTo(AccessRights value, std::ostream* os);
+NX_VMS_API void PrintTo(SpecialResourceGroup value, std::ostream* os);
 
 } // namespace nx::vms::api
