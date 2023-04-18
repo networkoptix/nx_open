@@ -8,7 +8,7 @@
 #include "manager.h"
 
 #ifndef DIRECTINPUT_VERSION
-    #define DIRECTINPUT_VERSION 0x0800
+#define DIRECTINPUT_VERSION 0x0800
 #endif
 #include <dinput.h>
 
@@ -36,7 +36,7 @@ protected:
     virtual void removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths) override;
 
 private:
-    virtual void enumerateDevices() override;
+    void enumerateDevices();
     virtual void updateSearchState() override;
 
     DeviceWindowsPtr createDevice(

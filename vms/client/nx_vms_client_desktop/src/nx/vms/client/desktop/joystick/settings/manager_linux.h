@@ -18,7 +18,7 @@ public:
     ManagerLinux(QObject* parent = 0);
 
 private:
-    virtual void enumerateDevices() override;
+    void enumerateDevices();
 
     QString findDeviceModel(const QString& modelAndManufacturer) const;
 
