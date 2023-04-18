@@ -36,7 +36,7 @@ protected:
     virtual void removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths) override;
 
 private:
-    virtual void enumerateDevices() override;
+    void enumerateDevices();
     virtual void updateSearchState() override;
 
     DeviceWindowsPtr createDevice(

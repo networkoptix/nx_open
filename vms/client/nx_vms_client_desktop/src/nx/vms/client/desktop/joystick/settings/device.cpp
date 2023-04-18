@@ -2,6 +2,10 @@
 
 #include "device.h"
 
+#include <QtCore/QTimer>
+
+#include <nx/utils/log/assert.h>
+
 #include "descriptors.h"
 
 namespace nx::vms::client::desktop::joystick {
@@ -18,7 +22,8 @@ Device::Device(
     m_path(path),
     m_buttonStates(modelInfo.buttons.size(), false)
 {
-    connect(pollTimer, &QTimer::timeout, this, &Device::pollData);
+    if (pollTimer)
+        connect(pollTimer, &QTimer::timeout, this, &Device::pollData);
 }
 
 Device::~Device()
@@ -97,13 +102,8 @@ double Device::mapAxisState(int rawValue, const AxisLimits& limits)
     }
 }
 
-void Device::pollData()
+void Device::processNewState(const State& newState)
 {
-    const auto newState = getNewState();
-
-    if (newState.buttonStates.empty())
-        return;
-
     bool deviceStateChanged = false;
 
     if (newState.stickPosition != m_stickPosition)
@@ -133,6 +133,16 @@ void Device::pollData()
 
     if (deviceStateChanged)
         emit stateChanged(newState.stickPosition, newState.buttonStates);
+}
+
+void Device::pollData()
+{
+    const auto newState = getNewState();
+
+    if (newState.buttonStates.empty())
+        return;
+
+    processNewState(newState);
 }
 
 bool Device::axisIsInitialized(AxisIndexes index) const

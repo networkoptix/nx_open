@@ -169,7 +169,7 @@ void ManagerWindows::enumerateDevices()
                     path,
                     deviceInfo.directInputDeviceObject);
                 if (device && device->isValid())
-                    initializeDevice(device, config, path);
+                    initializeDevice(device, config);
                 else
                     NX_VERBOSE(this, "Device is invalid. Model: %1, path: %2", modelName, path);
             }
