@@ -253,7 +253,7 @@ QString UserSettingsDialog::validateLogin(const QString& login)
 void UserSettingsDialog::onGroupClicked(const QVariant& idVariant)
 {
     d->sessionNotifier->actionManager()->trigger(
-        ui::action::UserRolesAction, ui::action::Parameters()
+        ui::action::UserGroupsAction, ui::action::Parameters()
             .withArgument(Qn::UuidRole, idVariant.value<QnUuid>())
             .withArgument(Qn::ParentWidgetRole, QPointer(window())));
 }

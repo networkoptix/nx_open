@@ -406,14 +406,14 @@ void UserGroupsWidget::Private::handleCellClicked(const QModelIndex& index)
     if (index.column() == UserGroupListModel::CheckBoxColumn)
         return;
 
-    q->menu()->trigger(ui::action::UserRolesAction, ui::action::Parameters()
+    q->menu()->trigger(ui::action::UserGroupsAction, ui::action::Parameters()
         .withArgument(Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>())
         .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
 }
 
 void UserGroupsWidget::Private::createGroup()
 {
-    q->menu()->triggerIfPossible(ui::action::UserRolesAction, ui::action::Parameters()
+    q->menu()->triggerIfPossible(ui::action::UserGroupsAction, ui::action::Parameters()
         .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
 }
 

@@ -1467,16 +1467,9 @@ void initialize(Manager* manager, Action* root)
         .requiredTargetPermissions(Qn::ReadPermission)
         .condition(condition::hasFlags(Qn::user, MatchMode::any));
 
-    factory(UserRolesAction)
-        .flags(Tree | NoTarget)
-        .text(ContextMenu::tr("User Roles..."))
-        .conditionalText(
-            ContextMenu::tr("Role Settings..."),
-            condition::treeNodeType(ResourceTree::NodeType::role))
-        .requiredPowerUserPermissions()
-        .condition(
-            condition::treeNodeType(
-                {ResourceTree::NodeType::users, ResourceTree::NodeType::role}));
+    factory(UserGroupsAction)
+        .flags(NoTarget)
+        .requiredPowerUserPermissions();
 
     factory(UploadVirtualCameraFileAction)
         .mode(DesktopMode)

@@ -54,28 +54,28 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ui(new Ui::SubjectSelectionDialog()),
     m_roles(new RoleListModel(this)),
     m_users(new UserListModel(m_roles, this)),
-    m_roleListDelegate(new RoleListDelegate(this)),
+    m_groupListDelegate(new GroupListDelegate(this)),
     m_userListDelegate(new UserListDelegate(this))
 {
     ui->setupUi(this);
     ui->nothingFoundLabel->setHidden(true);
 
-    ui->rolesTreeView->setIgnoreWheelEvents(true);
+    ui->groupsTreeView->setIgnoreWheelEvents(true);
     ui->usersTreeView->setIgnoreWheelEvents(true);
 
-    ui->rolesTreeView->setSelectionMode(QAbstractItemView::NoSelection);
+    ui->groupsTreeView->setSelectionMode(QAbstractItemView::NoSelection);
     ui->usersTreeView->setSelectionMode(QAbstractItemView::NoSelection);
 
     auto filterRoles = new QSortFilterProxyModel(m_roles);
     filterRoles->setFilterCaseSensitivity(Qt::CaseInsensitive);
     filterRoles->setFilterKeyColumn(QnUserRolesModel::NameColumn);
     filterRoles->setSourceModel(m_roles);
-    ui->rolesTreeView->setModel(filterRoles);
+    ui->groupsTreeView->setModel(filterRoles);
 
     ui->usersTreeView->setModel(m_users);
     ui->usersTreeView->sortByColumn(UserListModel::NameColumn, Qt::AscendingOrder);
 
-    ui->rolesTreeView->setItemDelegate(m_roleListDelegate);
+    ui->groupsTreeView->setItemDelegate(m_groupListDelegate);
     ui->usersTreeView->setItemDelegate(m_userListDelegate);
 
     auto indicatorDelegate = new CustomizableItemDelegate(this);
@@ -110,7 +110,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     item_view_utils::setupDefaultAutoToggle(ui->allUsersCheckableLine->view(),
         CheckableLineWidget::CheckColumn);
 
-    item_view_utils::setupDefaultAutoToggle(ui->rolesTreeView, RoleListModel::CheckColumn);
+    item_view_utils::setupDefaultAutoToggle(ui->groupsTreeView, RoleListModel::CheckColumn);
     item_view_utils::setupDefaultAutoToggle(ui->usersTreeView, UserListModel::CheckColumn);
 
     auto setupTreeView =
@@ -125,7 +125,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
             treeView->setDefaultSpacePressIgnored(true);
         };
 
-    setupTreeView(ui->rolesTreeView);
+    setupTreeView(ui->groupsTreeView);
     setupTreeView(ui->usersTreeView);
 
     auto scrollBar = new SnappedScrollBar(ui->mainWidget);
@@ -174,9 +174,9 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     const auto updateVisibility =
         [this]()
         {
-            const bool noRoles = !ui->rolesTreeView->model()->rowCount();
+            const bool noRoles = !ui->groupsTreeView->model()->rowCount();
             const bool noUsers = !ui->usersTreeView->model()->rowCount();
-            ui->rolesGroupBox->setHidden(noRoles);
+            ui->groupsGroupBox->setHidden(noRoles);
             ui->usersGroupBox->setHidden(noUsers);
             ui->nothingFoundLabel->setVisible(noRoles && noUsers);
         };
@@ -184,14 +184,14 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     connect(ui->usersTreeView->model(), &QAbstractItemModel::rowsInserted, this, updateVisibility);
     connect(ui->usersTreeView->model(), &QAbstractItemModel::rowsRemoved, this, updateVisibility);
     connect(ui->usersTreeView->model(), &QAbstractItemModel::modelReset, this, updateVisibility);
-    connect(ui->rolesTreeView->model(), &QAbstractItemModel::rowsInserted, this, updateVisibility);
-    connect(ui->rolesTreeView->model(), &QAbstractItemModel::rowsRemoved, this, updateVisibility);
-    connect(ui->rolesTreeView->model(), &QAbstractItemModel::modelReset, this, updateVisibility);
+    connect(ui->groupsTreeView->model(), &QAbstractItemModel::rowsInserted, this, updateVisibility);
+    connect(ui->groupsTreeView->model(), &QAbstractItemModel::rowsRemoved, this, updateVisibility);
+    connect(ui->groupsTreeView->model(), &QAbstractItemModel::modelReset, this, updateVisibility);
 
     // Customized top margin for panel content:
     static constexpr int kContentTopMargin = 8;
     Style::setGroupBoxContentTopMargin(ui->usersGroupBox, kContentTopMargin);
-    Style::setGroupBoxContentTopMargin(ui->rolesGroupBox, kContentTopMargin);
+    Style::setGroupBoxContentTopMargin(ui->groupsGroupBox, kContentTopMargin);
 
     ui->allUsersCheckableLine->setText(tr("All Users"));
     setupTreeView(ui->allUsersCheckableLine->view());
@@ -209,7 +209,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
         {
             const bool checked = m_allUsersSelectorEnabled
                 && checkState == Qt::Checked;
-            ui->rolesGroupBox->setEnabled(!checked);
+            ui->groupsGroupBox->setEnabled(!checked);
             ui->usersGroupBox->setEnabled(!checked);
             ui->searchLineEdit->setEnabled(!checked);
             if (checked)

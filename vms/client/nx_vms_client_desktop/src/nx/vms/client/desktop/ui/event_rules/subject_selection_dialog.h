@@ -29,7 +29,7 @@ namespace subject_selection_dialog_private {
 class UserListModel;
 class RoleListModel;
 class UserListDelegate;
-class RoleListDelegate;
+class GroupListDelegate;
 
 } //namespace subject_selection_dialog_private
 
@@ -97,7 +97,7 @@ private:
 
     subject_selection_dialog_private::RoleListModel* m_roles = nullptr;
     subject_selection_dialog_private::UserListModel* m_users = nullptr;
-    subject_selection_dialog_private::RoleListDelegate* m_roleListDelegate = nullptr;
+    subject_selection_dialog_private::GroupListDelegate* m_groupListDelegate = nullptr;
     subject_selection_dialog_private::UserListDelegate* m_userListDelegate = nullptr;
 
     bool m_allUsersSelectorEnabled = true;

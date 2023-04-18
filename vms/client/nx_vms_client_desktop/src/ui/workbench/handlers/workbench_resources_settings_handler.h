@@ -34,7 +34,7 @@ private:
     void at_serverSettingsAction_triggered();
     void at_newUserAction_triggered();
     void at_userSettingsAction_triggered();
-    void at_userRolesAction_triggered();
+    void at_userGroupsAction_triggered();
     void at_layoutSettingsAction_triggered();
     void at_currentLayoutSettingsAction_triggered();
     void at_copyRecordingScheduleAction_triggered();

@@ -366,20 +366,20 @@ void UserListModel::updateIndicators()
 };
 
 //-------------------------------------------------------------------------------------------------
-// subject_selection_dialog_private::RoleListDelegate
+// subject_selection_dialog_private::GroupListDelegate
 
-RoleListDelegate::RoleListDelegate(QObject* parent):
+GroupListDelegate::GroupListDelegate(QObject* parent):
     base_type(parent)
 {
     setOptions(HighlightChecked | ValidateOnlyChecked);
     setCheckBoxColumn(RoleListModel::CheckColumn);
 }
 
-RoleListDelegate::~RoleListDelegate()
+GroupListDelegate::~GroupListDelegate()
 {
 }
 
-void RoleListDelegate::initStyleOption(QStyleOptionViewItem* option,
+void GroupListDelegate::initStyleOption(QStyleOptionViewItem* option,
     const QModelIndex& index) const
 {
     base_type::initStyleOption(option, index);
@@ -395,7 +395,7 @@ void RoleListDelegate::initStyleOption(QStyleOptionViewItem* option,
     }
 }
 
-void RoleListDelegate::getDisplayInfo(const QModelIndex& index,
+void GroupListDelegate::getDisplayInfo(const QModelIndex& index,
     QString& baseName, QString& extInfo) const
 {
     static const auto kExtraInfoTemplate = QString::fromWCharArray(L"\x2013 %1"); //< "- %1"

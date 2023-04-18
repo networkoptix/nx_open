@@ -184,7 +184,7 @@ QString GroupSettingsDialog::validateName(const QString& text)
 void GroupSettingsDialog::onGroupClicked(const QVariant& idVariant)
 {
     d->sessionNotifier->actionManager()->trigger(
-        ui::action::UserRolesAction,
+        ui::action::UserGroupsAction,
         ui::action::Parameters()
             .withArgument(Qn::UuidRole, idVariant.value<QnUuid>())
             .withArgument(Qn::ParentWidgetRole, QPointer(window())));

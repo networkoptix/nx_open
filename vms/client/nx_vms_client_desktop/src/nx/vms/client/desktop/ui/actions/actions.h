@@ -670,9 +670,9 @@ enum IDType
     UserSettingsAction,
 
     /**
-     * Opens user roles dialog.
+     * Opens User Groups dialog.
      */
-    UserRolesAction,
+    UserGroupsAction,
 
     /**
      * Opens camera settings dialog.
