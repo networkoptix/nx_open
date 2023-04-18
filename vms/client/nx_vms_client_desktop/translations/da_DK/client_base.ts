@@ -271,30 +271,30 @@
     </message>
     <message>
       <source>Audit Trail...</source>
-      <translation type="unfinished">Audit Trail...</translation>
+      <translation>Handlings Log...</translation>
     </message>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation type="unfinished">Log in to %1...</translation>
+      <translation>Log ind på %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation type="unfinished">Log out from %1</translation>
+      <translation>Log ud fra %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation type="unfinished">Open %1 Portal...</translation>
+      <translation>Åbn %1 portalen...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
-      <translation type="unfinished">Account Settings...</translation>
+      <translation>Kontoindstillinger...</translation>
     </message>
     <message>
       <source>Create Account...</source>
-      <translation type="unfinished">Create Account...</translation>
+      <translation>Opret konto...</translation>
     </message>
     <message>
       <source>Event Rules...</source>
@@ -993,7 +993,7 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation type="unfinished">Archive filter...</translation>
+      <translation>Arkivér filter...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1013,7 +1013,7 @@
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>Udskift kamera...</translation>
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
