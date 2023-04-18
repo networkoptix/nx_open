@@ -434,7 +434,8 @@ void QnVideoStreamDisplay::flushReverseBlock(
             tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
         m_reverseQueue.enqueue(tmpOutFrame);
-        m_reverseSizeInBytes += tmpOutFrame->sizeBytes();
+        if (tmpOutFrame->data[0])
+            m_reverseSizeInBytes += tmpOutFrame->sizeBytes();
         checkQueueOverflow();
     }
     m_flushedBeforeReverseStart = true;
@@ -629,11 +630,15 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         if (outFrame->flags.testFlag(QnAbstractMediaData::MediaFlags_ReverseBlockStart))
             reorderPrevFrames();
         m_reverseQueue.enqueue(outFrame);
-        m_reverseSizeInBytes += outFrame->sizeBytes();
+        if (outFrame->data[0])
+            m_reverseSizeInBytes += outFrame->sizeBytes();
         checkQueueOverflow();
 
-        while(!m_reverseQueue.front()->data[0])
+        while(!m_reverseQueue.isEmpty() && !m_reverseQueue.front()->data[0])
             outFrame = m_reverseQueue.dequeue();
+
+        if (m_reverseQueue.isEmpty())
+            return Status_Skipped;
 
         if (!m_reverseQueue.front()->flags.testFlag(QnAbstractMediaData::MediaFlags_ReverseReordered))
             return Status_Buffered; // frame does not ready. need more frames. does not perform wait
