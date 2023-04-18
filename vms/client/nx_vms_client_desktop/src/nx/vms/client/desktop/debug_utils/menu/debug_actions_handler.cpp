@@ -32,6 +32,7 @@
 #include "../dialogs/credentials_store_dialog.h"
 #include "../dialogs/custom_settings_test_dialog.h"
 #include "../dialogs/interactive_settings_test_dialog.h"
+#include "../dialogs/joystick_investigation_wizard/joystick_investigation_wizard_dialog.h"
 #include "../dialogs/palette_dialog.h"
 #include "../dialogs/qml_test_dialog.h"
 #include "../dialogs/resource_pool_dialog.h"
@@ -143,6 +144,9 @@ DebugActionsHandler::DebugActionsHandler(QObject *parent):
     {
         if (ini().virtualJoystick)
             VirtualJoystickDialog::registerAction();
+
+        if (ini().joystickInvestigationWizard)
+            JoystickInvestigationWizardDialog::registerAction();
     }
 }
 

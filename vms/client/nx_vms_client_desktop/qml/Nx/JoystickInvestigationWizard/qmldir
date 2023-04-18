@@ -1,0 +1,12 @@
+module Nx.UnknownJoystickInvestigation
+
+JoystickInvestigation 1.0 JoystickInvestigation.qml
+WizardStep 1.0 WizardStep.qml
+
+Buttons 1.0 steps/Buttons.qml
+Done 1.0 steps/Done.qml
+Initial 1.0 steps/Initial.qml
+SavingResults 1.0 steps/SavingResults.qml
+XAxis 1.0 steps/XAxis.qml
+YAxis 1.0 steps/YAxis.qml
+ZAxis 1.0 steps/ZAxis.qml
