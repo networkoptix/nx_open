@@ -147,6 +147,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         restApiResourceChangesManager,
         "[Dev] Enable rest api for resource change manager requests");
 
+    NX_INI_FLAG(false, joystickInvestigationWizard,
+                "[Dev] Enables joystick investigation wizard (works only on MacOS).");
+
     NX_INI_FLAG(false, virtualJoystick,
         "[Dev] Enables joystick emulator (works only on MacOS).");
 
