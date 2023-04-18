@@ -1873,7 +1873,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Otwórz folder plików</translation>
     </message>
   </context>
   <context>

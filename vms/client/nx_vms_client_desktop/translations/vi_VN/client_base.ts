@@ -8922,9 +8922,10 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
       <source>Logs downloading canceled</source>
       <translation>Đã hủy tải xuống nhật ký</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Apply Settings</source>
+      <translation>Áp dụng cài đặt</translation>
+    </message>
     <message>
       <source>Enter your account password</source>
       <translation>Nhập mật khẩu tài khoản của bạn</translation>
@@ -8933,10 +8934,9 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
       <source>Apply</source>
       <translation>ứng dụng</translation>
     </message>
-    <message>
-      <source>Apply Settings</source>
-      <translation>Áp dụng cài đặt</translation>
-    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
       <translation>Chọn thư mục...</translation>

@@ -9055,9 +9055,10 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
       <source>Logs downloading canceled</source>
       <translation>Günlüklerin indirilmesi iptal edildi</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Apply Settings</source>
+      <translation>Ayarları Uygula</translation>
+    </message>
     <message>
       <source>Enter your account password</source>
       <translation>Şifrenizi girin</translation>
@@ -9066,10 +9067,9 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
       <source>Apply</source>
       <translation>Uygula</translation>
     </message>
-    <message>
-      <source>Apply Settings</source>
-      <translation>Ayarları Uygula</translation>
-    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
       <translation>Klasör Seç...</translation>

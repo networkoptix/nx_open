@@ -9323,9 +9323,10 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>Logs downloading canceled</source>
       <translation>Pobieranie logów zostało anulowane</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Apply Settings</source>
+      <translation>Zastosuj ustawienia</translation>
+    </message>
     <message>
       <source>Enter your account password</source>
       <translation>Wprowadź hasło do konta</translation>
@@ -9334,10 +9335,9 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>Apply</source>
       <translation>Zastosuj</translation>
     </message>
-    <message>
-      <source>Apply Settings</source>
-      <translation>Zastosuj ustawienia</translation>
-    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
       <translation>Wybierz folder...</translation>

@@ -1155,6 +1155,10 @@
       <comment>%1 is name, %2 is value.</comment>
       <translation>Paramètre invalide `%1`: %2.</translation>
     </message>
+    <message>
+      <source>Session authorization required.</source>
+      <translation type="unfinished">Session authorization required.</translation>
+    </message>
   </context>
   <context>
     <name>SystemHelpers</name>
@@ -2306,6 +2310,34 @@
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
       <translation>Pas assez de licences. L'enregistrement a été désactivé sur les modules d'E/S suivants :</translation>
+    </message>
+    <message>
+      <source>Also show source camera</source>
+      <translation>Aussi afficher la caméra source</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Source Caméra</translation>
+    </message>
+    <message>
+      <source>Also show on source camera</source>
+      <translation>Aussi afficher la caméra source</translation>
+    </message>
+    <message>
+      <source>Also set on source camera</source>
+      <translation type="unfinished">Also set on source camera</translation>
+    </message>
+    <message>
+      <source>Also trigger on source camera</source>
+      <translation type="unfinished">Also trigger on source camera</translation>
+    </message>
+    <message>
+      <source>Also record source camera</source>
+      <translation type="unfinished">Also record source camera</translation>
+    </message>
+    <message>
+      <source>Also play on source camera</source>
+      <translation type="unfinished">Also play on source camera</translation>
     </message>
   </context>
   <context>

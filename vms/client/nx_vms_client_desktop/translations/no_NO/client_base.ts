@@ -9061,9 +9061,10 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
       <source>Logs downloading canceled</source>
       <translation>Loggnedlasting avbrutt</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Apply Settings</source>
+      <translation>Bruk innstillinger</translation>
+    </message>
     <message>
       <source>Enter your account password</source>
       <translation>Skriv inn kontopassordet ditt</translation>
@@ -9072,10 +9073,9 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
       <source>Apply</source>
       <translation>Bruk</translation>
     </message>
-    <message>
-      <source>Apply Settings</source>
-      <translation>Bruk innstillinger</translation>
-    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
       <translation>Velg mappe...</translation>

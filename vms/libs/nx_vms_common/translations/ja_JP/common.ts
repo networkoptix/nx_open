@@ -1109,6 +1109,10 @@
       <comment>%1 is name, %2 is value.</comment>
       <translation>無効なパラメータ `%1`: %2。</translation>
     </message>
+    <message>
+      <source>Session authorization required.</source>
+      <translation type="unfinished">Session authorization required.</translation>
+    </message>
   </context>
   <context>
     <name>SystemHelpers</name>
@@ -2246,6 +2250,34 @@
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
       <translation>ライセンスが不足しています。以下のI/Oモジュールで録音が無効になっています:</translation>
+    </message>
+    <message>
+      <source>Also show source camera</source>
+      <translation>ソースカメラも表示する</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>ソースカメラ</translation>
+    </message>
+    <message>
+      <source>Also show on source camera</source>
+      <translation>ソースカメラも表示する</translation>
+    </message>
+    <message>
+      <source>Also set on source camera</source>
+      <translation type="unfinished">Also set on source camera</translation>
+    </message>
+    <message>
+      <source>Also trigger on source camera</source>
+      <translation type="unfinished">Also trigger on source camera</translation>
+    </message>
+    <message>
+      <source>Also record source camera</source>
+      <translation type="unfinished">Also record source camera</translation>
+    </message>
+    <message>
+      <source>Also play on source camera</source>
+      <translation type="unfinished">Also play on source camera</translation>
     </message>
   </context>
   <context>

@@ -9061,9 +9061,10 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
       <source>Logs downloading canceled</source>
       <translation>Loggnedladdning avbröts</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Apply Settings</source>
+      <translation>Tillämpa inställningarna</translation>
+    </message>
     <message>
       <source>Enter your account password</source>
       <translation>Ange ditt kontolösenord</translation>
@@ -9072,10 +9073,9 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
       <source>Apply</source>
       <translation>Verkställ</translation>
     </message>
-    <message>
-      <source>Apply Settings</source>
-      <translation>Tillämpa inställningarna</translation>
-    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
       <translation>Välj mapp...</translation>
