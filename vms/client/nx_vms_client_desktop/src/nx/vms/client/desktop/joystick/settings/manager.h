@@ -3,16 +3,16 @@
 #pragma once
 
 #include <QtCore/QDir>
-#include <QtCore/QObject>
 #include <QtCore/QMap>
+#include <QtCore/QObject>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 #include <QtCore/QTimer>
-#include <QtCore/QSharedPointer>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/thread/mutex.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <nx/utils/impl_ptr.h>
 
 #include "device.h"
 
@@ -70,7 +70,6 @@ public:
     void setDeviceActionsEnabled(bool enabled);
 
 protected:
-    virtual void enumerateDevices() = 0;
     virtual void updateSearchState();
 
     /** Load config files. */
@@ -84,10 +83,7 @@ protected:
     void loadGeneralConfig(const QDir& searchDir, JoystickDescriptor& destConfig) const;
 
     virtual void removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths);
-    void initializeDevice(
-        const DevicePtr& device,
-        const JoystickDescriptor& description,
-        const QString& devicePath);
+    void initializeDevice(const DevicePtr& device, const JoystickDescriptor& description);
 
     bool isGeneralJoystickConfig(const JoystickDescriptor& config);
 
