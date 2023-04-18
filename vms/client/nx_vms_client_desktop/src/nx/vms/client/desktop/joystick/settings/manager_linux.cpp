@@ -3,14 +3,14 @@
 #include "manager_linux.h"
 
 #include <fcntl.h>
-#include <linux/joystick.h>
 
 #include <QtCore/QDir>
 
+#include <linux/joystick.h>
 #include <nx/utils/log/log_main.h>
 
-#include "device_linux.h"
 #include "descriptors.h"
+#include "device_linux.h"
 
 using namespace std::chrono;
 
@@ -78,7 +78,7 @@ void ManagerLinux::enumerateDevices()
         deviceLinux->setFoundControlsNumber(axesNumber, buttonsNumber);
 
         if (device->isValid())
-            initializeDevice(device, config, path);
+            initializeDevice(device, config);
         else
             NX_VERBOSE(this, "Device is invalid. Model: %1, path: %2", modelAndManufacturer, path);
     }
