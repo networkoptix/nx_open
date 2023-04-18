@@ -47,9 +47,14 @@ struct NX_VMS_API UserGroupModel
      */
     std::optional<std::map<QnUuid, AccessRights>> resourceAccessRights;
 
-    /**%apidoc[readonly] Whether this Role comes with the System. */
-    bool isPredefined = false;
+    /**%apidoc[readonly] */
+    nx::vms::api::UserAttributes attributes{};
 
+    UserGroupModel() = default;
+    UserGroupModel(const UserGroupModel&) = default;
+    UserGroupModel(UserGroupModel&&) = default;
+    UserGroupModel& operator=(const UserGroupModel&) = default;
+    UserGroupModel& operator=(UserGroupModel&&) = default;
     bool operator==(const UserGroupModel& other) const = default;
 
     using DbReadTypes = std::tuple<UserGroupData, AccessRightsData>;
@@ -73,7 +78,7 @@ struct NX_VMS_API UserGroupModel
     (permissions) \
     (parentGroupIds) \
     (resourceAccessRights) \
-    (isPredefined) \
+    (attributes) \
     (externalId)
 QN_FUSION_DECLARE_FUNCTIONS(UserGroupModel, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserGroupModel, UserGroupModel_Fields)

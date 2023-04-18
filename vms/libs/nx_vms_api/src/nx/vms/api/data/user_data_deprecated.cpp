@@ -33,7 +33,10 @@ std::tuple<UserData, AccessRightsData> UserDataDeprecated::toUserData() const
         static_cast<const nx::vms::api::ResourceData&>(*this);
 
     if (this->isAdmin)
+    {
+        newUserData.attributes = nx::vms::api::UserAttribute::readonly;
         newUserData.groupIds.push_back(nx::vms::api::kAdministratorsGroupId);
+    }
     if (const auto& id = permissionPresetToGroupId(this->permissions))
         newUserData.groupIds.push_back(*id);
     else

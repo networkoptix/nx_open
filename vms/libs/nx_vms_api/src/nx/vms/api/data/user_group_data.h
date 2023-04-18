@@ -33,8 +33,8 @@ struct NX_VMS_API UserGroupData: IdData
     /**%apidoc[opt] List of roles to inherit permissions. */
     std::vector<QnUuid> parentGroupIds;
 
-    /**%apidoc[readonly] Whether this Role comes with the System. */
-    bool isPredefined = false;
+    /**%apidoc[readonly] */
+    nx::vms::api::UserAttributes attributes{};
 
     /**%apidoc[readonly] External identification data (currently used for LDAP only). */
     UserExternalId externalId;
@@ -60,7 +60,7 @@ struct NX_VMS_API UserGroupData: IdData
     (type) \
     (permissions) \
     (parentGroupIds) \
-    (isPredefined) \
+    (attributes) \
     (externalId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserGroupData)
 

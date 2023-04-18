@@ -27,7 +27,7 @@ UserGroupData UserGroupData::makePredefined(
 {
     UserGroupData role(id, name, permissions);
     role.description = description;
-    role.isPredefined = true;
+    role.attributes = UserAttribute::readonly;
     return role;
 }
 

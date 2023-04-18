@@ -16,10 +16,10 @@ UserGroupModel::DbUpdateTypes UserGroupModel::toDbTypes() &&
     userRole.id = std::move(id);
     userRole.name = std::move(name);
     userRole.description = std::move(description);
-    userRole.isPredefined = isPredefined;
     userRole.type = type;
     if (externalId)
         userRole.externalId = std::move(*externalId);
+    userRole.attributes = std::move(attributes);
     userRole.permissions = std::move(permissions);
     userRole.parentGroupIds = std::move(parentGroupIds);
 
@@ -51,7 +51,7 @@ std::vector<UserGroupModel> UserGroupModel::fromDbTypes(DbListTypes all)
         if (!baseData.externalId.isEmpty())
             model.externalId = std::move(baseData.externalId);
         model.permissions = std::move(baseData.permissions);
-        model.isPredefined = baseData.isPredefined;
+        model.attributes = std::move(baseData.attributes);
         model.parentGroupIds = std::move(baseData.parentGroupIds);
 
         auto accessRights = nx::utils::find_if(

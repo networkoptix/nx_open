@@ -34,7 +34,7 @@ MembersModelGroup MembersModelGroup::fromId(SystemContext* systemContext, const 
         .text = group.name,
         .description = group.description,
         .isLdap = (group.type == nx::vms::api::UserType::ldap),
-        .isPredefined = group.isPredefined};
+        .isPredefined = group.attributes.testFlag(nx::vms::api::UserAttribute::readonly)};
 }
 
 MembersModel::MembersModel(SystemContext* systemContext):

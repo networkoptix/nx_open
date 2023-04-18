@@ -762,7 +762,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     {
         result = Qn::ReadPermission;
 
-        if (!targetGroup.isPredefined)
+        if (!targetGroup.attributes.testFlag(nx::vms::api::UserAttribute::readonly))
         {
             // Power Users can only be edited by Administrators, other groups - by all Power Users.
             if (isSubjectAdministrator || !m_accessRightsResolver->hasFullAccessRights(targetGroup.id))

@@ -269,7 +269,7 @@ void MembersCache::updateStats(const QSet<QnUuid>& added, const QSet<QnUuid>& re
         [this, &statsModified](const QnUuid& id, int diff)
         {
             const auto group = m_subjectContext->systemContext()->userGroupManager()->find(id);
-            if (!group || group->isPredefined)
+            if (!group || group->attributes.testFlag(nx::vms::api::UserAttribute::readonly))
                 return;
 
             statsModified = true;

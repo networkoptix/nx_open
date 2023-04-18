@@ -40,6 +40,9 @@ UserDataEx UserModelBase::toUserData() &&
     user.isEnabled = std::move(isEnabled);
     if (password)
         user.password = std::move(*password);
+    if (externalId)
+        user.externalId = std::move(*externalId);
+    user.attributes = std::move(attributes);
     if (!isHttpDigestEnabled)
         user.digest = UserData::kHttpIsDisabledStub;
     if (isHttpDigestEnabled && user.digest == UserData::kHttpIsDisabledStub)
@@ -56,10 +59,11 @@ UserModelBase UserModelBase::fromUserData(UserData&& baseData)
     model.fullName = std::move(baseData.fullName);
     model.permissions = std::move(baseData.permissions);
     model.email = std::move(baseData.email);
-    model.isHttpDigestEnabled = (model.type == UserType::cloud)
-        ? false
-        : (baseData.digest != UserData::kHttpIsDisabledStub);
+    model.isHttpDigestEnabled = (baseData.digest != UserData::kHttpIsDisabledStub);
     model.isEnabled = std::move(baseData.isEnabled);
+    if (!baseData.externalId.isEmpty())
+        model.externalId = std::move(baseData.externalId);
+    model.attributes = std::move(baseData.attributes);
     model.digest = std::move(baseData.digest);
     model.hash = std::move(baseData.hash);
     model.cryptSha512Hash = std::move(baseData.cryptSha512Hash);
@@ -72,8 +76,6 @@ QN_FUSION_DEFINE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml))
 UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
 {
     auto user = std::move(*this).toUserData();
-    if (externalId)
-        user.externalId = std::move(*externalId);
     if (isOwner)
         user.groupIds.push_back(kAdministratorsGroupId);
     if (const auto& id = UserDataDeprecated::permissionPresetToGroupId(user.permissions))
@@ -103,9 +105,6 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
         static_cast<UserModelBase&>(model) = fromUserData(std::move(baseData));
 
         model.isOwner = baseData.isAdministrator();
-        if (!baseData.externalId.isEmpty())
-            model.externalId = std::move(baseData.externalId);
-
         for (const auto& id: baseData.groupIds)
         {
             if (const auto preset = UserDataDeprecated::groupIdToPermissionPreset(model.userRoleId))
@@ -128,9 +127,6 @@ UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
 {
     auto user = std::move(*this).toUserData();
     user.groupIds = std::move(groupIds);
-    if (externalId)
-        user.externalId = std::move(*externalId);
-
     std::optional<AccessRightsData> accessRights;
     if (resourceAccessRights)
     {
@@ -157,7 +153,6 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
         static_cast<UserModelBase&>(model) = fromUserData(std::move(baseData));
 
         model.groupIds = std::move(baseData.groupIds);
-        model.externalId = std::move(baseData.externalId);
         auto accessRights = nx::utils::find_if(allAccessRights,
             [id = model.getId()](const auto& accessRights) { return accessRights.userId == id; });
         if (accessRights)

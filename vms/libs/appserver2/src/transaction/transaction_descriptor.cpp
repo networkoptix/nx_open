@@ -708,6 +708,14 @@ struct RemoveResourceAccess
                 storage->getId().toSimpleString()));
         }
 
+
+        if (const auto user = target.dynamicCast<QnUserResource>();
+            user && user->attributes().testFlag(nx::vms::api::UserAttribute::readonly))
+        {
+            return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                "Removal of the User with readonly attribute is forbidden for VMS."));
+        }
+
         return Result();
     }
 };
@@ -777,6 +785,12 @@ struct SaveUserAccess
             systemContext->resourcePool()->getResourceById<QnUserResource>(param.id);
         if (existingUser)
         {
+            if (existingUser->attributes().testFlag(nx::vms::api::UserAttribute::readonly))
+            {
+                return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                    "Change of the User with readonly attribute is forbidden for VMS."));
+            }
+
             if (!param.externalId.isEmpty())
             {
                 const auto existingExternalId = existingUser->externalId();
