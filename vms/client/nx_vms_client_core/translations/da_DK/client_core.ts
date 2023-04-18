@@ -265,7 +265,7 @@
     </message>
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation type="unfinished">To learn more about the current problem view the server&apos;s certificate:</translation>
+      <translation>For at lære mere om det aktuelle problem, se serveren&apos;s certifikat:</translation>
     </message>
   </context>
 </TS>
