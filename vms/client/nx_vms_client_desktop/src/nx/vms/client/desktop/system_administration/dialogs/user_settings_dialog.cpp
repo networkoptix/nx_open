@@ -481,19 +481,6 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                     return;
                 }
 
-                // Try to immidiately update UI if the user did not change.
-                if (createState(*d->user) != originalState())
-                {
-                    saveStateComplete(state);
-                    return; //< Already updated.
-                }
-
-                if (!(*d->user)->resourcePool())
-                {
-                    saveStateComplete(state);
-                    return; //< Wait for the new user from the message bus.
-                }
-
                 if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
                 {
                     auto user = *d->user;
