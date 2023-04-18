@@ -31,6 +31,7 @@
 #include <nx/vms/client/desktop/common/utils/quick_message_box.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
 #include <nx/vms/client/desktop/debug_utils/components/performance_info.h>
+#include <nx/vms/client/desktop/debug_utils/dialogs/joystick_investigation_wizard/joystick_manager.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_action_choice_model.h>
@@ -252,6 +253,7 @@ void QnClientMetaTypes::registerQmlTypes()
     WhatsThis::registerQmlType();
     MouseSpy::registerQmlType();
     AudioDispatcher::registerQmlType();
+    joystick::JoystickManager::registerQmlType();
 
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");

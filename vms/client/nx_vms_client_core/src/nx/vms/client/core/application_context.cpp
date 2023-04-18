@@ -60,7 +60,6 @@ struct ApplicationContext::Private
             });
 
         qmlEngine = new QQmlEngine(q);
-        qmlEngine->setOutputWarningsToStandardError(true);
 
         const auto thumbnailProvider = new ThumbnailImageProvider();
         // QQmlEngine takes ownership of thumbnailProvider.
