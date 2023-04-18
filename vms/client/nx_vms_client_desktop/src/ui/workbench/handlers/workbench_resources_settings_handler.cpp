@@ -73,8 +73,8 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
         &QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered);
     connect(action(action::UserSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered);
-    connect(action(action::UserRolesAction), &QAction::triggered, this,
-        &QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered);
+    connect(action(action::UserGroupsAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered);
     connect(action(action::LayoutSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered);
     connect(action(action::CurrentLayoutSettingsAction), &QAction::triggered, this,
@@ -209,7 +209,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
     m_userSettingsDialog->raise();
 }
 
-void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
+void QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     const auto parent = utils::extractParentWidget(parameters, mainWindowWidget());

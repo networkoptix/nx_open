@@ -767,20 +767,20 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
             const auto group = userGroupManager()->find(invalidRoles.front()).value_or(
                 UserGroupData{});
 
-            alert = tr("Role %1 has no %2 permission",
-                "%1 is the name of selected role, %2 is permission name")
+            alert = tr("User group %1 has no %2 permission",
+                "%1 is the name of selected user group, %2 is permission name")
                 .arg(html::bold(group.name))
                 .arg(m_permissionName);
         }
         else if (validRoles.empty())
         {
-            alert = tr("Selected roles have no %1 permission", "%1 is permission name")
+            alert = tr("Selected user groups have no %1 permission", "%1 is permission name")
                 .arg(m_permissionName);
         }
         else
         {
-            alert = tr("%n of %1 selected roles have no %2 permission",
-                "%1 is number of selected roles, %2 is permission name", invalidRoles.size())
+            alert = tr("%n of %1 selected user groups have no %2 permission",
+                "%1 is number of selected user groups, %2 is permission name", invalidRoles.size())
                 .arg(validRoles.size() + invalidRoles.size()).arg(m_permissionName);
         }
     }

@@ -120,9 +120,9 @@ private:
 };
 
 //------------------------------------------------------------------------------------------------
-// subject_selection_dialog_private::RoleListDelegate
+// subject_selection_dialog_private::GroupListDelegate
 
-class RoleListDelegate:
+class GroupListDelegate:
     public QnResourceItemDelegate,
     public core::CommonModuleAware
 {
@@ -130,8 +130,8 @@ class RoleListDelegate:
     using base_type = QnResourceItemDelegate;
 
 public:
-    explicit RoleListDelegate(QObject* parent);
-    virtual ~RoleListDelegate() override;
+    explicit GroupListDelegate(QObject* parent);
+    virtual ~GroupListDelegate() override;
 
 protected:
     virtual void initStyleOption(QStyleOptionViewItem* option,
