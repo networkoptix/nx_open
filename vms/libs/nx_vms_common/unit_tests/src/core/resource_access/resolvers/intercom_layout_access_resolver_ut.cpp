@@ -10,7 +10,6 @@
 #include <core/resource_access/resolvers/intercom_layout_access_resolver.h>
 
 #include "private/resource_access_resolver_test_fixture.h"
-#include "../access_rights_types_testing.h"
 
 namespace nx::core::access {
 namespace test {

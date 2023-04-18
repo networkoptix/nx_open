@@ -25,7 +25,6 @@
 #include <nx/vms/common/test_support/test_context.h>
 
 #include "private/resource_access_resolver_test_fixture.h"
-#include "../access_rights_types_testing.h"
 #include "../test_subject_hierarchy.h"
 
 namespace nx::core::access {

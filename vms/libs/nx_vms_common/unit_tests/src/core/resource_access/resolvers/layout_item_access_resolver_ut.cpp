@@ -16,7 +16,6 @@
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
 #include "private/resource_access_resolver_test_fixture.h"
-#include "../access_rights_types_testing.h"
 
 namespace nx::core::access {
 namespace test {
