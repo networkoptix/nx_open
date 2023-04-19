@@ -165,7 +165,7 @@ void RemoteSession::updatePassword(const QString& newPassword)
 
     NX_ASSERT(QThread::currentThread() == qApp->thread());
     if (NX_ASSERT(d->messageProcessor))
-        d->messageProcessor->setHoldConnection(true);
+        d->messageProcessor->holdConnection(true);
     auto credentials = d->connection->credentials();
 
     if (!newPassword.isEmpty())
@@ -201,7 +201,7 @@ void RemoteSession::updatePassword(const QString& newPassword)
                 }
             }
             if (NX_ASSERT(d->messageProcessor))
-                d->messageProcessor->setHoldConnection(false);
+                d->messageProcessor->holdConnection(false);
         });
 
     LogonData logonData = d->connection->createLogonData();

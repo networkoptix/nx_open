@@ -20,8 +20,7 @@ public:
 
     const QnClientConnectionStatus* connectionStatus() const;
 
-    void setHoldConnection(bool holdConnection);
-    bool isConnectionHeld() const;
+    void holdConnection(bool value, bool autoUnhold = false);
 
 protected:
     virtual Qt::ConnectionType handlerConnectionType() const override;
@@ -46,6 +45,7 @@ private:
     QnClientConnectionStatus m_status;
     bool m_connected = false;
     bool m_holdConnection = false;
+    bool m_autoUnhold = false;
 };
 
 #define qnClientMessageProcessor \
