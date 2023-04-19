@@ -10,6 +10,8 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <client/client_globals.h>
 
+using namespace nx::vms::api;
+
 namespace nx::vms::client::desktop {
 namespace test {
 
@@ -327,9 +329,8 @@ TEST_F(ResourceTreeModelTest, cameraIsEditableByAdmin)
 
 TEST_F(ResourceTreeModelTest, cameraIsEditableByCustomUserWithEditCamerasPermissions)
 {
-    // When custom user with permission to edit camera settings is logged in.
-    const auto user = loginAsCustomUser("custom_with_edit_cameras");
-    setupAllMediaAccess(currentUser(), nx::vms::api::AccessRight::edit);
+    // When custom user with is logged in.
+    const auto user = loginAsCustomUser("custom_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -338,7 +339,7 @@ TEST_F(ResourceTreeModelTest, cameraIsEditableByCustomUserWithEditCamerasPermiss
     const auto camera = addCamera(kUniqueCameraName, server->getId());
 
     // And custom user gets access to that camera.
-    setupAccessToResourceForUser(user, camera, true);
+    setupAccessToResourceForUser(user, camera, AccessRight::view | AccessRight::edit);
 
     // Then exactly one camera node with corresponding display text appears in the tree.
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
@@ -406,9 +407,8 @@ TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByAdmin)
 
 TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByCustomUserWithEditCamerasPermissions)
 {
-    // When custom user with permission to edit camera settings is logged in.
-    const auto user = loginAsCustomUser("custom_with_edit_cameras");
-    setupAllMediaAccess(currentUser(), nx::vms::api::AccessRight::edit);
+    // When custom user is logged in.
+    const auto user = loginAsCustomUser("custom_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");
@@ -417,7 +417,7 @@ TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByCustomUserWithEditCameras
     const auto recorderCamera = addRecorderCamera("recorder", kUniqueGroupName, server->getId());
 
     // And custom user gets access to that recorder camera.
-    setupAccessToResourceForUser(user, recorderCamera, true);
+    setupAccessToResourceForUser(user, recorderCamera, AccessRight::view | AccessRight::edit);
 
     // Then exactly one recorder group node with corresponding display text appears in the tree.
     const auto recorderIndex = uniqueMatchingIndex(kUniqueGroupNameCondition);
@@ -428,8 +428,8 @@ TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByCustomUserWithEditCameras
 
 TEST_F(ResourceTreeModelTest, recorderGroupIsNotEditableByPlainCustomUser)
 {
-    // When custom user without permission to edit camera settings is logged in.
-    const auto user = loginAsCustomUser("custom_without_edit_cameras");
+    // When custom user is logged in.
+    const auto user = loginAsCustomUser("custom_user");
 
     // When server is added to the resource pool.
     const auto server = addServer("server");

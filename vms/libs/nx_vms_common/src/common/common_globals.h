@@ -443,6 +443,9 @@ namespace Qn {
         // Alias for common set of generic permissions.
         ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
 
+        // Alias for generic edit set of permissions.
+        GenericEditPermissions = WritePermission | WriteNamePermission | SavePermission,
+
         // Alias for full set of generic permissions.
         FullGenericPermissions = ReadWriteSavePermission | RemovePermission | WriteNamePermission,
 
@@ -549,6 +552,12 @@ namespace Qn {
 
         // Permission to use two-way audio.
         TwoWayAudioPermission = 1 << 21,
+
+        // Permission granted by userInput access right.
+        UserInputPermissions = WritePtzPermission
+            | DeviceInputPermission
+            | SoftTriggerPermission
+            | TwoWayAudioPermission,
 
         //-----------------------------------------------------------------------------------------
 

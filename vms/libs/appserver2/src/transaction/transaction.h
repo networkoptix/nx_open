@@ -96,11 +96,11 @@ APPLY(1, tranSyncRequest, nx::vms::api::SyncRequestData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(2, tranSyncResponse, nx::vms::api::TranStateResponse, \
                        false, /* persistent*/ \
@@ -108,11 +108,11 @@ APPLY(2, tranSyncResponse, nx::vms::api::TranStateResponse, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(3, lockRequest, nx::vms::api::LockData, \
                        false, /* persistent*/ \
@@ -120,11 +120,11 @@ APPLY(3, lockRequest, nx::vms::api::LockData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(4, lockResponse, nx::vms::api::LockData, \
                        false, /* persistent*/ \
@@ -132,11 +132,11 @@ APPLY(4, lockResponse, nx::vms::api::LockData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(5, unlockRequest, nx::vms::api::LockData, \
                        false, /* persistent*/ \
@@ -144,11 +144,11 @@ APPLY(5, unlockRequest, nx::vms::api::LockData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(6, peerAliveInfo, nx::vms::api::PeerAliveData, \
                        false, /* persistent*/ \
@@ -168,11 +168,11 @@ APPLY(7, tranSyncDone, nx::vms::api::TranSyncDoneData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(102, openReverseConnection, nx::vms::api::ReverseConnectionData, \
                        false, /* persistent*/ \
@@ -185,11 +185,11 @@ APPLY(102, openReverseConnection, nx::vms::api::ReverseConnectionData, \
                             NX_ASSERT(tran.command == ApiCommand::openReverseConnection); \
                             emit notificationParams.ecConnection->reverseConnectionRequested(tran.params); \
                        },  /* trigger notification*/ \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(201, removeResource, nx::vms::api::IdData, \
                        true, /* persistent*/ \
@@ -481,8 +481,8 @@ APPLY(315, addHardwareIdMapping, nx::vms::api::HardwareIdMapping, \
                        false, /*isRemoveOperation*/ \
                        HardwareIdMappingHashHelper(), /* getHash*/ \
                        CameraNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
@@ -493,8 +493,8 @@ APPLY(316, removeHardwareIdMapping, nx::vms::api::IdData, \
                        true, /*isRemoveOperation*/ \
                        CreateHashByIdRfc4122Helper("hardwareid_mapping"), /* getHash*/ \
                        CameraNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
@@ -507,8 +507,8 @@ APPLY(317, getHardwareIdMappings, nx::vms::api::HardwareIdMappingList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter read func */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter save func */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(400, getMediaServers, nx::vms::api::MediaServerDataList, \
@@ -529,7 +529,7 @@ APPLY(401, saveMediaServer, nx::vms::api::MediaServerData, \
                        false, /*isRemoveOperation*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        MediaServerNotificationManagerHelper(), \
-                       AdminOnlyAccess(), \
+                       PowerUserAccess(), \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -711,7 +711,7 @@ APPLY(503, getAccessRights, nx::vms::api::AccessRightsDataList, \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -747,7 +747,7 @@ APPLY(505, getUserGroups, nx::vms::api::UserGroupDataList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -927,7 +927,7 @@ APPLY(800, getEventRules, nx::vms::api::EventRuleDataList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -937,7 +937,7 @@ APPLY(801, saveEventRule, nx::vms::api::EventRuleData, \
                        false, /*isRemoveOperation*/ \
                        CreateHashByIdHelper(), \
                        BusinessEventNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -949,7 +949,7 @@ APPLY(802, removeEventRule, nx::vms::api::IdData, \
                        true, /*isRemoveOperation*/ \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper, \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -961,7 +961,7 @@ APPLY(803, resetEventRules, nx::vms::api::ResetEventRulesData, \
                        false, /*isRemoveOperation*/ \
                        [] (const nx::vms::api::ResetEventRulesData&) { return QnAbstractTransaction::makeHash("reset_brule", ADD_HASH_DATA); }, \
                        BusinessEventNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -985,7 +985,7 @@ APPLY(805, execAction, nx::vms::api::EventActionData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), \
                        BusinessEventNotificationManagerHelper(), \
-                       UserInputAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -999,7 +999,7 @@ APPLY(810, getVmsRules, nx::vms::api::rules::RuleList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -1009,7 +1009,7 @@ APPLY(811, saveVmsRule, nx::vms::api::rules::Rule, \
                        false, /*isRemoveOperation*/ \
                        CreateHashByIdHelper(), \
                        VmsRulesNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1021,7 +1021,7 @@ APPLY(812, removeVmsRule, nx::vms::api::IdData, \
                        true, /*isRemoveOperation*/ \
                        CreateHashByIdHelper(), \
                        VmsRulesNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1033,7 +1033,7 @@ APPLY(813, resetVmsRules, nx::vms::api::rules::ResetRules, \
                        false, /*isRemoveOperation*/ \
                        [] (const nx::vms::api::rules::ResetRules&) { return QnAbstractTransaction::makeHash("reset_vms_rules", ADD_HASH_DATA); }, \
                        VmsRulesNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1057,7 +1057,7 @@ APPLY(815, transmitVmsEvent, nx::vms::api::rules::EventInfo, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), \
                        VmsRulesNotificationManagerHelper(), \
-                       UserInputAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1147,7 +1147,7 @@ APPLY(1000, getLicenses, nx::vms::api::LicenseDataList, \
                        LicenseNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -1157,7 +1157,7 @@ APPLY(1001, addLicense, nx::vms::api::LicenseData, \
                        false, /*isRemoveOperation*/ \
                        &createHashForApiLicenseDataHelper, \
                        LicenseNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1171,7 +1171,7 @@ APPLY(1002, addLicenses, nx::vms::api::LicenseDataList, \
                        LicenseNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -1181,7 +1181,7 @@ APPLY(1003, removeLicense, nx::vms::api::LicenseData, \
                        true, /*isRemoveOperation*/ \
                        &createHashForApiLicenseDataHelper, \
                        LicenseNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1193,7 +1193,7 @@ APPLY(1301, discoveredServerChanged, nx::vms::api::DiscoveredServerData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), \
                        DiscoveryNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1207,7 +1207,7 @@ APPLY(1302, discoveredServersList, nx::vms::api::DiscoveredServerDataList, \
                        DiscoveryNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -1217,7 +1217,7 @@ APPLY(1401, discoverPeer, nx::vms::api::DiscoverPeerData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), \
                        DiscoveryNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1229,7 +1229,7 @@ APPLY(1402, addDiscoveryInformation, nx::vms::api::DiscoveryData, \
                        false, /*isRemoveOperation*/ \
                        &createHashForApiDiscoveryDataHelper, \
                        DiscoveryNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1241,7 +1241,7 @@ APPLY(1403, removeDiscoveryInformation, nx::vms::api::DiscoveryData, \
                        true, /*isRemoveOperation*/ \
                        &createHashForApiDiscoveryDataHelper, \
                        DiscoveryNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1255,7 +1255,7 @@ APPLY(1404, getDiscoveryData, nx::vms::api::DiscoveryDataList, \
                        DiscoveryNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -1302,7 +1302,7 @@ APPLY(2004, changeSystemId, nx::vms::api::SystemIdData, \
                        InvalidGetHashHelper(), \
                        [] (const QnTransaction<nx::vms::api::SystemIdData>& tran, const NotificationParams& notificationParams) \
                         { return notificationParams.miscNotificationManager->triggerNotification(tran, notificationParams.source); }, \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1314,7 +1314,7 @@ APPLY(2006, markLicenseOverflow, nx::vms::api::LicenseOverflowData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), \
                        ResourceNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1328,7 +1328,7 @@ APPLY(2007, getSettings, nx::vms::api::ResourceParamDataList, \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(),  \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
@@ -1338,7 +1338,7 @@ APPLY(2008, cleanupDatabase, nx::vms::api::CleanupDatabaseData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), \
                        ResourceNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1350,7 +1350,7 @@ APPLY(2009, broadcastPeerSyncTime, nx::vms::api::PeerSyncTimeData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), \
                        TimeNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1362,7 +1362,7 @@ APPLY(2010, markVideoWallLicenseOverflow, nx::vms::api::VideoWallLicenseOverflow
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), \
                        ResourceNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1397,11 +1397,11 @@ APPLY(9005, dumpDatabase, nx::vms::api::DatabaseDumpData, \
                         { \
                             emit notificationParams.ecConnection->databaseDumped(); \
                         }, \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* local transaction type */ \
 APPLY(9006, restoreDatabase, nx::vms::api::DatabaseDumpData, \
                        true, \
@@ -1412,11 +1412,11 @@ APPLY(9006, restoreDatabase, nx::vms::api::DatabaseDumpData, \
                         { \
                             emit notificationParams.ecConnection->databaseDumped(); \
                         }, \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* local transaction type */ \
 APPLY(9009, updatePersistentSequence, nx::vms::api::UpdateSequenceData, \
                        true, /* persistent*/ \
@@ -1424,11 +1424,11 @@ APPLY(9009, updatePersistentSequence, nx::vms::api::UpdateSequenceData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), \
                        EmptyNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(9010, dumpDatabaseToFile, nx::vms::api::DatabaseDumpToFileData, \
                        false, \
@@ -1436,11 +1436,11 @@ APPLY(9010, dumpDatabaseToFile, nx::vms::api::DatabaseDumpToFileData, \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), \
                        EmptyNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(9011, runtimeInfoRemoved, nx::vms::api::IdData, false, true,                                                \
                        true, /*isRemoveOperation*/ \
@@ -1475,7 +1475,7 @@ APPLY(10100, saveMiscParam, nx::vms::api::MiscData, \
                        InvalidGetHashHelper(), \
                        [] (const QnTransaction<nx::vms::api::MiscData>& tran, const NotificationParams& notificationParams) \
                         { return notificationParams.miscNotificationManager->triggerNotification(tran); }, \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1488,7 +1488,7 @@ APPLY(10101, getMiscParam, nx::vms::api::MiscData, \
                        InvalidGetHashHelper(), \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
@@ -1499,8 +1499,8 @@ APPLY(10200, saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecor
                        false, /*isRemoveOperation*/ \
                        makeCreateHashFromCustomFieldHelper(&nx::vms::api::SystemMergeHistoryRecord::mergedSystemLocalId), /* getHash*/ \
                        EmptyNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* save permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
@@ -1512,10 +1512,10 @@ APPLY(10201, getSystemMergeHistory, nx::vms::api::SystemMergeHistoryRecordList, 
                        InvalidGetHashHelper(), /* getHash*/ \
                        InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
+                       PowerUserAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       FilterListByAccess<PowerUserAccess>(), /* Filter read func */ \
+                       PowerUserAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(10300, getAnalyticsPlugins, nx::vms::api::AnalyticsPluginDataList, \
                         false, \
@@ -1627,7 +1627,7 @@ APPLY(10600, getLookupLists, nx::vms::api::LookupListDataList, \
     InvalidTriggerNotificationHelper(), \
     InvalidAccess(), /*< Save permission checker. */ \
     InvalidAccess(), /*< Read permission checker. */ \
-    FilterListByAccess<AdminOnlyAccess>(), /*< Filter save func. */ \
+    FilterListByAccess<PowerUserAccess>(), /*< Filter save func. */ \
     FilterListByAccess<AllowForAllAccess>(), /*< Filter read func. */ \
     AllowForAllAccessOut(),  /*< Outgoing check is not actual for non-persistent transactions. */ \
     RegularTransactionType()) \
@@ -1637,7 +1637,7 @@ APPLY(10601, saveLookupList, nx::vms::api::LookupListData, \
     /*isRemoveOperation*/ false, \
     CreateHashByIdHelper(), /*< Id is enough to generate hash. */ \
     LookupListNotificationManagerHelper(), \
-    AdminOnlyAccess(), /*< Save permission checker. */ \
+    PowerUserAccess(), /*< Save permission checker. */ \
     AllowForAllAccess(), /*< Read permission checker */ \
     InvalidFilterFunc(), /*< Filter save func. */ \
     InvalidFilterFunc(), /*< Filter read func. */ \
@@ -1649,7 +1649,7 @@ APPLY(10602, removeLookupList, nx::vms::api::IdData, \
     /*isRemoveOperation*/ true, \
     CreateHashByIdHelper(), \
     &apiIdDataTriggerNotificationHelper, \
-    AdminOnlyAccess(), /*< Save permission checker. */ \
+    PowerUserAccess(), /*< Save permission checker. */ \
     AllowForAllAccess(), /*< Read permission checker */ \
     InvalidFilterFunc(), /*< Filter save func. */ \
     InvalidFilterFunc(), /*< Filter read func. */ \
