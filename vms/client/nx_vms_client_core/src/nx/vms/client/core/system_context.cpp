@@ -98,7 +98,8 @@ SystemContext::SystemContext(
                 this);
             d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(
                 this,
-                std::make_unique<nx::vms::rules::Initializer>(this));
+                std::make_unique<nx::vms::rules::Initializer>(this),
+                /*separateThread*/ false);
             break;
 
         case Mode::crossSystem:

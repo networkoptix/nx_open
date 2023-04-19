@@ -3,6 +3,7 @@
 #include "engine.h"
 
 #include <QtCore/QMetaProperty>
+#include <QtCore/QThread>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/log.h>
@@ -24,6 +25,7 @@
 #include "manifest.h"
 #include "router.h"
 #include "rule.h"
+#include "utils/api.h"
 #include "utils/field.h"
 #include "utils/serialization.h"
 #include "utils/type.h"
@@ -52,7 +54,7 @@ bool isDescriptorValid(const ItemDescriptor& descriptor)
 Engine::Engine(std::unique_ptr<Router> router, QObject* parent):
     QObject(parent),
     m_router(std::move(router)),
-    m_eventCache(new EventCache())
+    m_eventCache(std::make_unique<EventCache>())
 {
     const QString rulesVersion(ini().rulesEngine);
     m_enabled = (rulesVersion == "new" || rulesVersion == "both");
@@ -67,6 +69,9 @@ Engine::~Engine()
 
 void Engine::setId(QnUuid id)
 {
+    if (m_id == id)
+        return;
+
     m_id = id;
     m_router->init(id);
 }
@@ -81,9 +86,11 @@ bool Engine::isOldEngineEnabled() const
     return m_oldEngineEnabled;
 }
 
-bool Engine::hasRules() const
+size_t Engine::ruleCount() const
 {
-    return !m_rules.empty();
+    NX_MUTEX_LOCKER lock(&m_ruleMutex);
+
+    return m_rules.size();
 }
 
 bool Engine::addEventConnector(EventConnector *eventConnector)
@@ -110,80 +117,104 @@ bool Engine::addActionExecutor(const QString& actionType, ActionExecutor* action
     return true;
 }
 
-const std::unordered_map<QnUuid, const Rule*> Engine::rules() const
+Engine::ConstRuleSet Engine::rules() const
 {
-    std::unordered_map<QnUuid, const Rule*> result;
-    for (const auto& i: m_rules)
-        result.insert(std::make_pair(i.first, i.second.get()));
+    ConstRuleSet result;
+    NX_MUTEX_LOCKER lock(&m_ruleMutex);
+
+    result.reserve(m_rules.size());
+    for (const auto& [id, rule]: m_rules)
+        result.insert_or_assign(id, rule);
 
     return result;
 }
 
-const Rule* Engine::rule(const QnUuid& id) const
+Engine::ConstRulePtr Engine::rule(const QnUuid& id) const
 {
-    if (m_rules.contains(id))
-        return m_rules.at(id).get();
+    NX_MUTEX_LOCKER lock(&m_ruleMutex);
+    if (const auto it = m_rules.find(id); it != m_rules.end())
+        return it->second;
 
-    return nullptr;
+    return {};
+}
+
+Engine::RulePtr Engine::findRule(const QnUuid& id)
+{
+    NX_MUTEX_LOCKER lock(&m_ruleMutex);
+    if (const auto it = m_rules.find(id); it != m_rules.end())
+        return it->second;
+
+    return {};
 }
 
 Engine::RuleSet Engine::cloneRules() const
 {
     RuleSet result;
+    NX_MUTEX_LOCKER lock(&m_ruleMutex);
 
-    for (const auto& rule: m_rules)
+    for (const auto& [id, rule]: m_rules)
     {
-        if (auto cloned = cloneRule(rule.first))
-            result[rule.first] = std::move(cloned);
+        if (auto cloned = cloneRule(rule.get()))
+            result[id] = std::move(cloned);
     }
 
     return result;
 }
 
-std::unique_ptr<Rule> Engine::cloneRule(const QnUuid& id) const
+Engine::RulePtr Engine::cloneRule(const QnUuid& id) const
 {
-    if (!m_rules.contains(id))
+    auto rule = this->rule(id);
+    if (!rule)
         return {};
 
-    auto cloned = buildRule(serialize(m_rules.at(id).get()));
+    auto cloned = cloneRule(rule.get());
 
-    NX_ASSERT(cloned, "Failed to clone existing rule");
+    NX_ASSERT(cloned, "Failed to clone existing rule, id: %1", id);
 
     return cloned;
 }
 
-bool Engine::updateRule(const api::Rule& ruleData)
+std::unique_ptr<Rule> Engine::cloneRule(const Rule* rule) const
 {
-    if (auto rule = buildRule(ruleData))
-        return updateRule(std::move(rule));
-
-    return false;
+    return buildRule(serialize(rule));
 }
 
-bool Engine::updateRule(std::unique_ptr<Rule> rule)
+void Engine::updateRule(const api::Rule& ruleData)
 {
+    auto rule = buildRule(ruleData);
+    if (!rule)
+        return;
+
     auto ruleId = rule->id();
+    NX_MUTEX_LOCKER lock(&m_ruleMutex);
     auto result = m_rules.insert_or_assign(ruleId, std::move(rule));
+    lock.unlock();
 
     emit ruleAddedOrUpdated(ruleId, result.second);
-    return result.second;
 }
 
 void Engine::removeRule(QnUuid ruleId)
 {
-    auto it = m_rules.find(ruleId);
-    if (it == m_rules.end())
-        return;
+    NX_MUTEX_LOCKER lock(&m_ruleMutex);
+    const auto erasedCount = m_rules.erase(ruleId);
+    lock.unlock();
 
-    m_rules.erase(it);
-    emit ruleRemoved(ruleId);
+    if (erasedCount > 0)
+        emit ruleRemoved(ruleId);
 }
 
 void Engine::resetRules(const std::vector<api::Rule>& rulesData)
 {
-    m_rules.clear();
-    for (const auto& data: rulesData)
-        addRule(data);
+    RuleSet ruleSet;
+    for (const auto& ruleData: rulesData)
+    {
+        if (auto rule = buildRule(ruleData))
+            ruleSet.insert_or_assign(rule->id(), std::move(rule));
+    }
+
+    NX_MUTEX_LOCKER lock(&m_ruleMutex);
+    m_rules = std::move(ruleSet);
+    lock.unlock();
 
     emit rulesReset();
 }
@@ -370,49 +401,9 @@ bool Engine::registerActionField(const QString& type, const ActionFieldConstruct
     return true;
 }
 
-bool Engine::registerEventField(
-    const QJsonObject& /*manifest*/,
-    const std::function<bool()>& /*checker*/)
-{
-    return false;
-}
-
-bool Engine::registerActionField(
-    const QJsonObject& /*manifest*/,
-    const std::function<QJsonValue()>& /*reducer*/)
-{
-    return false;
-}
-
-bool Engine::registerEventType(
-    const QJsonObject& /*manifest*/,
-    const std::function<EventPtr()>& /*constructor*/ /*, QObject* source*/)
-{
-    return false;
-}
-
-bool Engine::registerActionType(
-    const QJsonObject& /*manifest*/,
-    const std::function<EventPtr()>& /*constructor*/,
-    QObject* /*executor*/)
-{
-    return false;
-}
-
-bool Engine::addRule(const api::Rule& serialized)
-{
-    if (auto rule = buildRule(serialized))
-    {
-        m_rules[serialized.id] = std::move(rule);
-        return true;
-    }
-
-    return false;
-}
-
 std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized) const
 {
-    std::unique_ptr<Rule> rule(new Rule(serialized.id, this));
+    auto rule = std::make_unique<Rule>(serialized.id, this);
 
     for (const auto& filterInfo: serialized.eventList)
     {
@@ -438,30 +429,6 @@ std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized) const
     rule->setSchedule(nx::vms::common::scheduleToByteArray(serialized.schedule));
 
     return rule;
-}
-
-api::Rule Engine::serialize(const Rule* rule) const
-{
-    NX_ASSERT(rule);
-
-    api::Rule result;
-
-    result.id = rule->id();
-
-    for (auto filter: rule->eventFilters())
-    {
-        result.eventList += serialize(filter);
-    }
-    for (auto builder: rule->actionBuilders())
-    {
-        result.actionList += serialize(builder);
-    }
-    result.comment = rule->comment();
-    result.enabled = rule->enabled();
-    result.system = rule->isSystem();
-    result.schedule = nx::vms::common::scheduleFromByteArray(rule->schedule());
-
-    return result;
 }
 
 EventPtr Engine::buildEvent(const EventData& eventData) const
@@ -520,7 +487,7 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& se
     if (!NX_ASSERT(descriptor, "Descriptor for the '%1' type is not registered", serialized.type))
         return {};
 
-    std::unique_ptr<EventFilter> filter(new EventFilter(serialized.id, serialized.type));
+    auto filter = std::make_unique<EventFilter>(serialized.id, serialized.type);
 
     for (const auto& fieldDescriptor: descriptor->fields)
     {
@@ -564,7 +531,7 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const ItemDescriptor& desc
 {
     const auto id = QUuid::createUuid();
 
-    std::unique_ptr<EventFilter> filter(new EventFilter(id, descriptor.id));
+    auto filter = std::make_unique<EventFilter>(id, descriptor.id);
 
     for (const auto& fieldDescriptor: descriptor.fields)
     {
@@ -587,30 +554,6 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const ItemDescriptor& desc
     return filter;
 }
 
-api::EventFilter Engine::serialize(const EventFilter *filter) const
-{
-    NX_ASSERT(filter);
-
-    api::EventFilter result;
-
-    const auto fields = filter->fields();
-    for (auto it = fields.cbegin(); it != fields.cend(); ++it)
-    {
-        const auto& name = it.key();
-        const auto field = it.value();
-
-        api::Field serialized;
-        serialized.type = field->metatype();
-        serialized.props = field->serializedProperties();
-
-        result.fields.emplace(name, std::move(serialized));
-    }
-    result.id = filter->id();
-    result.type = filter->eventType();
-
-    return result;
-}
-
 std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuilder& serialized) const
 {
     const auto descriptor = actionDescriptor(serialized.type);
@@ -621,8 +564,7 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuild
     //if (!ctor)
     //    return nullptr;
 
-    std::unique_ptr<ActionBuilder> builder(
-        new ActionBuilder(serialized.id, serialized.type, ctor));
+    auto  builder = std::make_unique<ActionBuilder>(serialized.id, serialized.type, ctor);
     connect(builder.get(), &ActionBuilder::action, this, &Engine::processAction);
 
     for (const auto& fieldDescriptor: descriptor->fields)
@@ -646,30 +588,6 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuild
     }
 
     return builder;
-}
-
-api::ActionBuilder Engine::serialize(const ActionBuilder *builder) const
-{
-    NX_ASSERT(builder);
-
-    api::ActionBuilder result;
-
-    const auto fields = builder->fields();
-    for (auto it = fields.cbegin(); it != fields.cend(); ++it)
-    {
-        const auto& name = it.key();
-        const auto field = it.value();
-
-        api::Field serialized;
-        serialized.type = field->metatype();
-        serialized.props = field->serializedProperties();
-
-        result.fields.emplace(name, std::move(serialized));
-    }
-    result.id = builder->id();
-    result.type = builder->actionType();
-
-    return result;
 }
 
 std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const QString& actionType) const
@@ -781,49 +699,53 @@ void Engine::processEvent(const EventPtr& event)
     if (!m_enabled)
         return;
 
+    checkOwnThread();
     NX_DEBUG(this, "Processing Event: %1, state: %2", event->type(), event->state());
 
     EventData eventData;
     QSet<QByteArray> eventFields; // TODO: #spanasenko Cache data.
     QSet<QnUuid> ruleIds, resources;
 
-    // TODO: #spanasenko Add filters-by-type maps?
-    for (const auto& [id, rule]: m_rules)
     {
-        if (!rule->enabled())
-            continue;
+        NX_MUTEX_LOCKER lock(&m_ruleMutex);
 
-        bool matched = false;
-        for (const auto filter: rule->eventFiltersByType(event->type()))
+        // TODO: #spanasenko Add filters-by-type maps?
+        for (const auto& [id, rule]: m_rules)
         {
-            if (filter->match(event))
+            if (!rule->enabled())
+                continue;
+
+            bool matched = false;
+            for (const auto filter: rule->eventFiltersByType(event->type()))
             {
-                matched = true;
-                break;
-            }
-        }
-
-        if (matched)
-        {
-            //for (const auto& builder: rule->actionBuilders())
-            //{
-            //    eventFields += builder->requiredEventFields();
-            //}
-
-            //for (const auto& builder: rule->actionBuilders())
-            //{
-            //    resources += builder->affectedResources(eventData);
-            //}
-
-            for (const auto& fieldName: nx::utils::propertyNames(event.get()))
-            {
-                eventFields += fieldName;
+                if (filter->match(event))
+                {
+                    matched = true;
+                    break;
+                }
             }
 
-            ruleIds += id;
+            if (matched)
+            {
+                //for (const auto& builder: rule->actionBuilders())
+                //{
+                //    eventFields += builder->requiredEventFields();
+                //}
+
+                //for (const auto& builder: rule->actionBuilders())
+                //{
+                //    resources += builder->affectedResources(eventData);
+                //}
+
+                for (const auto& fieldName: nx::utils::propertyNames(event.get()))
+                {
+                    eventFields += fieldName;
+                }
+
+                ruleIds += id;
+            }
         }
     }
-
     NX_DEBUG(this, "Matched with %1 rules", ruleIds.size());
 
     if (!ruleIds.empty())
@@ -835,6 +757,7 @@ void Engine::processEvent(const EventPtr& event)
 
 void Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
 {
+    checkOwnThread();
     for (const auto& event: events)
         processEvent(event);
 }
@@ -842,13 +765,12 @@ void Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
 // TODO: #spanasenko Use a wrapper with additional checks instead of QHash.
 void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventData)
 {
+    checkOwnThread();
     NX_DEBUG(this, "Processing accepted event, rule id: %1", ruleId);
 
-    const auto it = m_rules.find(ruleId);
-    if (it == m_rules.end()) // Assert?
+    const auto rule = this->findRule(ruleId);
+    if (!rule)
         return;
-
-    const auto& rule = it->second;
 
     if (!rule->timeInSchedule(qnSyncTime->currentDateTime()))
     {
@@ -873,6 +795,7 @@ void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventDa
 
 void Engine::processAction(const ActionPtr& action)
 {
+    checkOwnThread();
     NX_DEBUG(this, "Processing Action %1", action->type());
 
     if (auto executor = m_executors.value(action->type()))
@@ -891,7 +814,16 @@ bool Engine::isActionFieldRegistered(const QString& fieldId) const
 
 EventCache* Engine::eventCache() const
 {
+    checkOwnThread();
+
     return m_eventCache.get();
+}
+
+void Engine::checkOwnThread() const
+{
+    const auto currentThread = QThread::currentThread();
+    NX_ASSERT(this->thread() == currentThread,
+        "Unexpected thread: %1", currentThread->objectName());
 }
 
 } // namespace nx::vms::rules

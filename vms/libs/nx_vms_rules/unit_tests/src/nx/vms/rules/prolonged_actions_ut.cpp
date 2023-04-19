@@ -12,6 +12,7 @@
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/utils/api.h>
 #include <utils/common/synctime.h>
 
 #include "mock_engine_events.h"
@@ -73,7 +74,7 @@ protected:
 
         rule->addActionBuilder(std::move(builder));
 
-        engine->updateRule(std::move(rule));
+        engine->updateRule(serialize(rule.get()));
     }
 
     virtual void TearDown() override

@@ -11,6 +11,7 @@
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/utils/api.h>
 
 #include "mock_engine_events.h"
 #include "test_action.h"
@@ -57,19 +58,19 @@ protected:
 TEST_F(EngineTest, ruleAddedSuccessfully)
 {
     // No rules at the moment the engine is just created.
-    ASSERT_TRUE(engine->rules().empty());
+    ASSERT_EQ(0, engine->ruleCount());
 
     auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
-    engine->addRule(engine->serialize(rule.get()));
+    engine->updateRule(serialize(rule.get()));
 
-    ASSERT_EQ(engine->rules().size(), 1);
-    ASSERT_TRUE(engine->rules().contains(rule->id()));
+    ASSERT_EQ(engine->ruleCount(), 1);
+    ASSERT_TRUE(engine->cloneRule(rule->id()));
 }
 
 TEST_F(EngineTest, ruleClonedSuccessfully)
 {
     auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
-    engine->addRule(engine->serialize(rule.get()));
+    engine->updateRule(serialize(rule.get()));
 
     auto clonedRule = engine->cloneRule(rule->id());
 
@@ -101,7 +102,7 @@ TEST_F(EngineTest, invalidDescriptorMustNotBeRegistered)
 
 TEST_F(EngineTest, invalidConstructorMustNotBeRegistered)
 {
-    ASSERT_FALSE(engine->registerActionConstructor(kTestActionId, {}));
+    ASSERT_FALSE(engine->registerAction(TestEvent::manifest(), {}));
 }
 
 TEST_F(EngineTest, descriptionWithoutIdMustNotBeRegistered)
@@ -305,8 +306,8 @@ TEST_F(EngineTest, updateRule)
 
     EXPECT_CALL(mockEvents, onRuleAddedOrUpdated(ruleData1.id, true));
     EXPECT_CALL(mockEvents, onRuleAddedOrUpdated(ruleData1.id, false));
-    EXPECT_TRUE(engine->updateRule(ruleData1));
-    EXPECT_FALSE(engine->updateRule(ruleData1));
+    engine->updateRule(ruleData1);
+    engine->updateRule(ruleData1);
     EXPECT_TRUE(engine->cloneRules()[ruleData1.id]);
 }
 
@@ -317,7 +318,7 @@ TEST_F(EngineTest, removeRule)
 
     EXPECT_CALL(mockEvents, onRuleAddedOrUpdated(ruleData1.id, true));
     EXPECT_CALL(mockEvents, onRuleRemoved(ruleData1.id));
-    EXPECT_TRUE(engine->updateRule(ruleData1));
+    engine->updateRule(ruleData1);
     engine->removeRule(ruleData1.id);
     EXPECT_TRUE(engine->cloneRules().empty());
     engine->removeRule(ruleData1.id);
@@ -329,12 +330,12 @@ TEST_F(EngineTest, resetRules)
     auto ruleData1 = makeEmptyRuleData();
 
     EXPECT_CALL(mockEvents, onRulesReset());
-    EXPECT_TRUE(engine->cloneRules().empty());
+    EXPECT_EQ(engine->ruleCount(), 0);
     engine->resetRules({});
 
     EXPECT_CALL(mockEvents, onRuleAddedOrUpdated(ruleData1.id, true));
     EXPECT_CALL(mockEvents, onRulesReset());
-    EXPECT_TRUE(engine->updateRule(ruleData1));
+    engine->updateRule(ruleData1);
     engine->resetRules({});
 }
 

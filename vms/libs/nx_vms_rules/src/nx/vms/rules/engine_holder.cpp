@@ -3,9 +3,10 @@
 #include "engine_holder.h"
 
 #include <api/common_message_processor.h>
+#include <nx/utils/async_handler_executor.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
-#include <nx/vms/common/system_context.h>
 
 #include "ec2_router.h"
 #include "plugin.h"
@@ -13,16 +14,41 @@
 
 namespace nx::vms::rules {
 
-EngineHolder::EngineHolder(nx::vms::common::SystemContext* context, std::unique_ptr<Plugin> plugin):
-    m_engine(std::make_unique<Engine>(std::make_unique<Ec2Router>(context))),
-    m_builtinPlugin(std::move(plugin))
+EngineHolder::EngineHolder(
+    nx::vms::common::SystemContext* context,
+    std::unique_ptr<Plugin> plugin,
+    bool separateThread)
+    :
+    m_builtinPlugin(std::move(plugin)),
+    m_engine(std::make_unique<Engine>(std::make_unique<Ec2Router>(context)))
 {
     m_builtinPlugin->initialize(m_engine.get());
+
+    if (separateThread)
+    {
+        m_thread = std::make_unique<QThread>();
+        m_thread->setObjectName("VmsRulesEngine");
+        m_thread->start();
+
+        m_engine->moveToThread(m_thread.get());
+    }
+
     context->setVmsRulesEngine(m_engine.get());
 }
 
 EngineHolder::~EngineHolder()
 {
+    if (!m_thread)
+        return;
+
+    nx::utils::AsyncHandlerExecutor(m_thread.get()).submit(
+        [this]
+        {
+            m_engine.reset();
+            m_thread->quit();
+        });
+
+    m_thread->wait();
 }
 
 Engine* EngineHolder::engine() const

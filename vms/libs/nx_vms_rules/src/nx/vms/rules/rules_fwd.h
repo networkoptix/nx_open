@@ -18,8 +18,6 @@ class ActionExecutor;
 class BasicEvent;
 class BasicAction;
 
-class AggregatedEvent;
-
 class ActionBuilder;
 class EventFilter;
 
@@ -33,6 +31,7 @@ struct ItemDescriptor;
 using EventPtr = QSharedPointer<BasicEvent>;
 using ActionPtr = QSharedPointer<BasicAction>;
 
+class AggregatedEvent;
 using AggregatedEventPtr = QSharedPointer<AggregatedEvent>;
 
 using EventData = nx::vms::api::rules::PropertyMap;

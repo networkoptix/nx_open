@@ -14,6 +14,7 @@
 #include <nx/vms/rules/events/generic_event.h>
 #include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/utils/api.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
 
@@ -70,7 +71,7 @@ bool operator==(const Rule& left, const Rule& right)
 
 } // namespace
 
-SimplifiedRule::SimplifiedRule(Engine* engine, std::unique_ptr<vms::rules::Rule>&& rule):
+SimplifiedRule::SimplifiedRule(Engine* engine, std::shared_ptr<vms::rules::Rule>&& rule):
     m_engine{engine},
     m_rule{std::move(rule)}
 {
@@ -85,7 +86,7 @@ SimplifiedRule::~SimplifiedRule()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-void SimplifiedRule::setRule(std::unique_ptr<vms::rules::Rule>&& rule)
+void SimplifiedRule::setRule(std::shared_ptr<vms::rules::Rule>&& rule)
 {
     stopWatchOnRule();
 
@@ -597,7 +598,7 @@ void RulesTableModel::applyChanges(std::function<void(const QString&)> errorHand
         if (!simplifiedRule)
             continue;
 
-        auto serializedRule = m_engine->serialize(simplifiedRule->rule());
+        auto serializedRule = serialize(simplifiedRule->rule());
         rulesManager->save(
             serializedRule,
             [this, errorHandler, id](int /*requestId*/, ec2::ErrorCode errorCode)
@@ -698,7 +699,7 @@ bool RulesTableModel::isIndexValid(const QModelIndex& index) const
 
 bool RulesTableModel::isRuleModified(const SimplifiedRule* rule) const
 {
-    auto& sourceRuleSet = m_engine->rules();
+    auto sourceRuleSet = m_engine->rules();
 
     if (!sourceRuleSet.contains(rule->id()))
         return true; //< It is a new rule.
