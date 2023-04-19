@@ -384,7 +384,7 @@ void SoftwareTriggersWatcher::updateTriggerAvailability(QnUuid id)
         if (!rule)
             return;
 
-        const auto enabled = rule->isScheduleMatchTime(dateTime);
+        enabled = rule->isScheduleMatchTime(dateTime);
     }
     else
     {
