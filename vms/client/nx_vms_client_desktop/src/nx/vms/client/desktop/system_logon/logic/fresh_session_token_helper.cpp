@@ -34,7 +34,7 @@ ActionTypeInfo info(FreshSessionTokenHelper::ActionType actionType)
         case ActionType::merge:
             return {core::OauthClientType::passwordMerge};
         case ActionType::updateSettings:
-            return {core::OauthClientType::renewDesktop};
+            return {core::OauthClientType::passwordApply};
     }
 
     NX_ASSERT(false, "Unexpected action type");
