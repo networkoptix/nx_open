@@ -434,7 +434,7 @@ std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized) const
 EventPtr Engine::buildEvent(const EventData& eventData) const
 {
     const QString eventType = eventData.value(utils::kType).toString();
-    if (!NX_ASSERT(m_eventTypes.contains(eventType)))
+    if (!NX_ASSERT(m_eventTypes.contains(eventType), "Unknown event type: %1", eventType))
         return EventPtr();
 
     auto event = EventPtr(m_eventTypes[eventType]());

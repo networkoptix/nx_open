@@ -17,8 +17,8 @@ struct NX_VMS_API EventLogFilter
     /**%apidoc[opt] Period of event log timestamps, infinite by default. */
     ServerTimePeriod period;
 
-    /**%apidoc[opt] List of event or action resource ids. */
-    std::vector<QnUuid> resourceIds; //< TODO: #amalov Consider splitting to event/action resources.
+    /**%apidoc[opt] List of event resource ids. */
+    std::vector<QnUuid> eventResourceIds; //< TODO: #amalov Consider adding action resources.
 
     /**%apidoc[opt]
      * List of event types. See /rest/v{3-}/events/manifest/events for event manifests
@@ -85,3 +85,6 @@ struct NX_VMS_API EventLogRecord
 QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(sql_record), NX_VMS_API)
 
 } // namespace nx::vms::rules
+
+void NX_VMS_API serialize_field(const nx::vms::api::rules::PropertyMap& data, QVariant* value);
+void NX_VMS_API deserialize_field(const QVariant& value, nx::vms::api::rules::PropertyMap* data);
