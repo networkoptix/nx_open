@@ -225,6 +225,10 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
             {
                 auto credentials = connection()->credentials();
                 credentials.authToken = refreshSessionResult.token;
+
+                if (NX_ASSERT(qnClientMessageProcessor))
+                    qnClientMessageProcessor->holdConnection(true, true);
+
                 connection()->updateCredentials(
                     credentials,
                     refreshSessionResult.tokenExpirationTime);
