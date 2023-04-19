@@ -1495,7 +1495,7 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
         setTargetState(WidgetUpdateState::installingStalled, targets);
     }
 
-    qnClientMessageProcessor->setHoldConnection(false);
+    qnClientMessageProcessor->holdConnection(false);
 
     if (hasPendingUiChanges())
         loadDataToUi();
@@ -2093,7 +2093,7 @@ void MultiServerUpdatesWidget::completeClientInstallation(bool clientUpdated)
 
     // Client must be forcefully disconnected before restarting to make sure all components
     // are deinitialized correctly.
-    qnClientMessageProcessor->setHoldConnection(false);
+    qnClientMessageProcessor->holdConnection(false);
 
     const QnUuidSet incompatibleServers = m_stateTracker->serversWithChangedProtocol();
     if (clientUpdated || !incompatibleServers.empty())
@@ -2245,7 +2245,7 @@ void MultiServerUpdatesWidget::setTargetState(
                     QSet<QnUuid> servers = targets;
                     servers.remove(clientPeerId());
                     if (!servers.empty())
-                        qnClientMessageProcessor->setHoldConnection(true);
+                        qnClientMessageProcessor->holdConnection(true);
                 }
 
                 m_installCheckTimer = std::make_unique<QTimer>(this);
