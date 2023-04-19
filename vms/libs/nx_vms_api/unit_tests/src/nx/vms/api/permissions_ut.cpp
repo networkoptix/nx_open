@@ -19,19 +19,19 @@ TEST(Permissions, BackwardCompatibility)
 {
     const auto resourceId = QnUuid::createUuid();
     const std::vector<PermissionsV1> deprecatedPermissions{
-        {GlobalPermission::editCameras, {}},
+        {GlobalPermission::editCameras | GlobalPermission::accessAllMedia, {}},
         {GlobalPermission::editCameras, {{resourceId}}},
-        {GlobalPermission::controlVideowall, {}},
-        {GlobalPermission::viewArchive, {}},
+        {GlobalPermission::viewArchive | GlobalPermission::accessAllMedia, {}},
         {GlobalPermission::viewArchive, {{resourceId}}},
-        {GlobalPermission::exportArchive, {}},
+        {GlobalPermission::exportArchive | GlobalPermission::accessAllMedia, {}},
         {GlobalPermission::exportArchive, {{resourceId}}},
-        {GlobalPermission::viewBookmarks, {}},
+        {GlobalPermission::viewBookmarks | GlobalPermission::accessAllMedia, {}},
         {GlobalPermission::viewBookmarks, {{resourceId}}},
-        {GlobalPermission::manageBookmarks, {}},
+        {GlobalPermission::manageBookmarks | GlobalPermission::accessAllMedia, {}},
         {GlobalPermission::manageBookmarks, {{resourceId}}},
-        {GlobalPermission::userInput, {}},
+        {GlobalPermission::userInput | GlobalPermission::accessAllMedia, {}},
         {GlobalPermission::userInput, {{resourceId}}},
+        {GlobalPermission::controlVideowall, {}},
         {GlobalPermission::accessAllMedia, {}},
     };
     const auto userId = QnUuid::createUuid();
@@ -41,10 +41,35 @@ TEST(Permissions, BackwardCompatibility)
         auto converted =
             PermissionConverter::accessRights(&permissions, userId, origin.accessibleResources);
         ASSERT_EQ(permissions, GlobalPermission::none);
-        PermissionsV1 expected;
+        PermissionsV1 convertedBack;
         PermissionConverter::extractFromResourceAccessRights(
-            {converted}, userId, &expected.permissions, &expected.accessibleResources);
-        ASSERT_EQ(nx::reflect::json::serialize(origin), nx::reflect::json::serialize(expected));
+            {converted}, userId, &convertedBack.permissions, &convertedBack.accessibleResources);
+        ASSERT_EQ(nx::reflect::json::serialize(origin), nx::reflect::json::serialize(convertedBack));
+    }
+}
+
+TEST(Permissions, CasesNotPreservingBackwardCompatibility)
+{
+    const std::vector<PermissionsV1> deprecatedPermissions{
+        {GlobalPermission::editCameras, {}},
+        {GlobalPermission::viewArchive, {}},
+        {GlobalPermission::exportArchive, {}},
+        {GlobalPermission::viewBookmarks, {}},
+        {GlobalPermission::manageBookmarks, {}},
+        {GlobalPermission::userInput, {}},
+    };
+    const auto expectedNoPermissions = nx::reflect::json::serialize(PermissionsV1{});
+    const auto userId = QnUuid::createUuid();
+    for (const auto& origin: deprecatedPermissions)
+    {
+        auto permissions = origin.permissions;
+        auto converted =
+            PermissionConverter::accessRights(&permissions, userId, origin.accessibleResources);
+        ASSERT_EQ(permissions, GlobalPermission::none);
+        PermissionsV1 convertedBack;
+        PermissionConverter::extractFromResourceAccessRights(
+            {converted}, userId, &convertedBack.permissions, &convertedBack.accessibleResources);
+        ASSERT_EQ(expectedNoPermissions, nx::reflect::json::serialize(convertedBack));
     }
 }
 

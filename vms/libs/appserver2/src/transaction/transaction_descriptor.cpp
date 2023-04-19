@@ -1412,19 +1412,7 @@ static Result userHasAccess(
     return Result();
 }
 
-struct UserInputAccess
-{
-    template<typename Event>
-    Result operator()(
-        SystemContext* systemContext, const Qn::UserAccessData& accessData, const Event& event)
-    {
-        // TODO: Check if this requirenment is not too strict.
-        return userHasAccess(systemContext, accessData, nx::vms::api::kAllDevicesGroupId,
-            nx::vms::api::AccessRight::userInput);
-    }
-};
-
-struct AdminOnlyAccess
+struct PowerUserAccess
 {
     template<typename Param>
     Result operator()(
@@ -1434,7 +1422,7 @@ struct AdminOnlyAccess
     }
 };
 
-struct AdminOnlyAccessOut
+struct PowerUserAccessOut
 {
     template<typename Param>
     RemotePeerAccess operator()(
@@ -1453,7 +1441,7 @@ struct SaveUserRoleAccess
         const Qn::UserAccessData& accessData,
         const nx::vms::api::UserGroupData& param)
     {
-        if (auto r = AdminOnlyAccess()(systemContext, accessData, param); !r)
+        if (auto r = PowerUserAccess()(systemContext, accessData, param); !r)
         {
             r.message = ServerApiErrors::tr(
                 "Saving Role is forbidden because the user has no admin access.");
@@ -1500,7 +1488,7 @@ struct RemoveUserRoleAccess
         const Qn::UserAccessData& accessData,
         const nx::vms::api::IdData& param)
     {
-        if (auto r = AdminOnlyAccess()(systemContext, accessData, param); !r)
+        if (auto r = PowerUserAccess()(systemContext, accessData, param); !r)
         {
             r.message = ServerApiErrors::tr(
                 "Removing Role is forbidden because the user has no admin access.");

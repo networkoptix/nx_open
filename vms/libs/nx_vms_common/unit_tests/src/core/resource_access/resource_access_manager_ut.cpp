@@ -97,7 +97,7 @@ protected:
         const QnResourcePtr &resource, Qn::Permissions desired, Qn::Permissions forbidden) const
     {
         Qn::Permissions actual = resourceAccessManager()->permissions(m_currentUser, resource);
-        ASSERT_EQ(desired, actual);
+        ASSERT_EQ(desired, desired & actual);
         ASSERT_EQ(0U, forbidden & actual);
     }
 
@@ -1733,6 +1733,51 @@ TEST_F(ResourceAccessManagerTest, checkPermissionsById)
     ASSERT_EQ(
         resourceAccessManager()->permissions(m_currentUser, group),
         resourceAccessManager()->permissions(m_currentUser, group.id));
+}
+
+// ------------------------------------------------------------------------------------------------
+// AccessRights related checks
+
+TEST_F(ResourceAccessManagerTest, accessRightsIndependency)
+{
+    loginAsCustom();
+
+    auto camera = addCamera();
+    auto videowall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videowall);
+    addToLayout(layout, camera);
+
+    checkPermissions(camera, Qn::NoPermissions, Qn::AllPermissions);
+
+    const Qn::Permissions kRelevantPermissions =
+        Qn::ViewContentPermission
+        | Qn::ViewFootagePermission
+        | Qn::ViewBookmarksPermission
+        | Qn::ManageBookmarksPermission
+        | Qn::UserInputPermissions
+        | Qn::GenericEditPermissions;
+
+    static const std::map<AccessRight, Qn::Permissions> kTestAccessRights{
+        {AccessRight::view, Qn::ViewContentPermission | Qn::ViewLivePermission},
+        {AccessRight::viewArchive, Qn::ViewContentPermission | Qn::ViewFootagePermission},
+        {AccessRight::viewBookmarks, Qn::ViewBookmarksPermission},
+        {AccessRight::manageBookmarks, Qn::ManageBookmarksPermission},
+        {AccessRight::userInput, Qn::UserInputPermissions},
+        {AccessRight::edit, Qn::GenericEditPermissions}};
+
+    for (const auto [testAccessRight, expectedPermissions]: kTestAccessRights)
+    {
+        const auto forbiddenPermissions = kRelevantPermissions & ~expectedPermissions;
+        setOwnAccessRights(m_currentUser->getId(), {{videowall->getId(), testAccessRight}});
+        checkPermissions(camera, expectedPermissions, forbiddenPermissions);
+    }
+
+    // The only exception is AccessRight::exportArchive.
+    setOwnAccessRights(m_currentUser->getId(), {{videowall->getId(), AccessRight::exportArchive}});
+    EXPECT_FALSE(hasPermission(m_currentUser, camera, Qn::ExportPermission));
+    setOwnAccessRights(m_currentUser->getId(),
+        {{videowall->getId(), AccessRight::viewArchive | AccessRight::exportArchive}});
+    EXPECT_TRUE(hasPermission(m_currentUser, camera, Qn::ExportPermission));
 }
 
 } // namespace nx::vms::common::test

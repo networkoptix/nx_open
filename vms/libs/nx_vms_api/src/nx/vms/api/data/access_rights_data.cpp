@@ -58,7 +58,7 @@ std::map<QnUuid, AccessRights> migrateAccessRights(
         return kPowerUserAccess;
     }
 
-    AccessRights accessRights{};
+    AccessRights accessRights = AccessRight::view;
     if (permissions.testFlag(GlobalPermission::editCameras))
         accessRights |= AccessRight::edit;
     if (permissions.testFlag(GlobalPermission::viewArchive))
@@ -72,25 +72,19 @@ std::map<QnUuid, AccessRights> migrateAccessRights(
     if (permissions.testFlag(GlobalPermission::userInput))
         accessRights |= AccessRight::userInput;
 
-    const auto fullAccessRights = accessRights | AccessRight::view;
-
     std::map<QnUuid, AccessRights> accessMap;
     if (permissions.testFlag(GlobalPermission::accessAllMedia))
     {
-        accessMap.emplace(kAllDevicesGroupId, fullAccessRights);
+        accessMap.emplace(kAllDevicesGroupId, accessRights);
         accessMap.emplace(kAllServersGroupId, AccessRight::view);
         accessMap.emplace(kAllWebPagesGroupId, AccessRight::view);
     }
-    else if (accessRights)
-    {
-        accessMap.emplace(kAllDevicesGroupId, accessRights);
-    }
 
     if (permissions.testFlag(GlobalPermission::controlVideowall))
-        accessMap.emplace(kAllVideoWallsGroupId, fullAccessRights);
+        accessMap.emplace(kAllVideoWallsGroupId, AccessRight::view);
 
     for (const auto& id: accessibleResources)
-        accessMap.emplace(id, fullAccessRights);
+        accessMap.emplace(id, accessRights);
 
     return accessMap;
 }

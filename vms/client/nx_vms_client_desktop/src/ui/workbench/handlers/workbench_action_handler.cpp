@@ -526,12 +526,16 @@ void ActionHandler::addToLayout(
     }
     else if (params.time > 0ms)
     {
-        layout->setItemData(
-            data.uuid, Qn::ItemTimeRole, QVariant::fromValue<qint64>(params.time.count()));
-        layout->setItemData(
-            data.uuid, Qn::ItemPausedRole, params.paused);
-        layout->setItemData(
-            data.uuid, Qn::ItemSpeedRole, params.speed);
+        qint64 timeMs = params.time.count();
+        if (timeMs == DATETIME_NOW
+            && !accessController()->hasPermissions(resource, Qn::ViewLivePermission))
+        {
+            timeMs = 0;
+        }
+
+        layout->setItemData(data.uuid, Qn::ItemTimeRole, timeMs);
+        layout->setItemData(data.uuid, Qn::ItemPausedRole, params.paused);
+        layout->setItemData(data.uuid, Qn::ItemSpeedRole, params.speed);
     }
 }
 

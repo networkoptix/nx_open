@@ -415,12 +415,17 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         result |= Qn::RemovePermission;
 
     const auto accessRights = this->accessRights(subject, camera);
-    if (!accessRights.testFlag(AccessRight::view))
+    if (!accessRights)
         return result;
 
-    result |= Qn::ReadPermission | Qn::ViewContentPermission;
+    result |= Qn::ReadPermission;
 
-    const bool isLiveAllowed = !camera->needsToChangeDefaultPassword();
+    if (accessRights.testAnyFlags(AccessRight::view | AccessRight::viewArchive))
+        result |= Qn::ViewContentPermission;
+
+    const bool isLiveAllowed = !camera->needsToChangeDefaultPassword()
+        && accessRights.testFlag(AccessRight::view);
+
     bool isFootageAllowed = accessRights.testFlag(AccessRight::viewArchive);
     bool isExportAllowed = isFootageAllowed
         && accessRights.testFlag(AccessRight::exportArchive);
@@ -461,23 +466,16 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     }
 
     if (accessRights.testFlag(AccessRight::viewBookmarks))
-    {
         result |= Qn::ViewBookmarksPermission;
 
-        if (accessRights.testFlag(AccessRight::manageBookmarks))
-            result |= Qn::ManageBookmarksPermission;
-    }
+    if (accessRights.testFlag(AccessRight::manageBookmarks))
+        result |= Qn::ManageBookmarksPermission;
 
     if (accessRights.testFlag(AccessRight::userInput))
-    {
-        result |= Qn::WritePtzPermission
-            | Qn::DeviceInputPermission
-            | Qn::SoftTriggerPermission
-            | Qn::TwoWayAudioPermission;
-    }
+        result |= Qn::UserInputPermissions;
 
     if (accessRights.testFlag(AccessRight::edit))
-        result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission;
+        result |= Qn::GenericEditPermissions;
 
     return result;
 }
@@ -485,14 +483,13 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnMediaServerResourcePtr& server) const
 {
-    Qn::Permissions result = Qn::ReadPermission;
-    if (!hasAccessRights(subject, server, AccessRight::view))
-        return result;
-
-    result |= Qn::ViewContentPermission;
-
     if (hasPowerUserPermissions(subject))
-        result |= Qn::FullServerPermissions;
+        return Qn::FullServerPermissions;
+
+    Qn::Permissions result = Qn::ReadPermission;
+
+    if (hasAccessRights(subject, server, AccessRight::view))
+        result |= Qn::ViewContentPermission;
 
     return result;
 }
@@ -525,6 +522,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnVideoWallResourcePtr& videoWall) const
 {
+    // `AccessRight::view` for a videowall grants the subject with videowall control permissions.
+
     if (!hasAccessRights(subject, videoWall, AccessRight::view))
         return Qn::NoPermissions;
 
@@ -544,12 +543,14 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnWebPageResourcePtr& webPage) const
 {
     const auto accessRights = this->accessRights(subject, webPage);
-    if (!accessRights.testFlag(AccessRight::view))
+    if (!accessRights)
         return Qn::NoPermissions;
 
-    Qn::Permissions result = Qn::ReadPermission | Qn::ViewContentPermission;
+    Qn::Permissions result = Qn::ReadPermission;
 
-    // Web Page behaves totally like camera.
+    if (accessRights.testFlag(AccessRight::view))
+        result |= Qn::ViewContentPermission;
+
     if (accessRights.testFlag(AccessRight::edit))
         result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
 

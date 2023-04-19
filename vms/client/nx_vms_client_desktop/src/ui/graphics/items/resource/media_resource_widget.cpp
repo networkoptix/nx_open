@@ -2439,8 +2439,15 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (d->camera)
     {
+        if (d->isPlayingLive()
+            && !accessController()->hasPermissions(d->camera, Qn::ViewLivePermission))
+        {
+            return Qn::NoLiveStreamOverlay;
+        }
+
         if (d->isPlayingLive() && d->camera->needsToChangeDefaultPassword())
             return Qn::PasswordRequiredOverlay;
+
         if (d->camera->isDtsBased() && !d->camera->isScheduleEnabled())
         {
             const auto requiredPermission = d->isPlayingLive()
