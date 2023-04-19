@@ -182,7 +182,7 @@ QVariant TextWithFields::build(const AggregatedEventPtr& eventAggregator) const
             }
 
             const auto propertyValue = eventAggregator->property(name.toUtf8().data());
-            if (propertyValue.isValid() && propertyValue.canConvert(QVariant::String))
+            if (propertyValue.isValid() && propertyValue.canConvert<QString>())
             {
                 // Found a valid event field, use it instead of the placeholder.
                 result += propertyValue.toString(); //< TODO: #spanasenko Refactor.

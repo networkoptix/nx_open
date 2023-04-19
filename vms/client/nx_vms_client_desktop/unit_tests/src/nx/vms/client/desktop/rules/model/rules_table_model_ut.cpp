@@ -77,7 +77,7 @@ protected:
 TEST_F(RulesTableModelTest, NotInitializedModelIsEmpty)
 {
     // By default engine has no rules.
-    ASSERT_FALSE(m_engine->hasRules());
+    ASSERT_EQ(0, m_engine->ruleCount());
     // Therefore model has no records.
     ASSERT_EQ(m_model->rowCount(), 0);
     // And has no changes.

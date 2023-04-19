@@ -8,6 +8,7 @@
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/source_user_field.h>
+#include <nx/vms/rules/utils/api.h>
 #include <nx/vms/rules/utils/serialization.h>
 
 #include "test_field.h"
@@ -50,7 +51,7 @@ TEST(VmsRulesSerialization, EventField)
     auto sourceField = dynamic_cast<TestEventField*>(filter.fields()[kFieldName]);
     ASSERT_TRUE(sourceField);
 
-    auto filterApi = engine->serialize(&filter);
+    auto filterApi = serialize(&filter);
     auto filterJson = QJson::serialized(filterApi);
     SCOPED_TRACE(filterJson.toStdString());
 

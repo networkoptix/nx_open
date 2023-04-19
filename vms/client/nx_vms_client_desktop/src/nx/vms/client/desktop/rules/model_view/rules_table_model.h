@@ -53,14 +53,14 @@ public:
 private:
     QPersistentModelIndex m_index;
     nx::vms::rules::Engine* m_engine = nullptr;
-    std::unique_ptr<vms::rules::Rule> m_rule;
+    std::shared_ptr<vms::rules::Rule> m_rule;
 
     /** Only RulesTableModel must has an ability to create SimplifiedRule instances. */
     friend class RulesTableModel;
 
-    SimplifiedRule(vms::rules::Engine* engine, std::unique_ptr<vms::rules::Rule>&& rule);
+    SimplifiedRule(vms::rules::Engine* engine, std::shared_ptr<vms::rules::Rule>&& rule);
 
-    void setRule(std::unique_ptr<vms::rules::Rule>&& rule);
+    void setRule(std::shared_ptr<vms::rules::Rule>&& rule);
     const vms::rules::Rule* rule() const;
     void setModelIndex(const QPersistentModelIndex& modelIndex);
     void update(const QVector<int>& roles);

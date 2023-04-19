@@ -20,12 +20,12 @@
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/customizable_icon_field.h>
 #include <nx/vms/rules/event_filter_fields/customizable_text_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/event_filter_fields/source_user_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
-#include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/soft_trigger_event.h>
 #include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/rule.h>
@@ -168,7 +168,10 @@ SoftwareTriggersWatcher::SoftwareTriggersWatcher(
         connect(rulesEngine, &nx::vms::rules::Engine::rulesReset,
             this, &SoftwareTriggersWatcher::updateTriggers);
         connect(rulesEngine, &nx::vms::rules::Engine::ruleAddedOrUpdated, this,
-            [this, rulesEngine](QnUuid id) { updateTriggerByVmsRule(rulesEngine->rule(id)); });
+            [this, rulesEngine](QnUuid id)
+            {
+                updateTriggerByVmsRule(rulesEngine->rule(id).get());
+            });
         connect(rulesEngine, &nx::vms::rules::Engine::ruleRemoved,
             this, &SoftwareTriggersWatcher::tryRemoveTrigger);
     }
@@ -273,7 +276,7 @@ void SoftwareTriggersWatcher::updateTriggers()
     {
         for (const auto [id, rule]: systemContext()->vmsRulesEngine()->rules())
         {
-            updateTriggerByVmsRule(rule);
+            updateTriggerByVmsRule(rule.get());
             removedIds.remove(id);
         }
     }

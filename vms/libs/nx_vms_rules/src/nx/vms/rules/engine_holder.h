@@ -6,6 +6,7 @@
 
 namespace nx::vms::common { class SystemContext; }
 
+class QThread;
 class QnCommonMessageProcessor;
 
 namespace nx::vms::rules {
@@ -16,7 +17,10 @@ class Plugin;
 class NX_VMS_RULES_API EngineHolder: public QObject
 {
 public:
-    EngineHolder(nx::vms::common::SystemContext* context, std::unique_ptr<Plugin> plugin);
+    EngineHolder(
+        nx::vms::common::SystemContext* context,
+        std::unique_ptr<Plugin> plugin,
+        bool separateThread);
     ~EngineHolder();
 
     Engine* engine() const;
@@ -27,8 +31,9 @@ public:
         Qt::ConnectionType connectionType);
 
 private:
-    std::unique_ptr<Engine> m_engine;
     std::unique_ptr<Plugin> m_builtinPlugin;
+    std::unique_ptr<Engine> m_engine;
+    std::unique_ptr<QThread> m_thread;
 };
 
 } // namespace nx::vms::rules
