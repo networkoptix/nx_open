@@ -62,6 +62,9 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     {
         // Double init by null is allowed.
         m_connected = false;
+        if (m_autoUnhold)
+            holdConnection(false);
+
         NX_DEBUG(this, "Deinit while connected, connection closed");
         emit connectionClosed();
     }
@@ -74,24 +77,21 @@ const QnClientConnectionStatus* QnClientMessageProcessor::connectionStatus() con
     return &m_status;
 }
 
-void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
+void QnClientMessageProcessor::holdConnection(bool value, bool autoUnhold)
 {
-    NX_DEBUG(this, nx::format("Hold connection set to %1").arg(holdConnection));
-    if (m_holdConnection == holdConnection)
+    m_autoUnhold = autoUnhold;
+
+    NX_DEBUG(this, nx::format("Hold connection set to %1").arg(value));
+    if (m_holdConnection == value)
         return;
 
-    m_holdConnection = holdConnection;
+    m_holdConnection = value;
 
     if (!m_holdConnection && !m_connected && connection()->moduleInformation().id.isNull())
     {
         NX_DEBUG(this, "Unholding connection while disconnected, connection closed");
         emit connectionClosed();
     }
-}
-
-bool QnClientMessageProcessor::isConnectionHeld() const
-{
-    return m_holdConnection;
 }
 
 Qt::ConnectionType QnClientMessageProcessor::handlerConnectionType() const
@@ -169,6 +169,10 @@ void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, nx::vms::api::
     NX_DEBUG(this, lit("peer found, state -> Connected"));
     m_status.setState(QnConnectionState::Connected);
     m_connected = true;
+
+    if (m_autoUnhold)
+        holdConnection(false);
+
     NX_DEBUG(this, "Remote peer found, connection opened");
     emit connectionOpened();
 }
