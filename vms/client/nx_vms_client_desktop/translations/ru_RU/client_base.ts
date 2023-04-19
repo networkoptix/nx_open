@@ -9331,11 +9331,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Apply Settings</source>
-      <translation type="unfinished">Apply Settings</translation>
+      <translation>Применить настройки</translation>
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>Введите пароль своей учетной записи</translation>
     </message>
     <message>
       <source>Apply</source>

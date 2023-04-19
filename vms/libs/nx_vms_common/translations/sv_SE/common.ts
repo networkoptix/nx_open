@@ -1157,7 +1157,7 @@
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Sessionsauktorisering krävs.</translation>
     </message>
   </context>
   <context>
@@ -2311,7 +2311,7 @@
     </message>
     <message>
       <source>Also show source camera</source>
-      <translation>Visa också källkamera</translation>
+      <translation>Visa även källkamera</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -2323,19 +2323,19 @@
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Ställ även in på källkamera</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Trigger även på källkameran</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Spela även in källkamera</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>Spela också på källkameran</translation>
     </message>
   </context>
   <context>
