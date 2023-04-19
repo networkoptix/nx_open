@@ -2432,7 +2432,10 @@ Result<> CUDT::cleanup()
 Result<UDTSOCKET> CUDT::socket(int af, int type, int)
 {
     if (!s_UDTUnited->m_bGCStatus)
-        s_UDTUnited->initializeUdtLibrary();
+    {
+        if (auto result = s_UDTUnited->initializeUdtLibrary(); !result.ok())
+            return result.error();
+    }
 
     return s_UDTUnited->newSocket(af, type);
 }
