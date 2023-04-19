@@ -172,12 +172,10 @@ void Pipeline::initSslBio(std::shared_ptr<SSL_CTX> context)
     BIO_meth_set_destroy(m_bioMethods.get(), &Pipeline::bioFree);
 
     BIO* rbio = BIO_new(m_bioMethods.get());
-    BIO_up_ref(rbio);
     BIO_set_nbio(rbio, /*nonblocking I/O*/ 1);
     BIO_set_app_data(rbio, this);
 
     BIO* wbio = BIO_new(m_bioMethods.get());
-    BIO_up_ref(wbio);
     BIO_set_nbio(wbio, /*nonblocking I/O*/ 1);
     BIO_set_app_data(wbio, this);
 
