@@ -353,7 +353,8 @@ Result<> CUDTUnited::bind(const UDTSOCKET u, const sockaddr* name, int namelen)
     }
 
     s->m_pUDT->open();
-    updateMux(s.get(), detail::SocketAddress(name, namelen));
+    if (auto result = updateMux(s.get(), detail::SocketAddress(name, namelen)); !result.ok())
+        return result;
     s->m_Status = OPENED;
 
     // copy address information of local node
@@ -380,7 +381,8 @@ Result<> CUDTUnited::bind(UDTSOCKET u, UDPSOCKET udpsock)
         return OsError();
 
     s->m_pUDT->open();
-    updateMux(s.get(), socketAddress, &udpsock);
+    if (auto result = updateMux(s.get(), socketAddress, &udpsock); !result.ok())
+        return result;
     s->m_Status = OPENED;
 
     // copy address information of local node
@@ -523,7 +525,8 @@ Result<> CUDTUnited::connect(const UDTSOCKET u, const sockaddr* name, int namele
         if (!s->m_pUDT->rendezvous())
         {
             s->m_pUDT->open();
-            updateMux(s.get());
+            if (auto result = updateMux(s.get()); !result.ok())
+                return result;
             s->m_Status = OPENED;
         }
         else
