@@ -67,12 +67,13 @@ public:
     }
 
 protected:
-    void startSilentUdpServer()
+    SocketAddress startSilentUdpServer()
     {
         m_udpSocket = std::make_unique<UDPSocket>(AF_INET);
-        ASSERT_TRUE(m_udpSocket->bind(SocketAddress::anyPrivateAddress));
+        EXPECT_TRUE(m_udpSocket->bind(SocketAddress::anyPrivateAddress));
 
         m_serverEndpoint = m_udpSocket->getLocalAddress();
+        return m_serverEndpoint;
     }
 
     void whenConnectWithTimeout(std::chrono::milliseconds timeout)
@@ -116,6 +117,15 @@ TEST_F(SocketUdt, connect_timeout)
 
     whenConnectWithTimeout(std::chrono::milliseconds(1));
     thenConnectFailedWithError(SystemError::timedOut);
+}
+
+TEST_F(SocketUdt, bind_to_unavailable_port_results_in_error)
+{
+    auto endpoint = startSilentUdpServer();
+
+    UdtStreamServerSocket sock(AF_INET);
+    ASSERT_FALSE(sock.bind(endpoint));
+    ASSERT_EQ(SystemError::addressInUse, SystemError::getLastOSErrorCode());
 }
 
 //-------------------------------------------------------------------------------------------------

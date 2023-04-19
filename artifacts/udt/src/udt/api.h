@@ -118,9 +118,9 @@ public:
     CUDTUnited(const CUDTUnited&) = delete;
     CUDTUnited& operator=(const CUDTUnited&) = delete;
 
-    Result<> initializeUdtLibrary();
+    [[nodiscard]] Result<> initializeUdtLibrary();
 
-    Result<> deinitializeUdtLibrary();
+    [[nodiscard]] Result<> deinitializeUdtLibrary();
 
     // Functionality:
     //    Create a new UDT socket.
@@ -130,7 +130,7 @@ public:
     // Returned value:
     //    The new UDT socket ID, or INVALID_SOCK.
 
-    Result<UDTSOCKET> newSocket(int af, int type);
+    [[nodiscard]] Result<UDTSOCKET> newSocket(int af, int type);
 
     // Parameters:
     //    0) [in] listen: the listening UDT socket;
@@ -139,7 +139,7 @@ public:
     // Returned value:
     //    If the new connection is successfully created: 1 success, 0 already exist.
 
-    Result<int> createConnection(
+    [[nodiscard]] Result<int> createConnection(
         const UDTSOCKET listen,
         const detail::SocketAddress& remotePeerAddress,
         CHandShake* hs);
@@ -147,7 +147,7 @@ public:
     // Parameters:
     //    0) [in] u: the UDT socket ID.
 
-    Result<std::shared_ptr<CUDT>> lookup(const UDTSOCKET u);
+    [[nodiscard]] Result<std::shared_ptr<CUDT>> lookup(const UDTSOCKET u);
 
     // Parameters:
     //    0) [in] u: the UDT socket ID.
@@ -158,25 +158,25 @@ public:
 
     // socket APIs
 
-    Result<> bind(const UDTSOCKET u, const sockaddr* name, int namelen);
-    Result<> bind(const UDTSOCKET u, UDPSOCKET udpsock);
-    Result<> listen(const UDTSOCKET u, int backlog);
-    Result<UDTSOCKET> accept(const UDTSOCKET listen, sockaddr* addr, int* addrlen);
-    Result<> connect(const UDTSOCKET u, const sockaddr* name, int namelen);
-    Result<> shutdown(const UDTSOCKET u, int how);
-    Result<> close(const UDTSOCKET u);
-    Result<> getpeername(const UDTSOCKET u, sockaddr* name, int* namelen);
-    Result<> getsockname(const UDTSOCKET u, sockaddr* name, int* namelen);
+    [[nodiscard]] Result<> bind(const UDTSOCKET u, const sockaddr* name, int namelen);
+    [[nodiscard]] Result<> bind(const UDTSOCKET u, UDPSOCKET udpsock);
+    [[nodiscard]] Result<> listen(const UDTSOCKET u, int backlog);
+    [[nodiscard]] Result<UDTSOCKET> accept(const UDTSOCKET listen, sockaddr* addr, int* addrlen);
+    [[nodiscard]] Result<> connect(const UDTSOCKET u, const sockaddr* name, int namelen);
+    [[nodiscard]] Result<> shutdown(const UDTSOCKET u, int how);
+    [[nodiscard]] Result<> close(const UDTSOCKET u);
+    [[nodiscard]] Result<> getpeername(const UDTSOCKET u, sockaddr* name, int* namelen);
+    [[nodiscard]] Result<> getsockname(const UDTSOCKET u, sockaddr* name, int* namelen);
 
     /**
      * @return Signalled socket count.
      */
-    Result<int> select(ud_set* readfds, ud_set* writefds, ud_set* exceptfds, const timeval* timeout);
+    [[nodiscard]] Result<int> select(ud_set* readfds, ud_set* writefds, ud_set* exceptfds, const timeval* timeout);
 
     /**
      * @return Signalled socket count.
      */
-    Result<int> selectEx(
+    [[nodiscard]] Result<int> selectEx(
         const std::vector<UDTSOCKET>& fds,
         std::vector<UDTSOCKET>* readfds,
         std::vector<UDTSOCKET>* writefds,
@@ -186,24 +186,24 @@ public:
     /**
      * @return epoll id.
      */
-    Result<int> epoll_create();
+    [[nodiscard]] Result<int> epoll_create();
 
-    Result<> epoll_release(const int eid);
+    [[nodiscard]] Result<> epoll_release(const int eid);
 
-    Result<> epoll_add_usock(const int eid, const UDTSOCKET u, const int* events = NULL);
-    Result<> epoll_add_ssock(const int eid, const SYSSOCKET s, const int* events = NULL);
-    Result<> epoll_remove_usock(const int eid, const UDTSOCKET u);
-    Result<> epoll_remove_ssock(const int eid, const SYSSOCKET s);
+    [[nodiscard]] Result<> epoll_add_usock(const int eid, const UDTSOCKET u, const int* events = NULL);
+    [[nodiscard]] Result<> epoll_add_ssock(const int eid, const SYSSOCKET s, const int* events = NULL);
+    [[nodiscard]] Result<> epoll_remove_usock(const int eid, const UDTSOCKET u);
+    [[nodiscard]] Result<> epoll_remove_ssock(const int eid, const SYSSOCKET s);
 
     /**
      * @return Signalled socket count.
      */
-    Result<int> epoll_wait(
+    [[nodiscard]] Result<int> epoll_wait(
         const int eid,
         std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
         std::map<SYSSOCKET, int>* lrfds = NULL, std::map<SYSSOCKET, int>* lwfds = NULL);
 
-    Result<> epoll_interrupt_wait(int eid);
+    [[nodiscard]] Result<> epoll_interrupt_wait(int eid);
 
     /**
      * Set last error for the current thread.
@@ -216,7 +216,7 @@ public:
     const Error& getError() const;
 
 private:
-    Result<> connect_complete(const UDTSOCKET u);
+    [[nodiscard]] Result<> connect_complete(const UDTSOCKET u);
 
     std::shared_ptr<CUDTSocket> locate(const UDTSOCKET u);
 
@@ -231,12 +231,12 @@ private:
         const std::unique_lock<std::mutex>& lock,
         const CUDTSocket& sock);
 
-    Result<> updateMux(
+    [[nodiscard]] Result<> updateMux(
         CUDTSocket* s,
         const std::optional<detail::SocketAddress>& addr = std::nullopt,
         const UDPSOCKET* = NULL);
 
-    Result<> updateMux(CUDTSocket* s, const CUDTSocket* ls);
+    [[nodiscard]] Result<> updateMux(CUDTSocket* s, const CUDTSocket* ls);
 
     UDTSOCKET generateSocketId();
 
