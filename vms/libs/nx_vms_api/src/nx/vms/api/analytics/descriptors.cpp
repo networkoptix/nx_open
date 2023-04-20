@@ -109,7 +109,12 @@ void mergeDescriptors(Descriptor* first, Descriptor* second)
     }
 
     for (auto& scope: first->scopes)
-        second->scopes.insert(std::move(scope));
+    {
+        if (auto it = second->scopes.find(scope); it != second->scopes.cend())
+            it->hasTypeEverBeenSupportedInThisScope |= scope.hasTypeEverBeenSupportedInThisScope;
+        else
+            second->scopes.insert(std::move(scope));
+    }
 
     *first = std::move(*second);
 }
