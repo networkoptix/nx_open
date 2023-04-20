@@ -370,7 +370,7 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
     }
     else if (resource.dynamicCast<QnVideoWallResource>())
     {
-        action = QString("/rest/v3/videowalls/%1").arg(resource->getId().toString());
+        action = QString("/rest/v3/videoWalls/%1").arg(resource->getId().toString());
     }
     else if (resource.dynamicCast<QnWebPageResource>())
     {
