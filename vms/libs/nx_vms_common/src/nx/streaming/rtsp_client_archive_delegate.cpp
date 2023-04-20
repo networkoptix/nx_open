@@ -931,6 +931,8 @@ bool QnRtspClientArchiveDelegate::setQuality(
 
 void QnRtspClientArchiveDelegate::setStreamDataFilter(nx::vms::api::StreamDataFilters filter)
 {
+    if (m_streamDataFilter == filter)
+        return;
     m_streamDataFilter = filter;
 
     const auto value = QByteArray::fromStdString(nx::reflect::toString(filter));
