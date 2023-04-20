@@ -682,9 +682,7 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Main | Tree)
-        .text(ini().webPagesAndIntegrations
-            ? ContextMenu::tr("New")
-            : ContextMenu::tr("Add"));
+        .text(ContextMenu::tr("Add"));
 
     factory.beginSubMenu();
     {
@@ -714,6 +712,7 @@ void initialize(Manager* manager, Action* root)
             .pulledText(ContextMenu::tr("New Integration..."))
             .condition(
                 condition::treeNodeType(ResourceTree::NodeType::integrations)
+                && condition::isTrue(ini().webPagesAndIntegrations)
             );
 
         factory(NewWebPageAction)

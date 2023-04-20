@@ -21,12 +21,15 @@ WebPageDecorator::WebPageDecorator(
     m_sourceItem->setDataChangedCallback(
         [this](const QVector<int>& roles) { notifyDataChanged(roles); });
 
-    connect(appContext()->webPageIconCache(), &WebPageIconCache::iconChanged, this,
-        [this](const QUrl& webPageUrl)
-        {
-            if (const auto webPage = getWebPage(); webPage && webPage->getUrl() == webPageUrl)
-                notifyDataChanged({Qn::DecorationPathRole});
-        });
+    if (WebPageIconCache* iconCache = appContext()->webPageIconCache())
+    {
+        connect(iconCache, &WebPageIconCache::iconChanged, this,
+            [this](const QUrl& webPageUrl)
+            {
+                if (const auto webPage = getWebPage(); webPage && webPage->getUrl() == webPageUrl)
+                    notifyDataChanged({Qn::DecorationPathRole});
+            });
+    }
 }
 
 QVariant WebPageDecorator::data(int role) const
