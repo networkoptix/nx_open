@@ -590,7 +590,7 @@ void AsyncClient::stopWhileInAioThread()
 
 void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 {
-    NX_VERBOSE(this, "Opened connection to url %1. Result code %2", m_contentLocationUrl, errorCode);
+    NX_VERBOSE(this, "Connect to %1 completed with result %2", m_contentLocationUrl, errorCode);
 
     initializeMessagePipeline();
 
@@ -603,14 +603,10 @@ void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
         return;
     }
 
-    NX_DEBUG(this, "Failed to establish tcp connection to %1. %2",
+    NX_DEBUG(this, "Failed to establish TCP connection to %1. %2",
         m_contentLocationUrl, SystemError::toString(errorCode));
-    m_lastSysErrorCode = errorCode;
 
-    m_state = State::sFailed;
-    if (emitDone() != Result::proceed)
-        return;
-    m_messagePipeline.reset(); //< Closing failed connection so that it is not reused.
+    reportConnectionFailure(errorCode);
 }
 
 void AsyncClient::sendRequest()
@@ -622,6 +618,18 @@ void AsyncClient::sendRequest()
     m_messagePipeline->sendMessage(
         std::move(msg),
         [this](auto resultCode) { onRequestSent(resultCode); });
+}
+
+void AsyncClient::reportConnectionFailure(SystemError::ErrorCode err)
+{
+    m_lastSysErrorCode = err;
+
+    m_state = State::sFailed;
+    if (emitDone() != Result::proceed)
+        return;
+
+    m_socket.reset();
+    m_messagePipeline.reset(); //< Closing failed connection so that it is not reused.
 }
 
 void AsyncClient::onRequestSent(SystemError::ErrorCode errorCode)
@@ -882,7 +890,14 @@ void AsyncClient::sendRequestOverExternalConnection()
         m_request.requestLine, m_contentLocationUrl);
 
     if (!configureSocket(m_messagePipeline->socket().get()))
-        return post([this, err = SystemError::getLastOSErrorCode()]() { asyncConnectDone(err); });
+    {
+        return post([this, err = SystemError::getLastOSErrorCode()]()
+        {
+            NX_DEBUG(this, "Error configuring connection to %1. %2",
+                m_contentLocationUrl, SystemError::toString(err));
+            reportConnectionFailure(err);
+        });
+    }
 
     m_remoteEndpointWithProtocol = endpointWithProtocol(m_contentLocationUrl);
     sendRequest();
