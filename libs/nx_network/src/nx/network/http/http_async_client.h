@@ -428,8 +428,9 @@ private:
 
     virtual void stopWhileInAioThread() override;
 
-    void asyncConnectDone(SystemError::ErrorCode errorCode);
+    void reportConnectionFailure(SystemError::ErrorCode errorCode);
     void sendRequest();
+    void asyncConnectDone(SystemError::ErrorCode errorCode);
     void onRequestSent(SystemError::ErrorCode errorCode);
 
     void initializeMessagePipeline();

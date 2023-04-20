@@ -16,6 +16,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/ssl/context.h>
 #include <nx/network/ssl/ssl_stream_socket.h>
+#include <nx/network/socket_delegate.h>
+#include <nx/network/system_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/synchronous_tcp_server.h>
 #include <nx/reflect/string_conversion.h>
@@ -32,6 +34,36 @@ using namespace std::literals;
 static constexpr char kTestPath[] = "/HttpAsyncClient_upgrade";
 static constexpr char kUpgradeTo[] = "NXRELAY/0.1";
 static constexpr char kNewProtocolMessage[] = "Hello, Http Client!";
+
+namespace {
+
+class BrokenSocket:
+    public CustomStreamSocketDelegate<AbstractStreamSocket, TCPSocket>
+{
+    using base_type = CustomStreamSocketDelegate<AbstractStreamSocket, TCPSocket>;
+
+public:
+    BrokenSocket(SystemError::ErrorCode errToReport):
+        base_type(&m_socket),
+        m_socket(AF_INET),
+        m_errToReport(errToReport)
+    {
+    }
+
+    virtual bool setNonBlockingMode(bool /*val*/) override
+    {
+        SystemError::setLastErrorCode(m_errToReport);
+        return false;
+    }
+
+private:
+    TCPSocket m_socket;
+    SystemError::ErrorCode m_errToReport = SystemError::noError;
+};
+
+} // namespace
+
+//--------------------------------------------------------------------------------------------------
 
 class UpgradableHttpServer:
     public nx::network::test::SynchronousStreamSocketServer
@@ -231,8 +263,20 @@ protected:
                 return connection;
             });
 
-        m_client = std::make_unique<AsyncClient>(std::move(tcpConnection), ssl::kAcceptAnyCertificate);
+        m_client = std::make_unique<AsyncClient>(
+            std::move(tcpConnection), ssl::kAcceptAnyCertificate);
         configureClient();
+    }
+
+    // Returns error code that is reported by the socket in HTTP client.
+    SystemError::ErrorCode givenHttpClientWithExternalMalfunctioningConnection()
+    {
+        m_client = std::make_unique<AsyncClient>(
+            std::make_unique<BrokenSocket>(SystemError::invalidData),
+            ssl::kAcceptAnyCertificate);
+        configureClient();
+
+        return SystemError::invalidData;
     }
 
     void givenFiniteResourceResponseBodySource()
@@ -429,6 +473,12 @@ protected:
         ASSERT_EQ(StatusCode::ok, m_prevRequestResult.response->statusLine.statusCode);
         ASSERT_TRUE(m_prevRequestResult.fail);
         ASSERT_EQ(SystemError::timedOut, m_prevRequestResult.systemResultCode);
+    }
+
+    void thenRequestFailedAs(SystemError::ErrorCode expected)
+    {
+        m_prevRequestResult = m_responses.pop();
+        ASSERT_EQ(expected, m_prevRequestResult.systemResultCode);
     }
 
     void thenResponseBodyIsReported()
@@ -755,6 +805,14 @@ TEST_F(HttpAsyncClient, requesting_over_externally_provided_connection)
         whenSendGetRequestProvidingPathOnly();
         thenSuccessResponseIsReceived();
     }
+}
+
+// VMS-36204.
+TEST_F(HttpAsyncClient, error_in_external_connection_is_handled_properly)
+{
+    const auto errCode = givenHttpClientWithExternalMalfunctioningConnection();
+    whenSendGetRequestProvidingPathOnly();
+    thenRequestFailedAs(errCode);
 }
 
 TEST_F(HttpAsyncClient, receives_message_body_with_end_signalled_by_closing_connection)
