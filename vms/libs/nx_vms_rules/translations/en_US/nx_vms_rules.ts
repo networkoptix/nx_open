@@ -160,7 +160,7 @@
     </message>
     <message numerus="yes">
         <source>Device Disconnected</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Device Disconnected</numerusform>
             <numerusform>Devices Disconnected</numerusform>
         </translation>
@@ -171,7 +171,7 @@
     </message>
     <message numerus="yes">
         <source>Camera Disconnected</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Camera Disconnected</numerusform>
             <numerusform>Cameras Disconnected</numerusform>
         </translation>
@@ -274,7 +274,7 @@
     </message>
     <message>
         <source>Do HTTP(S) request</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>HTTP(S) URL</source>
@@ -282,15 +282,15 @@
     </message>
     <message>
         <source>HTTP(S) Content</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Content Type</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Request Method</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -305,15 +305,15 @@
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -392,19 +392,19 @@
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connection to device was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -688,15 +688,15 @@
     </message>
     <message>
         <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>RAID error: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
