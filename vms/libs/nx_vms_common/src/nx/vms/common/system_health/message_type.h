@@ -67,5 +67,6 @@ NX_VMS_COMMON_API bool isMessageVisibleInSettings(MessageType message);
 NX_VMS_COMMON_API bool isMessageLocked(MessageType message);
 
 NX_VMS_COMMON_API std::set<MessageType> allVisibleMessageTypes();
+NX_VMS_COMMON_API std::set<MessageType> defaultMessageTypes();
 
 } // namespace nx::vms::common::system_health
