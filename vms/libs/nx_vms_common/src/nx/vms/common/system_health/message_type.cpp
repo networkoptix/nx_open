@@ -79,4 +79,12 @@ std::set<MessageType> allVisibleMessageTypes()
     return result;
 }
 
+std::set<MessageType> defaultMessageTypes()
+{
+    auto result = allVisibleMessageTypes();
+    result.erase(MessageType::emailIsEmpty);
+    result.erase(MessageType::usersEmailIsEmpty);
+    return result;
+}
+
 } // namespace nx::vms::common::system_health

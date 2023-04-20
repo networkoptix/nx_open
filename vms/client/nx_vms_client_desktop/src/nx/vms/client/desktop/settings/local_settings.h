@@ -90,7 +90,7 @@ public:
         "Version of the latest read and accepted EULA."};
 
     Property<std::set<nx::vms::common::system_health::MessageType>> popupSystemHealth{
-        this, "popupSystemHealth", nx::vms::common::system_health::allVisibleMessageTypes()};
+        this, "popupSystemHealth", nx::vms::common::system_health::defaultMessageTypes()};
 
     Property<bool> downmixAudio{this, "downmixAudio"};
     Property<qreal> audioVolume{this, "audioVolume", 1.0};
