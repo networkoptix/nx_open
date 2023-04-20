@@ -153,20 +153,20 @@
       <translation>L'analyse vidéo de la caméra ne fonctionnera que lorsque qu'elle est en train d'être visionnée. Activez l'enregistrement pour qu'il fonctionne en permanence.</translation>
     </message>
     <message>
-      <source>This integration has no settings for this Camera.</source>
-      <translation>Cette intégration n'a pas de paramètres pour cette caméra.</translation>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation>Vérifiez les paramètres de la caméra pour configurer ce plugin.</translation>
     </message>
     <message>
-      <source>Check System Administration Settings to configure this integration.</source>
-      <translation>Vérifiez les paramètres d'administration du système pour configurer cette intégration.</translation>
+      <source>Check System Administration settings to configure this plugin.</source>
+      <translation>Vérifiez les paramètres d'administration du système pour configurer ce plugin.</translation>
     </message>
     <message>
-      <source>This integration has no settings at System level.</source>
-      <translation>Cette intégration n'a pas de paramètres au niveau du système.</translation>
+      <source>This plugin has no settings at the System level.</source>
+      <translation>Ce plugin n'a pas de paramètres au niveau du système.</translation>
     </message>
     <message>
-      <source>Check Camera Settings to configure this integration.</source>
-      <translation>Vérifiez les paramètres de la caméra pour configurer cette intégration.</translation>
+      <source>This plugin has no settings for this camera.</source>
+      <translation>Ce plugin n'a pas de paramètres pour cette caméra.</translation>
     </message>
   </context>
   <context>
@@ -1071,6 +1071,17 @@ pour activer le PTZ</translation>
     </message>
   </context>
   <context>
+    <name>SettingsDialog</name>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Entrez les paramètres</translation>
+    </message>
+    <message>
+      <source>This action requires some parameters to be filled.</source>
+      <translation>Cette action nécessite que certains paramètres soient remplis.</translation>
+    </message>
+  </context>
+  <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
@@ -1189,6 +1200,10 @@ pour activer le PTZ</translation>
       <source>Unsupported firmware version</source>
       <translation>Version du firmware non prise en charge</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation>Accès refusé</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
@@ -1298,10 +1313,6 @@ pour activer le PTZ</translation>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation>Vous n'avez pas accès à %1. Veuillez vérifier votre connexion Internet.</translation>
-    </message>
-    <message>
       <source>Official Website</source>
       <translation>Site Web officiel</translation>
     </message>
@@ -1312,6 +1323,10 @@ pour activer le PTZ</translation>
     <message>
       <source>Support</source>
       <translation>Support</translation>
+    </message>
+    <message>
+      <source>You do not have access to the %1. Please check your internet connection.</source>
+      <translation>Vous n'avez pas accès à %1. Veuillez vérifier votre connexion Internet.</translation>
     </message>
   </context>
 </TS>

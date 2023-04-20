@@ -732,25 +732,25 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>NVR-lisenser</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n NVR Licenses</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n NVR-lisenser</numerusform>
+        <numerusform>%n NVR-lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 NVR-lisenser</numerusform>
+        <numerusform>%n/%1 NVR-lisenser</numerusform>
       </translation>
     </message>
   </context>
@@ -1096,6 +1096,71 @@
     </message>
   </context>
   <context>
+    <name>Result</name>
+    <message>
+      <source>Missing required parameter: %1.</source>
+      <translation>Mangler nødvendig parameter: %1.</translation>
+    </message>
+    <message>
+      <source>Failed to process request.</source>
+      <translation>Kunne ikke behandle forespørselen.</translation>
+    </message>
+    <message>
+      <source>Forbidden.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Forbudt.</translation>
+    </message>
+    <message>
+      <source>Conflict.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Konflikt.</translation>
+    </message>
+    <message>
+      <source>Bad request.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Ugyldig forespørsel.</translation>
+    </message>
+    <message>
+      <source>Not implemented.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Ikke implementert.</translation>
+    </message>
+    <message>
+      <source>Not found.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Ikke funnet.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation>Intern feil.</translation>
+    </message>
+    <message>
+      <source>Unsupported media type.</source>
+      <translation>Ustøttet medietype.</translation>
+    </message>
+    <message>
+      <source>Service unavailable.</source>
+      <translation>Tjenesten er utilgjengelig.</translation>
+    </message>
+    <message>
+      <source>Unauthorized.</source>
+      <translation>Uautorisert.</translation>
+    </message>
+    <message>
+      <source>Session expired.</source>
+      <translation>Sesjon utløpt.</translation>
+    </message>
+    <message>
+      <source>Invalid parameter `%1`: %2.</source>
+      <comment>%1 is name, %2 is value.</comment>
+      <translation>Ugyldig parameter `%1: %2.</translation>
+    </message>
+    <message>
+      <source>Session authorization required.</source>
+      <translation>Øktautorisasjon kreves.</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
@@ -1139,10 +1204,6 @@
     <message>
       <source>SMTP timeout (seconds)</source>
       <translation>SMTP-tidsavbrudd (sekunder)</translation>
-    </message>
-    <message>
-      <source>SMTP use simple settings view in Client</source>
-      <translation>SMTP bruker enkel innstillingsvisning i klienten</translation>
     </message>
     <message>
       <source>SMTP name</source>
@@ -1190,7 +1251,7 @@
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
+      <translation>Anonym statistikk rapporterer siste nummer</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
@@ -1206,7 +1267,7 @@
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
+      <translation>Anonym statistikk rapporterer Klientinnstillinger</translation>
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
@@ -1262,15 +1323,15 @@
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
+      <translation>Siste hovedsystemsammenslåings-ID</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
+      <translation>Siste slave Systemsammenslåings-ID</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
+      <translation>Deaktiver enhetsleverandører</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
@@ -1303,7 +1364,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+      <translation>Revisjonslogg (dager, 14-730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
@@ -1311,15 +1372,15 @@
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
+      <translation>Håndheve HTTPS (datatrafikkryptering)</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
+      <translation>Håndheve RTSPS (kryptering av videotrafikk)</translation>
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>Aktiver automatisk oppdagelse</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
@@ -1342,40 +1403,32 @@
       <translation>Overstyring av nettskyvert</translation>
     </message>
     <message>
-      <source>Enable crossdomain policy</source>
-      <translation type="unfinished">Enable crossdomain policy</translation>
-    </message>
-    <message>
       <source>Enable RTSP for Arecont</source>
       <translation>Aktiver RTSP for Arecont</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+      <translation>Aktiver sekvensiell Flir ONVIF-søker</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB)</translation>
+      <translation>Maks P2P-køstørrelse (byte, 32–512 Mb)</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
+      <translation>Maks P2P alle klientstørrelser (byte, 32–512 Mb)</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB)</translation>
+      <translation>Maks opptakskøstørrelse (byte, 6–96 Mb)</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
       <translation>Maks. postkø størrelse (elementer, 250-4000)</translation>
     </message>
     <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</translation>
-    </message>
-    <message>
       <source>RTP retry count</source>
-      <translation type="unfinished">RTP retry count</translation>
+      <translation>Antall RTP-forsøk på nytt</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
@@ -1383,35 +1436,27 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
+      <translation>Maks RTSP-tilkoblingsvarighet (sekunder)</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
+      <translation>Aktiver cloud-connect UDP-hullhulling</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage</source>
-      <translation type="unfinished">Enable cloud-connect relays usage</translation>
+      <translation>Aktiver bruk av cloud-connect-reléer</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
+      <translation>Håndhev SSL for skytilkoblingsreléer</translation>
     </message>
     <message>
       <source>Enable recording on EDGE</source>
       <translation>Aktiver opptak på EDGE</translation>
     </message>
     <message>
-      <source>Enable WebSocket for p2p</source>
-      <translation>Aktiver WebSocket for p2p</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</translation>
-    </message>
-    <message>
       <source>Target update information</source>
-      <translation type="unfinished">Target update information</translation>
+      <translation>Informasjon om måloppdatering</translation>
     </message>
     <message>
       <source>Installed update information</source>
@@ -1419,15 +1464,11 @@
     </message>
     <message>
       <source>Downloader peers for files</source>
-      <translation type="unfinished">Downloader peers for files</translation>
+      <translation>Peers for nedlasting av filer</translation>
     </message>
     <message>
       <source>Client update settings</source>
       <translation>Klientoppdateringsinnstillinger</translation>
-    </message>
-    <message>
-      <source>Thread count limit for Camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for Camera archive synchronization</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1435,23 +1476,23 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
-      <translation type="unfinished">Authorization Session token lifetime (minutes)</translation>
+      <translation>Levetid for autorisasjonsøkttoken (minutter)</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
+      <translation>Begrensning for antall sesjonstokener på en enkelt server</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
-      <translation type="unfinished">Max session token count per user on single Server</translation>
+      <translation>Maks antall økttokener per bruker på enkelt server</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Oppdateringsintervall for ekstern sesjonstoken (andre servere og sky)</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Tidsavbrudd for ekstern sesjonstoken (andre servere og sky)</translation>
     </message>
     <message>
       <source>Default video codec</source>
@@ -1459,7 +1500,7 @@
     </message>
     <message>
       <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
+      <translation>Standard kodek for eksport av video</translation>
     </message>
     <message>
       <source>Low quality screen video codec</source>
@@ -1471,15 +1512,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
-      <translation type="unfinished">URI for resource_data.json automatic update</translation>
-    </message>
-    <message>
-      <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation>Maksimal hendelsesloggoppføringer for å oppbevare i databasen. Den reelle mengden ubemerkede poster kan være opptil 20% høyere enn den spesifiserte verdien.</translation>
-    </message>
-    <message>
-      <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>URI for resource_data.json automatisk oppdatering</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1487,79 +1520,124 @@
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
+      <translation>Vedvarende servere for oppdateringslagring</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+      <translation>Vedvarende servere hvor oppdateringer lagres</translation>
     </message>
     <message>
       <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
-    </message>
-    <message>
-      <source>Language for mobile push notifications</source>
-      <translation type="unfinished">Language for mobile push notifications</translation>
+      <translation>VMS Server versjonsspesifikke funksjoner</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the Device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4Mb)</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1Kb-1MB)</translation>
+      <translation>Ytterligere lokale FS-lagringstyper for opptak</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
+      <translation>Tving analytics DB-lagringsmonteringspunkttillatelser i tilfelle feil</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
-      <translation type="unfinished">Check video stream period (milliseconds)</translation>
+      <translation>Sjekk videostrømperiode (millisekunder)</translation>
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation type="unfinished">Storage encryption enabled</translation>
+      <translation>Lagringskryptering aktivert</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
-      <translation type="unfinished">Current storage encryption key</translation>
-    </message>
-    <message>
-      <source>Show Servers in tree for non-admins</source>
-      <translation type="unfinished">Show Servers in tree for non-admins</translation>
+      <translation>Gjeldende lagringskrypteringsnøkkel</translation>
     </message>
     <message>
       <source>HTTP header: Origin</source>
-      <translation type="unfinished">HTTP header: Origin</translation>
+      <translation>HTTP-header: Opprinnelse</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
-    </message>
-    <message>
-      <source>Use only HTTPS for Cameras</source>
-      <translation type="unfinished">Use only HTTPS for Cameras</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API</source>
-      <translation type="unfinished">Enable insecure deprecated API</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation type="unfinished">Enable insecure deprecated API functions curently in use by Nx products</translation>
+      <translation>HTTP-header: X-Frame-Options</translation>
     </message>
     <message>
       <source>Show mouse timeline preview</source>
-      <translation type="unfinished">Show mouse timeline preview</translation>
+      <translation>Vis forhåndsvisning av musens tidslinje</translation>
+    </message>
+    <message>
+      <source>Language for Cloud notifications</source>
+      <translation>Språk for skyvarsler</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4MB)</source>
+      <translation>Mediebufferstørrelse (KB, 10KB-4MB)</translation>
+    </message>
+    <message>
+      <source>Enable cross-domain policy</source>
+      <translation>Aktiver policy på tvers av domener</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for P2P</source>
+      <translation>Aktiver WebSocket for P2P</translation>
+    </message>
+    <message>
+      <source>Show Servers in the Resource Tree for non-admins</source>
+      <translation>Vis servere i ressurstreet for ikke-administratorer</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for cameras</source>
+      <translation>Bruk kun HTTPS for kameraer</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (unsecure)</source>
+      <translation>Aktiver utdaterte API-funksjoner (usikre)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Aktiver utdaterte API-funksjoner som for øyeblikket brukes av %1 programvare (usikkert)</translation>
+    </message>
+    <message>
+      <source>Expose IP addresses for autodiscovery</source>
+      <translation>La IP-adresser bli automatisk oppdaget</translation>
+    </message>
+    <message>
+      <source>Keep IO port state on when Server connects to the device</source>
+      <translation>Hold IO-portstatus på når serveren kobles til enheten</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
+      <translation>Mediebufferstørrelse for bare lydenheter (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2FA for the System</source>
+      <translation>Aktiver 2FA for systemet</translation>
+    </message>
+    <message>
+      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
+      <translation>Vis enhetspassord som er lagret i VMS for administratorer (for nettsider)</translation>
+    </message>
+    <message>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
+      <translation>Maks antall tråder for ekstern arkiv synkronisering (&lt;=0 - auto, maks 32)</translation>
+    </message>
+    <message>
+      <source>Thread count limit for camera archive synchronization</source>
+      <translation>Trådtellergrense for synkronisering av kameraarkiv</translation>
+    </message>
+    <message>
+      <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
+      <translation>Maksimalt antall hendelsesloggposter å beholde i databasen. Den reelle mengden av ikke slettede poster kan være opptil 20 % høyere enn den angitte verdien.</translation>
+    </message>
+    <message>
+      <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+      <translation>Hvorvidt du skal bufre noen rammer for primærstrømmen eller ikke. Verdier: &apos;ja&apos; - alltid aktivert (kan bruke mye RAM), &apos;nei&apos; - alltid deaktivert bortsett fra når det kreves av avspillingen (f.eks. HLS), &apos;auto&apos; - ligner på &apos;nei&apos;, men slått på når du forbedrer brukeropplevelse (f.eks. når en Analytics-plugin fungerer på kameraet).</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
+      <translation>Maks antall HTTP-tilkoblinger som bruker transkoding for serveren. Chrome åpner 2 tilkoblinger samtidig, og lukker deretter den første. Vi anbefaler å sette denne parameterens verdi til 2 eller mer.</translation>
+    </message>
+    <message>
+      <source>Update releases.json file URL</source>
+      <translation>Oppdater nettadressen til releases.json-filen</translation>
     </message>
   </context>
   <context>
@@ -1661,10 +1739,6 @@
     <message>
       <source>Show on Alarm Layout</source>
       <translation>Vis på alarm-visning</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>Gjør HTTP-forespørsel</translation>
     </message>
     <message>
       <source>Device output</source>
@@ -1882,7 +1956,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1911,18 +1985,6 @@
         <numerusform>Ingen data mottatt i løpet av de siste %n sekunder.</numerusform>
         <numerusform>Ingen data mottatt i løpet av de siste %n sekunder.</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Tilkobling til enheten ble uventet lukket.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Tilkobling til kamera (primær strøm) ble uventet lukket.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Tilkobling til kamera (sekundær strøm) ble uventet lukket.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1955,18 +2017,6 @@
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
       <translation>Systemdisk &quot;%1&quot; er nesten full.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende enheter:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende kameraer:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende I / O-moduler:</translation>
     </message>
     <message>
       <source>start</source>
@@ -2068,24 +2118,8 @@
       <translation>Åpne visning</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>Kunne ikke tvinge bruk av tid fra kamera, det henger for mye, systemtid vil bli brukt</translation>
-    </message>
-    <message>
-      <source>Camera time is back to normal</source>
-      <translation>Kameratiden er tilbake til det normale</translation>
-    </message>
-    <message>
       <source>Multiple %1 events have occurred</source>
       <translation>Flere %1 hendelser har skjedd</translation>
-    </message>
-    <message>
-      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation>Multicast adresse konflikt oppdaget. Adresse %1 er allerede i bruk med %2 på %3 strøm</translation>
-    </message>
-    <message>
-      <source>Network address %1 is not a multicast address</source>
-      <translation>Nettverksadresse %1 er ikke en multicast-adresse</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
@@ -2102,10 +2136,6 @@
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>Ukjent diagnostikkhendelse for plugin</translation>
-    </message>
-    <message>
-      <source>RAID error. %1.</source>
-      <translation>RAID-feil. %1.</translation>
     </message>
     <message>
       <source>Buzzer</source>
@@ -2161,14 +2191,6 @@
       <translation>I / O-modulen ble koblet fra</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1)</source>
-      <translation>RTP-feil i primærstrøm (%1)</translation>
-    </message>
-    <message>
-      <source>RTP error in secondary stream (%1)</source>
-      <translation>RTP-feil i sekundærstrøm (%1)</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>Analyse Objekt Oppdaget</translation>
     </message>
@@ -2180,14 +2202,6 @@
     <message>
       <source>Plugin: %1</source>
       <translation>Plugin: %1</translation>
-    </message>
-    <message>
-      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</translation>
-    </message>
-    <message>
-      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>&apos;ikke initialisere AES-kryptering under opptak av mediearkiv. Data skrives ukryptert.</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
@@ -2214,12 +2228,114 @@
       <translation>Server &quot;%1&quot; sertifikatfeil</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>RTP-feil i primærstrøm (%1).</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>Kunne ikke sikkerhetskopiere filen</translation>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>RTP-feil i sekundærstrøm (%1).</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>Kameratiden er tilbake til det normale.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Adresse %1 er allerede i bruk av %2 på primærstrømmen.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Adresse %1 er allerede i bruk av %2 på sekundærstrøm.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Multicast-adressekonflikt oppdaget.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>Nettverksadresse %1 er ikke en multicast-adresse.</translation>
+    </message>
+    <message>
+      <source>Failed to backup file %1</source>
+      <translation>Kunne ikke sikkerhetskopiere filen %1</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation>Vis Intercom Informer</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation>Gjør HTTP(S)-forespørsel</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Tilkobling til kamera (primær strøm) ble uventet lukket.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Tilkobling til kamera (sekundær strøm) ble uventet lukket.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Tilkobling til enheten ble uventet lukket.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation>Kunne ikke tvinge bruk av kameratid, da det henger for mye. Systemtid vil bli brukt i stedet.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation>Analytics-lagring &quot;%1&quot; databasefeil: Utilstrekkelige tillatelser på monteringspunktet.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation>Kan ikke initialisere AES-kryptering mens opptak er aktivert i mediearkivet. Data skrives ukryptert.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation>RAID-feil: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende enheter:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende kameraer:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende I/O-moduler:</translation>
+    </message>
+    <message>
+      <source>Also show source camera</source>
+      <translation>Vis også kildekamera</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Kildekamera</translation>
+    </message>
+    <message>
+      <source>Also show on source camera</source>
+      <translation>Vis også på kildekamera</translation>
+    </message>
+    <message>
+      <source>Also set on source camera</source>
+      <translation>Også satt på kildekamera</translation>
+    </message>
+    <message>
+      <source>Also trigger on source camera</source>
+      <translation>Trigger også på kildekamera</translation>
+    </message>
+    <message>
+      <source>Also record source camera</source>
+      <translation>Ta også opp kildekamera</translation>
+    </message>
+    <message>
+      <source>Also play on source camera</source>
+      <translation>Spill også på kildekamera</translation>
     </message>
   </context>
   <context>

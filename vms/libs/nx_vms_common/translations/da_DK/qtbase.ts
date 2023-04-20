@@ -1104,7 +1104,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation type="unfinished">Runtime</translation>
+      <translation>Varighed</translation>
     </message>
     <message>
       <source>Configuration</source>

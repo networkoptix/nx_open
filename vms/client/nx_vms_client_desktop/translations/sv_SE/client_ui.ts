@@ -85,10 +85,6 @@
       <translation>Maximal realtids buffertlängd</translation>
     </message>
     <message>
-      <source>Browse Logs</source>
-      <translation>Bläddra i loggar</translation>
-    </message>
-    <message>
       <source>Clear Local Cache</source>
       <translation>Rensa lokal cache</translation>
     </message>
@@ -115,6 +111,30 @@
     <message>
       <source>Server certificate validation</source>
       <translation>Validering av servercertifikat</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation>Logghantering</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>Ladda ner</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Inställningar</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>Klart</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation>Öppna mappen Filer</translation>
     </message>
   </context>
   <context>
@@ -219,10 +239,6 @@
       <translation>Inloggning/utloggning</translation>
     </message>
     <message>
-      <source>Event rules</source>
-      <translation>Händelsesregler</translation>
-    </message>
-    <message>
       <source>Server actions</source>
       <translation>Serveråtgärder</translation>
     </message>
@@ -257,6 +273,10 @@
     <message>
       <source>All servers are offline. Audit data is not available.</source>
       <translation>Alla servrar är offline. Auditdata är inte tillgängligt.</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation>Händelsesregler</translation>
     </message>
   </context>
   <context>
@@ -318,10 +338,6 @@
     <message>
       <source>Skip Current Queue</source>
       <translation>Hoppa över aktuell kö</translation>
-    </message>
-    <message>
-      <source>Maximum backup queue size</source>
-      <translation>Maximal storlek på säkerhetskopieringskö</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
@@ -454,6 +470,10 @@
       <source>Use event source server</source>
       <translation>Använd händelsekällserver</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation>Använd kamera för händelsekälla</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -509,14 +529,6 @@
   </context>
   <context>
     <name>CameraExpertSettingsWidget</name>
-    <message>
-      <source>Do not archive primary stream</source>
-      <translation>Arkivera inte primärströmmen</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>Arkivera inte sekundära strömmen</translation>
-    </message>
     <message>
       <source>Auto</source>
       <translation>Auto</translation>
@@ -638,20 +650,36 @@
       <translation>ONVIF inställningar</translation>
     </message>
     <message>
-      <source>Secondary stream profile</source>
-      <translation>Sekundär strömprofil</translation>
+      <source>Do not record primary stream</source>
+      <translation>Spela inte in primärström</translation>
     </message>
     <message>
-      <source>Primary stream profile</source>
-      <translation>Primär strömprofil</translation>
+      <source>Do not record secondary stream</source>
+      <translation>Spela inte in sekundär ström</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation>Exportera från SD-kort</translation>
+      <source>Secondary Stream Profile</source>
+      <translation>Sekundär strömningsprofil</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>Exportera inte video automatiskt</translation>
+      <source>Primary Stream Profile</source>
+      <translation>Primär strömningsprofil</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation>Importera från enhet</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Importera video automatiskt</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Webbsida</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Porten för webbsida</translation>
     </message>
   </context>
   <context>
@@ -772,10 +800,6 @@
       <translation>Kamerabyte</translation>
     </message>
     <message>
-      <source>New device</source>
-      <translation>Ny enhet</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Namn</translation>
     </message>
@@ -790,6 +814,10 @@
     <message>
       <source>Next</source>
       <translation>Nästa</translation>
+    </message>
+    <message>
+      <source>New Device</source>
+      <translation>Ny enhet</translation>
     </message>
   </context>
   <context>
@@ -875,6 +903,57 @@
     </message>
   </context>
   <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+      <source>BETA</source>
+      <translation>BETA</translation>
+    </message>
+    <message>
+      <source>Available Actions</source>
+      <translation>Tillgängliga åtgärder</translation>
+    </message>
+    <message>
+      <source>Video Export</source>
+      <translation>Exportera video</translation>
+    </message>
+    <message>
+      <source>Live Video and Archive</source>
+      <translation>Livevideo och arkiv</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation>Showreels</translation>
+    </message>
+    <message>
+      <source>Read more on the help page</source>
+      <translation>Läs mer på hjälpsidan</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation>Visa inte det här fönstret igen</translation>
+    </message>
+    <message>
+      <source>Introducing Cloud Layouts</source>
+      <translation>Vi introducerar molnlayouter</translation>
+    </message>
+    <message>
+      <source>Motion Search</source>
+      <translation>Rörelsesökning</translation>
+    </message>
+    <message>
+      <source>Searching Bookmarks, Objects, Events</source>
+      <translation>Söker bokmärken, objekt, händelser</translation>
+    </message>
+    <message>
+      <source>In the Future</source>
+      <translation>I framtiden</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -946,6 +1025,22 @@
     <message>
       <source>Restore from Backup...</source>
       <translation>Återställ från säkerhetskopia...</translation>
+    </message>
+    <message>
+      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+      <translation>Skapa en säkerhetskopia av systemhanteringsdata, eller återställ systemhanteringsdata från en befintlig säkerhetskopia</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>&lt;Message&gt;</source>
+      <translation>&lt;Message&gt;</translation>
+    </message>
+    <message>
+      <source>Open Folder</source>
+      <translation>Öppna mapp</translation>
     </message>
   </context>
   <context>
@@ -1082,10 +1177,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP-innehåll</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Logga in för att autentisera (valfritt)</translation>
     </message>
@@ -1102,20 +1193,24 @@
       <translation>Lösenord</translation>
     </message>
     <message>
-      <source>Content type</source>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation>HTTP(S) innehåll</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
       <translation>Innehållstyp</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP-URL</translation>
+      <source>Authentication Type</source>
+      <translation>Autentiseringsmetod</translation>
     </message>
     <message>
-      <source>Authentication type</source>
-      <translation>Autentiseringstyp</translation>
-    </message>
-    <message>
-      <source>Request type</source>
-      <translation>Typ av begäran</translation>
+      <source>Request Method</source>
+      <translation>Metod för begäran</translation>
     </message>
   </context>
   <context>
@@ -1255,8 +1350,8 @@
       <translation>Testa åtgärd</translation>
     </message>
     <message>
-      <source>Add some comment</source>
-      <translation>Lägg till en kommentar</translation>
+      <source>Add a comment</source>
+      <translation>Lägg till kommentar</translation>
     </message>
   </context>
   <context>
@@ -1268,10 +1363,6 @@
     <message>
       <source>Camera</source>
       <translation>Kamera</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Källkamera</translation>
     </message>
   </context>
   <context>
@@ -1340,16 +1431,16 @@
       <source>Mute audio when the mic is active</source>
       <translation>Stäng av ljudet när mikrofonen är aktiv</translation>
     </message>
+    <message>
+      <source>Allow the computer to enter sleep mode on idle</source>
+      <translation>Tillåt datorn att gå in i viloläge</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
       <translation>Systeminställningar</translation>
-    </message>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>Säkerhetskopiering och återställning</translation>
     </message>
   </context>
   <context>
@@ -1530,10 +1621,6 @@
       <source>Shared layouts</source>
       <translation>Delade vyer</translation>
     </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Välj en enskild användare i &quot;Visa till&quot; rad för att visa sina lokala vyer i den här listan</translation>
-    </message>
   </context>
   <context>
     <name>LdapSettingsDialog</name>
@@ -1705,6 +1792,29 @@
     </message>
   </context>
   <context>
+    <name>LogSettingsDialog</name>
+    <message>
+      <source>Enable</source>
+      <translation>Aktivera</translation>
+    </message>
+    <message>
+      <source>Logging Level</source>
+      <translation>Loggningsnivå</translation>
+    </message>
+    <message>
+      <source>Split File by Size</source>
+      <translation>Dela upp fil efter storlek</translation>
+    </message>
+    <message>
+      <source>Split File by Time</source>
+      <translation>Dela fil efter tid</translation>
+    </message>
+    <message>
+      <source>Limit Max Volume</source>
+      <translation>Begränsa maximal volym</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
@@ -1725,6 +1835,45 @@
     <message>
       <source>Test</source>
       <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>LogsManagementWidget</name>
+    <message>
+      <source>Download</source>
+      <translation>Ladda ner</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Inställningar</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>Återställ standardvärden</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>Klart</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation>Försök igen</translation>
+    </message>
+    <message>
+      <source>Download complete!</source>
+      <translation>Nedladdning klar!</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation>Det gick inte att spara loggar till den valda mappen</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation>Öppna filmapp</translation>
     </message>
   </context>
   <context>
@@ -1851,6 +2000,18 @@
       <source>Advanced settings</source>
       <translation>Avancerade inställningar</translation>
     </message>
+    <message>
+      <source>Get Update File</source>
+      <translation>Hämta uppdateringsfil</translation>
+    </message>
+    <message>
+      <source>Check Again</source>
+      <translation>Kontrollera Igen</translation>
+    </message>
+    <message>
+      <source>Try Again</source>
+      <translation>Försök Igen</translation>
+    </message>
   </context>
   <context>
     <name>MultilineTextPickerWidget</name>
@@ -1938,7 +2099,7 @@
       <translation>Supportsignatur</translation>
     </message>
     <message>
-      <source>System Singnature</source>
+      <source>System Signature</source>
       <translation>Systemsignatur</translation>
     </message>
   </context>
@@ -2478,11 +2639,11 @@
       <translation>Ta bort regel</translation>
     </message>
     <message>
-      <source>Select some rule</source>
+      <source>Select a Rule</source>
       <translation>Välj en regel</translation>
     </message>
     <message>
-      <source>Reset default rules</source>
+      <source>Reset Default Rules</source>
       <translation>Återställ standardregler</translation>
     </message>
   </context>
@@ -2729,10 +2890,6 @@
       <source>Force Alarm Layout opening</source>
       <translation>Tvinga larmvyn att visas</translation>
     </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>Visa också källkamera</translation>
-    </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2751,10 +2908,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>Regel kommer endast att fungera för långvariga händelser</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>Visa också på källkamera</translation>
     </message>
   </context>
   <context>
@@ -2855,10 +3008,6 @@
       <translation>Återskapa Backup</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>Analytics-data fortsätter att lagras i det inaktiverade lagret.</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>Inspelning till avaktiverad lagring stoppas. Men det kommer att fortsätta att radera utdaterat material från det.</translation>
     </message>
@@ -2867,8 +3016,12 @@
       <translation>Inspelningen aktiverades på USB-minnet</translation>
     </message>
     <message>
-      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation>Analytics-data kan ta stora mängder utrymme. Vi rekommenderar att du väljer en annan plats för den istället för systempartitionen.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation>Analysdata kan ta stora mängder utrymme. Vi rekommenderar att du väljer en annan plats för den istället för systempartitionen.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation>Analys- och rörelsedata kommer att fortsätta att lagras på den inaktiverade lagringen.</translation>
     </message>
   </context>
   <context>
@@ -2935,8 +3088,8 @@
       <translation>Varning! Detta gör att inställningarna för kvalitet och bildfrekvens (FPS) i inspelningsschemat är irrelevanta.</translation>
     </message>
     <message>
-      <source>Custom language for mobile notifications</source>
-      <translation>Anpassat språk för mobilaviseringar</translation>
+      <source>Custom language for Cloud notifications</source>
+      <translation>Anpassat språk för molnaviseringar</translation>
     </message>
   </context>
   <context>

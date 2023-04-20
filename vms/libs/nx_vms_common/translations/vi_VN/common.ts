@@ -170,7 +170,7 @@
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation>Kiểm tra Máy chủ đó có đang chạy hay không.</translation>
+      <translation>Kiểm tra Máy chủ có đang hoạt động.</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
@@ -294,15 +294,15 @@
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation>Nếu nó không giúp đỡ, khôi phục các giá trị mặc định của nhà sản xuất trên trang web của thiết bị.</translation>
+      <translation>Nếu không được, hãy khôi phục cài đặt gốc trên trang web của thiết bị.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation>Nếu nó không giúp đỡ, khôi phục các giá trị mặc định của camera trên trang web.</translation>
+      <translation>Nếu không được, hãy khôi phục cài đặt gốc trên trang web của camera.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation>Nếu cách này không hiệu quả, hãy khôi phục cài đặt gốc trên trang web mô-đun I/O.</translation>
+      <translation>Nếu không được, hãy khôi phục cài đặt gốc trên trang web mô-đun I/O.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
@@ -310,7 +310,7 @@
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation>Không thể mở phương tiện truyền thông URL %1. Kết nối đến cổng %2 đã tình cờ bị đóng.</translation>
+      <translation>Không thể mở phương tiện truyền thông URL %1. Kết nối đến cổng %2 đã bị đóng đột ngột.</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
@@ -326,15 +326,15 @@
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation>Không hỗ trợ phương tiện truyền thông theo dõi tại URL %1.</translation>
+      <translation>Không có trình theo dõi đa phương tiện nào được hỗ trợ tại URL %1.</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation>Không được phép. URL %1.</translation>
+      <translation>Không được ủy quyền. URL %1.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation>Không thể mở media URL %1. Phương tiện truyền thông không hỗ trợ giao thức %2.</translation>
+      <translation>Không thể mở phương tiện URL %1. Giao thức phương tiện không được hỗ trợ %2.</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
@@ -738,7 +738,7 @@
     </message>
     <message>
       <source>camera</source>
-      <translation>máy chụp hình</translation>
+      <translation>camera</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -825,7 +825,7 @@
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation>Hình mờ: %1</translation>
+      <translation>Hình nền mờ: %1</translation>
     </message>
     <message>
       <source>Hardware ID: %1</source>
@@ -1050,6 +1050,71 @@
     </message>
   </context>
   <context>
+    <name>Result</name>
+    <message>
+      <source>Missing required parameter: %1.</source>
+      <translation>Thiếu tham số bắt buộc: %1.</translation>
+    </message>
+    <message>
+      <source>Failed to process request.</source>
+      <translation>Không thể xử lý yêu cầu.</translation>
+    </message>
+    <message>
+      <source>Forbidden.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Bị cấm.</translation>
+    </message>
+    <message>
+      <source>Conflict.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Mâu thuẫn.</translation>
+    </message>
+    <message>
+      <source>Bad request.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Yêu cầu lỗi.</translation>
+    </message>
+    <message>
+      <source>Not implemented.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Không được thực hiện.</translation>
+    </message>
+    <message>
+      <source>Not found.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Không tìm thấy.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation>Lỗi nội bộ.</translation>
+    </message>
+    <message>
+      <source>Unsupported media type.</source>
+      <translation>Loại tập tin không được hỗ trợ.</translation>
+    </message>
+    <message>
+      <source>Service unavailable.</source>
+      <translation>Dịch vụ không khả dụng.</translation>
+    </message>
+    <message>
+      <source>Unauthorized.</source>
+      <translation>Không được phép.</translation>
+    </message>
+    <message>
+      <source>Session expired.</source>
+      <translation>Phiên hết hạn.</translation>
+    </message>
+    <message>
+      <source>Invalid parameter `%1`: %2.</source>
+      <comment>%1 is name, %2 is value.</comment>
+      <translation>Tham số không hợp lệ `%1`: %2.</translation>
+    </message>
+    <message>
+      <source>Session authorization required.</source>
+      <translation type="unfinished">Session authorization required.</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
@@ -1093,10 +1158,6 @@
     <message>
       <source>SMTP timeout (seconds)</source>
       <translation>Thời gian chờ SMTP (giây)</translation>
-    </message>
-    <message>
-      <source>SMTP use simple settings view in Client</source>
-      <translation>SMTP sử dụng chế độ xem cài đặt đơn giản trong Ứng dụng khách</translation>
     </message>
     <message>
       <source>SMTP name</source>
@@ -1285,7 +1346,7 @@
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation>Bật port-mapping UPNP</translation>
+      <translation>Bật ánh xạ cổng UPNP</translation>
     </message>
     <message>
       <source>Backup settings</source>
@@ -1294,10 +1355,6 @@
     <message>
       <source>Cloud host override</source>
       <translation>Ghi đè máy chủ đám mây</translation>
-    </message>
-    <message>
-      <source>Enable crossdomain policy</source>
-      <translation>Bật chính sách tên miền chéo</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
@@ -1322,10 +1379,6 @@
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
       <translation>Kích thước hàng đợi ghi tối đa (phần tử, 250-4000)</translation>
-    </message>
-    <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
-      <translation>Số lượng kết nối HTTP tối đa sử dụng chuyển mã cho Máy chủ. Chrome mở 2 kết nối cùng một lúc, sau đó đóng kết nối đầu tiên. Vì vậy, bạn nên đặt giá trị &gt;= 2 cho tham số này.</translation>
     </message>
     <message>
       <source>RTP retry count</source>
@@ -1356,14 +1409,6 @@
       <translation>Bật ghi tại biên</translation>
     </message>
     <message>
-      <source>Enable WebSocket for p2p</source>
-      <translation>Bật WebSocket cho p2p</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
-      <translation>Số luồng tối đa để đồng bộ hóa lưu trữ từ xa (&lt;= 0 - tự động, tối đa 32</translation>
-    </message>
-    <message>
       <source>Target update information</source>
       <translation>Thông tin cập nhật mục tiêu</translation>
     </message>
@@ -1378,10 +1423,6 @@
     <message>
       <source>Client update settings</source>
       <translation>Cài đặt cập nhật ứng dụng khách</translation>
-    </message>
-    <message>
-      <source>Thread count limit for Camera archive synchronization</source>
-      <translation>Giới hạn số luồng đối với đồng bộ hóa lưu trữ camera</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1428,14 +1469,6 @@
       <translation>URI cho cập nhật tự động resource_data.json</translation>
     </message>
     <message>
-      <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation>Bản ghi nhật ký sự kiện tối đa để giữ vào cơ sở dữ liệu. Số lượng thực của các bản ghi chưa được xóa có thể cao hơn tới 20% so với giá trị được chỉ định.</translation>
-    </message>
-    <message>
-      <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation>Có lưu vào bộ nhớ cache một số khung cho luồng chính hay không. Giá trị: &apos;có&apos; - luôn được bật (có thể sử dụng nhiều RAM), &apos;không&apos; - luôn bị tắt ngoại trừ khi yêu cầu phát lại (ví dụ: HLS), &apos;tự động&apos; - tương tự như &apos;không&apos;, nhưng được bật khi cải thiện trải nghiệm người dùng (ví dụ: khi một số plugin Analytics đang hoạt động trên Camera).</translation>
-    </message>
-    <message>
       <source>Meta data storage change policy</source>
       <translation>Chính sách thay đổi lưu trữ dữ liệu meta</translation>
     </message>
@@ -1452,24 +1485,8 @@
       <translation>Các tính năng cụ thể của phiên bản máy chủ VMS</translation>
     </message>
     <message>
-      <source>Language for mobile push notifications</source>
-      <translation>Ngôn ngữ cho thông báo trên thiết bị di động</translation>
-    </message>
-    <message>
       <source>Additional local FS storage types for recording</source>
       <translation>Các loại lưu trữ FS cục bộ bổ sung dành cho việc ghi</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the Device</source>
-      <translation>Luôn bật trạng thái cổng IO khi Máy chủ kết nối với Thiết bị</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation>Kích thước bộ đệm đa phương tiện (KB, 10KB-4Mb)</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation>Kích thước bộ đệm đa phương tiện chỉ dành cho thiết bị âm thanh (KB, 1Kb-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
@@ -1488,10 +1505,6 @@
       <translation>Khóa mã hóa bộ nhớ hiện tại</translation>
     </message>
     <message>
-      <source>Show Servers in tree for non-admins</source>
-      <translation>Hiển thị Máy chủ trong cây cho người dùng không phải quản trị viên</translation>
-    </message>
-    <message>
       <source>HTTP header: Origin</source>
       <translation>Tiêu đề HTTP: Nguồn gốc</translation>
     </message>
@@ -1500,20 +1513,85 @@
       <translation>Tiêu đề HTTP: X-Frame-Options</translation>
     </message>
     <message>
-      <source>Use only HTTPS for Cameras</source>
+      <source>Show mouse timeline preview</source>
+      <translation>Hiển thị bản xem trước dòng thời gian từ chuột</translation>
+    </message>
+    <message>
+      <source>Language for Cloud notifications</source>
+      <translation>Ngôn ngữ cho thông báo trên đám mây</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4MB)</source>
+      <translation>Kích thước bộ đệm đa phương tiện (KB, 10KB-4MB)</translation>
+    </message>
+    <message>
+      <source>Enable cross-domain policy</source>
+      <translation>Bật chính sách tên miền chéo</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for P2P</source>
+      <translation>Bật WebSocket cho P2P</translation>
+    </message>
+    <message>
+      <source>Show Servers in the Resource Tree for non-admins</source>
+      <translation>Hiển thị Máy chủ trong Danh sách tài nguyên cho những người không phải là quản trị viên</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for cameras</source>
       <translation>Chỉ sử dụng HTTPS cho camera</translation>
     </message>
     <message>
-      <source>Enable insecure deprecated API</source>
-      <translation>Bật API deprecated không an toàn</translation>
+      <source>Enable deprecated API functions (unsecure)</source>
+      <translation>Bật các hàm API deprecated (không an toàn)</translation>
     </message>
     <message>
-      <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation>Bật các hàm API deprecated không an toàn đang được sử dụng</translation>
+      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Bật các hàm API deprecated đang được phần mềm %1 sử dụng (không an toàn)</translation>
     </message>
     <message>
-      <source>Show mouse timeline preview</source>
-      <translation>Hiển thị bản xem trước dòng thời gian từ chuột</translation>
+      <source>Expose IP addresses for autodiscovery</source>
+      <translation>Hiển thị địa chỉ IP để tự động phát hiện</translation>
+    </message>
+    <message>
+      <source>Keep IO port state on when Server connects to the device</source>
+      <translation>Luôn bật trạng thái cổng IO khi Máy chủ kết nối với Thiết bị</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
+      <translation>Kích thước bộ đệm đa phương tiện chỉ dành cho thiết bị âm thanh (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2FA for the System</source>
+      <translation>Bật 2fa cho hệ thống</translation>
+    </message>
+    <message>
+      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
+      <translation>Hiển thị mật khẩu thiết bị được lưu trữ trong VMS cho quản trị viên (đối với trang web)</translation>
+    </message>
+    <message>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
+      <translation>Số luồng tối đa để đồng bộ hóa lưu trữ từ xa (&lt;= 0 - tự động, tối đa 32)</translation>
+    </message>
+    <message>
+      <source>Thread count limit for camera archive synchronization</source>
+      <translation>Giới hạn số luồng đối với đồng bộ hóa lưu trữ camera</translation>
+    </message>
+    <message>
+      <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
+      <translation>Bản ghi nhật ký sự kiện tối đa có thể lưu vào cơ sở dữ liệu. Số lượng thực của các bản ghi chưa được xóa có thể cao hơn tới 20% so với giá trị được chỉ định.</translation>
+    </message>
+    <message>
+      <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+      <translation>Có lưu vào bộ nhớ cache một số khung cho luồng chính hay không. Giá trị: &apos;có&apos; - luôn được bật (có thể sử dụng nhiều RAM), &apos;không&apos; - luôn bị tắt ngoại trừ khi yêu cầu phát lại (ví dụ: HLS), &apos;tự động&apos; - tương tự như &apos;không&apos;, nhưng được bật khi cải thiện trải nghiệm người dùng (ví dụ: khi một số plugin Analytics đang hoạt động trên Camera).</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
+      <translation>Số lượng kết nối HTTP tối đa sử dụng chuyển mã cho Máy chủ. Chrome mở 2 kết nối cùng một lúc, sau đó đóng kết nối đầu tiên. Chúng tôi khuyến nghị nên đặt giá trị tham số này là 2 hoặc nhiều hơn.</translation>
+    </message>
+    <message>
+      <source>Update releases.json file URL</source>
+      <translation>URL cập nhật tệp phát hành .json</translation>
     </message>
   </context>
   <context>
@@ -1552,7 +1630,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation>Chuyển mã video là cần thiết.</translation>
+      <translation>Yêu cầu chuyển mã video.</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
@@ -1615,10 +1693,6 @@
     <message>
       <source>Show on Alarm Layout</source>
       <translation>Hiển thị trên Bố cục cảnh báo</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>Gởi HTTP yêu cầu</translation>
     </message>
     <message>
       <source>Device output</source>
@@ -1736,11 +1810,11 @@
     </message>
     <message>
       <source>Input on %1</source>
-      <translation>%1 vào</translation>
+      <translation>Nhập vào %1</translation>
     </message>
     <message>
       <source>Motion on %1</source>
-      <translation>%1 phát hiện chuyển động</translation>
+      <translation>Chuyển động trên %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1770,7 +1844,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Máy chủ &quot;%1&quot; có vấn đề về bản quyền</translation>
+      <translation>Máy chủ &quot;%1&quot; có vấn đề về giấy phép</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
@@ -1778,11 +1852,11 @@
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation>Sự kiện Generic %1</translation>
+      <translation>Sự kiện chung tại %1</translation>
     </message>
     <message>
       <source>An unknown event has occurred</source>
-      <translation>Một sự kiện chưa biết</translation>
+      <translation>Đã xảy ra lỗi chưa xác định</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1806,7 +1880,7 @@
     </message>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation>Mâu thuẫn Địa chỉ: %1</translation>
+      <translation>Địa chỉ xung đột: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
@@ -1816,11 +1890,11 @@
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Mâu thuẫn máy chủ #%1:%2</translation>
+      <translation>Máy chủ xung đột #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation>Mâu thuẫn Server: %1</translation>
+      <translation>Máy chủ xung đột: %1</translation>
     </message>
     <message>
       <source>Trigger: %1</source>
@@ -1847,42 +1921,30 @@
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>Lần đầu xuất hiện: %1 trong %2 ( %n xuất hiện thứ hai)</numerusform>
+        <numerusform>Lần xuất hiện đầu tiên: %1 trên %2 ( tổng cộng%n lần)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>Không có dữ liệu nhận được trong %n seconds cuối cùng.</numerusform>
+        <numerusform>Không nhận được dữ liệu nào trong %n giây qua.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Kết nối với thiết bị đã bất ngờ đóng cửa.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (luồng chính) đã bất ngờ đóng cửa.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (dòng thứ cấp) đã bất ngờ đóng cửa.</translation>
-    </message>
-    <message>
       <source>RTP packet loss detected.</source>
-      <translation>RTP Phát hiện mất gói tin.</translation>
+      <translation>Phát hiện mất gói tin RTP.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>Thiết bị không đáp ứng yêu cầu mạng.</translation>
+      <translation>Thiết bị không phản hồi yêu cầu mạng.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation>Kết nối đến máy chủ bị mất.</translation>
+      <translation>Kết nối với máy chủ bị mất.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation>Máy chủ dừng bất ngờ.</translation>
+      <translation>Máy chủ dừng đột ngột.</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
@@ -1890,27 +1952,15 @@
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>HDD/SSD %1 Đủ để video nhanh.</translation>
+      <translation>Không đủ tốc độ HDD/SSD để ghi tới %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>Ổ đĩa HDD / SSD &quot;%1&quot; đã đầy. Đĩa chứa quá nhiều dữ liệu không được quản lý bởi VMS.</translation>
+      <translation>Ổ đĩa HDD/SSD &quot;%1&quot; đã đầy. Đĩa chứa quá nhiều dữ liệu không được quản lý bởi VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>Đĩa hệ thống &quot;%1&quot; gần như đầy.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Bản quyền chưa đủ. Ghi đã bị tắt trên các thiết bị sau:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Bản quyền chưa đủ. Ghi đã bị tắt trên các camera sau:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Không đủ khóa giấy phép. Chức năng ghi đã bị tắt trên các Mô-đun I/O sau:</translation>
+      <translation>Đĩa hệ thống &quot;%1&quot; gần đầy.</translation>
     </message>
     <message>
       <source>start</source>
@@ -1918,7 +1968,7 @@
     </message>
     <message>
       <source>stop</source>
-      <translation>dừng lại</translation>
+      <translation>kết thúc</translation>
     </message>
     <message>
       <source>While %1</source>
@@ -2010,24 +2060,8 @@
       <translation>Mở bố cục</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>Không thể bắt buộc sử dụng thời gian của camera, nó bị trễ quá nhiều, sẽ sử dụng thời gian hệ thống</translation>
-    </message>
-    <message>
-      <source>Camera time is back to normal</source>
-      <translation>Thời gian camera trở lại bình thường</translation>
-    </message>
-    <message>
       <source>Multiple %1 events have occurred</source>
       <translation>Nhiều sự kiện %1 đã xảy ra</translation>
-    </message>
-    <message>
-      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation>Phát hiện xung đột địa chỉ Multicast. Địa chỉ %1 đã được sử dụng bởi %2 trên %3 luồng</translation>
-    </message>
-    <message>
-      <source>Network address %1 is not a multicast address</source>
-      <translation>Địa chỉ mạng %1 không phải là địa chỉ multicast</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
@@ -2044,10 +2078,6 @@
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>Sự kiện chẩn đoán plugin không xác định</translation>
-    </message>
-    <message>
-      <source>RAID error. %1.</source>
-      <translation>Lỗi RAID. %1.</translation>
     </message>
     <message>
       <source>Buzzer</source>
@@ -2103,14 +2133,6 @@
       <translation>Mô-đun I/O bị ngắt kết nối</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1)</source>
-      <translation>Lỗi RTP trong luồng chính (%1)</translation>
-    </message>
-    <message>
-      <source>RTP error in secondary stream (%1)</source>
-      <translation>Lỗi RTP trong luồng phụ (%1)</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>Phát hiện phân tích Đối tượng</translation>
     </message>
@@ -2124,14 +2146,6 @@
       <translation>Plugin: %1</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>Bộ nhớ Phân tích &quot;%1&quot; Lỗi DB: Không đủ quyền tại điểm gắn kết.</translation>
-    </message>
-    <message>
-      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>Không thể khởi tạo mã hóa AES trong khi ghi lưu trữ đa phương tiện. Dữ liệu không được mã hóa.</translation>
-    </message>
-    <message>
       <source>Archive backup failed.</source>
       <translation>Sao lưu video không thành công.</translation>
     </message>
@@ -2141,11 +2155,11 @@
     </message>
     <message>
       <source>Archive backup failed</source>
-      <translation>Sao lưu video không thành công</translation>
+      <translation>Sao lưu lưu trữ không thành công</translation>
     </message>
     <message>
       <source>Data is backed up to %1</source>
-      <translation>Dữ liệu được sao lưu lên đến %1</translation>
+      <translation>Dữ liệu được sao lưu về %1</translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
@@ -2153,15 +2167,117 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation>Máy chủ &quot;%1&quot; lỗi chứng chỉ</translation>
+      <translation>Lỗi chứng chỉ máy chủ &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation>Trình thông báo intercom</translation>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>Lỗi RTP trong luồng chính (%1).</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>Không thể sao lưu tệp</translation>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>Lỗi RTP trong luồng phụ (%1).</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>Thời gian camera trở lại bình thường.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Địa chỉ %1 đã được sử dụng bởi %2 trên luồng chính.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Địa chỉ %1 đã được sử dụng bởi %2 trên luồng phụ.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Đã phát hiện xung đột địa chỉ multicast.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>Địa chỉ mạng %1 không phải là địa chỉ multicast.</translation>
+    </message>
+    <message>
+      <source>Failed to backup file %1</source>
+      <translation>Không thể sao lưu tệp %1</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation>Hiển thị thông tin liên lạc nội bộ</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation>Thực hiện yêu cầu HTTP(S)</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Kết nối với camera (luồng chính) đã bị đóng đột ngột.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Kết nối với camera (luồng phụ) đã bị đóng đột ngột.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Kết nối với thiết bị đã bị đóng đột ngột.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation>Không thể buộc sử dụng thời gian của camera vì bị trễ quá nhiều. Thay vào đó sẽ sử dụng thời gian hệ thống.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation>Bộ nhớ Phân tích &quot;%1&quot; lỗi cơ sở dữ liệu: Không đủ quyền tại điểm gắn kết.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation>Không thể khởi tạo mã hóa AES khi trình ghi được bật trên kho lưu trữ phương tiện. Dữ liệu ghi không được mã hóa.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation>Lỗi RAID. %1.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation>Không đủ giấy phép. Trình ghi đã bị tắt trên các thiết bị sau:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các camera sau:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các mô-đun I/O sau:</translation>
+    </message>
+    <message>
+      <source>Also show source camera</source>
+      <translation>Cũng hiển thị camera nguồn</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Máy ảnh nguồn</translation>
+    </message>
+    <message>
+      <source>Also show on source camera</source>
+      <translation>Cũng hiển thị trên máy ảnh nguồn</translation>
+    </message>
+    <message>
+      <source>Also set on source camera</source>
+      <translation type="unfinished">Also set on source camera</translation>
+    </message>
+    <message>
+      <source>Also trigger on source camera</source>
+      <translation type="unfinished">Also trigger on source camera</translation>
+    </message>
+    <message>
+      <source>Also record source camera</source>
+      <translation type="unfinished">Also record source camera</translation>
+    </message>
+    <message>
+      <source>Also play on source camera</source>
+      <translation type="unfinished">Also play on source camera</translation>
     </message>
   </context>
   <context>

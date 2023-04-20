@@ -54,17 +54,6 @@
     </message>
   </context>
   <context>
-    <name>CloudSystemStatusItem::Private</name>
-    <message>
-      <source>Loading...</source>
-      <translation>Laddar...</translation>
-    </message>
-    <message>
-      <source>User interaction required</source>
-      <translation>Åtgärd från användaren krävs</translation>
-    </message>
-  </context>
-  <context>
     <name>ComboBoxUtils</name>
     <message>
       <source>multiple values</source>
@@ -564,24 +553,12 @@
       <translation>Enhetsregler...</translation>
     </message>
     <message>
-      <source>Devices Rules...</source>
-      <translation>Enhetsregler...</translation>
-    </message>
-    <message>
       <source>Camera Rules...</source>
       <translation>Kameraregler...</translation>
     </message>
     <message>
-      <source>Cameras Rules...</source>
-      <translation>Kamerans regler...</translation>
-    </message>
-    <message>
       <source>I/O Module Rules...</source>
       <translation>I / O-modulregler...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Rules...</source>
-      <translation>I/O-modulsregler...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
@@ -1038,6 +1015,22 @@
       <source>Replace Camera...</source>
       <translation>Byt ut kamera...</translation>
     </message>
+    <message>
+      <source>Save Current Layout As Cloud...</source>
+      <translation>Spara aktuell layout som moln...</translation>
+    </message>
+    <message>
+      <source>Save Layout As Cloud...</source>
+      <translation>Spara layout som moln...</translation>
+    </message>
+    <message>
+      <source>Save Cloud Layout</source>
+      <translation>Spara molnlayout</translation>
+    </message>
+    <message>
+      <source>Save Cloud Layout As...</source>
+      <translation>Spara molnlayout som...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1076,6 +1069,13 @@
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>Maskinvaru-ID för server med den här licensen matchar inte maskinvaru-ID, vilken licens som aktiverades.</translation>
+    </message>
+  </context>
+  <context>
+    <name>DropdownTextPickerWidgetStrings</name>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
     </message>
   </context>
   <context>
@@ -1317,14 +1317,6 @@
       <translation>För att aktivera licensnyckel manuellt kontakta din regionala supportagent:</translation>
     </message>
     <message>
-      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>Om systemet inte har&apos;inte tillgång till internet, för att få aktiveringsfilen skicka den angivna licensnyckeln och hårdvaru-ID till %1.</translation>
-    </message>
-    <message>
-      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</source>
-      <translation>Om systemet inte har tillgång till internet, för att få aktiveringsfilen skicka den medföljande&apos;och maskinvaru-ID till din regionala/licenssupport:</translation>
-    </message>
-    <message>
       <source>Hardware ID</source>
       <translation>Hårdvaruid</translation>
     </message>
@@ -1337,10 +1329,6 @@
       <translation>Det gick inte att aktivera fri licens</translation>
     </message>
     <message>
-      <source>Copy parameters</source>
-      <translation>Kopiera parametrar</translation>
-    </message>
-    <message>
       <source>Copied</source>
       <translation>Kopierad</translation>
     </message>
@@ -1349,6 +1337,18 @@
 License Key: %2</source>
       <translation>Maskinvaru-ID: %1
 Licensnyckel: %2</translation>
+    </message>
+    <message>
+      <source>Copy Parameters</source>
+      <translation>Kopiera parametrar</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation>Om ditt system inte har tillgång till Internet, skicka den medföljande licensnyckeln och maskinvaru-ID till %1 för att ta emot aktiveringsfilen.</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation>Om ditt system inte har tillgång till Internet, skicka den medföljande licensnyckeln och maskinvaru-ID till ditt regionala/licenssupportteam för att ta emot aktiveringsfilen:</translation>
     </message>
   </context>
   <context>
@@ -1528,18 +1528,9 @@ Licensnyckel: %2</translation>
       <translation>Ställ in din e-postadress eller SMTP-server</translation>
     </message>
     <message>
-      <source>Unable to test email settings due to no internetconnection on any of the active servers</source>
-      <translation>Det går inte att testa e-postinställningar på grund av ingen internetanslutning på någon av de aktiva servrarna</translation>
-    </message>
-    <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
       <translation>%1 användare tar emot e-post</translation>
-    </message>
-    <message>
-      <source>%1 users will start receiving emails right after you apply settings</source>
-      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation>%1 användare kommer att börja få e-postmeddelanden direkt efter att du har tillämpat inställningarna</translation>
     </message>
     <message>
       <source>%1 is not available</source>
@@ -1570,6 +1561,15 @@ Licensnyckel: %2</translation>
     <message>
       <source>Unknown error</source>
       <translation>Okänt Fel</translation>
+    </message>
+    <message>
+      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
+      <translation>Det går inte att testa e-postinställningar på grund av ingen internetanslutning på någon av de aktiva servrarna</translation>
+    </message>
+    <message>
+      <source>%1 users will start receiving emails immediately after you apply these settings</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation>%1 användare kommer att börja få e-postmeddelanden direkt efter att du har tillämpat inställningarna</translation>
     </message>
   </context>
   <context>
@@ -1833,10 +1833,6 @@ Licensnyckel: %2</translation>
   <context>
     <name>QnAdvancedSettingsWidget</name>
     <message>
-      <source>Folder not found</source>
-      <translation>Mappen hittades inte</translation>
-    </message>
-    <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
       <translation>Hjälper till att undvika problem med OpenGL som resulterar i 100% CPU-belastning.</translation>
     </message>
@@ -1891,6 +1887,22 @@ Licensnyckel: %2</translation>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
       <translation>Vid den första anslutningen till servern kommer din bekräftelse att bli ombedd att acceptera certifikatet om det innehåller fel</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Välj mapp...</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation>Det gick inte att spara loggar till den valda mappen</translation>
+    </message>
+    <message>
+      <source>Download complete!</source>
+      <translation>Nedladdning klar!</translation>
+    </message>
+    <message>
+      <source>NVIDIA hardware acceleration is in beta mode</source>
+      <translation>NVIDIA hårdvaruacceleration är i betaläge</translation>
     </message>
   </context>
   <context>
@@ -2203,6 +2215,26 @@ Licensnyckel: %2</translation>
       <source>MitM attack from server %1</source>
       <translation>MitM attack från server %1</translation>
     </message>
+    <message>
+      <source>Connected to %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation>Ansluten till %1</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation>Frånkopplad från %1</translation>
+    </message>
+    <message>
+      <source>Connected to %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation>Ansluten till %1 via %2</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation>Frånkopplad från %1 via %2</translation>
+    </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
@@ -2465,10 +2497,6 @@ Licensnyckel: %2</translation>
       <translation>Misslyckades med att spara regeln</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>Tillämpa ändringar före avslut?</translation>
-    </message>
-    <message>
       <source>This action cannot be undone.</source>
       <translation>Denna åtgärd kan inte ångras.</translation>
     </message>
@@ -2479,6 +2507,10 @@ Licensnyckel: %2</translation>
     <message>
       <source>Some rules are not valid and may not work</source>
       <translation>Vissa regler är ogiltiga och kanske inte fungerar</translation>
+    </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation>Vill du tillämpa ändringar innan du avslutar?</translation>
     </message>
   </context>
   <context>
@@ -2513,6 +2545,14 @@ Licensnyckel: %2</translation>
     <message>
       <source>Servers that support buzzer</source>
       <translation>Servrar som stöder summer</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCamDisplay</name>
+    <message>
+      <source>%1 Running</source>
+      <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+      <translation>%1 körs</translation>
     </message>
   </context>
   <context>
@@ -3084,8 +3124,8 @@ till %1</translation>
       <translation>Systemet är inte kompatibelt med tvåfaktorsautentisering</translation>
     </message>
     <message>
-      <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation>Det gick inte att logga in på &quot;%1&quot; system</translation>
+      <source>Failed to log in to System &quot;%1&quot;</source>
+      <translation>Det gick inte att logga in på System &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3122,20 +3162,12 @@ till %1</translation>
       <translation>Spara databas säkerhetskopiering...</translation>
     </message>
     <message>
-      <source>Downloading Database Backup</source>
-      <translation>Nedladdning av databas säkerhetskopiering</translation>
-    </message>
-    <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
       <translation>Databasbackup laddas ner från servern. Vänta.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
       <translation>Öppna databas säkerhetskopiering...</translation>
-    </message>
-    <message>
-      <source>Restoring Database Backup</source>
-      <translation>Återställer databas säkerhetskopiering</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
@@ -3152,14 +3184,6 @@ till %1</translation>
     <message>
       <source>Failed to open file</source>
       <translation>Det gick inte att öppna filen</translation>
-    </message>
-    <message>
-      <source>Database successfully restored</source>
-      <translation>Databasen har återställts</translation>
-    </message>
-    <message>
-      <source>Server application will restart shortly.</source>
-      <translation>Serverprogrammet startas om kort.</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
@@ -3200,6 +3224,10 @@ till %1</translation>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation>Systemkonfigurationen kommer att återställas från säkerhetskopiering, Serverprogram startas om.</translation>
+    </message>
+    <message>
+      <source>Database successfully restored. Server application will restart shortly.</source>
+      <translation>Databasen har återställts. Serverapplikationen kommer att starta om inom kort.</translation>
     </message>
   </context>
   <context>
@@ -3545,10 +3573,6 @@ till %1</translation>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
-      <source>Select folder...</source>
-      <translation>Välj mapp...</translation>
-    </message>
-    <message>
       <source>Folder already added</source>
       <translation>Mappa har redan lagts till</translation>
     </message>
@@ -3559,6 +3583,10 @@ till %1</translation>
     <message>
       <source>Auto (%1)</source>
       <translation>Auto (%1)</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Välj mapp...</translation>
     </message>
   </context>
   <context>
@@ -3610,14 +3638,6 @@ till %1</translation>
     <message>
       <source>Open Camera List</source>
       <translation>Öppna kameralista</translation>
-    </message>
-    <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>Säkerhetskopiering inkluderar inställningar för servrar och kameror, användare, webbsidor, händelseregler etc. Video sparas inte.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Skapar en säkerhetskopia av Systemkonfiguration som kan återställas vid fel.</translation>
     </message>
   </context>
   <context>
@@ -4364,14 +4384,21 @@ till %1</translation>
     </message>
   </context>
   <context>
+    <name>QnPopupSettingsWidget</name>
+    <message>
+      <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
+      <translation>Dessa inställningar gäller endast det system du är inloggad på och kommer att tas bort i framtida versioner.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPtzManageDialog</name>
     <message>
       <source>Manage PTZ for %1...</source>
       <translation>Hantera PTZ för %1...</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>Tillämpa ändringar före avslut?</translation>
+      <source>Apply changes before exiting?</source>
+      <translation>Spara ändringar före avslut?</translation>
     </message>
   </context>
   <context>
@@ -4534,10 +4561,6 @@ till %1</translation>
       <translation>%1 (Primär)</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Välj mapp...</translation>
-    </message>
-    <message>
       <source>Best</source>
       <translation>Bästa</translation>
     </message>
@@ -4556,6 +4579,10 @@ till %1</translation>
     <message>
       <source>Quarter Native</source>
       <translation>Fjärdedel av ursprungliga</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Välj mapp...</translation>
     </message>
   </context>
   <context>
@@ -5006,16 +5033,16 @@ till %1</translation>
       </translation>
     </message>
     <message>
-      <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation>Certifikat mottaget från servern gör&apos;t matcha det certifikat som servern är fäst vid.</translation>
-    </message>
-    <message>
       <source>Details</source>
       <translation>Detaljer</translation>
     </message>
     <message>
-      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
       <translation>Servrar med failover aktiverat tar automatiskt kameror från offlineservrar med samma plats-ID.</translation>
+    </message>
+    <message>
+      <source>The certificate received from the Server does not match the pinned certificate.</source>
+      <translation>Certifikatet som tas emot från servern matchar inte det fästa certifikatet.</translation>
     </message>
   </context>
   <context>
@@ -5155,6 +5182,18 @@ till %1</translation>
     <message>
       <source>Unlock</source>
       <translation>Lås upp</translation>
+    </message>
+    <message>
+      <source>INFORMATION REQUIRED</source>
+      <translation>INFORMATION KRÄVS</translation>
+    </message>
+    <message>
+      <source>Provide</source>
+      <translation>Förse</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation>ÅTKOMST NEKAD</translation>
     </message>
   </context>
   <context>
@@ -5329,14 +5368,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>För små och systempartitioner reserveras och används inte för skrivning om det finns tillräckligt med annat lagringsutrymme tillgängligt.</translation>
     </message>
     <message>
-      <source>Use to store analytics data</source>
-      <translation>Använd för att lagra analysdata</translation>
-    </message>
-    <message>
-      <source>Stores analytics data</source>
-      <translation>Lagrar analysdata</translation>
-    </message>
-    <message>
       <source>Reserved</source>
       <translation>Reserverad</translation>
     </message>
@@ -5371,6 +5402,14 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>smb</source>
       <translation>smb</translation>
+    </message>
+    <message>
+      <source>Use to store analytics and motion data</source>
+      <translation>Används för att lagra analyser och rörelsedata</translation>
+    </message>
+    <message>
+      <source>Stores analytics and motion data</source>
+      <translation>Lagrar analys- och rörelsedata</translation>
     </message>
   </context>
   <context>
@@ -5450,14 +5489,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Uppdateringar</translation>
     </message>
     <message>
-      <source>Routing Management</source>
-      <translation>Hantering av routing</translation>
-    </message>
-    <message>
-      <source>Time Synchronization</source>
-      <translation>Tidsynkronisering</translation>
-    </message>
-    <message>
       <source>Users</source>
       <translation>Användare</translation>
     </message>
@@ -5470,8 +5501,20 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Användarhantering</translation>
     </message>
     <message>
-      <source>Integrations</source>
-      <translation>Integrationer</translation>
+      <source>Time Sync</source>
+      <translation>Tidssynkronisering</translation>
+    </message>
+    <message>
+      <source>Routing</source>
+      <translation>Routing</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Advanced</source>
+      <translation>Avancerad</translation>
     </message>
   </context>
   <context>
@@ -5557,10 +5600,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Ett fel inträffade när e-post skickades</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started</source>
-      <translation>Synkronisering av fjärrarkiv har startats</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished</source>
       <translation>Synkronisering av fjärrarkiv har startats</translation>
     </message>
@@ -5569,16 +5608,8 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Synkronisering av fjärrarkiv pågår</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>Synkronisering av fjärrarkiv har startats för följande enhet:</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Synkronisering av fjärrarkiv har slutförts för följande enhet:</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization</source>
-      <translation>Synkronisering av fjärrarkiv</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5623,8 +5654,28 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Kamerainspelningsschemat är ogiltigt</translation>
     </message>
     <message>
-      <source>Remote archive synchronization available</source>
-      <translation>Synkronisering av fjärrarkiv</translation>
+      <source>Remote archive synchronization has been stopped</source>
+      <translation>Fjärrarkivsynkronisering har stoppats</translation>
+    </message>
+    <message>
+      <source>Storage for analytics data is not set</source>
+      <translation>Lagring för analysdata är inte inställt</translation>
+    </message>
+    <message>
+      <source>System storage is used for analytics data</source>
+      <translation>Systemlagring används för analysdata</translation>
+    </message>
+    <message>
+      <source>Analytics data can take up large amounts of space.</source>
+      <translation>Analysdata kan ta upp stora mängder utrymme.</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization is available</source>
+      <translation>Fjärrsynkronisering av arkiv är tillgänglig</translation>
+    </message>
+    <message>
+      <source>We recommend choosing another location for it instead of the system partition.</source>
+      <translation>Vi rekommenderar att du väljer en annan plats för den istället för systempartitionen.</translation>
     </message>
   </context>
   <context>
@@ -6028,13 +6079,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
-    <name>QnWorkbenchAlarmLayoutHandler</name>
-    <message>
-      <source>Alarms</source>
-      <translation>Larm</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
@@ -6145,8 +6189,8 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>AVI (Audio/Video Interleaved)</translation>
     </message>
     <message>
-      <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-      <translation>Det gick inte att öppna filen &apos;%1&apos;. Kontrollera om mappen är tillgänglig</translation>
+      <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
+      <translation>Det gick inte att öppna filen &quot;%1&quot;. Kontrollera om mappen är tillgänglig.</translation>
     </message>
   </context>
   <context>
@@ -6647,13 +6691,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>Merge</source>
       <translation>Sammanfoga</translation>
     </message>
-    <message numerus="yes">
-      <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation>
-        <numerusform>Du håller på att flytta dessa webbsidor till server &quot;%1&quot;. Dessa webbsidor proxyar allt begärt innehåll, och deras proxyserver ändras till server &quot;%1&quot;.</numerusform>
-        <numerusform>Du håller på att flytta dessa webbsidor till server &quot;%1&quot;. Dessa webbsidor proxyar allt begärt innehåll, och deras proxyserver ändras till server &quot;%1&quot;.</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
       <translation>Proxy av allt innehåll exponerar alla tjänster eller enheter i serverns&apos;-nätverk för användare av denna webbsida.</translation>
@@ -6669,10 +6706,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Cancel</source>
       <translation>Avbryt</translation>
-    </message>
-    <message>
-      <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-      <translation>Vissa enheter från %1 flyttas inte till %2. Flytta i alla fall?</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
@@ -6691,28 +6724,27 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Virtuella kameror, USB- eller webbkameror kan inte flyttas mellan servrar</translation>
     </message>
     <message>
-      <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation>%1 kan inte flyttas mellan servrar eftersom den innehåller virtuella kameror, USB- eller webbkameror</translation>
-    </message>
-    <message>
       <source>Virtual cameras cannot be moved between servers</source>
       <translation>Virtuella kameror kan inte flyttas mellan servrar</translation>
-    </message>
-    <message>
-      <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation>%1 kan inte flyttas mellan servrarna eftersom den innehåller virtuella kameror</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
       <translation>USB- eller webbkameror kan inte flyttas mellan servrar</translation>
     </message>
     <message>
-      <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation>%1 kan inte flyttas mellan servrar eftersom den innehåller USB- eller webbkameror</translation>
+      <source>Only some of the selected devices can be moved to %1</source>
+      <translation>Endast några av de valda enheterna kan flyttas till %1</translation>
     </message>
     <message>
-      <source>Move Group without them</source>
-      <translation>Flytta grupp utan dem</translation>
+      <source>Move Partially</source>
+      <translation>Flytta delvis</translation>
+    </message>
+    <message numerus="yes">
+      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
+      <translation>
+        <numerusform>Du håller på att flytta dessa webbsidor till server &quot;%1&quot;. Dessa webbsidor proxyar allt begärt innehåll, och deras proxyserver ändras till server &quot;%1&quot;.</numerusform>
+        <numerusform>Du håller på att flytta dessa webbsidor till server &quot;%1&quot;. Dessa webbsidor proxyar allt begärt innehåll, och deras proxyserver ändras till server &quot;%1&quot;.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6741,6 +6773,29 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>none</source>
       <comment>No currently selected camera</comment>
       <translation>ingen</translation>
+    </message>
+  </context>
+  <context>
+    <name>SourcePickerWidgetStrings</name>
+    <message>
+      <source>Select at least one Server</source>
+      <translation>Välj minst en server</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>Välj minst en användare</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation>Välj minst en enhet</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation>Välj minst en kamera</translation>
+    </message>
+    <message>
+      <source>Select at least one I/O module</source>
+      <translation>Välj minst en I/O-modul</translation>
     </message>
   </context>
   <context>
@@ -6997,6 +7052,24 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
+    <message>
+      <source>Backup and Restore</source>
+      <translation>Säkerhetskopiering och återställning</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation>Logghantering</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AlarmLayoutHandler</name>
+    <message>
+      <source>Alarms</source>
+      <translation>Larm</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7140,44 +7213,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
       <translation>Välj ett område på schemat för att tillämpa valda inställningar.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n veckor</numerusform>
-        <numerusform>%n veckor</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n dagar</numerusform>
-        <numerusform>%n dagar</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n timmar</numerusform>
-        <numerusform>%n timmar</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n minuter</numerusform>
-        <numerusform>%n minuter</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n sekunder</numerusform>
-        <numerusform>%n sekunder</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -7329,6 +7364,15 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
         <numerusform>Säkerhetskopiering är aktiverad för %n kameror</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation>Filmer från dessa kameror säkerhetskopieras till %1 %2</translation>
+    </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation>Framstegen kommer att visas när säkerhetskopieringsprocessen startar</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7375,6 +7419,18 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Wiper</source>
       <translation>Torkare</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Tysta</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation>Ljud på</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>Öppna dörr</translation>
     </message>
   </context>
   <context>
@@ -7457,10 +7513,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Auto</source>
+      <comment>Let server determine if Media2 should be used to fetch profiles</comment>
       <translation>Auto</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
       <translation>Video inspelad på den interna kameran&apos;s lagring kommer inte att laddas upp till huvudarkivet.</translation>
     </message>
   </context>
@@ -7575,25 +7632,29 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Kamera för byte</translation>
     </message>
     <message>
-      <source>%1 will be replaced by selected camera and removed from the system</source>
-      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation>%1 kommer att ersättas av vald kamera och tas bort från systemet</translation>
-    </message>
-    <message>
       <source>Data for Transfer</source>
       <translation>Data för överföring</translation>
     </message>
     <message>
-      <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation>Kontrollera om data från kameran kan överföras till den nya.</translation>
+      <source>Camera replaced!</source>
+      <translation>Kamera bytt!</translation>
     </message>
     <message>
-      <source>Some data and settings may not supported for new Camera</source>
+      <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
+      <translation>Kontrollera om den gamla kameran&apos;data kan överföras till den nya kameran.</translation>
+    </message>
+    <message>
+      <source>Some data and settings may not be compatible with the new camera</source>
       <translation>Vissa data och inställningar stöds inte för ny kamera</translation>
     </message>
     <message>
-      <source>Camera replaced!</source>
-      <translation>Kamera bytt!</translation>
+      <source>%1 will be removed from the System and replaced by the selected camera</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation>%1 kommer att tas bort från systemet och ersättas av den valda kameran</translation>
+    </message>
+    <message>
+      <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
+      <translation>Det går inte att byta kamera eftersom servern inte är tillgänglig.</translation>
     </message>
   </context>
   <context>
@@ -7774,8 +7835,8 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Rörelse, Objekt + Låg-Res</translation>
     </message>
     <message>
-      <source>Integrations</source>
-      <translation>Integrationer</translation>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -7897,10 +7958,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
   <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
-      <source>This webpage is requesting access to your account for authorization</source>
-      <translation>Denna webbsida begär åtkomst till ditt konto för auktorisering</translation>
-    </message>
-    <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
       <translation>Din bekräftelse krävs för att tillhandahålla en token till</translation>
@@ -7908,6 +7965,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Allow</source>
       <translation>Tillåt</translation>
+    </message>
+    <message>
+      <source>This web page is requesting access to your account for authorization</source>
+      <translation>Denna webbsida begär åtkomst till ditt konto för auktorisering</translation>
     </message>
   </context>
   <context>
@@ -7997,6 +8058,54 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
+    <message>
+      <source>Inaccessible</source>
+      <translation>Otillgänglig</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Laddar...</translation>
+    </message>
+    <message>
+      <source>Click to Show Cameras</source>
+      <translation>Klicka för att visa kameror</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
+    <message>
+      <source>Introducing %1 Layouts</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Introducerar %1 layouter</translation>
+    </message>
+    <message>
+      <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
+      <translation>%1 Layouter är &lt;b&gt;systemöverskridande layouter&lt;/b&gt; som låter dig arbeta med enheter från olika system. För närvarande är endast vissa funktioner i vanliga layouter tillgängliga, men vi kommer att fortsätta att utöka kapaciteten för %1 layouter i framtida versioner</translation>
+    </message>
+    <message>
+      <source>Read more on the %1</source>
+      <translation>Läs mer på %1</translation>
+    </message>
+    <message>
+      <source>help page</source>
+      <translation>hjälpsida</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
+    <message>
+      <source>%1 (Copy)</source>
+      <comment>Original name will be substituted</comment>
+      <translation>%1 (Kopiera)</translation>
+    </message>
+    <message>
+      <source>%1 (Copy %2)</source>
+      <comment>Original name will be substituted as %1, counter as %2</comment>
+      <translation>%1 (Kopiera %2)</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
@@ -8073,8 +8182,8 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Anslut</translation>
     </message>
     <message>
-      <source>Internal server error. Please try again later.</source>
-      <translation>Internt serverfel. Vänligen försök igen senare.</translation>
+      <source>Internal error. Please try again later.</source>
+      <translation>Internt fel. Vänligen försök igen.</translation>
     </message>
   </context>
   <context>
@@ -8154,6 +8263,13 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>Inspelningsschemat innehåller inspelningslägen som inte stöds av de valda kamerorna. Inspelningslägen som inte stöds kommer att ändras till &quot;Spela in alltid&quot;.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
+    <message>
+      <source>Unknown camera</source>
+      <translation>Okänd kamera</translation>
     </message>
   </context>
   <context>
@@ -8327,6 +8443,13 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>Objects</source>
       <comment>Analytics tab title</comment>
       <translation>Objekt</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventRibbon::Private</name>
+    <message>
+      <source>INFORMATION REQUIRED</source>
+      <translation>INFORMATION KRÄVS</translation>
     </message>
   </context>
   <context>
@@ -8564,7 +8687,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Namn kan inte vara tomt.</translation>
     </message>
     <message>
-      <source>Select folder...</source>
+      <source>Select Folder...</source>
       <translation>Välj mapp...</translation>
     </message>
   </context>
@@ -8691,6 +8814,13 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation>%1 Layout</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -8804,6 +8934,33 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::LogSettingsDialog</name>
+    <message>
+      <source>Reset to Default</source>
+      <translation>Återställ till standard</translation>
+    </message>
+    <message>
+      <source>Must be greater than or equal to the value set for Split File by Size</source>
+      <translation>Måste vara större än eller lika med värdet som ställts in för Dela fil efter storlek</translation>
+    </message>
+    <message>
+      <source>Must be less than or equal to the value set for Limit Max Volume</source>
+      <translation>Måste vara mindre än eller lika med värdet som för maxvolym</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may not be collecting enough information.
+The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
+      <translation>Den valda loggningsnivån kanske inte samlar in tillräckligt med information.
+Loggningsnivån &quot;%1&quot; ger dig mer detaljerad information.</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may degrade your system&apos;s performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
+      <translation>Den valda loggningsnivån kan försämra ditt system&apos;:s prestanda.
+Kom ihåg att återställa loggningsnivån till standardinställningen efter att du har samlat in tillräckligt med loggar.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LoginDialog</name>
     <message>
       <source>Connect to Server...</source>
@@ -8812,6 +8969,116 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Version %1</source>
       <translation>Version %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementModel</name>
+    <message>
+      <source>Unit</source>
+      <translation>Enhet</translation>
+    </message>
+    <message>
+      <source>Current Level</source>
+      <translation>Nuvarande Nivå</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>Klient</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Inget</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Fel</translation>
+    </message>
+    <message>
+      <source>Warning</source>
+      <translation>Varning</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
+    </message>
+    <message>
+      <source>Debug</source>
+      <translation>Debugläge</translation>
+    </message>
+    <message>
+      <source>Verbose</source>
+      <translation>Detaljerad</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWatcher</name>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <translation>
+        <numerusform>... och %n mer</numerusform>
+        <numerusform>... och %n mer</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Downloading file...</source>
+      <translation>Hämtar fil...</translation>
+    </message>
+    <message>
+      <source>Pending download...</source>
+      <translation>Väntar på nedladdning...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n Servrar</numerusform>
+        <numerusform>%n Servrar</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Logs downloaded</source>
+      <translation>Loggar nedladdade</translation>
+    </message>
+    <message>
+      <source>Logs downloading failed</source>
+      <translation>Det gick inte att ladda ned loggar</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled on the Client</source>
+      <translation>Felsökningsloggning är aktiverat på klienten</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled, resulting in degraded system performance.</source>
+      <translation>Felsökningsloggning är aktiverad, vilket resulterar i försämrad systemprestanda.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Debug logging is enabled on %n Servers</source>
+      <translation>
+        <numerusform>Felsökningsloggning är aktiverad på %n servrar</numerusform>
+        <numerusform>Felsökningsloggning är aktiverad på %n servrar</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Logs downloading canceled</source>
+      <translation>Loggnedladdning avbröts</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation>Tillämpa inställningarna</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Ange ditt kontolösenord</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>Verkställ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Välj mapp...</translation>
     </message>
   </context>
   <context>
@@ -9362,16 +9629,27 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
       <source>Acknowledge</source>
       <translation>Bekräfta</translation>
     </message>
+    <message>
+      <source>Calling...</source>
+      <translation>Ringer...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
-    <message>
-      <source>No new notifications</source>
-      <translation>Inga nya notifieringar</translation>
+    <message numerus="yes">
+      <source>%n notifications</source>
+      <translation>
+        <numerusform>%n aviseringar</numerusform>
+        <numerusform>%n aviseringar</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Notifications Settings</source>
-      <translation>Meddelandeinställningar</translation>
+      <source>Current System</source>
+      <translation>Nuvarande system</translation>
+    </message>
+    <message>
+      <source>All Systems</source>
+      <translation>Alla system</translation>
     </message>
   </context>
   <context>
@@ -9400,10 +9678,6 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
       <translation>Välj layout...</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Välj en enskild användare i &quot;Visa till&quot; rad för att visa sina lokala vyer i den här listan</translation>
-    </message>
-    <message>
       <source>Local layouts can only be shown to their owners.</source>
       <translation>Lokala layouter kan bara visas för sina ägare.</translation>
     </message>
@@ -9414,6 +9688,25 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Vissa användare har inte tillgång till den valda layouten. Åtgärden fungerar inte för dem.</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation>Letar du efter en lokal layout? Välj endast en användare från listan &quot;Visa till&quot; för att visa deras lokala layouter som ett alternativ här.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
+    <message>
+      <source>Not supported</source>
+      <translation>Stöds inte</translation>
+    </message>
+    <message>
+      <source>This tab will be available in future versions</source>
+      <translation>Den här fliken kommer att finnas tillgänglig i framtida versioner</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>Lär dig mer</translation>
     </message>
   </context>
   <context>
@@ -9664,7 +9957,7 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
       <translation>Proxy av allt innehåll exponerar alla tjänster eller enheter i serverns&apos; nätverk för användare av denna webbsida</translation>
     </message>
     <message>
-      <source>The webpage is able to interact with the Desktop Client and request access to the user session</source>
+      <source>The web page can interact with the Desktop Client and request access to the user session</source>
       <translation>Webbsidan kan interagera med skrivbordsklienten och begära åtkomst till användarsessionen</translation>
     </message>
   </context>
@@ -10075,11 +10368,6 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
       <translation>Obegränsad livstid för användarsessioner hotar den övergripande systemsäkerheten och kan leda till försämring av systemprestandan</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Det rekommenderas att användarens sessionslivslängd inte är större än %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Läs mer.</translation>
     </message>
@@ -10090,6 +10378,11 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
         <numerusform>%n av %1 användare får använda digest-autentisering (inte säker).</numerusform>
         <numerusform>%n av %1 användare får använda digest-autentisering (inte säker).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>Den rekommenderade maximala användarsessionens livslängd är %1</translation>
     </message>
   </context>
   <context>
@@ -10106,32 +10399,12 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>Certifikatet är fäst till %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>Certifikatet presenterades av %1</translation>
     </message>
     <message>
-      <source>Server Id: %1</source>
-      <translation>Server-id: %1</translation>
-    </message>
-    <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
       <translation>Detta certifikat matchar inte certifikatet %1 är fäst vid.</translation>
-    </message>
-    <message>
-      <source>Custom certificate</source>
-      <translation>Anpassat certifikat</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Fäst certifikat</translation>
-    </message>
-    <message>
-      <source>Unknown certificate</source>
-      <translation>Okänt certifikat</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
@@ -10146,18 +10419,34 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
       <translation>Fäst</translation>
     </message>
     <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation>Certifikatet är automatiskt genererat och fäst till %1</translation>
+    </message>
+    <message>
+      <source>Server ID: %1</source>
+      <translation>Server-ID: %1</translation>
+    </message>
+    <message>
       <source>Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
       <translation>Någon kan efterlikna %1 för att stjäla dina personuppgifter.
-Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.</translation>
+Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</translation>
+    </message>
+    <message>
+      <source>Custom Certificate</source>
+      <translation>Anpassat certifikat</translation>
+    </message>
+    <message>
+      <source>Auto-generated Certificate</source>
+      <translation>Auto-genererat certifikat</translation>
+    </message>
+    <message>
+      <source>Unknown Certificate</source>
+      <translation>Okänt certifikat</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-      <source>View certificate</source>
-      <translation>Visa certifikat</translation>
-    </message>
     <message>
       <source>Connect Anyway</source>
       <translation>Anslut ändå</translation>
@@ -10165,6 +10454,10 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
     <message>
       <source>I trust this server</source>
       <translation>Jag litar på den här servern</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>Fortsätt</translation>
     </message>
   </context>
   <context>
@@ -10397,10 +10690,6 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
       <translation>Ersatt kamera upptäckt</translation>
     </message>
     <message>
-      <source>Export in progress...</source>
-      <translation>Export pågår...</translation>
-    </message>
-    <message>
       <source>Camera %1 has been replaced by %2.</source>
       <translation>Kamera %1 har ersatts av %2.</translation>
     </message>
@@ -10411,6 +10700,71 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
     <message>
       <source>Undo Replace</source>
       <translation>Ångra Ersätt</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Exportera</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation>Inspelningar på enheten hittades</translation>
+    </message>
+    <message>
+      <source>Import in progress...</source>
+      <translation>Import pågår...</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 completed</source>
+      <translation>Import av arkiv från %1 slutförd</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 failed</source>
+      <translation>Importera arkiv från %1 misslyckades</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 stopped</source>
+      <translation>Importera arkiv från %1 stoppas</translation>
+    </message>
+    <message>
+      <source>Import archive from %1</source>
+      <translation>Importera arkiv från %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup storage is not configured on %n Servers</source>
+      <translation>
+        <numerusform>Backuplagring är inte konfigurerad på %n servrar</numerusform>
+        <numerusform>Backuplagring är inte konfigurerad på %n servrar</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage for analytics data is not set on %n Servers</source>
+      <translation>
+        <numerusform>Lagring för analysdata är inte inställt på %n -servrar</numerusform>
+        <numerusform>Lagring för analysdata är inte inställt på %n -servrar</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>System storage is used for analytics data on %n Servers</source>
+      <translation>
+        <numerusform>Systemlagring används för analysdata på %n servrar</numerusform>
+        <numerusform>Systemlagring används för analysdata på %n servrar</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Not imported archive found on device %1</source>
+      <translation>Ej importerat arkiv hittades på enhet %1</translation>
+    </message>
+    <message>
+      <source>Not imported archive found on camera %1</source>
+      <translation>Ej importerat arkiv hittades på kamera %1</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by the user</source>
+      <translation>Arkiv strömningsinställningarna har ändrats av användaren</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by the user</source>
+      <translation>Inspelningsinställningarna har ändrats av användaren</translation>
     </message>
   </context>
   <context>
@@ -10470,20 +10824,16 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
       <translation>Beskrivning</translation>
     </message>
     <message>
-      <source>Enter parameters</source>
-      <translation>Ange parametrar</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Åtgärden kräver att vissa parametrar ska fyllas i.</translation>
-    </message>
-    <message>
       <source>Open</source>
       <translation>Öppna</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
       <translation>Öppna i ny flik</translation>
+    </message>
+    <message>
+      <source>This action is not supported for notifications from other Systems</source>
+      <translation>Denna åtgärd stöds inte för meddelanden från andra system</translation>
     </message>
   </context>
   <context>
@@ -10679,12 +11029,12 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
       <translation>Tvinga fram säker autentisering</translation>
     </message>
     <message>
-      <source>All users</source>
+      <source>All Users</source>
       <translation>Alla användare</translation>
     </message>
     <message>
-      <source>With enabled digest authentication</source>
-      <translation>Med aktiverad digestautentisering</translation>
+      <source>Users with Digest Authentication</source>
+      <translation>Användare med Digest-autentisering</translation>
     </message>
   </context>
   <context>
@@ -11013,21 +11363,6 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>Intercom larm layout</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>Intercom öppna dörr</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation>Öppna dörr</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
       <source>Latest</source>
@@ -11113,14 +11448,6 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
-      <source>Cannot find an item with the specified id</source>
-      <translation>Kan inte hitta ett objekt med angivet Id</translation>
-    </message>
-    <message>
-      <source>Cannot find a resource with the specified id.</source>
-      <translation>Kan inte hitta ett objekt med angivet Id.</translation>
-    </message>
-    <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
       <translation>Det går inte att ange mediaparametrar för resursen utan mediaström.</translation>
     </message>
@@ -11132,12 +11459,13 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
       <source>Cannot find a widget corresponding to the specified item.</source>
       <translation>Kan inte hitta en widget som motsvarar det angivna objektet.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::DropdownTextPickerWidget</name>
     <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
+      <source>Cannot find an item with the specified ID</source>
+      <translation>Kan inte hitta ett objekt med det angivna ID</translation>
+    </message>
+    <message>
+      <source>Cannot find a resource with the specified ID.</source>
+      <translation>Kan inte hitta en resurs med angivet ID.</translation>
     </message>
   </context>
   <context>
@@ -11169,14 +11497,6 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
   <context>
     <name>nx::vms::client::desktop::rules::RulesDialog</name>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>Tillämpa ändringar före avslut?</translation>
-    </message>
-    <message>
-      <source>Apply changes failed.</source>
-      <translation>Det gick inte att tillämpa ändringar.</translation>
-    </message>
-    <message>
       <source>Restore all rules to default?</source>
       <translation>Återställ alla regler till standard?</translation>
     </message>
@@ -11185,8 +11505,16 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
       <translation>Denna åtgärd kan inte ångras.</translation>
     </message>
     <message>
-      <source>Restore rules failed.</source>
-      <translation>Återställning av regler misslyckades.</translation>
+      <source>Failed to apply changes.</source>
+      <translation>Det gick inte att tillämpa ändringar.</translation>
+    </message>
+    <message>
+      <source>Failed to restore rules.</source>
+      <translation>Det gick inte att återställa reglerna.</translation>
+    </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation>Spara ändringar före avslut?</translation>
     </message>
   </context>
   <context>
@@ -11198,13 +11526,6 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
     <message>
       <source>Action</source>
       <translation>Åtgärd</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
-    <message>
-      <source>Select at least one User</source>
-      <translation>Välj minst en användare</translation>
     </message>
   </context>
   <context>
@@ -11497,10 +11818,6 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
       <translation>Alla stöds</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Välj mapp...</translation>
-    </message>
-    <message>
       <source>Too short period selected</source>
       <translation>För kort period vald</translation>
     </message>
@@ -11572,18 +11889,6 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
       <translation>Var god uppgradera till en nästa tillgänglig patch eller release version när den är tillgänglig.</translation>
     </message>
     <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation>Systemet skickar anonym användarstatistik</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation>Den kommer att användas av mjukvaruutvecklingsteam för att förbättra användarupplevelsen.</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation>För att inaktivera det, gå till menyn Systemadministration.</translation>
-    </message>
-    <message>
       <source>Failed to open server web page</source>
       <translation>Misslyckades med att öppna serverns webbsida</translation>
     </message>
@@ -11648,16 +11953,24 @@ Du kan välja en annan lagringsplats på fliken &quot;Storage Management&quot; i
       <translation>%1 Beta</translation>
     </message>
     <message>
-      <source>There are no suitable cameras for replacement on the %1</source>
-      <translation>Det finns inga lämpliga kameror för utbyte på %1</translation>
-    </message>
-    <message>
       <source>Undo replacement completed successfully!</source>
       <translation>Ångra ersättningen har slutförts!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
       <translation>Vissa inställningar kanske inte överförs från den ersatta kameran på grund av kompatibilitetsproblem.</translation>
+    </message>
+    <message>
+      <source>Confirm undo replacement?</source>
+      <translation>Bekräfta ångra ersättning?</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Välj mapp...</translation>
+    </message>
+    <message>
+      <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
+      <translation>Det finns inga lämpliga kameror för ersättning på Server &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -11725,6 +12038,10 @@ Du kan välja en annan lagringsplats på fliken &quot;Storage Management&quot; i
     <message>
       <source>New Layout %1</source>
       <translation>Ny vy %1</translation>
+    </message>
+    <message>
+      <source>Save Layout As Cloud</source>
+      <translation>Spara layout som moln</translation>
     </message>
   </context>
   <context>
@@ -11840,6 +12157,10 @@ om du vill visa fler bokmärken</translation>
       <source>To End</source>
       <translation>Till slut</translation>
     </message>
+    <message>
+      <source>Rewind is not available for VMAX</source>
+      <translation>Spola tillbaka är inte tillgängligt för VMAX</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::SpeedSlider</name>
@@ -11899,8 +12220,8 @@ om du vill visa fler bokmärken</translation>
       <translation>Klientuppdateringspaket saknas för nuvarande plattform.</translation>
     </message>
     <message>
-      <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation>Kan&apos;t kontrollera klientuppdateringens tillgänglighet. Kontrollera din internetanslutning och försök igen.</translation>
+      <source>Cannot check Client update availability. Check your internet connection and try again.</source>
+      <translation>Kan inte kontrollera tillgängligheten för klientuppdateringar. Kontrollera din internetanslutning och försök igen.</translation>
     </message>
   </context>
 </TS>

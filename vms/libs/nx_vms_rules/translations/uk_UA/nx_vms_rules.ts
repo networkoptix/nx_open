@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>Опис</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,27 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>Модуль вводу-виводу %1 був відключений</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation type="unfinished">
+        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Device Disconnected</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
       <translation type="unfinished">Device ID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation type="unfinished">
+        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Camera Disconnected</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +201,23 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Конфлікт IP адреси камери на %1</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation type="unfinished">
+        <numerusform>Device IP Conflict</numerusform>
+        <numerusform>Device IP Conflict</numerusform>
+        <numerusform>Device IP Conflict</numerusform>
+        <numerusform>Device IP Conflict</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation type="unfinished">
+        <numerusform>Camera IP Conflict</numerusform>
+        <numerusform>Camera IP Conflict</numerusform>
+        <numerusform>Camera IP Conflict</numerusform>
+        <numerusform>Camera IP Conflict</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -226,10 +250,6 @@
       <translation>Ключові слова, розділені пробілом</translation>
     </message>
     <message>
-      <source>Generic</source>
-      <translation>Загальні</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Стан</translation>
     </message>
@@ -249,24 +269,8 @@
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Do HTTP request</source>
-      <translation>Виконати HTTP запит</translation>
-    </message>
-    <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
-    </message>
-    <message>
-      <source>HTTP Url</source>
-      <translation type="unfinished">HTTP Url</translation>
-    </message>
-    <message>
-      <source>HTTP Content</source>
-      <translation type="unfinished">HTTP Content</translation>
-    </message>
-    <message>
-      <source>Content type</source>
-      <translation>Тип вмісту</translation>
+      <translation>Інтервал спрацьовування</translation>
     </message>
     <message>
       <source>Login</source>
@@ -277,8 +281,24 @@
       <translation>Пароль</translation>
     </message>
     <message>
-      <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation type="unfinished">HTTP(S) Content</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation type="unfinished">Content Type</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
@@ -292,16 +312,16 @@
       <translation>Проблема ліцензії</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Недостатньо ліцензій Запис вимкнено на наступних пристроях:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Недостатньо ліцензій Запис вимкнено на наступних камерах:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Недостатньо ліцензій Запис було відключено на наступних модулях вводу / виводу:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
   </context>
   <context>
@@ -311,16 +331,16 @@
       <translation>Рух на %1</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Стан</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>Камера</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation type="unfinished">Motion on Camera</translation>
     </message>
   </context>
   <context>
@@ -332,6 +352,69 @@
     <message>
       <source>Network Issue</source>
       <translation>Проблема з мережею</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>Помилка RTP в основному потоці (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>Помилка RTP у вторинному потоці (%1).</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>Виявлено втрату RTP пакетів.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>Час камери знову нормалізується.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>Пристрій не відповідає на запити мережі.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation type="unfinished">Multicast address conflict detected.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>Мережева адреса %1 не є адресою мультикасту.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Підключення до камери (основний потік) було несподівано закрито.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Підключення до камери (вторинний потік) було несподівано закрито.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Підключення до пристрою було несподівано закрито.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
     </message>
   </context>
   <context>
@@ -346,7 +429,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Інтервал спрацьовування</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
@@ -370,10 +453,6 @@
     <message>
       <source>Plugin Diagnostic Event</source>
       <translation>Діагностична подія плагіна</translation>
-    </message>
-    <message>
-      <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -436,7 +515,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Інтервал спрацьовування</translation>
     </message>
     <message>
       <source>Additional recipients</source>
@@ -492,6 +571,14 @@
     <message>
       <source>Server Failure</source>
       <translation>Серверна помилка</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>З'єднання із сервером втрачено.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>Відбулася несподівана зупинка сервера.</translation>
     </message>
   </context>
   <context>
@@ -556,7 +643,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Інтервал спрацьовування</translation>
     </message>
     <message>
       <source>Speak to users</source>
@@ -580,6 +667,46 @@
     <message>
       <source>Storage Issue</source>
       <translation>Проблема зі зберіганням</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>Помилка введення / виведення на %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>Недостатньо швидкості HDD/SSD для запису на %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>Диск &quot;%1&quot; переповнений. Диск містить занадто багато даних, що не відносяться до системи.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>Системний диск &quot;%1&quot; майже повний.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Analytics storage &quot;%1&quot; офлайн.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Analytics storage &quot;%1&quot; майже заповнена.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
     </message>
   </context>
   <context>
@@ -618,6 +745,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation type="unfinished">Plugin: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Заголовок: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Причина: %1</translation>
     </message>
   </context>
   <context>

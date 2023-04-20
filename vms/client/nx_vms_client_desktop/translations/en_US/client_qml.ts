@@ -2,6 +2,92 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>AddLookupListEntryDialog</name>
+    <message>
+        <source>Add Entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AdvancedSettingsDialog</name>
+    <message>
+        <source>LDAP - Advanced Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login Attribute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full Name Attribute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email Attribute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow digest authentication for imported users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name Attribute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Membership</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Membership Attribute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group Members Attribute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Base membership on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group members</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User’s membership</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Misc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronization Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy LDAP requests via server</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AdvancedUpdateSettings</name>
     <message>
         <source>Advanced Update Settings</source>
@@ -153,19 +239,30 @@
         <translation></translation>
     </message>
     <message>
-        <source>This plugin has no settings for this Camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Check Camera Settings to configure this plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Check System Administration settings to configure this plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This plugin has no settings at the System level.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>This plugin has no settings for this camera.</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>AnalyticsSettingsMenu</name>
+    <message>
+        <source>Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>API Integrations</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -174,6 +271,57 @@
     <message>
         <source>NO DATA</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ApiIntegrations</name>
+    <message>
+        <source>API Integrations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New requests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This Integration will be able to:
+ • change settings on cameras
+ • get access to archive
+ • process video streams
+ • exchange metadata over the network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Integration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will remove Integration request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Request</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -278,7 +426,7 @@
     <name>CloudTile</name>
     <message>
         <source>Log in to</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -293,6 +441,49 @@
     <message>
         <source>Connect to Server</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ConnectionSettingsDialog</name>
+    <message>
+        <source>LDAP - Connection Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This field cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login DN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use StarTLS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore LDAP server certificate errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connecting...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -346,6 +537,37 @@
     <message>
         <source>360° Equirectangular</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>EditLookupListDialog</name>
+    <message>
+        <source>List Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Column Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -406,6 +628,29 @@
     <message>
         <source>NO PREVIEW</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>FilterDialog</name>
+    <message>
+        <source>Edit Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Base DN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Base DN cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -597,7 +842,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Custom Permissions</source>
+        <source>Permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -659,36 +904,43 @@
     </message>
 </context>
 <context>
-    <name>InformationPanel</name>
-    <message>
-        <source>Version</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Vendor</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select video stream from the camera for analysis</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Refresh</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Refreshing...</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>InsecureWarning</name>
     <message>
         <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>IntegrationHeader</name>
+    <message>
+        <source>OFFLINE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refreshing...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>IntegrationPanel</name>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vendor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select video stream from the camera for analysis</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -770,6 +1022,89 @@
     <message>
         <source>Default value:</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>LdapSettings</name>
+    <message>
+        <source>LDAP is not configured yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect your System to a LDAP server for easier user management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ONLINE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OFFLINE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last Sync</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continuous User Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VMS imports and synchronizes users and groups with LDAP in real time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continuous import from LDAP is disabled for this system. Some settings may be not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No users or groups match synchronization settings and are added to the system’s DB. Make sure LDAP server parameters and filters are configured correctly. </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -861,6 +1196,40 @@
     </message>
 </context>
 <context>
+    <name>LookupListTable</name>
+    <message>
+        <source>NONE</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LookupListsDialog</name>
+    <message>
+        <source>Lookup Lists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create New...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MotionAreaSelector</name>
     <message>
         <source>In selected area</source>
@@ -869,6 +1238,21 @@
     <message>
         <source>Select an area on the video to filter results</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>NoListsPage</name>
+    <message>
+        <source>No Lists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create New...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -917,7 +1301,22 @@
     </message>
 </context>
 <context>
+    <name>PanelBase</name>
+    <message>
+        <source>Approve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reject</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ParentGroupsTab</name>
+    <message>
+        <source>Add Group</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Built In</source>
         <translation type="unfinished"></translation>
@@ -927,7 +1326,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add</source>
+        <source>No custom groups yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No groups found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change search criteria or create a new group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -988,11 +1395,30 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Try changing search criteria or enable showing all permissions and resources</source>
+        <source>Try changing search criteria or enable editing to see available resources</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All permissions &amp; resources</source>
+        <source>Try changing search criteria</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editing enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editing disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Plugins</name>
+    <message>
+        <source>Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1062,7 +1488,7 @@
     </message>
     <message>
         <source>Preview is not available for the selected object</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1121,23 +1547,23 @@ to activate PTZ</source>
 <context>
     <name>QuickIntervalPanel</name>
     <message>
-        <source>Last</source>
+        <source>today</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hour</source>
+        <source>-1 hour</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Day</source>
+        <source>-24 hours</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Week</source>
+        <source>-7 days</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Month</source>
+        <source>-30 days</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1171,14 +1597,7 @@ to activate PTZ</source>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ResourceAccessDelegate</name>
-    <message>
-        <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1228,10 +1647,6 @@ to activate PTZ</source>
         <translation></translation>
     </message>
     <message>
-        <source>All Types</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Servers</source>
         <translation></translation>
     </message>
@@ -1256,12 +1671,12 @@ to activate PTZ</source>
         <translation></translation>
     </message>
     <message>
-        <source>Users</source>
+        <source>Local Files</source>
         <translation></translation>
     </message>
     <message>
-        <source>Local Files</source>
-        <translation></translation>
+        <source>Integrations</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1345,11 +1760,11 @@ to activate PTZ</source>
     <name>SettingsDialog</name>
     <message>
         <source>Enter parameters</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This action requires some parameters to be filled.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1473,14 +1888,14 @@ to activate PTZ</source>
     </message>
     <message>
         <source>Access denied</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>StyledRadioButton</name>
     <message>
         <source>Logical ID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1729,7 +2144,7 @@ to activate PTZ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Custom Permissions</source>
+        <source>Permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1768,7 +2183,7 @@ to activate PTZ</source>
     </message>
     <message>
         <source>You do not have access to the %1. Please check your internet connection.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>

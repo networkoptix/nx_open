@@ -54,17 +54,6 @@
     </message>
   </context>
   <context>
-    <name>CloudSystemStatusItem::Private</name>
-    <message>
-      <source>Loading...</source>
-      <translation>Yükleniyor...</translation>
-    </message>
-    <message>
-      <source>User interaction required</source>
-      <translation type="unfinished">User interaction required</translation>
-    </message>
-  </context>
-  <context>
     <name>ComboBoxUtils</name>
     <message>
       <source>multiple values</source>
@@ -103,7 +92,7 @@
     </message>
     <message>
       <source>Cannot connect to the System</source>
-      <translation type="unfinished">Cannot connect to the System</translation>
+      <translation>Sisteme bağlanılamıyor</translation>
     </message>
   </context>
   <context>
@@ -564,23 +553,11 @@
       <translation>Aygıt Kuralları...</translation>
     </message>
     <message>
-      <source>Devices Rules...</source>
-      <translation>Aygıt Kuralları...</translation>
-    </message>
-    <message>
       <source>Camera Rules...</source>
       <translation>Kamera Kuralları...</translation>
     </message>
     <message>
-      <source>Cameras Rules...</source>
-      <translation>Kamera Kuralları...</translation>
-    </message>
-    <message>
       <source>I/O Module Rules...</source>
-      <translation>I/O Mödül Kuralları...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Rules...</source>
       <translation>I/O Mödül Kuralları...</translation>
     </message>
     <message>
@@ -933,39 +910,39 @@
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>Pencere Yapılandırmasını Kaydet</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>Pencere Yapılandırmasını Kaydet</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>Pencere Yapılandırması</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>Mevcut Durumu Kaydet</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>Kayıtlı Durumu Geri Yükle</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>Kayıtlı Durumu Sil</translation>
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation type="unfinished">Close all Windows</translation>
+      <translation>Tüm pencereleri kapat</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>Yer İşaretini Sil...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
+      <translation>Yer imlerini sil...</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
@@ -980,63 +957,79 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Döndür</translation>
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>Grup Oluştur</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>Grubu Kaldır</translation>
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
-      <translation type="unfinished">Add Proxied Web Page...</translation>
+      <translation>Proxy Web Sayfası Ekle...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Hücre Aralığı</translation>
     </message>
     <message>
       <source>Show Panel</source>
-      <translation type="unfinished">Show Panel</translation>
+      <translation>Paneli Göster</translation>
     </message>
     <message>
       <source>Hide Panel</source>
-      <translation type="unfinished">Hide Panel</translation>
+      <translation>Paneli Gizle</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>Joystick Ayarları...</translation>
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Gelişmiş...</translation>
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation type="unfinished">Archive filter...</translation>
+      <translation>Arşiv filtresi...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>Yer İşareti Metnini Kopyala</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>Yer İmleri Metnini Kopyala</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>Web Sayfası Ayarları...</translation>
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>Hesap Güvenliği...</translation>
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>Kamerayı Değiştir...</translation>
+    </message>
+    <message>
+      <source>Save Current Layout As Cloud...</source>
+      <translation>Geçerli Düzeni Bulut Olarak Kaydet...</translation>
+    </message>
+    <message>
+      <source>Save Layout As Cloud...</source>
+      <translation>Düzeni Bulut Olarak Kaydet...</translation>
+    </message>
+    <message>
+      <source>Save Cloud Layout</source>
+      <translation>Bulut Düzenini Kaydet</translation>
+    </message>
+    <message>
+      <source>Save Cloud Layout As...</source>
+      <translation>Bulut Düzenini Farklı Kaydet...</translation>
     </message>
   </context>
   <context>
@@ -1076,6 +1069,13 @@
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>Bu lisansa sahip Sunucu Donanım Kimliği, lisansın etkinleştirildiği Donanım Kimliği ile eşleşmiyor.</translation>
+    </message>
+  </context>
+  <context>
+    <name>DropdownTextPickerWidgetStrings</name>
+    <message>
+      <source>Auto</source>
+      <translation>Oto</translation>
     </message>
   </context>
   <context>
@@ -1317,14 +1317,6 @@
       <translation>Lisans Anahtarını manuel olarak etkinleştirmek için lütfen Bölgesel / Lisans desteğine başvurun:</translation>
     </message>
     <message>
-      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</translation>
-    </message>
-    <message>
-      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</source>
-      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</translation>
-    </message>
-    <message>
       <source>Hardware ID</source>
       <translation>Donanım Kimliği</translation>
     </message>
@@ -1334,11 +1326,7 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
-    </message>
-    <message>
-      <source>Copy parameters</source>
-      <translation type="unfinished">Copy parameters</translation>
+      <translation>Ücretsiz lisans etkinleştirilemedi</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1347,8 +1335,19 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>Donanım Kimliği: %1 Lisans Anahtarı: %2</translation>
+    </message>
+    <message>
+      <source>Copy Parameters</source>
+      <translation>Parametreleri Kopyala</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation>Sisteminizin İnternet erişimi yoksa, aktivasyon dosyasını almak için lütfen sağlanan Lisans Anahtarını ve Donanım Kimliğini %1 gönderin.</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation>Sisteminizin İnternet erişimi yoksa, aktivasyon dosyasını almak için lütfen Lisans Anahtarınızı ve Sunucu Donanım Kimliğinizi Bölge / Lisans destek ekibinize gönderin:</translation>
     </message>
   </context>
   <context>
@@ -1493,7 +1492,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
+      <translation>Güvensiz</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1505,7 +1504,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>Url geçerli değil.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -1513,11 +1512,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Aktif</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>Yapılandırılmadı</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1525,35 +1524,26 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
-    </message>
-    <message>
-      <source>Unable to test email settings due to no internetconnection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internetconnection on any of the active servers</translation>
+      <translation>E-posta adresinizi veya SMTP sunucunuzu ayarlayın</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
-    </message>
-    <message>
-      <source>%1 users will start receiving emails right after you apply settings</source>
-      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails right after you apply settings</translation>
+      <translation>%1 kullanıcılar e-posta alıyor</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>%1 mevcut değil</translation>
     </message>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Route via %1</translation>
+      <translation>%1üzerinden yönlendir</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation type="unfinished">Route via SMTP server</translation>
+      <translation>SMTP sunucusu üzerinden yönlendirme</translation>
     </message>
     <message>
       <source>Success</source>
@@ -1570,6 +1560,15 @@ License Key: %2</translation>
     <message>
       <source>Unknown error</source>
       <translation>Bilinmeyen hata</translation>
+    </message>
+    <message>
+      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
+      <translation>Sunucuların hiçbirinde internet bağlantısı olmadığından e-posta ayarları test edilemiyor</translation>
+    </message>
+    <message>
+      <source>%1 users will start receiving emails immediately after you apply these settings</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation>%1 kullanıcı, siz bu ayarları uyguladıktan sonra e-posta almaya başlayacak</translation>
     </message>
   </context>
   <context>
@@ -1833,10 +1832,6 @@ License Key: %2</translation>
   <context>
     <name>QnAdvancedSettingsWidget</name>
     <message>
-      <source>Folder not found</source>
-      <translation>Dosya bulunamadı</translation>
-    </message>
-    <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
       <translation>OpenGL çiziminde% 100 CPU yüküyle sonuçlanan sorunların önlenmesine yardımcı olur.</translation>
     </message>
@@ -1854,11 +1849,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Önerilen</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Sıkı</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
@@ -1870,7 +1865,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>Sertifika deposu temizlenecek.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
@@ -1878,11 +1873,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Diğer tüm istemci pencereleri kapatılacaktır.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Güvenlik ayarları değiştirildi</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -1891,6 +1886,22 @@ License Key: %2</translation>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
       <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Klasör Seç...</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation>Günlükler seçilen klasöre kaydedilemedi</translation>
+    </message>
+    <message>
+      <source>Download complete!</source>
+      <translation>İndirme tamamlandı!</translation>
+    </message>
+    <message>
+      <source>NVIDIA hardware acceleration is in beta mode</source>
+      <translation>NVIDIA donanım hızlandırma beta modunda</translation>
     </message>
   </context>
   <context>
@@ -2197,11 +2208,31 @@ License Key: %2</translation>
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>MitM Saldırısı</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
       <translation type="unfinished">MitM attack from server %1</translation>
+    </message>
+    <message>
+      <source>Connected to %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation>%1 ile bağlantı kuruldu</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation>%1 ile bağlantı kesildi</translation>
+    </message>
+    <message>
+      <source>Connected to %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation>%2 üzerinden %1 bağlı</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation>%2 üzerinden %1 ile bağlantı kesildi</translation>
     </message>
   </context>
   <context>
@@ -2465,10 +2496,6 @@ License Key: %2</translation>
       <translation>Kural kaydedilirken hata oluştu</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>Çıkış yapmadan önce değişiklikler uygulansın mı?</translation>
-    </message>
-    <message>
       <source>This action cannot be undone.</source>
       <translation>Bu işlem geri alınamaz.</translation>
     </message>
@@ -2478,7 +2505,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
-      <translation type="unfinished">Some rules are not valid and may not work</translation>
+      <translation>Bazı kurallar geçerli değil ve çalışmayabilir</translation>
+    </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation>Çıkmadan önce değişiklikler uygulansın mı?</translation>
     </message>
   </context>
   <context>
@@ -2513,6 +2544,14 @@ License Key: %2</translation>
     <message>
       <source>Servers that support buzzer</source>
       <translation>Sesli uyarıyı destekleyen sunucular</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCamDisplay</name>
+    <message>
+      <source>%1 Running</source>
+      <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+      <translation>%1$ çalışıyor</translation>
     </message>
   </context>
   <context>
@@ -2884,7 +2923,7 @@ to %1</source>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Oturumunuz kapatılacak.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -3080,8 +3119,8 @@ to %1</source>
       <translation type="unfinished">System is not compatible with two-factor authentication</translation>
     </message>
     <message>
-      <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
+      <source>Failed to log in to System &quot;%1&quot;</source>
+      <translation>Sistemde oturum açılamadı &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3118,20 +3157,12 @@ to %1</source>
       <translation>Veri Tabanı Yedeklemesini Kaydet...</translation>
     </message>
     <message>
-      <source>Downloading Database Backup</source>
-      <translation>Veri Tabanı Yedeklemesi İndiriliyor</translation>
-    </message>
-    <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
       <translation>Veri tabanı Yedeklemesi Sunucudan İndiriliyor. Lütfen Bekleyin.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
       <translation>Veri Tabanı Yedeklemesini Aç...</translation>
-    </message>
-    <message>
-      <source>Restoring Database Backup</source>
-      <translation>Veri Tabanı Yedeklemesi Geri Yükleniyor</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
@@ -3150,14 +3181,6 @@ to %1</source>
       <translation>Dosya açılamadı</translation>
     </message>
     <message>
-      <source>Database successfully restored</source>
-      <translation>Veritabanı geri yüklemesi başarıyla tamamlandı</translation>
-    </message>
-    <message>
-      <source>Server application will restart shortly.</source>
-      <translation>Sunucu uygulaması kısa süre içinde yeniden başlayacak.</translation>
-    </message>
-    <message>
       <source>Failed to restore database</source>
       <translation>Veritabası geri yüklemesi başarısız oldu</translation>
     </message>
@@ -3167,7 +3190,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Veri Tabanı Yedeğini Kaydet</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -3175,11 +3198,11 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Oluştur</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Veritabanı Yedeğinden Geri Yükleme</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
@@ -3196,6 +3219,10 @@ to %1</source>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation>Sistem konfigürasyonu yedekten geri yüklendi. Sunucu yeniden başlatılacak.</translation>
+    </message>
+    <message>
+      <source>Database successfully restored. Server application will restart shortly.</source>
+      <translation>Veritabanı başarıyla geri yüklendi. Sunucu uygulaması kısa süre içinde yeniden başlatılacak.</translation>
     </message>
   </context>
   <context>
@@ -3285,7 +3312,7 @@ to %1</source>
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>Digest kimlik doğrulaması ile etkin</translation>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
@@ -3541,10 +3568,6 @@ to %1</source>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
-      <source>Select folder...</source>
-      <translation>Klasör Seç...</translation>
-    </message>
-    <message>
       <source>Folder already added</source>
       <translation>Dosya zaten ekli</translation>
     </message>
@@ -3555,6 +3578,10 @@ to %1</source>
     <message>
       <source>Auto (%1)</source>
       <translation>Otomatik (%1)</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Klasör Seç...</translation>
     </message>
   </context>
   <context>
@@ -3606,14 +3633,6 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>Kamera listesini aç</translation>
-    </message>
-    <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>Yedekleme sunucuları ve kamera ayarlarını, kullanıcıları, web sayfalarını, etkinlik kurallarını vb. Içerir. Video kaydedilmez.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Herhangi bir aksilik olmasına karşın sistem konfigürasyonunu yedekleyebilir ve daha sonra tekrar yükleyebilirsiniz.</translation>
     </message>
   </context>
   <context>
@@ -3708,7 +3727,7 @@ to %1</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Lütfen şifre girin.</translation>
     </message>
   </context>
   <context>
@@ -4176,11 +4195,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Hareket Arama</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Nesne Arama</translation>
     </message>
   </context>
   <context>
@@ -4360,14 +4379,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnPopupSettingsWidget</name>
+    <message>
+      <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
+      <translation>Bu ayarlar sadece oturum açmış olduğunuz Sistem için geçerlidir ve gelecek sürümlerde kaldırılacaktır.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPtzManageDialog</name>
     <message>
       <source>Manage PTZ for %1...</source>
       <translation>PTZ'yi Yönet %1...</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>Çıkış yapmadan önce değişiklikler uygulansın mı?</translation>
+      <source>Apply changes before exiting?</source>
+      <translation>Çıkmadan önce değişiklikler uygulansın mı?</translation>
     </message>
   </context>
   <context>
@@ -4530,10 +4556,6 @@ to %1</source>
       <translation>%1 (Öncelikli)</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Klasör Seç...</translation>
-    </message>
-    <message>
       <source>Best</source>
       <translation>En iyi</translation>
     </message>
@@ -4552,6 +4574,10 @@ to %1</source>
     <message>
       <source>Quarter Native</source>
       <translation>Çeyrek kadar</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Klasör Seç...</translation>
     </message>
   </context>
   <context>
@@ -4686,7 +4712,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Tam ekrana geç</translation>
     </message>
   </context>
   <context>
@@ -4989,9 +5015,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>Sertifikalar</numerusform>
+        <numerusform>Sertifikalar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5002,16 +5028,16 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</translation>
-    </message>
-    <message>
       <source>Details</source>
       <translation>Detaylar</translation>
     </message>
     <message>
-      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
+      <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
+      <translation>Yük devretmenin etkinleştirildiği sunucular, aynı Konum Kimliğine sahip çevrimdışı Sunuculardan kameraları otomatik olarak devir alacaktır.</translation>
+    </message>
+    <message>
+      <source>The certificate received from the Server does not match the pinned certificate.</source>
+      <translation>Sunucudan alınan sertifika, sabitlenen sertifikayla eşleşmiyor.</translation>
     </message>
   </context>
   <context>
@@ -5141,7 +5167,7 @@ to %1</source>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>ARŞİV ŞİFRELİ</translation>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
@@ -5149,7 +5175,19 @@ to %1</source>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Kilidi Aç</translation>
+    </message>
+    <message>
+      <source>INFORMATION REQUIRED</source>
+      <translation>BİLGİ GEREKİYOR</translation>
+    </message>
+    <message>
+      <source>Provide</source>
+      <translation>Sağlamak</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation>ERİŞİM ENGELLENDİ</translation>
     </message>
   </context>
   <context>
@@ -5324,14 +5362,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Çok küçük ve sistem bölümleri korumalıdır ve kullanılabilir yeterli alan varsa, yazma için kullanılmamaktadır.</translation>
     </message>
     <message>
-      <source>Use to store analytics data</source>
-      <translation>Analytics verilerini depolamak için kullanın</translation>
-    </message>
-    <message>
-      <source>Stores analytics data</source>
-      <translation>Analytics verilerini depolar</translation>
-    </message>
-    <message>
       <source>Reserved</source>
       <translation>Rezerve</translation>
     </message>
@@ -5366,6 +5396,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>smb</source>
       <translation>smb</translation>
+    </message>
+    <message>
+      <source>Use to store analytics and motion data</source>
+      <translation>Analitik ve hareket verilerini depolamak için kullanın</translation>
+    </message>
+    <message>
+      <source>Stores analytics and motion data</source>
+      <translation>Analitik ve hareket verilerini depolar</translation>
     </message>
   </context>
   <context>
@@ -5445,14 +5483,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Güncellemeler</translation>
     </message>
     <message>
-      <source>Routing Management</source>
-      <translation>Yönlendirme Yönetimi</translation>
-    </message>
-    <message>
-      <source>Time Synchronization</source>
-      <translation>Zaman Senkronizasyonu</translation>
-    </message>
-    <message>
       <source>Users</source>
       <translation>Kullanıcılar</translation>
     </message>
@@ -5462,11 +5492,23 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Kullanıcı yönetimi</translation>
     </message>
     <message>
-      <source>Integrations</source>
-      <translation>Entegrasyonlar</translation>
+      <source>Time Sync</source>
+      <translation>Zaman Senkronizasyonu</translation>
+    </message>
+    <message>
+      <source>Routing</source>
+      <translation>Yönlendirme</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Eklentiler</translation>
+    </message>
+    <message>
+      <source>Advanced</source>
+      <translation>Gelişmiş</translation>
     </message>
   </context>
   <context>
@@ -5552,10 +5594,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>E-posta gönderirken hata oluştu</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started</source>
-      <translation>Uzak arşiv senkronizasyonu başlatıldı</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished</source>
       <translation>Uzak arşiv senkronizasyonu tamamlandı</translation>
     </message>
@@ -5564,16 +5602,8 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Uzak arşiv senkronizasyonu devam ediyor</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>Aşağıdaki cihaz için uzak arşiv senkronizasyonu başlatıldı:</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Aşağıdaki cihaz için uzak arşiv senkronizasyonu tamamlandı:</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization</source>
-      <translation>Remote archive synchronization</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5611,15 +5641,35 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>Yedek depolama yapılandırılmamış</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>Kamera kayıt programı geçersiz</translation>
     </message>
     <message>
-      <source>Remote archive synchronization available</source>
-      <translation type="unfinished">Remote archive synchronization available</translation>
+      <source>Remote archive synchronization has been stopped</source>
+      <translation>Uzak arşiv senkronizasyonu durduruldu</translation>
+    </message>
+    <message>
+      <source>Storage for analytics data is not set</source>
+      <translation>Analitik verileri için depolama ayarlanmamış</translation>
+    </message>
+    <message>
+      <source>System storage is used for analytics data</source>
+      <translation>Sistem depolaması analitik veriler için kullanıldı</translation>
+    </message>
+    <message>
+      <source>Analytics data can take up large amounts of space.</source>
+      <translation>Analitik verileri büyük miktarda yer kaplayabilir.</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization is available</source>
+      <translation>Uzaktan arşiv senkronizasyonu mevcut</translation>
+    </message>
+    <message>
+      <source>We recommend choosing another location for it instead of the system partition.</source>
+      <translation>Bunun için sistem bölümü yerine başka bir konum seçmenizi öneririz.</translation>
     </message>
   </context>
   <context>
@@ -5722,7 +5772,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
+      <translation>Digest kimlik doğrulamasını etkinleştirmek için parola sıfırlama gereklidir</translation>
     </message>
   </context>
   <context>
@@ -5842,11 +5892,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
+      <translation>Bu kullanıcı için özet kimlik doğrulamasına izin ver</translation>
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Daha Fazla Bilgi</translation>
     </message>
   </context>
   <context>
@@ -5921,7 +5971,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation type="unfinished">Password reset is required</translation>
+      <translation>Parola sıfırlama gerekli</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
@@ -5996,19 +6046,19 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>Bu web sayfası açılsın mı?</translation>
     </message>
     <message>
       <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <translation>Web Sayfası</translation>
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>Yine de bağlan</translation>
     </message>
     <message>
       <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
+      <translation>Web sayfası ayarları...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6020,13 +6070,6 @@ We recommend you not to open this web page. If you understand the risks, you can
 %1
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchAlarmLayoutHandler</name>
-    <message>
-      <source>Alarms</source>
-      <translation>Alarmlar</translation>
     </message>
   </context>
   <context>
@@ -6140,8 +6183,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>AVI (Audio/Video Interleaved)</translation>
     </message>
     <message>
-      <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-      <translation type="unfinished">Could not open file &apos;%1&apos;. Please check if the folder is accessible</translation>
+      <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
+      <translation>&quot;%1&quot; dosyası açılamadı. Lütfen klasörün erişilebilir olup olmadığını kontrol edin.</translation>
     </message>
   </context>
   <context>
@@ -6636,18 +6679,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+      <translation>Aynı ada sahip iki grup olamaz.</translation>
     </message>
     <message>
       <source>Merge</source>
       <translation>Birleştir</translation>
-    </message>
-    <message numerus="yes">
-      <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-      </translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
@@ -6655,7 +6691,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
+      <translation>Yine de taşınsın mı?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -6666,12 +6702,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>İptal</translation>
     </message>
     <message>
-      <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-      <translation type="unfinished">Some devices from %1 will not be moved to %2. Move anyways?</translation>
-    </message>
-    <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Sanal kameralar, USB veya web kameralar sunucular arasında taşınamaz. Bu cihazlar %1 üzerinde kalacak:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
@@ -6683,31 +6715,30 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
-    </message>
-    <message>
-      <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</translation>
+      <translation>Sanal kameralar, USB veya web kameralar sunucular arasında taşınamaz</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
-    </message>
-    <message>
-      <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras</translation>
+      <translation>Sanal kameralar sunucular arasında taşınamaz</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
       <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
     </message>
     <message>
-      <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains USB or web cameras</translation>
+      <source>Only some of the selected devices can be moved to %1</source>
+      <translation>Seçilen cihazlardan bazıları %1 üzerine taşınabilir</translation>
     </message>
     <message>
-      <source>Move Group without them</source>
-      <translation type="unfinished">Move Group without them</translation>
+      <source>Move Partially</source>
+      <translation>Kısmen Taşı</translation>
+    </message>
+    <message numerus="yes">
+      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
+      <translation>
+        <numerusform>Bu web sayfalarını Sunucu &quot;%1&quot; taşımak üzeresiniz. Bu web sayfaları istenen tüm içerikleri proxy olarak kullanır ve proxy sunucuları Server &quot;%1&quot; olarak değişir.</numerusform>
+        <numerusform>Bu web sayfalarını Sunucu &quot;%1&quot; taşımak üzeresiniz. Bu web sayfaları istenen tüm içerikleri proxy olarak kullanır ve proxy sunucuları Server &quot;%1&quot; olarak değişir.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6736,6 +6767,29 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>none</source>
       <comment>No currently selected camera</comment>
       <translation>hiçbiri</translation>
+    </message>
+  </context>
+  <context>
+    <name>SourcePickerWidgetStrings</name>
+    <message>
+      <source>Select at least one Server</source>
+      <translation>En az bir Sunucu seçin</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>En az bir kullanıcı seçin</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation>En Az Bir Aygıt Seç</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation>En Az Bir Kamera Seç</translation>
+    </message>
+    <message>
+      <source>Select at least one I/O module</source>
+      <translation>En az bir Giriş/Çıkış modülü seçin</translation>
     </message>
   </context>
   <context>
@@ -6955,33 +7009,33 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Cihazları seçin...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Kameraları seçin...</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n seçili cihaz</numerusform>
+        <numerusform>%n seçili cihaz</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n seçilmiş kamera</numerusform>
+        <numerusform>%n seçilmiş kamera</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Seçilen kamera</translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Seçilen cihaz</translation>
     </message>
   </context>
   <context>
@@ -6989,6 +7043,24 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>All Cameras &amp; Resources</source>
       <translation>Tüm kameralar ve kaynaklar</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
+    <message>
+      <source>Backup and Restore</source>
+      <translation>Yedekleme ve Geri Yükleme</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation>Günlük Yönetimi</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AlarmLayoutHandler</name>
+    <message>
+      <source>Alarms</source>
+      <translation>Alarmlar</translation>
     </message>
   </context>
   <context>
@@ -7035,15 +7107,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
     <message>
       <source>Select Device...</source>
-      <translation type="unfinished">Select Device...</translation>
+      <translation>Cihaz seçin...</translation>
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
+      <translation>Şuradaki ses akışını kullan</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
+      <translation>Ses akışını şuraya aktar</translation>
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
@@ -7063,27 +7135,27 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
+      <translation>Ses çıkışı için bu cihazı kullanın</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
+      <translation>Ses çıkışı için bu kamerayı kullanın</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
+      <translation>Başka bir cihazdan ses akışı kullan</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation type="unfinished">Use audio stream from another camera</translation>
+      <translation>Başka bir kameradan ses akışı kullan</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation type="unfinished">Transmit audio stream to another device</translation>
+      <translation>Ses akışını başka bir cihaza iletin</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>Ses akışını başka bir kameraya iletin</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
@@ -7111,11 +7183,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
+      <translation>Bu cihazdan ses akışını kullan</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
+      <translation>Bu kameradan gelen ses akışını kullan</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
@@ -7134,45 +7206,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation type="unfinished">
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
-      </translation>
+      <translation>Ayarları uygulamak istediğiniz aralıkları takvimden seçin.</translation>
     </message>
   </context>
   <context>
@@ -7187,7 +7221,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>Analiz eklentisi yok</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -7195,7 +7229,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Ne yedeklenmeli</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7203,23 +7237,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>Yeni eklenen kameralar için değiştirilemez</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>Bu cihaz yalnızca bir veri akışı sağlar</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>Akış ayarı bu cihaz türü için geçerli değil</translation>
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Desteklenmiyor</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>Bu cihaz için yedekleme desteklenmiyor</translation>
     </message>
   </context>
   <context>
@@ -7230,7 +7264,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Ne yedeklemeli</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7248,7 +7282,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>Yedeklenecek bir şey yok</translation>
     </message>
   </context>
   <context>
@@ -7259,15 +7293,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
+      <translation>Bant genişliği sınırı</translation>
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>Yeni eklenen kameralar</translation>
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
+      <translation>Yeni eklenen kamera ayarları sistemdeki tüm sunucular için geçerli olacaktır.</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
@@ -7313,16 +7347,25 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
+        <numerusform>%n cihazlar için yedekleme etkinleştirildi</numerusform>
         <numerusform>Backup is enabled for %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+        <numerusform>%n kameralar için yedekleme etkinleştirildi</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation>Bu kameralardan alınan görüntüler %1 %2 tamamen yedeklenir</translation>
+    </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation>Yedekleme işlemi başladığında ilerleme görüntülenecektir</translation>
     </message>
   </context>
   <context>
@@ -7365,11 +7408,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Isıtıcı</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Silecek</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Sessiz</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation>Sesi aç</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>Kapıyı Aç</translation>
     </message>
   </context>
   <context>
@@ -7415,7 +7470,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>Destekleniyorsa kullan</translation>
     </message>
     <message>
       <source>Never</source>
@@ -7423,15 +7478,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Hareket Algılamaya Zorla</translation>
     </message>
     <message>
       <source>Pan</source>
-      <translation type="unfinished">Pan</translation>
+      <translation>Sağ/Sol</translation>
     </message>
     <message>
       <source>Pan &amp; Tilt</source>
-      <translation type="unfinished">Pan &amp; Tilt</translation>
+      <translation>Pan-Tilt</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
@@ -7439,7 +7494,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>Sunucu, zaman ayarlarını kameraya göndermeyecektir.</translation>
     </message>
     <message>
       <source>default</source>
@@ -7452,11 +7507,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Auto</source>
+      <comment>Let server determine if Media2 should be used to fetch profiles</comment>
       <translation>Oto</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation>Kamera&apos;s dahili deposunda kaydedilen video otomatik olarak ana arşive yüklenecektir.</translation>
     </message>
   </context>
   <context>
@@ -7528,7 +7584,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Hareket Algılamaya Zorla</translation>
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
@@ -7543,19 +7599,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>Kamera değiştirilemedi</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
-      <translation type="unfinished">Abort camera replacement?</translation>
+      <translation>Kamera değişimi iptal edilsin mi?</translation>
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation type="unfinished">Will be transferred partially:</translation>
+      <translation>Kısmen transfer edilecek:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation type="unfinished">Will not be transferred:</translation>
+      <translation>Transfer edilemez:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7567,28 +7623,32 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera for Replacement</source>
-      <translation type="unfinished">Camera for Replacement</translation>
-    </message>
-    <message>
-      <source>%1 will be replaced by selected camera and removed from the system</source>
-      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be replaced by selected camera and removed from the system</translation>
+      <translation>Değiştirilecek Kamera</translation>
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation type="unfinished">Data for Transfer</translation>
-    </message>
-    <message>
-      <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
-    </message>
-    <message>
-      <source>Some data and settings may not supported for new Camera</source>
-      <translation type="unfinished">Some data and settings may not supported for new Camera</translation>
+      <translation>Aktarım Verileri</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
-      <translation type="unfinished">Camera replaced!</translation>
+      <translation>Kamera değiştirildi!</translation>
+    </message>
+    <message>
+      <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
+      <translation>Eski kamera&apos; verilerinin yeni kameraya aktarılıp aktarılamayacağı kontrol ediliyor.</translation>
+    </message>
+    <message>
+      <source>Some data and settings may not be compatible with the new camera</source>
+      <translation>Bazı veriler ve ayarlar yeni kamerayla uyumlu olmayabilir</translation>
+    </message>
+    <message>
+      <source>%1 will be removed from the System and replaced by the selected camera</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation>%1, Sistemden kaldırılacak ve seçilen kamera ile değiştirilecektir</translation>
+    </message>
+    <message>
+      <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
+      <translation>Sunucu kullanılamadığı için Kamera Değiştirme işlemi mümkün değildir.</translation>
     </message>
   </context>
   <context>
@@ -7626,7 +7686,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>Tüm cihazları göster</translation>
     </message>
     <message>
       <source>Show all cameras</source>
@@ -7634,23 +7694,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Cihazları Seç</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Kameraları Seç</translation>
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Cihaz Seç</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Kamera Seç</translation>
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Kullanılabilir kamera yok</translation>
     </message>
   </context>
   <context>
@@ -7750,11 +7810,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Yalnızca nesneler</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Yalnızca Hareket ve Nesneler</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -7762,15 +7822,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Nesne + Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>Hareket ve Nesne + Düşük Çözünürlük</translation>
     </message>
     <message>
-      <source>Integrations</source>
-      <translation>Entegrasyonlar</translation>
+      <source>Plugins</source>
+      <translation>Eklentiler</translation>
     </message>
   </context>
   <context>
@@ -7805,7 +7865,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Audio will be disabled</source>
-      <translation type="unfinished">Audio will be disabled</translation>
+      <translation>Ses devre dışı bırakılacak</translation>
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
@@ -7813,7 +7873,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>2 yönlü ses devre dışı bırakılacak</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
@@ -7855,11 +7915,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>Geçersiz akış adresi</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>Akış protokolü uyuşmazlığı</translation>
     </message>
   </context>
   <context>
@@ -7871,38 +7931,38 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Seç</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
     <message>
       <source>No filter</source>
-      <translation type="unfinished">No filter</translation>
+      <translation>Filtresiz</translation>
     </message>
     <message>
       <source>Main storage only</source>
-      <translation type="unfinished">Main storage only</translation>
+      <translation>Yalnızca ana depolama</translation>
     </message>
     <message>
       <source>Backup storage only</source>
-      <translation type="unfinished">Backup storage only</translation>
+      <translation>Yalnızca yedek depolama</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
-      <source>This webpage is requesting access to your account for authorization</source>
-      <translation type="unfinished">This webpage is requesting access to your account for authorization</translation>
-    </message>
-    <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
-      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+      <translation>Bir belirteç sağlamak için onayınız gerekiyor</translation>
     </message>
     <message>
       <source>Allow</source>
-      <translation type="unfinished">Allow</translation>
+      <translation>İzin ver</translation>
+    </message>
+    <message>
+      <source>This web page is requesting access to your account for authorization</source>
+      <translation>Bu web sayfası yetkilendirme için hesabınıza erişim istiyor</translation>
     </message>
   </context>
   <context>
@@ -7945,11 +8005,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
+      <translation>Güncelleme dosyası indirilemiyor</translation>
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
+      <translation>Güncelleme dosyasını indirmek için yeterli alan yok</translation>
     </message>
   </context>
   <context>
@@ -7988,7 +8048,55 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>%1 giriş yap</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
+    <message>
+      <source>Inaccessible</source>
+      <translation>Erişilemez</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Yükleniyor...</translation>
+    </message>
+    <message>
+      <source>Click to Show Cameras</source>
+      <translation>Kameraları Göstermek İçin Tıklayın</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
+    <message>
+      <source>Introducing %1 Layouts</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 Ekran Düzeni Tanıtımı</translation>
+    </message>
+    <message>
+      <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
+      <translation>%1 Düzenler, farklı Sistemlerdeki cihazlarla çalışmanıza izin veren &lt;b&gt;sistemler arası düzenlerdir&lt;/b&gt;. Şu anda normal mizanpajların yalnızca bazı özellikleri mevcuttur, ancak gelecek sürümlerde %1 Düzen'in yeteneklerini genişletmeye devam edeceğiz</translation>
+    </message>
+    <message>
+      <source>Read more on the %1</source>
+      <translation>%1 hakkında daha fazlasını okuyun</translation>
+    </message>
+    <message>
+      <source>help page</source>
+      <translation>yardım sayfası</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
+    <message>
+      <source>%1 (Copy)</source>
+      <comment>Original name will be substituted</comment>
+      <translation>%1 (Kopyala)</translation>
+    </message>
+    <message>
+      <source>%1 (Copy %2)</source>
+      <comment>Original name will be substituted as %1, counter as %2</comment>
+      <translation>%1 (Kopya %2)</translation>
     </message>
   </context>
   <context>
@@ -8011,11 +8119,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
+      <translation>Yeniden kimlik doğrulama gerekli</translation>
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>Oturumunuza devam etmek için parolayı girin</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
@@ -8031,7 +8139,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Local System owner is absent or disabled.</source>
-      <translation type="unfinished">Local System owner is absent or disabled.</translation>
+      <translation>Yerel Sistem sahibi yok veya devre dışı.</translation>
     </message>
     <message>
       <source>None of your Servers is connected to the Internet.</source>
@@ -8060,7 +8168,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect System to %1</translation>
+      <translation>%1 Sisteme bağlanmak için hesap şifrenizi girin</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8068,8 +8176,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Bağlan</translation>
     </message>
     <message>
-      <source>Internal server error. Please try again later.</source>
-      <translation>Dahili sunucu hatası. Lütfen daha sonra tekrar deneyin.</translation>
+      <source>Internal error. Please try again later.</source>
+      <translation>Dahili sunucu hatası. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
   </context>
   <context>
@@ -8093,11 +8201,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Merge Server to the System</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the System</translation>
+      <translation>Sunucuyu Sistemle Birleştir</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the System</source>
-      <translation type="unfinished">Enter your account password to merge Server to the System</translation>
+      <translation>Sunucuyu Sistemle birleştirmek için hesap şifrenizi girin</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8149,6 +8257,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
+    <message>
+      <source>Unknown camera</source>
+      <translation>Bilinmeyen kamera</translation>
     </message>
   </context>
   <context>
@@ -8278,7 +8393,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
     <message>
       <source>Decrypt</source>
-      <translation type="unfinished">Decrypt</translation>
+      <translation>Şifreyi kaldır</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -8325,6 +8440,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EventRibbon::Private</name>
+    <message>
+      <source>INFORMATION REQUIRED</source>
+      <translation>BİLGİ GEREKİYOR</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>No events</source>
@@ -8339,7 +8461,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya bir Olay Kuralı oluşturun</translation>
     </message>
   </context>
   <context>
@@ -8395,11 +8517,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Archive is encrypted.</source>
-      <translation type="unfinished">Archive is encrypted.</translation>
+      <translation>Arşiv şifreli.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>Arşiv şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
   </context>
   <context>
@@ -8514,7 +8636,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>Dışa aktarma kullanılamıyor: Bu kameranın seçilen zaman aralığı için bir video arşivi yok.</translation>
     </message>
   </context>
   <context>
@@ -8522,7 +8644,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation type="unfinished">Exported: %1</translation>
+      <translation>Dışa aktarıldı: %1</translation>
     </message>
   </context>
   <context>
@@ -8541,7 +8663,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Yük Devretme Yok</translation>
     </message>
   </context>
   <context>
@@ -8559,7 +8681,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>İsim boş olamaz.</translation>
     </message>
     <message>
-      <source>Select folder...</source>
+      <source>Select Folder...</source>
       <translation>Klasör Seç...</translation>
     </message>
   </context>
@@ -8567,7 +8689,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
+      <translation>Güvenli kimlik doğrulamayı zorla?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
@@ -8615,7 +8737,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Daha fazla okumak için simgeye tıklayın</translation>
     </message>
   </context>
   <context>
@@ -8683,6 +8805,13 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>ve %n den fazlası</numerusform>
         <numerusform>ve %n den fazlası</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation>%1 Düzen</translation>
     </message>
   </context>
   <context>
@@ -8780,22 +8909,49 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>Oturumunuzun süresi yakında sona eriyor</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
-      <translation type="unfinished">Re-Authenticate Now</translation>
+      <translation>Yeniden Kimlik Doğrulayın</translation>
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>Bir dakikadan az kaldı</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
       <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
+        <numerusform>%n dakika kaldı</numerusform>
         <numerusform>%n minutes left</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogSettingsDialog</name>
+    <message>
+      <source>Reset to Default</source>
+      <translation>Varsayılana Sıfırla</translation>
+    </message>
+    <message>
+      <source>Must be greater than or equal to the value set for Split File by Size</source>
+      <translation>Dosyayı Boyuta Göre Böl için ayarlanan değerden büyük veya bu değere eşit olmalıdır</translation>
+    </message>
+    <message>
+      <source>Must be less than or equal to the value set for Limit Max Volume</source>
+      <translation>Değer ayarlanan maksimum değerden küçük veya bu değere eşit olmalıdır</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may not be collecting enough information.
+The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
+      <translation>Seçilen Günlük Düzeyi yeterli bilgi toplamıyor olabilir.
+Günlüğe Kaydetme Düzeyi &quot;%1&quot; size daha ayrıntılı bilgi sağlayacaktır.</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may degrade your system&apos;s performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
+      <translation>Seçilen Kayıt Düzeyi, sistem&apos; performansını düşürebilir.
+Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına döndürmeyi unutmayın.</translation>
     </message>
   </context>
   <context>
@@ -8807,6 +8963,116 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Version %1</source>
       <translation>Versiyon %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementModel</name>
+    <message>
+      <source>Unit</source>
+      <translation>Ünite</translation>
+    </message>
+    <message>
+      <source>Current Level</source>
+      <translation>Güncel Seviye</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>İstemci</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Yok</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Hata</translation>
+    </message>
+    <message>
+      <source>Warning</source>
+      <translation>Uyarı</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Bilgi</translation>
+    </message>
+    <message>
+      <source>Debug</source>
+      <translation>Hata ayıklama</translation>
+    </message>
+    <message>
+      <source>Verbose</source>
+      <translation>Ayrıntılı</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWatcher</name>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <translation>
+        <numerusform>... ve %n den fazlası</numerusform>
+        <numerusform>... ve %n den fazlası</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Downloading file...</source>
+      <translation>Dosyalar indiriliyor...</translation>
+    </message>
+    <message>
+      <source>Pending download...</source>
+      <translation>İndirme bekleniyor...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n sunucu</numerusform>
+        <numerusform>%n sunucular</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Logs downloaded</source>
+      <translation>Günlükler indirildi</translation>
+    </message>
+    <message>
+      <source>Logs downloading failed</source>
+      <translation>Günlükler indirilemedi</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled on the Client</source>
+      <translation>İstemcide hata ayıklama günlüğü etkinleştirildi</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled, resulting in degraded system performance.</source>
+      <translation>Hata ayıklama günlüğü etkinleştirildi, bu sistem performansının düşmesine neden olabilir.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Debug logging is enabled on %n Servers</source>
+      <translation>
+        <numerusform>Hata ayıklama günlüğü %n Sunucuda etkinleştirildi</numerusform>
+        <numerusform>Hata ayıklama kaydı %n Sunucuda etkinleştirildi</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Logs downloading canceled</source>
+      <translation>Günlüklerin indirilmesi iptal edildi</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation>Ayarları Uygula</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Şifrenizi girin</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>Uygula</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Klasör Seç...</translation>
     </message>
   </context>
   <context>
@@ -8871,7 +9137,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation type="unfinished">Enter your account password to merge Systems</translation>
+      <translation>Sistemleri birleştirmek için hesap şifrenizi girin</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9329,15 +9595,15 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Özel bir istemci kullanıyorsunuz. Güncelleme talimatlarını almak için lütfen %1 ile iletişime geçin.</translation>
     </message>
     <message>
       <source>Uploading client packages to Servers...</source>
-      <translation type="unfinished">Uploading client packages to Servers...</translation>
+      <translation>İstemci paketleri Sunuculara yükleniyor...</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>İstemci güncellemesini indirmek için bilgisayarınızda yeterli alan yok. Lütfen sabit sürücünüzde biraz yer açın ve tekrar deneyin.</translation>
     </message>
   </context>
   <context>
@@ -9357,16 +9623,27 @@ You can force it, but it may significantly increase CPU load.</translation>
       <source>Acknowledge</source>
       <translation>Kabul edilen</translation>
     </message>
+    <message>
+      <source>Calling...</source>
+      <translation>Arıyor...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
-    <message>
-      <source>No new notifications</source>
-      <translation>Yeni bildirim yok</translation>
+    <message numerus="yes">
+      <source>%n notifications</source>
+      <translation>
+        <numerusform>Bildirimleri Tuttur</numerusform>
+        <numerusform>%n bildirimler</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <source>Current System</source>
+      <translation>Geçerli sistem</translation>
+    </message>
+    <message>
+      <source>All Systems</source>
+      <translation>Tüm sistemler</translation>
     </message>
   </context>
   <context>
@@ -9395,10 +9672,6 @@ You can force it, but it may significantly increase CPU load.</translation>
       <translation>Düzen seç...</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>&quot;göstermek onun yerel düzenleri bu listede görüntülemek için&quot; satır için tek bir kullanıcı seçin</translation>
-    </message>
-    <message>
       <source>Local layouts can only be shown to their owners.</source>
       <translation>Yerel düzenler yalnızca sahiplerine gösterilebilir.</translation>
     </message>
@@ -9409,6 +9682,25 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>Seçilen kullanıcıların hiçbiri seçilen yerleşime erişemez. Eylem çalışmayacak.</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation>Yerel bir düzen mi arıyorsunuz? Burada bir seçenek olarak yerel düzenlerini görüntülemek için &quot;Göster&quot; listesinden yalnızca bir kullanıcı seçin.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
+    <message>
+      <source>Not supported</source>
+      <translation>Desteklenmiyor</translation>
+    </message>
+    <message>
+      <source>This tab will be available in future versions</source>
+      <translation>Bu sekme gelecekteki sürümlerde kullanılabilecektir</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>Dahası için</translation>
     </message>
   </context>
   <context>
@@ -9636,15 +9928,15 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
+      <translation>Proxy Web Sayfası Ekle</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>Web Sayfası Ekle</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
-      <translation type="unfinished">Edit Proxied Web Page</translation>
+      <translation>Proxy Web Sayfasını Düzenle</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
@@ -9659,8 +9951,8 @@ You can force it, but it may significantly increase CPU load.</translation>
       <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
     </message>
     <message>
-      <source>The webpage is able to interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The webpage is able to interact with the Desktop Client and request access to the user session</translation>
+      <source>The web page can interact with the Desktop Client and request access to the user session</source>
+      <translation>Web sayfası, Masaüstü İstemcisi ile etkileşim kurabilir ve kullanıcı oturumuna erişim talep edebilir</translation>
     </message>
   </context>
   <context>
@@ -9731,35 +10023,35 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
+      <translation>Hareket ve nesneleri kaydetme</translation>
     </message>
     <message>
       <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
+      <translation>Yalnızca nesneleri kaydetme</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>Hareket ve nesneleri düşük kalite kaydetme</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>Nesneleri düşük kalite kaydetme</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Hareket, Nesne</translation>
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>Yalnızca nesneler</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+      <translation>Hareket, Nesne + Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Nesne + Düşük Çözünürlük</translation>
     </message>
   </context>
   <context>
@@ -9813,7 +10105,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Analytic</source>
-      <translation type="unfinished">Analytic</translation>
+      <translation>Analitik</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -9821,7 +10113,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Input Signal</source>
-      <translation type="unfinished">Input Signal</translation>
+      <translation>Giriş Sinyali</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -9829,11 +10121,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Stream Issue</source>
-      <translation type="unfinished">Stream Issue</translation>
+      <translation>Akış Sorunu</translation>
     </message>
     <message>
       <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
+      <translation>Cihaz Bağlantısını Kes</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -9898,23 +10190,21 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Hareket, Nesne</translation>
     </message>
     <message>
       <source>Motion, Objects
  + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
+      <translation>Hareket ve Nesne + Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Yalnızca nesneler</translation>
     </message>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>Nesne + Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -9923,20 +10213,19 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation type="unfinished">Motion
- + Low-Res</translation>
+      <translation>Hareket + Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+      <translation>Seçilen cihazlardan bazıları için hareket algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>Bu kamera için hareket algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>Seçilen kameralardan bazıları için hareket algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
@@ -9952,23 +10241,23 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>Seçilen cihazlardan bazıları için nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
-      <translation type="unfinished">Object detection is disabled for this camera</translation>
+      <translation>Bu kamera için nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
+      <translation>Seçilen kameralardan bazıları için nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
+      <translation>Seçilen cihazlardan bazıları için hareket ve nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>Bu kamera için hareket ve nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
@@ -9976,7 +10265,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion detection is disabled for this I/O module</translation>
+      <translation>Bu G/Ç modülü için hareket algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected I/O modules</source>
@@ -9992,11 +10281,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Object detection is disabled for this I/O module</translation>
+      <translation>Bu G/Ç modülü için nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected I/O modules</translation>
+      <translation>Seçilen G/Ç modüllerinden bazıları için nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this I/O module</source>
@@ -10034,7 +10323,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation type="unfinished">Archive encryption password</translation>
+      <translation>Arşiv şifreleme parolası</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
@@ -10048,15 +10337,15 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
-      <translation type="unfinished">Failed to set archive encryption password</translation>
+      <translation>Arşiv şifreleme parolası ayarlanamadı</translation>
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>Sunucu tarafından kurulan bağlantıları etkilemez.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>RTSP trafik şifrelemesini etkinleştirir.</translation>
     </message>
     <message>
       <source>days</source>
@@ -10071,11 +10360,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation type="unfinished">Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">It is recommended to have user session lifetime not greater than %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Dahası için.</translation>
     </message>
@@ -10087,47 +10371,32 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
       </translation>
     </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>Önerilen maksimum kullanıcı oturumu ömrü %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
     <message>
       <source>Failed to connect to server</source>
-      <translation type="unfinished">Failed to connect to server</translation>
+      <translation>Sunucuyla bağlantı başarısız</translation>
     </message>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>Sertifikayı görüntüle</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation type="unfinished">The certificate is pinned to %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation type="unfinished">The certificate was presented by %1</translation>
     </message>
     <message>
-      <source>Server Id: %1</source>
-      <translation type="unfinished">Server Id: %1</translation>
-    </message>
-    <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
       <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
-    </message>
-    <message>
-      <source>Custom certificate</source>
-      <translation type="unfinished">Custom certificate</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation type="unfinished">Pinned certificate</translation>
-    </message>
-    <message>
-      <source>Unknown certificate</source>
-      <translation type="unfinished">Unknown certificate</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
@@ -10142,25 +10411,45 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>Pin</translation>
     </message>
     <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation>Sertifika otomatik olarak oluşturulur ve %1 ile sabitlendi</translation>
+    </message>
+    <message>
+      <source>Server ID: %1</source>
+      <translation>Sunucu ID: %1</translation>
+    </message>
+    <message>
       <source>Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
+      <translation>Birisi, kişisel bilgilerinizi çalmak için %1'in kimliğine bürünüyor olabilir.
+%2 Sunucu SSL sertifikasını değiştirmediyseniz bu sertifikayı sabitlemeyin.</translation>
+    </message>
+    <message>
+      <source>Custom Certificate</source>
+      <translation>Özel Sertifika</translation>
+    </message>
+    <message>
+      <source>Auto-generated Certificate</source>
+      <translation>Otomatik Oluşturulan Sertifika</translation>
+    </message>
+    <message>
+      <source>Unknown Certificate</source>
+      <translation>Bilinmeyen Sertifika</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
-      <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
-    </message>
-    <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>Yine de Bağlan</translation>
     </message>
     <message>
       <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
+      <translation>Bu sunucuya güveniyorum</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>Devam et</translation>
     </message>
   </context>
   <context>
@@ -10174,7 +10463,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Uygun sunucu yok</translation>
     </message>
   </context>
   <context>
@@ -10245,7 +10534,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>unknown status</source>
-      <translation type="unfinished">unknown status</translation>
+      <translation>bilinmeyen durum</translation>
     </message>
   </context>
   <context>
@@ -10354,7 +10643,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya hareket kaydını etkinleştirin</translation>
     </message>
   </context>
   <context>
@@ -10379,34 +10668,95 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+      <translation>
+        <numerusform>Kayıt programı %n kamera için geçersiz</numerusform>
+        <numerusform>Kayıt programı %n kameralar için geçersiz</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
+      <translation>Bazı kameralardaki kayıt programı, desteklenmeyen kayıt modları içeriyor.</translation>
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation type="unfinished">Replaced camera discovered</translation>
-    </message>
-    <message>
-      <source>Export in progress...</source>
-      <translation type="unfinished">Export in progress...</translation>
+      <translation>Değiştirilen kamera keşfedildi</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
-      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+      <translation>Kamera %1, %2 ile değiştirildi.</translation>
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+      <translation>İki cihazı kullanmaya devam etmek için &quot;Geri Al&quot; düğmesine tıklayın.</translation>
     </message>
     <message>
       <source>Undo Replace</source>
-      <translation type="unfinished">Undo Replace</translation>
+      <translation>Değiştirmeyi Geri Al</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Dışa Aktar</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation>Cihaz üzerinde kayıtlar bulundu</translation>
+    </message>
+    <message>
+      <source>Import in progress...</source>
+      <translation>İçe aktarma işlemi devam ediyor...</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 completed</source>
+      <translation>%1 üzerinden arşivi içe aktarma tamamlandı</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 failed</source>
+      <translation>%1 üzerinden arşivi içe aktarma başarısız oldu</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 stopped</source>
+      <translation>%1 üzerinden arşivi içe aktarma durduruldu</translation>
+    </message>
+    <message>
+      <source>Import archive from %1</source>
+      <translation>%1 üzerinden arşivi içe aktar</translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup storage is not configured on %n Servers</source>
+      <translation>
+        <numerusform>Yedek depolama %n Sunucuda yapılandırılmadı</numerusform>
+        <numerusform>Yedek depolama %n Sunucuda yapılandırılmadı</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage for analytics data is not set on %n Servers</source>
+      <translation>
+        <numerusform>Analitik verileri için depolama, %n Sunucuda ayarlanmamış</numerusform>
+        <numerusform>Analitik verileri için %n depolama ayarlanmamış</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>System storage is used for analytics data on %n Servers</source>
+      <translation>
+        <numerusform>Sistem depolaması, %n Sunucudaki analiz verileri için kullanılır</numerusform>
+        <numerusform>Sistem depolaması, %n Sunucudaki analiz verileri için kullanılır</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Not imported archive found on device %1</source>
+      <translation>%1üzerinde aktarılmamış arşiv bulundu</translation>
+    </message>
+    <message>
+      <source>Not imported archive found on camera %1</source>
+      <translation>%1 Kamera üzerinde içe aktarılmamış arşiv bulundu</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by the user</source>
+      <translation>Arşiv akışı ayarları kullanıcı tarafından değiştirildi</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by the user</source>
+      <translation>Kayıt ayarları kullanıcı tarafından değiştirildi</translation>
     </message>
   </context>
   <context>
@@ -10466,20 +10816,16 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>Açıklama</translation>
     </message>
     <message>
-      <source>Enter parameters</source>
-      <translation>Parametre girin</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Aksiyon için bazı parametrelerin doldurulması gereklidir.</translation>
-    </message>
-    <message>
       <source>Open</source>
       <translation>Aç</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
       <translation>Yeni Sekmede Aç</translation>
+    </message>
+    <message>
+      <source>This action is not supported for notifications from other Systems</source>
+      <translation>Bu eylem diğer Sistemlerden gelen bildirimler için desteklenmiyor</translation>
     </message>
   </context>
   <context>
@@ -10586,15 +10932,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>LDAP grubu</translation>
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>Yerleşik grup</translation>
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>Özel grup</translation>
     </message>
     <message>
       <source>Name</source>
@@ -10606,7 +10952,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Member of</source>
-      <translation type="unfinished">Member of</translation>
+      <translation>Üyesi</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -10649,7 +10995,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Gruplar</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -10672,15 +11018,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Güvenli Kimlik Doğrulamayı Zorla</translation>
     </message>
     <message>
-      <source>All users</source>
+      <source>All Users</source>
       <translation>Tüm Kullanıcılar</translation>
     </message>
     <message>
-      <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <source>Users with Digest Authentication</source>
+      <translation>Özet Kimlik Doğrulamasına Sahip Kullanıcılar</translation>
     </message>
   </context>
   <context>
@@ -10691,18 +11037,18 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Gruplar</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
     <message>
       <source>Select Version</source>
-      <translation type="unfinished">Select Version</translation>
+      <translation>Sürümü Seçin</translation>
     </message>
     <message>
       <source>Version</source>
@@ -10710,7 +11056,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Invalid version.</source>
-      <translation type="unfinished">Invalid version.</translation>
+      <translation>Geçersiz sürüm.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -10780,7 +11126,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::WelcomeScreen</name>
     <message>
       <source>Are you sure you want to hide this tile?</source>
-      <translation type="unfinished">Are you sure you want to hide this tile?</translation>
+      <translation>Bu yerleşimi gizlemek istediğinizden emin misiniz?</translation>
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
@@ -10905,7 +11251,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
     <message>
       <source>All archive</source>
-      <translation type="unfinished">All archive</translation>
+      <translation>Tüm arşiv</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -10921,15 +11267,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>High-Res</source>
-      <translation type="unfinished">High-Res</translation>
+      <translation>Yüksek çözünürlük</translation>
     </message>
     <message>
       <source>Low-Res</source>
-      <translation type="unfinished">Low-Res</translation>
+      <translation>Düşük Çözünürlük</translation>
     </message>
     <message>
       <source>All streams</source>
-      <translation type="unfinished">All streams</translation>
+      <translation>Tüm akışlar</translation>
     </message>
   </context>
   <context>
@@ -11001,26 +11347,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Yeni Grup</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation type="unfinished">Intercom Alarm Layout</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation type="unfinished">Intercom Open Door</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation>Kapı aç</translation>
+      <translation>Yeni Grup %1</translation>
     </message>
   </context>
   <context>
@@ -11041,7 +11372,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation type="unfinished">No Action</translation>
+      <translation>Eylem Yok</translation>
     </message>
     <message>
       <source>Focus Near</source>
@@ -11053,50 +11384,50 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Autofocus</source>
-      <translation type="unfinished">Autofocus</translation>
+      <translation>Otomatik odaklama</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation type="unfinished">Go to PTZ Position</translation>
+      <translation>PTZ Konumuna Git</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Tam Ekran Moduna Geç</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>Düzende Sonraki Kamera</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>Düzende Önceki Kamera</translation>
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Düzeni Aç</translation>
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>Düzenleyici</translation>
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Çoklu</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Düzen Seçiniz...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Buton</translation>
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>Seçilen Düzen</translation>
     </message>
   </context>
   <context>
@@ -11109,31 +11440,24 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
-      <source>Cannot find an item with the specified id</source>
-      <translation type="unfinished">Cannot find an item with the specified id</translation>
-    </message>
-    <message>
-      <source>Cannot find a resource with the specified id.</source>
-      <translation type="unfinished">Cannot find a resource with the specified id.</translation>
-    </message>
-    <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
-      <translation type="unfinished">Cannot specify a media parameters for the resource without media stream.</translation>
+      <translation>Medya akışı olmadan kaynak için bir medya parametresi belirtilemez.</translation>
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
-      <translation type="unfinished">Cannot add the resource to the layout</translation>
+      <translation>Kaynak düzene eklenemiyor</translation>
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
       <translation type="unfinished">Cannot find a widget corresponding to the specified item.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::DropdownTextPickerWidget</name>
     <message>
-      <source>Auto</source>
-      <translation>Oto</translation>
+      <source>Cannot find an item with the specified ID</source>
+      <translation>Belirtilen kimliğe sahip bir öğe bulunamıyor</translation>
+    </message>
+    <message>
+      <source>Cannot find a resource with the specified ID.</source>
+      <translation>Belirtilen kimliğe sahip bir kaynak bulunamıyor.</translation>
     </message>
   </context>
   <context>
@@ -11159,19 +11483,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
     <message>
       <source>Not saved</source>
-      <translation type="unfinished">Not saved</translation>
+      <translation>Kaydedilmedi</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::RulesDialog</name>
-    <message>
-      <source>Apply changes before exit?</source>
-      <translation>Çıkış yapmadan önce değişiklikler uygulansın mı?</translation>
-    </message>
-    <message>
-      <source>Apply changes failed.</source>
-      <translation type="unfinished">Apply changes failed.</translation>
-    </message>
     <message>
       <source>Restore all rules to default?</source>
       <translation>Tüm Ayarları Varsayılan Ayarlara Döndür?</translation>
@@ -11181,8 +11497,16 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>Bu işlem geri alınamaz.</translation>
     </message>
     <message>
-      <source>Restore rules failed.</source>
-      <translation type="unfinished">Restore rules failed.</translation>
+      <source>Failed to apply changes.</source>
+      <translation>Değişlikler uygulanamadı.</translation>
+    </message>
+    <message>
+      <source>Failed to restore rules.</source>
+      <translation>Kurallar geri yüklenemedi.</translation>
+    </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation>Çıkmadan önce değişiklikler uygulansın mı?</translation>
     </message>
   </context>
   <context>
@@ -11194,13 +11518,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Action</source>
       <translation>Hareket</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
-    <message>
-      <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
     </message>
   </context>
   <context>
@@ -11493,10 +11810,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>Tüm Desteklenenler</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Klasör Seç...</translation>
-    </message>
-    <message>
       <source>Too short period selected</source>
       <translation>Seçilen süre çok kısa</translation>
     </message>
@@ -11568,18 +11881,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>Lütfen mevcut olan bir sonraki yamaya veya sürüm sürümüne yükseltin.</translation>
     </message>
     <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation>Anonim kullanım istatistiklerini topla ve gönder</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation>Yazılım geliştirme ekibi tarafından kullanıcı deneyiminizi geliştirmek için kullanılacaktır.</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation>Devredışı bırakmak için Sistem Yönetim bölümüne gidin.</translation>
-    </message>
-    <message>
       <source>Failed to open server web page</source>
       <translation>Sunucunun web sayfası açılırken hata oluştu</translation>
     </message>
@@ -11624,11 +11925,11 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>Window configuration saved</source>
-      <translation type="unfinished">Window configuration saved</translation>
+      <translation>Pencere yapılandırması kaydedildi</translation>
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
-      <translation type="unfinished">This build is for demo purposes only.</translation>
+      <translation>Bu derleme yalnızca demo amaçlıdır.</translation>
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
@@ -11637,24 +11938,32 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
       <comment>%1 is the product name</comment>
-      <translation type="unfinished">To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</translation>
+      <translation>Yükseltmek için lütfen güncellenmiş bir yapı kurmadan önce %1 kaldırın (tüm veriler kaybolacaktır).</translation>
     </message>
     <message>
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 Beta</translation>
-    </message>
-    <message>
-      <source>There are no suitable cameras for replacement on the %1</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the %1</translation>
+      <translation>%1 Beta</translation>
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation type="unfinished">Undo replacement completed successfully!</translation>
+      <translation>Değiştirme işlemini geri alma başarıyla tamamlandı!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
+      <translation>Uyumluluk sorunları nedeniyle bazı ayarlar değiştirilen kameradan aktarılamayabilir.</translation>
+    </message>
+    <message>
+      <source>Confirm undo replacement?</source>
+      <translation>Değiştirme geri alınsın mı?</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Klasör Seç...</translation>
+    </message>
+    <message>
+      <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
+      <translation>Sunucuda değiştirilecek uygun kamera yok &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -11665,7 +11974,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation type="unfinished">Press Esc to stop the tour.</translation>
+      <translation>Turu durdurmak için Esc tuşuna basın.</translation>
     </message>
   </context>
   <context>
@@ -11722,6 +12031,10 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     <message>
       <source>New Layout %1</source>
       <translation>Yeni Ekran %1</translation>
+    </message>
+    <message>
+      <source>Save Layout As Cloud</source>
+      <translation>Düzeni Bulut Olarak Kaydet</translation>
     </message>
   </context>
   <context>
@@ -11836,6 +12149,10 @@ to view more bookmarks</source>
       <source>To End</source>
       <translation>Bitir</translation>
     </message>
+    <message>
+      <source>Rewind is not available for VMAX</source>
+      <translation>Geri sarma VMAX için kullanılamaz</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::SpeedSlider</name>
@@ -11859,15 +12176,15 @@ to view more bookmarks</source>
     <name>nx::vms::update::desktop::ClientUpdateManager</name>
     <message>
       <source>Restart Client</source>
-      <translation type="unfinished">Restart Client</translation>
+      <translation>İstemciyi Yeniden Başlat</translation>
     </message>
     <message>
       <source>Updates Settings</source>
-      <translation type="unfinished">Updates Settings</translation>
+      <translation>Güncelleme Ayarları</translation>
     </message>
     <message>
       <source>Client update is installed</source>
-      <translation type="unfinished">Client update is installed</translation>
+      <translation>İstemci güncellemesi yüklendi</translation>
     </message>
     <message>
       <source>Client is updated to version %1. Restart %2 to finish update.</source>
@@ -11876,27 +12193,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Otomatik istemci güncellemeleri</translation>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
-      <translation type="unfinished">New client-only updates will be installed automatically. You can change this in the settings.</translation>
+      <translation>Yeni yalnızca-istemci güncelleştirmeleri otomatik olarak yüklenecektir. Bunu ayarlardan değiştirebilirsiniz.</translation>
     </message>
     <message>
       <source>Cannot check for update.</source>
-      <translation type="unfinished">Cannot check for update.</translation>
+      <translation>Güncelleme kontrol edilemiyor.</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>
-      <translation type="unfinished">Client update package is broken.</translation>
+      <translation>İstemci güncelleme paketi bozuk.</translation>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
-      <translation type="unfinished">Client update package is missing for current platform.</translation>
+      <translation>Mevcut platform için istemci güncelleme paketi eksik.</translation>
     </message>
     <message>
-      <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Can&apos;t check client update availability. Check your internet connection and try again.</translation>
+      <source>Cannot check Client update availability. Check your internet connection and try again.</source>
+      <translation>İstemci güncellemesi kontrol edilemiyor. İnternet bağlantınızı kontrol edin ve tekrar deneyin.</translation>
     </message>
   </context>
 </TS>

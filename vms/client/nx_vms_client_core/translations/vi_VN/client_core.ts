@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Connection timed out</source>
-      <translation>Kết nối đã hết hạn</translation>
+      <translation>Hết thời gian kết nối</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -201,7 +201,7 @@
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Để đăng nhập vào Hệ thống này, hãy tắt “Yêu cầu mã xác minh trên mỗi lần đăng nhập bằng tài khoản %1” trong %2 của bạn.</translation>
+      <translation>Để đăng nhập vào Hệ thống này, hãy tắt “Yêu cầu mã xác minh trên mỗi lần đăng nhập bằng tài khoản %1” trong %2.</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
@@ -210,58 +210,62 @@
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Bạn có thể bật xác thực hai yếu tố trong %1 của mình.</translation>
+      <translation>Bạn có thể bật xác thực hai yếu tố tại %1.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Trust this server?</source>
-      <translation>Tin tưởng máy chủ này?</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Không thể xác minh danh tính của %1</translation>
-    </message>
-    <message>
-      <source>System:</source>
-      <translation>Hệ thống:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>Máy chủ:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>ID máy chủ:</translation>
-    </message>
-    <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Xem lại các chi tiết của chứng chỉ để đảm bảo rằng bạn đang kết nối với đúng Máy chủ.</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>Chứng chỉ máy chủ không hợp lệ.</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>Bạn đã cố gắng kết nối với Máy chủ này, nhưng xuất hiện một chứng chỉ không thể xác minh tự động.</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation>Kết nối với %1 lần đầu tiên?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation>Ai đó có thể đang mạo danh Máy chủ này để lấy thông tin cá nhân của bạn.</translation>
+      <source>certificate details</source>
+      <translation>chi tiết chứng chỉ</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
-      <translation>Bạn đã cố gắng kết nối với Máy chủ này nhưng chứng chỉ của Máy chủ đã thay đổi.</translation>
+      <source>help article</source>
+      <translation>bài báo trợ giúp</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation>Không kết nối với Máy chủ này trừ khi được người quản trị VMS của bạn hướng dẫn.</translation>
+      <source>Read this %1 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation>Đọc %1 này để tìm hiểu thêm về xác thực chứng chỉ.</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation>Xem lại các chi tiết của chứng chỉ để đảm bảo rằng bạn đang kết nối với đúng Máy chủ.</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
+      <translation>Xem lại %1 để đảm bảo bạn tin tưởng vào máy chủ mà bạn đang kết nối tới.%2</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation>chứng chỉ của máy chủ</translation>
+    </message>
+    <message>
+      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
+      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation>Bạn có thể xem %1 hoặc đọc %2 này để tìm hiểu thêm về vấn đề hiện tại.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
+      <comment>%1 is the system name, %2 are possible extra details</comment>
+      <translation>Điều này có thể do chứng chỉ máy chủ đã hết hạn hoặc ai đó đang cố mạo danh %1 để lấy cắp thông tin cá nhân của bạn.%2</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation>Thông báo này có thể hiển thị nhiều lần khi kết nối với hệ thống nhiều máy chủ.</translation>
+    </message>
+    <message>
+      <source>To learn more about the current problem view the server&apos;s certificate:</source>
+      <translation>Để tìm hiểu thêm về sự cố hiện tại, hãy xem chứng chỉ của máy chủ:</translation>
     </message>
   </context>
 </TS>

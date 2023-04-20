@@ -85,10 +85,6 @@
       <translation>Độ dài lớn nhất của bộ đệm khi xem trực tuyến</translation>
     </message>
     <message>
-      <source>Browse Logs</source>
-      <translation>Lịch sử</translation>
-    </message>
-    <message>
       <source>Clear Local Cache</source>
       <translation>Xóa bộ nhớ cache cục bộ</translation>
     </message>
@@ -115,6 +111,30 @@
     <message>
       <source>Server certificate validation</source>
       <translation>Xác thực chứng chỉ máy chủ</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation>Quản lý nhật ký</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>Tải xuống</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Cài đặt</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Hủy bỏ</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>Làm xong</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation>Mở thư mục</translation>
     </message>
   </context>
   <context>
@@ -219,10 +239,6 @@
       <translation>Đăng nhập / đăng xuất</translation>
     </message>
     <message>
-      <source>Event rules</source>
-      <translation>Quy định tổ chức sự kiện</translation>
-    </message>
-    <message>
       <source>Server actions</source>
       <translation>Hành động máy chủ</translation>
     </message>
@@ -257,6 +273,10 @@
     <message>
       <source>All servers are offline. Audit data is not available.</source>
       <translation>Tất cả các máy chủ đang ngoại tuyến. Dữ liệu kiểm tra không có sẵn.</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation>Event Rules</translation>
     </message>
   </context>
   <context>
@@ -318,10 +338,6 @@
     <message>
       <source>Skip Current Queue</source>
       <translation>Bỏ qua hàng đợi hiện tại</translation>
-    </message>
-    <message>
-      <source>Maximum backup queue size</source>
-      <translation>Kích thước hàng đợi sao lưu tối đa</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
@@ -454,6 +470,10 @@
       <source>Use event source server</source>
       <translation>Sử dụng máy chủ nguồn sự kiện</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation>Sử dụng camera nguồn sự kiện</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -509,14 +529,6 @@
   </context>
   <context>
     <name>CameraExpertSettingsWidget</name>
-    <message>
-      <source>Do not archive primary stream</source>
-      <translation>Không lưu trữ luồng chính</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>Không lưu trữ dòng thứ cấp</translation>
-    </message>
     <message>
       <source>Auto</source>
       <translation>Tự động</translation>
@@ -638,20 +650,36 @@
       <translation>Cài đặt ONVIF</translation>
     </message>
     <message>
-      <source>Secondary stream profile</source>
-      <translation>Profile luồng phụ</translation>
+      <source>Do not record primary stream</source>
+      <translation>Không ghi luồng chính</translation>
     </message>
     <message>
-      <source>Primary stream profile</source>
-      <translation>Profile luồng chính</translation>
+      <source>Do not record secondary stream</source>
+      <translation>Không ghi luồng phụ</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation>Xuất từ thẻ SD</translation>
+      <source>Secondary Stream Profile</source>
+      <translation>Hồ sơ luồng thứ cấp</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>Không tự động xuất video</translation>
+      <source>Primary Stream Profile</source>
+      <translation>Hồ sơ luồng chính</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation>Nhập từ thiết bị</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Nhập video tự động</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Trang Web</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Cổng trang web</translation>
     </message>
   </context>
   <context>
@@ -772,10 +800,6 @@
       <translation>Thay thế camera</translation>
     </message>
     <message>
-      <source>New device</source>
-      <translation>Thiết bị mới</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Tên</translation>
     </message>
@@ -790,6 +814,10 @@
     <message>
       <source>Next</source>
       <translation>Tiếp tục</translation>
+    </message>
+    <message>
+      <source>New Device</source>
+      <translation>Thiết bị mới</translation>
     </message>
   </context>
   <context>
@@ -875,6 +903,57 @@
     </message>
   </context>
   <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+      <source>BETA</source>
+      <translation>BETA</translation>
+    </message>
+    <message>
+      <source>Available Actions</source>
+      <translation>Hoạt động có sẵn</translation>
+    </message>
+    <message>
+      <source>Video Export</source>
+      <translation>Xuất video</translation>
+    </message>
+    <message>
+      <source>Live Video and Archive</source>
+      <translation>Video trực tiếp và lưu trữ</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation>Showreels</translation>
+    </message>
+    <message>
+      <source>Read more on the help page</source>
+      <translation>Đọc thêm trên trang trợ giúp</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation>Không hiển thị lại cửa sổ này</translation>
+    </message>
+    <message>
+      <source>Introducing Cloud Layouts</source>
+      <translation>Giới thiệu Bố cục đám mây</translation>
+    </message>
+    <message>
+      <source>Motion Search</source>
+      <translation>Tìm kiếm chuyển động</translation>
+    </message>
+    <message>
+      <source>Searching Bookmarks, Objects, Events</source>
+      <translation>Tìm kiếm Dấu trang, Đối tượng, Sự kiện</translation>
+    </message>
+    <message>
+      <source>In the Future</source>
+      <translation>Trong tương lai</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -946,6 +1025,22 @@
     <message>
       <source>Restore from Backup...</source>
       <translation>Trả lời từ bản sao lưu...</translation>
+    </message>
+    <message>
+      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+      <translation>Tạo bản sao lưu dữ liệu quản lý Hệ thống hoặc khôi phục dữ liệu Quản lý hệ thống từ bản sao lưu hiện có</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Hủy bỏ</translation>
+    </message>
+    <message>
+      <source>&lt;Message&gt;</source>
+      <translation>&lt;Message&gt;</translation>
+    </message>
+    <message>
+      <source>Open Folder</source>
+      <translation>Mở thư mục</translation>
     </message>
   </context>
   <context>
@@ -1082,10 +1177,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP Nội dung</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>Đăng nhập vào xác thực (tùy chọn)</translation>
     </message>
@@ -1102,20 +1193,24 @@
       <translation>Mật khẩu</translation>
     </message>
     <message>
-      <source>Content type</source>
-      <translation>Kiểu Nội dung</translation>
+      <source>HTTP(S) URL</source>
+      <translation>URL HTTP(S)</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>URL HTTP</translation>
+      <source>HTTP(S) Content</source>
+      <translation>Nội dung HTTP(S)</translation>
     </message>
     <message>
-      <source>Authentication type</source>
-      <translation>Xác thực...</translation>
+      <source>Content Type</source>
+      <translation>Loại nội dung</translation>
     </message>
     <message>
-      <source>Request type</source>
-      <translation>Loại yêu cầu</translation>
+      <source>Authentication Type</source>
+      <translation>Loại Xác Thực,</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation>Phương thức yêu cầu</translation>
     </message>
   </context>
   <context>
@@ -1255,8 +1350,8 @@
       <translation>Hành động thử nghiệm</translation>
     </message>
     <message>
-      <source>Add some comment</source>
-      <translation>Thêm một số bình luận</translation>
+      <source>Add a comment</source>
+      <translation>Thêm bình luận</translation>
     </message>
   </context>
   <context>
@@ -1268,10 +1363,6 @@
     <message>
       <source>Camera</source>
       <translation>Máy chụp hình</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Máy ảnh nguồn</translation>
     </message>
   </context>
   <context>
@@ -1340,16 +1431,16 @@
       <source>Mute audio when the mic is active</source>
       <translation>Tắt tiếng khi mic đang hoạt động</translation>
     </message>
+    <message>
+      <source>Allow the computer to enter sleep mode on idle</source>
+      <translation>Cho phép máy tính chuyển sang chế độ ngủ khi không hoạt động</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
       <translation>Cài đặt hệ thống</translation>
-    </message>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>Sao lưu và khôi phục</translation>
     </message>
   </context>
   <context>
@@ -1530,10 +1621,6 @@
       <source>Shared layouts</source>
       <translation>Bố cục được chia sẻ</translation>
     </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Chọn một số người dùng trong &quot;Hiển thị đến dòng&quot; để hiển thị bố cục cục bộ của người dùng đó trong danh sách này</translation>
-    </message>
   </context>
   <context>
     <name>LdapSettingsDialog</name>
@@ -1705,6 +1792,29 @@
     </message>
   </context>
   <context>
+    <name>LogSettingsDialog</name>
+    <message>
+      <source>Enable</source>
+      <translation>Cho phép</translation>
+    </message>
+    <message>
+      <source>Logging Level</source>
+      <translation>Mức ghi nhật ký</translation>
+    </message>
+    <message>
+      <source>Split File by Size</source>
+      <translation>Tách tệp theo kích thước</translation>
+    </message>
+    <message>
+      <source>Split File by Time</source>
+      <translation>Tách tệp theo thời gian</translation>
+    </message>
+    <message>
+      <source>Limit Max Volume</source>
+      <translation>Giới hạn khối lượng tối đa</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
@@ -1725,6 +1835,45 @@
     <message>
       <source>Test</source>
       <translation>Thử</translation>
+    </message>
+  </context>
+  <context>
+    <name>LogsManagementWidget</name>
+    <message>
+      <source>Download</source>
+      <translation>Tải xuống</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Cài đặt</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>Khôi phục về mặc định</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Hủy bỏ</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>Làm xong</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation>thử lại</translation>
+    </message>
+    <message>
+      <source>Download complete!</source>
+      <translation>Tải xuống hoàn tất!</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation>Không thể lưu nhật ký vào thư mục đã chọn</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation>Mở thư mục</translation>
     </message>
   </context>
   <context>
@@ -1851,6 +2000,18 @@
       <source>Advanced settings</source>
       <translation>Cài đặt nâng cao</translation>
     </message>
+    <message>
+      <source>Get Update File</source>
+      <translation>Nhận tệp cập nhật</translation>
+    </message>
+    <message>
+      <source>Check Again</source>
+      <translation>Kiểm tra lại</translation>
+    </message>
+    <message>
+      <source>Try Again</source>
+      <translation>Thử lại</translation>
+    </message>
   </context>
   <context>
     <name>MultilineTextPickerWidget</name>
@@ -1938,7 +2099,7 @@
       <translation>Chữ ký Hỗ trợ</translation>
     </message>
     <message>
-      <source>System Singnature</source>
+      <source>System Signature</source>
       <translation>Chữ ký hệ thống</translation>
     </message>
   </context>
@@ -2478,12 +2639,12 @@
       <translation>Xoá quy tắc</translation>
     </message>
     <message>
-      <source>Select some rule</source>
-      <translation>Chọn một số quy tắc</translation>
+      <source>Select a Rule</source>
+      <translation>Chọn một quy tắc</translation>
     </message>
     <message>
-      <source>Reset default rules</source>
-      <translation>Khôi phục quy tắc mặc định</translation>
+      <source>Reset Default Rules</source>
+      <translation>Đặt lại quy tắc mặc định</translation>
     </message>
   </context>
   <context>
@@ -2729,10 +2890,6 @@
       <source>Force Alarm Layout opening</source>
       <translation>Lực lượng báo động Giao diện mở</translation>
     </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>Cũng hiển thị camera nguồn</translation>
-    </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2751,10 +2908,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>Quy tắc này sẽ chỉ làm việc cho các sự kiện kéo dài</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>Cũng hiển thị trên máy ảnh nguồn</translation>
     </message>
   </context>
   <context>
@@ -2855,10 +3008,6 @@
       <translation>Lập lại chỉ mục Sao lưu</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>Dữ liệu phân tích sẽ tiếp tục được lưu trữ trên bộ nhớ bị vô hiệu hóa.</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>Ghi vào vị trí lưu trữ bị vô hiệu hóa sẽ dừng lại. Tuy nhiên, việc xóa các đoạn phim lỗi thời khỏi nó sẽ tiếp tục.</translation>
     </message>
@@ -2867,8 +3016,12 @@
       <translation>Ghi âm được kích hoạt trên USB lưu trữ</translation>
     </message>
     <message>
-      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation>Dữ liệu phân tích có thể chiếm một lượng lớn không gian. Chúng tôi khuyên bạn nên chọn một vị trí khác cho nó thay vì phân vùng hệ thống.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation>Dữ liệu phân tích có thể chiếm một lượng lớn dung lượng. Chúng tôi khuyên bạn nên chọn một vị trí khác thay vì phân vùng hệ thống.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation>Dữ liệu phân tích và chuyển động sẽ tiếp tục được lưu trữ trên bộ nhớ đã bị vô hiệu hóa.</translation>
     </message>
   </context>
   <context>
@@ -2935,8 +3088,8 @@
       <translation>Cảnh báo! Điều này sẽ làm cho chất lượng và tỷ lệ khung hình (FPS) thiết lập trong Biểu ghi không liên quan.</translation>
     </message>
     <message>
-      <source>Custom language for mobile notifications</source>
-      <translation>Ngôn ngữ tùy chỉnh cho Thúc đẩy thông báo</translation>
+      <source>Custom language for Cloud notifications</source>
+      <translation>Ngôn ngữ tùy chỉnh cho thông báo trên Đám mây</translation>
     </message>
   </context>
   <context>

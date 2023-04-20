@@ -114,27 +114,27 @@
     </message>
     <message>
         <source>Logs Management</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open files folder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Open Files Folder</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -239,10 +239,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Event rules</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server actions</source>
         <translation></translation>
     </message>
@@ -276,6 +272,10 @@
     </message>
     <message>
         <source>All servers are offline. Audit data is not available.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Event Rules</source>
         <translation></translation>
     </message>
 </context>
@@ -470,6 +470,10 @@
         <source>Use event source server</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Use event source camera</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>BusinessRulesDialog</name>
@@ -643,45 +647,57 @@
     </message>
     <message>
         <source>ONVIF Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Secondary stream profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Primary stream profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Do not export video automatically</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export From Device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Do not record primary stream</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Do not record secondary stream</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Secondary Stream Profile</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Primary Stream Profile</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Import From Device</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Import video automatically</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Web Page</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Web Page Port</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Disable import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import video manually</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CameraHotspotsSettingsWidget</name>
     <message>
-        <source>Select Camera</source>
+        <source>Hotspots</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete Hotspot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add Hotspot</source>
+        <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -800,27 +816,27 @@
     <name>CameraReplacementDialog</name>
     <message>
         <source>Camera Replacement</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>New Device</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -909,55 +925,51 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
         <source>BETA</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Available Actions</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Video Export</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Live Video and Archive</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>PTZ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In Future</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Showreels</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Read more on the help page</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Do not show this window again</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Introducing Cloud Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Motion Search</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Searching Bookmarks, Objects, Events</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <source>•</source>
-        <translation type="unfinished"></translation>
+        <source>In the Future</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -982,15 +994,15 @@
     <name>ContinuousActionAlertWidget</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This action can be set only for instant events</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select another event or action</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1035,19 +1047,19 @@
     </message>
     <message>
         <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;Message&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <source>Open folder</source>
-        <translation type="unfinished"></translation>
+        <source>Open Folder</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1184,10 +1196,6 @@
 <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-        <source>HTTP content</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Login to authenticate (optional)</source>
         <translation></translation>
     </message>
@@ -1204,19 +1212,23 @@
         <translation></translation>
     </message>
     <message>
-        <source>Content type</source>
+        <source>HTTP(S) URL</source>
         <translation></translation>
     </message>
     <message>
-        <source>HTTP URL</source>
+        <source>HTTP(S) Content</source>
         <translation></translation>
     </message>
     <message>
-        <source>Authentication type</source>
+        <source>Content Type</source>
         <translation></translation>
     </message>
     <message>
-        <source>Request type</source>
+        <source>Authentication Type</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Request Method</source>
         <translation></translation>
     </message>
 </context>
@@ -1325,7 +1337,7 @@
     </message>
     <message>
         <source>No Failover</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1346,19 +1358,19 @@
     <name>FooterWidget</name>
     <message>
         <source>Add Comment</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Set Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Test Action</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Add a comment</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1369,10 +1381,6 @@
     </message>
     <message>
         <source>Camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Source camera</source>
         <translation></translation>
     </message>
 </context>
@@ -1443,8 +1451,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Allow computer entering sleep mode on idle</source>
-        <translation type="unfinished"></translation>
+        <source>Allow the computer to enter sleep mode on idle</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1532,13 +1540,6 @@
     <message>
         <source>Delete</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>InputIDPickerWidget</name>
-    <message>
-        <source>Input ID</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1673,33 +1674,6 @@
     </message>
 </context>
 <context>
-    <name>LdapUsersDialog</name>
-    <message>
-        <source>Fetch Users from LDAP...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Loading...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connection error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Role to assign to imported users</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Disable imported users</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Allow digest authentication for imported user</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>LicenseDetailsDialog</name>
     <message>
         <source>License Details</source>
@@ -1711,29 +1685,6 @@
     </message>
     <message>
         <source>Features</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>LicenseManagerWidget</name>
-    <message>
-        <source>Active Licenses</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New License</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Details...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>The software is licensed to</source>
         <translation></translation>
     </message>
 </context>
@@ -1805,24 +1756,24 @@
 <context>
     <name>LogSettingsDialog</name>
     <message>
-        <source>Logging level</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Limit Max volume</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Split file by time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Split file by size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Logging Level</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Split File by Size</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Split File by Time</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Limit Max Volume</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1852,39 +1803,39 @@
     <name>LogsManagementWidget</name>
     <message>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Reset to Default</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Download is finished!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open files folder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Retry</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <source>Failed to save logs to selected folder</source>
-        <translation type="unfinished"></translation>
+        <source>Download complete!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Failed to save logs to the selected folder</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Open Files Folder</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2011,16 +1962,17 @@
         <source>Advanced settings</source>
         <translation></translation>
     </message>
-</context>
-<context>
-    <name>MultilineTextPickerWidget</name>
     <message>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
+        <source>Get Update File</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Text</source>
-        <translation type="unfinished"></translation>
+        <source>Check Again</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Try Again</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2067,38 +2019,38 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
         <source>Connection Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Email</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Server Address</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Security Protocol</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Email Settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Support Signature</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>System Signature</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mail from</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2206,17 +2158,6 @@
     <message>
         <source>Events</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>PresetPickerWidget</name>
-    <message>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preset</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2342,49 +2283,6 @@
     </message>
 </context>
 <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-        <source>Search users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Force Secure Authentication</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Nothing found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New User...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit Roles...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LDAP Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Fetch Users from LDAP...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnMessageBox</name>
     <message>
         <source>Do not show this message again</source>
@@ -2460,17 +2358,6 @@
     </message>
 </context>
 <context>
-    <name>QualityPickerWidget</name>
-    <message>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Quality</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>RapidReviewSettingsWidget</name>
     <message>
         <source>Rapid Review</source>
@@ -2540,46 +2427,46 @@
     </message>
 </context>
 <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
         <source>Temporary Folder</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Additional Options</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Disable Aero</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Capture Cursor</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Browse...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Resolution</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Recording Quality</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Source</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resolution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Screen</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Aero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Cursor</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2627,23 +2514,23 @@
     <name>RulesDialog</name>
     <message>
         <source>Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>New Rule</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Delete Rule</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <source>Reset default rules</source>
-        <translation type="unfinished"></translation>
+        <source>Select a Rule</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Select a rule</source>
-        <translation type="unfinished"></translation>
+        <source>Reset Default Rules</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2751,10 +2638,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Display servers in tree for non-administrator users</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Archive encryption</source>
         <translation></translation>
     </message>
@@ -2785,6 +2668,10 @@
     <message>
         <source>Manage Users</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Display servers in tree for non-power users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2889,10 +2776,6 @@
         <source>Force Alarm Layout opening</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Also show source camera</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2910,10 +2793,6 @@
     </message>
     <message>
         <source>Rule will work only for prolonged events</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Also show on source camera</source>
         <translation></translation>
     </message>
 </context>
@@ -2945,32 +2824,6 @@
     <message>
         <source>Icon</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>SoundPickerWidget</name>
-    <message>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Manage</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>StatePickerWidget</name>
-    <message>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>State</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3015,10 +2868,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Analytics data will continue to be stored on the disabled storage.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
         <translation></translation>
     </message>
@@ -3027,7 +2876,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+        <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
         <translation></translation>
     </message>
 </context>
@@ -3064,10 +2917,6 @@
 <context>
     <name>SubjectSelectionDialog</name>
     <message>
-        <source>Roles</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Show all users</source>
         <translation></translation>
     </message>
@@ -3078,6 +2927,10 @@
     <message>
         <source>Nothing matches your search.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3096,7 +2949,7 @@
     </message>
     <message>
         <source>Custom language for Cloud notifications</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3160,96 +3013,21 @@
     <name>UserGroupsWidget</name>
     <message>
         <source>Search users</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>+ Add Group</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No groups found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>UserListWidget</name>
     <message>
         <source>Search users</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>+ Add User</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No users found</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>UserProfileWidget</name>
-    <message>
-        <source>Change Password...</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-        <source>Name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Users</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete Role</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>UserRolesDialog</name>
-    <message>
-        <source>User Roles</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New role</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>There are no custom user roles yet.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click &quot;New role&quot; button to create one.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>UserSettingsDialog</name>
-    <message>
-        <source>This user can use digest authentication.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Force Secure Authentication</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>UserSettingsWidget</name>
-    <message>
-        <source>User Type</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Role</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Edit Roles...</source>
         <translation></translation>
     </message>
 </context>
@@ -3310,21 +3088,6 @@
     </message>
 </context>
 <context>
-    <name>VolumePickerWidget</name>
-    <message>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Volume</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>WebpageDialog</name>
     <message>
         <source>General</source>
@@ -3376,6 +3139,29 @@
     <message>
         <source>Note: Schedule is based on server time.</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+        <source>Active Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The software is licensed to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New License</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -13,27 +13,27 @@
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation type="unfinished">Notify about available updates</translation>
+      <translation>Mevcut güncellemeler hakkında bilgi ver</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Otomatik istemci güncellemeleri</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
+      <translation>Bağlı istemcilerin otomatik olarak uyumlu en son sürüme güncellenmesini sağlamak için bu seçeneği aktif edin.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
+      <translation>Bağlanan istemciler, kullanılabilir yeni sürüm olduğunda otomatik olarak güncellenecektir.</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
+      <translation>Tüm bağlanan istemcilerde sürüm %1 güncelleniyor.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation type="unfinished">Connecting clients will be updated to version %1 on %2.</translation>
+      <translation>Bağlanan istemciler %1 sürümünden %2 sürümüne güncellenecektir.</translation>
     </message>
     <message>
       <source>Check for updates</source>
@@ -41,11 +41,11 @@
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation type="unfinished">Speed up this update</translation>
+      <translation>Bu güncellemeyi hızlandırın</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Özel bir istemci kullanıyorsunuz. Güncelleme talimatlarını almak için lütfen %1 ile iletişime geçin.</translation>
     </message>
   </context>
   <context>
@@ -63,7 +63,7 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Nesne türü</translation>
     </message>
   </context>
   <context>
@@ -86,29 +86,29 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya kamera eklentisi ayarlarında nesne algılamayı yapılandırın</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n yeni sonuç</numerusform>
+        <numerusform>%n yeni sonuç</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>yeni sonuçlar</translation>
     </message>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Tarafından tespit edilen</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>Gelişmiş Nesne Arama</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -128,7 +128,7 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya kamera eklentisi ayarlarında nesne algılamayı yapılandırın</translation>
     </message>
     <message>
       <source>Any plugin</source>
@@ -136,14 +136,14 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n yeni sonuç</numerusform>
+        <numerusform>%n yeni sonuç</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>yeni sonuçlar</translation>
     </message>
   </context>
   <context>
@@ -153,20 +153,20 @@
       <translation>Kamera analitikleri sadece kamera görüntülenirken çalışır. Sürekli çalışması için kaydı etkinleştirin.</translation>
     </message>
     <message>
-      <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation>Bu eklentiyi yapılandırmak için Kamera Ayarlarını kontrol edin.</translation>
     </message>
     <message>
-      <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <source>Check System Administration settings to configure this plugin.</source>
+      <translation>Bu eklentiyi yapılandırmak için Sistem Yönetimi ayarlarını kontrol edin.</translation>
     </message>
     <message>
-      <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <source>This plugin has no settings at the System level.</source>
+      <translation>Bu eklentinin Sistem düzeyinde ayarı yoktur.</translation>
     </message>
     <message>
-      <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <source>This plugin has no settings for this camera.</source>
+      <translation>Bu eklentinin bu kamera için ayarı yok.</translation>
     </message>
   </context>
   <context>
@@ -218,15 +218,15 @@
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Seçili kamera</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Aygıt seçin...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Kameraları seçin...</translation>
     </message>
     <message>
       <source>none</source>
@@ -234,25 +234,25 @@
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n seçili cihaz</numerusform>
+        <numerusform>%n seçili cihaz</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n seçilmiş kamera</numerusform>
+        <numerusform>%n seçilmiş kamera</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Seçilen cihaz</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Seçilen kamera</translation>
     </message>
   </context>
   <context>
@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Unreachable</source>
-      <translation type="unfinished">Unreachable</translation>
+      <translation>Ulaşılamaz</translation>
     </message>
     <message>
       <source>Incompatible</source>
@@ -271,14 +271,14 @@
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>Bekliyor</translation>
     </message>
   </context>
   <context>
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Giriş</translation>
     </message>
   </context>
   <context>
@@ -299,18 +299,18 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Daha fazla okumak için simgeye tıklayın</translation>
     </message>
   </context>
   <context>
     <name>CounterBlock</name>
     <message>
       <source>Remove column</source>
-      <translation type="unfinished">Remove column</translation>
+      <translation>Sütunu kaldır</translation>
     </message>
     <message>
       <source>Add column</source>
-      <translation type="unfinished">Add column</translation>
+      <translation>Sütun ekle</translation>
     </message>
     <message>
       <source>Hide information</source>
@@ -345,7 +345,7 @@
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360° Eşkenar</translation>
     </message>
   </context>
   <context>
@@ -356,7 +356,7 @@
     </message>
     <message>
       <source>See %1 for other events</source>
-      <translation type="unfinished">See %1 for other events</translation>
+      <translation>Diğer olaylar için %1 bakın</translation>
     </message>
     <message>
       <source>No events</source>
@@ -364,7 +364,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya bir Olay Kuralı oluşturun</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -444,7 +444,7 @@
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>Zemin / masa</translation>
     </message>
     <message>
       <source>Angle</source>
@@ -452,7 +452,7 @@
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>Kamera açı düzeltmesi</translation>
     </message>
     <message>
       <source>Lens projection</source>
@@ -506,7 +506,7 @@
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Tarafından tespit edilen</translation>
     </message>
   </context>
   <context>
@@ -544,7 +544,7 @@
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Önceki Nesne</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -556,11 +556,11 @@
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Sonraki Nesne</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Tekrarı Değiştir</translation>
     </message>
   </context>
   <context>
@@ -583,7 +583,7 @@
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>Bu model desteklenmiyor</translation>
     </message>
     <message>
       <source>Reset to Default</source>
@@ -652,7 +652,7 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Hareket olaylarını görmek için bir kamera seçin</translation>
     </message>
     <message>
       <source>No motion detected</source>
@@ -660,11 +660,11 @@
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya hareket kaydını etkinleştirin</translation>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>Kamera Seç...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -672,7 +672,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Zaman çizelgesinde bir zaman aralığı seçin ve bir yer imi oluşturmak için vurgulanan bölüme sağ tıklayın</translation>
     </message>
   </context>
   <context>
@@ -712,18 +712,18 @@
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Sonuçları filtrelemek için videoda bir alan seçin</translation>
     </message>
   </context>
   <context>
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Mevcut</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Yok</translation>
     </message>
   </context>
   <context>
@@ -741,7 +741,7 @@
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL veya Ana Bilgisayar: Bağlantı Noktası</translation>
     </message>
     <message>
       <source>Login</source>
@@ -814,11 +814,11 @@
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Ön izleme Yok</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Önizlemeyi görüntülemek için nesneyi seçin</translation>
     </message>
     <message>
       <source>Show on Layout</source>
@@ -826,7 +826,7 @@
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>Seçili nesne için önizleme mevcut değil</translation>
     </message>
   </context>
   <context>
@@ -880,7 +880,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>kimden</translation>
     </message>
     <message>
       <source>to</source>
@@ -891,11 +891,11 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Nesne Türü</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Alt tip</translation>
     </message>
   </context>
   <context>
@@ -921,11 +921,11 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>Video dosyalarını veya görüntüleri istemci penceresine sürükleyin veya Yerel Ayarlar iletişim kutusundan yerel medya klasörü ekleyin</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Başka bir şey aramayı dene</translation>
     </message>
   </context>
   <context>
@@ -946,7 +946,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>ESKİ</translation>
     </message>
   </context>
   <context>
@@ -957,7 +957,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>All Types</source>
-      <translation type="unfinished">All Types</translation>
+      <translation>Tüm Türler</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -996,11 +996,11 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>Ön izleme yüklenemiyor</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>Önizleme eski</translation>
     </message>
   </context>
   <context>
@@ -1055,7 +1055,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Seç</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1067,6 +1067,17 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <message>
       <source>Sensitivity</source>
       <translation>Hassasiyet</translation>
+    </message>
+  </context>
+  <context>
+    <name>SettingsDialog</name>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Parametre girin</translation>
+    </message>
+    <message>
+      <source>This action requires some parameters to be filled.</source>
+      <translation>Aksiyon için bazı parametrelerin doldurulması gereklidir.</translation>
     </message>
   </context>
   <context>
@@ -1092,7 +1103,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>Ufuk düzeltme</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1150,7 +1161,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>Sinyal yok</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -1158,15 +1169,15 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>Sunucuya ulaşılamıyor</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Erişim yok</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation type="unfinished">Device disabled</translation>
+      <translation>Cihaz devre dışı</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1174,7 +1185,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>Medyanın şifresi çözülemiyor</translation>
     </message>
     <message>
       <source>Password required</source>
@@ -1187,6 +1198,10 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <message>
       <source>Unsupported firmware version</source>
       <translation>Desteklenmeyen yazılım versiyonu</translation>
+    </message>
+    <message>
+      <source>Access denied</source>
+      <translation>Erişim engellendi</translation>
     </message>
   </context>
   <context>
@@ -1204,19 +1219,19 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>No Favorite Systems</source>
-      <translation type="unfinished">No Favorite Systems</translation>
+      <translation>Favori Sistem Yok</translation>
     </message>
     <message>
       <source>No Hidden Systems</source>
-      <translation type="unfinished">No Hidden Systems</translation>
+      <translation>Gizli Sistem Yok</translation>
     </message>
     <message>
       <source>You can add system to the favorites from the context menu</source>
-      <translation type="unfinished">You can add system to the favorites from the context menu</translation>
+      <translation>İçerik menüsünden sistemi sık kullanılanlara ekleyebilirsiniz</translation>
     </message>
     <message>
       <source>You can hide systems from the main list from the context menu</source>
-      <translation type="unfinished">You can hide systems from the main list from the context menu</translation>
+      <translation>İçerik menüsünden ana listedeki sistemleri gizleyebilirsiniz</translation>
     </message>
   </context>
   <context>
@@ -1239,11 +1254,11 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation type="unfinished">Add to Favorites</translation>
+      <translation>Favorilere Ekle</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation type="unfinished">Remove from Favorites</translation>
+      <translation>Favorilerden Çıkar</translation>
     </message>
   </context>
   <context>
@@ -1283,7 +1298,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>Gizli</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -1291,26 +1306,26 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>Favoriler</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
-    </message>
-    <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>Resmi Web Site</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>Yardım ve Kullanım Kılavuzu</translation>
     </message>
     <message>
       <source>Support</source>
       <translation>Destek</translation>
+    </message>
+    <message>
+      <source>You do not have access to the %1. Please check your internet connection.</source>
+      <translation>%1 için erişiminiz yok. Lütfen internet bağlantınızı kontrol edin.</translation>
     </message>
   </context>
 </TS>
