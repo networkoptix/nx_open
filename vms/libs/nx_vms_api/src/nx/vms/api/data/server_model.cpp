@@ -17,8 +17,7 @@ ServerModel::DbUpdateTypes ServerModel::toDbTypes() &&
     mainData.url = std::move(url);
     mainData.version = std::move(version);
     mainData.flags = std::move(flags);
-    if (authKey)
-        mainData.authKey = std::move(*authKey);
+    mainData.authKey = std::move(authKey);
     if (!endpoints.empty())
     {
         mainData.networkAddresses =
@@ -71,6 +70,7 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
             if (!data.osInfo.isEmpty())
                 model.osInfo = nx::utils::OsInfo::fromString(data.osInfo);
             model.flags = std::move(data.flags);
+            model.authKey = std::move(data.authKey);
 
             if (auto attrs = nx::utils::find_if(
                 allAttributes, [id = model.getId()](const auto& a) { return a.serverId == id; }))
