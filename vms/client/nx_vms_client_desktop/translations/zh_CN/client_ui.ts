@@ -85,10 +85,6 @@
       <translation>最大的缓冲区长度</translation>
     </message>
     <message>
-      <source>Browse Logs</source>
-      <translation>浏览记录</translation>
-    </message>
-    <message>
       <source>Clear Local Cache</source>
       <translation>清除本地缓存</translation>
     </message>
@@ -115,6 +111,30 @@
     <message>
       <source>Server certificate validation</source>
       <translation>服务器证书验证</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation type="unfinished">Logs Management</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>下载</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>设置</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>取消</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>完成</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation type="unfinished">Open Files Folder</translation>
     </message>
   </context>
   <context>
@@ -219,10 +239,6 @@
       <translation>登录/退出</translation>
     </message>
     <message>
-      <source>Event rules</source>
-      <translation>事件规则</translation>
-    </message>
-    <message>
       <source>Server actions</source>
       <translation>服务端操作</translation>
     </message>
@@ -257,6 +273,10 @@
     <message>
       <source>All servers are offline. Audit data is not available.</source>
       <translation>所有服务器离线，审查数据不可用。</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation>事件规则</translation>
     </message>
   </context>
   <context>
@@ -318,10 +338,6 @@
     <message>
       <source>Skip Current Queue</source>
       <translation>跳过目前队列</translation>
-    </message>
-    <message>
-      <source>Maximum backup queue size</source>
-      <translation>最大备份队列容量</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
@@ -454,6 +470,10 @@
       <source>Use event source server</source>
       <translation>使用事件源服务器</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation type="unfinished">Use event source camera</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -509,14 +529,6 @@
   </context>
   <context>
     <name>CameraExpertSettingsWidget</name>
-    <message>
-      <source>Do not archive primary stream</source>
-      <translation>不使用主码流存储</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>不使用次码流存储</translation>
-    </message>
     <message>
       <source>Auto</source>
       <translation>自动</translation>
@@ -638,20 +650,36 @@
       <translation type="unfinished">ONVIF Settings</translation>
     </message>
     <message>
-      <source>Secondary stream profile</source>
-      <translation type="unfinished">Secondary stream profile</translation>
+      <source>Do not record primary stream</source>
+      <translation type="unfinished">Do not record primary stream</translation>
     </message>
     <message>
-      <source>Primary stream profile</source>
-      <translation type="unfinished">Primary stream profile</translation>
+      <source>Do not record secondary stream</source>
+      <translation type="unfinished">Do not record secondary stream</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
+      <source>Secondary Stream Profile</source>
+      <translation type="unfinished">Secondary Stream Profile</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <source>Primary Stream Profile</source>
+      <translation type="unfinished">Primary Stream Profile</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation type="unfinished">Import From Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>网页:</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation type="unfinished">Web Page Port</translation>
     </message>
   </context>
   <context>
@@ -772,10 +800,6 @@
       <translation type="unfinished">Camera Replacement</translation>
     </message>
     <message>
-      <source>New device</source>
-      <translation type="unfinished">New device</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>名称</translation>
     </message>
@@ -790,6 +814,10 @@
     <message>
       <source>Next</source>
       <translation>下一个</translation>
+    </message>
+    <message>
+      <source>New Device</source>
+      <translation type="unfinished">New Device</translation>
     </message>
   </context>
   <context>
@@ -875,6 +903,57 @@
     </message>
   </context>
   <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+      <source>BETA</source>
+      <translation type="unfinished">BETA</translation>
+    </message>
+    <message>
+      <source>Available Actions</source>
+      <translation type="unfinished">Available Actions</translation>
+    </message>
+    <message>
+      <source>Video Export</source>
+      <translation type="unfinished">Video Export</translation>
+    </message>
+    <message>
+      <source>Live Video and Archive</source>
+      <translation type="unfinished">Live Video and Archive</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation>幻灯片</translation>
+    </message>
+    <message>
+      <source>Read more on the help page</source>
+      <translation type="unfinished">Read more on the help page</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation type="unfinished">Do not show this window again</translation>
+    </message>
+    <message>
+      <source>Introducing Cloud Layouts</source>
+      <translation type="unfinished">Introducing Cloud Layouts</translation>
+    </message>
+    <message>
+      <source>Motion Search</source>
+      <translation>智慧位移搜寻</translation>
+    </message>
+    <message>
+      <source>Searching Bookmarks, Objects, Events</source>
+      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+    </message>
+    <message>
+      <source>In the Future</source>
+      <translation type="unfinished">In the Future</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -946,6 +1025,22 @@
     <message>
       <source>Restore from Backup...</source>
       <translation>从备份文件还原...</translation>
+    </message>
+    <message>
+      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>取消</translation>
+    </message>
+    <message>
+      <source>&lt;Message&gt;</source>
+      <translation>&lt;Message&gt;</translation>
+    </message>
+    <message>
+      <source>Open Folder</source>
+      <translation type="unfinished">Open Folder</translation>
     </message>
   </context>
   <context>
@@ -1082,10 +1177,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTP内容</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>请进行登录验证(可选)</translation>
     </message>
@@ -1102,20 +1193,24 @@
       <translation>密码</translation>
     </message>
     <message>
-      <source>Content type</source>
-      <translation>内容类型</translation>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTPS URL 地址</translation>
+      <source>HTTP(S) Content</source>
+      <translation type="unfinished">HTTP(S) Content</translation>
     </message>
     <message>
-      <source>Authentication type</source>
-      <translation>身份验证类型</translation>
+      <source>Content Type</source>
+      <translation type="unfinished">Content Type</translation>
     </message>
     <message>
-      <source>Request type</source>
-      <translation>请求类型</translation>
+      <source>Authentication Type</source>
+      <translation type="unfinished">Authentication Type</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
@@ -1248,15 +1343,15 @@
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>设置计划表</translation>
     </message>
     <message>
       <source>Test Action</source>
       <translation type="unfinished">Test Action</translation>
     </message>
     <message>
-      <source>Add some comment</source>
-      <translation type="unfinished">Add some comment</translation>
+      <source>Add a comment</source>
+      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1268,10 +1363,6 @@
     <message>
       <source>Camera</source>
       <translation>摄像机</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>来源摄像机</translation>
     </message>
   </context>
   <context>
@@ -1340,16 +1431,16 @@
       <source>Mute audio when the mic is active</source>
       <translation>当麦克风启用时，将音频切换成静音</translation>
     </message>
+    <message>
+      <source>Allow the computer to enter sleep mode on idle</source>
+      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
       <translation>系统设置</translation>
-    </message>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>备份和恢复</translation>
     </message>
   </context>
   <context>
@@ -1530,10 +1621,6 @@
       <source>Shared layouts</source>
       <translation>共享布局</translation>
     </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>在 &quot;列表中选择单个用户, 然後显示本地布局到&quot;</translation>
-    </message>
   </context>
   <context>
     <name>LdapSettingsDialog</name>
@@ -1705,6 +1792,29 @@
     </message>
   </context>
   <context>
+    <name>LogSettingsDialog</name>
+    <message>
+      <source>Enable</source>
+      <translation>启用</translation>
+    </message>
+    <message>
+      <source>Logging Level</source>
+      <translation type="unfinished">Logging Level</translation>
+    </message>
+    <message>
+      <source>Split File by Size</source>
+      <translation type="unfinished">Split File by Size</translation>
+    </message>
+    <message>
+      <source>Split File by Time</source>
+      <translation type="unfinished">Split File by Time</translation>
+    </message>
+    <message>
+      <source>Limit Max Volume</source>
+      <translation type="unfinished">Limit Max Volume</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
@@ -1725,6 +1835,45 @@
     <message>
       <source>Test</source>
       <translation>测试</translation>
+    </message>
+  </context>
+  <context>
+    <name>LogsManagementWidget</name>
+    <message>
+      <source>Download</source>
+      <translation>下载</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>设置</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>重置为默认值</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>取消</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>完成</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation>重试</translation>
+    </message>
+    <message>
+      <source>Download complete!</source>
+      <translation type="unfinished">Download complete!</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation type="unfinished">Open Files Folder</translation>
     </message>
   </context>
   <context>
@@ -1851,6 +2000,18 @@
       <source>Advanced settings</source>
       <translation>高级设置</translation>
     </message>
+    <message>
+      <source>Get Update File</source>
+      <translation type="unfinished">Get Update File</translation>
+    </message>
+    <message>
+      <source>Check Again</source>
+      <translation type="unfinished">Check Again</translation>
+    </message>
+    <message>
+      <source>Try Again</source>
+      <translation>请重试</translation>
+    </message>
   </context>
   <context>
     <name>MultilineTextPickerWidget</name>
@@ -1938,8 +2099,8 @@
       <translation>支持签名</translation>
     </message>
     <message>
-      <source>System Singnature</source>
-      <translation type="unfinished">System Singnature</translation>
+      <source>System Signature</source>
+      <translation>系统签名</translation>
     </message>
   </context>
   <context>
@@ -2467,7 +2628,7 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>报警/事件规则</translation>
     </message>
     <message>
       <source>New Rule</source>
@@ -2478,12 +2639,12 @@
       <translation type="unfinished">Delete Rule</translation>
     </message>
     <message>
-      <source>Select some rule</source>
-      <translation type="unfinished">Select some rule</translation>
+      <source>Select a Rule</source>
+      <translation type="unfinished">Select a Rule</translation>
     </message>
     <message>
-      <source>Reset default rules</source>
-      <translation type="unfinished">Reset default rules</translation>
+      <source>Reset Default Rules</source>
+      <translation>重置默认规则</translation>
     </message>
   </context>
   <context>
@@ -2729,10 +2890,6 @@
       <source>Force Alarm Layout opening</source>
       <translation>允许报警视图开放</translation>
     </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>显示系统内摄像机</translation>
-    </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2751,10 +2908,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>规则将针对长时间的时间有效</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>显示系统内摄像机</translation>
     </message>
   </context>
   <context>
@@ -2855,10 +3008,6 @@
       <translation>重新建立索引备份</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>分析数据将续存于已停用的存储中。</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>将停止录像到停用的存储装置上, 而且旧的录像资料将继续被删除.</translation>
     </message>
@@ -2867,8 +3016,12 @@
       <translation>已启用录像于USB储存装置上</translation>
     </message>
     <message>
-      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation>分析数据可能会占用大量空间。建议选择其他位置, 不要存放於系统分区。</translation>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
     </message>
   </context>
   <context>
@@ -2935,8 +3088,8 @@
       <translation>注意！若勾选以上设置当前视频质量和帧率将无法与录像计划中的录像设置同步.</translation>
     </message>
     <message>
-      <source>Custom language for mobile notifications</source>
-      <translation>自订手机推播通知的语言</translation>
+      <source>Custom language for Cloud notifications</source>
+      <translation type="unfinished">Custom language for Cloud notifications</translation>
     </message>
   </context>
   <context>
@@ -3019,7 +3172,7 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ 新增用户</translation>
     </message>
     <message>
       <source>No users found</source>

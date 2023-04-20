@@ -53,17 +53,6 @@
     </message>
   </context>
   <context>
-    <name>CloudSystemStatusItem::Private</name>
-    <message>
-      <source>Loading...</source>
-      <translation>ロード中...</translation>
-    </message>
-    <message>
-      <source>User interaction required</source>
-      <translation>ユーザー操作が必要です</translation>
-    </message>
-  </context>
-  <context>
     <name>ComboBoxUtils</name>
     <message>
       <source>multiple values</source>
@@ -332,11 +321,11 @@
     </message>
     <message>
       <source>Mark Selection Start</source>
-      <translation>開始位置の選択</translation>
+      <translation>選択範囲の始点</translation>
     </message>
     <message>
       <source>Mark Selection End</source>
-      <translation>終了位置の選択</translation>
+      <translation>選択範囲の終点</translation>
     </message>
     <message>
       <source>Clear Selection</source>
@@ -356,7 +345,7 @@
     </message>
     <message>
       <source>Preview Search...</source>
-      <translation>検索表示...</translation>
+      <translation>プレビュー検索...</translation>
     </message>
     <message>
       <source>Server...</source>
@@ -563,23 +552,11 @@
       <translation>デバイスルール...</translation>
     </message>
     <message>
-      <source>Devices Rules...</source>
-      <translation>デバイスルール...</translation>
-    </message>
-    <message>
       <source>Camera Rules...</source>
       <translation>カメラルール...</translation>
     </message>
     <message>
-      <source>Cameras Rules...</source>
-      <translation>カメラルール...</translation>
-    </message>
-    <message>
       <source>I/O Module Rules...</source>
-      <translation>I/Oモジュール ルール...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Rules...</source>
       <translation>I/Oモジュール ルール...</translation>
     </message>
     <message>
@@ -1036,6 +1013,22 @@
       <source>Replace Camera...</source>
       <translation>カメラ交換...</translation>
     </message>
+    <message>
+      <source>Save Current Layout As Cloud...</source>
+      <translation>現在のレイアウトをクラウドとして保存...</translation>
+    </message>
+    <message>
+      <source>Save Layout As Cloud...</source>
+      <translation>レイアウトをクラウドとして保存...</translation>
+    </message>
+    <message>
+      <source>Save Cloud Layout</source>
+      <translation>クラウドレイアウトを保存</translation>
+    </message>
+    <message>
+      <source>Save Cloud Layout As...</source>
+      <translation>名前を付けてクラウドレイアウトを保存...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1074,6 +1067,13 @@
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>このライセンスを持つサーバーのハードウェアIDは、ライセンスが有効化されたハードウェアIDと一致しません。</translation>
+    </message>
+  </context>
+  <context>
+    <name>DropdownTextPickerWidgetStrings</name>
+    <message>
+      <source>Auto</source>
+      <translation>自動</translation>
     </message>
   </context>
   <context>
@@ -1313,14 +1313,6 @@
       <translation>ライセンスキーを手動で有効化するには、地域/ライセンスサポートにお問い合わせください:</translation>
     </message>
     <message>
-      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>システムがインターネットにアクセスできない場合、ライセンスキーとハードウェアIDを%1に送信してライセンスファイルを取得してください。</translation>
-    </message>
-    <message>
-      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</source>
-      <translation>システムがインターネットにアクセスできない場合、ライセンスキーとハードウェアIDを地域/ライセンスサポートに送信してライセンスファイルを取得してください。</translation>
-    </message>
-    <message>
       <source>Hardware ID</source>
       <translation>ハードウェア ID</translation>
     </message>
@@ -1333,10 +1325,6 @@
       <translation>無料ライセンスの有効化に失敗しました</translation>
     </message>
     <message>
-      <source>Copy parameters</source>
-      <translation>パラメータをコピー</translation>
-    </message>
-    <message>
       <source>Copied</source>
       <translation>コピー</translation>
     </message>
@@ -1345,6 +1333,18 @@
 License Key: %2</source>
       <translation>ハードウェアID: %1
 ライセンスキー: %2</translation>
+    </message>
+    <message>
+      <source>Copy Parameters</source>
+      <translation>パラメータをコピー</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation>システムがインターネットにアクセスできない場合は、提供されたライセンス キーとハードウェア ID を %1 に送信してアクティベーションファイルを取得してください。</translation>
+    </message>
+    <message>
+      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation>システムがインターネットにアクセスできない場合は、提供されたライセンス キーとハードウェア ID を 地域/ライセンスサポートチーム に送信してアクティベーションファイルを取得してください。</translation>
     </message>
   </context>
   <context>
@@ -1517,18 +1517,9 @@ License Key: %2</source>
       <translation>メールアドレスまたはSMTPサーバーを設定してください</translation>
     </message>
     <message>
-      <source>Unable to test email settings due to no internetconnection on any of the active servers</source>
-      <translation>アクティブなサーバーのいずれにもインターネット接続がないため、電子メール設定をテストできません</translation>
-    </message>
-    <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
       <translation>%1 ユーザーがメールを受信します</translation>
-    </message>
-    <message>
-      <source>%1 users will start receiving emails right after you apply settings</source>
-      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation>%1 ユーザーは、設定を適用するとすぐにメールを受信しはじめます</translation>
     </message>
     <message>
       <source>%1 is not available</source>
@@ -1559,6 +1550,15 @@ License Key: %2</source>
     <message>
       <source>Unknown error</source>
       <translation>不明なエラー</translation>
+    </message>
+    <message>
+      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
+      <translation>アクティブなサーバーのいずれにもインターネット接続がないため、電子メール設定をテストできません</translation>
+    </message>
+    <message>
+      <source>%1 users will start receiving emails immediately after you apply these settings</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation>これらの設定を適用すると、%1 ユーザーへのメール配信がすぐに始まります</translation>
     </message>
   </context>
   <context>
@@ -1817,10 +1817,6 @@ License Key: %2</source>
   <context>
     <name>QnAdvancedSettingsWidget</name>
     <message>
-      <source>Folder not found</source>
-      <translation>フォルダーが見つかりません</translation>
-    </message>
-    <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
       <translation>OpenGLの表示でCPU負荷が100％になる問題を回避できます。</translation>
     </message>
@@ -1875,6 +1871,22 @@ License Key: %2</source>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
       <translation>サーバーへの最初の接続時に、証明書にエラーが含まれている場合は、証明書を受け入れるように確認が求められます</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>フォルダー選択...</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation>指定されたフォルダーにログを保存できませんでした</translation>
+    </message>
+    <message>
+      <source>Download complete!</source>
+      <translation>ダウンロード完了！</translation>
+    </message>
+    <message>
+      <source>NVIDIA hardware acceleration is in beta mode</source>
+      <translation>NVIDIA ハードウェアアクセラレーションはベータモードです</translation>
     </message>
   </context>
   <context>
@@ -2179,6 +2191,26 @@ License Key: %2</source>
       <source>MitM attack from server %1</source>
       <translation>サーバ %1 からのMITM攻撃</translation>
     </message>
+    <message>
+      <source>Connected to %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation>%1 に接続</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1</source>
+      <comment>%1 is the Cloud name (like Nx Cloud)</comment>
+      <translation>%1 から切断</translation>
+    </message>
+    <message>
+      <source>Connected to %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation>%2 経由で %1 に接続</translation>
+    </message>
+    <message>
+      <source>Disconnected from %1 via %2</source>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <translation>%2 経由で %1 から切断</translation>
+    </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
@@ -2435,10 +2467,6 @@ License Key: %2</source>
       <translation>ルールを保存できませんでした</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>終了する前に変更を適用しますか？</translation>
-    </message>
-    <message>
       <source>This action cannot be undone.</source>
       <translation>この操作は元に戻せません。</translation>
     </message>
@@ -2449,6 +2477,10 @@ License Key: %2</source>
     <message>
       <source>Some rules are not valid and may not work</source>
       <translation>一部のルールは不完全であり、動作しない可能性があります</translation>
+    </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation>終了する前に変更を適用しますか?</translation>
     </message>
   </context>
   <context>
@@ -2483,6 +2515,14 @@ License Key: %2</source>
     <message>
       <source>Servers that support buzzer</source>
       <translation>ブザーをサポートするサーバー</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCamDisplay</name>
+    <message>
+      <source>%1 Running</source>
+      <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
+      <translation>%1 実行中</translation>
     </message>
   </context>
   <context>
@@ -3043,8 +3083,8 @@ to %1</source>
       <translation>システムは二要素認証と互換性がありません</translation>
     </message>
     <message>
-      <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation>&quot;%1&quot; システムへのログインに失敗しました</translation>
+      <source>Failed to log in to System &quot;%1&quot;</source>
+      <translation>システム &quot;%1&quot; へのログインに失敗しました</translation>
     </message>
   </context>
   <context>
@@ -3081,20 +3121,12 @@ to %1</source>
       <translation>バックアップデータベース保存...</translation>
     </message>
     <message>
-      <source>Downloading Database Backup</source>
-      <translation>データベースバックアップのダウンロード中</translation>
-    </message>
-    <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
       <translation>サーバーからデータベースバックアップをダウンロード中　暫くお待ちください.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
       <translation>データベースバックアップを開く...</translation>
-    </message>
-    <message>
-      <source>Restoring Database Backup</source>
-      <translation>データベースバックアップのリストア中</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
@@ -3111,14 +3143,6 @@ to %1</source>
     <message>
       <source>Failed to open file</source>
       <translation>ファイルが開けませんでした：</translation>
-    </message>
-    <message>
-      <source>Database successfully restored</source>
-      <translation>データベースが正常に復元されました</translation>
-    </message>
-    <message>
-      <source>Server application will restart shortly.</source>
-      <translation>サーバー アプリケーションはすぐに再起動されます</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
@@ -3159,6 +3183,10 @@ to %1</source>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation>システム構成をバックアップから復元するとサーバー アプリケーションが再起動されます</translation>
+    </message>
+    <message>
+      <source>Database successfully restored. Server application will restart shortly.</source>
+      <translation>データベースが正常に復元されました。サーバーアプリケーションはまもなく再起動します。</translation>
     </message>
   </context>
   <context>
@@ -3497,10 +3525,6 @@ to %1</source>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
-      <source>Select folder...</source>
-      <translation>フォルダー選択...</translation>
-    </message>
-    <message>
       <source>Folder already added</source>
       <translation>指定したフォルダーは既に追加されています。</translation>
     </message>
@@ -3511,6 +3535,10 @@ to %1</source>
     <message>
       <source>Auto (%1)</source>
       <translation>自動(%1)</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>フォルダー選択...</translation>
     </message>
   </context>
   <context>
@@ -3562,14 +3590,6 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>カメラリストを開く</translation>
-    </message>
-    <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>バックアップには、サーバーとカメラの設定、ユーザー、Webページ、イベントルールなどが含まれます。ビデオは保存されません</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>障害発生時に復元可能なシステム構成のバックアップを作成します</translation>
     </message>
   </context>
   <context>
@@ -3630,7 +3650,7 @@ to %1</source>
     </message>
     <message>
       <source>On click</source>
-      <translation>クリック</translation>
+      <translation>クリック時</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -4308,14 +4328,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnPopupSettingsWidget</name>
+    <message>
+      <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
+      <translation>これらの設定はログインしているシステムにのみ適用され、将来のバージョンで削除されます。</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPtzManageDialog</name>
     <message>
       <source>Manage PTZ for %1...</source>
       <translation>%1 のPTZ管理...</translation>
     </message>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>終了する前に変更を適用しますか？</translation>
+      <source>Apply changes before exiting?</source>
+      <translation>終了する前に変更を適用しますか?</translation>
     </message>
   </context>
   <context>
@@ -4475,10 +4502,6 @@ to %1</source>
       <translation>%1 (プライマリ)</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>フォルダー選択...</translation>
-    </message>
-    <message>
       <source>Best</source>
       <translation>最高</translation>
     </message>
@@ -4497,6 +4520,10 @@ to %1</source>
     <message>
       <source>Quarter Native</source>
       <translation>モニタ解像度の1/4</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>フォルダー選択...</translation>
     </message>
   </context>
   <context>
@@ -4935,16 +4962,16 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation>サーバーから受信した証明書は、このサーバーがピン留めされた証明書と一致しません。</translation>
-    </message>
-    <message>
       <source>Details</source>
       <translation>詳細</translation>
     </message>
     <message>
-      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
       <translation>フェイルオーバーが有効なサーバーは、同じロケーションIDをもつオフラインサーバーからカメラを自動的に引き継ぎます。</translation>
+    </message>
+    <message>
+      <source>The certificate received from the Server does not match the pinned certificate.</source>
+      <translation>サーバーから受信した証明書がピン留めされた証明書と一致しません。</translation>
     </message>
   </context>
   <context>
@@ -5084,6 +5111,18 @@ to %1</source>
     <message>
       <source>Unlock</source>
       <translation>ロック解除</translation>
+    </message>
+    <message>
+      <source>INFORMATION REQUIRED</source>
+      <translation>情報が必要です</translation>
+    </message>
+    <message>
+      <source>Provide</source>
+      <translation>提供</translation>
+    </message>
+    <message>
+      <source>ACCESS DENIED</source>
+      <translation>アクセスが拒否されました</translation>
     </message>
   </context>
   <context>
@@ -5257,14 +5296,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>容量が小さくて、他に十分な領域があるストレージがある場合には書込み先として使用されません</translation>
     </message>
     <message>
-      <source>Use to store analytics data</source>
-      <translation>分析データの保存に使用</translation>
-    </message>
-    <message>
-      <source>Stores analytics data</source>
-      <translation>分析データを保管する</translation>
-    </message>
-    <message>
       <source>Reserved</source>
       <translation>予約済み</translation>
     </message>
@@ -5299,6 +5330,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>smb</source>
       <translation>smb</translation>
+    </message>
+    <message>
+      <source>Use to store analytics and motion data</source>
+      <translation>分析データとモーションデータの保存に使用</translation>
+    </message>
+    <message>
+      <source>Stores analytics and motion data</source>
+      <translation>分析データとモーションデータの保存先</translation>
     </message>
   </context>
   <context>
@@ -5378,14 +5417,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更新</translation>
     </message>
     <message>
-      <source>Routing Management</source>
-      <translation>ルート管理</translation>
-    </message>
-    <message>
-      <source>Time Synchronization</source>
-      <translation>時刻同期</translation>
-    </message>
-    <message>
       <source>Users</source>
       <translation>ユーザー</translation>
     </message>
@@ -5398,8 +5429,20 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ユーザー管理</translation>
     </message>
     <message>
-      <source>Integrations</source>
-      <translation>インテグレーション</translation>
+      <source>Time Sync</source>
+      <translation>時刻同期</translation>
+    </message>
+    <message>
+      <source>Routing</source>
+      <translation>ルーティング</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>プラグイン</translation>
+    </message>
+    <message>
+      <source>Advanced</source>
+      <translation>アドバンス</translation>
     </message>
   </context>
   <context>
@@ -5485,10 +5528,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Email送信中のエラー</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started</source>
-      <translation>カメラストレージとの同期が開始されました</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished</source>
       <translation>カメラストレージとの同期が完了しました</translation>
     </message>
@@ -5497,16 +5536,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>カメラストレージとの同期が進行中です</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>次のデバイスのカメラストレージとの同期が開始されました：</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>下記のデバイスのカメラストレージとの同期が完了しました：</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization</source>
-      <translation>カメラストレージとの同期</translation>
+      <translation>次のデバイスのカメラストレージとの同期が完了しました：</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5551,8 +5582,28 @@ If you intended to move analytics data to another storage location, please conta
       <translation>カメラの録画スケジュールが無効です</translation>
     </message>
     <message>
-      <source>Remote archive synchronization available</source>
+      <source>Remote archive synchronization has been stopped</source>
+      <translation>カメラストレージとの同期が停止されました</translation>
+    </message>
+    <message>
+      <source>Storage for analytics data is not set</source>
+      <translation>分析データ用ストレージが設定されていません</translation>
+    </message>
+    <message>
+      <source>System storage is used for analytics data</source>
+      <translation>システムストレージが分析データ用に使用されます</translation>
+    </message>
+    <message>
+      <source>Analytics data can take up large amounts of space.</source>
+      <translation>分析データは大量のスペースを占める可能性があります。</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization is available</source>
       <translation>リモートアーカイブの同期が利用可能です</translation>
+    </message>
+    <message>
+      <source>We recommend choosing another location for it instead of the system partition.</source>
+      <translation>システムパーティション以外の場所を選択することをお勧めします。</translation>
     </message>
   </context>
   <context>
@@ -5953,13 +6004,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>QnWorkbenchAlarmLayoutHandler</name>
-    <message>
-      <source>Alarms</source>
-      <translation>アラーム</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
@@ -6067,8 +6111,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>AVI (オーディオ/ビデオ インターリーブ)</translation>
     </message>
     <message>
-      <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-      <translation>ファイル &apos;%1&apos; を開くことができませんでした。フォルダがアクセス可能か確認してください。</translation>
+      <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
+      <translation>ファイル &quot;%1&quot; を開くことができませんでした。フォルダがアクセス可能か確認してください。</translation>
     </message>
   </context>
   <context>
@@ -6539,12 +6583,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Merge</source>
       <translation>統合</translation>
     </message>
-    <message numerus="yes">
-      <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation>
-        <numerusform>これらのWebページをサーバー &quot;%1&quot; に移動しようとしています。 これらのWebページは要求されたすべてのコンテンツをプロキシし、プロキシサーバーはサーバー &quot;%1&quot; に変更されます。</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
       <translation>すべてのコンテンツをプロキシすると、サーバーネットワーク上のすべてのサービスやデバイスがこのWebページのユーザーに公開されます。</translation>
@@ -6560,10 +6598,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Cancel</source>
       <translation>キャンセル</translation>
-    </message>
-    <message>
-      <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-      <translation>%1 の一部のデバイスは %2 に移動されません。それでもよろしいですか？</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
@@ -6582,28 +6616,26 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>仮想カメラ、USBカメラ、またはWebカメラはサーバー間で移動できません</translation>
     </message>
     <message>
-      <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation>%1 には仮想カメラ、USBカメラ、またはWebカメラが含まれているため、サーバー間で移動できません</translation>
-    </message>
-    <message>
       <source>Virtual cameras cannot be moved between servers</source>
       <translation>仮想カメラはサーバー間で移動できません</translation>
-    </message>
-    <message>
-      <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation>%1 には仮想カメラが含まれているため、サーバー間で移動できません</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
       <translation>USBカメラまたはWebカメラはサーバー間で移動できません</translation>
     </message>
     <message>
-      <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation>%1 はUSBカメラまたはWebカメラが含まれているため、サーバー間で移動できません</translation>
+      <source>Only some of the selected devices can be moved to %1</source>
+      <translation>選択したデバイスの一部のみを %1 に移動できます</translation>
     </message>
     <message>
-      <source>Move Group without them</source>
-      <translation>それらを除いてグループを移動する</translation>
+      <source>Move Partially</source>
+      <translation>部分的に移動</translation>
+    </message>
+    <message numerus="yes">
+      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
+      <translation>
+        <numerusform>これらのWebページをサーバー &quot;%1&quot; に移動しようとしています。 これらのWebページは要求されたすべてのコンテンツをプロキシし、プロキシサーバーはサーバー &quot;%1&quot; に変更されます。</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6632,6 +6664,29 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>none</source>
       <comment>No currently selected camera</comment>
       <translation>なし</translation>
+    </message>
+  </context>
+  <context>
+    <name>SourcePickerWidgetStrings</name>
+    <message>
+      <source>Select at least one Server</source>
+      <translation>1台以上のサーバーを選択してください</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>1人以上のユーザーを選択してください</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation>少なくとも一つのデバイスを選択してください</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation>少なくとも1台のカメラを選択してください</translation>
+    </message>
+    <message>
+      <source>Select at least one I/O module</source>
+      <translation>1台以上のI/Oモジュールを選択してください</translation>
     </message>
   </context>
   <context>
@@ -6886,6 +6941,24 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
+    <message>
+      <source>Backup and Restore</source>
+      <translation>バックアップと復元</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation>ログ管理</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AlarmLayoutHandler</name>
+    <message>
+      <source>Alarms</source>
+      <translation>アラーム</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7028,39 +7101,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
       <translation>選択した設定を適用するには、スケジュール上の領域を選択してください。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BackupQueueSize</name>
-    <message numerus="yes">
-      <source>%n weeks</source>
-      <translation>
-        <numerusform>%n 週</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n days</source>
-      <translation>
-        <numerusform>%n 日</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n hours</source>
-      <translation>
-        <numerusform>%n 時間</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <translation>
-        <numerusform>%n 分</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n seconds</source>
-      <translation>
-        <numerusform>%n 秒</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -7209,6 +7249,15 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>%n カメラのバックアップが有効です</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
+      <translation>これらのカメラからの映像は %1 %2 までバックアップされています</translation>
+    </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation>バックアッププロセスが開始されると進行状況が表示されます</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
@@ -7254,6 +7303,18 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Wiper</source>
       <translation>ワイパー</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>ミュート</translation>
+    </message>
+    <message>
+      <source>Unmute</source>
+      <translation>ミュート解除</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>ドアを開ける</translation>
     </message>
   </context>
   <context>
@@ -7335,11 +7396,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Auto</source>
+      <comment>Let server determine if Media2 should be used to fetch profiles</comment>
       <translation>自動</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation>カメラの内部ストレージに保存された映像はメインアーカイブにアップロードされません。</translation>
+      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
+      <translation>カメラの内部ストレージに保存された映像は、メインアーカイブに自動的にアップロードされます。</translation>
     </message>
   </context>
   <context>
@@ -7452,25 +7514,29 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>交換用カメラ</translation>
     </message>
     <message>
-      <source>%1 will be replaced by selected camera and removed from the system</source>
-      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation>%1 は選択したカメラに置き換えられ、システムから削除されます</translation>
-    </message>
-    <message>
       <source>Data for Transfer</source>
       <translation>転送するデータ</translation>
     </message>
     <message>
-      <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation>カメラからのデータを新しいカメラに転送できるかどうかを確認しています。</translation>
-    </message>
-    <message>
-      <source>Some data and settings may not supported for new Camera</source>
-      <translation>一部のデータと設定は、新しいカメラではサポートされない可能性があります</translation>
-    </message>
-    <message>
       <source>Camera replaced!</source>
       <translation>カメラを交換しました!</translation>
+    </message>
+    <message>
+      <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
+      <translation>古いカメラのデータが新しいカメラに転送できるか確認しています。</translation>
+    </message>
+    <message>
+      <source>Some data and settings may not be compatible with the new camera</source>
+      <translation>一部のデータと設定は、新しいカメラと互換性がない可能性があります</translation>
+    </message>
+    <message>
+      <source>%1 will be removed from the System and replaced by the selected camera</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation>%1 はシステムから削除され、選択したカメラに置き換えられます</translation>
+    </message>
+    <message>
+      <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
+      <translation>サーバーが利用できないため、カメラの交換操作は行えません。</translation>
     </message>
   </context>
   <context>
@@ -7648,8 +7714,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>モーション &amp; オブジェクト + 低解像度</translation>
     </message>
     <message>
-      <source>Integrations</source>
-      <translation>インテグレーション</translation>
+      <source>Plugins</source>
+      <translation>プラグイン</translation>
     </message>
   </context>
   <context>
@@ -7765,10 +7831,6 @@ We recommend you not to open this web page. If you understand the risks, you can
   <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
-      <source>This webpage is requesting access to your account for authorization</source>
-      <translation>このウェブページは認証のためにあなたのアカウントへのアクセスを要求しています</translation>
-    </message>
-    <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
       <translation>次のサイトにトークンを提供するには確認が必要です</translation>
@@ -7776,6 +7838,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Allow</source>
       <translation>許可</translation>
+    </message>
+    <message>
+      <source>This web page is requesting access to your account for authorization</source>
+      <translation>このウェブページは認証のためにあなたのアカウントへのアクセスを要求しています</translation>
     </message>
   </context>
   <context>
@@ -7865,6 +7931,55 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
+    <message>
+      <source>Inaccessible</source>
+      <translation>アクセス不可</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>ロード中...</translation>
+    </message>
+    <message>
+      <source>Click to Show Cameras</source>
+      <translation>クリックしてカメラを表示</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
+    <message>
+      <source>Introducing %1 Layouts</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 レイアウトのご紹介</translation>
+    </message>
+    <message>
+      <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
+      <translation>%1 レイアウトは&lt;b&gt;クロスシステムレイアウト&lt;/b&gt;であり、異なるシステムのデバイスを扱うことができます。現在、通常レイアウトと比べて
+機能が限定されていますが、今後のバージョンで %1 のレイアウトの機能を拡張し続ける予定です</translation>
+    </message>
+    <message>
+      <source>Read more on the %1</source>
+      <translation>%1で詳細を確認</translation>
+    </message>
+    <message>
+      <source>help page</source>
+      <translation>ヘルプページ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
+    <message>
+      <source>%1 (Copy)</source>
+      <comment>Original name will be substituted</comment>
+      <translation>%1 (コピー)</translation>
+    </message>
+    <message>
+      <source>%1 (Copy %2)</source>
+      <comment>Original name will be substituted as %1, counter as %2</comment>
+      <translation>%1 (コピー %2)</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
@@ -7941,8 +8056,8 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>接続</translation>
     </message>
     <message>
-      <source>Internal server error. Please try again later.</source>
-      <translation>内部サーバーエラーです　後で再試行してください。</translation>
+      <source>Internal error. Please try again later.</source>
+      <translation>内部エラーが発生しました。後でもう一度お試しください。</translation>
     </message>
   </context>
   <context>
@@ -8022,6 +8137,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>録画スケジュールには、選択したカメラでサポートされていない録画モードが含まれています。サポートされていない録画モードは &quot;常時録画&quot; に変更されます。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
+    <message>
+      <source>Unknown camera</source>
+      <translation>不明なカメラ</translation>
     </message>
   </context>
   <context>
@@ -8192,6 +8314,13 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Objects</source>
       <comment>Analytics tab title</comment>
       <translation>オブジェクト</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventRibbon::Private</name>
+    <message>
+      <source>INFORMATION REQUIRED</source>
+      <translation>情報が必要です</translation>
     </message>
   </context>
   <context>
@@ -8427,7 +8556,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>名前を空にすることはできません</translation>
     </message>
     <message>
-      <source>Select folder...</source>
+      <source>Select Folder...</source>
       <translation>フォルダー選択...</translation>
     </message>
   </context>
@@ -8551,6 +8680,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntercomManager</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation>%1 レイアウト</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -8663,6 +8799,33 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::LogSettingsDialog</name>
+    <message>
+      <source>Reset to Default</source>
+      <translation>既定値にリセット</translation>
+    </message>
+    <message>
+      <source>Must be greater than or equal to the value set for Split File by Size</source>
+      <translation>「ファイルをサイズで分割」の設定値以上である必要があります</translation>
+    </message>
+    <message>
+      <source>Must be less than or equal to the value set for Limit Max Volume</source>
+      <translation>「最大サイズを制限」の設定値以下である必要があります</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may not be collecting enough information.
+The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
+      <translation>指定されたログレベルでは、十分な情報を収集できない可能性があります。
+ログレベル &quot;%1&quot; はより詳細な情報を提供します。</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may degrade your system&apos;s performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
+      <translation>指定されたログレベルではシステムのパフォーマンスが低下する可能性があります。
+必要なログを収集した後、忘れずにログレベルをデフォルト設定にお戻しください。</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LoginDialog</name>
     <message>
       <source>Connect to Server...</source>
@@ -8671,6 +8834,113 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Version %1</source>
       <translation>バージョン %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementModel</name>
+    <message>
+      <source>Unit</source>
+      <translation>単位</translation>
+    </message>
+    <message>
+      <source>Current Level</source>
+      <translation>現在のレベル</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>クライアント</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>なし</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>エラー</translation>
+    </message>
+    <message>
+      <source>Warning</source>
+      <translation>警告</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>情報</translation>
+    </message>
+    <message>
+      <source>Debug</source>
+      <translation>デバッグ</translation>
+    </message>
+    <message>
+      <source>Verbose</source>
+      <translation>詳細</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWatcher</name>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <translation>
+        <numerusform>... ほか %n 件</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Downloading file...</source>
+      <translation>ファイルをダウンロードしています...</translation>
+    </message>
+    <message>
+      <source>Pending download...</source>
+      <translation>ダウンロードを保留中...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n サーバー</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Logs downloaded</source>
+      <translation>ログをダウンロードしました</translation>
+    </message>
+    <message>
+      <source>Logs downloading failed</source>
+      <translation>ログのダウンロードに失敗しました</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled on the Client</source>
+      <translation>クライアントのデバッグログが有効です</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled, resulting in degraded system performance.</source>
+      <translation>デバッグログが有効になっているため、システムパフォーマンスが低下します。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Debug logging is enabled on %n Servers</source>
+      <translation>
+        <numerusform>%n 台のサーバーでデバッグログが有効です</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Logs downloading canceled</source>
+      <translation>ログのダウンロードがキャンセルされました</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation>設定を適用</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>アカウントのパスワードを入力してください</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>適用</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Select Folder...</source>
+      <translation>フォルダー選択...</translation>
     </message>
   </context>
   <context>
@@ -8711,7 +8981,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>You are about to merge the current System %1 with System</source>
-      <translation>現在のシステム %1 を統合しようとしています</translation>
+      <translation>現在のシステム %1 を次のシステムと統合しようとしています:</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -8719,11 +8989,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>URL is invalid.</source>
-      <translation>URL が無効です</translation>
+      <translation>URL が無効です。</translation>
     </message>
     <message>
       <source>The login cannot be empty.</source>
-      <translation>ログインを空にすることはできません</translation>
+      <translation>ログインは空にできません。</translation>
     </message>
     <message>
       <source>Testing...</source>
@@ -8748,7 +9018,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
-      <translation>%1. よりも具体的なホスト名またはIPアドレスを使用してください</translation>
+      <translation>%1 よりも具体的なホスト名またはIPアドレスを使用してください。</translation>
     </message>
     <message>
       <source>This is the current System URL.</source>
@@ -8760,11 +9030,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>データベースの同期が完了すると、他のシステムのサーバーがリソースツリーに表示されます</translation>
+      <translation>データベースの同期が完了すると、他のシステムのサーバーがリソースツリーに表示されます。</translation>
     </message>
     <message>
       <source>You will be reconnected.</source>
-      <translation>再接続されます.</translation>
+      <translation>再接続されます。</translation>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
@@ -9220,16 +9490,26 @@ You can force it, but it may significantly increase CPU load.</source>
       <source>Acknowledge</source>
       <translation>確認</translation>
     </message>
+    <message>
+      <source>Calling...</source>
+      <translation>発信中...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
-    <message>
-      <source>No new notifications</source>
-      <translation>新しい通知はありません</translation>
+    <message numerus="yes">
+      <source>%n notifications</source>
+      <translation>
+        <numerusform>%n 件の通知</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Notifications Settings</source>
-      <translation>通知設定</translation>
+      <source>Current System</source>
+      <translation>現在のシステム</translation>
+    </message>
+    <message>
+      <source>All Systems</source>
+      <translation>すべてのシステム</translation>
     </message>
   </context>
   <context>
@@ -9258,10 +9538,6 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>レイアウトを選択...</translation>
     </message>
     <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>&quot;表示先&quot; 行でユーザー1名を選択すると、そのユーザーのローカルレイアウトがリストに表示されます</translation>
-    </message>
-    <message>
       <source>Local layouts can only be shown to their owners.</source>
       <translation>ローカルレイアウトはその所有者にのみ表示できます。</translation>
     </message>
@@ -9272,6 +9548,25 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
       <translation>一部のユーザーは選択されたレイアウトにアクセスできません。当該ユーザーに対してアクションは機能しません。</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation>ローカルレイアウトをお探しですか？ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;表示先&quot; リストからユーザーを1名のみ選択してください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
+    <message>
+      <source>Not supported</source>
+      <translation>サポートされていません</translation>
+    </message>
+    <message>
+      <source>This tab will be available in future versions</source>
+      <translation>このタブは将来のバージョンで利用可能になります</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>詳細</translation>
     </message>
   </context>
   <context>
@@ -9520,7 +9815,7 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>すべてのコンテンツをプロキシすると、サーバーが所属するネットワーク内のすべてのサービスやデバイスがこのWebページのユーザーに公開されます。</translation>
     </message>
     <message>
-      <source>The webpage is able to interact with the Desktop Client and request access to the user session</source>
+      <source>The web page can interact with the Desktop Client and request access to the user session</source>
       <translation>Webページはデスクトップクライアントと通信し、ユーザーセッションへのアクセスを要求することができます</translation>
     </message>
   </context>
@@ -9925,11 +10220,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>ユーザーセッション期間を無制限にするとシステム全体のセキュリティが損なわれるほか、システムのパフォーマンスが低下する可能性があります</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>ユーザーセッションの有効期間は %1 以下にすることをお勧めします</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>詳細</translation>
     </message>
@@ -9939,6 +10229,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>
         <numerusform>%1 ユーザー中 %n 名が Digest認証を利用できる (安全ではない) 設定です。</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>推奨のユーザーセッション期間上限は %1 です。</translation>
     </message>
   </context>
   <context>
@@ -9955,32 +10250,12 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>証明書は %1 にピン留めされています</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>この証明書は %1 によって提示されました。</translation>
     </message>
     <message>
-      <source>Server Id: %1</source>
-      <translation>サーバー ID: %1</translation>
-    </message>
-    <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
       <translation>この証明書は、証明書 %1 がピン留めされているものと一致しません。</translation>
-    </message>
-    <message>
-      <source>Custom certificate</source>
-      <translation>カスタム証明書</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>ピン留めされた証明書</translation>
-    </message>
-    <message>
-      <source>Unknown certificate</source>
-      <translation>不明な証明書</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
@@ -9995,18 +10270,34 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>ピン留めする</translation>
     </message>
     <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation>証明書は自動生成され、 %1 にピン留めされました</translation>
+    </message>
+    <message>
+      <source>Server ID: %1</source>
+      <translation>サーバー ID: %1</translation>
+    </message>
+    <message>
       <source>Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
       <translation>誰かがあなたの個人情報を盗むために %1 になりすましている可能性があります。
-%2 サーバーのSSL証明書を変更していない場合は、この証明書を固定しないでください。</translation>
+%2 サーバーのSSL証明書を変更していない場合は、この証明書をピン留めしないでください。</translation>
+    </message>
+    <message>
+      <source>Custom Certificate</source>
+      <translation>カスタム証明書</translation>
+    </message>
+    <message>
+      <source>Auto-generated Certificate</source>
+      <translation>自動生成された証明書</translation>
+    </message>
+    <message>
+      <source>Unknown Certificate</source>
+      <translation>不明な証明書</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-      <source>View certificate</source>
-      <translation>証明書を表示</translation>
-    </message>
     <message>
       <source>Connect Anyway</source>
       <translation>理解した上で接続</translation>
@@ -10014,6 +10305,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>I trust this server</source>
       <translation>このサーバーを信用する</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>続行</translation>
     </message>
   </context>
   <context>
@@ -10242,10 +10537,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>交換されたカメラが見つかりました</translation>
     </message>
     <message>
-      <source>Export in progress...</source>
-      <translation>エクスポート中...</translation>
-    </message>
-    <message>
       <source>Camera %1 has been replaced by %2.</source>
       <translation>カメラ %1 は %2 に交換されました。</translation>
     </message>
@@ -10256,6 +10547,68 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Undo Replace</source>
       <translation>交換を元に戻す</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>エクスポート</translation>
+    </message>
+    <message>
+      <source>On-device recordings were found</source>
+      <translation>デバイス内録画が見つかりました</translation>
+    </message>
+    <message>
+      <source>Import in progress...</source>
+      <translation>インポート中...</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 completed</source>
+      <translation>%1 からのアーカイブのインポートが完了しました</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 failed</source>
+      <translation>%1 からのアーカイブのインポートに失敗しました</translation>
+    </message>
+    <message>
+      <source>Import archive from %1 stopped</source>
+      <translation>%1 からのアーカイブのインポートが停止しました</translation>
+    </message>
+    <message>
+      <source>Import archive from %1</source>
+      <translation>%1 からアーカイブをインポート</translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup storage is not configured on %n Servers</source>
+      <translation>
+        <numerusform>%n サーバーでバックアップストレージが構成されていません</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage for analytics data is not set on %n Servers</source>
+      <translation>
+        <numerusform>%n サーバーで分析データ用ストレージが設定されていません</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>System storage is used for analytics data on %n Servers</source>
+      <translation>
+        <numerusform>%n サーバーで分析データ用にシステムストレージが使用されています</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Not imported archive found on device %1</source>
+      <translation>未インポートのアーカイブがデバイス %1 で見つかりました</translation>
+    </message>
+    <message>
+      <source>Not imported archive found on camera %1</source>
+      <translation>未インポートのアーカイブがカメラ %1 で見つかりました</translation>
+    </message>
+    <message>
+      <source>The archive stream settings have been changed by the user</source>
+      <translation>アーカイブストリームの設定がユーザーによって変更されました</translation>
+    </message>
+    <message>
+      <source>The recording settings have been changed by the user</source>
+      <translation>録画設定がユーザーによって変更されました</translation>
     </message>
   </context>
   <context>
@@ -10313,20 +10666,16 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>説明</translation>
     </message>
     <message>
-      <source>Enter parameters</source>
-      <translation>パラメータを入力</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>このアクションにはパラメータ入力が必要です</translation>
-    </message>
-    <message>
       <source>Open</source>
       <translation>開く</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
       <translation>新規タブで開く</translation>
+    </message>
+    <message>
+      <source>This action is not supported for notifications from other Systems</source>
+      <translation>他システムからの通知に対しては、このアクションはサポートされていません</translation>
     </message>
   </context>
   <context>
@@ -10522,12 +10871,12 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>安全な認証を強制する</translation>
     </message>
     <message>
-      <source>All users</source>
-      <translation>全ユーザー</translation>
+      <source>All Users</source>
+      <translation>全てのユーザー</translation>
     </message>
     <message>
-      <source>With enabled digest authentication</source>
-      <translation>Digest認証有効</translation>
+      <source>Users with Digest Authentication</source>
+      <translation>ダイジェスト認証を使用するユーザー</translation>
     </message>
   </context>
   <context>
@@ -10855,21 +11204,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
-    <message>
-      <source>Intercom Alarm Layout</source>
-      <translation>インターホン アラームレイアウト</translation>
-    </message>
-    <message>
-      <source>Intercom Open Door</source>
-      <translation>インターホン ドア開放</translation>
-    </message>
-    <message>
-      <source>Open door</source>
-      <translation>ドアを開く</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
       <source>Latest</source>
@@ -10955,14 +11289,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
-      <source>Cannot find an item with the specified id</source>
-      <translation>指定されたIDのアイテムが見つかりません。</translation>
-    </message>
-    <message>
-      <source>Cannot find a resource with the specified id.</source>
-      <translation>指定されたIDのリソースが見つかりません。</translation>
-    </message>
-    <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
       <translation>メディアストリームが存在しないリソースのメディアパラメータは指定できません。</translation>
     </message>
@@ -10974,12 +11300,13 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <source>Cannot find a widget corresponding to the specified item.</source>
       <translation>指定されたアイテムに対応するウィジェットが見つかりません。</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::DropdownTextPickerWidget</name>
     <message>
-      <source>Auto</source>
-      <translation>自動</translation>
+      <source>Cannot find an item with the specified ID</source>
+      <translation>指定されたIDのアイテムが見つかりません</translation>
+    </message>
+    <message>
+      <source>Cannot find a resource with the specified ID.</source>
+      <translation>指定されたIDのリソースが見つかりません。</translation>
     </message>
   </context>
   <context>
@@ -11011,14 +11338,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
   <context>
     <name>nx::vms::client::desktop::rules::RulesDialog</name>
     <message>
-      <source>Apply changes before exit?</source>
-      <translation>終了する前に変更を適用しますか？</translation>
-    </message>
-    <message>
-      <source>Apply changes failed.</source>
-      <translation>変更の適用に失敗しました。</translation>
-    </message>
-    <message>
       <source>Restore all rules to default?</source>
       <translation>すべてのルールを既定に戻しますか？</translation>
     </message>
@@ -11027,8 +11346,16 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>この操作は元に戻せません。</translation>
     </message>
     <message>
-      <source>Restore rules failed.</source>
+      <source>Failed to apply changes.</source>
+      <translation>変更を適用できませんでした。</translation>
+    </message>
+    <message>
+      <source>Failed to restore rules.</source>
       <translation>ルールの復元に失敗しました。</translation>
+    </message>
+    <message>
+      <source>Apply changes before exiting?</source>
+      <translation>終了する前に変更を適用しますか?</translation>
     </message>
   </context>
   <context>
@@ -11040,13 +11367,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Action</source>
       <translation>アクション</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
-    <message>
-      <source>Select at least one User</source>
-      <translation>少なくとも1人のユーザーを選択してください</translation>
     </message>
   </context>
   <context>
@@ -11331,10 +11651,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>すべてサポート</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>フォルダー選択...</translation>
-    </message>
-    <message>
       <source>Too short period selected</source>
       <translation>選択された期間が短すぎます</translation>
     </message>
@@ -11344,7 +11660,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Preview Search for %1</source>
-      <translation>検索表示 %1</translation>
+      <translation>%1 プレビュー検索</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
@@ -11403,18 +11719,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
       <translation>利用可能な次のパッチまたはリリースバージョンにアップグレードしてください。</translation>
-    </message>
-    <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation>システムは匿名の使用情報を送信します</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation>ソフトウェア開発チームがユーザーエクスペリエンスを向上させるために使用します。</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation>無効にするには、システム管理ダイアログに移動してください。</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>
@@ -11480,16 +11784,24 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <translation>%1 Beta</translation>
     </message>
     <message>
-      <source>There are no suitable cameras for replacement on the %1</source>
-      <translation>%1の交換に適したカメラはありません</translation>
-    </message>
-    <message>
       <source>Undo replacement completed successfully!</source>
       <translation>交換の差し戻しが正常に完了しました!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
       <translation>互換性の問題により、交換したカメラから一部の設定が転送されない場合があります。</translation>
+    </message>
+    <message>
+      <source>Confirm undo replacement?</source>
+      <translation>置換を元に戻しますか？</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>フォルダー選択...</translation>
+    </message>
+    <message>
+      <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
+      <translation>サーバー &quot;%1&quot; には交換に適したカメラがありません</translation>
     </message>
   </context>
   <context>
@@ -11513,7 +11825,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>Display for</source>
       <comment>Time selector will follow</comment>
-      <translation>表示</translation>
+      <translation>表示期間</translation>
     </message>
     <message>
       <source>Display selected for</source>
@@ -11557,6 +11869,10 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>New Layout %1</source>
       <translation>新規レイアウト%1</translation>
+    </message>
+    <message>
+      <source>Save Layout As Cloud</source>
+      <translation>レイアウトをクラウドとして保存</translation>
     </message>
   </context>
   <context>
@@ -11611,7 +11927,8 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation>更にブックマークを表示するにはタイムラインをズームします</translation>
+      <translation>ほかのブックマークを表示するには
+タイムラインをズームしてください</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
@@ -11670,6 +11987,10 @@ to view more bookmarks</source>
     <message>
       <source>To End</source>
       <translation>終了</translation>
+    </message>
+    <message>
+      <source>Rewind is not available for VMAX</source>
+      <translation>VMAX では巻き戻しはできません</translation>
     </message>
   </context>
   <context>
@@ -11730,7 +12051,7 @@ to view more bookmarks</source>
       <translation>現在のプラットフォームのクライアント更新パッケージがありません。</translation>
     </message>
     <message>
-      <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
+      <source>Cannot check Client update availability. Check your internet connection and try again.</source>
       <translation>クライアントのアップデートが利用可能か確認できません。インターネット接続を確認して、もう一度お試しください。</translation>
     </message>
   </context>

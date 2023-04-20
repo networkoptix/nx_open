@@ -1050,6 +1050,71 @@
     </message>
   </context>
   <context>
+    <name>Result</name>
+    <message>
+      <source>Missing required parameter: %1.</source>
+      <translation type="unfinished">Missing required parameter: %1.</translation>
+    </message>
+    <message>
+      <source>Failed to process request.</source>
+      <translation type="unfinished">Failed to process request.</translation>
+    </message>
+    <message>
+      <source>Forbidden.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Forbidden.</translation>
+    </message>
+    <message>
+      <source>Conflict.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Conflict.</translation>
+    </message>
+    <message>
+      <source>Bad request.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>잘못된 요청입니다.</translation>
+    </message>
+    <message>
+      <source>Not implemented.</source>
+      <comment>Generic HTTP response</comment>
+      <translation type="unfinished">Not implemented.</translation>
+    </message>
+    <message>
+      <source>Not found.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>찾을 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation>내부 오류</translation>
+    </message>
+    <message>
+      <source>Unsupported media type.</source>
+      <translation type="unfinished">Unsupported media type.</translation>
+    </message>
+    <message>
+      <source>Service unavailable.</source>
+      <translation type="unfinished">Service unavailable.</translation>
+    </message>
+    <message>
+      <source>Unauthorized.</source>
+      <translation>허용되지 않음.</translation>
+    </message>
+    <message>
+      <source>Session expired.</source>
+      <translation type="unfinished">Session expired.</translation>
+    </message>
+    <message>
+      <source>Invalid parameter `%1`: %2.</source>
+      <comment>%1 is name, %2 is value.</comment>
+      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+    </message>
+    <message>
+      <source>Session authorization required.</source>
+      <translation type="unfinished">Session authorization required.</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
@@ -1093,10 +1158,6 @@
     <message>
       <source>SMTP timeout (seconds)</source>
       <translation type="unfinished">SMTP timeout (seconds)</translation>
-    </message>
-    <message>
-      <source>SMTP use simple settings view in Client</source>
-      <translation type="unfinished">SMTP use simple settings view in Client</translation>
     </message>
     <message>
       <source>SMTP name</source>
@@ -1296,10 +1357,6 @@
       <translation type="unfinished">Cloud host override</translation>
     </message>
     <message>
-      <source>Enable crossdomain policy</source>
-      <translation type="unfinished">Enable crossdomain policy</translation>
-    </message>
-    <message>
       <source>Enable RTSP for Arecont</source>
       <translation type="unfinished">Enable RTSP for Arecont</translation>
     </message>
@@ -1322,10 +1379,6 @@
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
       <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
-    </message>
-    <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</translation>
     </message>
     <message>
       <source>RTP retry count</source>
@@ -1356,14 +1409,6 @@
       <translation type="unfinished">Enable recording on EDGE</translation>
     </message>
     <message>
-      <source>Enable WebSocket for p2p</source>
-      <translation type="unfinished">Enable WebSocket for p2p</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</translation>
-    </message>
-    <message>
       <source>Target update information</source>
       <translation type="unfinished">Target update information</translation>
     </message>
@@ -1378,10 +1423,6 @@
     <message>
       <source>Client update settings</source>
       <translation type="unfinished">Client update settings</translation>
-    </message>
-    <message>
-      <source>Thread count limit for Camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for Camera archive synchronization</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1428,14 +1469,6 @@
       <translation type="unfinished">URI for resource_data.json automatic update</translation>
     </message>
     <message>
-      <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation>데이터베이스에 보관할 최대 이벤트 로그 레코드. 삭제되지 않은 실제 레코드 양은 지정된 값보다 최대 20 % 더 높을 수 있습니다.</translation>
-    </message>
-    <message>
-      <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
-    </message>
-    <message>
       <source>Meta data storage change policy</source>
       <translation>메타 데이터 스토리지 변경 정책</translation>
     </message>
@@ -1452,24 +1485,8 @@
       <translation type="unfinished">VMS Server version specific features</translation>
     </message>
     <message>
-      <source>Language for mobile push notifications</source>
-      <translation type="unfinished">Language for mobile push notifications</translation>
-    </message>
-    <message>
       <source>Additional local FS storage types for recording</source>
       <translation type="unfinished">Additional local FS storage types for recording</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the Device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4Mb)</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1Kb-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
@@ -1488,10 +1505,6 @@
       <translation type="unfinished">Current storage encryption key</translation>
     </message>
     <message>
-      <source>Show Servers in tree for non-admins</source>
-      <translation type="unfinished">Show Servers in tree for non-admins</translation>
-    </message>
-    <message>
       <source>HTTP header: Origin</source>
       <translation type="unfinished">HTTP header: Origin</translation>
     </message>
@@ -1500,20 +1513,85 @@
       <translation type="unfinished">HTTP header: X-Frame-Options</translation>
     </message>
     <message>
-      <source>Use only HTTPS for Cameras</source>
-      <translation type="unfinished">Use only HTTPS for Cameras</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API</source>
-      <translation type="unfinished">Enable insecure deprecated API</translation>
-    </message>
-    <message>
-      <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation type="unfinished">Enable insecure deprecated API functions curently in use by Nx products</translation>
-    </message>
-    <message>
       <source>Show mouse timeline preview</source>
       <translation type="unfinished">Show mouse timeline preview</translation>
+    </message>
+    <message>
+      <source>Language for Cloud notifications</source>
+      <translation type="unfinished">Language for Cloud notifications</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4MB)</source>
+      <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
+    </message>
+    <message>
+      <source>Enable cross-domain policy</source>
+      <translation type="unfinished">Enable cross-domain policy</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for P2P</source>
+      <translation type="unfinished">Enable WebSocket for P2P</translation>
+    </message>
+    <message>
+      <source>Show Servers in the Resource Tree for non-admins</source>
+      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for cameras</source>
+      <translation type="unfinished">Use only HTTPS for cameras</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (unsecure)</source>
+      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
+    </message>
+    <message>
+      <source>Expose IP addresses for autodiscovery</source>
+      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+    </message>
+    <message>
+      <source>Keep IO port state on when Server connects to the device</source>
+      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
+      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2FA for the System</source>
+      <translation type="unfinished">Enable 2FA for the System</translation>
+    </message>
+    <message>
+      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
+      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
+    </message>
+    <message>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
+      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+    </message>
+    <message>
+      <source>Thread count limit for camera archive synchronization</source>
+      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+    </message>
+    <message>
+      <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
+      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+    </message>
+    <message>
+      <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
+      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+    </message>
+    <message>
+      <source>Update releases.json file URL</source>
+      <translation type="unfinished">Update releases.json file URL</translation>
     </message>
   </context>
   <context>
@@ -1615,10 +1693,6 @@
     <message>
       <source>Show on Alarm Layout</source>
       <translation>알람 레이아웃에 표시</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>HTTP 요청</translation>
     </message>
     <message>
       <source>Device output</source>
@@ -1857,18 +1931,6 @@
       </translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>장치 연결이 예상치 못하게 끊김.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>카메라 메인스트림 연결이 예상치 못하게 끊겼습니다.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>카메라 2nd 스트림이 에상치 못하게 끊겼습니다.</translation>
-    </message>
-    <message>
       <source>RTP packet loss detected.</source>
       <translation>RTP 패킷 손실이 발생함.</translation>
     </message>
@@ -1899,18 +1961,6 @@
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
       <translation>시스템 디스크 &quot;%1&quot; 가 거의 찼습니다.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>라이선스가 모두 사용 중 입니다. 다음 장치에서 녹화가 비활성화 되었습니다.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>라이선스가 모두 사용 중 입니다. 다음 장치에서 녹화가 비활성화 되었습니다.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>라이선스가 모두 사용 중 입니다. 다음 장치에서 녹화가 비활성화 되었습니다.</translation>
     </message>
     <message>
       <source>start</source>
@@ -2010,24 +2060,8 @@
       <translation>레이아웃 열기</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>시간차가 심해 강제로 카메라 시간을 사용하는데 실패하여 시스템 시간이 사용됩니다</translation>
-    </message>
-    <message>
-      <source>Camera time is back to normal</source>
-      <translation>카메라 시간이 정상으로 돌아 왔습니다.</translation>
-    </message>
-    <message>
       <source>Multiple %1 events have occurred</source>
       <translation>여러 개의 %1 이벤트가 발생했습니다.</translation>
-    </message>
-    <message>
-      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation>멀티 캐스트 주소 충돌이 감지되었습니다. %2 가 %3 스트림으로 이미 %1 주소를 사용중 입니다.</translation>
-    </message>
-    <message>
-      <source>Network address %1 is not a multicast address</source>
-      <translation>네트워크 주소 %1 은 멀티 캐스트 주소가 아닙니다.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
@@ -2044,10 +2078,6 @@
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>알 수없는 플러그인 진단 이벤트</translation>
-    </message>
-    <message>
-      <source>RAID error. %1.</source>
-      <translation>RAID 오류. %1.</translation>
     </message>
     <message>
       <source>Buzzer</source>
@@ -2103,14 +2133,6 @@
       <translation>I/O 모듈 연결이 끊어졌었습니다</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1)</source>
-      <translation>기본 스트림의 RTP 오류 (%1)</translation>
-    </message>
-    <message>
-      <source>RTP error in secondary stream (%1)</source>
-      <translation>보조 스트림의 RTP 오류 (%1)</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>분석 개체 감지됨</translation>
     </message>
@@ -2122,14 +2144,6 @@
     <message>
       <source>Plugin: %1</source>
       <translation>플러그인 : %1</translation>
-    </message>
-    <message>
-      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>분석 저장소 &quot;%1&quot; DB 오류: 마운트 포인트(mount point)에 대한 권한이 충분하지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>미디어 아카이브를 기록하는 동안&apos;암호화를 초기화할 수 없습니다. 데이터는 암호화되지 않은 상태로 기록됩니다.</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
@@ -2156,12 +2170,114 @@
       <translation>서버 &quot;%1&quot; 인증서 오류</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>기본 스트림의 RTP 오류 (%1).</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation type="unfinished">Failed to backup file</translation>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>보조 스트림의 RTP 오류 (%1).</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation type="unfinished">Camera time is back to normal.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation type="unfinished">Multicast address conflict detected.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+    </message>
+    <message>
+      <source>Failed to backup file %1</source>
+      <translation type="unfinished">Failed to backup file %1</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation type="unfinished">Show Intercom Informer</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>카메라 메인스트림 연결이 예상치 못하게 끊겼습니다.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>카메라 2nd 스트림이 에상치 못하게 끊겼습니다.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>장치 연결이 예상치 못하게 끊김.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+    </message>
+    <message>
+      <source>Also show source camera</source>
+      <translation>이벤트 발생 카메라 보여주기</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>선택된 카메라</translation>
+    </message>
+    <message>
+      <source>Also show on source camera</source>
+      <translation>이벤트 발생카메라 보이기</translation>
+    </message>
+    <message>
+      <source>Also set on source camera</source>
+      <translation type="unfinished">Also set on source camera</translation>
+    </message>
+    <message>
+      <source>Also trigger on source camera</source>
+      <translation type="unfinished">Also trigger on source camera</translation>
+    </message>
+    <message>
+      <source>Also record source camera</source>
+      <translation type="unfinished">Also record source camera</translation>
+    </message>
+    <message>
+      <source>Also play on source camera</source>
+      <translation type="unfinished">Also play on source camera</translation>
     </message>
   </context>
   <context>

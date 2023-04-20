@@ -178,16 +178,16 @@
     <message>
         <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
         <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Two-factor authentication is required.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You can enable two-factor authentication in your %1.</source>
         <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -202,47 +202,47 @@
     </message>
     <message>
         <source>Connecting to %1 for the first time?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>certificate details</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>help article</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Read this %1 to learn more about certificate validation.</source>
         <comment>%1 is &lt;help article&gt; link</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
         <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>the server&apos;s certificate</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You can view %1 or read this %2 to learn more about the current problem.</source>
         <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
         <comment>%1 is the system name, %2 are possible extra details</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To learn more about the current problem view the server&apos;s certificate:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

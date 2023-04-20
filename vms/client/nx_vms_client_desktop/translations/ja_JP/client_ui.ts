@@ -85,10 +85,6 @@
       <translation>ライブバッファー上限値</translation>
     </message>
     <message>
-      <source>Browse Logs</source>
-      <translation>ログ参照</translation>
-    </message>
-    <message>
       <source>Clear Local Cache</source>
       <translation>ローカルキャッシュのクリア</translation>
     </message>
@@ -115,6 +111,30 @@
     <message>
       <source>Server certificate validation</source>
       <translation>サーバー証明書の検証</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation>ログ管理</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>ダウンロード</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>設定</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>完了</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation>ファイルフォルダーを開く</translation>
     </message>
   </context>
   <context>
@@ -174,7 +194,7 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation>アーカイブを保持...</translation>
+      <translation>アーカイブ保持時間</translation>
     </message>
     <message>
       <source>Max</source>
@@ -219,10 +239,6 @@
       <translation>ログイン／ログアウト</translation>
     </message>
     <message>
-      <source>Event rules</source>
-      <translation>イベントルール</translation>
-    </message>
-    <message>
       <source>Server actions</source>
       <translation>サーバーアクション</translation>
     </message>
@@ -257,6 +273,10 @@
     <message>
       <source>All servers are offline. Audit data is not available.</source>
       <translation>全サーバーがオフラインの為、操作履歴が表示できません</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation>イベントルール</translation>
     </message>
   </context>
   <context>
@@ -318,10 +338,6 @@
     <message>
       <source>Skip Current Queue</source>
       <translation>現在のキューをスキップ</translation>
-    </message>
-    <message>
-      <source>Maximum backup queue size</source>
-      <translation>バックアップキューの最大サイズ</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
@@ -454,6 +470,10 @@
       <source>Use event source server</source>
       <translation>イベントソースサーバーを使用する</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation>イベントソースのカメラを使用</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -509,14 +529,6 @@
   </context>
   <context>
     <name>CameraExpertSettingsWidget</name>
-    <message>
-      <source>Do not archive primary stream</source>
-      <translation>プライマリストリームを録画しない</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>セカンダリストリームを録画しない</translation>
-    </message>
     <message>
       <source>Auto</source>
       <translation>自動</translation>
@@ -638,20 +650,36 @@
       <translation>ONVIF設定</translation>
     </message>
     <message>
-      <source>Secondary stream profile</source>
+      <source>Do not record primary stream</source>
+      <translation>プライマリストリームを録画しない</translation>
+    </message>
+    <message>
+      <source>Do not record secondary stream</source>
+      <translation>セカンダリストリームを録画しない</translation>
+    </message>
+    <message>
+      <source>Secondary Stream Profile</source>
       <translation>セカンダリストリームのプロファイル</translation>
     </message>
     <message>
-      <source>Primary stream profile</source>
+      <source>Primary Stream Profile</source>
       <translation>プライマリストリームのプロファイル</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation>SDカードからエクスポート</translation>
+      <source>Import From Device</source>
+      <translation>デバイスからインポート</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation>ビデオを自動的にエクスポートしない</translation>
+      <source>Import video automatically</source>
+      <translation>映像を自動的にインポート</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>ウェブページ</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Webページポート</translation>
     </message>
   </context>
   <context>
@@ -772,10 +800,6 @@
       <translation>カメラ交換</translation>
     </message>
     <message>
-      <source>New device</source>
-      <translation>新しいデバイス</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>名前</translation>
     </message>
@@ -790,6 +814,10 @@
     <message>
       <source>Next</source>
       <translation>次へ</translation>
+    </message>
+    <message>
+      <source>New Device</source>
+      <translation>新しいデバイス</translation>
     </message>
   </context>
   <context>
@@ -875,6 +903,57 @@
     </message>
   </context>
   <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+      <source>BETA</source>
+      <translation>ベータ</translation>
+    </message>
+    <message>
+      <source>Available Actions</source>
+      <translation>利用可能なアクション</translation>
+    </message>
+    <message>
+      <source>Video Export</source>
+      <translation>映像エクスポート</translation>
+    </message>
+    <message>
+      <source>Live Video and Archive</source>
+      <translation>ライブ映像とアーカイブ</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation>シーケンス表示</translation>
+    </message>
+    <message>
+      <source>Read more on the help page</source>
+      <translation>詳しくはヘルプページをご覧ください</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation>今後このウィンドウを表示しない</translation>
+    </message>
+    <message>
+      <source>Introducing Cloud Layouts</source>
+      <translation>クラウドレイアウトのご紹介</translation>
+    </message>
+    <message>
+      <source>Motion Search</source>
+      <translation>モーション検索</translation>
+    </message>
+    <message>
+      <source>Searching Bookmarks, Objects, Events</source>
+      <translation>ブックマーク、オブジェクト、イベントの検索</translation>
+    </message>
+    <message>
+      <source>In the Future</source>
+      <translation>将来</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -946,6 +1025,22 @@
     <message>
       <source>Restore from Backup...</source>
       <translation>リストア...</translation>
+    </message>
+    <message>
+      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+      <translation>システム管理データのバックアップを作成、または既存のバックアップからシステム管理データを復元します</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
+    </message>
+    <message>
+      <source>&lt;Message&gt;</source>
+      <translation>&lt;Message&gt;</translation>
+    </message>
+    <message>
+      <source>Open Folder</source>
+      <translation>フォルダーを開く</translation>
     </message>
   </context>
   <context>
@@ -1082,10 +1177,6 @@
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
-      <source>HTTP content</source>
-      <translation>HTTPコンテンツ</translation>
-    </message>
-    <message>
       <source>Login to authenticate (optional)</source>
       <translation>ログイン認証</translation>
     </message>
@@ -1102,20 +1193,24 @@
       <translation>パスワード</translation>
     </message>
     <message>
-      <source>Content type</source>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation>HTTP(S) コンテンツ</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
       <translation>コンテンツタイプ</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
-      <source>Authentication type</source>
+      <source>Authentication Type</source>
       <translation>認証タイプ</translation>
     </message>
     <message>
-      <source>Request type</source>
-      <translation>要求のタイプ</translation>
+      <source>Request Method</source>
+      <translation>リクエストメソッド</translation>
     </message>
   </context>
   <context>
@@ -1255,7 +1350,7 @@
       <translation>アクションをテスト</translation>
     </message>
     <message>
-      <source>Add some comment</source>
+      <source>Add a comment</source>
       <translation>コメントを追加</translation>
     </message>
   </context>
@@ -1268,10 +1363,6 @@
     <message>
       <source>Camera</source>
       <translation>カメラ</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>ソースカメラ</translation>
     </message>
   </context>
   <context>
@@ -1340,16 +1431,16 @@
       <source>Mute audio when the mic is active</source>
       <translation>マイクがアクティブなときに音声をミュート</translation>
     </message>
+    <message>
+      <source>Allow the computer to enter sleep mode on idle</source>
+      <translation>アイドル時にコンピューターがスリープモードに入ることを許可する</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
       <translation>システム設定</translation>
-    </message>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>バックアップと復元</translation>
     </message>
   </context>
   <context>
@@ -1447,7 +1538,7 @@
     </message>
     <message>
       <source>Enable tile interface</source>
-      <translation>タイルのインタ フェースを有効にする</translation>
+      <translation>タイル状インターフェイスを有効化</translation>
     </message>
   </context>
   <context>
@@ -1529,10 +1620,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>共有レイアウト</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>&quot;表示先&quot; 行でユーザー1名を選択すると、そのユーザーのローカルレイアウトがリストに表示されます</translation>
     </message>
   </context>
   <context>
@@ -1705,6 +1792,29 @@
     </message>
   </context>
   <context>
+    <name>LogSettingsDialog</name>
+    <message>
+      <source>Enable</source>
+      <translation>有効化</translation>
+    </message>
+    <message>
+      <source>Logging Level</source>
+      <translation>ログレベル</translation>
+    </message>
+    <message>
+      <source>Split File by Size</source>
+      <translation>ファイルをサイズで分割</translation>
+    </message>
+    <message>
+      <source>Split File by Time</source>
+      <translation>ファイルを時間で分割</translation>
+    </message>
+    <message>
+      <source>Limit Max Volume</source>
+      <translation>最大サイズを制限</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
@@ -1725,6 +1835,45 @@
     <message>
       <source>Test</source>
       <translation>テスト</translation>
+    </message>
+  </context>
+  <context>
+    <name>LogsManagementWidget</name>
+    <message>
+      <source>Download</source>
+      <translation>ダウンロード</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>設定</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>初期設定にリセット</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>完了</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation>再試行</translation>
+    </message>
+    <message>
+      <source>Download complete!</source>
+      <translation>ダウンロード完了！</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation>指定されたフォルダーにログを保存できませんでした</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation>ファイルフォルダーを開く</translation>
     </message>
   </context>
   <context>
@@ -1837,7 +1986,7 @@
     </message>
     <message>
       <source>Link copied</source>
-      <translation>リンクのコピー</translation>
+      <translation>リンクをコピーしました</translation>
     </message>
     <message>
       <source>Advanced Update Settings</source>
@@ -1850,6 +1999,18 @@
     <message>
       <source>Advanced settings</source>
       <translation>詳細設定</translation>
+    </message>
+    <message>
+      <source>Get Update File</source>
+      <translation>更新ファイルを取得</translation>
+    </message>
+    <message>
+      <source>Check Again</source>
+      <translation>もう一度確認</translation>
+    </message>
+    <message>
+      <source>Try Again</source>
+      <translation>再試行</translation>
     </message>
   </context>
   <context>
@@ -1938,7 +2099,7 @@
       <translation>サポート署名</translation>
     </message>
     <message>
-      <source>System Singnature</source>
+      <source>System Signature</source>
       <translation>システム識別情報</translation>
     </message>
   </context>
@@ -2478,11 +2639,11 @@
       <translation>ルールを削除</translation>
     </message>
     <message>
-      <source>Select some rule</source>
-      <translation>ルールを選択してください</translation>
+      <source>Select a Rule</source>
+      <translation>ルールを選択</translation>
     </message>
     <message>
-      <source>Reset default rules</source>
+      <source>Reset Default Rules</source>
       <translation>デフォルトのルールにリセット</translation>
     </message>
   </context>
@@ -2729,10 +2890,6 @@
       <source>Force Alarm Layout opening</source>
       <translation>強制的にアラームレイアウトを開く</translation>
     </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>ソースカメラも表示する</translation>
-    </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
@@ -2742,7 +2899,7 @@
     </message>
     <message>
       <source>Display text for:</source>
-      <translation>テキスト表示:</translation>
+      <translation>テキスト表示期間:</translation>
     </message>
     <message>
       <source>Use custom text:</source>
@@ -2751,10 +2908,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>ルールは延長イベントのみ適用</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>ソースカメラも表示する</translation>
     </message>
   </context>
   <context>
@@ -2855,10 +3008,6 @@
       <translation>バックアップの再インデックス</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>分析データは、無効化されたストレージに引き続き保存されます。</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>無効化された保存先への録画は停止しますが、古い映像は引き続き削除されます。</translation>
     </message>
@@ -2867,8 +3016,12 @@
       <translation>USBストレージで録画が有効になりました</translation>
     </message>
     <message>
-      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
       <translation>分析データは大量のスペースを占有する可能性があります。システムパーティションではなく、別の場所を選択することをお勧めします。</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation>分析およびモーションデータは、無効なストレージに引き続き保存されます。</translation>
     </message>
   </context>
   <context>
@@ -2935,8 +3088,8 @@
       <translation>注： 録画スケジュール内の映像品質・フレームレート (FPS) 設定は無視されます。</translation>
     </message>
     <message>
-      <source>Custom language for mobile notifications</source>
-      <translation>モバイル通知のカスタム言語</translation>
+      <source>Custom language for Cloud notifications</source>
+      <translation>クラウド通知のカスタム言語</translation>
     </message>
   </context>
   <context>

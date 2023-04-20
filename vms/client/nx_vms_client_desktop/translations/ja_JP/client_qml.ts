@@ -151,20 +151,20 @@
       <translation>カメラ分析は、カメラが表示されているときにのみ機能します。常に動作させるためには録画を有効にしてください。</translation>
     </message>
     <message>
-      <source>This integration has no settings for this Camera.</source>
-      <translation>このインテグレーションには、このカメラに対する設定がありません。</translation>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation>このプラグインを構成するには、カメラ設定を確認してください。</translation>
     </message>
     <message>
-      <source>Check System Administration Settings to configure this integration.</source>
-      <translation>このインテグレーションを構成するには、システム管理設定を確認してください。</translation>
+      <source>Check System Administration settings to configure this plugin.</source>
+      <translation>このプラグインを構成するには、システム管理設定を確認してください。</translation>
     </message>
     <message>
-      <source>This integration has no settings at System level.</source>
-      <translation>このインテグレーションには、システムレベルでの設定はありません。</translation>
+      <source>This plugin has no settings at the System level.</source>
+      <translation>このプラグインには、システムレベルでの設定はありません。</translation>
     </message>
     <message>
-      <source>Check Camera Settings to configure this integration.</source>
-      <translation>このインテグレーションを構成するには、カメラ設定を確認してください。</translation>
+      <source>This plugin has no settings for this camera.</source>
+      <translation>このプラグインには、このカメラに対する設定はありません。</translation>
     </message>
   </context>
   <context>
@@ -1060,6 +1060,17 @@ PTZを行います</translation>
     </message>
   </context>
   <context>
+    <name>SettingsDialog</name>
+    <message>
+      <source>Enter parameters</source>
+      <translation>パラメータを入力してください</translation>
+    </message>
+    <message>
+      <source>This action requires some parameters to be filled.</source>
+      <translation>このアクションにはパラメータ入力が必要です。</translation>
+    </message>
+  </context>
+  <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
@@ -1177,6 +1188,10 @@ PTZを行います</translation>
       <source>Unsupported firmware version</source>
       <translation>サポートされていないファームウェアバージョンです</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation>アクセスが拒否されました</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
@@ -1285,10 +1300,6 @@ PTZを行います</translation>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation>%1 にアクセスできません。インターネット接続を確認してください。</translation>
-    </message>
-    <message>
       <source>Official Website</source>
       <translation>公式ウェブサイト</translation>
     </message>
@@ -1299,6 +1310,10 @@ PTZを行います</translation>
     <message>
       <source>Support</source>
       <translation>サポート</translation>
+    </message>
+    <message>
+      <source>You do not have access to the %1. Please check your internet connection.</source>
+      <translation>%1 にアクセスできません。インターネット接続を確認してください。</translation>
     </message>
   </context>
 </TS>

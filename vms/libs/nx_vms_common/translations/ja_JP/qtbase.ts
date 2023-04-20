@@ -180,7 +180,7 @@
     </message>
     <message>
       <source>About</source>
-      <translation>について</translation>
+      <translation>概要</translation>
     </message>
     <message>
       <source>Config</source>

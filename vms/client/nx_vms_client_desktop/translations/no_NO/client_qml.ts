@@ -153,20 +153,20 @@
       <translation>Kameraanalyser fungerer bare når kameraet blir vist. Aktiver opptak for å få det til å fungere hele tiden.</translation>
     </message>
     <message>
-      <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation>Sjekk kamerainnstillinger for å konfigurere denne plugin-en.</translation>
     </message>
     <message>
-      <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <source>Check System Administration settings to configure this plugin.</source>
+      <translation>Sjekk systemadministrasjonsinnstillingene for å konfigurere denne plugin-en.</translation>
     </message>
     <message>
-      <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <source>This plugin has no settings at the System level.</source>
+      <translation>Denne plugin-en har ingen innstillinger på systemnivå.</translation>
     </message>
     <message>
-      <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <source>This plugin has no settings for this camera.</source>
+      <translation>Denne plugin-en har ingen innstillinger for dette kameraet.</translation>
     </message>
   </context>
   <context>
@@ -845,36 +845,36 @@
     <message>
       <source>Introducing you
 new PTZ controls</source>
-      <translation type="unfinished">Introducing you
-new PTZ controls</translation>
+      <translation>Vi introduserer deg for
+nye PTZ-kontrollere</translation>
     </message>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation type="unfinished">Here is a quick presentation
-of what has changed</translation>
+      <translation>Her er en rask presentasjon
+av hva som har endret seg</translation>
     </message>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Dra over en hvilken som helst del av videoen
+for å aktivere PTZ</translation>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation type="unfinished">Press arrows keys to move and plus or minus keys to zoom</translation>
+      <translation>Trykk på piltastene for å flytte og pluss- eller minustastene for å zoome</translation>
     </message>
     <message>
       <source>Use the mouse wheel to zoom</source>
-      <translation type="unfinished">Use the mouse wheel to zoom</translation>
+      <translation>Bruk musehjulet for å zoome</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</translation>
+      <translation>Klikk, dobbeltklikk eller dra musepekeren mens du trykker på Shift-tasten for å bruke avansert PTZ</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Gå til lokale innstillinger for å aktivere en dramarkør over midten av videoen</translation>
     </message>
   </context>
   <context>
@@ -1052,7 +1052,7 @@ to activate PTZ</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Tidslinjeidentifikator, som opprettes når tiden endres bakover på en ekstern NVR. Den nye tidslinjen kan overlappe den eksisterende.</translation>
     </message>
     <message>
       <source>Select</source>
@@ -1068,6 +1068,17 @@ to activate PTZ</translation>
     <message>
       <source>Sensitivity</source>
       <translation>Følsomhet</translation>
+    </message>
+  </context>
+  <context>
+    <name>SettingsDialog</name>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Angi parametere</translation>
+    </message>
+    <message>
+      <source>This action requires some parameters to be filled.</source>
+      <translation>Denne handlingen krever at noen parametere fylles ut.</translation>
     </message>
   </context>
   <context>
@@ -1189,6 +1200,10 @@ to activate PTZ</translation>
       <source>Unsupported firmware version</source>
       <translation>Firmware på kamera er ikke støttet</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation>Ingen tilgang</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
@@ -1298,10 +1313,6 @@ to activate PTZ</translation>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation>Du har ikke tilgang til&apos; %1Vennligst sjekk internettforbindelsen din.</translation>
-    </message>
-    <message>
       <source>Official Website</source>
       <translation>Offisiell webside</translation>
     </message>
@@ -1312,6 +1323,10 @@ to activate PTZ</translation>
     <message>
       <source>Support</source>
       <translation>Brukerstøtte</translation>
+    </message>
+    <message>
+      <source>You do not have access to the %1. Please check your internet connection.</source>
+      <translation>Du har ikke tilgang til %1. Vennligst sjekk Internett-tilkoblingen din.</translation>
     </message>
   </context>
 </TS>

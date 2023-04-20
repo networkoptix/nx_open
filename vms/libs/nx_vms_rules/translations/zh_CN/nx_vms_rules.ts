@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>&amp;描述</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,21 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>I/O模块 %1无法连接</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation type="unfinished">
+        <numerusform>Device Disconnected</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
       <translation type="unfinished">Device ID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation type="unfinished">
+        <numerusform>Camera Disconnected</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +195,17 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>摄像机IP冲突: %1</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>设备 IP 冲突</translation>
+      <translation>
+        <numerusform>设备 IP 冲突</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation>
+        <numerusform>摄像机 IP 冲突</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -226,10 +238,6 @@
       <translation>关键字隔开的空间</translation>
     </message>
     <message>
-      <source>Generic</source>
-      <translation>通用</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>状态</translation>
     </message>
@@ -249,24 +257,8 @@
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Do HTTP request</source>
-      <translation>进行HTTP请求</translation>
-    </message>
-    <message>
       <source>Interval of action</source>
       <translation type="unfinished">Interval of action</translation>
-    </message>
-    <message>
-      <source>HTTP Url</source>
-      <translation type="unfinished">HTTP Url</translation>
-    </message>
-    <message>
-      <source>HTTP Content</source>
-      <translation type="unfinished">HTTP Content</translation>
-    </message>
-    <message>
-      <source>Content type</source>
-      <translation>内容类型</translation>
     </message>
     <message>
       <source>Login</source>
@@ -277,8 +269,24 @@
       <translation>密码</translation>
     </message>
     <message>
-      <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation type="unfinished">HTTP(S) Content</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation type="unfinished">Content Type</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
@@ -292,16 +300,16 @@
       <translation>授权问题</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>没有足够的许可。以下设备录像已被禁用︰</translation>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>没有足够的授权。以下摄像机已被禁用录像</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>没有足够的许可。以下I/O模块已被禁用录像︰</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
   </context>
   <context>
@@ -311,16 +319,16 @@
       <translation>%1侦测到移动</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>状态</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>摄像机</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation type="unfinished">Motion on Camera</translation>
     </message>
   </context>
   <context>
@@ -332,6 +340,66 @@
     <message>
       <source>Network Issue</source>
       <translation>网络问题</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>未收到数据(%n秒).</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>检测到RTP包丢失.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>摄像机时间将恢复正常.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>设备不响应网络请求。</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation type="unfinished">Multicast address conflict detected.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>网址 %1 不是组播地址.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>连接摄像机(主码流) 意外关闭.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>连接摄像机(子码流) 意外关闭.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>连接设备被意外关闭.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
     </message>
   </context>
   <context>
@@ -370,10 +438,6 @@
     <message>
       <source>Plugin Diagnostic Event</source>
       <translation>插件诊断事件</translation>
-    </message>
-    <message>
-      <source>%1 - %2</source>
-      <translation>%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -493,6 +557,14 @@
       <source>Server Failure</source>
       <translation>服务器故障</translation>
     </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>无法连接到服务器</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>服务器意外停止。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
@@ -581,6 +653,46 @@
       <source>Storage Issue</source>
       <translation>存储问题</translation>
     </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>I/0错误发生在 %1</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>硬盘写入速度不足以录像至%1.。</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>HDD / SSD磁盘&quot;%1&quot; 已满。磁盘包含太多不受VMS管理的数据。</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>系统磁盘&quot;%1&quot; 几乎已满。</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>储存空间 &quot;%1&quot; 处于离线状态。</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>储存空间 &quot;%1&quot; 容量即将不足。</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -618,6 +730,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>插件: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>容量: (%1)</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>原因: %1</translation>
     </message>
   </context>
   <context>

@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation type="unfinished">Open source libraries</translation>
+      <translation>Açık kaynak kitaplıkları</translation>
     </message>
   </context>
   <context>
@@ -85,10 +85,6 @@
       <translation>Maksimum tampon bellek Büyüklüğü</translation>
     </message>
     <message>
-      <source>Browse Logs</source>
-      <translation>Günlüklere göz at</translation>
-    </message>
-    <message>
       <source>Clear Local Cache</source>
       <translation>Yerel önbelleği temizle</translation>
     </message>
@@ -114,7 +110,31 @@
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation type="unfinished">Server certificate validation</translation>
+      <translation>Sunucu sertifikası doğrulaması</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation>Günlük Yönetimi</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>İndir</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Ayarlar</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>İptal</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>Tamamlandı</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation>Dosya Klasörünü Aç</translation>
     </message>
   </context>
   <context>
@@ -159,11 +179,11 @@
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
+      <translation>Öznitellikler:</translation>
     </message>
     <message>
       <source>Object Type:</source>
-      <translation type="unfinished">Object Type:</translation>
+      <translation>Nesne Türü:</translation>
     </message>
   </context>
   <context>
@@ -174,15 +194,15 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation type="unfinished">Keep Archive For...</translation>
+      <translation>Arşivi Şunun İçin Sakla...</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation type="unfinished">Max</translation>
+      <translation>Maks</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>Min</translation>
     </message>
   </context>
   <context>
@@ -217,10 +237,6 @@
     <message>
       <source>Login/logout</source>
       <translation>Giriş/Çıkış</translation>
-    </message>
-    <message>
-      <source>Event rules</source>
-      <translation>Olay Kuralları</translation>
     </message>
     <message>
       <source>Server actions</source>
@@ -258,24 +274,28 @@
       <source>All servers are offline. Audit data is not available.</source>
       <translation>Tüm sunucular çevrimdışı. Denetim dataları erişilemez.</translation>
     </message>
+    <message>
+      <source>Event Rules</source>
+      <translation>Olay Kuralları</translation>
+    </message>
   </context>
   <context>
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation type="unfinished">No Limit</translation>
+      <translation>Limit yok</translation>
     </message>
     <message>
       <source>Fixed</source>
-      <translation type="unfinished">Fixed</translation>
+      <translation>Sabit</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>Zamanlanmış</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation type="unfinished">Fix bandwidth to</translation>
+      <translation>Bant genişliğini sabitle</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -283,33 +303,33 @@
     </message>
     <message>
       <source>Unlimited</source>
-      <translation type="unfinished">Unlimited</translation>
+      <translation>Sınırsız</translation>
     </message>
     <message>
       <source>Limited to</source>
-      <translation type="unfinished">Limited to</translation>
+      <translation>Sınırlı</translation>
     </message>
     <message>
       <source>No backup</source>
-      <translation type="unfinished">No backup</translation>
+      <translation>Yedek yok</translation>
     </message>
   </context>
   <context>
     <name>BackupSettingsWidget</name>
     <message>
       <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
+      <translation>Sunucu çevrimdışı. Yedekleme ayarları mevcut değil.</translation>
     </message>
   </context>
   <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
-      <translation type="unfinished">Backup is not configured yet.</translation>
+      <translation>Yedekleme henüz yapılandırılmadı.</translation>
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
-      <translation type="unfinished">To start backup enable it for some cameras and apply settings.</translation>
+      <translation>Yedeklemeyi başlatmak için bazı kameralar için etkinleştirin ve ayarları uygulayın.</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -317,19 +337,15 @@
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation type="unfinished">Skip Current Queue</translation>
-    </message>
-    <message>
-      <source>Maximum backup queue size</source>
-      <translation type="unfinished">Maximum backup queue size</translation>
+      <translation>Geçerli Kuyruğu Atla</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>Tüm dosyalar başarıyla yedeklendi! Yeni dosyalar otomatik olarak yedeklenecek</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>Depolama sorunu nedeniyle yedekleme durduruldu. Depolama sorunu çözüldükten sonra yedekleme otomatik olarak devam edecek</translation>
     </message>
   </context>
   <context>
@@ -454,6 +470,10 @@
       <source>Use event source server</source>
       <translation>Olay kaynağı sunucusunu kullan</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation>Olay kaynağı kamerasını kullan</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -509,14 +529,6 @@
   </context>
   <context>
     <name>CameraExpertSettingsWidget</name>
-    <message>
-      <source>Do not archive primary stream</source>
-      <translation>Birincil Akışı Arşivleme</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>İkincil Akışı Arşivleme</translation>
-    </message>
     <message>
       <source>Auto</source>
       <translation>Otomatik</translation>
@@ -591,67 +603,83 @@
     </message>
     <message>
       <source>Stream Settings</source>
-      <translation type="unfinished">Stream Settings</translation>
+      <translation>Akış Ayarları</translation>
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Profilleri getirmek için Media2'yi kullanın</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation type="unfinished">Use different values for pan and tilt</translation>
+      <translation>Pan ve tilt için farklı değerler kullanın</translation>
     </message>
     <message>
       <source>Tilt</source>
-      <translation type="unfinished">Tilt</translation>
+      <translation>Eğim</translation>
     </message>
     <message>
       <source>Media Port</source>
-      <translation type="unfinished">Media Port</translation>
+      <translation>Medya Bağlantı Noktası</translation>
     </message>
     <message>
       <source>Use system presets</source>
-      <translation type="unfinished">Use system presets</translation>
+      <translation>Sistem ön ayarlarını kullan</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
-      <translation type="unfinished">PTZ Speed</translation>
+      <translation>PTZ Hızı</translation>
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>RTP Transport'u</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation type="unfinished">Use camera native presets</translation>
+      <translation>Kamera yerel ön ayarlarını kullan</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Zaman Ayarları</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Kamera zaman ayarlarını koru</translation>
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>ONVIF Ayarları</translation>
     </message>
     <message>
-      <source>Secondary stream profile</source>
-      <translation type="unfinished">Secondary stream profile</translation>
+      <source>Do not record primary stream</source>
+      <translation>Birincil akışı kaydetme</translation>
     </message>
     <message>
-      <source>Primary stream profile</source>
-      <translation type="unfinished">Primary stream profile</translation>
+      <source>Do not record secondary stream</source>
+      <translation>İkincil akışı kaydetme</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
+      <source>Secondary Stream Profile</source>
+      <translation>İkincil Akış Profili</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <source>Primary Stream Profile</source>
+      <translation>Birincil Akış Profili</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation>Cihazdan İçe Aktar</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Videoyu otomatik olarak içe aktar</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Web Sayfası</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Web Sayfası Bağlantı Noktası</translation>
     </message>
   </context>
   <context>
@@ -751,7 +779,7 @@
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation type="unfinished">in</translation>
+      <translation>içinde</translation>
     </message>
   </context>
   <context>
@@ -769,11 +797,7 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
-    </message>
-    <message>
-      <source>New device</source>
-      <translation type="unfinished">New device</translation>
+      <translation>Kamera Değişimi</translation>
     </message>
     <message>
       <source>Name</source>
@@ -789,7 +813,11 @@
     </message>
     <message>
       <source>Next</source>
-      <translation>İleri</translation>
+      <translation>Sonraki</translation>
+    </message>
+    <message>
+      <source>New Device</source>
+      <translation>Yeni Cihaz</translation>
     </message>
   </context>
   <context>
@@ -812,7 +840,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
+      <translation>Hareket &amp;&amp; Nesne Kaydı</translation>
     </message>
   </context>
   <context>
@@ -850,7 +878,7 @@
     </message>
     <message>
       <source>Enable 2-way audio</source>
-      <translation type="unfinished">Enable 2-way audio</translation>
+      <translation>2 yönlü sesi etkinleştir</translation>
     </message>
   </context>
   <context>
@@ -864,7 +892,7 @@
     <name>CertificateSelectionDialog</name>
     <message>
       <source>Web site requires a certificate</source>
-      <translation type="unfinished">Web site requires a certificate</translation>
+      <translation>Web sitesi bir sertifika gerektirir</translation>
     </message>
   </context>
   <context>
@@ -872,6 +900,57 @@
     <message>
       <source>Change password</source>
       <translation>Şifre değiştir</translation>
+    </message>
+  </context>
+  <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+      <source>BETA</source>
+      <translation>BETA</translation>
+    </message>
+    <message>
+      <source>Available Actions</source>
+      <translation>Yapılabilecek işlemler</translation>
+    </message>
+    <message>
+      <source>Video Export</source>
+      <translation>Video Dışa Aktarma</translation>
+    </message>
+    <message>
+      <source>Live Video and Archive</source>
+      <translation>Canlı Video ve Arşiv</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation>Kamera Tur</translation>
+    </message>
+    <message>
+      <source>Read more on the help page</source>
+      <translation>Yardım sayfasında daha fazlasını okuyun</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation>Bu pencereyi tekrar gösterme</translation>
+    </message>
+    <message>
+      <source>Introducing Cloud Layouts</source>
+      <translation>Cloud Layouts'a Giriş</translation>
+    </message>
+    <message>
+      <source>Motion Search</source>
+      <translation>Hareket Arama</translation>
+    </message>
+    <message>
+      <source>Searching Bookmarks, Objects, Events</source>
+      <translation>Yer İmlerini, Nesneleri, Olayları Arama</translation>
+    </message>
+    <message>
+      <source>In the Future</source>
+      <translation>Gelecekte</translation>
     </message>
   </context>
   <context>
@@ -900,11 +979,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>Bu eylem yalnızca anlık olaylar için ayarlanabilir</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>Başka bir etkinlik veya eylem seçin</translation>
     </message>
   </context>
   <context>
@@ -946,6 +1025,22 @@
     <message>
       <source>Restore from Backup...</source>
       <translation>Yedekten Geri Yükle...</translation>
+    </message>
+    <message>
+      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+      <translation>Sistem yönetimi verilerinin yedeğini oluşturun veya Sistem yönetimi verilerini yedekten geri yükleyin</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>İptal</translation>
+    </message>
+    <message>
+      <source>&lt;Message&gt;</source>
+      <translation>&lt;Mesaj&gt;</translation>
+    </message>
+    <message>
+      <source>Open Folder</source>
+      <translation>Klasör aç</translation>
     </message>
   </context>
   <context>
@@ -1019,11 +1114,11 @@
     <name>EncryptedArchivePasswordDialog</name>
     <message>
       <source>Encrypted archive</source>
-      <translation type="unfinished">Encrypted archive</translation>
+      <translation>Şifreli arşiv</translation>
     </message>
     <message>
       <source>Enter your encryption password to view the archive</source>
-      <translation type="unfinished">Enter your encryption password to view the archive</translation>
+      <translation>Arşivi görüntülemek için şifreleme parolanızı girin</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1076,15 +1171,11 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>Genel olay</translation>
     </message>
   </context>
   <context>
     <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>HTTP content</source>
-      <translation>HTTP içeriği</translation>
-    </message>
     <message>
       <source>Login to authenticate (optional)</source>
       <translation>Kimlik doğrulaması (isteğe Bağlı)</translation>
@@ -1102,20 +1193,24 @@
       <translation>Parola</translation>
     </message>
     <message>
-      <source>Content type</source>
-      <translation>İçerik Tipi</translation>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S) Bağlantısı</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
+      <source>HTTP(S) Content</source>
+      <translation>HTTP(S) İçeriği</translation>
     </message>
     <message>
-      <source>Authentication type</source>
-      <translation>Kimlik doğrulama türü</translation>
+      <source>Content Type</source>
+      <translation>İçerik Türü</translation>
     </message>
     <message>
-      <source>Request type</source>
-      <translation>Talep Türü</translation>
+      <source>Authentication Type</source>
+      <translation>Kimlik Doğrulama Türü</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation>İstek Yöntemi</translation>
     </message>
   </context>
   <context>
@@ -1203,7 +1298,7 @@
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation type="unfinished">Set priority:</translation>
+      <translation>Önceliği belirle:</translation>
     </message>
     <message>
       <source>Low</source>
@@ -1219,11 +1314,11 @@
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation type="unfinished">Select some devices to setup failover priority</translation>
+      <translation>Yük devretme önceliğini ayarlamak için bazı cihazlar seçin</translation>
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Yük Devretme Yok</translation>
     </message>
   </context>
   <context>
@@ -1244,19 +1339,19 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>Yorum Ekle</translation>
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>Takvimi Ayarla</translation>
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>Test Eylemi</translation>
     </message>
     <message>
-      <source>Add some comment</source>
-      <translation type="unfinished">Add some comment</translation>
+      <source>Add a comment</source>
+      <translation>Yorum ekle</translation>
     </message>
   </context>
   <context>
@@ -1268,10 +1363,6 @@
     <message>
       <source>Camera</source>
       <translation>Kamera</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Kaynak Kamera</translation>
     </message>
   </context>
   <context>
@@ -1322,15 +1413,15 @@
     </message>
     <message>
       <source>Startup</source>
-      <translation type="unfinished">Startup</translation>
+      <translation>Başlangıç</translation>
     </message>
     <message>
       <source>Connect to the previous system on startup</source>
-      <translation type="unfinished">Connect to the previous system on startup</translation>
+      <translation>Başlangıçta önceki sisteme bağlan</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation type="unfinished">Automatically restore saved windows configuration</translation>
+      <translation>Kaydedilen pencere yapılandırmasını otomatik olarak geri yükle</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
@@ -1338,7 +1429,11 @@
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation type="unfinished">Mute audio when the mic is active</translation>
+      <translation>Mikrofon etkinken sesi kapatın</translation>
+    </message>
+    <message>
+      <source>Allow the computer to enter sleep mode on idle</source>
+      <translation>Bilgisayarın boştayken uyku moduna girmesine izin ver</translation>
     </message>
   </context>
   <context>
@@ -1346,10 +1441,6 @@
     <message>
       <source>System Settings</source>
       <translation>Sistem Ayarları</translation>
-    </message>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>Yedekleme ve Geri Yükleme</translation>
     </message>
   </context>
   <context>
@@ -1530,10 +1621,6 @@
       <source>Shared layouts</source>
       <translation>Paylaşılan ekran düzenleri</translation>
     </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>&quot;göstermek onun yerel düzenleri bu listede görüntülemek için&quot; satır için tek bir kullanıcı seçin</translation>
-    </message>
   </context>
   <context>
     <name>LdapSettingsDialog</name>
@@ -1598,7 +1685,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
+      <translation>İçe aktarılan kullanıcı için özet kimlik doğrulamasına izin ver</translation>
     </message>
   </context>
   <context>
@@ -1705,6 +1792,29 @@
     </message>
   </context>
   <context>
+    <name>LogSettingsDialog</name>
+    <message>
+      <source>Enable</source>
+      <translation>Etkinleştir</translation>
+    </message>
+    <message>
+      <source>Logging Level</source>
+      <translation>Günlük Kaydı Düzeyi</translation>
+    </message>
+    <message>
+      <source>Split File by Size</source>
+      <translation>Dosyayı Boyuta Göre Böl</translation>
+    </message>
+    <message>
+      <source>Split File by Time</source>
+      <translation>Zamana Göre Böl</translation>
+    </message>
+    <message>
+      <source>Limit Max Volume</source>
+      <translation>Maksimum Sesi Sınırla</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
@@ -1725,6 +1835,45 @@
     <message>
       <source>Test</source>
       <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>LogsManagementWidget</name>
+    <message>
+      <source>Download</source>
+      <translation>İndir</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Ayarlar</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>Varsayılan Ayarlara Geri Dön</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>İptal</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>Tamamlandı</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation>Yeniden dene</translation>
+    </message>
+    <message>
+      <source>Download complete!</source>
+      <translation>İndirme tamamlandı!</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation>Günlükler seçilen klasöre kaydedilemedi</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation>Dosya Klasörünü Aç</translation>
     </message>
   </context>
   <context>
@@ -1849,7 +1998,19 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>Gelişmiş ayarlar</translation>
+    </message>
+    <message>
+      <source>Get Update File</source>
+      <translation>Güncelleme Dosyasını Alın</translation>
+    </message>
+    <message>
+      <source>Check Again</source>
+      <translation>Tekrar Kontrol Et</translation>
+    </message>
+    <message>
+      <source>Try Again</source>
+      <translation>Tekrar Deneyin</translation>
     </message>
   </context>
   <context>
@@ -1907,7 +2068,7 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>Bağlantı Ayarları</translation>
     </message>
     <message>
       <source>Email</source>
@@ -1923,23 +2084,23 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Sunucu adresi</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>Güvenlik Protokolü</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>E-posta Ayarları</translation>
     </message>
     <message>
       <source>Support Signature</source>
       <translation>Destek imzası</translation>
     </message>
     <message>
-      <source>System Singnature</source>
-      <translation type="unfinished">System Singnature</translation>
+      <source>System Signature</source>
+      <translation>Sistem imzası</translation>
     </message>
   </context>
   <context>
@@ -2056,7 +2217,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation>Standart</translation>
+      <translation>Önayar</translation>
     </message>
   </context>
   <context>
@@ -2201,7 +2362,7 @@
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Güvenli Kimlik Doğrulamayı Zorla</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -2452,11 +2613,11 @@
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation type="unfinished">Playback time :</translation>
+      <translation>Oynatma süresi:</translation>
     </message>
     <message>
       <source>rewind for</source>
-      <translation type="unfinished">rewind for</translation>
+      <translation>için geri sar</translation>
     </message>
     <message>
       <source>Live</source>
@@ -2467,23 +2628,23 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>Alarm/Olay Kuralları</translation>
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>Yeni kural</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <translation>Kuralı Sil</translation>
     </message>
     <message>
-      <source>Select some rule</source>
-      <translation type="unfinished">Select some rule</translation>
+      <source>Select a Rule</source>
+      <translation>Bir Kural Seçin</translation>
     </message>
     <message>
-      <source>Reset default rules</source>
-      <translation type="unfinished">Reset default rules</translation>
+      <source>Reset Default Rules</source>
+      <translation>Varsayılan Kuralları Sıfırla</translation>
     </message>
   </context>
   <context>
@@ -2553,7 +2714,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
+      <translation>Hareket &amp;&amp; Nesneler</translation>
     </message>
   </context>
   <context>
@@ -2580,27 +2741,27 @@
     </message>
     <message>
       <source>Data protection</source>
-      <translation type="unfinished">Data protection</translation>
+      <translation>Veri koruması</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Kameralara bağlanmak için yalnızca HTTPS kullanın</translation>
     </message>
     <message>
       <source>User Activity</source>
-      <translation type="unfinished">User Activity</translation>
+      <translation>Kullanıcı Aktivitesi</translation>
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
+      <translation>Yönetici olmayan kullanıcılar için sunucuları ağaçta görüntüle</translation>
     </message>
     <message>
       <source>Archive encryption</source>
-      <translation type="unfinished">Archive encryption</translation>
+      <translation>Arşiv şifreleme</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Arşiv şifreleme CPU kullanımını artırır</translation>
     </message>
     <message>
       <source>Change Password...</source>
@@ -2612,19 +2773,19 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>HTTPS'yi desteklemeyen kameralarla bağlantı kesilecek.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Sunucuları yalnızca şifrelenmiş bağlantıları kabul etmeye zorla</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Video trafiğini masaüstü ve mobil istemciler için şifreleyin</translation>
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Kullanıcıları Yönet</translation>
     </message>
   </context>
   <context>
@@ -2642,7 +2803,7 @@
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
-      <translation type="unfinished">Server certificate</translation>
+      <translation>Sunucu sertifikası</translation>
     </message>
     <message>
       <source>General</source>
@@ -2650,11 +2811,11 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>Sertifikayı veren</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation type="unfinished">Self-signed root certificate</translation>
+      <translation>Kendinden imzalı kök sertifika</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -2662,11 +2823,11 @@
     </message>
     <message>
       <source>Certificate is expired</source>
-      <translation type="unfinished">Certificate is expired</translation>
+      <translation>Sertifikanın süresi doldu</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>Parmak izleri</translation>
     </message>
     <message>
       <source>Details</source>
@@ -2674,11 +2835,11 @@
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
+      <translation>Bu sertifikaya sabitle</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
+      <translation>Sabitlenmiş sertifikayı görüntüle</translation>
     </message>
   </context>
   <context>
@@ -2716,7 +2877,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Yerleşik ve USB web kameralarını otomatik olarak algıla</translation>
     </message>
   </context>
   <context>
@@ -2728,10 +2889,6 @@
     <message>
       <source>Force Alarm Layout opening</source>
       <translation>Alarm Ekranını Açmaya Zorla</translation>
-    </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>Ayrıca Kaynak Kamerayı Göster</translation>
     </message>
   </context>
   <context>
@@ -2751,10 +2908,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>Kural Sadece Devam Eden Olaylarda Çalışacaktır</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>Kaynak Kamerada Göster</translation>
     </message>
   </context>
   <context>
@@ -2795,11 +2948,11 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Ses</translation>
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Yönet</translation>
     </message>
   </context>
   <context>
@@ -2855,10 +3008,6 @@
       <translation>Yedeklemeyi tekrar indexle</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>Analytics verileri, engelli deposunda depolanmaya devam edecek.</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>Kayıt depolama durduralacaktır. Hedef dışı kayıtlar silinmeye devam edecektir.</translation>
     </message>
@@ -2867,8 +3016,12 @@
       <translation>USB depolamada kayıt etkinleştirildi</translation>
     </message>
     <message>
-      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation>Analytics verileri, onlarca gigabaytlık depolama alanını kaplayabilir. Sistem bölümü yerine başka bir yer seçmenizi öneririz.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation>Analitik verileri büyük miktarda yer kaplayabilir. Bunun için sistem bölümü yerine başka bir konum seçmenizi öneririz.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation>Analitik ve hareket verileri, devre dışı bırakılan depolama alanında saklanmaya devam edecektir.</translation>
     </message>
   </context>
   <context>
@@ -2935,8 +3088,8 @@
       <translation>Uyarı! Bu Kayıt Takvimindeki Kaliteyi ve FPS Ayarlarını Etkileyebilir.</translation>
     </message>
     <message>
-      <source>Custom language for mobile notifications</source>
-      <translation>Mobil bildirimler için özel dil</translation>
+      <source>Custom language for Cloud notifications</source>
+      <translation>Bulut bildirimleri için özel dil</translation>
     </message>
   </context>
   <context>
@@ -3004,11 +3157,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ Grup Ekle</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Grup bulunamadı</translation>
     </message>
   </context>
   <context>
@@ -3019,11 +3172,11 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ Kullanıcı Ekle</translation>
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>Kullanıcı bulunamadı</translation>
     </message>
   </context>
   <context>
@@ -3071,11 +3224,11 @@
     <name>UserSettingsDialog</name>
     <message>
       <source>This user can use digest authentication.</source>
-      <translation type="unfinished">This user can use digest authentication.</translation>
+      <translation>Bu kullanıcı özet kimlik doğrulamasını kullanabilir.</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Güvenli Kimlik Doğrulamayı Zorla</translation>
     </message>
   </context>
   <context>
@@ -3172,7 +3325,7 @@
     </message>
     <message>
       <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
+      <translation>Bu web sayfasını sunucu aracılığıyla proxy'le</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3184,15 +3337,15 @@
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation type="unfinished">Allow using Client API</translation>
+      <translation>İstemci API kullanılmasına izin ver</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation type="unfinished">Proxy all requested contents</translation>
+      <translation>İstenen tüm içerikleri proxy'le</translation>
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>SSL sertifikası kontrolü olmadan web sayfasının açılmasına izin ver</translation>
     </message>
   </context>
   <context>

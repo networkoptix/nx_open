@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>&amp;Leírás</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,23 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>%1 I/O modul szétkapcsolt</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation type="unfinished">
+        <numerusform>Device Disconnected</numerusform>
+        <numerusform>Device Disconnected</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
       <translation type="unfinished">Device ID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation type="unfinished">
+        <numerusform>Camera Disconnected</numerusform>
+        <numerusform>Camera Disconnected</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +197,19 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Kamera IP ütközés %1 szerveren</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>Eszköz IP ütközés</translation>
+      <translation>
+        <numerusform>Eszköz IP ütközés</numerusform>
+        <numerusform>Eszköz IP ütközés</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation>
+        <numerusform>Kamera IP ütközés</numerusform>
+        <numerusform>Kamera IP ütközés</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -226,10 +242,6 @@
       <translation>Címszavak szóközzel elválasztva</translation>
     </message>
     <message>
-      <source>Generic</source>
-      <translation>Általános</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Állapot</translation>
     </message>
@@ -249,24 +261,8 @@
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Do HTTP request</source>
-      <translation>HTTP kérés</translation>
-    </message>
-    <message>
       <source>Interval of action</source>
       <translation type="unfinished">Interval of action</translation>
-    </message>
-    <message>
-      <source>HTTP Url</source>
-      <translation type="unfinished">HTTP Url</translation>
-    </message>
-    <message>
-      <source>HTTP Content</source>
-      <translation type="unfinished">HTTP Content</translation>
-    </message>
-    <message>
-      <source>Content type</source>
-      <translation>Tartalom típusa</translation>
     </message>
     <message>
       <source>Login</source>
@@ -277,8 +273,24 @@
       <translation>Jelszó</translation>
     </message>
     <message>
-      <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation type="unfinished">HTTP(S) Content</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation type="unfinished">Content Type</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
@@ -292,16 +304,16 @@
       <translation>Licence probléma</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Nincs elég licenc. A felvétel a következő eszközökre le van állítva:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Nincs elég licenc. A felvétel a következő kamerákon le van állítva:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Nincs elég licenc. A felvétel a következő I/O modulokon le van állítva:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
   </context>
   <context>
@@ -311,16 +323,16 @@
       <translation>Mozgás: %1</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Állapot</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation type="unfinished">Motion on Camera</translation>
     </message>
   </context>
   <context>
@@ -332,6 +344,67 @@
     <message>
       <source>Network Issue</source>
       <translation>Hálózati probléma</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
+        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>RTP hiba az elsődleges adatfolyamban (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>RTP hiba a másodlagos adatfolyamban (%1).</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTP csomag vesztés észlelve.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>A kameraidő visszaállt alaphelyzetbe.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>A berendezés nem válaszol a hálózati kérésre.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation type="unfinished">Multicast address conflict detected.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>A %1 hálózati cím nem multicast-cím.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>A kapcsolat a kamerával (elsődleges adatfolyam) váratlanul bezárult.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>A kapcsolat a kamerával (másodlagos adatfolyam) váratlanul bezárult.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>A kapcsolat az eszközzel váratlanul bezárult.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
     </message>
   </context>
   <context>
@@ -370,10 +443,6 @@
     <message>
       <source>Plugin Diagnostic Event</source>
       <translation>Plugin diagnosztikai esemény</translation>
-    </message>
-    <message>
-      <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -493,6 +562,14 @@
       <source>Server Failure</source>
       <translation>Szerver hiba</translation>
     </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>A kapcsolat a szerverrrel megszakadt.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>A szerver váratlanul leállt.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
@@ -581,6 +658,46 @@
       <source>Storage Issue</source>
       <translation>Tároló hiba</translation>
     </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>I/O hiba történt: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>Nincs elegendő HDD/SDD sebesség a rögzítéshez: %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>&quot;%1&quot; HDD/SDD lemez megtelt. A lemez túl sok adatot tartalmaz amit a VMS nem menedzsel.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>&quot;%1&quot; rendszerlemez majdnem megtelt.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Az Analytics tárhely &quot;%1&quot; offline állapotban van.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Az Analytics &quot;%1&quot; tárhelye majdnem tele van.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -618,6 +735,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation type="unfinished">Plugin: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Felirat: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Ok: %1</translation>
     </message>
   </context>
   <context>

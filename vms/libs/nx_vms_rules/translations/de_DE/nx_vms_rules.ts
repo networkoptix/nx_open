@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>&amp;Beschreibung</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation>Attribute</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,23 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>I/O-Modul %1 wurde getrennt</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation>Gerät getrennt</translation>
+      <translation>
+        <numerusform>Gerät getrennt</numerusform>
+        <numerusform>Geräte getrennt</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
       <translation>Geräte-ID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation>
+        <numerusform>Kamera getrennt</numerusform>
+        <numerusform>Kameras getrennt</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +197,19 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Kamera-IP-Konflikt auf %1</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>Geräte-IP-Konflikt</translation>
+      <translation>
+        <numerusform>Geräte-IP-Konflikt</numerusform>
+        <numerusform>Geräte-IP-Konflikte</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation>
+        <numerusform>Kamera-IP-Konflikt</numerusform>
+        <numerusform>Kamera-IP-Konflikte</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -226,10 +242,6 @@
       <translation>Passwörter, die durch Leerzeichen getrennt sind</translation>
     </message>
     <message>
-      <source>Generic</source>
-      <translation>Allgemein</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Zustand</translation>
     </message>
@@ -249,24 +261,8 @@
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Do HTTP request</source>
-      <translation>HTTP-Anfrage starten</translation>
-    </message>
-    <message>
       <source>Interval of action</source>
       <translation>Aktionsintervall</translation>
-    </message>
-    <message>
-      <source>HTTP Url</source>
-      <translation>HTTP-URL</translation>
-    </message>
-    <message>
-      <source>HTTP Content</source>
-      <translation>HTTP-Inhalt</translation>
-    </message>
-    <message>
-      <source>Content type</source>
-      <translation>Inhaltstyp</translation>
     </message>
     <message>
       <source>Login</source>
@@ -277,8 +273,24 @@
       <translation>Passwort</translation>
     </message>
     <message>
-      <source>Request method</source>
-      <translation>Methode anfordern</translation>
+      <source>Do HTTP(S) request</source>
+      <translation>HTTP(S)-Anfrage durchführen</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S)-URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation type="unfinished">HTTP(S) Content</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation type="unfinished">Content Type</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
@@ -292,16 +304,16 @@
       <translation>Lizenzproblem</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Nicht genügend Lizenzen. Aufnahme wurde auf folgenden Geräten deaktiviert:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Nicht genügend Lizenzen. Aufnahme wurde auf folgenden Kameras deaktiviert:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Nicht genügend Lizenzen. Aufnahme wurde auf folgenden I/O-Modulen deaktiviert:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
   </context>
   <context>
@@ -311,16 +323,16 @@
       <translation>Bewegung auf %1</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation>Bewegungsereignis</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Zustand</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation>Bewegung auf Kamera</translation>
     </message>
   </context>
   <context>
@@ -332,6 +344,67 @@
     <message>
       <source>Network Issue</source>
       <translation>Netzwerkproblem</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>Kein Datenempfang während der letzten Sekunde.</numerusform>
+        <numerusform>Kein Datenempfang während der letzten %n Sekunden.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>RTP-Fehler im primären Stream (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>RTP-Fehler im sekundären Stream (%1).</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTP-Paketverlust identifiziert.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>Die Kamerazeit ist wieder normal.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>Gerät reagiert nicht auf Netzwerkanfragen.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Die Adresse %1 wird bereits von %2 im primären Stream verwendet.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Die Adresse %1 wird bereits von %2 im sekundären Stream verwendet.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Multicast-Adresskonflikt entdeckt.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>Die Netzwerkadresse %1 ist keine Multicast-Adresse.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Verbindung zur Kamera (primärer Stream) wurde unerwartet geschlossen.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Verbindung zur Kamera (sekundärer Stream) wurde unerwartet geschlossen.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Verbindung zum Gerät wurde unerwartet geschlossen.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
     </message>
   </context>
   <context>
@@ -370,10 +443,6 @@
     <message>
       <source>Plugin Diagnostic Event</source>
       <translation>Plugin-Diagnoseereignis</translation>
-    </message>
-    <message>
-      <source>%1 - %2</source>
-      <translation>%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -493,6 +562,14 @@
       <source>Server Failure</source>
       <translation>Serverausfall</translation>
     </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>Die Verbindung zum Server ist unterbrochen.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>Der Server wurde unerwartet angehalten.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
@@ -581,6 +658,46 @@
       <source>Storage Issue</source>
       <translation>Speicherproblem</translation>
     </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>Bei %1 ist ein I/O-Fehler aufgetreten.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>Nicht genügend HDD/SSD-Geschwindigkeit für die Aufzeichnung auf %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>HDD/SSD-Platte &quot;%1&quot; ist voll. Die Festplatte enthält zu viele Daten, die nicht von VMS verwaltet werden.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>Die Systemplatte &quot;%1&quot; ist fast voll.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Analytics-Speicher &quot;%1&quot; ist offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Analytics-Speicher &quot;%1&quot; ist fast voll.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation>Archivsicherung fehlgeschlagen. Datei %1 konnte nicht gesichert werden.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -618,6 +735,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>Plugin: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Überschrift: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Grund: %1</translation>
     </message>
   </context>
   <context>

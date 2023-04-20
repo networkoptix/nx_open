@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>Beskrivning</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation>Attribut</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,23 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>I/O-modul %1 kopplades bort</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation>Enheten är frånkopplad</translation>
+      <translation>
+        <numerusform>Enheten är frånkopplad</numerusform>
+        <numerusform>Enheten är frånkopplad</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
       <translation>Enhets ID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation>
+        <numerusform>Kamera frånkopplad</numerusform>
+        <numerusform>Kamera frånkopplad</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +197,19 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Kamera IP-konflikt vid %1</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>Enheter i IP konflikt</translation>
+      <translation>
+        <numerusform>Enheter i IP konflikt</numerusform>
+        <numerusform>Enheter i IP konflikt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation>
+        <numerusform>Kamera IP-konflikt</numerusform>
+        <numerusform>Kamera IP-konflikt</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -226,10 +242,6 @@
       <translation>Nyckelord åtskilda med blanksteg</translation>
     </message>
     <message>
-      <source>Generic</source>
-      <translation>Allmänt</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Läge</translation>
     </message>
@@ -249,24 +261,8 @@
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Do HTTP request</source>
-      <translation>Gör HTTP-förfrågan</translation>
-    </message>
-    <message>
       <source>Interval of action</source>
       <translation>Åtgärdsintervall</translation>
-    </message>
-    <message>
-      <source>HTTP Url</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
-      <source>HTTP Content</source>
-      <translation>HTTP innehåll</translation>
-    </message>
-    <message>
-      <source>Content type</source>
-      <translation>Innehållstyp</translation>
     </message>
     <message>
       <source>Login</source>
@@ -277,7 +273,23 @@
       <translation>Lösenord</translation>
     </message>
     <message>
-      <source>Request method</source>
+      <source>Do HTTP(S) request</source>
+      <translation>Begär HTTP(S)</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation>HTTP(S)-innehåll</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation>Innehållstyp</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
       <translation>Metod för begäran</translation>
     </message>
   </context>
@@ -292,16 +304,16 @@
       <translation>Licensproblem</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
       <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande enheter:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande enheter:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation>Inte tillräckligt med licenser. Inspelning har inaktiverats på följande kameror:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande I / O-moduler:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation>Inte tillräckligt med licenser. Inspelning har inaktiverats på följande I/O-moduler:</translation>
     </message>
   </context>
   <context>
@@ -311,16 +323,16 @@
       <translation>Rörelse på %1</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation>Rörelsehändelse</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Läge</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation>Rörelse i kamera</translation>
     </message>
   </context>
   <context>
@@ -332,6 +344,67 @@
     <message>
       <source>Network Issue</source>
       <translation>Nätverksproblem</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>Inga data mottagna under de senaste %n sekunderna.</numerusform>
+        <numerusform>Inga data mottagna under de senaste %n sekunderna.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>RTP-fel i primärström (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>RTP-fel i sekundär ström (%1).</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTP-paketförlust upptäckt.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>Kameratiden är tillbaka till det normala.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>Enheten svarar inte på nätverksförfrågningar.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Adress %1 används redan av %2 på primärström.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Adress %1 används redan av %2 på sekundär stream.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Multicast-adresskonflikt upptäcktes.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>Nätverksadress %1 är inte en multicast-adress.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Anslutningen till kameran (primär ström) stängdes oväntat.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Anslutningen till kameran (sekundär ström) stängdes oväntat.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Anslutningen till enheten stängdes oväntat.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation>Det gick inte att tvinga fram kameratid eftersom den släpar för mycket. Systemtid kommer att användas istället.</translation>
     </message>
   </context>
   <context>
@@ -370,10 +443,6 @@
     <message>
       <source>Plugin Diagnostic Event</source>
       <translation>Plugin Diagnostic Event</translation>
-    </message>
-    <message>
-      <source>%1 - %2</source>
-      <translation>%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -493,6 +562,14 @@
       <source>Server Failure</source>
       <translation>Serverfel</translation>
     </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>Anslutning till Server förlorad.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>Servern stoppade oväntat.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
@@ -581,6 +658,46 @@
       <source>Storage Issue</source>
       <translation>Lagringsproblem</translation>
     </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>I/O-fel har uppstått vid %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>Inte tillräckligt med HDD/SSD-hastighet för inspelning till %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>HDD / SSD &quot;%1&quot; är full. Disken innehåller för mycket data som inte hanteras av VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>Systemdisken &quot;%1&quot; är nästan full.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Analyslagring &quot;%1&quot; är offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Analyslagring &quot;%1&quot; är nästan full.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation>Säkerhetskopiering av arkiv misslyckades. Det gick inte att säkerhetskopiera filen %1.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation>Analyslagring &quot;%1&quot; Db-fel: Otillräckliga behörigheter på monteringspunkten.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation>Kan inte initiera AES-kryptering under inspelning till mediaarkiv. Data skrivs okrypterad.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation>RAID-fel: %1.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -618,6 +735,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>Plugin: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Titel: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Anledning: %1</translation>
     </message>
   </context>
   <context>

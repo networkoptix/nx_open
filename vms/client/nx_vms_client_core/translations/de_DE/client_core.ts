@@ -216,52 +216,56 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Trust this server?</source>
-      <translation>Diesem Server vertrauen?</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Kann die Identität von %1 nicht verifizieren</translation>
-    </message>
-    <message>
-      <source>System:</source>
-      <translation>System:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>Server:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>Server-ID:</translation>
-    </message>
-    <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Überprüfen Sie die Details des Zertifikats, um sicherzustellen, dass Sie sich mit dem richtigen Server verbinden.</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>Serverzertifikat ist ungültig.</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>Sie haben versucht, eine Verbindung zu diesem Server herzustellen, aber er hat ein Zertifikat vorgelegt, das nicht automatisch überprüft werden kann.</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation>Zum ersten Mal eine Verbindung zu %1 herstellen?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation>Jemand könnte sich als dieser Server ausgeben, um Ihre persönlichen Daten zu stehlen.</translation>
+      <source>certificate details</source>
+      <translation>zertifikatsdetails</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
-      <translation>Sie haben versucht, eine Verbindung zu diesem Server herzustellen, aber das Zertifikat des Servers hat sich geändert.</translation>
+      <source>help article</source>
+      <translation>hilfe-artikel</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation>Stellen Sie nur dann eine Verbindung zu diesem Server her, wenn Sie von Ihrem VMS-Administrator dazu aufgefordert werden.</translation>
+      <source>Read this %1 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation>Lesen Sie %1 um mehr über Zertifikatsvalidierung zu erfahren.</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation>Überprüfen Sie die Zertifikatsdetails, um sicherzustellen, dass Sie sich mit dem richtigen Server verbinden.</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
+      <translation>Überprüfen Sie den %1 um sicherzustellen, dass Sie dem Server, mit dem Sie sich verbinden, vertrauen.%2</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation>das server-zertifikat</translation>
+    </message>
+    <message>
+      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
+      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation>Sie können %1 anzeigen oder diese %2 lesen, um mehr über das aktuelle Problem zu erfahren.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
+      <comment>%1 is the system name, %2 are possible extra details</comment>
+      <translation>Dies kann an einem abgelaufenen Serverzertifikat oder jemandem liegen, der versucht, sich als %1 auszugeben, um Ihre persönlichen Daten zu stehlen.%2</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation>Diese Meldung kann mehrfach angezeigt werden, wenn eine Verbindung zu einem System mit mehreren Servern besteht.</translation>
+    </message>
+    <message>
+      <source>To learn more about the current problem view the server&apos;s certificate:</source>
+      <translation>Um mehr über das aktuelle Problem zu erfahren, sehen Sie sich das server-zertifikat an:</translation>
     </message>
   </context>
 </TS>

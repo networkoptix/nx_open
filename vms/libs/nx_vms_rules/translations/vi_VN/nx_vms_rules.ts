@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>Miêu tả</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation>Các đặc tính</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,21 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>I / O Module %1 đã bị ngắt kết nối</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation>Thiết bị ngắt kết nối</translation>
+      <translation>
+        <numerusform>Thiết bị ngắt kết nối</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
       <translation>ID thiết bị</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation>
+        <numerusform>Camera Ngắt kết nối</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +195,17 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Camera IP xung đột tại %1</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>Thiết bị xung đột IP</translation>
+      <translation>
+        <numerusform>Xung đột IP của thiết bị</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation>
+        <numerusform>Xung đột IP của camera</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -226,10 +238,6 @@
       <translation>Từ khóa ngăn cách bởi không gian</translation>
     </message>
     <message>
-      <source>Generic</source>
-      <translation>Chung</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Tiểu bang</translation>
     </message>
@@ -249,24 +257,8 @@
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Do HTTP request</source>
-      <translation>Gởi HTTP yêu cầu</translation>
-    </message>
-    <message>
       <source>Interval of action</source>
       <translation>Khoảng thời gian hành động</translation>
-    </message>
-    <message>
-      <source>HTTP Url</source>
-      <translation>URL HTTP</translation>
-    </message>
-    <message>
-      <source>HTTP Content</source>
-      <translation>Nội dung HTTP</translation>
-    </message>
-    <message>
-      <source>Content type</source>
-      <translation>Kiểu Nội dung</translation>
     </message>
     <message>
       <source>Login</source>
@@ -277,7 +269,23 @@
       <translation>Mật khẩu</translation>
     </message>
     <message>
-      <source>Request method</source>
+      <source>Do HTTP(S) request</source>
+      <translation>Thực hiện yêu cầu HTTP(S)</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation>URL HTTP(S)</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation>Nội dung HTTP(S)</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation>Loại nội dung</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
       <translation>Phương thức yêu cầu</translation>
     </message>
   </context>
@@ -292,16 +300,16 @@
       <translation>Vấn đề giấy phép</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Bản quyền chưa đủ. Ghi đã bị tắt trên các thiết bị sau:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation>Không đủ giấy phép. Trình ghi đã bị tắt trên các thiết bị sau:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Bản quyền chưa đủ. Ghi đã bị tắt trên các camera sau:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các camera sau:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Bản quyền chưa đủ. Ghi đã bị tắt trên các moudle I/O sau:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các mô-đun I/O sau:</translation>
     </message>
   </context>
   <context>
@@ -311,16 +319,16 @@
       <translation>%1 phát hiện chuyển động</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation>Sự kiện chuyển động</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Tiểu bang</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>Máy chụp hình</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation>Chuyển động trên camera</translation>
     </message>
   </context>
   <context>
@@ -332,6 +340,66 @@
     <message>
       <source>Network Issue</source>
       <translation>Vấn đề về mạng</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>Không nhận được dữ liệu nào trong %n giây qua.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>Lỗi RTP trong luồng chính (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>Lỗi RTP trong luồng phụ (%1).</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>Phát hiện mất gói RTP.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>Thời gian camera trở lại bình thường.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>Thiết bị không phản hồi yêu cầu mạng.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Địa chỉ %1 đã được sử dụng bởi %2 trên luồng chính.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Địa chỉ %1 đã được sử dụng bởi %2 trên luồng phụ.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Đã phát hiện xung đột địa chỉ multicast.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>Địa chỉ mạng %1 không phải là địa chỉ multicast.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Kết nối với camera (luồng chính) đã bị đóng đột ngột.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Kết nối với camera (luồng thứ cấp) đã bị đóng đột ngột.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Kết nối với thiết bị đã bị đóng đột ngột.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation>Không thể buộc sử dụng thời gian của camera vì bị trễ quá nhiều. Thay vào đó sẽ sử dụng thời gian hệ thống.</translation>
     </message>
   </context>
   <context>
@@ -370,10 +438,6 @@
     <message>
       <source>Plugin Diagnostic Event</source>
       <translation>Sự kiện chẩn đoán plugin</translation>
-    </message>
-    <message>
-      <source>%1 - %2</source>
-      <translation>%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -493,6 +557,14 @@
       <source>Server Failure</source>
       <translation>Máy chủ thất bại</translation>
     </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>Kết nối đến máy chủ bị mất.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>Máy chủ dừng đột ngột.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
@@ -581,6 +653,46 @@
       <source>Storage Issue</source>
       <translation>Vấn đề lưu trữ</translation>
     </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>I/O lỗi tại %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>Không đủ tốc độ HDD/SSD để ghi về %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>Ổ HDD/SSD &quot;%1&quot; đã đầy. Ổ chứa quá nhiều dữ liệu không được quản lý bởi VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>Ổ hệ thống &quot;%1&quot; gần đầy.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Lưu trữ phân tích &quot;%1&quot; đang ngoại tuyến.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Lưu trữ phân tích &quot;%1&quot; gần đầy.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation>Sao lưu lưu trữ không thành công. Không sao lưu được tệp %1.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation>Bộ nhớ Phân tích &quot;%1&quot; lỗi cơ sở dữ liệu: Không đủ quyền tại điểm gắn kết.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation>Không thể khởi tạo mã hóa AES khi trình ghi được bật trên kho lưu trữ phương tiện. Dữ liệu ghi không được mã hóa.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation>Lỗi RAID. %1.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -618,6 +730,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>Plugin: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Chú thích: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Lý do: %1</translation>
     </message>
   </context>
   <context>

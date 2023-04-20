@@ -1096,6 +1096,71 @@
     </message>
   </context>
   <context>
+    <name>Result</name>
+    <message>
+      <source>Missing required parameter: %1.</source>
+      <translation>Erforderlicher Parameter fehlt: %1.</translation>
+    </message>
+    <message>
+      <source>Failed to process request.</source>
+      <translation>Die Anfrage konnte nicht bearbeitet werden.</translation>
+    </message>
+    <message>
+      <source>Forbidden.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Verboten.</translation>
+    </message>
+    <message>
+      <source>Conflict.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Konflikt.</translation>
+    </message>
+    <message>
+      <source>Bad request.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Ungültige Anforderung.</translation>
+    </message>
+    <message>
+      <source>Not implemented.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Nicht implementiert.</translation>
+    </message>
+    <message>
+      <source>Not found.</source>
+      <comment>Generic HTTP response</comment>
+      <translation>Nicht gefunden.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation>Interner Fehler.</translation>
+    </message>
+    <message>
+      <source>Unsupported media type.</source>
+      <translation>Nicht unterstützter Medientyp.</translation>
+    </message>
+    <message>
+      <source>Service unavailable.</source>
+      <translation>Service nicht erreichbar.</translation>
+    </message>
+    <message>
+      <source>Unauthorized.</source>
+      <translation>Nicht autorisiert.</translation>
+    </message>
+    <message>
+      <source>Session expired.</source>
+      <translation>Session beendet.</translation>
+    </message>
+    <message>
+      <source>Invalid parameter `%1`: %2.</source>
+      <comment>%1 is name, %2 is value.</comment>
+      <translation>Ungültiger Parameter `%1`: %2.</translation>
+    </message>
+    <message>
+      <source>Session authorization required.</source>
+      <translation type="unfinished">Session authorization required.</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
@@ -1139,10 +1204,6 @@
     <message>
       <source>SMTP timeout (seconds)</source>
       <translation>SMTP-Timeout (Sekunden)</translation>
-    </message>
-    <message>
-      <source>SMTP use simple settings view in Client</source>
-      <translation>SMTP-Ansicht mit einfachen Einstellungen im Client</translation>
     </message>
     <message>
       <source>SMTP name</source>
@@ -1342,10 +1403,6 @@
       <translation>Cloud-Host überschreiben</translation>
     </message>
     <message>
-      <source>Enable crossdomain policy</source>
-      <translation>Domänenübergreifende Richtlinie aktivieren</translation>
-    </message>
-    <message>
       <source>Enable RTSP for Arecont</source>
       <translation>RTSP für Arecont aktivieren</translation>
     </message>
@@ -1368,10 +1425,6 @@
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
       <translation>Maximale Größe der Datensatz-Warteschlange (Elemente, 250-4000)</translation>
-    </message>
-    <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
-      <translation>Maximale Anzahl von HTTP-Verbindungen mit Transcoding für den Server. Chrome öffnet 2 Verbindungen auf einmal und schließt dann die erste. Es wird daher empfohlen, für diesen Parameter den Wert &gt;=2 festzulegen.</translation>
     </message>
     <message>
       <source>RTP retry count</source>
@@ -1402,14 +1455,6 @@
       <translation>Aufzeichnung auf EDGE aktivieren</translation>
     </message>
     <message>
-      <source>Enable WebSocket for p2p</source>
-      <translation>WebSocket für p2p aktivieren</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
-      <translation>Maximale Anzahl von Threads für die entfernte Archivsynchronisierung (&lt;=0 - auto, max 32</translation>
-    </message>
-    <message>
       <source>Target update information</source>
       <translation>Informationen zur Zielaktualisierung</translation>
     </message>
@@ -1424,10 +1469,6 @@
     <message>
       <source>Client update settings</source>
       <translation>Client-Update-Einstellungen</translation>
-    </message>
-    <message>
-      <source>Thread count limit for Camera archive synchronization</source>
-      <translation>Begrenzung der Thread-Anzahl für die Synchronisierung von Kameraarchiven</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1474,14 +1515,6 @@
       <translation>URI für die automatische Aktualisierung von resource_data.json</translation>
     </message>
     <message>
-      <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation>Maximale Ereignisprotokollaufzeichnungen, die in der Datenbank gespeichert werden sollen. Die tatsächliche Anzahl der nicht gelöschten Datensätze kann bis zu 20% höher sein als der angegebene Wert.</translation>
-    </message>
-    <message>
-      <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation>Gibt an, ob einige Frames für den primären Stream zwischengespeichert werden sollen. Werte: &apos;Ja&apos; - immer aktiviert (verwendet möglicherweise viel RAM), &apos;Nein&apos; - immer deaktiviert, außer wenn dies für die Wiedergabe erforderlich ist (z. B. HLS), &apos;Auto&apos; - ähnlich wie &apos;Nein&apos;, wird aber eingeschaltet, wenn die Benutzerfreundlichkeit verbessert wird (z.B. wenn einige Analytics-Plugins an der Kamera arbeiten).</translation>
-    </message>
-    <message>
       <source>Meta data storage change policy</source>
       <translation>Richtlinie zur Änderung der Speicherung von Metadaten</translation>
     </message>
@@ -1498,24 +1531,8 @@
       <translation>VMS-Server spezifische Versionsmerkmale</translation>
     </message>
     <message>
-      <source>Language for mobile push notifications</source>
-      <translation>Sprache für mobile Push-Benachrichtigungen</translation>
-    </message>
-    <message>
       <source>Additional local FS storage types for recording</source>
       <translation>Zusätzliche lokale FS-Speichertypen für die Aufzeichnung</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the Device</source>
-      <translation>IO-Port-Status beibehalten, wenn der Server eine Verbindung zum Gerät herstellt</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation>Medienpuffergröße (KB, 10KB-4MB)</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation>Medienpuffergröße für reine Audiogeräte (KB, 1KB-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
@@ -1534,10 +1551,6 @@
       <translation>Aktueller Speicherverschlüsselungsschlüssel</translation>
     </message>
     <message>
-      <source>Show Servers in tree for non-admins</source>
-      <translation>Server in der Objektleiste für Nicht-Administratoren anzeigen</translation>
-    </message>
-    <message>
       <source>HTTP header: Origin</source>
       <translation>HTTP-Header: Ursprung</translation>
     </message>
@@ -1546,20 +1559,85 @@
       <translation>HTTP-Header: X-Frame-Optionen</translation>
     </message>
     <message>
-      <source>Use only HTTPS for Cameras</source>
+      <source>Show mouse timeline preview</source>
+      <translation>Maus-Zeitachsenvorschau anzeigen</translation>
+    </message>
+    <message>
+      <source>Language for Cloud notifications</source>
+      <translation>Sprache für Cloud-Benachrichtigungen</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4MB)</source>
+      <translation>Medienpuffergröße (KB, 10KB-4MB)</translation>
+    </message>
+    <message>
+      <source>Enable cross-domain policy</source>
+      <translation>Domänenübergreifende Richtlinie aktivieren</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for P2P</source>
+      <translation>WebSocket für P2P aktivieren</translation>
+    </message>
+    <message>
+      <source>Show Servers in the Resource Tree for non-admins</source>
+      <translation>Server in der Objektleiste für Nicht-Administratoren anzeigen</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for cameras</source>
       <translation>Nur HTTPS für Kameras verwenden</translation>
     </message>
     <message>
-      <source>Enable insecure deprecated API</source>
-      <translation>Unsichere, veraltete API aktivieren</translation>
+      <source>Enable deprecated API functions (unsecure)</source>
+      <translation>Aktivieren veralteter API-Funktionen (unsicher)</translation>
     </message>
     <message>
-      <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation>Aktivieren unsicherer, veralteter API-Funktionen, die derzeit von Nx-Produkten verwendet werden</translation>
+      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Aktiviere veraltete API-Funktionen, die derzeit von %1-Software verwendet werden (unsicher)</translation>
     </message>
     <message>
-      <source>Show mouse timeline preview</source>
-      <translation>Maus-Zeitachsenvorschau anzeigen</translation>
+      <source>Expose IP addresses for autodiscovery</source>
+      <translation>IP-Adressen für die automatische Erkennung freigeben</translation>
+    </message>
+    <message>
+      <source>Keep IO port state on when Server connects to the device</source>
+      <translation>IO-Port-Status beibehalten, wenn der Server eine Verbindung zum Gerät herstellt</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
+      <translation>Medienpuffergröße für reine Audiogeräte (KB, 1KB-1MB)</translation>
+    </message>
+    <message>
+      <source>Enable 2FA for the System</source>
+      <translation type="unfinished">Enable 2FA for the System</translation>
+    </message>
+    <message>
+      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
+      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
+    </message>
+    <message>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
+      <translation>Maximale Anzahl von Threads für die entfernte Archivsynchronisierung (&lt;=0 - auto, max 32)</translation>
+    </message>
+    <message>
+      <source>Thread count limit for camera archive synchronization</source>
+      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+    </message>
+    <message>
+      <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
+      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+    </message>
+    <message>
+      <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
+      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+    </message>
+    <message>
+      <source>Update releases.json file URL</source>
+      <translation type="unfinished">Update releases.json file URL</translation>
     </message>
   </context>
   <context>
@@ -1661,10 +1739,6 @@
     <message>
       <source>Show on Alarm Layout</source>
       <translation>Zeige auf Alarmlayout</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>HTTP-Anfrage starten</translation>
     </message>
     <message>
       <source>Device output</source>
@@ -1913,18 +1987,6 @@
       </translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Verbindung zum Gerät wurde unerwartet geschlossen.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Verbindung zur Kamera (primärer Stream) wurde unerwartet geschlossen.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Verbindung zur Kamera (sekundärer Stream) wurde unerwartet geschlossen.</translation>
-    </message>
-    <message>
       <source>RTP packet loss detected.</source>
       <translation>RTP-Paketverlust identifiziert.</translation>
     </message>
@@ -1955,18 +2017,6 @@
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
       <translation>Festplatte &quot;%1&quot; ist fast voll.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Nicht genügend Lizenzen. Aufnahme wurde auf folgenden Geräten deaktiviert:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Nicht genügend Lizenzen. Aufnahme wurde auf folgenden Kameras deaktiviert:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Nicht genügend Lizenzen. Aufnahme wurde auf folgenden I/O-Modulen deaktiviert:</translation>
     </message>
     <message>
       <source>start</source>
@@ -2068,24 +2118,8 @@
       <translation>Layout öffnen</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>Die Kamerazeit konnte nicht erzwungen werden, die Verzögerung ist zu hoch, die Systemzeit wird verwendet</translation>
-    </message>
-    <message>
-      <source>Camera time is back to normal</source>
-      <translation>Die Kamerazeit ist wieder normal</translation>
-    </message>
-    <message>
       <source>Multiple %1 events have occurred</source>
       <translation>Mehrere %1 Ereignisse sind aufgetreten</translation>
-    </message>
-    <message>
-      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation>Multicast-Adresskonflikt erkannt. Adresse %1 wird bereits von %2 auf %3 Stream verwendet</translation>
-    </message>
-    <message>
-      <source>Network address %1 is not a multicast address</source>
-      <translation>Die Netzwerkadresse %1 ist keine Multicast-Adresse</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
@@ -2102,10 +2136,6 @@
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
       <translation>Unbekanntes Plugin-Diagnoseereignis</translation>
-    </message>
-    <message>
-      <source>RAID error. %1.</source>
-      <translation>RAID-Fehler. %1.</translation>
     </message>
     <message>
       <source>Buzzer</source>
@@ -2161,14 +2191,6 @@
       <translation>I/O-Modul wurde getrennt</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1)</source>
-      <translation>RTP-Fehler im primären Stream (%1)</translation>
-    </message>
-    <message>
-      <source>RTP error in secondary stream (%1)</source>
-      <translation>RTP-Fehler im sekundären Stream (%1)</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>Analytics-Objekt erkannt</translation>
     </message>
@@ -2180,14 +2202,6 @@
     <message>
       <source>Plugin: %1</source>
       <translation>Plugin: %1</translation>
-    </message>
-    <message>
-      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>Analytics-Speicher &quot;%1&quot; DB-Fehler: Unzureichende Berechtigungen für den Einhängepunkt.</translation>
-    </message>
-    <message>
-      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>Kann die AES-Verschlüsselung während der Aufzeichnung des Medienarchivs nicht initialisieren. Daten werden unverschlüsselt geschrieben.</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
@@ -2214,12 +2228,114 @@
       <translation>Server &quot;%1&quot; Zertifikatsfehler</translation>
     </message>
     <message>
-      <source>Intercom informer</source>
-      <translation>Intercom-Informant</translation>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>RTP-Fehler im primären Stream (%1).</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>Fehler beim Sichern der Datei</translation>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>RTP-Fehler im sekundären Stream (%1).</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>Die Kamerazeit ist wieder normal.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Die Adresse %1 wird bereits von %2 im primären Stream verwendet.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Die Adresse %1 wird bereits von %2 im sekundären Stream verwendet.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Multicast-Adresskonflikt entdeckt.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>Die Netzwerkadresse %1 ist keine Multicast-Adresse.</translation>
+    </message>
+    <message>
+      <source>Failed to backup file %1</source>
+      <translation>Sicherung der Datei %1 fehlgeschlagen</translation>
+    </message>
+    <message>
+      <source>Show Intercom Informer</source>
+      <translation>Intercom Informer anzeigen</translation>
+    </message>
+    <message>
+      <source>Do HTTP(S) request</source>
+      <translation>HTTP(S)-Anfrage durchführen</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Verbindung zur Kamera (primärer Stream) wurde unerwartet geschlossen.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Verbindung zur Kamera (sekundärer Stream) wurde unerwartet geschlossen.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Verbindung zum Gerät wurde unerwartet geschlossen.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+    </message>
+    <message>
+      <source>Also show source camera</source>
+      <translation>Auch auf Quellkamera anzeigen</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Quell-Kamera</translation>
+    </message>
+    <message>
+      <source>Also show on source camera</source>
+      <translation>Auch auf Quellkamera anzeigen</translation>
+    </message>
+    <message>
+      <source>Also set on source camera</source>
+      <translation type="unfinished">Also set on source camera</translation>
+    </message>
+    <message>
+      <source>Also trigger on source camera</source>
+      <translation type="unfinished">Also trigger on source camera</translation>
+    </message>
+    <message>
+      <source>Also record source camera</source>
+      <translation type="unfinished">Also record source camera</translation>
+    </message>
+    <message>
+      <source>Also play on source camera</source>
+      <translation type="unfinished">Also play on source camera</translation>
     </message>
   </context>
   <context>

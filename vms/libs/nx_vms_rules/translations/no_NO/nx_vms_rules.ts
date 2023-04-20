@@ -33,15 +33,11 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Bildetekst</translation>
     </message>
     <message>
       <source>Description</source>
       <translation>Beskrivelse</translation>
-    </message>
-    <message>
-      <source>Attributes</source>
-      <translation>Egenskaper</translation>
     </message>
   </context>
   <context>
@@ -80,18 +76,18 @@
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>Sikkerhetskopieringen er fullført</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Ukjent hendelse</translation>
     </message>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>%1 hendelse har oppstått</translation>
     </message>
   </context>
   <context>
@@ -106,7 +102,7 @@
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>Inngangssignal på kamera</translation>
     </message>
     <message>
       <source>State</source>
@@ -125,7 +121,7 @@
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>Feilsøkingshendelse</translation>
     </message>
     <message>
       <source>Action</source>
@@ -133,7 +129,7 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Verdi</translation>
     </message>
   </context>
   <context>
@@ -162,13 +158,23 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>I / O-modul %1 ble koblet fra</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation>
+        <numerusform>Enhet frakoblet</numerusform>
+        <numerusform>Enhet frakoblet</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
+      <translation>Enhets-ID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation>
+        <numerusform>Kamera frakoblet</numerusform>
+        <numerusform>Kamera frakoblet</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +197,19 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Kamera IP Konflikt på %1</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>Enhets IP-konflikt</translation>
+      <translation>
+        <numerusform>Enhets IP-konflikt</numerusform>
+        <numerusform>Enhets IP-konflikt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation>
+        <numerusform>Kamera IP-konflikt</numerusform>
+        <numerusform>Kamera IP-konflikt</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -226,20 +242,16 @@
       <translation>Søkeord skilt av plass</translation>
     </message>
     <message>
-      <source>Generic</source>
-      <translation>Generisk</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Delstat</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Kilde</translation>
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Bildetekst</translation>
     </message>
     <message>
       <source>Description</source>
@@ -249,24 +261,8 @@
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Do HTTP request</source>
-      <translation>Gjør HTTP-forespørsel</translation>
-    </message>
-    <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
-    </message>
-    <message>
-      <source>HTTP Url</source>
-      <translation type="unfinished">HTTP Url</translation>
-    </message>
-    <message>
-      <source>HTTP Content</source>
-      <translation type="unfinished">HTTP Content</translation>
-    </message>
-    <message>
-      <source>Content type</source>
-      <translation>Innholdstype</translation>
+      <translation>Handlingsintervall</translation>
     </message>
     <message>
       <source>Login</source>
@@ -277,8 +273,24 @@
       <translation>Passord</translation>
     </message>
     <message>
-      <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
+      <source>Do HTTP(S) request</source>
+      <translation>Gjør HTTP(S)-forespørsel</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation>HTTP(S)-innhold</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation>Innholdstype</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation>Forespørsel Metode</translation>
     </message>
   </context>
   <context>
@@ -292,16 +304,16 @@
       <translation>Lisensproblem</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende enheter:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende enheter:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende kameraer:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende kameraer:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Ikke nok lisenser. Innspillingen er deaktivert på følgende I / O-moduler:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation>Ikke nok lisenser. Opptak er deaktivert på følgende I/O-moduler:</translation>
     </message>
   </context>
   <context>
@@ -311,16 +323,16 @@
       <translation>Bevegelse på %1</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Delstat</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation>Bevegelse på kamera</translation>
     </message>
   </context>
   <context>
@@ -333,12 +345,73 @@
       <source>Network Issue</source>
       <translation>Nettverksproblem</translation>
     </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>Ingen data mottatt i løpet av de siste %n sekunder.</numerusform>
+        <numerusform>Ingen data mottatt i løpet av de siste %n sekunder.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>RTP-feil i primærstrøm (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>RTP-feil i sekundærstrøm (%1).</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTP-pakketap oppdaget.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>Kameraets tidsur er tilbake til normal.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>Enheten svarer ikke på nettverksforespørsler.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Adressen %1 er allerede i bruk av %2 på primærstrømmen.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>Adressen %1 er allerede i bruk av %2 på sekundærstrøm.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>Multicast-adressekonflikt oppdaget.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>Nettverksadresse %1 er ikke en multicast-adresse.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>Tilkobling til kamera (primærstrøm) ble uventet lukket.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>Tilkobling til kamera (sekundær strøm) ble uventet stengt.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>Tilkoblingen til enheten ble uventet lukket.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation>Kunne ikke tvinge bruk av kameratid, da den henger for mye. Systemtid vil bli brukt i stedet.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
+      <translation>Vis varsel</translation>
     </message>
     <message>
       <source>To</source>
@@ -346,15 +419,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Handlingsintervall</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>Krev godkjenning</translation>
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Bildetekst</translation>
     </message>
     <message>
       <source>Description</source>
@@ -362,7 +435,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>Verktøytips</translation>
     </message>
   </context>
   <context>
@@ -372,20 +445,16 @@
       <translation>Plugin Diagnostic Event</translation>
     </message>
     <message>
-      <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
-    </message>
-    <message>
       <source>Camera</source>
       <translation>Kamera</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Kilde</translation>
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Bildetekst</translation>
     </message>
     <message>
       <source>Description</source>
@@ -436,15 +505,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Handlingsintervall</translation>
     </message>
     <message>
       <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
+      <translation>Ytterligere mottakere</translation>
     </message>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>E-postmelding</translation>
     </message>
   </context>
   <context>
@@ -492,6 +561,14 @@
     <message>
       <source>Server Failure</source>
       <translation>Serverfeil</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>Tilkoblingen til serveren er brutt.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>Serveren stoppet uventet.</translation>
     </message>
   </context>
   <context>
@@ -556,7 +633,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Handlingsintervall</translation>
     </message>
     <message>
       <source>Speak to users</source>
@@ -580,6 +657,46 @@
     <message>
       <source>Storage Issue</source>
       <translation>Harddiskproblem</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>I/O-feil oppstod på %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>Ikke nok HDD/SSD-hastighet for opptak til %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>HDD/SSD-disk &quot;%1&quot; er full. Disken inneholder for mye data som ikke administreres av VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>Systemdisk &quot;%1&quot; er nesten full.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Analytics-lagring &quot;%1&quot; er frakoblet.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Analytics-lagring &quot;%1&quot; er nesten full.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation>Sikkerhetskopiering av arkiv mislyktes. Kunne ikke sikkerhetskopiere fil %1.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation>Analytics-lagring &quot;%1&quot; databasefeil: Utilstrekkelige tillatelser på monteringspunktet.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation>Kan ikke initialisere AES-kryptering mens opptak er aktivert i mediearkivet. Data skrives ukryptert.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation>RAID-feil: %1.</translation>
     </message>
   </context>
   <context>
@@ -618,6 +735,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>Plugin: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Bildetekst: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Årsak: %1</translation>
     </message>
   </context>
   <context>

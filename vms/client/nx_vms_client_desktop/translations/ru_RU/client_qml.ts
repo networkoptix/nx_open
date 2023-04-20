@@ -157,20 +157,20 @@
       <translation>Аналитика камеры будет работать только во время просмотра камеры. Включите запись, чтобы она работала постоянно.</translation>
     </message>
     <message>
-      <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
     </message>
     <message>
-      <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <source>Check System Administration settings to configure this plugin.</source>
+      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
     </message>
     <message>
-      <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <source>This plugin has no settings at the System level.</source>
+      <translation type="unfinished">This plugin has no settings at the System level.</translation>
     </message>
     <message>
-      <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <source>This plugin has no settings for this camera.</source>
+      <translation type="unfinished">This plugin has no settings for this camera.</translation>
     </message>
   </context>
   <context>
@@ -1089,6 +1089,17 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>SettingsDialog</name>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Введите параметры</translation>
+    </message>
+    <message>
+      <source>This action requires some parameters to be filled.</source>
+      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+    </message>
+  </context>
+  <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
@@ -1209,6 +1220,10 @@ to activate PTZ</source>
       <source>Unsupported firmware version</source>
       <translation>Неподдерживаемая версия прошивки</translation>
     </message>
+    <message>
+      <source>Access denied</source>
+      <translation>В доступе отказано</translation>
+    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
@@ -1320,10 +1335,6 @@ to activate PTZ</source>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation>У вас нет доступа к %1. Пожалуйста, проверьте подключение к интернету.</translation>
-    </message>
-    <message>
       <source>Official Website</source>
       <translation>Официальный сайт</translation>
     </message>
@@ -1334,6 +1345,10 @@ to activate PTZ</source>
     <message>
       <source>Support</source>
       <translation>Техническая поддержка</translation>
+    </message>
+    <message>
+      <source>You do not have access to the %1. Please check your internet connection.</source>
+      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
     </message>
   </context>
 </TS>

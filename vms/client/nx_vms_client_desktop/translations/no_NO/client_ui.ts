@@ -85,10 +85,6 @@
       <translation>Maksimal live-buffer lengde</translation>
     </message>
     <message>
-      <source>Browse Logs</source>
-      <translation>Bla gjennom logger</translation>
-    </message>
-    <message>
       <source>Clear Local Cache</source>
       <translation>Slett lokal cache</translation>
     </message>
@@ -115,6 +111,30 @@
     <message>
       <source>Server certificate validation</source>
       <translation>Serversertifikatvalidering</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation>Loggbehandling</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>Last ned</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Innstillingar</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>Ferdig</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation>Åpne mappen Filer</translation>
     </message>
   </context>
   <context>
@@ -219,10 +239,6 @@
       <translation>Logg inn/logg ut</translation>
     </message>
     <message>
-      <source>Event rules</source>
-      <translation>Hendelsesregler</translation>
-    </message>
-    <message>
       <source>Server actions</source>
       <translation>Serverhandlinger</translation>
     </message>
@@ -257,6 +273,10 @@
     <message>
       <source>All servers are offline. Audit data is not available.</source>
       <translation>Alle servere er offline. Revisjonsdata er ikke tilgjengelig.</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation>Hendelseregler</translation>
     </message>
   </context>
   <context>
@@ -318,10 +338,6 @@
     <message>
       <source>Skip Current Queue</source>
       <translation>Hopp over gjeldende kø</translation>
-    </message>
-    <message>
-      <source>Maximum backup queue size</source>
-      <translation>Maksimal størrelse for backupkø</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
@@ -454,6 +470,10 @@
       <source>Use event source server</source>
       <translation>Bruk hendelseskildeserver</translation>
     </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation>Bruk hendelseskildekamera</translation>
+    </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
@@ -509,14 +529,6 @@
   </context>
   <context>
     <name>CameraExpertSettingsWidget</name>
-    <message>
-      <source>Do not archive primary stream</source>
-      <translation>Ikke opptak av primærstrøm</translation>
-    </message>
-    <message>
-      <source>Do not archive secondary stream</source>
-      <translation>Deaktver lagring av sekunder strøm</translation>
-    </message>
     <message>
       <source>Auto</source>
       <translation>Auto</translation>
@@ -595,7 +607,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Bruk Media2 til å hente profiler</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
@@ -635,23 +647,39 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>ONVIF-innstillinger</translation>
     </message>
     <message>
-      <source>Secondary stream profile</source>
-      <translation type="unfinished">Secondary stream profile</translation>
+      <source>Do not record primary stream</source>
+      <translation>Ikke ta opp primærstrøm</translation>
     </message>
     <message>
-      <source>Primary stream profile</source>
-      <translation type="unfinished">Primary stream profile</translation>
+      <source>Do not record secondary stream</source>
+      <translation>Ikke ta opp sekundærstrøm</translation>
     </message>
     <message>
-      <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
+      <source>Secondary Stream Profile</source>
+      <translation>Sekundær strømningsprofil</translation>
     </message>
     <message>
-      <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <source>Primary Stream Profile</source>
+      <translation>Primær strømmeprofil</translation>
+    </message>
+    <message>
+      <source>Import From Device</source>
+      <translation>Importer fra enhet</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Importer video automatisk</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Nettside</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Nettsideport</translation>
     </message>
   </context>
   <context>
@@ -769,11 +797,7 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
-    </message>
-    <message>
-      <source>New device</source>
-      <translation type="unfinished">New device</translation>
+      <translation>Kamerabytte</translation>
     </message>
     <message>
       <source>Name</source>
@@ -790,6 +814,10 @@
     <message>
       <source>Next</source>
       <translation>Neste</translation>
+    </message>
+    <message>
+      <source>New Device</source>
+      <translation>Ny enhet</translation>
     </message>
   </context>
   <context>
@@ -875,6 +903,57 @@
     </message>
   </context>
   <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+      <source>BETA</source>
+      <translation>BETA</translation>
+    </message>
+    <message>
+      <source>Available Actions</source>
+      <translation>Tilgjengelige handlinger</translation>
+    </message>
+    <message>
+      <source>Video Export</source>
+      <translation>Videoeksport</translation>
+    </message>
+    <message>
+      <source>Live Video and Archive</source>
+      <translation>Live video og arkiv</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>Showreels</source>
+      <translation>Bildesyklus</translation>
+    </message>
+    <message>
+      <source>Read more on the help page</source>
+      <translation>Les mer på hjelpesiden</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation>Ikke vis dette vinduet igjen</translation>
+    </message>
+    <message>
+      <source>Introducing Cloud Layouts</source>
+      <translation>Vi introduserer skyoppsett</translation>
+    </message>
+    <message>
+      <source>Motion Search</source>
+      <translation>Bevegelsessøk</translation>
+    </message>
+    <message>
+      <source>Searching Bookmarks, Objects, Events</source>
+      <translation>Søker i bokmerker, objekter, hendelser</translation>
+    </message>
+    <message>
+      <source>In the Future</source>
+      <translation>I fremtiden</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -900,11 +979,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>Denne handlingen kan kun angis for øyeblikkelige hendelser</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>Velg en annen hendelse eller handling</translation>
     </message>
   </context>
   <context>
@@ -946,6 +1025,22 @@
     <message>
       <source>Restore from Backup...</source>
       <translation>Gjenopprett fra sikkerhetskopi...</translation>
+    </message>
+    <message>
+      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
+      <translation>Lag en sikkerhetskopi av systemadministrasjonsdata, eller gjenopprett systemadministrasjonsdata fra en eksisterende sikkerhetskopi</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>&lt;Message&gt;</source>
+      <translation>&lt;Message&gt;</translation>
+    </message>
+    <message>
+      <source>Open Folder</source>
+      <translation>Åpne mappe</translation>
     </message>
   </context>
   <context>
@@ -1076,15 +1171,11 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>Generisk hendelse</translation>
     </message>
   </context>
   <context>
     <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>HTTP content</source>
-      <translation>HTTP-innhold</translation>
-    </message>
     <message>
       <source>Login to authenticate (optional)</source>
       <translation>Logg inn for å autentisere (valgfritt)</translation>
@@ -1102,20 +1193,24 @@
       <translation>Passord</translation>
     </message>
     <message>
-      <source>Content type</source>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation>HTTP(S)-innhold</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
       <translation>Innholdstype</translation>
     </message>
     <message>
-      <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
-      <source>Authentication type</source>
+      <source>Authentication Type</source>
       <translation>Autentiseringstype</translation>
     </message>
     <message>
-      <source>Request type</source>
-      <translation>Forespørselstype</translation>
+      <source>Request Method</source>
+      <translation>Forespørselsmetode</translation>
     </message>
   </context>
   <context>
@@ -1244,19 +1339,19 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>Legg til en kommentar</translation>
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>Sett tidsplan</translation>
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>Test handling</translation>
     </message>
     <message>
-      <source>Add some comment</source>
-      <translation type="unfinished">Add some comment</translation>
+      <source>Add a comment</source>
+      <translation>Legg til en kommentar</translation>
     </message>
   </context>
   <context>
@@ -1268,10 +1363,6 @@
     <message>
       <source>Camera</source>
       <translation>Kamera</translation>
-    </message>
-    <message>
-      <source>Source camera</source>
-      <translation>Kildekamera</translation>
     </message>
   </context>
   <context>
@@ -1334,11 +1425,15 @@
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>Spill av lyd fra alle kameraer på layout</translation>
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
       <translation>Demp lyden når mikrofonen er aktiv</translation>
+    </message>
+    <message>
+      <source>Allow the computer to enter sleep mode on idle</source>
+      <translation>La datamaskinen gå inn i hvilemodus når inaktiv</translation>
     </message>
   </context>
   <context>
@@ -1346,10 +1441,6 @@
     <message>
       <source>System Settings</source>
       <translation>Systeminnstillinger</translation>
-    </message>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>Sikkerhetskopiering og gjenoppretting</translation>
     </message>
   </context>
   <context>
@@ -1421,7 +1512,7 @@
     </message>
     <message>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>Eksportdato</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -1529,10 +1620,6 @@
     <message>
       <source>Shared layouts</source>
       <translation>Delte visninger</translation>
-    </message>
-    <message>
-      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Velg en enkelt bruker i &quot;Vis til&quot; linje for å vise de lokale layoutene i denne listen</translation>
     </message>
   </context>
   <context>
@@ -1705,6 +1792,29 @@
     </message>
   </context>
   <context>
+    <name>LogSettingsDialog</name>
+    <message>
+      <source>Enable</source>
+      <translation>Aktiver</translation>
+    </message>
+    <message>
+      <source>Logging Level</source>
+      <translation>Loggingsnivå</translation>
+    </message>
+    <message>
+      <source>Split File by Size</source>
+      <translation>Del fil etter størrelse</translation>
+    </message>
+    <message>
+      <source>Split File by Time</source>
+      <translation>Del fil etter tid</translation>
+    </message>
+    <message>
+      <source>Limit Max Volume</source>
+      <translation>Begrens maks størrelse</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
@@ -1725,6 +1835,45 @@
     <message>
       <source>Test</source>
       <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>LogsManagementWidget</name>
+    <message>
+      <source>Download</source>
+      <translation>Last ned</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Innstillingar</translation>
+    </message>
+    <message>
+      <source>Reset to Default</source>
+      <translation>Tilbakestill til standard</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation>Ferdig</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation>Prøv på nytt</translation>
+    </message>
+    <message>
+      <source>Download complete!</source>
+      <translation>Nedlasting ferdig!</translation>
+    </message>
+    <message>
+      <source>Failed to save logs to the selected folder</source>
+      <translation>Kunne ikke lagre logger i den valgte mappen</translation>
+    </message>
+    <message>
+      <source>Open Files Folder</source>
+      <translation>Åpne filmappe</translation>
     </message>
   </context>
   <context>
@@ -1779,7 +1928,7 @@
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>Vis måloverlegg for PTZ-kameraer</translation>
     </message>
   </context>
   <context>
@@ -1851,6 +2000,18 @@
       <source>Advanced settings</source>
       <translation>Avanserte innstillinger</translation>
     </message>
+    <message>
+      <source>Get Update File</source>
+      <translation>Få oppdateringsfil</translation>
+    </message>
+    <message>
+      <source>Check Again</source>
+      <translation>Sjekk igjen</translation>
+    </message>
+    <message>
+      <source>Try Again</source>
+      <translation>Prøv igjen</translation>
+    </message>
   </context>
   <context>
     <name>MultilineTextPickerWidget</name>
@@ -1907,7 +2068,7 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>Tilkoblingsinnstillinger</translation>
     </message>
     <message>
       <source>Email</source>
@@ -1923,23 +2084,23 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Serveradresse</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>Sikkerhetsprotokoll</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>E-postinnstillinger</translation>
     </message>
     <message>
       <source>Support Signature</source>
       <translation>Brukerstøtte signatur</translation>
     </message>
     <message>
-      <source>System Singnature</source>
-      <translation type="unfinished">System Singnature</translation>
+      <source>System Signature</source>
+      <translation>Systemsignatur</translation>
     </message>
   </context>
   <context>
@@ -2467,23 +2628,23 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>Alarm/hendelsesregler</translation>
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>Ny regel</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <translation>Slett regel</translation>
     </message>
     <message>
-      <source>Select some rule</source>
-      <translation type="unfinished">Select some rule</translation>
+      <source>Select a Rule</source>
+      <translation>Velg en regel</translation>
     </message>
     <message>
-      <source>Reset default rules</source>
-      <translation type="unfinished">Reset default rules</translation>
+      <source>Reset Default Rules</source>
+      <translation>Tilbakestill standardregler</translation>
     </message>
   </context>
   <context>
@@ -2553,7 +2714,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
+      <translation>Bevegelse &amp;&amp; Objekter</translation>
     </message>
   </context>
   <context>
@@ -2580,27 +2741,27 @@
     </message>
     <message>
       <source>Data protection</source>
-      <translation type="unfinished">Data protection</translation>
+      <translation>Databeskyttelse</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Bruk kun HTTPS for å koble til kameraer</translation>
     </message>
     <message>
       <source>User Activity</source>
-      <translation type="unfinished">User Activity</translation>
+      <translation>Brukeraktivitet</translation>
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
+      <translation>Vis servere i treet for ikke-administratorbrukere</translation>
     </message>
     <message>
       <source>Archive encryption</source>
-      <translation type="unfinished">Archive encryption</translation>
+      <translation>Arkivkryptering</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Arkivkryptering øker CPU-bruken</translation>
     </message>
     <message>
       <source>Change Password...</source>
@@ -2612,19 +2773,19 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>Forbindelsen med kameraer som ikke støtter HTTPS vil gå tapt.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Tving servere til å akseptere kun krypterte tilkoblinger</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Krypter videotrafikk til stasjonære og mobile klienter</translation>
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Administrer brukere</translation>
     </message>
   </context>
   <context>
@@ -2642,7 +2803,7 @@
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
-      <translation type="unfinished">Server certificate</translation>
+      <translation>Serversertifikat</translation>
     </message>
     <message>
       <source>General</source>
@@ -2654,7 +2815,7 @@
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation type="unfinished">Self-signed root certificate</translation>
+      <translation>Selvsignert rotsertifikat</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -2662,7 +2823,7 @@
     </message>
     <message>
       <source>Certificate is expired</source>
-      <translation type="unfinished">Certificate is expired</translation>
+      <translation>Sertifikatet er utløpt</translation>
     </message>
     <message>
       <source>Fingerprints</source>
@@ -2674,11 +2835,11 @@
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
+      <translation>Fest til dette sertifikatet</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
+      <translation>Vis festet sertifikat</translation>
     </message>
   </context>
   <context>
@@ -2716,7 +2877,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Oppdag innebygde og USB-webkameraer automatisk</translation>
     </message>
   </context>
   <context>
@@ -2728,10 +2889,6 @@
     <message>
       <source>Force Alarm Layout opening</source>
       <translation>Tving åpning av alarmvisning</translation>
-    </message>
-    <message>
-      <source>Also show source camera</source>
-      <translation>Vis også kildekamera</translation>
     </message>
   </context>
   <context>
@@ -2751,10 +2908,6 @@
     <message>
       <source>Rule will work only for prolonged events</source>
       <translation>Regel vil bare fungere for langvarige hendelser</translation>
-    </message>
-    <message>
-      <source>Also show on source camera</source>
-      <translation>Vis også på kildekamera</translation>
     </message>
   </context>
   <context>
@@ -2795,11 +2948,11 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Lyd</translation>
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Administrer</translation>
     </message>
   </context>
   <context>
@@ -2855,10 +3008,6 @@
       <translation>Reindekserer sikkerhetskopi</translation>
     </message>
     <message>
-      <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>Analyse-data vil fortsette å bli lagret på den deaktiverte stasjonen.</translation>
-    </message>
-    <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
       <translation>Opptak til deaktivert lagringsplass vil stoppe. Men utdaterte opptak vil fremdeles slettes.</translation>
     </message>
@@ -2867,8 +3016,12 @@
       <translation>Innspilling aktivert på USB-lagringen</translation>
     </message>
     <message>
-      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation>Analytics-data kan ta store mengder plass. Vi anbefaler å velge et annet sted for det i stedet for systempartisjonen.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation>Analytics-data kan ta opp store mengder plass. Vi anbefaler å velge en annen plassering for den i stedet for systempartisjonen.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
+      <translation>Analyse-data vil fortsette å bli lagret på den deaktiverte stasjonen.</translation>
     </message>
   </context>
   <context>
@@ -2935,8 +3088,8 @@
       <translation>Advarsel! Dette vil gjøre innstillingene for kvalitet og bildefrekvens (BPS) i opptaksplanen uten betydning.</translation>
     </message>
     <message>
-      <source>Custom language for mobile notifications</source>
-      <translation>Tilpasset språk for mobilvarsler</translation>
+      <source>Custom language for Cloud notifications</source>
+      <translation>Egendefinert språk for skyvarsler</translation>
     </message>
   </context>
   <context>
@@ -3004,11 +3157,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ Legg til gruppe</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Ingen grupper funnet</translation>
     </message>
   </context>
   <context>
@@ -3019,11 +3172,11 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ Legg til bruker</translation>
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>Ingen brukere funnet</translation>
     </message>
   </context>
   <context>
@@ -3071,7 +3224,7 @@
     <name>UserSettingsDialog</name>
     <message>
       <source>This user can use digest authentication.</source>
-      <translation type="unfinished">This user can use digest authentication.</translation>
+      <translation>Denne brukeren kan bruke sammendragsgodkjenning.</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
@@ -3172,7 +3325,7 @@
     </message>
     <message>
       <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
+      <translation>Proxy denne nettsiden via server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3184,15 +3337,15 @@
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation type="unfinished">Allow using Client API</translation>
+      <translation>Tillat bruk av Client API</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation type="unfinished">Proxy all requested contents</translation>
+      <translation>Fullmakt for alt etterspurt innhold</translation>
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>Tillat åpning av nettside uten SSL-sertifikatkontroll</translation>
     </message>
   </context>
   <context>

@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>설명</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation>속성</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,21 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>I/O 모듈 %1이 끊어졌습니다.</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation type="unfinished">
+        <numerusform>Device Disconnected</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
       <translation type="unfinished">Device ID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation type="unfinished">
+        <numerusform>Camera Disconnected</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +195,17 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>%1에서 카메라 IP 충돌</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>장치 IP 충돌</translation>
+      <translation>
+        <numerusform>장치 IP 충돌</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation>
+        <numerusform>카메라 IP 충돌</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -226,10 +238,6 @@
       <translation>공간으로 단어 구분됨</translation>
     </message>
     <message>
-      <source>Generic</source>
-      <translation>일반</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>상태</translation>
     </message>
@@ -249,24 +257,8 @@
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Do HTTP request</source>
-      <translation>HTTP 요청</translation>
-    </message>
-    <message>
       <source>Interval of action</source>
       <translation type="unfinished">Interval of action</translation>
-    </message>
-    <message>
-      <source>HTTP Url</source>
-      <translation type="unfinished">HTTP Url</translation>
-    </message>
-    <message>
-      <source>HTTP Content</source>
-      <translation type="unfinished">HTTP Content</translation>
-    </message>
-    <message>
-      <source>Content type</source>
-      <translation>콘텐츠 형식</translation>
     </message>
     <message>
       <source>Login</source>
@@ -277,8 +269,24 @@
       <translation>패스워드</translation>
     </message>
     <message>
-      <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
+      <source>Do HTTP(S) request</source>
+      <translation type="unfinished">Do HTTP(S) request</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation type="unfinished">HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation type="unfinished">HTTP(S) Content</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation type="unfinished">Content Type</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
@@ -292,16 +300,16 @@
       <translation>인증키 이슈</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
   </context>
   <context>
@@ -311,16 +319,16 @@
       <translation>%1의 모션</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>상태</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>카메라</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation type="unfinished">Motion on Camera</translation>
     </message>
   </context>
   <context>
@@ -332,6 +340,66 @@
     <message>
       <source>Network Issue</source>
       <translation>네트워크 문제</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>%n 초간 데이터 받기 실패.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>기본 스트림의 RTP 오류 (%1).</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>보조 스트림의 RTP 오류 (%1).</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTP 패킷 손실이 발생함.</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation type="unfinished">Camera time is back to normal.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>장치는 네트워크 요청에 응답 하지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation type="unfinished">Multicast address conflict detected.</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>카메라 메인스트림 연결이 예상치 못하게 끊겼습니다.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>카메라 2nd 스트림이 에상치 못하게 끊겼습니다.</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>장치 연결이 예상치 못하게 끊김.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
     </message>
   </context>
   <context>
@@ -370,10 +438,6 @@
     <message>
       <source>Plugin Diagnostic Event</source>
       <translation>플러그인 진단 이벤트</translation>
-    </message>
-    <message>
-      <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -493,6 +557,14 @@
       <source>Server Failure</source>
       <translation>서버 오류</translation>
     </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>서버 접속 연결 실패.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>서버는 예기치 않게 중단 되었습니다.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
@@ -581,6 +653,46 @@
       <source>Storage Issue</source>
       <translation>저장공간 문제</translation>
     </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>%1에 I/O 오류 발생.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>%1. 에 저장을 위한 HDD/SSD 속도 정보.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>HDD/SSD 디스크 "%1" 꽉 찼습니다. 디스크에 VM에 의해 관리 되지 않는 너무 많은 데이터를 포함 합니다.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>시스템 디스크 &quot;%1&quot;가 거의 찼습니다.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>웹 로그 분석 저장 공간 &quot;%1&quot; 은 오프라인입니다.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>에널리틱 저장소 &quot;%1&quot; 가 거의 찼습니다.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation type="unfinished">RAID error: %1.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -618,6 +730,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>플러그인 : %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>캡션: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>원인: %1</translation>
     </message>
   </context>
   <context>

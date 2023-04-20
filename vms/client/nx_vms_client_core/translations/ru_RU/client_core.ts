@@ -216,52 +216,56 @@
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
-      <source>Trust this server?</source>
-      <translation>Доверять этому серверу?</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Невозможно проверить личность %1</translation>
-    </message>
-    <message>
-      <source>System:</source>
-      <translation>Система:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>Сервер:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>ID сервера:</translation>
-    </message>
-    <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Просмотрите сведения о сертификате, чтобы убедиться, что вы подключаетесь к правильному серверу.</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>Сертификат сервера недействителен.</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation>Подключаетесь к %1 в первый раз?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <source>certificate details</source>
+      <translation>сведения о сертификате</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
-      <translation type="unfinished">You attempted to connect to this Server but the Server&apos;s certificate has changed.</translation>
+      <source>help article</source>
+      <translation>справочная статья</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <source>Read this %1 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation>Прочитайте %1, чтобы узнать больше о проверке сертификата.</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
+      <translation>Проверьте %1, чтобы убедиться, что вы доверяете серверу, к которому подключаетесь.%2</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation>сертификат сервера</translation>
+    </message>
+    <message>
+      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
+      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation>Вы можете просмотреть %1 или прочитать %2, чтобы узнать больше о текущей проблеме.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
+      <comment>%1 is the system name, %2 are possible extra details</comment>
+      <translation>Это может произойти из-за просроченного сертификата сервера или из-за того, что кто-то пытается выдать себя за %1, чтобы украсть вашу личную информацию.%2</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation>Это сообщение может отображаться несколько раз при подключении к многосерверной системе.</translation>
+    </message>
+    <message>
+      <source>To learn more about the current problem view the server&apos;s certificate:</source>
+      <translation>Чтобы узнать больше о текущей проблеме, просмотрите сертификат сервера:</translation>
     </message>
   </context>
 </TS>

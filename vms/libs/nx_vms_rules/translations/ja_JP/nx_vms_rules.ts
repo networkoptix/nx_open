@@ -39,10 +39,6 @@
       <source>Description</source>
       <translation>説明(&amp;D)</translation>
     </message>
-    <message>
-      <source>Attributes</source>
-      <translation>属性</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
@@ -162,13 +158,21 @@
       <source>I/O Module %1 was disconnected</source>
       <translation>IOモジュール %1 切断</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation>デバイス切断</translation>
+      <translation>
+        <numerusform>デバイス切断</numerusform>
+      </translation>
     </message>
     <message>
       <source>Device ID</source>
       <translation>デバイスID</translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera Disconnected</source>
+      <translation>
+        <numerusform>カメラ切断</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -191,9 +195,17 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>カメラIPが %1 と重複</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation>デバイスの IPの競合</translation>
+      <translation>
+        <numerusform>デバイスの IP競合</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Camera IP Conflict</source>
+      <translation>
+        <numerusform>カメラのIP競合</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -226,10 +238,6 @@
       <translation>キーワード (スペース区切り)</translation>
     </message>
     <message>
-      <source>Generic</source>
-      <translation>一般</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>状態</translation>
     </message>
@@ -249,24 +257,8 @@
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Do HTTP request</source>
-      <translation>HTTPリクエスト</translation>
-    </message>
-    <message>
       <source>Interval of action</source>
       <translation>実行間隔</translation>
-    </message>
-    <message>
-      <source>HTTP Url</source>
-      <translation>HTTP URL</translation>
-    </message>
-    <message>
-      <source>HTTP Content</source>
-      <translation>HTTPコンテンツ</translation>
-    </message>
-    <message>
-      <source>Content type</source>
-      <translation>コンテンツタイプ</translation>
     </message>
     <message>
       <source>Login</source>
@@ -277,7 +269,23 @@
       <translation>パスワード</translation>
     </message>
     <message>
-      <source>Request method</source>
+      <source>Do HTTP(S) request</source>
+      <translation>HTTP(S) リクエストを実行</translation>
+    </message>
+    <message>
+      <source>HTTP(S) URL</source>
+      <translation>HTTP(S) URL</translation>
+    </message>
+    <message>
+      <source>HTTP(S) Content</source>
+      <translation>HTTP(S) コンテンツ</translation>
+    </message>
+    <message>
+      <source>Content Type</source>
+      <translation>コンテンツタイプ</translation>
+    </message>
+    <message>
+      <source>Request Method</source>
       <translation>リクエストメソッド</translation>
     </message>
   </context>
@@ -292,16 +300,16 @@
       <translation>ライセンス障害</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>ライセンスが不足しています　記録は次のデバイスで無効になっています:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
+      <translation>ライセンスが不足しています。以下のデバイスで録画が無効になっています:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>ライセンスが不足しています　記録は次のカメラで無効になっています:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
+      <translation>ライセンスが不足しています。以下のカメラで録画が無効になっています:</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>ライセンスが不足しています　記録は次のI/Oモジュールで無効になっています:</translation>
+      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
+      <translation>ライセンスが不足しています。以下のI/Oモジュールで録音が無効になっています:</translation>
     </message>
   </context>
   <context>
@@ -311,16 +319,16 @@
       <translation>動体検知ON %1</translation>
     </message>
     <message>
-      <source>Motion Event</source>
-      <translation>モーションイベント</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>状態</translation>
     </message>
     <message>
       <source>Camera</source>
       <translation>カメラ</translation>
+    </message>
+    <message>
+      <source>Motion on Camera</source>
+      <translation>カメラのモーション</translation>
     </message>
   </context>
   <context>
@@ -332,6 +340,66 @@
     <message>
       <source>Network Issue</source>
       <translation>ネットワーク障害</translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>%n 秒間データを受信していません。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1).</source>
+      <translation>プライマリストリームのRTPエラー (%1)。</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1).</source>
+      <translation>セカンダリストリームのRTPエラー (%1)。</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTPパケットロスが検出されました。</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal.</source>
+      <translation>カメラ時刻が正常な状態に戻りました。</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>デバイスがネットワーク要求に応答しません。</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on primary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>アドレス %1 は、すでに %2 のプライマリストリームとして使用されています。</translation>
+    </message>
+    <message>
+      <source>Address %1 is already in use by %2 on secondary stream.</source>
+      <comment>%1 is the address, %2 is the device name</comment>
+      <translation>アドレス %1 は、すでに %2 のセカンダリストリームとして使用されています。</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected.</source>
+      <translation>マルチキャストアドレスの競合が検出されました。</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address.</source>
+      <translation>ネットワークアドレス %1 はマルチキャストアドレスではありません。</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>カメラ (プライマリストリーム) への接続が予期せず終了しました。</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>カメラ (セカンダリストリーム) への接続が予期せず終了しました。</translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>デバイスとの通信が予期せず終了しました。</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
+      <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。代わりにシステム時刻が使用されます。</translation>
     </message>
   </context>
   <context>
@@ -372,10 +440,6 @@
       <translation>プラグイン診断イベント</translation>
     </message>
     <message>
-      <source>%1 - %2</source>
-      <translation>%1 - %2</translation>
-    </message>
-    <message>
       <source>Camera</source>
       <translation>カメラ</translation>
     </message>
@@ -389,7 +453,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>説明(&amp;D)</translation>
+      <translation>説明</translation>
     </message>
     <message>
       <source>Level</source>
@@ -493,6 +557,14 @@
       <source>Server Failure</source>
       <translation>サーバー不良</translation>
     </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>サーバーへの接続が失われました。</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>サーバーが予期せず停止しました。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
@@ -581,6 +653,46 @@
       <source>Storage Issue</source>
       <translation>ストレージエラー</translation>
     </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>%1 でI/Oエラーが発生しました。</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>%1 へのHDD/SSD書き込み速度が不十分です。</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>HDD/SSDディスク &quot;%1&quot; がいっぱいです。ディスク上にVMS管理外のデータが多すぎます。</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>システムディスク &quot;%1&quot; の空き容量が少なくなっています。</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>分析ストレージ &quot;%1&quot; がオフラインです。</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>分析ストレージ &quot;%1&quot; の空き容量が少なくなっています。</translation>
+    </message>
+    <message>
+      <source>Archive backup failed. Failed to backup file %1.</source>
+      <translation>アーカイブのバックアップに失敗しました。ファイル %1のバックアップに失敗しました。</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
+      <translation>分析ストレージ &quot;%1&quot; データベースエラー: マウントポイントの権限が不足しています。</translation>
+    </message>
+    <message>
+      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
+      <translation>メディアアーカイブの録画が有効になっている間は、AES 暗号化を初期化できません。データは暗号化されずに書き込まれます。</translation>
+    </message>
+    <message>
+      <source>RAID error: %1.</source>
+      <translation>RAID エラー: %1。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -598,7 +710,7 @@
     </message>
     <message>
       <source>Display text for</source>
-      <translation>テキスト表示</translation>
+      <translation>テキスト表示期間</translation>
     </message>
     <message>
       <source>Text</source>
@@ -618,6 +730,14 @@
     <message>
       <source>Plugin: %1</source>
       <translation>プラグイン: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>キャプション: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>理由: %1</translation>
     </message>
   </context>
   <context>
