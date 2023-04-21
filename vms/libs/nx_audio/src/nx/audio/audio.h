@@ -4,7 +4,7 @@
 
 namespace nx::audio {
 
-// Forces usage of primary speakers in iOS.
-void forceSpeakersUsage();
+// Setup audio sessions mode, etc, if needed.
+void setupAudio();
 
-} // namespace nx::audio
+} //namespace nx::audio
