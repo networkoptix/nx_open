@@ -15,6 +15,7 @@ extern "C"
 #include <speex/speex_preprocess.h>
 
 #include <decoders/audio/ffmpeg_audio_decoder.h>
+#include <nx/audio/audio.h>
 #include <nx/build_info.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
@@ -136,6 +137,9 @@ void DesktopAudioOnlyDataProvider::run()
 
     startInputs();
     m_initialized = true;
+
+    // Re-setup audio session since QAudioInput initialization may cause invalid changes.
+    nx::audio::setupAudio();
 
     exec();
 

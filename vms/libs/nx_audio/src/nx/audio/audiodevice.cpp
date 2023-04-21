@@ -4,6 +4,7 @@
 
 #include <QtCore/QScopedPointer>
 
+#include "audio.h"
 #include "sound.h"
 
 #ifdef Q_OS_MAC
@@ -14,10 +15,6 @@
 #include <AL/alc.h>
 #endif
 #include <nx/utils/log/log.h>
-
-#if defined(Q_OS_IOS)
-#include <nx/audio/ios_audio_utils.h>
-#endif
 
 #ifdef OPENAL_STATIC
 extern "C"
@@ -80,10 +77,6 @@ int AudioDevice::internalBufferInSamples(ALCdevice* device)
 
 AudioDevice *AudioDevice::instance()
 {
-#if defined (Q_OS_IOS)
-    nx::audio::forceSpeakersUsage();
-#endif
-
     static AudioDevice audioDevice;
     return &audioDevice;
 }
@@ -106,6 +99,8 @@ AudioDevice::AudioDevice(QObject* parent):
         alc_init();
         NX_DEBUG(this, "OpenAL init");
     #endif
+
+    nx::audio::setupAudio();
 
     m_device = alcOpenDevice(nullptr);
     initDeviceInternal();

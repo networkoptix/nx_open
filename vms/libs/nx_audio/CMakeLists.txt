@@ -1,7 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 if (IOS)
-    set(mac_sources src/nx/audio/ios_audio_utils.mm)
+    set(mac_sources src/nx/audio/audio_ios.mm)
 endif()
 
 nx_add_target(nx_audio LIBRARY NO_API_MACROS
