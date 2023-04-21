@@ -86,11 +86,19 @@ Button
         {
             id: iconLabel
 
-            x: control.contentHAlignment === Qt.AlignHCenter
-                ? (parent.width - width) / 2
-                : control.contentHAlignment === Qt.AlignRight
-                    ? parent.width - width
-                    : 0
+            x:
+            {
+                if (control.contentHAlignment === Qt.AlignHCenter)
+                    return (parent.width - width) / 2
+
+                if (control.contentHAlignment === Qt.AlignRight)
+                    return parent.width - width
+
+                return 0
+            }
+
+            width: Math.min(implicitWidth, parent.width)
+
             anchors.verticalCenter: parent.verticalCenter
 
             text: control.text

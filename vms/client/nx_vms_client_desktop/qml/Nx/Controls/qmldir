@@ -8,6 +8,7 @@ ArrowIcon 1.0 ArrowIcon.qml
 AutoScalableItem 1.0 AutoScalableItem.qml
 AutoScroller 1.0 AutoScroller.qml
 Banner 1.0 Banner.qml
+BasicTableCellDelegate 1.0 BasicTableCellDelegate.qml
 Bubble 1.0 Bubble.qml
 BubbleToolTip 1.0 BubbleToolTip.qml
 Button 1.0 Button.qml
@@ -72,6 +73,7 @@ SwitchIcon 1.0 SwitchIcon.qml
 Tab 1.0 Tab.qml
 TabBar 1.0 TabBar.qml
 TabControl 1.0 TabControl.qml
+TableView 1.0 TableView.qml
 TextArea 1.0 TextArea.qml
 TextButton 1.0 TextButton.qml
 TextField 1.0 TextField.qml
