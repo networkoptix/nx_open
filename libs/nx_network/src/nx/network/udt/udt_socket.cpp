@@ -200,7 +200,12 @@ bool UdtSocket<InterfaceToImplement>::setReuseAddrFlag(bool reuseAddr)
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::getReuseAddrFlag(bool* val) const
 {
-    NX_ASSERT(!isClosed());
+    if (isClosed())
+    {
+        SystemError::setLastErrorCode(SystemError::badDescriptor);
+        return false;
+    }
+
     int len = sizeof(*val);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_REUSEADDR, val, &len);
     if (ret != 0)
@@ -245,7 +250,12 @@ bool UdtSocket<InterfaceToImplement>::setNonBlockingMode(bool val)
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::getNonBlockingMode(bool* val) const
 {
-    NX_ASSERT(!isClosed());
+    if (isClosed())
+    {
+        SystemError::setLastErrorCode(SystemError::badDescriptor);
+        return false;
+    }
+
     int len = sizeof(*val);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_SNDSYN, val, &len);
 
@@ -285,7 +295,12 @@ bool UdtSocket<InterfaceToImplement>::setSendBufferSize(unsigned int buffSize)
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::getSendBufferSize(unsigned int* buffSize) const
 {
-    NX_ASSERT(!isClosed());
+    if (isClosed())
+    {
+        SystemError::setLastErrorCode(SystemError::badDescriptor);
+        return false;
+    }
+
     int len = sizeof(*buffSize);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_SNDBUF, buffSize, &len);
     if (ret != 0)
@@ -312,7 +327,12 @@ bool UdtSocket<InterfaceToImplement>::setRecvBufferSize(unsigned int buffSize)
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::getRecvBufferSize(unsigned int* buffSize) const
 {
-    NX_ASSERT(!isClosed());
+    if (isClosed())
+    {
+        SystemError::setLastErrorCode(SystemError::badDescriptor);
+        return false;
+    }
+
     int len = sizeof(*buffSize);
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_RCVBUF, buffSize, &len);
     if (ret != 0)
@@ -343,7 +363,12 @@ bool UdtSocket<InterfaceToImplement>::setRecvTimeout(unsigned int millis)
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::getRecvTimeout(unsigned int* millis) const
 {
-    NX_ASSERT(!isClosed());
+    if (isClosed())
+    {
+        SystemError::setLastErrorCode(SystemError::badDescriptor);
+        return false;
+    }
+
     int time;
     int len = sizeof(time);
     int ret = UDT::getsockopt(
@@ -416,7 +441,6 @@ bool UdtSocket<InterfaceToImplement>::getProtocol(int* protocol) const
 template<typename InterfaceToImplement>
 AbstractSocket::SOCKET_HANDLE UdtSocket<InterfaceToImplement>::handle() const
 {
-    NX_ASSERT(!isClosed());
     static_assert(
         sizeof(UDTSOCKET) <= sizeof(AbstractSocket::SOCKET_HANDLE),
         "One have to fix UdtSocket<InterfaceToImplement>::handle() implementation");
