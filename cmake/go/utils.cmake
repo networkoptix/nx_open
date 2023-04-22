@@ -2,8 +2,6 @@
 
 include_guard()
 
-include(list_subdirectories)
-
 # If the current platform is WIN32, out_target will have ".exe" appended to it and the result
 # stored in out_target.
 function(nx_go_fix_target_exe target out_target)
