@@ -3,7 +3,7 @@
 include_guard()
 
 include(list_subdirectories)
-include(go/utils)
+include(go/target)
 
 if(NOT cmake_nxgtest_dir)
     set(cmake_nxgtest_dir ${CMAKE_CURRENT_LIST_DIR})
