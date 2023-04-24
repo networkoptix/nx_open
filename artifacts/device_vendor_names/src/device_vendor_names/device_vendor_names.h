@@ -20,6 +20,7 @@ inline QString shortVendorByName(const QString& vendor)
         {"flir systems", "flir"},
         {"hanwha techwin", "hanwha"},
         {"hanwha_techwin", "hanwha"},
+        {"hanwha vision", "hanwha"},
         {"samsung techwin", "samsung"},
         {"2n telecommunications", "2nt"},
         {"hangzhou hikvision digital technology co., ltd", "hikvision"},
