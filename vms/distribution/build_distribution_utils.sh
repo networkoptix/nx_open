@@ -9,6 +9,17 @@
 #--------------------------------------------------------------------------------------------------
 # private
 
+# [in] PLATFORM
+#
+distrib_librarySuffix()
+{
+    if [[ "${PLATFORM}" =~ ^macos_.*$ ]]; then
+        echo "dylib"
+    else
+        echo "so"
+    fi
+}
+
 # [in] distrib_EXTRA_HELP
 #
 distrib_showHelp()
@@ -143,7 +154,7 @@ distrib_copyMediaserverPluginsToDir() # plugins-folder-name target-dir plugin_li
             # Plugin is a "directory" plugin.
             plugin_path="${BUILD_DIR}/bin/${plugins_dir_name}/${plugin}"
         else
-            plugin_path="${BUILD_DIR}/bin/${plugins_dir_name}/lib${plugin}.so"
+            plugin_path="${BUILD_DIR}/bin/${plugins_dir_name}/lib${plugin}.$(distrib_librarySuffix)"
         fi
 
         if [[ -f "${plugin_path}" ]]; then

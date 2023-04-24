@@ -1,6 +1,7 @@
 # This file is filtered by cmake; intended to be sourced into build_distribution.sh.
 
 ARCH="@arch@"
+PLATFORM="@platform@"
 CUSTOMIZATION="@customization.companyId@"
 LOGS_DIR="@CMAKE_BINARY_DIR@/build_logs"
 DISTRIBUTION_OUTPUT_DIR="@distribution_output_dir@" #< If empty, CURRENT_BUILD_DIR will be used.
