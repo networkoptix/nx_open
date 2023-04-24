@@ -296,12 +296,12 @@ void CloudServerSocket::startAcceptor(
 
             if (code == SystemError::noError)
             {
-                NX_INFO(this, "Cloud connection (session %1) from %2 has been accepted. Info %3",
+                NX_DEBUG(this, "Cloud connection (session %1) from %2 has been accepted. Info %3",
                     acceptorPtr->connectionId(), acceptorPtr->remotePeerId(), acceptorPtr->toString());
             }
             else
             {
-                NX_INFO(this, "Cloud connection (session %1) from %2 has not been accepted with error %3. Info %4",
+                NX_WARNING(this, "Cloud connection (session %1) from %2 has not been accepted with error %3. Info %4",
                     acceptorPtr->connectionId(), acceptorPtr->remotePeerId(), SystemError::toString(code),
                     acceptorPtr->toString());
             }
