@@ -44,9 +44,11 @@ protected:
     friend class ManagerHid;
 
 private:
-    ParsedFieldLocation parseLocation(const FieldLocation& location);
     QBitArray parseData(const QBitArray& buffer, const ParsedFieldLocation& location);
     State parseOsHidLevelState(const QBitArray& osHidLevelState);
+
+public:
+    static ParsedFieldLocation parseLocation(const FieldLocation& location);
 
 private:
     int m_bufferSize = 0;
