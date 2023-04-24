@@ -146,6 +146,13 @@ struct Ini: nx::kit::IniConfig
         allowOwnCloudNotifications,
         "[Dev] Allow receiving cloud notifications from the current cloud system");
 
+    NX_INI_FLAG(true,
+        restApiResourceChangesManager,
+        "[Dev] Enable rest api for resource change manager requests");
+
+    NX_INI_FLAG(false, virtualJoystick,
+        "[Dev] Enables joystick emulator (works only on MacOS).");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.

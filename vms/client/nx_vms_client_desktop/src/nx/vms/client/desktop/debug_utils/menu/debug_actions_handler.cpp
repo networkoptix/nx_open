@@ -8,6 +8,7 @@
 
 #include <api/common_message_processor.h>
 #include <client/client_runtime_settings.h>
+#include <nx/build_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -34,6 +35,7 @@
 #include "../dialogs/palette_dialog.h"
 #include "../dialogs/qml_test_dialog.h"
 #include "../dialogs/resource_pool_dialog.h"
+#include "../dialogs/virtual_joystick_dialog.h"
 #include "../dialogs/web_engine_dialog.h"
 #include "../utils/cameras_actions.h"
 #include "../utils/client_webserver.h"
@@ -140,6 +142,12 @@ DebugActionsHandler::DebugActionsHandler(QObject *parent):
     WebEngineDialog::registerAction();
     WelcomeScreenTest::registerAction();
     testkit::TestKit::registerAction();
+
+    if (nx::build_info::isMacOsX())
+    {
+        if (ini().virtualJoystick)
+            VirtualJoystickDialog::registerAction();
+    }
 }
 
 void DebugActionsHandler::registerDebugCounterActions()

@@ -28,7 +28,8 @@ struct OsHidDeviceMac::Private
     QBitArray state;
 };
 
-OsHidDeviceMac::OsHidDeviceMac(const OsHidDeviceInfo& info): d(new Private{.deviceInfo = info})
+OsHidDeviceMac::OsHidDeviceMac(const OsHidDeviceInfo& info):
+    d(new Private{.deviceInfo = info})
 {
 }
 
