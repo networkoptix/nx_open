@@ -29,17 +29,17 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
                 utils::kDurationFieldName,
                 tr("Fixed duration"),
                 {},
-                {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 9999h, .minimumValue = 5s}),
+                {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 9999h, .minimumValue = 1s}),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordBeforeFieldName,
                 tr("Pre-recording"),
                 {},
-                {.initialValue = 1s, .maximumValue = 600s, .minimumValue = 10s}),
+                {.initialValue = 1s, .maximumValue = 600s, .minimumValue = 0s}),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordAfterFieldName,
                 tr("Post-recording"),
                 {},
-                {.initialValue = 0s, .maximumValue = 600s, .minimumValue = 10s},
+                {.initialValue = 0s, .maximumValue = 600s, .minimumValue = 0s},
                 {utils::kDurationFieldName})
         }
     };

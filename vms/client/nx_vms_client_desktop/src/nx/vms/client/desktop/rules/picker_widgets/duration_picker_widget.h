@@ -138,12 +138,10 @@ private:
         DurationPicker<F>::onDescriptorSet();
 
         m_checkBox->setText(m_fieldDescriptor->displayName);
-        if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
-        {
-            m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
-            m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
-            m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
-        }
+
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
+        m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Days);
     }
 
     void updateUi() override
