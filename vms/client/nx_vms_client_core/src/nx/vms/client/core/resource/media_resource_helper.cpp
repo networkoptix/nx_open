@@ -55,11 +55,6 @@ bool MediaResourceHelper::isVirtualCamera() const
     return d->camera && d->camera->flags().testFlag(Qn::virtual_camera);
 }
 
-bool MediaResourceHelper::audioSupported() const
-{
-    return d->camera && d->camera->isAudioSupported();
-}
-
 bool MediaResourceHelper::audioEnabled() const
 {
     return d->camera && d->camera->isAudioEnabled();
@@ -236,7 +231,6 @@ void MediaResourceHelper::Private::handleResourceChanged()
     emit q->fisheyeParamsChanged();
     emit q->analogCameraWithoutLicenseChanged();
     emit q->virtualCameraChanged();
-    emit q->audioSupportedChanged();
     emit q->audioEnabledChanged();
     emit q->livePreviewVideoQualityChanged();
 }
