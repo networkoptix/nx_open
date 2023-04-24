@@ -62,8 +62,11 @@ private:
     {
         ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>::onDescriptorSet();
 
-        m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString(
-            parentParamsWidget()->descriptor().id));
+        if (Policy::canUseSourceCamera())
+        {
+            m_checkBox->setText(ResourcePickerWidgetStrings::useEventSourceString(
+                parentParamsWidget()->descriptor().id));
+        }
     }
 
     void updateUi() override
