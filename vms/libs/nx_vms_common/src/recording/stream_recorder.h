@@ -94,6 +94,8 @@ protected:
     virtual void setLastError(nx::recording::Error::Code code) = 0;
 
 private:
+    qint64 isPrimaryStream(const QnConstAbstractMediaDataPtr& md) const;
+    qint64 isPrimaryKeyFrame(const QnConstAbstractMediaDataPtr& md) const;
     qint64 findNextIFrame(qint64 baseTime);
     void updateProgress(qint64 timestampUs);
     bool prepareToStart(const QnConstAbstractMediaDataPtr& mediaData);
@@ -131,6 +133,7 @@ private:
     int m_lastProgress = -1;
     bool m_needReopen = false;
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
+    qint64 m_lastPrimaryTime = AV_NOPTS_VALUE;
     qint64 m_nextIFrameTime = AV_NOPTS_VALUE;
     mutable nx::Mutex m_mutex;
 };
