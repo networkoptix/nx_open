@@ -27,6 +27,7 @@
 namespace {
 
 static const int STORE_QUEUE_SIZE = 50;
+static const int kPrebufferHardLimit = 1000;
 
 } // namespace
 
@@ -88,7 +89,8 @@ void QnStreamRecorder::markNeedKeyData()
 
 void QnStreamRecorder::flushPrebuffer()
 {
-    NX_VERBOSE(this, "Flushing prebuffer for resource %1", m_resource);
+    if (!m_prebuffer.isEmpty())
+        NX_VERBOSE(this, "Flushing prebuffer for resource %1", m_resource);
 
     while (!m_prebuffer.isEmpty())
     {
@@ -99,7 +101,23 @@ void QnStreamRecorder::flushPrebuffer()
         else
             markNeedKeyData();
     }
-    m_nextIFrameTime = AV_NOPTS_VALUE;
+    m_nextIFrameTime = m_lastPrimaryTime = AV_NOPTS_VALUE;
+}
+
+qint64 QnStreamRecorder::isPrimaryStream(const QnConstAbstractMediaDataPtr& md) const
+{
+    if (!m_hasVideo)
+        return md->dataType == QnAbstractMediaData::AUDIO;
+    return md->dataType == QnAbstractMediaData::VIDEO && md->channelNumber == 0;
+}
+
+qint64 QnStreamRecorder::isPrimaryKeyFrame(const QnConstAbstractMediaDataPtr& md) const
+{
+    if (!m_hasVideo)
+        return md->dataType == QnAbstractMediaData::AUDIO;
+    return md->dataType == QnAbstractMediaData::VIDEO 
+        && md->channelNumber == 0
+        && md->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
 }
 
 qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
@@ -107,11 +125,7 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
     for (int i = 0; i < m_prebuffer.size(); ++i)
     {
         const QnConstAbstractMediaDataPtr& media = m_prebuffer.at(i);
-
-        const bool isKeyFrame =
-            media->dataType == QnAbstractMediaData::VIDEO && (media->flags & AV_PKT_FLAG_KEY);
-
-        if ((isKeyFrame || !m_hasVideo) && media->timestamp > baseTime)
+        if (isPrimaryKeyFrame(media) && media->timestamp > baseTime)
             return media->timestamp;
     }
     return AV_NOPTS_VALUE;
@@ -147,12 +161,9 @@ int QnStreamRecorder::getStreamIndex(const QnConstAbstractMediaDataPtr& mediaDat
 
 bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
-    #define VERBOSE(S) NX_VERBOSE(this, nx::format("%1 %2").args(__func__, (S)))
-
     if (m_needReopen)
     {
         m_needReopen = false;
-        VERBOSE("EXIT: Reopening");
         close();
     }
 
@@ -160,10 +171,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
         std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
 
     if (!md)
-    {
-        VERBOSE("EXIT: Unknown data");
         return true; //< skip unknown data
-    }
 
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
@@ -175,84 +183,41 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
     }
 
     m_prebuffer.push(md);
-    if (m_prebufferingUsec == 0 || (md->flags & QnAbstractMediaData::MediaFlags_AlwaysSave))
+    const bool alwaysSave = md->flags & QnAbstractMediaData::MediaFlags_AlwaysSave;
+    const bool timeDiscontinue = isPrimaryStream(md) && md->timestamp < m_lastPrimaryTime;
+    const bool hardLimitReached = m_prebuffer.size() > kPrebufferHardLimit;
+    const qint64 kNoPtsValue = (qint64) AV_NOPTS_VALUE;
+    if (m_prebufferingUsec == 0 || alwaysSave || timeDiscontinue || hardLimitReached)
     {
-        VERBOSE("no pre-buffering");
-        m_nextIFrameTime = AV_NOPTS_VALUE;
-
-        bool prebufferFlushHasBeenLogged = false;
-        while (!m_prebuffer.isEmpty())
-        {
-            if (!prebufferFlushHasBeenLogged)
-            {
-                NX_VERBOSE(this, "Flushing prebuffer inside %1(), resource %2",
-                    __func__, m_resource);
-                prebufferFlushHasBeenLogged = true;
-            }
-
-            QnConstAbstractMediaDataPtr d;
-            m_prebuffer.pop(d);
-
-            if (needSaveData(d))
-                saveData(d);
-            else if (md->dataType == QnAbstractMediaData::VIDEO)
-                markNeedKeyData();
-        }
+        if (timeDiscontinue)
+            NX_VERBOSE(this, "Time discontinue. Resource: %1", m_resource);
+        if (hardLimitReached)
+            NX_VERBOSE(this, "Pre-buffer hard limit reached. Resource: %1", m_resource);
+        flushPrebuffer();
     }
-    else
+    else if (isPrimaryStream(md))
     {
-        bool isKeyFrame = md->dataType == QnAbstractMediaData::VIDEO
-            && (md->flags & AV_PKT_FLAG_KEY);
-        if (m_nextIFrameTime == (qint64) AV_NOPTS_VALUE && (isKeyFrame || !m_hasVideo))
+        m_lastPrimaryTime = md->timestamp;
+        if (m_nextIFrameTime == kNoPtsValue && isPrimaryKeyFrame(md))
             m_nextIFrameTime = md->timestamp;
-        VERBOSE(nx::format("isKeyFrame: %1 "
-            "(dataType == VIDEO: %2; flags & VA_PKT_FLAG_KEY: %3)").args(
-                isKeyFrame ? "true" : "false",
-                md->dataType == QnAbstractMediaData::VIDEO ? "true" : "false",
-                md->flags & AV_PKT_FLAG_KEY ? "true" : "false"));
-
-        if (m_nextIFrameTime != (qint64) AV_NOPTS_VALUE
-            && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
+        while (m_nextIFrameTime != kNoPtsValue && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
         {
-            VERBOSE("find next I-Frame");
-            bool prebufferFlushHasBeenLogged = false;
-            while (!m_prebuffer.isEmpty() && m_prebuffer.front()->timestamp < m_nextIFrameTime)
+            while (!m_prebuffer.isEmpty() && (!isPrimaryStream(m_prebuffer.front())
+                || m_prebuffer.front()->timestamp < m_nextIFrameTime))
             {
                 QnConstAbstractMediaDataPtr d;
                 m_prebuffer.pop(d);
-
-                if (!prebufferFlushHasBeenLogged)
-                {
-                    NX_VERBOSE(this, "Flushing prebuffer inside %1() "
-                        "until I-frame with timestamp %2 us for resource %3",
-                        __func__, m_nextIFrameTime, m_resource);
-
-                    prebufferFlushHasBeenLogged = true;
-                }
-
                 if (needSaveData(d))
                     saveData(d);
                 else if (md->dataType == QnAbstractMediaData::VIDEO)
-                {
                     markNeedKeyData();
-                }
             }
             m_nextIFrameTime = findNextIFrame(m_nextIFrameTime);
         }
-        else
-        {
-            NX_VERBOSE(
-                this, "Won't save data because prerecording buffer hasn't been filled up."
-                " Prebuffering time: %1, nextIFrame: %2, current: %3",
-                m_prebufferingUsec, m_nextIFrameTime, md->timestamp);
-        }
     }
+
     updateProgress(md->timestamp);
-
-    VERBOSE("END");
     return true;
-
-    #undef VERBOSE
 }
 
 bool QnStreamRecorder::prepareToStart(const QnConstAbstractMediaDataPtr& mediaData)
