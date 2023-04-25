@@ -147,6 +147,8 @@ Item
 
     function finishEdit()
     {
+        labelTextField.focus = false
+
         if (!control.editing)
             return
 
