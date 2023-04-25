@@ -47,6 +47,11 @@ void CloudAddressConnector::connectAsync(ConnectHandler handler)
                 [this, errorCode, tunnelAttributes = std::move(tunnelAttributes),
                     cloudConnection = std::move(cloudConnection)]() mutable
                 {
+                    // It is generally expected that connectors report connections bound
+                    // to the same AIO thread as the connector.
+                    if (cloudConnection)
+                        cloudConnection->bindToAioThread(getAioThread());
+
                     nx::utils::swapAndCall(
                         m_handler,
                         errorCode,
