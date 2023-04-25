@@ -1811,7 +1811,7 @@
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation>最大サイズを制限</translation>
+      <translation>合計容量制限</translation>
     </message>
   </context>
   <context>
