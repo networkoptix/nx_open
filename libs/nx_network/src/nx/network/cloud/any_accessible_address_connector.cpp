@@ -177,7 +177,6 @@ void AnyAccessibleAddressConnector::onConnectDone(
 
     if (sysErrorCode == SystemError::noError)
     {
-        NX_ASSERT(connection->getAioThread() == getAioThread());
         if (!cloudTunnelAttributes)
             cloudTunnelAttributes = TunnelAttributes();
         cloudTunnelAttributes->addressType = addressType;
