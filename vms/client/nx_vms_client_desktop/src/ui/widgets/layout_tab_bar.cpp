@@ -28,6 +28,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <ui/common/indents.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -38,6 +39,7 @@ using namespace nx::vms::client::desktop::ui;
 
 namespace {
 static const int kMinimumTabSizeWidth = 50;
+static const QnIndents kTabIndents = {12, 8};
 }
 
 QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
@@ -56,6 +58,7 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     setTabShape(this, nx::style::TabShape::Rectangular);
     setUsesScrollButtons(false);
     setContentsMargins(0, 4, 1, 4);
+    setProperty(nx::style::Properties::kSideIndentation, QVariant::fromValue(kTabIndents));
 
     // Set palette colors for tabs:
     // - QPalette::Text - text;
@@ -291,9 +294,10 @@ QSize QnLayoutTabBar::minimumSizeHint() const
 QSize QnLayoutTabBar::tabSizeHint(int index) const
 {
     auto result = base_type::tabSizeHint(index);
-    if (result.width() < kMinimumTabSizeWidth)
-        result.setWidth(kMinimumTabSizeWidth);
-    return result;
+    int width = result.width() + nx::style::Metrics::kInterSpace;
+    if (width < kMinimumTabSizeWidth)
+        width = kMinimumTabSizeWidth;
+    return QSize(width, result.height());
 }
 
 QSize QnLayoutTabBar::minimumTabSizeHint(int index) const

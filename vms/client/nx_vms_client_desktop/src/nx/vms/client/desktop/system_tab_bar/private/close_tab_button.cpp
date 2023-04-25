@@ -22,12 +22,15 @@ CloseTabButton::CloseTabButton(QWidget* parent): QAbstractButton(parent)
         nullptr,
         Style::kTitleBarSubstitutions);
     setIcon(icon);
-    setContentsMargins(0, 0, 4, 0);
+    setContentsMargins(0, 0, 10, 0);
+    QSize size = core::Skin::maximumSize(icon);
+    size.setWidth(size.width() + contentsMargins().right() + parent->contentsMargins().right());
+    setFixedSize(size);
 }
 
 void CloseTabButton::paintEvent(QPaintEvent*)
 {
-    QPainter p(this);
+    QPainter painter(this);
     QRect rect = this->rect();
     QnIcon::Mode mode;
     QIcon::State state = QIcon::Off;
@@ -41,27 +44,15 @@ void CloseTabButton::paintEvent(QPaintEvent*)
     else
         mode = QnIcon::Normal;
 
-    if (const auto tb = qobject_cast<const QTabBar*>(parent()))
+    if (const auto tabWidget = qobject_cast<const QTabBar*>(parent()))
     {
-        int index = tb->currentIndex();
+        int index = tabWidget->currentIndex();
         auto position = static_cast<QTabBar::ButtonPosition>(
-            style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tb));
-        if (tb->tabButton(index, position) == this)
+            style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tabWidget));
+        if (tabWidget->tabButton(index, position) == this)
             state = QIcon::On;
-
-        auto margins = contentsMargins();
-        rect.moveLeft(position == QTabBar::RightSide ? -margins.right() : margins.left());
-        rect.moveTop(margins.top());
     }
-    icon().paint(&p, rect, Qt::AlignCenter, mode, state);
-}
-
-QSize CloseTabButton::sizeHint() const
-{
-    QSize result = qnSkin->maximumSize(icon());
-    auto margins = contentsMargins();
-    result += QSize(margins.left() + margins.right(), margins.top() + margins.bottom());
-    return result;
+    icon().paint(&painter, rect, Qt::AlignLeft | Qt::AlignVCenter, mode, state);
 }
 
 } // namespace nx::vms::client::desttop
