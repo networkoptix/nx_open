@@ -10339,7 +10339,7 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation>全サーバー間で同期されます。サーバーごとのOS時刻とは異なる場合があります。</translation>
+      <translation>全サーバーで使用される共通の時刻。サーバーごとのOS時刻とは異なる場合があります。</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
@@ -10351,7 +10351,7 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation>同期されません。各サーバーは、独自のローカル時間を使用します。</translation>
+      <translation>同期なし。各サーバーはそれぞれのローカル時刻を使用します。</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
