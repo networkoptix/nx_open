@@ -59,6 +59,7 @@ Item
                 id: descriptionTextArea
                 width: parent.width
                 height: 60
+                wrapMode: TextEdit.Wrap
             }
         }
     }
