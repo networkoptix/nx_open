@@ -138,7 +138,7 @@ void initialize(Manager* manager, Action* root)
     factory(WhatsThisAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Help")) //< To be displayed on button tooltip
-        .icon(qnSkin->icon("titlebar/window_question.png"));
+        .icon(qnSkin->icon("titlebar/window_question.svg"));
 
     factory(CameraDiagnosticsAction)
         .mode(DesktopMode)
@@ -512,18 +512,18 @@ void initialize(Manager* manager, Action* root)
         .toggledText(ContextMenu::tr("Exit Fullscreen"))
         .shortcut(QKeySequence::FullScreen, Builder::Mac, true)
         .shortcutContext(Qt::ApplicationShortcut)
-        .icon(qnSkin->icon("titlebar/window_maximize.png", "titlebar/window_restore.png"));
+        .icon(qnSkin->icon("titlebar/window_maximize.svg", "titlebar/window_restore.svg"));
 
     factory(MinimizeAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Minimize"))
-        .icon(qnSkin->icon("titlebar/window_minimize.png"));
+        .icon(qnSkin->icon("titlebar/window_minimize.svg"));
 
     factory(MaximizeAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Maximize"))
         .toggledText(ContextMenu::tr("Restore Down"))
-        .icon(qnSkin->icon("titlebar/window_maximize.png", "titlebar/window_restore.png"));
+        .icon(qnSkin->icon("titlebar/window_maximize.svg", "titlebar/window_restore.svg"));
 
     factory(FullscreenMaximizeHotkeyAction)
         .flags(GlobalHotkey)
@@ -843,7 +843,6 @@ void initialize(Manager* manager, Action* root)
         .shortcut(QString("Ctrl+Q"), Builder::Mac, true)
         .shortcutContext(Qt::ApplicationShortcut)
         .role(QAction::QuitRole)
-        .icon(qnSkin->icon("titlebar/window_close.png"))
         .iconVisibleInMenu(false);
 
     factory(DelayedForcedExitAction)

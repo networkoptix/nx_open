@@ -316,14 +316,25 @@ bool isNonEditableComboBox(const QWidget* widget)
     return comboBox && !comboBox->isEditable();
 }
 
-int getLeftIndent(const QWidget* widget)
+int leftIndent(const QWidget* widget)
 {
-    if (!qobject_cast<const QAbstractItemView*>(widget))
+    if (!qobject_cast<const QAbstractItemView*>(widget)
+        && !qobject_cast<const QTabBar*>(widget))
+    {
         return Metrics::kStandardPadding;
+    }
 
     const auto value = widget->property(Properties::kSideIndentation);
     return value.canConvert<QnIndents>()
         ? value.value<QnIndents>().left()
+        : Metrics::kStandardPadding;
+}
+
+int rightIndent(const QWidget* widget)
+{
+    const auto value = widget->property(Properties::kSideIndentation);
+    return value.canConvert<QnIndents>()
+        ? value.value<QnIndents>().right()
         : Metrics::kStandardPadding;
 }
 
@@ -1382,22 +1393,24 @@ void Style::drawPrimitive(PrimitiveElement element,
             bool selected = option->state.testFlag(QStyle::State_Selected);
 
             /* Main window tabs draw icons: */
-            if (auto tabBar = qobject_cast<const QTabBar*>(widget->parent()))
+            auto tabBar = qobject_cast<const QTabBar*>(widget->parent());
+            if (!tabBar)
+                tabBar = qobject_cast<const QTabBar*>(widget);
+            if (tabBar && tabShape(tabBar) == TabShape::Rectangular)
             {
-                if (tabShape(tabBar) == TabShape::Rectangular)
-                {
-                    QIcon::State state = selected ? QIcon::On : QIcon::Off;
-                    QIcon icon = qnSkin->icon(
-                        "tab_bar/tab_close.svg",
-                        "tab_bar/tab_close_checked.svg",
-                        nullptr,
-                        kTitleBarSubstitutions);
-                    QIcon::Mode mode = buttonIconMode(*option);
-                    QSize size = qnSkin->maximumSize(icon, mode, state);
-                    QRect rect = Geometry::aligned(size, option->rect);
-                    icon.paint(painter, rect, Qt::AlignCenter, mode, state);
-                    return;
-                }
+                QIcon::State state = selected ? QIcon::On : QIcon::Off;
+                QIcon icon = qnSkin->icon(
+                    "tab_bar/tab_close.svg",
+                    "tab_bar/tab_close_checked.svg",
+                    nullptr,
+                    kTitleBarSubstitutions);
+                QIcon::Mode mode = buttonIconMode(*option);
+                QSize size = qnSkin->maximumSize(icon, mode, state);
+                QRect placeholder = option->rect;
+                placeholder.moveLeft(placeholder.left() - rightIndent(widget));
+                QRect rect = Geometry::aligned(size, placeholder, Qt::AlignVCenter | Qt::AlignRight);
+                icon.paint(painter, rect, Qt::AlignCenter, mode, state);
+                return;
             }
 
             /* Other tabs normally don't have close buttons, but if
@@ -2041,7 +2054,6 @@ void Style::drawControl(ControlElement element,
                     case QFrame::VLine:
                     {
                         QColor mainColor = option->palette.color(QPalette::Shadow);
-
                         QColor firstColor = mainColor;
                         QColor secondColor;
 
@@ -2052,7 +2064,9 @@ void Style::drawControl(ControlElement element,
                         else if (frame->state.testFlag(State_Raised))
                         {
                             secondColor = firstColor;
-                            firstColor = core::colorTheme()->lighter(mainColor, 4);
+                            firstColor = option->palette.color(QPalette::Light);
+                            if (!firstColor.isValid())
+                                firstColor = core::colorTheme()->lighter(mainColor, 4);
                         }
 
                         QRect rect = frame->rect;
@@ -2070,15 +2084,15 @@ void Style::drawControl(ControlElement element,
                         }
                         else
                         {
-                            rect.setLeft(rect.left()
-                                + (rect.width() - frame->lineWidth + 1)
-                                    / 2); /* - center-align vertical lines */
+                            // Center-align vertical lines.
+                            rect.setLeft(qMax(rect.left(), 0) +
+                                (rect.width() - frame->lineWidth * 2) / 2);
                             rect.setWidth(frame->lineWidth);
                             painter->fillRect(rect, firstColor);
 
                             if (secondColor.isValid())
                             {
-                                rect.moveLeft(rect.left() + rect.width());
+                                rect.moveLeft(rect.left() + frame->lineWidth);
                                 painter->fillRect(rect, secondColor);
                             }
                         }
@@ -2185,7 +2199,7 @@ void Style::drawControl(ControlElement element,
                         painter->fillRect(rect, color);
 
                         auto margins = widget->contentsMargins();
-                        if (margins.right() > 0)
+                        if (margins.right() > 0 && tab->position != QStyleOptionTab::End)
                         {
                             painter->fillRect(rect.right() - margins.right() + 1,
                                 margins.top(),
@@ -2193,7 +2207,7 @@ void Style::drawControl(ControlElement element,
                                 rect.height() - margins.top() - margins.bottom(),
                                 option->palette.color(colorGroup, QPalette::Dark));
                         }
-                        if (margins.left() > 0)
+                        if (margins.left() > 0 && tab->position != QStyleOptionTab::Beginning)
                         {
                             painter->fillRect(rect.left(),
                                 margins.top(),
@@ -2216,55 +2230,72 @@ void Style::drawControl(ControlElement element,
             {
                 TabShape shape = tabShape(widget);
                 int textFlags = Qt::TextHideMnemonic;
-
                 QColor color;
-
                 QRect textRect = tab->rect;
                 QRect focusRect = tab->rect;
 
+                auto tabWidget = qobject_cast<const QTabBar*>(widget);
+                auto closeButton = tabWidget
+                    ? tabWidget->tabButton(tab->tabIndex, QTabBar::RightSide)
+                    : nullptr;
+                int padding = leftIndent(widget);
                 int iconWithPadding = 0;
                 if (!tab->icon.isNull())
                 {
                     QSize iconSize = core::Skin::maximumSize(tab->icon);
-                    iconWithPadding = iconSize.width() + Metrics::kStandardPadding;
-                    if (auto tabWidget = qobject_cast<const QTabBar*>(widget))
-                    {
-                        auto closeButton = tabWidget->tabButton(tab->tabIndex, QTabBar::RightSide);
-                        if (closeButton->isVisible())
-                            textRect.setWidth(textRect.width() - tab->rightButtonSize.width());
-                    }
+                    iconWithPadding += iconSize.width();
 
-                    QRect iconRect = textRect;
-                    if (!tab->text.isEmpty())
-                        iconRect.setWidth(iconWithPadding);
+                    QRect iconRect;
+                    if (tab->text.isEmpty())
+                    {
+                        iconRect = textRect;
+                        if (closeButton && closeButton->isVisible())
+                        {
+                            iconRect.setRight(iconRect.right() -
+                                closeButton->width() - Metrics::kInterSpace);
+                            iconRect.setLeft(iconRect.left() + padding);
+                        }
+                    }
+                    else
+                    {
+                        iconRect = Geometry::aligned(
+                            iconSize, textRect, Qt::AlignLeft | Qt::AlignVCenter);
+                        iconRect.moveLeft(iconRect.left() + padding);
+                        textRect.setLeft(textRect.left() + Metrics::kInterSpace);
+                    }
 
                     iconRect = Geometry::aligned(iconSize, iconRect);
                     tab->icon.paint(painter, iconRect);
                 }
 
+                if (closeButton && closeButton->isVisible())
+                {
+                    textRect.setRight(textRect.right() -
+                        closeButton->width() - Metrics::kInterSpace);
+                }
+
+
                 if (shape == TabShape::Rectangular)
                 {
-                    textFlags |= Qt::AlignLeft | Qt::AlignVCenter;
+                    textFlags |= Qt::AlignRight | Qt::AlignVCenter;
+                    iconWithPadding += padding;
+                    textRect.setLeft(textRect.left() + iconWithPadding);
                     auto colorGroup = tab->state.testFlag(State_Selected)
                         ? QPalette::Active
                         : QPalette::Inactive;
                     color = tab->palette.color(colorGroup, QPalette::Text);
-
-                    const int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget);
-                    textRect.adjust(
-                        qMax(iconWithPadding, kRectangularTabTextMargin), 0, -hspace, 0);
                     focusRect.adjust(0, 2, 0, -2);
                 }
                 else
                 {
                     textFlags |= Qt::AlignCenter;
                     textRect.setLeft(textRect.left() + iconWithPadding);
-
-                    const QColor mainColor = core::colorTheme()->darker(tab->palette.light().color(), 2);
+                    const QColor mainColor =
+                        core::colorTheme()->darker(tab->palette.light().color(), 2);
                     color = mainColor;
 
                     QFontMetrics fm(painter->font());
-                    QRect rect = fm.boundingRect(textRect, textFlags, tab->text);
+                    QRect rect = tab->rect.adjusted(padding, 0, -padding, 0);
 
                     if (shape == TabShape::Compact)
                     {
@@ -2302,7 +2333,6 @@ void Style::drawControl(ControlElement element,
                 }
 
                 QnScopedPainterPenRollback penRollback(painter, color);
-
                 drawItemText(painter,
                     textRect,
                     textFlags,
@@ -3319,7 +3349,7 @@ QRect Style::subElementRect(
 
         case SE_TreeViewDisclosureItem:
         {
-            const auto indent = getLeftIndent(widget);
+            const auto indent = leftIndent(widget);
             const auto defaultMargin = pixelMetric(PM_FocusFrameHMargin, option, widget) + 1;
             const auto rect =
                 option->rect.adjusted(indent - defaultMargin, 0, indent - defaultMargin, 0);

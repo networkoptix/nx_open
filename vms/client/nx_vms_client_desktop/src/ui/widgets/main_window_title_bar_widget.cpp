@@ -50,8 +50,19 @@ using namespace nx::vms::client::desktop::ui;
 namespace {
 
 const int kTitleBarHeight = 24;
-const QSize kControlButtonSize(36, kTitleBarHeight);
+const QSize kControlButtonSize(32, 32);
 const auto kTabBarButtonSize = QSize(kTitleBarHeight, kTitleBarHeight);
+
+QFrame* newVLine(const QString& lightColorName, const QString& shadowColorName)
+{
+    QFrame* line = new QFrame();
+    line->setFrameShape(QFrame::VLine);
+    line->setFrameShadow(QFrame::Raised);
+    line->setFixedWidth(2);
+    setPaletteColor(line, QPalette::Light, core::colorTheme()->color(lightColorName));
+    setPaletteColor(line, QPalette::Shadow, core::colorTheme()->color(shadowColorName));
+    return line;
+}
 
 QFrame* newVLine(int verticalMargin = 0, const QString& colorName = "")
 {
@@ -207,7 +218,6 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
 
     d->cloudPanel = new QnCloudStatusPanel(this);
     d->cloudPanel->setFocusPolicy(Qt::NoFocus);
-    d->cloudPanel->setFixedHeight(kTitleBarHeight);
 
     d->newTabButton = newActionButton(
         action::OpenNewTabAction,
@@ -443,8 +453,8 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
     tabLayout->setSpacing(0);
 
     auto tabPlaceholder = new QWidget(this);
-    tabPlaceholder->setAutoFillBackground(true);
-    setPaletteColor(tabPlaceholder, QPalette::Window, core::colorTheme()->color("dark10"));
+    tabPlaceholder->setStyleSheet(QString(".QWidget{ background-color: %1 }").arg(
+        core::colorTheme()->color("dark10").name()));
 
     mainLayout->addLayout(systemLayout);
     mainLayout->addWidget(tabPlaceholder);
@@ -455,26 +465,36 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
     systemLayout->addWidget(d->systemBar);
     systemLayout->addStretch(1);
     systemLayout->addSpacing(80);
-    systemLayout->addWidget(newVLine());
+    systemLayout->addWidget(newVLine("dark8", "dark6"));
     systemLayout->addWidget(d->cloudPanel);
-    systemLayout->addWidget(newVLine());
+    systemLayout->addWidget(newVLine("dark8", "dark6"));
     if (auto indicator = newRecordingIndicator(kControlButtonSize))
+    {
         systemLayout->addWidget(indicator);
+        systemLayout->addWidget(newVLine("dark8", "dark6"));
+    }
     systemLayout->addWidget(newActionButton(
         action::WhatsThisAction,
         Qn::MainWindow_ContextHelp_Help,
         kControlButtonSize));
+    systemLayout->addWidget(newVLine("dark8", "dark6"));
     systemLayout->addWidget(newActionButton(
         action::MinimizeAction,
         kControlButtonSize));
+    systemLayout->addWidget(newVLine("dark8", "dark6"));
     systemLayout->addWidget(newActionButton(
         action::EffectiveMaximizeAction,
         Qn::MainWindow_Fullscreen_Help,
         kControlButtonSize));
-    systemLayout->addWidget(newActionButton(
-        action::ExitAction,
-        kControlButtonSize));
-
+    systemLayout->addWidget(newVLine("dark8", "dark6"));
+    {
+        const QColor background = core::colorTheme()->color("dark7");
+        const core::SvgIconColorer::IconSubstitutions colorSubs = {
+            { QnIcon::Active, {{ background, "red_d1" }}},
+            { QnIcon::Pressed, {{ background, "red_d1" }}}};
+        QIcon icon = qnSkin->icon("titlebar/window_close.svg", "", nullptr, colorSubs);
+        systemLayout->addWidget(newActionButton(action::ExitAction, icon));
+    }
     tabLayout->addWidget(d->tabBar);
     tabLayout->addWidget(d->newTabButton);
     tabLayout->addWidget(newVLine(5, "dark12"));

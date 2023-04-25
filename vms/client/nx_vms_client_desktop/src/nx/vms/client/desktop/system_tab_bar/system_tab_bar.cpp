@@ -3,7 +3,6 @@
 #include "system_tab_bar.h"
 
 #include <QtCore/QScopedValueRollback>
-#include <QtGui/QPainter>
 #include <QtGui/QAction>
 #include <QtWidgets/QToolButton>
 
@@ -16,6 +15,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <ui/common/indents.h>
 #include <ui/widgets/main_window.h>
 #include <utils/common/delayed.h>
 
@@ -25,7 +25,8 @@
 namespace {
 static const int kFixedTabSizeHeight = 32;
 static const int kFixedHomeIconWidth = 32;
-static const int kFixedWideHomeIconWidth = 52;
+static const int kFixedWideHomeIconWidth = 65;
+static const QnIndents kTabIndents = {14, 10};
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -43,6 +44,7 @@ SystemTabBar::SystemTabBar(QWidget *parent):
     setUsesScrollButtons(false);
     setFixedHeight(kFixedTabSizeHeight);
     setContentsMargins(1, 0, 1, 0);
+    setProperty(style::Properties::kSideIndentation, QVariant::fromValue(kTabIndents));
 
     // Set palette colors for tabs:
     // - QPalette::Text - text;
@@ -140,7 +142,7 @@ QSize SystemTabBar::tabSizeHint(int index) const
     else
     {
         auto size = base_type::tabSizeHint(index);
-        width = size.width();
+        width = size.width() + style::Metrics::kStandardPadding;
         if (width < kFixedHomeIconWidth)
             width = kFixedHomeIconWidth;
     }

@@ -16,6 +16,7 @@ namespace nx::style {
 struct Metrics
 {
     static constexpr int kStandardPadding = 8;
+    static constexpr int kInterSpace = 4;
     static constexpr int kMenuItemHPadding = 12;
     static constexpr int kMenuItemVPadding = 5;
     static constexpr int kMenuItemTextLeftPadding = 28;
