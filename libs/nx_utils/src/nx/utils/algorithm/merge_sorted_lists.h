@@ -24,35 +24,52 @@ namespace nx::utils::algorithm {
  */
 template<class ListOfSortedLists, class LessPredicate>
 auto merge_sorted_lists(
-    ListOfSortedLists&& sortedLists,
+    ListOfSortedLists sortedLists,
     LessPredicate lessItem,
-    int totalLimit = std::numeric_limits<int>::max())
+    int totalLimit = std::numeric_limits<int>::max(),
+    bool removeDuplicates = true)
 {
     using SortedList = std::remove_reference_t<decltype(*sortedLists.begin())>;
+    using DestinationList = std::remove_cv_t<SortedList>;
 
     if (totalLimit <= 0)
         totalLimit = std::numeric_limits<int>::max(); //< No limit.
 
-    const auto truncatedList =
-        [](SortedList list, int limit)
+    const auto processOneList =
+        [removeDuplicates, lessItem](DestinationList list, int limit)
         {
+            if (removeDuplicates)
+            {
+                const auto equals =
+                    [lessItem](const auto& l, const auto& r)
+                    {
+                        return !(lessItem(l, r) || lessItem(r, l));
+                    };
+
+                list.erase(
+                    std::unique(list.begin(), list.end(), equals),
+                    list.end());
+            }
+
             if ((int) list.size() <= limit)
                 return list;
 
+            // Truncate.
             auto outOfLimit = list.begin();
             std::advance(outOfLimit, limit);
             list.erase(outOfLimit, list.end());
+
             return list;
         };
 
     switch (sortedLists.size())
     {
         case 0: return SortedList();
-        case 1: return truncatedList(std::move(*sortedLists.begin()), totalLimit);
+        case 1: return processOneList(std::move(*sortedLists.begin()), totalLimit);
         default: break;
     }
 
-    using Iterator = typename SortedList::iterator;
+    using Iterator = decltype(sortedLists.begin()->begin());
     using IteratorRange = std::pair<Iterator, Iterator>;
 
     std::vector<IteratorRange> queueData;
@@ -71,11 +88,11 @@ auto merge_sorted_lists(
     switch (queueData.size())
     {
         case 0: return SortedList();
-        case 1: return truncatedList(std::move(*lastNonEmptyList), totalLimit);
+        case 1: return processOneList(std::move(*lastNonEmptyList), totalLimit);
         default: break;
     }
 
-    SortedList result;
+    DestinationList result;
     static constexpr int kMaximumReserve = 10000; // Something sensible.
 
     result.reserve(std::min(totalLimit, kMaximumReserve));
@@ -93,10 +110,8 @@ auto merge_sorted_lists(
         std::pop_heap(queueData.begin(), queueData.end(), lessPriority);
         auto& range = queueData.back();
 
-        if constexpr (std::is_rvalue_reference_v<decltype(sortedLists)>)
+        if (!removeDuplicates || result.empty() || lessItem(result.back(), *range.first))
             result.push_back(std::move(*range.first));
-        else
-            result.push_back(*range.first);
 
         ++range.first;
 
@@ -126,7 +141,8 @@ auto merge_sorted_lists(
     ListOfSortedLists sortedLists,
     SortFieldGetter sortFieldGetter,
     Qt::SortOrder sortOrder = Qt::AscendingOrder,
-    int totalLimit = std::numeric_limits<int>::max())
+    int totalLimit = std::numeric_limits<int>::max(),
+    bool removeDuplicates = true)
 {
     using SortedList = std::remove_reference_t<decltype(*sortedLists.begin())>;
     using Item = typename SortedList::value_type;
@@ -136,7 +152,7 @@ auto merge_sorted_lists(
         ? Less([key = sortFieldGetter](const Item& l, const Item& r) { return key(l) < key(r); })
         : Less([key = sortFieldGetter](const Item& l, const Item& r) { return key(l) > key(r); });
 
-    return merge_sorted_lists(std::move(sortedLists), less, totalLimit);
+    return merge_sorted_lists(std::move(sortedLists), less, totalLimit, removeDuplicates);
 };
 
 /**
@@ -154,13 +170,14 @@ template<class ListOfSortedLists>
 auto merge_sorted_lists(
     ListOfSortedLists sortedLists,
     Qt::SortOrder sortOrder = Qt::AscendingOrder,
-    int totalLimit = std::numeric_limits<int>::max())
+    int totalLimit = std::numeric_limits<int>::max(),
+    bool removeDuplicates = true)
 {
     using SortedList = std::remove_reference_t<decltype(*sortedLists.begin())>;
 
     return merge_sorted_lists(std::move(sortedLists),
         [](const typename SortedList::value_type& value) { return value; },
-        sortOrder, totalLimit);
+        sortOrder, totalLimit, removeDuplicates);
 }
 
 } // namespace nx::utils::algorithm

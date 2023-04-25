@@ -2,10 +2,12 @@
 
 #include "camera_bookmark.h"
 
-#include <QtCore/QMap>
 #include <QtCore5Compat/QLinkedList>
+#include <QtCore/QMap>
 
+#include <core/resource/bookmark_sort.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/algorithm/merge_sorted_lists.h>
 #include <nx/vms/common/system_context.h>
 #include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
@@ -13,218 +15,25 @@
 using namespace std::chrono;
 using namespace nx::vms::common;
 
-namespace
-{
-// TODO: #ynikitenkov make generic version of algorithm
-typedef std::function<bool (const QnCameraBookmark &first, const QnCameraBookmark &second)> BinaryPredicate;
-QnCameraBookmarkList mergeSortedBookmarks(
-    const QnMultiServerCameraBookmarkList &source,
-    const BinaryPredicate &pred,
-    int limit)
-{
-    int totalSize = 0;
+namespace {
 
-    typedef std::vector<const QnCameraBookmarkList *> NonEmptyBookmarksList;
-    const auto nonEmptySources = [&totalSize, &source]() -> NonEmptyBookmarksList
-    {
-        NonEmptyBookmarksList result;
-        for (const auto &bookmarks: source)
-        {
-            if (bookmarks.empty())
-                continue;
-
-            totalSize += bookmarks.size();
-            result.push_back(&bookmarks);
-        }
-        return result;
-    }();
-
-    if (nonEmptySources.empty())
-        return QnCameraBookmarkList();
-
-    if (nonEmptySources.size() == 1)
-    {
-        const QnCameraBookmarkList &result = *nonEmptySources.front();
-        return result.size() <= limit ? result : result.mid(0, limit);
-    }
-    else if (nonEmptySources.size() == 2)
-    {
-        QnCameraBookmarkList result;
-        const auto& source = nonEmptySources;
-
-        result.resize(source[0]->size() + source[1]->size());
-        auto itr = std::set_union(
-            source[0]->constBegin(), source[0]->constEnd(),
-            source[1]->constBegin(), source[1]->constEnd(),
-            result.begin(), pred);
-        if (!result.empty())
-            result.resize(itr - result.begin());
-        return result.size() <= limit ? result : result.mid(0, limit);
-    }
-
-    typedef QPair<QnCameraBookmarkList::const_iterator,
-        QnCameraBookmarkList::const_iterator> IteratorsPair;
-    typedef std::vector<IteratorsPair> MergeDataVector;
-
-    MergeDataVector mergeData =
-        [nonEmptySources]() -> MergeDataVector
-        {
-            MergeDataVector result;
-            for (const auto source: nonEmptySources)
-                result.push_back(IteratorsPair(source->begin(), source->end()));
-            return result;
-        }();
-
-    const int resultSize = std::min(totalSize, limit);
-
-    QnCameraBookmarkList result;
-    result.reserve(resultSize);
-    while(!mergeData.empty() && (result.size() < resultSize))
-    {
-        // Looking for bookmarks list with minimal value
-        auto mergeDataIt = mergeData.begin();
-        const QnCameraBookmark *minBookmark = mergeDataIt->first;
-        for (auto it = mergeDataIt + 1; it != mergeData.end(); ++it)
-        {
-            const QnCameraBookmark *currentBookmark= it->first;
-            if (!pred(*currentBookmark, *minBookmark))
-                continue;
-
-            mergeDataIt = it;
-            minBookmark = currentBookmark;
-        }
-
-        result.append(*minBookmark);
-        if (++mergeDataIt->first == mergeDataIt->second)    // if list with min element is logically empty
-            mergeData.erase(mergeDataIt);
-
-        // TODO: #ynikitenkov add copy elements if it is only one list
-    }
-    return result;
-}
-
-template<typename GetterType>
-BinaryPredicate makePredByGetter(const GetterType &getter, bool isAscending)
-{
-    const BinaryPredicate ascPred =
-        [getter](const QnCameraBookmark &first, const QnCameraBookmark &second)
-        {
-            const auto firstValue = getter(first);
-            const auto secondValue = getter(second);
-            if (firstValue != secondValue)
-                return firstValue < secondValue;
-            return first.guid < second.guid;
-        };
-
-    const BinaryPredicate descPred =
-        [getter](const QnCameraBookmark &first, const QnCameraBookmark &second)
-        {
-            const auto firstValue = getter(first);
-            const auto secondValue = getter(second);
-            if (firstValue != secondValue)
-                return firstValue > secondValue;
-            return first.guid > second.guid;
-        };
-
-    return isAscending ? ascPred : descPred;
-}
-
-BinaryPredicate createPredicate(SystemContext* systemContext, const QnBookmarkSortOrder &sortOrder)
-{
-    const bool isAscending = (sortOrder.order == Qt::AscendingOrder);
-
-    switch(sortOrder.column)
-    {
-        case nx::vms::api::BookmarkSortField::name:
-        {
-            return makePredByGetter(
-                [](const QnCameraBookmark &bookmark)
-                {
-                    return bookmark.name;
-                }, isAscending);
-        }
-        case nx::vms::api::BookmarkSortField::startTime:
-        {
-            return makePredByGetter(
-                [](const QnCameraBookmark &bookmark)
-                {
-                    return bookmark.startTimeMs;
-                }, isAscending);
-        }
-        case nx::vms::api::BookmarkSortField::duration:
-        {
-            return makePredByGetter(
-                [](const QnCameraBookmark &bookmark)
-                {
-                    return bookmark.durationMs;
-                }, isAscending);
-        }
-        case nx::vms::api::BookmarkSortField::creationTime:
-        {
-            return makePredByGetter(
-                [](const QnCameraBookmark &bookmark)
-                {
-                    return bookmark.creationTime();
-                }, isAscending);
-        }
-        case nx::vms::api::BookmarkSortField::tags:
-        {
-            static const auto tagsGetter =
-                [](const QnCameraBookmark &bookmark)
-                {
-                    return QnCameraBookmark::tagsToString(bookmark.tags);
-                };
-            return makePredByGetter(tagsGetter, isAscending);
-        }
-        case nx::vms::api::BookmarkSortField::description:
-        {
-            static const auto descriptionGetter =
-                [](const QnCameraBookmark &bookmark)
-                {
-                    return bookmark.description;
-                };
-            return makePredByGetter(descriptionGetter, isAscending);
-        }
-        case nx::vms::api::BookmarkSortField::creator:
-        {
-            const auto creatorGetter =
-                [systemContext](const QnCameraBookmark& bookmark)
-                {
-                    auto resourcePool = systemContext->resourcePool();
-                    return helpers::getBookmarkCreatorName(bookmark, resourcePool);
-                };
-            return makePredByGetter(creatorGetter, isAscending);
-        }
-        case nx::vms::api::BookmarkSortField::cameraName:
-        {
-            static utils::QnCameraNamesWatcher namesWatcher(systemContext);
-            static const auto cameraNameGetter = [](const QnCameraBookmark &bookmark)
-                { return namesWatcher.getCameraName(bookmark.cameraId); };
-
-            return makePredByGetter(cameraNameGetter, isAscending);
-        }
-        default:
-        {
-            NX_ASSERT(false, "Invalid bookmark sorting field!");
-            return BinaryPredicate();
-        }
-    };
-};
+using BinaryPredicate =
+    std::function<bool (const QnCameraBookmark& first, const QnCameraBookmark& second)> ;
 
 QnMultiServerCameraBookmarkList sortEachList(
     SystemContext* systemContext,
     QnMultiServerCameraBookmarkList sources,
-    const QnBookmarkSortOrder &sortProp)
+    const QnBookmarkSortOrder& sortProp)
 {
-    for (auto &source: sources)
+    for (auto& source: sources)
         QnCameraBookmark::sortBookmarks(systemContext, source, sortProp);
 
     return std::move(sources);
 }
 
-typedef QLinkedList<QnCameraBookmarkList::const_iterator> ItersLinkedList;
+using ItersLinkedList = QLinkedList<QnCameraBookmarkList::const_iterator>;
 
-QnCameraBookmarkList createListFromIters(const ItersLinkedList &iters)
+QnCameraBookmarkList createListFromIters(const ItersLinkedList& iters)
 {
     QnCameraBookmarkList result;
     result.reserve(iters.size());
@@ -233,7 +42,7 @@ QnCameraBookmarkList createListFromIters(const ItersLinkedList &iters)
     return result;
 };
 
-QnCameraBookmarkList getSparseByIters(ItersLinkedList &bookmarkIters, int limit)
+QnCameraBookmarkList getSparseByIters(ItersLinkedList& bookmarkIters, int limit)
 {
     NX_ASSERT(limit > 0, "Limit should be greater than 0!");
     if (limit <= 0)
@@ -266,7 +75,7 @@ QnCameraBookmarkList getSparseByIters(ItersLinkedList &bookmarkIters, int limit)
 }
 
 QnCameraBookmarkList getSparseBookmarks(
-    const QnCameraBookmarkList &bookmarks,
+    const QnCameraBookmarkList& bookmarks,
     const std::optional<milliseconds>& minVisibleLength,
     int limit,
     const BinaryPredicate &pred)
@@ -297,7 +106,8 @@ QnCameraBookmarkList getSparseBookmarks(
     QnMultiServerCameraBookmarkList toMergeLists;
     toMergeLists.push_back(createListFromIters(valuableBookmarksIters));
     toMergeLists.push_back(getSparseByIters(nonValuableBookmarksIters, nonValuableBookmarkToAddCount));
-    return mergeSortedBookmarks(toMergeLists, pred, limit);
+
+    return nx::utils::algorithm::merge_sorted_lists(std::move(toMergeLists), pred, limit);
 }
 } // namespace
 
@@ -343,13 +153,10 @@ void QnCameraBookmark::sortBookmarks(
     QnCameraBookmarkList &bookmarks,
     const QnBookmarkSortOrder orderBy)
 {
-    /* For some reason clang fails to compile this if createPredicate is passed directly to std::sort.
-       Using lambda for this works. */
-    auto pred = createPredicate(systemContext, orderBy);
-    std::sort(bookmarks.begin(), bookmarks.end(), [pred](const QnCameraBookmark &first, const QnCameraBookmark &second)
-    {
-        return pred(first, second);
-    });
+    const auto pred = ::createBookmarkSortPredicate(
+        orderBy.column, orderBy.order, systemContext->resourcePool());
+
+    std::sort(bookmarks.begin(), bookmarks.end(), pred);
 }
 
 milliseconds QnCameraBookmark::creationTime() const
@@ -391,10 +198,12 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
     if (limit <= 0)
         return QnCameraBookmarkList();
 
-    const auto pred = createPredicate(systemContext, sortOrder);
+    const auto pred = ::createBookmarkSortPredicate(sortOrder.column, sortOrder.order,
+        systemContext ? systemContext->resourcePool() : nullptr); //< For unit test flexibility.
 
     const int intermediateLimit = (minVisibleLength ? QnCameraBookmarkSearchFilter::kNoLimit : limit);
     QnCameraBookmarkList result;
+
     switch(sortOrder.column)
     {
         case nx::vms::api::BookmarkSortField::creationTime:
@@ -402,14 +211,14 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
         case nx::vms::api::BookmarkSortField::cameraName:
         case nx::vms::api::BookmarkSortField::tags:
         {
-            const auto bookmarksList = sortEachList(systemContext, source, sortOrder);
-            result = mergeSortedBookmarks(bookmarksList, pred, intermediateLimit);
+            auto bookmarksList = sortEachList(systemContext, source, sortOrder);
+            result = nx::utils::algorithm::merge_sorted_lists(std::move(bookmarksList), pred, limit);
             break;
         }
         default:
         {
             // All data by other columns is sorted by database.
-            result = mergeSortedBookmarks(source, pred, intermediateLimit);
+            result = nx::utils::algorithm::merge_sorted_lists(source, pred, intermediateLimit);
         }
     }
 
