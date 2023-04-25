@@ -1482,7 +1482,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Unsecure</source>
-      <translation>安全でない</translation>
+      <translation>暗号化なし</translation>
     </message>
     <message>
       <source>Check</source>
@@ -8802,7 +8802,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LogSettingsDialog</name>
     <message>
       <source>Reset to Default</source>
-      <translation>既定値にリセット</translation>
+      <translation>初期設定にリセット</translation>
     </message>
     <message>
       <source>Must be greater than or equal to the value set for Split File by Size</source>
@@ -8810,19 +8810,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Must be less than or equal to the value set for Limit Max Volume</source>
-      <translation>「最大サイズを制限」の設定値以下である必要があります</translation>
+      <translation>「合計容量制限」の設定値以下である必要があります</translation>
     </message>
     <message>
       <source>The selected Logging Level may not be collecting enough information.
 The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
       <translation>指定されたログレベルでは、十分な情報を収集できない可能性があります。
-ログレベル &quot;%1&quot; はより詳細な情報を提供します。</translation>
+ログレベル &quot;%1&quot; では、より詳細な情報が提供されます。</translation>
     </message>
     <message>
       <source>The selected Logging Level may degrade your system&apos;s performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
       <translation>指定されたログレベルではシステムのパフォーマンスが低下する可能性があります。
-必要なログを収集した後、忘れずにログレベルをデフォルト設定にお戻しください。</translation>
+必要なログを収集した後、忘れずにログレベルを初期設定にお戻しください。</translation>
     </message>
   </context>
   <context>
@@ -10705,7 +10705,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation>全サーバー間で同期されます。サーバーごとのOS時刻とは異なる場合があります。</translation>
+      <translation>全サーバーで使用される共通の時刻。サーバーごとのOS時刻とは異なる場合があります。</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
@@ -10717,7 +10717,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation>同期されません。各サーバーは、独自のローカル時間を使用します。</translation>
+      <translation>同期なし。各サーバーはそれぞれのローカル時刻を使用します。</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
@@ -10725,11 +10725,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation>インターネットに接続できません。時刻が同期されていません。</translation>
+      <translation>インターネットに接続できません。時刻は同期されていません。</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation>タイムサーバーはオフラインです。時間が同期されていません。</translation>
+      <translation>タイムサーバーがオフラインです。時刻は同期されていません。</translation>
     </message>
   </context>
   <context>
