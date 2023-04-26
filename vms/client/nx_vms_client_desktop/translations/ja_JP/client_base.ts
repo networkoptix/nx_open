@@ -2662,7 +2662,8 @@
       <source>Connect to your Systems
 from anywhere with any
 devices</source>
-      <translation>場所やデバイスを問わず、このシステムに接続できます</translation>
+      <translation>任意のデバイスでどこからでも
+システムに接続</translation>
     </message>
     <message>
       <source>Disconnect System from %1</source>
@@ -5303,7 +5304,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation>Windowsネットワーク共有リソース</translation>
+      <translation>ネットワーク共有リソース</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
@@ -10359,11 +10360,11 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation>インターネットに接続できません。時刻が同期されていません。</translation>
+      <translation>インターネットに接続できません。時刻は同期されていません。</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation>タイムサーバーはオフラインです。時間が同期されていません。</translation>
+      <translation>タイムサーバーがオフラインです。時刻は同期されていません。</translation>
     </message>
   </context>
   <context>

@@ -1192,7 +1192,7 @@
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>サーバーの競合</translation>
+      <translation>サーバー競合</translation>
     </message>
     <message>
       <source>Server Started</source>
@@ -1352,11 +1352,11 @@
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>重複サーバー #%1: %2</translation>
+      <translation>競合サーバー #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation>重複サーバー: %1</translation>
+      <translation>競合サーバー: %1</translation>
     </message>
     <message>
       <source>Trigger: %1</source>
