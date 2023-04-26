@@ -141,7 +141,7 @@ Item
                         id: descriptionTextArea
                         width: parent.width
                         height: 60
-                        enabled: control.nameEditable
+                        readOnly: !control.nameEditable
                         wrapMode: TextEdit.Wrap
                     }
                 }

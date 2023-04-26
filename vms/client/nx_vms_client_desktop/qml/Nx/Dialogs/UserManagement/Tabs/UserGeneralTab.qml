@@ -214,9 +214,9 @@ Item
                         {
                             id: userFullNameTextField
                             width: parent.width
-                            enabled: control.fullNameEditable
-                                && control.enabled
-                                && control.userType != UserSettingsGlobal.CloudUser
+                            readOnly: !control.fullNameEditable
+                                || !control.enabled
+                                || control.userType == UserSettingsGlobal.CloudUser
                         }
                     }
 
@@ -288,7 +288,7 @@ Item
                         {
                             id: userEmailTextField
                             width: parent.width
-                            enabled: control.emailEditable && control.enabled
+                            readOnly: !(control.emailEditable && control.enabled)
                             validateFunc: (text) =>
                             {
                                 return control.self && enabled
