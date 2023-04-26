@@ -471,8 +471,13 @@ void CSndQueue::sendPostedPackets()
 
 void CRcvUList::push_back(std::shared_ptr<CUDT> u)
 {
-    m_sockets.push_back(CRNode{u->socketId(), u, CTimer::getTime()});
-    m_socketIdToNode[u->socketId()] = --m_sockets.end();
+    const auto id = u->socketId();
+
+    if (auto it = m_socketIdToNode.find(id); it != m_socketIdToNode.end())
+        m_sockets.erase(it->second);
+
+    m_sockets.push_back(CRNode{.socketId = id, .socket = u, .timestamp = CTimer::getTime()});
+    m_socketIdToNode[id] = std::prev(m_sockets.end());
 }
 
 void CRcvUList::erase(std::list<CRNode>::iterator it)
@@ -489,7 +494,7 @@ void CRcvUList::sink(UDTSOCKET socketId)
 
     it->second->timestamp = CTimer::getTime();
     m_sockets.splice(m_sockets.end(), m_sockets, it->second);
-    it->second = --m_sockets.end();
+    it->second = std::prev(m_sockets.end());
 }
 
 //-------------------------------------------------------------------------------------------------
