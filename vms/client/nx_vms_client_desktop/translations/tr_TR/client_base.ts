@@ -2212,7 +2212,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation type="unfinished">MitM attack from server %1</translation>
+      <translation>Sunucu %1 MitM saldırısı</translation>
     </message>
     <message>
       <source>Connected to %1</source>
@@ -2909,7 +2909,7 @@ to %1</source>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>%1 ile Sistem bağlantısı kesildi</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
@@ -3116,7 +3116,7 @@ to %1</source>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>Sistem, iki faktörlü kimlik doğrulama ile uyumlu değil</translation>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
@@ -3206,7 +3206,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
+      <translation>Sistemi yedekten geri yüklemek için hesap parolanızı girin</translation>
     </message>
     <message>
       <source>Restore</source>
@@ -3998,7 +3998,7 @@ to %1</source>
     </message>
     <message>
       <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+      <translation>Geçerli bir lisansınız yok. Lütfen ticari veya deneme lisansınızı etkinleştirin.</translation>
     </message>
   </context>
   <context>
@@ -6132,7 +6132,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
-      <translation type="unfinished">Camera %1 does not support PTZ</translation>
+      <translation>Kamera %1 PTZ'yi desteklemiyor</translation>
     </message>
   </context>
   <context>
@@ -6675,7 +6675,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
+      <translation>Bu grubu %1 ile birleştirmek ister misiniz?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
@@ -7894,7 +7894,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 gerekli</numerusform>
         <numerusform>%1 are required</numerusform>
       </translation>
     </message>
@@ -8127,7 +8127,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+      <translation>Oturumunuz sona erdi. Devam etmek için lütfen tekrar oturum açın.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -8143,7 +8143,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>None of your Servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your Servers is connected to the Internet.</translation>
+      <translation>Sunucularınızın hiçbiri İnternete bağlı değil.</translation>
     </message>
     <message>
       <source>System connected to %1</source>

@@ -2828,7 +2828,8 @@ License Key: %2</source>
       <source>Connect to your Systems
 from anywhere with any
 devices</source>
-      <translation>場所やデバイスを問わず、このシステムに接続できます</translation>
+      <translation>任意のデバイスでどこからでも
+システムに接続</translation>
     </message>
     <message>
       <source>Disconnect System from %1</source>
@@ -5367,7 +5368,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation>Windowsネットワーク共有リソース</translation>
+      <translation>ネットワーク共有リソース</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
@@ -7495,11 +7496,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation>部分的に転送されます:</translation>
+      <translation>部分的に移転されます:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation>転送されません:</translation>
+      <translation>移転されません:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7515,7 +7516,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation>転送するデータ</translation>
+      <translation>移転するデータ</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
@@ -7523,7 +7524,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation>古いカメラのデータが新しいカメラに転送できるか確認しています。</translation>
+      <translation>古いカメラのデータが新しいカメラに移転できるか確認しています。</translation>
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
@@ -11789,7 +11790,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation>互換性の問題により、交換したカメラから一部の設定が転送されない場合があります。</translation>
+      <translation>互換性の問題により、交換したカメラから一部の設定が移転されない場合があります。</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>

@@ -37,7 +37,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>説明(&amp;D)</translation>
+      <translation>説明</translation>
     </message>
   </context>
   <context>
@@ -148,20 +148,20 @@
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation>デバイス %1 切断</translation>
+      <translation>デバイス %1 が切断されました</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>カメラ %1 切断</translation>
+      <translation>カメラ %1 が切断されました</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>IOモジュール %1 切断</translation>
+      <translation>IOモジュール %1 が切断されました</translation>
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
       <translation>
-        <numerusform>デバイス切断</numerusform>
+        <numerusform>デバイスが切断されました</numerusform>
       </translation>
     </message>
     <message>
@@ -188,7 +188,7 @@
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>デバイスIPが %1 と重複</translation>
+      <translation>デバイスのIPが %1 と重複</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
@@ -231,7 +231,7 @@
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation>一般的イベント %1</translation>
+      <translation>%1 の汎用イベント</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -473,7 +473,7 @@
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation>理由：電力制限を超えました（%1）</translation>
+      <translation>理由：電力制限を超えました (%1)</translation>
     </message>
     <message>
       <source>PoE over Budget</source>
@@ -526,12 +526,12 @@
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation>重複サーバー: %1</translation>
+      <translation>競合サーバー: %1</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>重複サーバー #%1: %2</translation>
+      <translation>競合サーバー #%1: %2</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
@@ -544,7 +544,7 @@
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>サーバの競合</translation>
+      <translation>サーバー競合</translation>
     </message>
   </context>
   <context>
