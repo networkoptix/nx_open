@@ -12,6 +12,12 @@ static const QRect kMaxGridRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeigh
 
 //--------------------------------------- QnMetaDataV1 -------------------------------------------
 
+QnMetaDataV1::QnMetaDataV1()
+    : QnAbstractCompressedMetadata(MetadataType::Motion, kMotionDataBufferSize)
+{
+    m_data.writeFiller(0, m_data.capacity());
+}
+
 //TODO #akolesnikov delegate constructor
 QnMetaDataV1::QnMetaDataV1(std::chrono::microseconds timestamp_, int initialValue, int extraBufferSize)
     :
@@ -33,9 +39,9 @@ QnMetaDataV1::QnMetaDataV1(std::chrono::microseconds timestamp_, const char* buf
     m_data.writeFiller(0, extraBufferSize);
 }
 
-QnMetaDataV1Ptr QnMetaDataV1::fromLightData(const QnMetaDataV1Light& lightData, std::chrono::microseconds timestamp)
+QnMetaDataV1Ptr QnMetaDataV1::fromLightData(const QnMetaDataV1Light& lightData)
 {
-    QnMetaDataV1Ptr result(new QnMetaDataV1(timestamp));
+    QnMetaDataV1Ptr result(new QnMetaDataV1());
     result->timestamp = lightData.startTimeMs*1000;
     result->m_duration = lightData.durationMs*1000;
     result->channelNumber = lightData.channel;
@@ -495,7 +501,7 @@ QByteArray QnMetaDataV1::serialize() const
     buffer.open(QIODevice::WriteOnly);
     NX_ASSERT(channelNumber <= 255);
     qint64 timeStampMs = qToBigEndian(timestamp / 1000);
-    int durationMs = qToBigEndian(m_duration / 1000);
+    int durationMs = qToBigEndian(int(m_duration / 1000));
     buffer.write((const char*)&timeStampMs, sizeof(qint64));
     buffer.write((const char*)&durationMs, sizeof(int));
     quint8 channel8 = channelNumber;
