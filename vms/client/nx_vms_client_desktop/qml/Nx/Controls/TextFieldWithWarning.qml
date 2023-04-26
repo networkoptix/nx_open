@@ -9,6 +9,7 @@ FocusScope
 {
     id: root
     property alias warningText: warningMessage.text
+    property alias readOnly: textField.readOnly
     property real warningSpacing: 8
 
     implicitWidth: textField.implicitWidth
