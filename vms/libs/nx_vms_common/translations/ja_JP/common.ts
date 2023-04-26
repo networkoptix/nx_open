@@ -1062,31 +1062,31 @@
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation>アクセス禁止。</translation>
+      <translation>Forbidden</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation>競合。</translation>
+      <translation>Conflict</translation>
     </message>
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation>不正なリクエスト。</translation>
+      <translation>Bad request</translation>
     </message>
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation>未実装。</translation>
+      <translation>Not implemented</translation>
     </message>
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation>見つかりません。</translation>
+      <translation>Not found</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation>内部エラー。</translation>
+      <translation>Internal error</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1094,11 +1094,11 @@
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation>サービス利用不可。</translation>
+      <translation>Service unavailable</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation>権限がありません。</translation>
+      <translation>Unauthorized</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -1730,7 +1730,7 @@
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>サーバーの競合</translation>
+      <translation>サーバー競合</translation>
     </message>
     <message>
       <source>Server Started</source>
@@ -1890,11 +1890,11 @@
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>重複サーバー #%1: %2</translation>
+      <translation>競合サーバー #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation>重複サーバー: %1</translation>
+      <translation>競合サーバー: %1</translation>
     </message>
     <message>
       <source>Trigger: %1</source>

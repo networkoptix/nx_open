@@ -1157,7 +1157,7 @@
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Oturum yetkilendirmesi gerekli.</translation>
     </message>
   </context>
   <context>
@@ -2323,19 +2323,19 @@
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Kaynak kamerada da ayarla</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Ayrıca kaynak kamerada tetikle</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Kaynak kamerayı da kaydedin</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>Kaynak kamerada da oynat</translation>
     </message>
   </context>
   <context>

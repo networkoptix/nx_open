@@ -1474,7 +1474,7 @@
     </message>
     <message>
       <source>Opacity</source>
-      <translation>透過度</translation>
+      <translation>不透明度</translation>
     </message>
     <message>
       <source>Default</source>
@@ -3375,11 +3375,11 @@
     <name>nx::vms::client::desktop::WatermarkPreviewDialog</name>
     <message>
       <source>Watermark preview</source>
-      <translation>透かし表示</translation>
+      <translation>透かしのプレビュー</translation>
     </message>
     <message>
       <source>Opacity</source>
-      <translation>透過度</translation>
+      <translation>不透明度</translation>
     </message>
     <message>
       <source>Frequency</source>
