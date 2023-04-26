@@ -32,8 +32,9 @@ static QString resolveGetVersionEx(DWORD major, DWORD minor, bool ws)
     if (major == 6 && minor == 3)
         return ws ? lit("8.1") : lit("Server 2012 R2");
 
+    // There is no official way to distinguish between them.
     if (major == 10 && minor == 0)
-        return ws ? lit("10") : lit("Server 2016");
+        return ws ? lit("10/11") : lit("Server 2016/2019/2022");
 
     return lit("Unknown %1.%2").arg(major).arg(minor);
 }
