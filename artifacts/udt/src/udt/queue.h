@@ -50,6 +50,7 @@ Yunhong Gu, last updated 01/12/2011
 #include <queue>
 #include <vector>
 #include <thread>
+#include <unordered_map>
 
 #include "channel.h"
 #include "common.h"
@@ -178,7 +179,7 @@ public:
 
 private:
     std::list<CRNode> m_sockets;
-    std::map<UDTSOCKET, std::list<CRNode>::iterator> m_socketIdToNode;
+    std::unordered_map<UDTSOCKET, std::list<CRNode>::iterator> m_socketIdToNode;
 };
 
 //-------------------------------------------------------------------------------------------------
