@@ -116,10 +116,11 @@ struct NX_MEDIA_CORE_API QnMetaDataV1: public QnAbstractCompressedMetadata
 public:
     static const int kMotionDataBufferSize = Qn::kMotionGridWidth*Qn::kMotionGridHeight / 8;
 
+    QnMetaDataV1();
     QnMetaDataV1(std::chrono::microseconds timestamp, int initialValue = 0, int extraBufferSize = 0);
     QnMetaDataV1(std::chrono::microseconds timestamp_, const char* buffer, int extraBufferSize);
 
-    static QnMetaDataV1Ptr fromLightData(const QnMetaDataV1Light& lightData, std::chrono::microseconds timestamp);
+    static QnMetaDataV1Ptr fromLightData(const QnMetaDataV1Light& lightData);
 
     /**
     * Merge existing motion image with new motion image. Matrix is allowed col to col

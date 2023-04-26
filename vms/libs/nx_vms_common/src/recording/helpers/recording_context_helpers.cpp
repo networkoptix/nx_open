@@ -11,7 +11,6 @@
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/synctime.h>
 
 extern "C"
 {
@@ -108,7 +107,7 @@ QnAbstractCompressedMetadataPtr deserializeMetaDataPacket(const QByteArray& data
             QnMetaDataV1Light motionData;
             memcpy(&motionData, payload.constData(), sizeof(motionData));
             motionData.doMarshalling();
-            return QnMetaDataV1::fromLightData(motionData, qnSyncTime->currentTimePoint());
+            return QnMetaDataV1::fromLightData(motionData);
         }
         break;
         case MetadataType::ObjectDetection:
