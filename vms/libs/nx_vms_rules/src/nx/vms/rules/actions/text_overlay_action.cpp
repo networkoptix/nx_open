@@ -9,6 +9,8 @@
 #include "../utils/field.h"
 #include "../utils/type.h"
 
+using namespace std::chrono_literals;
+
 namespace nx::vms::rules {
 
 const ItemDescriptor& TextOverlayAction::manifest()
@@ -19,7 +21,11 @@ const ItemDescriptor& TextOverlayAction::manifest()
         .flags = ItemFlag::prolonged,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
-            makeFieldDescriptor<OptionalTimeField>("duration", tr("Display text for")),
+            utils::makeTimeFieldDescriptor<OptionalTimeField>(
+                utils::kDurationFieldName,
+                tr("Display text for"),
+                {},
+                {.initialValue = 5s, .maximumValue = 30s, .minimumValue = 5s}),
             makeFieldDescriptor<TextWithFields>("text", tr("Text"), {},
                 {
                     { "text", "{@EventCaption}" }
