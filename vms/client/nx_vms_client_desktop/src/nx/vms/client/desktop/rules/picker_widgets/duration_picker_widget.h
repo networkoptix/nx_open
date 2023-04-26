@@ -74,18 +74,15 @@ protected:
             if (!NX_ASSERT(durationField))
                 return;
 
-            const auto isRecordAfterField =
-                m_fieldDescriptor->fieldName == vms::rules::utils::kRecordAfterFieldName;
             const auto hasDuration =
                 durationField->value() != vms::rules::OptionalTimeField::value_type::zero();
-            if (isRecordAfterField && hasDuration && field->value() != F::value_type::zero())
+            if (hasDuration && field->value() != F::value_type::zero())
             {
                 field->setValue(F::value_type::zero());
                 return;
             }
 
-            if (isRecordAfterField)
-                this->setVisible(!hasDuration);
+            this->setVisible(!hasDuration);
         }
 
         QSignalBlocker blocker{m_timeDurationWidget};
