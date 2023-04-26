@@ -149,6 +149,7 @@ UserSettingsDialog::UserSettingsDialog(
                 if (resource == d->user)
                 {
                     reject();
+                    setUser({}); //< reject() will not clear the user when the dialog is closed.
                     return;
                 }
             }

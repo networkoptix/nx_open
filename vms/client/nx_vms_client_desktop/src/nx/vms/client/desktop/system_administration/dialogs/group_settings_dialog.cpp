@@ -152,7 +152,10 @@ GroupSettingsDialog::GroupSettingsDialog(
         [this](const nx::vms::api::UserGroupData& userGroup)
         {
             if (userGroup.id == d->groupId)
+            {
                 reject();
+                setGroup({}); //< reject() will not clear the group when the dialog is closed.
+            }
         });
 
     connect(this, &QmlDialogWrapper::rejected, [this] { setGroup({}); });
