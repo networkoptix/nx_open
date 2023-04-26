@@ -268,12 +268,12 @@ void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler handler)
 
             if (acceptedSocket)
             {
-                NX_INFO(this, nx::format("Cloud connection from %1 has been accepted. Info: relay %2")
+                NX_DEBUG(this, nx::format("Cloud connection from %1 has been accepted. Info: relay %2")
                     .args(acceptedSocket->getForeignAddress(), m_relayUrl));
             }
             else
             {
-                NX_INFO(this, nx::format("Cloud connection accept error (%1). Info: relay %2")
+                NX_WARNING(this, nx::format("Cloud connection accept error (%1). Info: relay %2")
                     .args(SystemError::toString(sysErrorCode), m_relayUrl));
             }
 
