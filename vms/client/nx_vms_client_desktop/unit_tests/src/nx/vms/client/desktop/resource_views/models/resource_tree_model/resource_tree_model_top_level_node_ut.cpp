@@ -9,6 +9,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -95,26 +96,24 @@ TEST_F(ResourceTreeModelTest, emptyIntegrationsNodeIsHiddenIfLoggedIn)
     ASSERT_TRUE(noneMatches(integrationsNodeCondition()));
 }
 
-TEST_F(ResourceTreeModelTest, webPagesNodeAreAlwaysDisplayedIfLoggedIn)
+TEST_F(ResourceTreeModelTest, emptyWebPagesNodeIsHidden)
 {
     // When user with power user permissions is logged in.
     loginAsPowerUser("power_user");
 
-    // Then there is single "Web Pages" node in the tree with no children.
-    ASSERT_TRUE(onlyOneMatches(webPagesNodeCondition()));
-    ASSERT_TRUE(noneMatches(directChildOf(webPagesNodeCondition())));
+    // Then there is no "Integrations" node in the tree.
+    ASSERT_TRUE(noneMatches(webPagesNodeCondition()));
 
     // When user with live viewer permissions is logged in.
     loginAsLiveViewer("live_viewer");
 
-    // Then there is single "Web Pages" node in the tree with no children.
-    ASSERT_TRUE(onlyOneMatches(webPagesNodeCondition()));
-    ASSERT_TRUE(noneMatches(directChildOf(webPagesNodeCondition())));
+    // Then there is no "Integrations" node in the tree.
+    ASSERT_TRUE(noneMatches(webPagesNodeCondition()));
 
     // When no one is logged in.
     logout();
 
-    // Then there is no "Web Pages" node in the tree.
+    // Then there is no "Integrations" node in the tree.
     ASSERT_TRUE(noneMatches(webPagesNodeCondition()));
 }
 
@@ -162,6 +161,7 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
     static constexpr auto kUserName = "test_owner";
     static constexpr auto kServerName = "test_server";
     static constexpr auto kFakeServerName = "fake_server";
+    static constexpr auto kWebPageName = "web_page";
     static constexpr auto kVideowallName = "videowall";
 
     // Set up environment.
@@ -173,6 +173,7 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
     addLayout("layout", userId);
     addVideoWall(kVideowallName);
     addShowreel("showreel", userId);
+    addWebPage(kWebPageName, WebPageSubtype::none);
 
     // Reference data.
     std::vector<QString> referenceSequence = {
