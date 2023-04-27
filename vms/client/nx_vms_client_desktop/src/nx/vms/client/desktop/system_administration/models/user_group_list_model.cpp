@@ -8,6 +8,7 @@
 #include <QtCore/QStringList>
 
 #include <client/client_globals.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -69,9 +70,10 @@ struct UserGroupListModel::Private
         return common::PredefinedUserGroups::contains(group.id);
     }
 
-    static bool hasOwnPermissions(const UserGroupData& group)
+    bool hasOwnPermissions(const UserGroupData& group) const
     {
-        return group.permissions != 0;
+        return group.permissions != api::GlobalPermissions{}
+            || !q->systemContext()->accessRightsManager()->ownResourceAccessMap(group.id).isEmpty();
     }
 
     QString sortKey(const QModelIndex& index) const
@@ -272,7 +274,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
 
                 case PermissionsColumn:
                 {
-                    if (Private::hasOwnPermissions(group))
+                    if (d->hasOwnPermissions(group))
                         return QString("text_buttons/ok.svg");
 
                     return {};
