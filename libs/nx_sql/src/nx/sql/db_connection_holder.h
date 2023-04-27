@@ -15,11 +15,12 @@ namespace nx::sql {
 class NX_SQL_API DbConnectionHolder
 {
 public:
-    DbConnectionHolder(const ConnectionOptions& connectionOptions);
-
+    /**
+     * @param connection If nullptr, the connection is created based on connectionOptions.
+     */
     DbConnectionHolder(
         const ConnectionOptions& connectionOptions,
-        std::unique_ptr<AbstractDbConnection> connection);
+        std::unique_ptr<AbstractDbConnection> connection = nullptr);
 
     ~DbConnectionHolder();
 
