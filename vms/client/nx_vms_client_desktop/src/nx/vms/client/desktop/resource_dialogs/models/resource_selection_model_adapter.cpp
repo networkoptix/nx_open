@@ -36,6 +36,7 @@ struct ResourceSelectionModelAdapter::Private
     ResourceTree::ResourceSelection selectionMode = ResourceTree::ResourceSelection::multiple;
     QString filterText;
     nx::vms::common::ResourceFilter resourceFilter;
+    TopLevelNodesPolicy topLevelNodesPolicy = TopLevelNodesPolicy::hideEmpty;
 
     Private(ResourceSelectionModelAdapter* q):
         q(q),
@@ -51,7 +52,8 @@ struct ResourceSelectionModelAdapter::Private
     {
         if (treeEntityBuilder && treeEntityBuilder->user() && resourceTypes != 0)
         {
-            auto entity = treeEntityBuilder->createDialogEntities(resourceTypes);
+            auto entity = treeEntityBuilder->createDialogEntities(resourceTypes,
+               /*alwaysCreateGroupElements*/ topLevelNodesPolicy == TopLevelNodesPolicy::showAlways);
             resourceTreeModel->setRootEntity(entity.get());
             rootEntity = std::move(entity);
         }
@@ -226,6 +228,23 @@ void ResourceSelectionModelAdapter::setResourceFilter(nx::vms::common::ResourceF
     emit resourceFilterChanged();
 
     invalidateFilter();
+}
+
+ResourceSelectionModelAdapter::TopLevelNodesPolicy
+    ResourceSelectionModelAdapter::topLevelNodesPolicy() const
+{
+    return d->topLevelNodesPolicy;
+}
+
+void ResourceSelectionModelAdapter::setTopLevelNodesPolicy(TopLevelNodesPolicy value)
+{
+    if (d->topLevelNodesPolicy == value)
+        return;
+
+    d->topLevelNodesPolicy = value;
+    d->updateRootEntity();
+
+    emit topLevelNodesPolicyChanged();
 }
 
 bool ResourceSelectionModelAdapter::isExtraInfoRequired() const

@@ -29,6 +29,7 @@
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
+#include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_group_request_chain.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
@@ -75,6 +76,7 @@ struct UserSettingsDialog::Private
     QmlProperty<int> tabIndex;
     QmlProperty<bool> isSaving;
     QmlProperty<bool> ldapError;
+    QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
     std::optional<QnUserResourcePtr> user;
     rest::Handle m_currentRequest = -1;
@@ -85,6 +87,7 @@ struct UserSettingsDialog::Private
         tabIndex(q->rootObjectHolder(), "tabIndex"),
         isSaving(q->rootObjectHolder(), "isSaving"),
         ldapError(q->rootObjectHolder(), "ldapError"),
+        editingContext(q->rootObjectHolder(), "editingContext"),
         self(q->rootObjectHolder(), "self")
     {
     }
@@ -154,6 +157,15 @@ UserSettingsDialog::UserSettingsDialog(
                 }
             }
         });
+
+    connect(this, &QmlDialogWrapper::applied, this,
+        [this]() { d->editingContext.value()->resetAccessibleResourcesFilter(); });
+
+    connect(this, &QmlDialogWrapper::accepted, this,
+        [this]() { d->editingContext.value()->resetAccessibleResourcesFilter(); });
+
+    connect(this, &QmlDialogWrapper::rejected, this,
+        [this]() { d->editingContext.value()->resetAccessibleResourcesFilter(); });
 }
 
 UserSettingsDialog::~UserSettingsDialog()

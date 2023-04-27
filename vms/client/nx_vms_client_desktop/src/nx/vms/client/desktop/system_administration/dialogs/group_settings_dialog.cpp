@@ -13,6 +13,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -26,7 +27,6 @@
 
 #include "../globals/session_notifier.h"
 #include "../globals/user_group_request_chain.h"
-
 
 namespace nx::vms::client::desktop {
 
@@ -68,6 +68,7 @@ struct GroupSettingsDialog::Private
     DialogType dialogType;
     QmlProperty<int> tabIndex;
     QmlProperty<bool> isSaving;
+    QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<GroupSettingsDialog*> self; //< Used to call validate functions from QML.
 
     QnUuid groupId;
@@ -78,6 +79,7 @@ struct GroupSettingsDialog::Private
         dialogType(dialogType),
         tabIndex(q->rootObjectHolder(), "tabIndex"),
         isSaving(q->rootObjectHolder(), "isSaving"),
+        editingContext(q->rootObjectHolder(), "editingContext"),
         self(q->rootObjectHolder(), "self")
     {
     }
@@ -159,6 +161,12 @@ GroupSettingsDialog::GroupSettingsDialog(
         });
 
     connect(this, &QmlDialogWrapper::rejected, [this] { setGroup({}); });
+
+    connect(this, &QmlDialogWrapper::applied, this,
+        [this]() { d->editingContext.value()->resetAccessibleResourcesFilter(); });
+
+    connect(this, &QmlDialogWrapper::accepted, this,
+        [this]() { d->editingContext.value()->resetAccessibleResourcesFilter(); });
 }
 
 GroupSettingsDialog::~GroupSettingsDialog()
