@@ -30,11 +30,22 @@ void QnProxyPtzController::setBaseController(const QnPtzControllerPtr& controlle
         this, &QnProxyPtzController::baseFinished);
     connect(m_controller.get(), &QnAbstractPtzController::changed,
         this, &QnProxyPtzController::baseChanged);
+
+    if (m_isInitialized)
+        m_controller->initialize();
 }
 
 QnPtzControllerPtr QnProxyPtzController::baseController() const
 {
     return m_controller;
+}
+
+void QnProxyPtzController::initialize()
+{
+    if (m_controller)
+        m_controller->initialize();
+
+    m_isInitialized = true;
 }
 
 Ptz::Capabilities QnProxyPtzController::getCapabilities(const Options& options) const
