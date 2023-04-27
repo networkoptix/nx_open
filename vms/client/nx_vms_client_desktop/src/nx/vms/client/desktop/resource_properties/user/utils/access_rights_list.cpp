@@ -19,7 +19,7 @@ AccessRightsList::AccessRightsList(QObject* parent):
     m_items({
         AccessRightDescriptor{
             .accessRight = AccessRight::view,
-            .name = tr("View"),
+            .name = tr("View Live"),
             .description = tr("Has access to a resource, can view live footage from a camera"),
             .icon = QUrl(kIconsDir + "view_live.svg")},
         AccessRightDescriptor{

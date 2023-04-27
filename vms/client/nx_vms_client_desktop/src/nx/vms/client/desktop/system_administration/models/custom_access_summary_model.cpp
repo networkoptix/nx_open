@@ -36,7 +36,7 @@ CustomAccessSummaryModel::CustomAccessSummaryModel(QObject* parent):
     d(new Private{
         .model = this,
         .permissions = {
-            {AccessRight::view, tr("View")},
+            {AccessRight::view, tr("View live")},
             {AccessRight::viewArchive, tr("View video archive")},
             {AccessRight::exportArchive, tr("Export video archive")},
             {AccessRight::viewBookmarks, tr("View bookmarks")},
