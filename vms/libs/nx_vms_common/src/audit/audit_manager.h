@@ -15,6 +15,8 @@
 
 #include "audit_manager_fwd.h"
 
+namespace Qn { struct UserAccessData; }
+
 class NX_VMS_COMMON_API QnAuditManager
 {
 public:
@@ -39,6 +41,6 @@ public:
     virtual void flushAuditRecords() = 0;
     virtual QnTimePeriod playbackRange(const AuditHandle& handle) const = 0;
 
-    virtual void at_connectionOpened(const QnAuthSession& session) = 0;
+    virtual void at_connectionOpened(const QnAuthSession& session, const Qn::UserAccessData& accessRights) = 0;
     virtual void at_connectionClosed(const QnAuthSession& session) = 0;
 };
