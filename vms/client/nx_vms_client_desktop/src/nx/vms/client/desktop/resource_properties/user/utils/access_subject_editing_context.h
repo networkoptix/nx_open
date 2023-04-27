@@ -20,10 +20,7 @@ class AccessSubjectEditingContext: public QObject
     using base_type = QObject;
 
     Q_PROPERTY(nx::vms::common::ResourceFilter accessibleResourcesFilter
-        READ accessibleResourcesFilter NOTIFY resourceAccessChanged)
-
-    Q_PROPERTY(nx::vms::api::AccessRights availableAccessRights
-        READ availableAccessRights NOTIFY resourceAccessChanged)
+        READ accessibleResourcesFilter NOTIFY accessibleResourcesFilterChanged)
 
 public:
     explicit AccessSubjectEditingContext(
@@ -59,8 +56,12 @@ public:
         const QnResourcePtr& resource,
         nx::vms::api::AccessRight accessRight) const;
 
+    /**
+     * Returns resource filter that accepts resources for which the current subject has had
+     * any access rights since resetAccessibleResourcesFilter() was called.
+     */
     nx::vms::common::ResourceFilter accessibleResourcesFilter() const;
-    nx::vms::api::AccessRights availableAccessRights() const;
+    Q_INVOKABLE void resetAccessibleResourcesFilter();
 
     /** Edit current subject relations with other subjects. */
     void setRelations(const QSet<QnUuid>& parents, const QSet<QnUuid>& members);
@@ -78,6 +79,7 @@ public:
     void revert();
 
     nx::vms::api::GlobalPermissions globalPermissions() const;
+    nx::vms::api::AccessRights availableAccessRights() const;
 
     QSet<QnUuid> globalPermissionSource(nx::vms::api::GlobalPermission perm) const;
 
@@ -92,6 +94,7 @@ signals:
     void currentSubjectRemoved();
     void resourceAccessChanged();
     void resourceGroupsChanged(const QSet<QnUuid>& resourceGroupIds);
+    void accessibleResourcesFilterChanged();
 
 private:
     class Private;

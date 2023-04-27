@@ -16,6 +16,7 @@ namespace nx::vms::client::desktop {
 class ResourceSelectionModelAdapter: public ScopedModelOperations<FilterProxyModel>
 {
     Q_OBJECT
+    Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
     Q_PROPERTY(nx::vms::client::desktop::SystemContext* context
         READ context WRITE setContext NOTIFY contextChanged)
@@ -27,8 +28,18 @@ class ResourceSelectionModelAdapter: public ScopedModelOperations<FilterProxyMod
     Q_PROPERTY(nx::vms::common::ResourceFilter resourceFilter READ resourceFilter
         WRITE setResourceFilter NOTIFY resourceFilterChanged)
     Q_PROPERTY(bool extraInfoRequired READ isExtraInfoRequired NOTIFY extraInfoRequiredChanged)
+    Q_PROPERTY(TopLevelNodesPolicy topLevelNodesPolicy READ topLevelNodesPolicy
+        WRITE setTopLevelNodesPolicy NOTIFY topLevelNodesPolicyChanged)
 
     using base_type = ScopedModelOperations<FilterProxyModel>;
+
+public:
+    enum class TopLevelNodesPolicy
+    {
+        showAlways,
+        hideEmpty
+    };
+    Q_ENUM(TopLevelNodesPolicy)
 
 public:
     explicit ResourceSelectionModelAdapter(QObject* parent = nullptr);
@@ -48,6 +59,9 @@ public:
 
     nx::vms::common::ResourceFilter resourceFilter() const;
     void setResourceFilter(nx::vms::common::ResourceFilter value);
+
+    TopLevelNodesPolicy topLevelNodesPolicy() const;
+    void setTopLevelNodesPolicy(TopLevelNodesPolicy value);
 
     bool isExtraInfoRequired() const;
 
@@ -71,6 +85,7 @@ signals:
     void filterTextChanged();
     void resourceFilterChanged();
     void resourceTypesChanged();
+    void topLevelNodesPolicyChanged();
     void selectionModeChanged();
     void extraInfoRequiredChanged();
     void selectedResourcesChanged();

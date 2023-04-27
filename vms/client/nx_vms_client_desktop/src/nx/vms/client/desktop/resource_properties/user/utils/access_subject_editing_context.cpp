@@ -53,6 +53,7 @@ public:
     const std::unique_ptr<AccessRightsResolver> accessRightsResolver;
     const std::unique_ptr<AccessRightsResolver::Notifier> notifier;
     bool hierarchyChanged = false;
+    mutable QSet<QnResourcePtr> currentlyAccessibleResourceCache; //< For filter by permissions.
 
 public:
     explicit Private(
@@ -72,11 +73,19 @@ public:
             AccessRightsResolver::Mode::editing)),
         notifier(accessRightsResolver->createNotifier())
     {
-        connect(notifier.get(), &AccessRightsResolver::Notifier::resourceAccessChanged,
-            q, &AccessSubjectEditingContext::resourceAccessChanged);
+        connect(notifier.get(), &AccessRightsResolver::Notifier::resourceAccessChanged, this,
+            [this]()
+            {
+                emit this->q->resourceAccessChanged();
+                emit this->q->accessibleResourcesFilterChanged();
+            });
 
         connect(accessRightsResolver.get(), &AccessRightsResolver::resourceAccessReset,
-            q, &AccessSubjectEditingContext::resourceAccessChanged);
+            [this]()
+            {
+                emit this->q->resourceAccessChanged();
+                this->q->resetAccessibleResourcesFilter();
+            });
 
         connect(systemSubjectHierarchy, &SubjectHierarchy::reset,
             q, &AccessSubjectEditingContext::resetRelations);
@@ -206,6 +215,7 @@ void AccessSubjectEditingContext::setCurrentSubjectId(const QnUuid& value)
     d->accessRightsManager->setCurrentSubjectId(value);
     d->notifier->setSubjectId(value);
     resetRelations();
+    resetAccessibleResourcesFilter();
 
     emit subjectChanged();
     emit resourceAccessChanged();
@@ -278,14 +288,25 @@ ResourceAccessDetails AccessSubjectEditingContext::accessDetails(
 nx::vms::common::ResourceFilter AccessSubjectEditingContext::accessibleResourcesFilter() const
 {
     const auto resourceFilter =
-        [this, guard = QPointer(this)](const QnResourcePtr& resource) -> bool
+        [this, guard = QPointer(d.get())](const QnResourcePtr& resource) -> bool
         {
-            return guard
-                && resource
-                && accessRights(resource) != 0;
+            if (!guard || !resource)
+                return false;
+
+            if (!d->currentlyAccessibleResourceCache.contains(resource) && !accessRights(resource))
+                return false;
+
+            d->currentlyAccessibleResourceCache.insert(resource);
+            return true;
         };
 
     return resourceFilter;
+}
+
+void AccessSubjectEditingContext::resetAccessibleResourcesFilter()
+{
+    d->currentlyAccessibleResourceCache.clear();
+    emit accessibleResourcesFilterChanged();
 }
 
 AccessRights AccessSubjectEditingContext::availableAccessRights() const
@@ -337,6 +358,7 @@ void AccessSubjectEditingContext::revert()
 {
     resetOwnResourceAccessMap();
     resetRelations();
+    resetAccessibleResourcesFilter();
 }
 
 QnUuid AccessSubjectEditingContext::specialResourceGroupFor(const QnResourcePtr& resource)

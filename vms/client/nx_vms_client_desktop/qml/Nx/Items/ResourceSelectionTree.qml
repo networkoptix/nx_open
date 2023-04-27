@@ -26,6 +26,8 @@ TreeView
 
     property int resourceTypes: 0
     property int selectionMode: { return ResourceTree.ResourceSelection.multiple }
+    property int topLevelNodesPolicy:
+        { return ResourceSelectionModel.TopLevelNodesPolicy.hideEmpty }
     property string filterText
 
     topMargin: 8
@@ -47,6 +49,7 @@ TreeView
         context: systemContext
         resourceTypes: resourceSelectionTree.resourceTypes
         selectionMode: resourceSelectionTree.selectionMode
+        topLevelNodesPolicy: resourceSelectionTree.topLevelNodesPolicy
         filterText: resourceSelectionTree.filterText
     }
 

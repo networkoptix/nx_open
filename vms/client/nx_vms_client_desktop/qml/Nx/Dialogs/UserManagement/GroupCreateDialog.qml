@@ -51,6 +51,7 @@ DialogWithState
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
     property bool isSaving: false
+    property alias editingContext: membersModel.editingContext
     property var self
 
     signal groupClicked(var id)
@@ -132,7 +133,6 @@ DialogWithState
 
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext
-                currentMode: PermissionsTab.EditMode
             }
         }
 

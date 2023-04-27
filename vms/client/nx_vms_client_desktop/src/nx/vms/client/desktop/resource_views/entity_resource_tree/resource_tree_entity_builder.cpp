@@ -943,20 +943,26 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createOtherSystemsGroupEntity() con
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
-    ResourceTree::ResourceFilters resourceTypes) const
+    ResourceTree::ResourceFilters resourceTypes, bool alwaysCreateGroupElements) const
 {
     std::vector<AbstractEntityPtr> entities;
+
+    const bool maySkipGroup = !alwaysCreateGroupElements;
+
+    const auto flatteningPolicy = alwaysCreateGroupElements
+        ? FlatteningGroupEntity::AutoFlatteningPolicy::noPolicy
+        : FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy;
 
     if (resourceTypes.testFlag(ResourceTree::ResourceFilter::camerasAndDevices))
     {
         auto entity = createDialogAllCamerasAndResourcesEntity(/*withProxiedWebPages*/ false);
-        if (resourceTypes == (int) ResourceTree::ResourceFilter::camerasAndDevices)
+        if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::camerasAndDevices)
             return entity; //< Only cameras and devices, return without a group element.
 
         entities.push_back(makeFlatteningGroup(
             m_itemFactory->createCamerasAndDevicesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
             std::move(entity),
-            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+            flatteningPolicy));
     }
 
     if (resourceTypes.testFlag(ResourceTree::ResourceFilter::layouts))
@@ -966,13 +972,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
 
         layoutsList->installItemSource(m_itemKeySourcePool->layoutsSource(user()));
 
-        if (resourceTypes == (int) ResourceTree::ResourceFilter::layouts)
+        if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::layouts)
             return layoutsList; //< Only layouts, return without a group element.
 
         entities.push_back(makeFlatteningGroup(
             m_itemFactory->createLayoutsItem(),
             std::move(layoutsList),
-            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+            flatteningPolicy));
     }
 
     if (resourceTypes.testFlag(ResourceTree::ResourceFilter::integrations)
@@ -985,13 +991,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
         integrationList->installItemSource(
             m_itemKeySourcePool->integrationsSource(user(), /*includeProxied*/ true));
 
-        if (resourceTypes == (int) ResourceTree::ResourceFilter::integrations)
-            return integrationList; //< Only web pages, return without a group element.
+        if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::integrations)
+            return integrationList; //< Only integrations, return without a group element.
 
         entities.push_back(makeFlatteningGroup(
             m_itemFactory->createIntegrationsItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
             std::move(integrationList),
-            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+            flatteningPolicy));
     }
 
     if (resourceTypes.testFlag(ResourceTree::ResourceFilter::webPages))
@@ -1012,13 +1018,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
                     user(), /*includeProxied*/ true));
         }
 
-        if (resourceTypes == (int) ResourceTree::ResourceFilter::webPages)
+        if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::webPages)
             return webPagesList; //< Only web pages, return without a group element.
 
         entities.push_back(makeFlatteningGroup(
             m_itemFactory->createWebPagesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
             std::move(webPagesList),
-            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+            flatteningPolicy));
     }
 
     if (resourceTypes.testFlag(ResourceTree::ResourceFilter::healthMonitors))
@@ -1037,13 +1043,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
         healthMonitorsList->installItemSource(
             m_itemKeySourcePool->serversSource(user(), /*reduceEdgeServers*/ false));
 
-        if (resourceTypes == (int) ResourceTree::ResourceFilter::healthMonitors)
+        if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::healthMonitors)
             return healthMonitorsList; //< Only health monitors, return without a group element.
 
         entities.push_back(makeFlatteningGroup(
             m_itemFactory->createHealthMonitorsItem(),
             std::move(healthMonitorsList),
-            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+            flatteningPolicy));
     }
 
     if (resourceTypes.testFlag(ResourceTree::ResourceFilter::videoWalls))
@@ -1055,13 +1061,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
         videoWallList->installItemSource(
             m_itemKeySourcePool->videoWallsSource(user()));
 
-        if (resourceTypes == (int) ResourceTree::ResourceFilter::videoWalls)
+        if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::videoWalls)
             return videoWallList; //< Only videowalls, return without a group element.
 
         entities.push_back(makeFlatteningGroup(
             m_itemFactory->createVideoWallsItem(),
             std::move(videoWallList),
-            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+            flatteningPolicy));
     }
 
     auto composition =

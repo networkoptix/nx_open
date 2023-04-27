@@ -81,7 +81,8 @@ public:
     AbstractEntityPtr createVideowallsEntity() const;
     AbstractEntityPtr createLayoutItemListEntity(const QnResourcePtr& layoutResource) const;
 
-    AbstractEntityPtr createDialogEntities(ResourceTree::ResourceFilters resourceTypes) const;
+    AbstractEntityPtr createDialogEntities(ResourceTree::ResourceFilters resourceTypes,
+        bool alwaysCreateGroupElements = false) const;
 
     AbstractEntityPtr addPinnedItem(AbstractEntityPtr baseEntity, AbstractItemPtr pinnedItem) const;
 

@@ -26,32 +26,10 @@ Item
 
     property var buttonBox
 
-    enum Mode
-    {
-        ViewMode,
-        EditMode
-    }
-
-    property int currentMode: PermissionsTab.ViewMode
-
-    readonly property bool editingEnabled: enabled && currentMode == PermissionsTab.EditMode
-
-    readonly property var kAllNodes: [
-        ResourceTree.NodeType.videoWalls,
-        ResourceTree.NodeType.layouts,
-        ResourceTree.NodeType.camerasAndDevices,
-        ResourceTree.NodeType.integrations,
-        ResourceTree.NodeType.webPages,
-        ResourceTree.NodeType.servers]
+    readonly property bool editingEnabled: enabled
 
     readonly property var availableAccessRightDescriptors:
-    {
-        if (control.editingEnabled || !control.editingContext)
-            return AccessRightsList.items
-
-        return Array.prototype.filter.call(AccessRightsList.items,
-            item => (item.accessRight & control.editingContext.availableAccessRights) !== 0)
-    }
+        Array.prototype.slice.call(AccessRightsList.items) //< Deep copy to JS for optimization.
 
     readonly property var availableAccessRights:
         Array.prototype.map.call(availableAccessRightDescriptors, item => item.accessRight)
@@ -150,12 +128,19 @@ Item
         showResourceStatus: false
         topMargin: 0
 
-        resourceTypes: ResourceTree.ResourceFilter.camerasAndDevices
-            | ResourceTree.ResourceFilter.integrations
-            | ResourceTree.ResourceFilter.webPages
-            | ResourceTree.ResourceFilter.layouts
-            | ResourceTree.ResourceFilter.healthMonitors
-            | ResourceTree.ResourceFilter.videoWalls
+        resourceTypes:
+        {
+            const kAllTypes = ResourceTree.ResourceFilter.camerasAndDevices
+                | ResourceTree.ResourceFilter.integrations
+                | ResourceTree.ResourceFilter.webPages
+                | ResourceTree.ResourceFilter.layouts
+                | ResourceTree.ResourceFilter.healthMonitors
+                | ResourceTree.ResourceFilter.videoWalls
+
+            return filterButton.resourceTypeFilter || kAllTypes
+        }
+
+        topLevelNodesPolicy: ResourceSelectionModel.TopLevelNodesPolicy.showAlways
 
         filterText: searchField.text
 
@@ -164,7 +149,7 @@ Item
             target: tree.model
             property: "resourceFilter"
             value: control.editingContext && control.editingContext.accessibleResourcesFilter
-            when: control.editingContext && !control.editingEnabled
+            when: control.editingContext && filterButton.withPermissionsOnly
         }
 
         delegate: ResourceAccessDelegate
@@ -211,55 +196,38 @@ Item
         Placeholder
         {
             anchors.centerIn: parent
-            anchors.verticalCenterOffset: - (searchField.y + searchField.height)
+            anchors.verticalCenterOffset: -(searchField.y + searchField.height)
 
             imageSource: "image://svg/skin/user_settings/no_resources.svg"
 
             text: qsTr("No resources")
-
-            additionalText: currentMode == PermissionsTab.ViewMode
-                ? qsTr("Try changing search criteria or enable editing to see available resources")
-                : qsTr("Try changing search criteria")
+            additionalText: qsTr("Try changing search criteria")
         }
     }
 
     SearchField
     {
         id: searchField
+
         anchors.left: parent.left
         anchors.bottom: tree.top
-        anchors.right: accessRightsHeader.left
+        anchors.right: filterButton.left
         anchors.leftMargin: 16
         anchors.bottomMargin: 16
-        anchors.rightMargin: 10
+        anchors.rightMargin: 4
     }
 
-    Item
+    ResourceFilterButton
     {
-        // Covers dialog button box.
+        id: filterButton
 
-        anchors.top: parent.bottom
+        anchors.top: searchField.top
+        anchors.bottom: searchField.bottom
+        anchors.right: accessRightsHeader.left
+        anchors.rightMargin: 16
+        width: 32
 
-        height: control.buttonBox.height
-        width: parent.width
-
-        Switch
-        {
-            id: editingEnabledSwitch
-
-            anchors.left: parent.left
-            anchors.leftMargin: 16
-            anchors.verticalCenter: parent.verticalCenter
-
-            visible: control.enabled
-
-            text: checked ? qsTr("Editing enabled") : qsTr("Editing disabled")
-
-            onCheckedChanged:
-                control.currentMode = checked ? PermissionsTab.EditMode : PermissionsTab.ViewMode
-        }
+        onWithPermissionsOnlyChanged:
+            editingContext.resetAccessibleResourcesFilter()
     }
-
-    onCurrentModeChanged:
-        editingEnabledSwitch.checked = currentMode == PermissionsTab.EditMode
 }
