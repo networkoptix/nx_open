@@ -21,6 +21,8 @@ const ItemDescriptor& TextOverlayAction::manifest()
         .flags = ItemFlag::prolonged,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
+            utils::makeTargetUserFieldDescriptor(
+                tr("Show to"), {}, utils::UserFieldPreset::All),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
                 tr("Display text for"),

@@ -32,6 +32,7 @@ public:
 
     virtual void registerEvents() const override
     {
+        registerEvent<SimpleEvent>();
         registerEvent<TestEvent>();
     }
 

@@ -11,12 +11,40 @@
 
 namespace nx::vms::rules::test {
 
-/** May be used for serialization test, should include all event prop types. */
+// Simplest event without permissions.
+class SimpleEvent: public nx::vms::rules::BasicEvent
+{
+
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.events.test")
+
+    Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(QnUuidList deviceIds MEMBER m_deviceIds)
+public:
+    static ItemDescriptor manifest()
+    {
+        return ItemDescriptor{
+            .id = utils::type<SimpleEvent>(),
+            .displayName = "Test event",
+            .flags = {ItemFlag::instant, ItemFlag::prolonged},
+        };
+    }
+
+    virtual QString resourceKey() const override
+    {
+        return m_cameraId.toSimpleString();
+    }
+
+    using BasicEvent::BasicEvent;
+    QnUuid m_cameraId;
+    QnUuidList m_deviceIds;
+};
+
 class TestEvent: public nx::vms::rules::BasicEvent
 {
     using base_type = BasicEvent;
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.test")
+    Q_CLASSINFO("type", "nx.events.test.permissions")
 
     Q_PROPERTY(QnUuid serverId MEMBER m_serverId)
     Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
@@ -37,7 +65,7 @@ public:
     {
         return ItemDescriptor{
             .id = utils::type<TestEvent>(),
-            .displayName = "Test event",
+            .displayName = "Test event with permissions",
             .flags = {ItemFlag::instant, ItemFlag::prolonged},
             .permissions = {
                 .globalPermission = nx::vms::api::GlobalPermission::viewLogs,
@@ -102,6 +130,7 @@ public:
     QString m_cacheKey;
 };
 
+using SimpleEventPtr = QSharedPointer<SimpleEvent>;
 using TestEventPtr = QSharedPointer<TestEvent>;
 
 class TestTimestampDependentEvent: public nx::vms::rules::BasicEvent

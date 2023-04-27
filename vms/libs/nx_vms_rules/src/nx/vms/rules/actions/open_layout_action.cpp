@@ -19,8 +19,9 @@ const ItemDescriptor& OpenLayoutAction::manifest()
             utils::makePlaybackFieldDescriptor(tr("Playback Time")),
             makeFieldDescriptor<LayoutField>("layoutId", tr("Layout")),
             utils::makeTargetUserFieldDescriptor(
-                tr("Show to"), {}, /*isAvailableForAdminsByDefault*/ false)
-        }
+                tr("Show to"), {}, utils::UserFieldPreset::None)
+        },
+        .permissions = {.resourcePermissions = {{"layoutId", Qn::ReadPermission}}},
     };
     return kDescriptor;
 }

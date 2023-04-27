@@ -18,6 +18,8 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetSingleDeviceField>(
                 utils::kCameraIdFieldName, tr("Camera"), {}, {}, {utils::kLayoutIdsFieldName}),
+            utils::makeTargetUserFieldDescriptor(
+                tr("Set for"), {}, utils::UserFieldPreset::All),
             makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName, tr("On Layout")),
             utils::makePlaybackFieldDescriptor(tr("Playback Time")),
         }

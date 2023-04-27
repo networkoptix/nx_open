@@ -4,6 +4,7 @@
 
 #include <gmock/gmock.h>
 
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/basic_action.h>
 
@@ -49,6 +50,37 @@ private:
             if (!targetedAction->m_deviceIds.empty())
                 targetedDeviceIds(targetedAction->m_deviceIds);
         }
+    }
+};
+
+class MockPermissionsActionEvents: public QObject
+{
+    Q_OBJECT
+
+public:
+    MOCK_METHOD(void, multiDeviceAction, (const QnUuidSet& usersIds, const QnUuidSet& devices));
+    MOCK_METHOD(void, singleDeviceAction, (const QnUuidSet& usersIds, QnUuid device));
+
+    MockPermissionsActionEvents(ActionBuilder* builder):
+        m_builder(builder)
+    {
+        connect(m_builder, &ActionBuilder::action, this,
+            &MockPermissionsActionEvents::onAction, Qt::DirectConnection);
+    }
+
+private:
+    ActionBuilder* m_builder;
+
+    void onAction(const ActionPtr& value)
+    {
+        auto action = value.dynamicCast<TestActionWithPermissions>();
+        if (!action)
+            return;
+
+        if (action->m_deviceIds.isEmpty())
+            singleDeviceAction(action->m_users.ids, action->m_cameraId);
+        else
+            multiDeviceAction(action->m_users.ids, nx::utils::toQSet(action->m_deviceIds));
     }
 };
 

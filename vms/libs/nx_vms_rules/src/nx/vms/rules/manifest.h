@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <map>
+
 #include <QtCore/QMap>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
@@ -11,8 +13,6 @@
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/vms/api/types/access_rights_types.h>
-
-#include "field.h"
 
 namespace nx::vms::rules {
 
@@ -39,19 +39,13 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
 
-struct ResourcePermission
-{
-    QnLatin1Array fieldName;
-    Qn::Permissions permissions;
-};
-#define nx_vms_rules_ResourcePermission_Fields (fieldName)(permissions)
-NX_VMS_RULES_API void serialize(
-    QnJsonContext* ctx, const ResourcePermission& value, QJsonValue* target);
-
 struct PermissionsDescriptor
 {
     nx::vms::api::GlobalPermission globalPermission = nx::vms::api::GlobalPermission::none;
-    QList<ResourcePermission> resourcePermissions;
+
+    std::map<std::string, Qn::Permissions> resourcePermissions;
+
+    bool empty() const;
 };
 #define nx_vms_rules_PermissionsDescriptor_Fields \
     (globalPermission)(resourcePermissions)
@@ -115,23 +109,5 @@ struct ItemDescriptor
     (id)(displayName)(description)(flags)(fields)(permissions)(emailTemplatePath)
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const ItemDescriptor& value, QJsonValue* target);
-
-template<class T>
-FieldDescriptor makeFieldDescriptor(
-    const QString& fieldName,
-    const QString& displayName,
-    const QString& description = {},
-    const QVariantMap& properties = {},
-    const QStringList& linkedFields = {})
-{
-    return FieldDescriptor{
-        .id = fieldMetatype<T>(),
-        .fieldName = fieldName,
-        .displayName = displayName,
-        .description = description,
-        .properties = properties,
-        .linkedFields = linkedFields
-    };
-}
 
 } // namespace nx::vms::rules

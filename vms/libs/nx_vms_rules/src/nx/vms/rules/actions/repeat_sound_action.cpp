@@ -21,7 +21,7 @@ const ItemDescriptor& RepeatSoundAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
             utils::makeTargetUserFieldDescriptor(
-                tr("Play to users"), {}, /*isAvailableForAdminsByDefault*/ false),
+                tr("Play to users"), {}, utils::UserFieldPreset::None),
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName, tr("Sound")),
             makeFieldDescriptor<VolumeField>(
                 "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),

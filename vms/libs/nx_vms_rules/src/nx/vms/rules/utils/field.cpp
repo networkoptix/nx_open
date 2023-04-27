@@ -2,8 +2,8 @@
 
 #include "field.h"
 
-#include <nx/vms/api/data/user_group_data.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/api/data/user_group_data.h>
 
 #include "../action_builder_fields/extract_detail_field.h"
 #include "../action_builder_fields/flag_field.h"
@@ -77,20 +77,19 @@ FieldDescriptor makeTextFormatterFieldDescriptor(
 FieldDescriptor makeTargetUserFieldDescriptor(
     const QString& displayName,
     const QString& description,
-    bool isAvailableForPowerUsersByDefault)
+    UserFieldPreset preset)
 {
+    QVariantMap props;
+    if (preset == UserFieldPreset::All)
+        props["acceptAll"] = true;
+    if (preset == UserFieldPreset::Power)
+        props["ids"] = QVariant::fromValue(nx::utils::toQSet(vms::api::kAllPowerUserGroupIds));
+
     return makeFieldDescriptor<TargetUserField>(
         utils::kUsersFieldName,
         displayName,
         description,
-        {
-            {
-                "ids",
-                QVariant::fromValue(isAvailableForPowerUsersByDefault
-                    ? nx::utils::toQSet(vms::api::kAllPowerUserGroupIds)
-                    : QnUuidSet{})
-            }
-        });
+        props);
 }
 
 FieldDescriptor makeActionFlagFieldDescriptor(

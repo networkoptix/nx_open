@@ -77,6 +77,32 @@ public:
     QnUuidList m_deviceIds;
 };
 
+class TestActionWithPermissions: public TestActionWithTargetUsers
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.actions.test.withPermissions")
+
+public:
+    static ItemDescriptor manifest()
+    {
+        return ItemDescriptor{
+            .id = utils::type<TestActionWithPermissions>(),
+            .displayName = "Test action with permissions",
+            .flags = ItemFlag::instant,
+            .fields = {
+                makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, "Users"),
+                makeFieldDescriptor<TargetDeviceField>(
+                    utils::kDeviceIdsFieldName, "Devices", {}, {{"useSource", true}})},
+            .permissions = {
+                .globalPermission = GlobalPermission::viewArchive,
+                .resourcePermissions = {
+                    {utils::kCameraIdFieldName, Qn::WritePermission},
+                    {utils::kDeviceIdsFieldName, Qn::WritePermission},
+                },
+            },
+        };
+    }
+};
 
 class TestActionForUserAndServer: public nx::vms::rules::BasicAction
 {

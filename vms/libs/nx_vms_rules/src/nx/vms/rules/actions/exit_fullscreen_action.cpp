@@ -15,6 +15,8 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
         .displayName = tr("Exit fullscreen"),
         .flags = ItemFlag::instant,
         .fields = {
+            utils::makeTargetUserFieldDescriptor(
+                tr("To"), {}, utils::UserFieldPreset::All),
             makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName, tr("On Layout")),
         }
     };
