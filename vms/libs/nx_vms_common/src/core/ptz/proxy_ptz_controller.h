@@ -19,6 +19,8 @@ public:
     QnPtzControllerPtr baseController() const;
 
 public: // Overrides section
+    virtual void initialize();
+
     virtual Ptz::Capabilities getCapabilities(const Options& options) const override;
 
     virtual bool continuousMove(
@@ -102,4 +104,5 @@ protected:
 
 private:
     QnPtzControllerPtr m_controller;
+    bool m_isInitialized = false;
 };
