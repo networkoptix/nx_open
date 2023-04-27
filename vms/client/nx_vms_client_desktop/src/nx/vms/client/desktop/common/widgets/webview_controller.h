@@ -53,7 +53,7 @@ public:
     using CertificateValidationFunc =
         std::function<bool(const QString& certificateChain, const QUrl& url)>;
 
-    using ClientApiAuthCondition = std::function<bool()>;
+    using ClientApiAuthCondition = std::function<bool(const QUrl& url)>;
 
 public:
     WebViewController(QObject* parent);
@@ -165,7 +165,13 @@ public:
      */
     void setCertificateValidator(CertificateValidationFunc validator);
 
-    /** Initializes Client API. */
+    /**
+     * Initializes Client API.
+     * @param context Workbench context.
+     * @param item Workbench item.
+     * @param authCondition Condition which is checked during the authentication using Client API.
+     *     May be used with another controller.
+     */
     void initClientApiSupport(
         QnWorkbenchContext* context, QnWorkbenchItem* item, ClientApiAuthCondition authCondition);
 
