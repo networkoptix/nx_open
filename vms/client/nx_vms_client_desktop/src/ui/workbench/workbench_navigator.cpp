@@ -1158,7 +1158,7 @@ void QnWorkbenchNavigator::rewind()
             return; //< Reader currently in some invalid state.
 
         std::chrono::milliseconds posMs;
-        if (!curPeriod->contains(currentTimeMs - 1s))
+        if (!curPeriod->contains(currentTimeMs - 2s))
         {
             posMs = curPeriod == periods.begin()
                 ? curPeriod->startTime()
