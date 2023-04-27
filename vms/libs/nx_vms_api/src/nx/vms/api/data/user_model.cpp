@@ -107,7 +107,7 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
         model.isOwner = baseData.isAdministrator();
         for (const auto& id: baseData.groupIds)
         {
-            if (const auto preset = UserDataDeprecated::groupIdToPermissionPreset(model.userRoleId))
+            if (const auto preset = UserDataDeprecated::groupIdToPermissionPreset(id))
                 model.permissions |= preset;
             else if (model.userRoleId.isNull())
                 model.userRoleId = id;
@@ -115,8 +115,16 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
 
         PermissionConverter::extractFromResourceAccessRights(
             allAccessRights, model.id, &model.permissions, &model.accessibleResources);
+
+        if (!model.isOwner && (baseData.groupIds.empty()
+            || !UserDataDeprecated::permissionPresetToGroupId(model.permissions)))
+        {
+            model.permissions |= GlobalPermission::customUser;
+        }
+
         result.push_back(std::move(model));
     }
+
     return result;
 }
 
