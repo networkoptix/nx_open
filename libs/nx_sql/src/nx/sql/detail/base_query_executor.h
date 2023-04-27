@@ -50,7 +50,7 @@ protected:
     const QueryExecutorQueue* queryExecutorQueue() const;
 
 private:
-    ConnectionOptions m_connectionOptions;
+    const ConnectionOptions m_connectionOptions;
     QueryExecutorQueue* const m_queryExecutorQueue;
 };
 

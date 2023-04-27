@@ -14,20 +14,19 @@ namespace nx::sql::detail {
 
 QueryExecutionThread::QueryExecutionThread(
     const ConnectionOptions& connectionOptions,
-    QueryExecutorQueue* const queryExecutorQueue)
+    QueryExecutorQueue* queryExecutorQueue)
 :
-    BaseQueryExecutor(connectionOptions, queryExecutorQueue),
-    m_dbConnectionHolder(connectionOptions)
+    base_type(connectionOptions, queryExecutorQueue)
 {
 }
 
 QueryExecutionThread::QueryExecutionThread(
     const ConnectionOptions& connectionOptions,
     std::unique_ptr<AbstractDbConnection> connection,
-    QueryExecutorQueue* const queryExecutorQueue)
+    QueryExecutorQueue* queryExecutorQueue)
     :
-    BaseQueryExecutor(connectionOptions, queryExecutorQueue),
-    m_dbConnectionHolder(connectionOptions, std::move(connection))
+    base_type(connectionOptions, queryExecutorQueue),
+    m_externalConnection(std::move(connection))
 {
 }
 
@@ -38,7 +37,6 @@ QueryExecutionThread::~QueryExecutionThread()
         pleaseStop();
         m_queryExecutionThread.join();
     }
-    m_dbConnectionHolder.close();
 }
 
 void QueryExecutionThread::pleaseStop()
@@ -69,7 +67,7 @@ void QueryExecutionThread::start(std::chrono::milliseconds connectDelay)
 
 void QueryExecutionThread::queryExecutionThreadMain()
 {
-    constexpr const std::chrono::milliseconds kTaskWaitTimeout =
+    static constexpr std::chrono::milliseconds kTaskWaitTimeout =
         std::chrono::milliseconds(50);
 
     auto invokeOnClosedHandlerGuard = nx::utils::makeScopeGuard(
@@ -82,7 +80,11 @@ void QueryExecutionThread::queryExecutionThreadMain()
     if (m_connectDelay > std::chrono::milliseconds::zero())
         std::this_thread::sleep_for(m_connectDelay);
 
-    if (!m_dbConnectionHolder.open())
+    DbConnectionHolder dbConnectionHolder(
+        connectionOptions(),
+        std::exchange(m_externalConnection, nullptr));
+
+    if (!dbConnectionHolder.open())
     {
         m_state = ConnectionState::closed;
         return;
@@ -105,13 +107,15 @@ void QueryExecutionThread::queryExecutionThreadMain()
                 // Dropping connection by timeout.
                 NX_VERBOSE(this, "Closing DB connection by timeout (%1)",
                     connectionOptions().inactivityTimeout);
-                closeConnection();
+                closeConnection(&dbConnectionHolder);
                 break;
             }
             continue;
         }
 
-        processTask(std::move(*task));
+        const auto result = task.value()->execute(dbConnectionHolder.dbConnection());
+        handleExecutionResult(result, &dbConnectionHolder);
+
         if (m_state == ConnectionState::closed)
             break;
 
@@ -119,18 +123,8 @@ void QueryExecutionThread::queryExecutionThreadMain()
     }
 }
 
-void QueryExecutionThread::processTask(std::unique_ptr<AbstractExecutor> task)
-{
-    const auto result = task->execute(m_dbConnectionHolder.dbConnection());
-    handleExecutionResult(result);
-}
-
-AbstractDbConnection* QueryExecutionThread::connection()
-{
-    return m_dbConnectionHolder.dbConnection();
-}
-
-void QueryExecutionThread::handleExecutionResult(DBResult result)
+void QueryExecutionThread::handleExecutionResult(
+    DBResult result, DbConnectionHolder* dbConnectionHolder)
 {
     switch (result.code)
     {
@@ -149,7 +143,7 @@ void QueryExecutionThread::handleExecutionResult(DBResult result)
             else
             {
                 NX_WARNING(this, "Dropping DB connection due to unrecoverable error %1", result);
-                closeConnection();
+                closeConnection(dbConnectionHolder);
                 break;
             }
 
@@ -158,16 +152,16 @@ void QueryExecutionThread::handleExecutionResult(DBResult result)
             {
                 NX_WARNING(this, "Dropping DB connection due to %1 errors in a row. Last error %2",
                     m_numberOfFailedRequestsInARow, result);
-                closeConnection();
+                closeConnection(dbConnectionHolder);
                 break;
             }
         }
     }
 }
 
-void QueryExecutionThread::closeConnection()
+void QueryExecutionThread::closeConnection(DbConnectionHolder* dbConnectionHolder)
 {
-    m_dbConnectionHolder.close();
+    dbConnectionHolder->close();
     m_state = ConnectionState::closed;
 }
 
