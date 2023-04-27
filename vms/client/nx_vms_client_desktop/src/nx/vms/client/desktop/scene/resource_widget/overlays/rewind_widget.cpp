@@ -237,6 +237,18 @@ void RewindWidget::tick(int deltaMs)
 void RewindWidget::blink()
 {
     setVisible(true);
+    
+    auto animator1 = opacityAnimator(m_triangle1);
+    auto animator2 = opacityAnimator(m_triangle2);
+    auto animator3 = opacityAnimator(m_triangle3);
+
+    if (!NX_ASSERT(animator1 && animator2 && animator3))
+        return; //< Some unexpected unpredictable case.
+    
+    animator1->stop();
+    animator2->stop();
+    animator3->stop();
+
     m_totalMs = 0;
 }
 
