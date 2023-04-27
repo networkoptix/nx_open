@@ -125,6 +125,7 @@ Item
                 id: loginTextField
                 width: parent.width
                 validateFunc: control.self ? control.self.validateLogin : null
+                focus: control.userType != UserSettingsGlobal.CloudUser
             }
         }
 
@@ -148,6 +149,7 @@ Item
             TextFieldWithValidator
             {
                 id: emailTextField
+                focus: control.userType == UserSettingsGlobal.CloudUser
                 width: parent.width
                 validateFunc: (text) =>
                 {

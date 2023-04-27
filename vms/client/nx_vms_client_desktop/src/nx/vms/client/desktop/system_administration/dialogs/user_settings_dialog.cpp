@@ -340,9 +340,13 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
     if (!user)
     {
-        // We need non-null uuid to make editingContext happy.
         if (d->dialogType == CreateUser)
+        {
+            // We need non-null uuid to make editingContext happy.
             state.userId = QnUuid::createUuid();
+            if (isConnectedToCloud())
+                state.userType = UserSettingsGlobal::CloudUser;
+        }
         return state;
     }
 
