@@ -105,10 +105,12 @@ QnWebResourceWidget::QnWebResourceWidget(
     updateButtonsVisibility();
 
     const auto controller = m_webEngineView->controller();
+
+    // May be used with another QnWebResourceWidget.
     auto authCondition =
-        [this, controller]
+        [resource = resource()](const QUrl& url)
         {
-            return ClientApiAuthDialog::isApproved(resource(), controller->url());
+            return ClientApiAuthDialog::isApproved(resource, url);
         };
 
     controller->initClientApiSupport(workbench()->context(), this->item(), authCondition);

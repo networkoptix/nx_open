@@ -892,7 +892,17 @@ void WebViewController::initClientApiSupport(
     registerApiObjectWithFactory("vms.auth",
         [=](QObject* parent) -> QObject*
         {
-            return new jsapi::Auth(context->systemContext(), authCondition, parent);
+            // Objects may be used with another controller, so use webView to get current url.
+            return new jsapi::Auth(
+                context->systemContext(),
+                [authCondition, webView = QPointer(d->rootObject())]
+                {
+                    if (!NX_ASSERT(webView))
+                        return false;
+
+                    return authCondition(webView->property("url").toUrl());
+                },
+                parent);
         });
 
     registerApiObjectWithFactory("vms.self",
