@@ -11,12 +11,6 @@
 
 namespace nx::sql {
 
-DbConnectionHolder::DbConnectionHolder(const ConnectionOptions& connectionOptions):
-    m_connectionOptions(connectionOptions),
-    m_connection(std::make_unique<QtDbConnection>(connectionOptions))
-{
-}
-
 DbConnectionHolder::DbConnectionHolder(
     const ConnectionOptions& connectionOptions,
     std::unique_ptr<AbstractDbConnection> connection)
@@ -24,6 +18,8 @@ DbConnectionHolder::DbConnectionHolder(
     m_connectionOptions(connectionOptions),
     m_connection(std::move(connection))
 {
+    if (!m_connection)
+        m_connection = std::make_unique<QtDbConnection>(connectionOptions);
 }
 
 DbConnectionHolder::~DbConnectionHolder()
