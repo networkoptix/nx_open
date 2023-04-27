@@ -3,11 +3,33 @@
 #pragma once
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/uuid.h>
 
+#include "../field.h"
 #include "../manifest.h"
 #include "../rules_fwd.h"
 
-namespace nx::vms::rules::utils {
+namespace nx::vms::rules {
+
+template<class T>
+FieldDescriptor makeFieldDescriptor(
+    const QString& fieldName,
+    const QString& displayName,
+    const QString& description = {},
+    const QVariantMap& properties = {},
+    const QStringList& linkedFields = {})
+{
+    return FieldDescriptor{
+        .id = fieldMetatype<T>(),
+        .fieldName = fieldName,
+        .displayName = displayName,
+        .description = description,
+        .properties = properties,
+        .linkedFields = linkedFields
+    };
+}
+
+namespace utils {
 
 static constexpr auto kAcknowledgeFieldName = "acknowledge";
 static constexpr auto kCameraIdFieldName = "cameraId";
@@ -26,6 +48,13 @@ static constexpr auto kSoundFieldName = "sound";
 static constexpr auto kStateFieldName = "state";
 static constexpr auto kTextFieldName = "text";
 static constexpr auto kUsersFieldName = "users";
+
+enum class UserFieldPreset
+{
+    None,
+    All,
+    Power, // Owners and administrators.
+};
 
 struct TimeFieldProperties
 {
@@ -87,7 +116,7 @@ FieldDescriptor makeTextFormatterFieldDescriptor(
 FieldDescriptor makeTargetUserFieldDescriptor(
     const QString& displayName,
     const QString& description = {},
-    bool isAvailableForPowerUsersByDefault = true);
+    UserFieldPreset preset = UserFieldPreset::Power);
 
 FieldDescriptor makeActionFlagFieldDescriptor(
     const QString& fieldName,
@@ -112,4 +141,5 @@ NX_VMS_RULES_API QnUuidList getDeviceIds(const AggregatedEventPtr& event);
 NX_VMS_RULES_API QnUuidList getResourceIds(const AggregatedEventPtr& event);
 NX_VMS_RULES_API QnUuidList getResourceIds(const ActionPtr& action);
 
-} // namespace nx::vms::rules::utils
+} // namespace utils
+} // namespace nx::vms::rules

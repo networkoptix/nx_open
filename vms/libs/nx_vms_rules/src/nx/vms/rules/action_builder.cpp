@@ -38,58 +38,88 @@ namespace {
 static const QSet<QString> kAllowedEvents = {
     "nx.events.debug",
     "nx.events.test",
+    "nx.events.test.permissions",
 };
 
-/** Keep in sync with hasAccessToSource() in the old engine. */
-EventPtr permissionFilter(
-    const EventPtr& event,
-    const QnUserResourcePtr& user,
-    const nx::vms::common::SystemContext* context)
+enum class FiltrationAction
 {
-    const auto engine = context->vmsRulesEngine();
-    if (!NX_ASSERT(engine))
-        return {};
+    Discard,
+    Accept,
+    Clone,
+};
 
-    const auto manifest = engine->eventDescriptor(event->type());
-    if (!NX_ASSERT(manifest))
-        return {};
+struct FiltrationResult
+{
+    FiltrationAction action;
+    std::map<std::string, QnUuidList> resourceMap;
+    QByteArray hash;
+};
 
-    const auto& permissions = manifest->permissions;
-    const auto deprecatedPermissions = nx::vms::api::kDeprecatedGlobalPermissions
-        & permissions.globalPermission;
-    NX_ASSERT(!deprecatedPermissions, "Deprecated permissions %1 in manifest for %2",
-        deprecatedPermissions, event->type());
-    if (permissions.globalPermission != nx::vms::api::GlobalPermission::none
-        && !context->resourceAccessManager()
-            ->hasGlobalPermission(user, permissions.globalPermission))
+// Events or actions may differ by resource list depending on user permissions.
+template<class T>
+QByteArray permissionHash(const PermissionsDescriptor& permissions, const T& object)
+{
+    QByteArray result;
+
+    for (const auto& [fieldName, _] : permissions.resourcePermissions)
     {
-        NX_VERBOSE(NX_SCOPE_TAG,
-            "User %1 has no global permission %2 for the event %3",
-            user, permissions.globalPermission, event->type());
+        const auto property = object->property(fieldName.c_str());
+        if (property.template canConvert<QnUuid>())
+            result.push_back(property.template value<QnUuid>().toRfc4122());
 
-        return {};
+        if (property.template canConvert<QnUuidList>())
+        {
+            for (const auto id: property.template value<QnUuidList>())
+                result.push_back(id.toRfc4122());
+        }
     }
 
-    std::map<QByteArray, QnUuidList> filteredFields;
-    for (const auto& permission: permissions.resourcePermissions)
+    return result;
+}
+
+FiltrationResult filterResourcesByPermission(
+    const QObject* object,
+    const QString& type,
+    const QnUserResourcePtr& user,
+    const PermissionsDescriptor& permissionsDescriptor)
+{
+    if (permissionsDescriptor.empty())
+        return {FiltrationAction::Accept};
+
+    const auto context = user->systemContext();
+    const auto accessManager = context->resourceAccessManager();
+    const auto globalPermission = permissionsDescriptor.globalPermission;
+
+    if ((globalPermission != nx::vms::api::GlobalPermission::none)
+        && !accessManager->hasGlobalPermission(user, globalPermission))
     {
-        const QVariant value = event->property(permission.fieldName);
+        NX_VERBOSE(NX_SCOPE_TAG,
+            "User %1 has no global permission %2 for the object %3",
+            user, globalPermission, type);
+
+        return {FiltrationAction::Discard};
+    }
+
+    auto result = FiltrationResult{FiltrationAction::Clone};
+    for (const auto& [fieldName, permissions]: permissionsDescriptor.resourcePermissions)
+    {
+        const QVariant value = object->property(fieldName.c_str());
 
         if (value.canConvert<QnUuid>())
         {
-            const auto resource = context->resourcePool()->getResourceById(value.value<QnUuid>());
+            const auto resourceId = value.value<QnUuid>();
+            const auto resource = context->resourcePool()->getResourceById(resourceId);
 
-            if (resource && !context->resourceAccessManager()->hasPermission(
-                user,
-                resource,
-                permission.permissions))
+            if (resource &&
+                !accessManager->hasPermission(user, resource, permissions))
             {
                 NX_VERBOSE(NX_SCOPE_TAG,
-                    "User %1 has no permission for the event %2 with resource %3",
-                    user, event->type(), resource);
+                    "User %1 has no permission for the object %2 with resource %3",
+                    user, type, resource);
 
-                return {};
+                return {FiltrationAction::Discard};
             }
+            result.hash.push_back(resourceId.toRfc4122());
         }
         else if (value.canConvert<QnUuidList>())
         {
@@ -103,10 +133,7 @@ EventPtr permissionFilter(
             {
                 const auto resource = context->resourcePool()->getResourceById(resourceId);
                 if (!resource
-                    || context->resourceAccessManager()->hasPermission(
-                        user,
-                        resource,
-                        permission.permissions))
+                    || accessManager->hasPermission(user, resource, permissions))
                 {
                     filteredResourceIds << resourceId;
                 }
@@ -115,41 +142,108 @@ EventPtr permissionFilter(
             if (filteredResourceIds.isEmpty())
             {
                 NX_VERBOSE(NX_SCOPE_TAG,
-                    "User %1 has no permissions for any resource of the field %2 of event %3",
-                    user, permission.fieldName, event->type());
+                    "User %1 has no permissions for any resource of the field %2 of object %3",
+                    user, fieldName, type);
 
-                return {};
+                return {FiltrationAction::Discard};
             }
 
+            for (const auto id: filteredResourceIds)
+                result.hash.push_back(id.toRfc4122());
+
             if (filteredResourceIds.size() != resourceIds.size())
-                filteredFields[permission.fieldName] = std::move(filteredResourceIds);
+                result.resourceMap[fieldName] = std::move(filteredResourceIds);
         }
         else
         {
             NX_ASSERT(false, "Unexpected field type: %1", value.typeName());
-            return {};
+            return {FiltrationAction::Discard};
         }
     }
 
-    if (!filteredFields.empty())
-    {
-        auto clone = engine->cloneEvent(event);
-        for (const auto& [key, value]: filteredFields)
-            clone->setProperty(key, QVariant::fromValue(value));
+    if (!result.resourceMap.empty())
+        return result;
 
-        return clone;
-    }
-
-    return event;
+    return {FiltrationAction::Accept};
 }
 
-QByteArray getUuidsHash(const QnUuidList& ids)
+EventPtr filterEventPermissions(
+    const EventPtr& event,
+    const QnUserResourcePtr& user,
+    const PermissionsDescriptor& permissionsDescriptor)
 {
-    QByteArray result;
-    result.reserve(16 * ids.size());
+    auto result = filterResourcesByPermission(event.get(), event->type(), user, permissionsDescriptor);
+    if (result.action == FiltrationAction::Accept)
+        return event;
 
-    for(auto id: ids)
-        result.push_back(id.toRfc4122());
+    if (result.action == FiltrationAction::Discard)
+        return {};
+
+    NX_ASSERT(!result.resourceMap.empty());
+
+    auto clone = user->systemContext()->vmsRulesEngine()->cloneEvent(event);
+    for (const auto& [key, value]: result.resourceMap)
+        clone->setProperty(key.c_str(), QVariant::fromValue(value));
+
+    return clone;
+}
+
+ActionBuilder::Actions filterActionPermissions(
+    const ActionPtr& action,
+    const nx::vms::common::SystemContext* context,
+    const PermissionsDescriptor& permissionsDescriptor)
+{
+    const auto selection = action->property(utils::kUsersFieldName).value<UuidSelection>();
+    NX_ASSERT(!selection.ids.isEmpty());
+
+    struct ActionUsers
+    {
+        ActionPtr action;
+        QnUuidSet userIds;
+    };
+    std::unordered_map<QByteArray, ActionUsers> actionUsersMap;
+
+    ActionBuilder::Actions result;
+    for (const auto& user:
+        context->resourcePool()->getResourcesByIds<QnUserResource>(selection.ids))
+    {
+        auto filterResult =
+            filterResourcesByPermission(action.get(), action->type(), user, permissionsDescriptor);
+
+        if (filterResult.action == FiltrationAction::Discard)
+            continue;
+
+        if (filterResult.action == FiltrationAction::Accept ||
+            filterResult.action == FiltrationAction::Clone)
+        {
+            if (auto it = actionUsersMap.find(filterResult.hash); it == actionUsersMap.end())
+            {
+                ActionPtr insert = action;
+
+                if (filterResult.action == FiltrationAction::Clone)
+                {
+                    insert = user->systemContext()->vmsRulesEngine()->cloneAction(action);
+                    for (const auto& [key, value]: filterResult.resourceMap)
+                        insert->setProperty(key.c_str(), QVariant::fromValue(value));
+                }
+
+                actionUsersMap.emplace(filterResult.hash, ActionUsers{insert, {user->getId()}});
+            }
+            else
+            {
+                it->second.userIds << user->getId();
+            }
+        }
+    }
+
+    for (auto& [key, value]: actionUsersMap)
+    {
+        value.action->setProperty(utils::kUsersFieldName, QVariant::fromValue(UuidSelection{
+            .ids = std::move(value.userIds),
+            .all = false}));
+
+        result.push_back(std::move(value.action));
+    }
 
     return result;
 }
@@ -320,19 +414,16 @@ void ActionBuilder::processEvent(const EventPtr& event)
         return;
     }
 
-    bool isAggregationByTypeSupported{false};
-    if (actionDescriptor->flags.testFlag(ItemFlag::aggregationByTypeSupported)
-        && eventDescriptor->flags.testFlag(ItemFlag::aggregationByTypeSupported))
-    {
-        isAggregationByTypeSupported = true;
-    }
+    const bool aggregateByType =
+        actionDescriptor->flags.testFlag(ItemFlag::aggregationByTypeSupported)
+        && eventDescriptor->flags.testFlag(ItemFlag::aggregationByTypeSupported);
 
     static const auto aggregationKey = [](const EventPtr& e) { return e->aggregationKey(); };
     static const auto eventType = [](const EventPtr& e) { return e->type(); };
 
     if (m_aggregator
         && m_aggregator->aggregate(
-            event, (isAggregationByTypeSupported ? eventType : aggregationKey)))
+            event, (aggregateByType ? eventType : aggregationKey)))
     {
         NX_VERBOSE(this, "Event %1(%2) occurred and was aggregated", event->type(), event->state());
     }
@@ -431,18 +522,17 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
         actions.push_back(logAction);
     }
 
+    std::erase(actions, ActionPtr());
+    if (actions.empty())
+        return;
+
     // TODO: #amalov The flag is taken from the old engine algorithms.
     // Think of more clever solution to support "Use source" flag.
-    if (isProlonged && !actions.empty())
-    {
+    if (isProlonged)
         m_isActionRunning = (actions.front()->state() == State::started);
-    }
 
     for (const auto& action: actions)
-    {
-        if(action)
-            emit this->action(action);
-    }
+        emit this->action(action);
 
     emit engine()->actionBuilt(aggregatedEvent, logAction);
 }
@@ -452,6 +542,10 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
 {
     auto targetUsersField = fieldByNameImpl<TargetUserField>(utils::kUsersFieldName);
     if (!NX_ASSERT(targetUsersField))
+        return {};
+
+    const auto eventManifest = engine()->eventDescriptor(aggregatedEvent->type());
+    if (!NX_ASSERT(eventManifest))
         return {};
 
     UuidSelection initialFieldValue {
@@ -486,15 +580,16 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
         }
 
         auto filteredAggregatedEvent = aggregatedEvent->filtered(
-            [&user, context = targetUsersField->systemContext()](const EventPtr& event)
+            [&user, &permissions = eventManifest->permissions](const EventPtr& event)
             {
-                return permissionFilter(event, user, context);
+                return filterEventPermissions(event, user, permissions);
             });
 
         if (!filteredAggregatedEvent)
             continue;
 
-        auto hash = getUuidsHash(utils::getDeviceIds(filteredAggregatedEvent));
+        // Grouping users with the same permissions.
+        auto hash = permissionHash(eventManifest->permissions, filteredAggregatedEvent);
         auto it = eventUsersMap.find(hash);
 
         if (it == eventUsersMap.end())
@@ -504,6 +599,7 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     }
 
     Actions result;
+    auto actionManifect = engine()->actionDescriptor(actionType());
 
     for (auto& [key, value]: eventUsersMap)
     {
@@ -514,7 +610,12 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
             .ids = std::move(value.userIds),
             .all = false});
 
-        result.push_back(buildAction(value.event));
+        auto actions = filterActionPermissions(
+            buildAction(value.event),
+            targetUsersField->systemContext(),
+            actionManifect->permissions);
+
+        result.insert(result.end(), actions.begin(), actions.end());
     }
 
     // Recover initial target users selection.

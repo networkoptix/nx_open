@@ -15,7 +15,7 @@ QVariant Substitution::build(const AggregatedEventPtr& eventAggregator) const
     if (eventAggregator)
         value = eventAggregator->property(m_fieldName.toUtf8().data());
 
-    return value.canConvert(QVariant::String)
+    return value.canConvert<QString>()
         ? value.toString() //< TODO: #spanasenko Refactor.
         : QString("{%1}").arg(m_fieldName);
 }

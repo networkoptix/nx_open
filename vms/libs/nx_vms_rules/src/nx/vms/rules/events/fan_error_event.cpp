@@ -4,6 +4,7 @@
 
 #include "../event_filter_fields/source_server_field.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
 

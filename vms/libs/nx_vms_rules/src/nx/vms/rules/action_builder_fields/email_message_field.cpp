@@ -18,7 +18,7 @@ EmailMessageField::EmailMessageField(common::SystemContext* context):
 QVariant EmailMessageField::build(const AggregatedEventPtr& eventAggregator) const
 {
     // Return correct type for testing.
-    NX_ASSERT(eventAggregator->type() == "nx.events.test", "Must not be called");
+    NX_ASSERT(eventAggregator->type().startsWith("nx.events.test"), "Must not be called");
     return QVariant::fromValue(nx::email::Message{});
 }
 

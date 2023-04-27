@@ -13,6 +13,7 @@ class NX_VMS_RULES_API PtzPresetAction: public nx::vms::rules::BasicAction
     Q_CLASSINFO("type", "nx.actions.ptzPreset")
 
     FIELD(QnUuid, cameraId, setCameraId)
+    FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(std::chrono::microseconds, interval, setInterval)
     FIELD(QString, presetId, setPresetId)
 

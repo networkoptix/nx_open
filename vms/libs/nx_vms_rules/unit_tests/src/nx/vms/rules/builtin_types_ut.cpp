@@ -80,15 +80,23 @@ public:
         const auto& manifest = T::manifest();
         const auto& meta = T::staticMetaObject;
 
+        // Check if global permissions are actual.
+        const auto globalPermission = manifest.permissions.globalPermission;
+        const auto deprecatedPermissions =
+            nx::vms::api::kDeprecatedGlobalPermissions & globalPermission;
+        ASSERT_FALSE(deprecatedPermissions)
+            << nx::format("Deprecated permissions %1 in manifest for %2",
+                deprecatedPermissions, manifest.id).toStdString();
+
         // Check all permission fields correspond to properties with the same name.
-        for (const auto& perm: manifest.permissions.resourcePermissions)
+        for (const auto& [fieldName, permissions]: manifest.permissions.resourcePermissions)
         {
-            SCOPED_TRACE(nx::format("Resource permission field: %1", perm.fieldName).toStdString());
-            ASSERT_FALSE(perm.fieldName.isEmpty());
-            ASSERT_FALSE(!perm.permissions);
+            SCOPED_TRACE(nx::format("Resource permission field: %1", fieldName).toStdString());
+            ASSERT_FALSE(fieldName.empty());
+            ASSERT_FALSE(!permissions);
 
 
-            const auto propIndex = meta.indexOfProperty(perm.fieldName.data());
+            const auto propIndex = meta.indexOfProperty(fieldName.c_str());
             EXPECT_GE(propIndex, 0);
 
             const auto prop = meta.property(propIndex);
@@ -159,6 +167,7 @@ public:
         SCOPED_TRACE(nx::format("Action id: %1", manifest.id).toStdString());
 
         testManifestValidity<T>();
+        testPermissionsValidity<T>();
 
         // Check if all fields are registered.
         for (const auto& field : manifest.fields)
