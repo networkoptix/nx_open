@@ -231,12 +231,21 @@
        </widget>
       </item>
       <item>
+       <widget class="nx::vms::client::desktop::AlertBar" name="alertBar" native="true"/>
+      </item>
+      <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
         <property name="sizeType">
          <enum>QSizePolicy::MinimumExpanding</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
         </property>
        </spacer>
       </item>
@@ -260,6 +269,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::AlertBar</class>
+   <extends>QWidget</extends>
+   <header>nx/vms/client/desktop/common/widgets/control_bars.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::ScheduleBrushSelectableButton</class>
    <extends>QToolButton</extends>

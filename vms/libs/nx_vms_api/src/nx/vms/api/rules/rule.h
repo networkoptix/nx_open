@@ -20,7 +20,12 @@ public:
     QList<ActionBuilder> actionList;
     bool enabled = true;
     bool system = false;
+
+    /*
+     * %apidoc[opt] Schedule of the rule. Empty list means the rule is always enabled.
+     */
     nx::vms::api::ScheduleTaskDataList schedule;
+
     QString comment;
 };
 

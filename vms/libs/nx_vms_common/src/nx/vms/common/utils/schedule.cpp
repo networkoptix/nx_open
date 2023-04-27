@@ -64,9 +64,6 @@ nx::vms::api::ScheduleTaskDataList scheduleFromByteArray(const QByteArray& sched
     if (!NX_ASSERT(schedule.size() >= kBufferSize))
         return {};
 
-    if (std::all_of(schedule.begin(), schedule.end(), [](char c) { return c == -1; }))
-        return {};
-
     nx::vms::api::ScheduleTaskDataList tasks;
     nx::utils::BitStreamReader reader((uint8_t*)schedule.data(), schedule.size());
 

@@ -50,9 +50,9 @@ FooterWidget::FooterWidget(QWidget* parent):
             if (!rule)
                 return;
 
-            WeekTimeScheduleDialog dialog(this);
+            WeekTimeScheduleDialog dialog(this, /*isEmptyAllowed*/ false);
             dialog.setSchedule(rule->schedule());
-            if (!dialog.exec())
+            if (dialog.exec() != QDialog::Accepted)
                 return;
 
             rule->setSchedule(dialog.schedule());

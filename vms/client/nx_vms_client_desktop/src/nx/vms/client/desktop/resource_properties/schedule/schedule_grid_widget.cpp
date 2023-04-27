@@ -357,6 +357,16 @@ void ScheduleGridWidget::setCellData(Qt::DayOfWeek day, int hour, const QVariant
     d->setCellData(QPoint(hour, dayIndex), value);
 }
 
+bool ScheduleGridWidget::empty() const
+{
+    return std::all_of(
+        d->gridData.begin(), d->gridData.end(),
+        [](const Private::ColumnData& col)
+        {
+            return std::all_of(col.begin(), col.end(), [](const QVariant& v){ return !v.toBool(); });
+        });
+}
+
 void ScheduleGridWidget::fillGridData(const QVariant& cellValue)
 {
     d->setCellsData(kGridRange, cellValue);
