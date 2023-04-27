@@ -45,6 +45,16 @@ namespace {
 constexpr int kMaxFrameQueueSize = 6;
 constexpr int kMaxReverseQueueSize = 1024 * 1024 * 300; //< In bytes.
 
+bool isNvidia()
+{
+    return QnGlFunctions::openGLInfo().vendor.toLower().contains("nvidia");
+}
+
+bool isIntel()
+{
+    return QnGlFunctions::openGLInfo().vendor.toLower().contains("intel");
+}
+
 QnFrameScaler::DownscaleFactor findScaleFactor(int width, int height, int fitWidth, int fitHeight)
 {
     if (fitWidth * 8 <= width && fitHeight * 8 <= height)
@@ -394,12 +404,14 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     if (qnSettings->isHardwareDecodingEnabled() && !m_reverseMode)
     {
         if (QuickSyncVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
-            && QuickSyncVideoDecoderOldPlayer::isSupported(data))
+            && QuickSyncVideoDecoderOldPlayer::isSupported(data)
+            && isIntel())
         {
             decoder = new QuickSyncVideoDecoderOldPlayer();
         }
         else if (NvidiaVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
-            && NvidiaVideoDecoderOldPlayer::isSupported(data))
+            && NvidiaVideoDecoderOldPlayer::isSupported(data)
+            && isNvidia())
         {
             decoder = new NvidiaVideoDecoderOldPlayer();
         }
