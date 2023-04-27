@@ -782,7 +782,9 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
     if (hasPowerUserPermissions())
         flags |= Qt::ItemIsDropEnabled;
 
-    return makeFlatteningGroup(m_itemFactory->createWebPagesItem(flags), std::move(webPagesList));
+    return makeFlatteningGroup(m_itemFactory->createWebPagesItem(flags),
+        std::move(webPagesList),
+        FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createLocalFilesGroupEntity() const
