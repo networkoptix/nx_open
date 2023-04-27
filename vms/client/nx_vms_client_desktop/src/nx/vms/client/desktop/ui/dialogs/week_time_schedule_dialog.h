@@ -18,7 +18,7 @@ class WeekTimeScheduleDialog: public QnSessionAwareButtonBoxDialog
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    explicit WeekTimeScheduleDialog(QWidget* parent);
+    WeekTimeScheduleDialog(QWidget* parent, bool isEmptyAllowed = true);
     virtual ~WeekTimeScheduleDialog() override;
 
     /**

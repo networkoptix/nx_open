@@ -1,6 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "week_time_schedule_dialog.h"
+#include "ui_week_time_schedule_dialog.h"
+
+#include <QtWidgets/QPushButton>
 
 #include <nx/utils/bit_stream.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/schedule_cell_painter.h>
@@ -8,11 +10,11 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include "ui_week_time_schedule_dialog.h"
+#include "week_time_schedule_dialog.h"
 
 namespace nx::vms::client::desktop {
 
-WeekTimeScheduleDialog::WeekTimeScheduleDialog(QWidget* parent):
+WeekTimeScheduleDialog::WeekTimeScheduleDialog(QWidget* parent, bool isEmptyAllowed):
     base_type(parent),
     ui(new Ui::WeekTimeScheduleDialog),
     m_scheduleCellPainter(new nx::vms::client::desktop::ScheduleCellPainter())
@@ -37,6 +39,23 @@ WeekTimeScheduleDialog::WeekTimeScheduleDialog(QWidget* parent):
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &WeekTimeScheduleDialog::accept);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &WeekTimeScheduleDialog::reject);
+
+    ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+
+    if (!isEmptyAllowed)
+    {
+        connect(
+            ui->gridWidget,
+            &ScheduleGridWidget::gridDataChanged,
+            this,
+            [this]
+            {
+                const auto isEmptySchedule = ui->gridWidget->empty();
+                ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!isEmptySchedule);
+                ui->alertBar->setText(
+                    isEmptySchedule ? tr("Empty schedule is not allowed") : QString{});
+            });
+    }
 }
 
 WeekTimeScheduleDialog::~WeekTimeScheduleDialog()

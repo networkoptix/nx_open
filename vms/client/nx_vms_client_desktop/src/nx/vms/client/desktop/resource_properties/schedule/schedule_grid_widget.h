@@ -72,6 +72,9 @@ public:
      */
     void setCellData(Qt::DayOfWeek day, int hour, const QVariant& value);
 
+    /* Returns whether all the grid is filled with null values. */
+    bool empty() const;
+
     /**
      * Fills whole schedule grid with the same value.
      */
