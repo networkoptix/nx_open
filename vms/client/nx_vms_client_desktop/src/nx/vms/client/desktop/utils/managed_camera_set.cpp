@@ -56,7 +56,8 @@ void ManagedCameraSet::setAllCameras()
         return;
 
     m_notFilteredCameras = NX_ASSERT(m_resourcePool)
-        ? nx::utils::toQSet(m_resourcePool->getResources<QnVirtualCameraResource>())
+        ? nx::utils::toQSet(
+            m_resourcePool->getAllCameras(/*parentId*/ QnUuid(), /*ignoreDesktopCameras*/ true))
         : QnVirtualCameraResourceSet();
 
     setCameras(Type::all, filteredCameras());
@@ -64,10 +65,10 @@ void ManagedCameraSet::setAllCameras()
 
 void ManagedCameraSet::setSingleCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    m_notFilteredCameras = camera
-        && NX_ASSERT(m_resourcePool && camera->resourcePool() == m_resourcePool)
-            ? QnVirtualCameraResourceSet({camera})
-            : QnVirtualCameraResourceSet();
+    // Cameras from other cloud systems should be filtered out.
+    m_notFilteredCameras = camera && cameraBelongsToLocalResourcePool(camera)
+        ? QnVirtualCameraResourceSet({camera})
+        : QnVirtualCameraResourceSet();
 
     setCameras(Type::single, filteredCameras());
 }
@@ -79,8 +80,9 @@ void ManagedCameraSet::setMultipleCameras(const QnVirtualCameraResourceSet& came
     QnVirtualCameraResourceSet invalid;
     for (const auto& camera: m_notFilteredCameras)
     {
-        if (!(camera && m_resourcePool && camera->resourcePool() == m_resourcePool))
-            invalid.insert(camera); // Cameras from other cloud systems can be here.
+        // Cameras from other cloud systems should be filtered out.
+        if (!cameraBelongsToLocalResourcePool(camera))
+            invalid.insert(camera);
     }
 
     m_notFilteredCameras -= invalid;
@@ -124,9 +126,16 @@ QnVirtualCameraResourceSet ManagedCameraSet::filteredCameras() const
     return filtered;
 }
 
+bool ManagedCameraSet::cameraBelongsToLocalResourcePool(const QnVirtualCameraResourcePtr& camera)
+{
+    return NX_ASSERT(camera)
+        && NX_ASSERT(m_resourcePool)
+        && camera->resourcePool() == m_resourcePool;
+}
+
 void ManagedCameraSet::addCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    if (!camera)
+    if (!camera || camera->hasFlags(Qn::desktop_camera))
         return;
 
     m_notFilteredCameras.insert(camera);
