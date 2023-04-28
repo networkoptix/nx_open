@@ -21,6 +21,7 @@ class CloudCrossSystemManager;
 class CloudLayoutsManager;
 class ContextStatisticsModule;
 class ObjectDisplaySettings;
+class PerformanceMonitor;
 class RadassController;
 class ResourceFactory;
 class RunningInstancesManager;
@@ -173,6 +174,11 @@ public:
      * System context, containing Cloud Layouts.
      */
     SystemContext* cloudLayoutsSystemContext() const;
+
+    /**
+     * Monitors system resources usage: CPU, memory, GPU, etc, in its own separate thread.
+     */
+    PerformanceMonitor* performanceMonitor() const;
 
     RadassController* radassController() const;
 
