@@ -30,6 +30,8 @@ struct NX_VMS_UPDATE_API ReleaseInfo
     PublicationType publication_type = PublicationType::release;
     qint64 release_date = 0;
     int release_delivery_days = 0;
+    nx::utils::SoftwareVersion availableForReleasesFrom;
+    nx::utils::SoftwareVersion availableForReleasesBefore;
 };
 #define ReleaseInfo_Fields \
     (version) \
@@ -37,7 +39,9 @@ struct NX_VMS_UPDATE_API ReleaseInfo
     (protocol_version) \
     (publication_type) \
     (release_date) \
-    (release_delivery_days)
+    (release_delivery_days) \
+    (availableForReleasesFrom) \
+    (availableForReleasesBefore)
 
 
 struct NX_VMS_UPDATE_API ReleasesInfo

@@ -181,4 +181,44 @@ TEST(ReleasesInfoTest, clientDoesNotSelectsLessReleasishBuild)
     EXPECT_FALSE(release.has_value());
 }
 
+TEST(ReleasesInfoTest, availabilityRangeFromWorks)
+{
+    auto vmsRelease = vmsRelease5_1;
+    vmsRelease.availableForReleasesFrom = {5, 0};
+
+    auto release = selectVmsRelease({vmsRelease}, {4, 2});
+    EXPECT_FALSE(release.has_value());
+
+    release = selectVmsRelease({vmsRelease}, {5, 0});
+    EXPECT_EQ(release->version, vmsRelease.version);
+}
+
+TEST(ReleasesInfoTest, availabilityRangeBeforeWorks)
+{
+    auto vmsRelease = vmsRelease5_1;
+    vmsRelease.availableForReleasesBefore = {5, 0};
+
+    auto release = selectVmsRelease({vmsRelease}, {5, 0});
+    EXPECT_FALSE(release.has_value());
+
+    release = selectVmsRelease({vmsRelease}, {4, 2});
+    EXPECT_EQ(release->version, vmsRelease.version);
+}
+
+TEST(ReleasesInfoTest, availabilityRangeWorksForBothBounds)
+{
+    auto vmsRelease = vmsRelease5_0;
+    vmsRelease.availableForReleasesFrom = {5, 0};
+    vmsRelease.availableForReleasesBefore = {5, 1};
+
+    auto release = selectVmsRelease({vmsRelease}, {5, 0});
+    EXPECT_EQ(release->version, vmsRelease.version);
+
+    release = selectVmsRelease({vmsRelease}, {4, 2});
+    EXPECT_FALSE(release.has_value());
+
+    release = selectVmsRelease({vmsRelease}, {5, 1});
+    EXPECT_FALSE(release.has_value());
+}
+
 } // namespace nx::vms::update::test
