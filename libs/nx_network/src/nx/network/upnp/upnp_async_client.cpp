@@ -353,15 +353,20 @@ void AsyncClient::getMapping(
         [callback](const Message& response)
         {
             if (response.isOk())
+            {
                 callback(MappingInfo(
-                    response.getParam(kNewInternalClient).toStdString(),
+                    HostAddress::fromString(
+                        response.getParam(kNewInternalClient).toStdString()),
                     response.getParam(kNewInternalPort).toUShort(),
                     response.getParam(kNewExternalPort).toUShort(),
                     nx::reflect::fromString<Protocol>(
                         response.getParam(kNewProtocol).toStdString()),
                     response.getParam(kNewPortMappingDescription)));
+            }
             else
+            {
                 callback(MappingInfo());
+            }
         });
 }
 
@@ -379,9 +384,11 @@ void AsyncClient::getMapping(
             if (response.isOk())
             {
                 callback(MappingInfo(
-                    response.getParam(kNewInternalClient).toStdString(),
+                    HostAddress::fromString(
+                        response.getParam(kNewInternalClient).toStdString()),
                     response.getParam(kNewInternalPort).toUShort(),
-                    externalPort, protocol,
+                    externalPort,
+                    protocol,
                     response.getParam(kNewPortMappingDescription),
                     response.getParam(kNewLeaseDuration).toULongLong()));
             }
