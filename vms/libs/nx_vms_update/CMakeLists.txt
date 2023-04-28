@@ -14,3 +14,7 @@ nx_add_target(nx_vms_update LIBRARY
 target_compile_definitions(nx_vms_update
     PRIVATE NX_VMS_UPDATE_API=${API_EXPORT_MACRO}
     INTERFACE NX_VMS_UPDATE_API=${API_IMPORT_MACRO})
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
