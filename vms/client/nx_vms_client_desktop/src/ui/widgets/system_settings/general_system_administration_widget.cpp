@@ -13,10 +13,12 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
+#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -41,7 +43,7 @@ static const QMargins kPreferencesButtonMargins(8, 4, 8, 4);
 
 } // namespace
 
-QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget *parent /* = nullptr*/) :
+QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget* parent /* = nullptr*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::GeneralSystemAdministrationWidget)
@@ -60,8 +62,6 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
         this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
     connect(ui->systemNameLabel, &EditableLabel::editingFinished,
         this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
-    connect(globalSettings(), &SystemSettings::systemNameChanged,
-        this, &QnGeneralSystemAdministrationWidget::loadSystemName);
 
     auto buttonLayout = new QHBoxLayout(ui->buttonWidget);
     buttonLayout->setSpacing(0);
@@ -155,14 +155,14 @@ void QnGeneralSystemAdministrationWidget::applyChanges()
 {
     ui->systemSettingsWidget->applyChanges();
     ui->systemNameLabel->setEditing(false);
-
-    globalSettings()->setSystemName(ui->systemNameLabel->text().trimmed());
-    globalSettings()->synchronizeNow();
+    const auto systemSetting = systemContext()->systemSettings();
+    systemSetting->systemName = ui->systemNameLabel->text().trimmed();
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const
 {
-    return (ui->systemNameLabel->text().trimmed() != globalSettings()->systemName())
+    const auto systemSetting = systemContext()->systemSettings();
+    return (ui->systemNameLabel->text().trimmed() != systemSetting->systemName)
         || ui->systemSettingsWidget->hasChanges();
 }
 
@@ -208,7 +208,8 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
 
 void QnGeneralSystemAdministrationWidget::loadSystemName()
 {
-    ui->systemNameLabel->setText(globalSettings()->systemName());
+    const auto systemSetting = systemContext()->systemSettings();
+    ui->systemNameLabel->setText(systemSetting->systemName);
 }
 
 void QnGeneralSystemAdministrationWidget::setReadOnlyInternal(bool readOnly)

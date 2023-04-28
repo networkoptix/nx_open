@@ -39,7 +39,6 @@
 #include <nx/vms/api/analytics/device_agent_active_setting_changed_request.h>
 #include <nx/vms/api/analytics/device_agent_settings_request.h>
 #include <nx/vms/api/data/device_actions.h>
-#include <nx/vms/api/data/email_settings_data.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/api/data/storage_encryption_data.h>
@@ -1514,7 +1513,7 @@ Handle ServerConnection::putRest(
 Handle ServerConnection::patchRest(nx::vms::common::SessionTokenHelperPtr helper,
     const QString& action,
     const nx::network::rest::Params& params,
-    const QByteArray& body,
+    const nx::String& body,
     Result<ErrorOrEmpty>::type callback,
     nx::utils::AsyncHandlerExecutor executor)
 {
@@ -1642,17 +1641,14 @@ Handle ServerConnection::getPluginInformation(
 }
 
 Handle ServerConnection::testEmailSettings(
-    const QnEmailSettings& settings,
+    const nx::vms::api::EmailSettingsData& settings,
     Result<RestResultWithData<QnTestEmailSettingsReply>>::type&& callback,
     QThread* targetThread,
     std::optional<QnUuid> proxyToServer)
 {
-    nx::vms::api::EmailSettingsData data;
-    ec2::fromResourceToApi(settings, data);
-
     return executePost(
         "/api/testEmailSettings",
-        QJson::serialized(data),
+        QJson::serialized(settings),
         std::move(callback),
         targetThread,
         proxyToServer);

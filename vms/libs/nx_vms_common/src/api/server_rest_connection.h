@@ -36,6 +36,7 @@
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/database_dump_data.h>
 #include <nx/vms/api/data/device_replacement.h>
+#include <nx/vms/api/data/email_settings_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/log_settings.h>
@@ -624,7 +625,7 @@ public:
      * passed as parameter is successful.
      */
     Handle testEmailSettings(
-        const QnEmailSettings& settings,
+        const nx::vms::api::EmailSettingsData& settings,
         Result<RestResultWithData<QnTestEmailSettingsReply>>::type&& callback,
         QThread* targetThread = nullptr,
         std::optional<QnUuid> proxyToServer = {});
@@ -855,7 +856,7 @@ public:
         nx::vms::common::SessionTokenHelperPtr helper,
         const QString& action,
         const nx::network::rest::Params& params,
-        const QByteArray& body,
+        const nx::String& body,
         Result<ErrorOrEmpty>::type callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 

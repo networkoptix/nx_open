@@ -275,12 +275,12 @@ nx::vms::api::ResourceParamDataList QnResourcePropertyDictionary::allProperties(
     return result;
 }
 
-QMap<QnUuid, QMap<QString, QString>> QnResourcePropertyDictionary::modifiedProperties(
+QMap<QString, QString> QnResourcePropertyDictionary::modifiedProperties(
     const QnUuid& resourceId) const
 {
     NX_MUTEX_LOCKER lock( &m_mutex );
 
-    return m_modifiedItems;
+    return m_modifiedItems[resourceId];
 }
 
 QHash<QnUuid, QSet<QString>> QnResourcePropertyDictionary::allPropertyNamesByResource() const

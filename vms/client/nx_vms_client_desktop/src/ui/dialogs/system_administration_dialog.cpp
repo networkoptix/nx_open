@@ -6,8 +6,12 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/branding.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/vms/api/data/system_settings.h>
+#include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_administration/widgets/advanced_system_settings_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.h>
@@ -26,6 +30,7 @@
 #include <ui/widgets/system_settings/license_manager_widget.h>
 #include <ui/widgets/system_settings/routing_management_widget.h>
 
+using namespace std::chrono;
 using namespace nx::vms::client::desktop;
 
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
@@ -66,7 +71,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     addPage(CloudManagement, new QnCloudManagementWidget(this), nx::branding::cloudName());
     addPage(
         TimeServerSelection,
-        new TimeSynchronizationWidget(this),
+        new TimeSynchronizationWidget(systemContext(), this),
         tr("Time Sync"));
 
     auto routingWidget = new QnRoutingManagementWidget(this);
@@ -94,7 +99,8 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     loadDataToUi();
     updateAnalyticsSettingsWidgetVisibility();
 
-    autoResizePagesToContents(ui->tabWidget, {QSizePolicy::Preferred, QSizePolicy::Preferred}, true);
+    autoResizePagesToContents(
+        ui->tabWidget, {QSizePolicy::Preferred, QSizePolicy::Preferred}, true);
 
     connect(this, &QnGenericTabbedDialog::dialogClosed,
         this, [securityWidget]() { securityWidget->resetWarnings(); });
@@ -103,4 +109,36 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog()
 {
     // Required here for forward-declared scoped pointer destruction.
+}
+
+void QnSystemAdministrationDialog::applyChanges()
+{
+    for (const Page& page: modifiedPages())
+    {
+        if (page.enabled && page.visible && page.widget->hasChanges())
+            page.widget->applyChanges();
+    }
+
+    const auto callback = nx::utils::guarded(this,
+        [this] (bool success)
+        {
+            systemContext()->systemSettingsManager()->requestSystemSettings(
+                [this, success]
+                {
+                    if (success)
+                        loadDataToUi();
+
+                    updateButtonBox();
+                });
+        });
+
+    systemContext()->systemSettingsManager()->saveSystemSettings(callback);
+
+    updateButtonBox();
+}
+
+void QnSystemAdministrationDialog::loadDataToUi()
+{
+    for (const Page& page: allPages())
+        page.widget->loadDataToUi();
 }

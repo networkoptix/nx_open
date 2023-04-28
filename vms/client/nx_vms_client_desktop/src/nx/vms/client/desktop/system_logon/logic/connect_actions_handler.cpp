@@ -1216,9 +1216,6 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
         return false;
     }
 
-    if (!force)
-        systemSettings()->synchronizeNow();
-
     if (flags.testFlag(DisconnectFlag::SwitchingServer))
     {
         setState(LogicalState::connecting);

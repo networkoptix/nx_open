@@ -62,7 +62,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(remoteSessionTimeoutS);
     DECLARE_SETTING_NAME(remoteSessionUpdateS);
     DECLARE_SETTING_NAME(resourceFileUri);
-    DECLARE_SETTING_NAME(sessionLimitMinutes);
+    DECLARE_SETTING_NAME(sessionLimitS);
     DECLARE_SETTING_NAME(sessionsLimit);
     DECLARE_SETTING_NAME(sessionsLimitPerUser);
     DECLARE_SETTING_NAME(smtpPassword);
@@ -108,7 +108,7 @@ struct SystemSettingNames
         remoteSessionTimeoutS,
         remoteSessionUpdateS,
         resourceFileUri,
-        sessionLimitMinutes,
+        sessionLimitS,
         sessionsLimit,
         sessionsLimitPerUser,
         trafficEncryptionForced,
@@ -401,8 +401,8 @@ public:
     nx::vms::api::WatermarkSettings watermarkSettings() const;
     void setWatermarkSettings(const nx::vms::api::WatermarkSettings& settings) const;
 
-    std::optional<std::chrono::minutes> sessionTimeoutLimit() const;
-    void setSessionTimeoutLimit(std::optional<std::chrono::minutes> value);
+    std::optional<std::chrono::seconds> sessionTimeoutLimit() const;
+    void setSessionTimeoutLimit(std::optional<std::chrono::seconds> value);
 
     int sessionsLimit() const;
     void setSessionsLimit(int value);
@@ -658,7 +658,7 @@ private:
         m_clientUpdateSettingsAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::WatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<int>* m_sessionTimeoutLimitMinutesAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_sessionTimeoutLimitSecondsAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_sessionsLimitAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_sessionsLimitPerUserAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_remoteSessionUpdateAdaptor = nullptr;

@@ -35,7 +35,6 @@
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>

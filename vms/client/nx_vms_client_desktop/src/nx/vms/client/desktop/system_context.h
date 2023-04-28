@@ -68,6 +68,7 @@ public:
     QnMediaServerStatisticsManager* mediaServerStatisticsManager() const;
     SystemSpecificLocalSettings* localSettings() const;
     RestApiHelper* restApiHelper() const;
+    virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const override;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;

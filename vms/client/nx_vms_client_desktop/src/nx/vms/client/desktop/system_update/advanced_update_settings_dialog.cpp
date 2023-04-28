@@ -6,9 +6,13 @@
 #include <QtWidgets/QWidget>
 
 #include <common/common_module.h>
+#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/utils/qml_property.h>
+#include <nx/vms/client/core/settings/system_settings_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
-#include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::common;
@@ -24,25 +28,25 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
 {
     QmlProperty<ClientUpdateManager*>(rootObjectHolder(), "clientUpdateManager") =
         context()->findInstance<ClientUpdateManager>();
-
     QmlProperty<bool> notifyAboutUpdates(rootObjectHolder(), "notifyAboutUpdates");
 
-    notifyAboutUpdates = systemSettings()->isUpdateNotificationsEnabled();
+    const auto systemSetting = systemContext()->systemSettings();
+    notifyAboutUpdates = systemSetting->updateNotificationsEnabled;
 
     notifyAboutUpdates.connectNotifySignal(
         this,
-        [this, notifyAboutUpdates]()
+        [this, notifyAboutUpdates, systemSetting]()
         {
-            systemSettings()->setUpdateNotificationsEnabled(notifyAboutUpdates);
-            systemSettings()->synchronizeNow();
+            systemSetting->updateNotificationsEnabled = notifyAboutUpdates;
+            systemContext()->systemSettingsManager()->saveSystemSettings();
         });
 
-    connect(systemSettings(),
-        &SystemSettings::updateNotificationsChanged,
+    connect(systemContext()->systemSettingsManager(),
+        &core::SystemSettingsManager::systemSettingsChanged,
         this,
-        [this, notifyAboutUpdates]()
+        [this, notifyAboutUpdates, systemSetting]()
         {
-            notifyAboutUpdates = systemSettings()->isUpdateNotificationsEnabled();
+            notifyAboutUpdates = systemSetting->updateNotificationsEnabled;
         });
 }
 

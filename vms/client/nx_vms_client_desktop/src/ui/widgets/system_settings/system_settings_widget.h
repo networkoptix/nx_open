@@ -4,8 +4,8 @@
 
 #include <QtWidgets/QWidget>
 
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 struct QnWatermarkSettings;
 
@@ -13,7 +13,7 @@ namespace Ui { class SystemSettingsWidget; }
 
 class QnSystemSettingsWidget:
     public QnAbstractPreferencesWidget,
-    public nx::vms::client::core::CommonModuleAware
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
 

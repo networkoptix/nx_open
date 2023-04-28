@@ -91,6 +91,11 @@ bool QnEmailSettings::isValid() const
     return QnEmailAddress(email).isValid() && nx::utils::Url::fromUserInput(server).isValid();
 }
 
+bool QnEmailSettings::isValid(const QString& email, const QString& server)
+{
+    return QnEmailAddress(email).isValid() && nx::utils::Url::fromUserInput(server).isValid();
+}
+
 QnEmailAddress::QnEmailAddress(const QString& email):
     m_email(email.trimmed())
 {

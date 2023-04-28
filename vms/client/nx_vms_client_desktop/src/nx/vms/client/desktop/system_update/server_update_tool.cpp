@@ -21,11 +21,15 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/settings/system_settings_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/requests.h>
@@ -118,13 +122,12 @@ ServerUpdateTool::~ServerUpdateTool()
 void ServerUpdateTool::onConnectToSystem(QnUuid systemId)
 {
     m_systemId = systemId;
-
     if (!branding::customReleaseListUrl().isEmpty())
     {
-        systemSettings()->setCustomReleaseListUrl(branding::customReleaseListUrl());
-        systemSettings()->synchronizeNow();
+        systemContext()->systemSettings()->customReleaseListUrl =
+            branding::customReleaseListUrl();
+        systemContext()->systemSettingsManager()->saveSystemSettings();
     }
-
     loadInternalState();
     m_downloader->startDownloads();
 }

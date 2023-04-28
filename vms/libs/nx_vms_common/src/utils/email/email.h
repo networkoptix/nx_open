@@ -105,6 +105,7 @@ struct NX_VMS_COMMON_API QnEmailSettings
      */
     bool isValid() const;
 
+    static bool isValid(const QString& email, const QString& server);
     static int defaultPort(QnEmail::ConnectionType connectionType);
     static int defaultTimeoutSec();
 };

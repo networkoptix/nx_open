@@ -19,7 +19,9 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/api/data/storage_scan_info.h>
+#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -936,11 +938,22 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
     const auto updateServerSettings =
         [this](const vms::api::MetadataStorageChangePolicy policy, const QnUuid& storageId)
         {
-            globalSettings()->setMetadataStorageChangePolicy(policy);
-            globalSettings()->synchronizeNow();
+            systemContext()->systemSettings()->metadataStorageChangePolicy = policy;
 
-            qnResourcesChangesManager->saveServer(m_server,
-                [storageId](const auto& server) { server->setMetadataStorageId(storageId); });
+            const auto callback = nx::utils::guarded(this,
+                [this, storageId](bool success)
+                {
+                    if (!success)
+                        return;
+
+                    qnResourcesChangesManager->saveServer(m_server,
+                        [storageId](const auto& server)
+                        {
+                            server->setMetadataStorageId(storageId);
+                        });
+                });
+
+            systemContext()->systemSettingsManager()->saveSystemSettings(callback);
         };
 
     if (m_metadataWatcher->metadataMayExist())

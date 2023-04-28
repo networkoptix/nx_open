@@ -2,6 +2,8 @@
 
 #include "system_settings.h"
 
+#include <chrono>
+
 #include <api/resource_property_adaptor.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
@@ -17,7 +19,12 @@
 #include <nx/vms/common/system_context.h>
 #include <utils/email/email.h>
 
+using namespace std::chrono;
+using namespace std::chrono_literals;
+
 namespace {
+
+static constexpr seconds kDefaultSessionLimit = 30 * 24h;
 
 QSet<QString> parseDisabledVendors(const QString& disabledVendors)
 {
@@ -548,9 +555,12 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "watermarkSettings", nx::vms::api::WatermarkSettings(), this,
         [] { return tr("Watermark settings"); });
 
-    m_sessionTimeoutLimitMinutesAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::sessionLimitMinutes, 30 * 24 * 60, [](const int& value) { return value >= 0; }, this,
-        [] { return tr("Authorization Session token lifetime (minutes)"); });
+    m_sessionTimeoutLimitSecondsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        Names::sessionLimitS,
+        kDefaultSessionLimit.count(),
+        [](const int& value) { return value >= 0; },
+        this,
+        [] { return tr("Authorization Session token lifetime (seconds)"); });
 
     m_sessionsLimitAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         Names::sessionsLimit, 100000, [](const int& value) { return value >= 0; }, this,
@@ -862,7 +872,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
-        m_sessionTimeoutLimitMinutesAdaptor,
+        m_sessionTimeoutLimitSecondsAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::sessionTimeoutChanged,
@@ -1049,7 +1059,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_installedUpdateInformationAdaptor
         << m_maxVirtualCameraArchiveSynchronizationThreads
         << m_watermarkSettingsAdaptor
-        << m_sessionTimeoutLimitMinutesAdaptor
+        << m_sessionTimeoutLimitSecondsAdaptor
         << m_sessionsLimitAdaptor
         << m_sessionsLimitPerUserAdaptor
         << m_remoteSessionUpdateAdaptor
@@ -1877,18 +1887,18 @@ void SystemSettings::setWatermarkSettings(const nx::vms::api::WatermarkSettings&
     m_watermarkSettingsAdaptor->setValue(settings);
 }
 
-std::optional<std::chrono::minutes> SystemSettings::sessionTimeoutLimit() const
+std::optional<std::chrono::seconds> SystemSettings::sessionTimeoutLimit() const
 {
-    int minutes = m_sessionTimeoutLimitMinutesAdaptor->value();
-    return minutes > 0
-        ? std::optional<std::chrono::minutes>(minutes)
+    int seconds = m_sessionTimeoutLimitSecondsAdaptor->value();
+    return seconds > 0
+        ? std::optional<std::chrono::seconds>(seconds)
         : std::nullopt;
 }
 
-void SystemSettings::setSessionTimeoutLimit(std::optional<std::chrono::minutes> value)
+void SystemSettings::setSessionTimeoutLimit(std::optional<std::chrono::seconds> value)
 {
-    int minutes = value ? value->count() : 0;
-    m_sessionTimeoutLimitMinutesAdaptor->setValue(minutes);
+    int seconds = value ? value->count() : 0;
+    m_sessionTimeoutLimitSecondsAdaptor->setValue(seconds);
 }
 
 int SystemSettings::sessionsLimit() const
@@ -2210,6 +2220,34 @@ void SystemSettings::update(const vms::api::SystemSettings& value)
     m_systemNameAdaptor->setValue(value.systemName);
     m_watermarkSettingsAdaptor->setValue(value.watermarkSettings);
     m_webSocketEnabledAdaptor->setValue(value.webSocketEnabled);
+    m_autoDiscoveryEnabledAdaptor->setValue(value.autoDiscoveryEnabled);
+    m_cameraSettingsOptimizationAdaptor->setValue(value.cameraSettingsOptimization);
+    m_statisticsAllowedAdaptor->setValue(value.statisticsAllowed);
+    m_cloudNotificationsLanguageAdaptor->setValue(value.cloudNotificationsLanguage);
+    m_auditTrailEnabledAdaptor->setValue(value.auditTrailEnabled);
+    m_trafficEncryptionForcedAdaptor->setValue(value.trafficEncryptionForced);
+    m_useHttpsOnlyCamerasAdaptor->setValue(value.useHttpsOnlyForCameras);
+    m_videoTrafficEncryptionForcedAdaptor->setValue(value.videoTrafficEncryptionForced);
+    m_sessionTimeoutLimitSecondsAdaptor->setValue(value.sessionLimitS.value_or(0s).count());
+    m_useStorageEncryptionAdaptor->setValue(value.storageEncryption);
+    m_showServersInTreeForNonAdminsAdaptor->setValue(value.showServersInTreeForNonAdmins);
+    m_updateNotificationsEnabledAdaptor->setValue(value.updateNotificationsEnabled);
+    m_serverAdaptor->setValue(value.smtpHost);
+    m_fromAdaptor->setValue(value.emailFrom);
+    m_userAdaptor->setValue(value.smtpUser);
+    m_smtpPasswordAdaptor->setValue(value.smtpPassword);
+    m_signatureAdaptor->setValue(value.emailSignature);
+    m_supportLinkAdaptor->setValue(value.emailSupportEmail);
+    m_connectionTypeAdaptor->setValue(value.smtpConnectionType);
+    m_portAdaptor->setValue(value.smtpPort);
+    m_timeoutAdaptor->setValue(value.smtpTimeout);
+    m_smtpNameAdaptor->setValue(value.smtpName);
+    m_useCloudServiceToSendEmailAdaptor->setValue(value.useCloudServiceToSendEmail);
+    m_timeSynchronizationEnabledAdaptor->setValue(value.timeSynchronizationEnabled);
+    m_primaryTimeServerAdaptor->setValue(value.primaryTimeServer);
+    m_customReleaseListUrlAdaptor->setValue(value.customReleaseListUrl);
+    m_backupSettingsAdaptor->setValue(value.backupSettings);
+    m_metadataStorageChangePolicyAdaptor->setValue(value.metadataStorageChangePolicy);
 }
 
 } // namespace nx::vms::common

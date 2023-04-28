@@ -9,6 +9,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/utils/abstract_session_token_helper.h>
 
 #include "system_context_aware.h" //< Forward declarations.
 
@@ -23,10 +24,12 @@ using AbstractECConnectionPtr = std::shared_ptr<AbstractECConnection>;
 } // namespace ec2
 
 namespace nx::network::http { class Credentials; }
+namespace nx::vms::api { struct SystemSettings; }
 namespace nx::vms::rules { class Engine; }
 
 namespace nx::vms::client::core {
 
+class SystemSettingsManager;
 class UserWatcher;
 class WatermarkWatcher;
 
@@ -121,6 +124,12 @@ public:
     WatermarkWatcher* watermarkWatcher() const;
 
     ServerTimeWatcher* serverTimeWatcher() const;
+
+    nx::vms::api::SystemSettings* systemSettings() const;
+
+    SystemSettingsManager* systemSettingsManager() const;
+
+    virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const;
 
 signals:
     void remoteIdChanged(const QnUuid& id);

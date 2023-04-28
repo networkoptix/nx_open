@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace Ui { class TimeSynchronizationWidget; }
 
@@ -19,14 +18,13 @@ class TimeSynchronizationServersDelegate;
 
 class TimeSynchronizationWidget:
     public QnAbstractPreferencesWidget,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    explicit TimeSynchronizationWidget(QWidget* parent = nullptr);
+    explicit TimeSynchronizationWidget(SystemContext* context, QWidget* parent = nullptr);
     virtual ~TimeSynchronizationWidget();
 
     virtual void loadDataToUi() override;
