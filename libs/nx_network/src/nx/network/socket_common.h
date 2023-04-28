@@ -172,7 +172,7 @@ public:
     static std::optional<in_addr> ipV4from(const in6_addr& addr);
     static IpV6WithScope ipV6from(const in_addr& addr);
 
-    static HostAddress fromString(const std::string_view& str);
+    static HostAddress fromString(const std::string_view& host);
 
     void swap(HostAddress& other);
 
@@ -183,16 +183,13 @@ private:
     std::optional<uint32_t> m_scopeId;
 
     HostAddress(
-        std::optional<std::string> addressString,
+        std::optional<std::string_view> addressString,
         std::optional<in_addr> ipV4,
         std::optional<in6_addr> ipV6);
 };
 
 NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
 NX_NETWORK_API void PrintTo(const HostAddress& val, ::std::ostream* os);
-
-NX_NETWORK_API void serialize(QnJsonContext*, const nx::network::HostAddress& value, QJsonValue* target);
-NX_NETWORK_API bool deserialize(QnJsonContext*, const QJsonValue& source, HostAddress* value);
 
 //-------------------------------------------------------------------------------------------------
 

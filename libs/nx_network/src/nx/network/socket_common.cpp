@@ -48,18 +48,18 @@ bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode)
 // HostAddress
 
 HostAddress::HostAddress(
-    std::optional<std::string> addressString,
+    std::optional<std::string_view> addressString,
     std::optional<in_addr> ipV4,
     std::optional<in6_addr> ipV6)
     :
     m_string(std::move(addressString)),
-    m_ipV4(ipV4),
-    m_ipV6(ipV6)
+    m_ipV4(std::move(ipV4)),
+    m_ipV6(std::move(ipV6))
 {
 }
 
 const HostAddress HostAddress::localhost(
-    std::string("localhost"), in4addr_loopback, in6addr_loopback);
+    std::string_view("localhost"), in4addr_loopback, in6addr_loopback);
 
 const HostAddress HostAddress::anyHost(*ipV4from("0.0.0.0"));
 
@@ -74,17 +74,13 @@ HostAddress::HostAddress(const in6_addr& addr, std::optional<uint32_t> scopeId):
 {
 }
 
-HostAddress::HostAddress(const std::string_view& addrStr):
-    m_string(addrStr)
+HostAddress::HostAddress(const std::string_view& host): m_string(host)
 {
-    auto assertCondition = [this, &addrStr]()
+    if (!host.empty())
     {
-        nx::utils::Url url;
-        url.setHost(*m_string);
-        return addrStr.empty() || url.isValid();
-    };
-
-    NX_ASSERT_HEAVY_CONDITION(assertCondition(), nx::format("Invalid host address: [%1]").args(*m_string));
+        NX_ASSERT_HEAVY_CONDITION(
+            nx::utils::Url::isValidHost(host), "Invalid host address: [%1]", host);
+    }
 }
 
 HostAddress::HostAddress(const char* addrStr):
@@ -443,9 +439,16 @@ void HostAddress::swap(HostAddress& other)
     m_ipV6.swap(other.m_ipV6);
 }
 
-HostAddress HostAddress::fromString(const std::string_view& str)
+HostAddress HostAddress::fromString(const std::string_view& host)
 {
-    return HostAddress(str);
+    std::optional<std::string_view> addressString;
+    std::optional<in6_addr> ipV6;
+    if (nx::utils::Url::isValidHost(host))
+        addressString = host;
+    else
+        ipV6 = in6addr_any;
+    std::optional<in_addr> ipV4;
+    return HostAddress(std::move(addressString), std::move(ipV4), std::move(ipV6));
 }
 
 void swap(HostAddress& one, HostAddress& two)
@@ -456,20 +459,6 @@ void swap(HostAddress& one, HostAddress& two)
 void PrintTo(const HostAddress& val, ::std::ostream* os)
 {
     *os << val.toString();
-}
-
-void serialize(
-    QnJsonContext*,
-    const nx::network::HostAddress& value,
-    QJsonValue* target)
-{
-    *target = QString::fromStdString(value.toString());
-}
-
-bool deserialize(QnJsonContext*, const QJsonValue& source, HostAddress* value)
-{
-    *value = HostAddress(source.toString().toStdString());
-    return true;
 }
 
 //-------------------------------------------------------------------------------------------------
