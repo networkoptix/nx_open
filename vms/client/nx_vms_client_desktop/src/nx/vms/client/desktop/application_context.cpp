@@ -11,13 +11,21 @@
 #include <api/server_rest_connection.h>
 #include <client/client_autorun_watcher.h>
 #include <client/client_meta_types.h>
+#include <client/client_resource_processor.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <client/client_show_once_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
+#include <client/system_weights_manager.h>
 #include <client_core/client_core_module.h>
+#include <core/resource/local_resource_status_watcher.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_directory_browser.h>
+#include <core/resource/storage_plugin_factory.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
+#include <core/storage/file_storage/qtfile_storage_resource.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -36,6 +44,7 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layouts_watcher.h>
+#include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
@@ -60,14 +69,6 @@
 #include <nx/vms/utils/external_resources.h>
 #include <nx/vms/utils/translation/translation_manager.h>
 #include <platform/platform_abstraction.h>
-#include <core/resource_management/resource_discovery_manager.h>
-#include <core/storage/file_storage/layout_storage_resource.h>
-#include <core/storage/file_storage/qtfile_storage_resource.h>
-#include <core/resource/storage_plugin_factory.h>
-#include <client/client_resource_processor.h>
-#include <client/system_weights_manager.h>
-#include <core/resource/local_resource_status_watcher.h>
-#include <core/resource/resource_directory_browser.h>
 
 #if defined(Q_OS_MACOS)
     #include <ui/workaround/mac_utils.h>
@@ -543,6 +544,8 @@ struct ApplicationContext::Private
 
     // Miscelaneous modules.
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
+    std::unique_ptr<PerformanceMonitor> performanceMonitor;
+
     std::unique_ptr<nx::vms::utils::TranslationManager> translationManager;
     std::unique_ptr<ApplauncherGuard> applauncherGuard;
     std::unique_ptr<QnClientAutoRunWatcher> autoRunWatcher;
@@ -607,6 +610,7 @@ ApplicationContext::ApplicationContext(
             d->initializeStateModules();
             d->initializeLogging(startupParameters); //< Depends on state modules.
             d->initializePlatformAbstraction();
+            d->performanceMonitor = std::make_unique<PerformanceMonitor>();
             d->initializeTranslations();
             d->statisticsModule = std::make_unique<ContextStatisticsModule>();
             d->initializeNetworkModules();
@@ -804,6 +808,11 @@ SystemContext* ApplicationContext::cloudLayoutsSystemContext() const
         return d->cloudLayoutsManager->systemContext();
 
     return {};
+}
+
+PerformanceMonitor* ApplicationContext::performanceMonitor() const
+{
+    return d->performanceMonitor.get();
 }
 
 RadassController* ApplicationContext::radassController() const

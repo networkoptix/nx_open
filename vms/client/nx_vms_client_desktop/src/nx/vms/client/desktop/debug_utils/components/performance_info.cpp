@@ -7,9 +7,9 @@
 
 #include <QtCore/QJsonObject>
 
-#include <client/client_module.h>
 #include <nx/build_info.h>
 #include <nx/utils/trace/trace.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -51,9 +51,9 @@ PerformanceInfo::PerformanceInfo(QObject* parent):
     base_type(parent),
     d(new Private())
 {
-    connect(qnClientModule->performanceMonitor(), &PerformanceMonitor::valuesChanged,
+    connect(appContext()->performanceMonitor(), &PerformanceMonitor::valuesChanged,
         this, &PerformanceInfo::setPerformanceValues);
-    connect(qnClientModule->performanceMonitor(), &PerformanceMonitor::visibleChanged,
+    connect(appContext()->performanceMonitor(), &PerformanceMonitor::visibleChanged,
         this, &PerformanceInfo::visibleChanged);
 
     d->fpsTimer.start();
@@ -115,7 +115,7 @@ void PerformanceInfo::setPerformanceValues(const QVariantMap& values)
     for (auto i = remaining.constBegin(); i != remaining.constEnd(); ++i)
         counters << QString("%1: %2").arg(i.key()).arg(i.value().toString());
 
-    if (qnClientModule->performanceMonitor()->isDebugInfoVisible())
+    if (appContext()->performanceMonitor()->isDebugInfoVisible())
         counters << DebugInfoStorage::instance()->debugInfo();
 
     d->text = html::document(counters.join(html::kLineBreak));
@@ -130,7 +130,7 @@ QString PerformanceInfo::text() const
 
 bool PerformanceInfo::isVisible() const
 {
-    return qnClientModule->performanceMonitor()->isVisible();
+    return appContext()->performanceMonitor()->isVisible();
 }
 
 } // namespace nx::vms::client::desktop
