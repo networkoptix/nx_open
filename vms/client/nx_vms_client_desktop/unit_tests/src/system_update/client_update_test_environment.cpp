@@ -10,16 +10,17 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 
-namespace os
-{
+namespace os {
+
 const nx::utils::OsInfo ubuntu("linux_x64", "ubuntu");
 const nx::utils::OsInfo ubuntu14("linux_x64", "ubuntu", "14.04");
 const nx::utils::OsInfo ubuntu16("linux_x64", "ubuntu", "16.04");
 const nx::utils::OsInfo ubuntu18("linux_x64", "ubuntu", "18.04");
 const nx::utils::OsInfo windows("windows_x64");
-} // namespace os;
 
-namespace nx::vms::client::desktop::test {
+} // namespace os
+
+namespace nx::vms::client::desktop::system_update::test {
 
 ClientVerificationData ClientUpdateTestEnvironment::makeClientData(nx::utils::SoftwareVersion version)
 {
@@ -70,4 +71,4 @@ QnResourcePool* ClientUpdateTestEnvironment::resourcePool() const
     return systemContext()->resourcePool();
 }
 
-} // namespace nx::vms::client::desktop::test
+} // namespace nx::vms::client::desktop::system_update::test

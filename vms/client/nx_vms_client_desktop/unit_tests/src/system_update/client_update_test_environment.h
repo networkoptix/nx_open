@@ -10,18 +10,19 @@
 
 class QnResourceRuntimeDataManager;
 
-namespace os
-{
+namespace os {
+
 extern const nx::utils::OsInfo ubuntu;
 extern const nx::utils::OsInfo ubuntu14;
 extern const nx::utils::OsInfo ubuntu16;
 extern const nx::utils::OsInfo ubuntu18;
 extern const nx::utils::OsInfo windows;
+
 } // namespace os
 
-namespace nx::vms::client::desktop::test {
+namespace nx::vms::client::desktop::system_update::test {
 
-class ClientUpdateTestEnvironment: public ContextBasedTest
+class ClientUpdateTestEnvironment: public desktop::test::ContextBasedTest
 {
 public:
     ClientVerificationData makeClientData(nx::utils::SoftwareVersion version);
@@ -40,4 +41,4 @@ public:
 
 using Version = nx::utils::SoftwareVersion;
 
-} // namespace nx::vms::client::desktop::test
+} // namespace nx::vms::client::desktop::system_update::test
