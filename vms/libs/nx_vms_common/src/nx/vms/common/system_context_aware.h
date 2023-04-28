@@ -56,11 +56,6 @@ public:
     QnResourceAccessManager* resourceAccessManager() const;
 
     /**
-     * Manages which global permissions each User or Role has.
-     */
-    QnGlobalPermissionsManager* globalPermissionsManager() const;
-
-    /**
      * List of all Resources in the System. Some data is stored in the external dictionaries.
      */
     QnResourcePool* resourcePool() const;

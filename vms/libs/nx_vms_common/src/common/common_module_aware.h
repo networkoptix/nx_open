@@ -51,7 +51,6 @@ public:
     QnResourcePool* resourcePool() const;
     QnResourceAccessManager* resourceAccessManager() const;
     nx::core::access::ResourceAccessSubjectHierarchy* accessSubjectHierarchy() const;
-    QnGlobalPermissionsManager* globalPermissionsManager() const;
     nx::vms::common::UserGroupManager* userGroupManager() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
     QnResourcePropertyDictionary* resourcePropertyDictionary() const;

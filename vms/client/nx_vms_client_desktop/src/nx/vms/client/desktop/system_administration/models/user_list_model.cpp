@@ -8,7 +8,6 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
-#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
@@ -70,14 +69,6 @@ public:
             {
                 if (auto user = resource.dynamicCast<QnUserResource>())
                     removeUser(user);
-            });
-
-        connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
-            this,
-            [this](const QnResourceAccessSubject& subject, GlobalPermissions /*value*/)
-            {
-                if (subject.user())
-                    handleUserChanged(subject.user());
             });
     }
 
@@ -225,6 +216,10 @@ void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
         &UserListModel::Private::at_resourcePool_resourceChanged);
     connect(user.get(), &QnUserResource::fullNameChanged, this,
         &UserListModel::Private::at_resourcePool_resourceChanged);
+    connect(user.get(), &QnUserResource::permissionsChanged, this,
+        &UserListModel::Private::handleUserChanged);
+    connect(user.get(), &QnUserResource::userGroupsChanged, this,
+        &UserListModel::Private::handleUserChanged);
     connect(user.get(), &QnUserResource::enabledChanged, this,
         [this](const QnUserResourcePtr &user)
         {

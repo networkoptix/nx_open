@@ -7,8 +7,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/streaming/abstract_archive_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -57,21 +58,49 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(
                 if (NX_ASSERT(m_user && subjectId == m_user->getId()))
                     recalculateAllPermissions();
             });
+
         connect(resourceAccessManager(), &QnResourceAccessManager::resourceAccessReset,
             this, &QnWorkbenchAccessController::recalculateAllPermissions);
 
-        connect(systemContext->globalPermissionsManager(),
-            &QnGlobalPermissionsManager::globalPermissionsChanged,
-            this,
-            [this](const QnResourceAccessSubject& subject, GlobalPermissions /*value*/)
+        const auto handleSubjectsChanged =
+            [this](const QSet<QnUuid>& changedSubjectIds)
             {
-                if (!subject.user())
+                if (!m_user)
                     return;
 
-                if (subject.user() == m_user)
+                if (changedSubjectIds.contains(m_user->getId()))
+                {
                     recalculateAllPermissions();
-                else
-                    updatePermissions(subject.user());
+                    return;
+                }
+
+                const auto users = resourcePool()->getResourcesByIds<QnUserResource>(
+                    changedSubjectIds);
+
+                for (const auto& user: users)
+                    updatePermissions(user);
+            };
+
+        connect(systemContext->globalPermissionsWatcher(),
+            &GlobalPermissionsWatcher::ownGlobalPermissionsChanged, this,
+            [this, handleSubjectsChanged](const QnUuid& subjectId)
+            {
+                QSet<QnUuid> affectedSubjectIds = {subjectId};
+                affectedSubjectIds += this->systemContext()->accessSubjectHierarchy()->
+                    recursiveMembers(affectedSubjectIds);
+
+                handleSubjectsChanged(affectedSubjectIds);
+            });
+
+        connect(systemContext->accessSubjectHierarchy(),
+            &nx::core::access::SubjectHierarchy::changed, this,
+            [handleSubjectsChanged](
+                const QSet<QnUuid>& /*added*/,
+                const QSet<QnUuid>& /*removed*/,
+                const QSet<QnUuid>& /*groupsWithChangedMembers*/,
+                const QSet<QnUuid>& subjectsWithChangedParents)
+            {
+                handleSubjectsChanged(subjectsWithChangedParents);
             });
 
         recalculateGlobalPermissions();
@@ -371,7 +400,7 @@ GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() cons
     if (!m_user)
         return {};
 
-    return systemContext()->globalPermissionsManager()->globalPermissions(m_user);
+    return systemContext()->resourceAccessManager()->globalPermissions(m_user);
 }
 
 void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr& resource)

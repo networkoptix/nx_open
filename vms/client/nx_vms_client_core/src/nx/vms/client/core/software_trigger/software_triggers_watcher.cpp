@@ -5,9 +5,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
@@ -160,7 +161,6 @@ SoftwareTriggersWatcher::SoftwareTriggersWatcher(
     connect(ruleManager, &vms::event::RuleManager::ruleRemoved,
         this, &SoftwareTriggersWatcher::tryRemoveTrigger);
 
-
     if (nx::vms::rules::ini().fullSupport)
     {
         auto rulesEngine = systemContext()->vmsRulesEngine();
@@ -179,21 +179,22 @@ SoftwareTriggersWatcher::SoftwareTriggersWatcher(
     connect(this, &SoftwareTriggersWatcher::resourceIdChanged,
         this, &SoftwareTriggersWatcher::updateTriggers);
 
-    const auto userWatcher = systemContext()->userWatcher();
-    connect(userWatcher, &nx::vms::client::core::UserWatcher::userChanged,
-        this, &SoftwareTriggersWatcher::updateTriggers);
+    // TODO: #vkutin Refactor this when QnWorkbenchAccessController is moved to client::core.
 
-    const auto manager = systemContext()->globalPermissionsManager();
-    connect(manager, &QnGlobalPermissionsManager::globalPermissionsChanged, this,
-        [this, userWatcher]
-            (const QnResourceAccessSubject& subject, GlobalPermissions /*permissions*/)
+    const auto notifier = systemContext()->resourceAccessManager()->createNotifier(this);
+
+    connect(systemContext()->userWatcher(), &nx::vms::client::core::UserWatcher::userChanged, this,
+        [this, notifier](const QnUserResourcePtr& user)
         {
-            const auto user = userWatcher->user();
-            if (subject != user)
-                return;
-
+            notifier->setSubjectId(user ? user->getId() : QnUuid{});
             updateTriggers();
         });
+
+    connect(notifier, &QnResourceAccessManager::Notifier::resourceAccessChanged,
+        this, &SoftwareTriggersWatcher::updateTriggers);
+
+    connect(systemContext()->resourceAccessManager(), &QnResourceAccessManager::resourceAccessReset,
+        this, &SoftwareTriggersWatcher::updateTriggers);
 
     connect(systemContext()->resourcePool(), &QnResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources)

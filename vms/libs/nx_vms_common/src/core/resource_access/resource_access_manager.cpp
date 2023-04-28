@@ -174,13 +174,7 @@ GlobalPermissions QnResourceAccessManager::globalPermissions(
             return {};
     }
 
-    auto permissions = m_accessRightsResolver->globalPermissions(subject.id());
-
-    // TODO: #vkutin Remove when transition to the new access rights is over.
-    if (permissions.testFlag(GlobalPermission::powerUser))
-        permissions |= GlobalPermission::powerUserPermissions;
-
-    return permissions;
+    return m_accessRightsResolver->globalPermissions(subject.id());
 }
 
 bool QnResourceAccessManager::hasGlobalPermission(

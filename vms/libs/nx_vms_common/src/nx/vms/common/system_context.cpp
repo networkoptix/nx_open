@@ -9,7 +9,6 @@
 #include <api/runtime_info_manager.h>
 #include <core/resource/camera_history.h>
 #include <core/resource_access/access_rights_manager.h>
-#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
@@ -56,7 +55,6 @@ struct SystemContext::Private
     std::unique_ptr<ResourceAccessSubjectHierarchy> accessSubjectHierarchy;
     std::unique_ptr<GlobalPermissionsWatcher> globalPermissionsWatcher;
     std::unique_ptr<AccessRightsManager> accessRightsManager;
-    std::unique_ptr<QnGlobalPermissionsManager> globalPermissionsManager;
     std::unique_ptr<QnResourceAccessManager> resourceAccessManager;
     std::unique_ptr<ShowreelManager> showreelManager;
     std::unique_ptr<LookupListManager> lookupListManager;
@@ -108,10 +106,6 @@ SystemContext::SystemContext(
         d->userGroupManager.get());
 
     d->accessRightsManager = std::make_unique<AccessRightsManager>();
-
-    // Depends on resource pool and roles.
-    d->globalPermissionsManager =
-        std::make_unique<QnGlobalPermissionsManager>(resourceAccessMode, this);
 
     // Depends on access provider.
     d->resourceAccessManager = std::make_unique<QnResourceAccessManager>(this);
@@ -288,11 +282,6 @@ AccessRightsManager* SystemContext::accessRightsManager() const
 QnResourceAccessManager* SystemContext::resourceAccessManager() const
 {
     return d->resourceAccessManager.get();
-}
-
-QnGlobalPermissionsManager* SystemContext::globalPermissionsManager() const
-{
-    return d->globalPermissionsManager.get();
 }
 
 ResourceAccessSubjectHierarchy* SystemContext::accessSubjectHierarchy() const

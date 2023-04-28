@@ -120,6 +120,11 @@ bool SubjectHierarchy::isRecursiveMember(const QnUuid& subject, const QSet<QnUui
     return d->isRecursiveMember(subject, parents);
 }
 
+bool SubjectHierarchy::isWithin(const QnUuid& subject, const QSet<QnUuid>& subjects) const
+{
+    return subjects.contains(subject) || isRecursiveMember(subject, subjects);
+}
+
 bool SubjectHierarchy::Private::isRecursiveMember(
     const QnUuid& subject, const QSet<QnUuid>& groups) const
 {
