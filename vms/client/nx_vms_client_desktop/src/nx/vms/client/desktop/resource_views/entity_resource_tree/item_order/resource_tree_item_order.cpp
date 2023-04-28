@@ -39,19 +39,22 @@ ItemOrder layoutsOrder()
         [mainOrder = numericOrder()] (const AbstractItem* lhs,
             const AbstractItem* rhs)
         {
-            const auto lhsIconKey = static_cast<QnResourceIconCache::Key>(
-                lhs->data(Qn::ResourceIconKeyRole).toInt());
-            const auto rhsIconKey = static_cast<QnResourceIconCache::Key>(
-                rhs->data(Qn::ResourceIconKeyRole).toInt());
+            const auto lhsIconKey =
+                static_cast<QnResourceIconCache::Key>(lhs->data(Qn::ResourceIconKeyRole).toInt());
+            const auto rhsIconKey =
+                static_cast<QnResourceIconCache::Key>(rhs->data(Qn::ResourceIconKeyRole).toInt());
 
-            const bool lhsIsSharedLayout = lhsIconKey == QnResourceIconCache::SharedLayout;
-            const bool rhsIsSharedLayout = rhsIconKey == QnResourceIconCache::SharedLayout;
+            const auto lhsIconType = lhsIconKey & QnResourceIconCache::TypeMask;
+            const auto rhsIconType = rhsIconKey & QnResourceIconCache::TypeMask;
+
+            const bool lhsIsSharedLayout = lhsIconType == QnResourceIconCache::SharedLayout;
+            const bool rhsIsSharedLayout = rhsIconType == QnResourceIconCache::SharedLayout;
 
             if (lhsIsSharedLayout != rhsIsSharedLayout)
                 return lhsIsSharedLayout;
 
-            const bool lhsIsIntercomLayout = lhsIconKey == QnResourceIconCache::IntercomLayout;
-            const bool rhsIsIntercomLayout = rhsIconKey == QnResourceIconCache::IntercomLayout;
+            const bool lhsIsIntercomLayout = lhsIconType == QnResourceIconCache::IntercomLayout;
+            const bool rhsIsIntercomLayout = rhsIconType == QnResourceIconCache::IntercomLayout;
 
             if (lhsIsIntercomLayout != rhsIsIntercomLayout)
                 return lhsIsIntercomLayout;
