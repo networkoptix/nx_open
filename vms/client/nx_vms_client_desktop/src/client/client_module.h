@@ -27,7 +27,6 @@ class AnalyticsMetadataProviderFactory;
 class AnalyticsSettingsManager;
 class ClientStateHandler;
 class LicenseHealthWatcher;
-class PerformanceMonitor;
 class RunningInstancesManager;
 class SharedMemoryManager;
 class SystemContext;
@@ -62,8 +61,6 @@ public:
 
     nx::vms::client::desktop::AnalyticsSettingsManager* analyticsSettingsManager() const;
 
-    nx::vms::client::desktop::PerformanceMonitor* performanceMonitor() const;
-
     nx::vms::license::VideoWallLicenseUsageHelper* videoWallLicenseUsageHelper() const;
     nx::vms::client::desktop::analytics::TaxonomyManager* taxonomyManager() const;
     nx::vms::client::desktop::analytics::AttributeHelper* analyticsAttributeHelper() const;
@@ -84,7 +81,6 @@ private:
     QScopedPointer<nx::vms::client::desktop::AnalyticsMetadataProviderFactory>
         m_analyticsMetadataProviderFactory;
 
-    QScopedPointer<nx::vms::client::desktop::PerformanceMonitor> m_performanceMonitor;
     QScopedPointer<nx::vms::client::desktop::LicenseHealthWatcher> m_licenseHealthWatcher;
 };
 

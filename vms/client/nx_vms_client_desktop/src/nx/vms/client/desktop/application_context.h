@@ -26,6 +26,7 @@ class CloudLayoutsManager;
 class ContextStatisticsModule;
 class LocalSettings;
 class ObjectDisplaySettings;
+class PerformanceMonitor;
 class RadassController;
 class ResourceFactory;
 class ResourcesChangesManager;
@@ -192,6 +193,11 @@ public:
      */
     SystemContext* cloudLayoutsSystemContext() const;
     QnResourcePool* cloudLayoutsPool() const;
+
+    /**
+     * Monitors system resources usage: CPU, memory, GPU, etc, in its own separate thread.
+     */
+    PerformanceMonitor* performanceMonitor() const;
 
     RadassController* radassController() const;
 
