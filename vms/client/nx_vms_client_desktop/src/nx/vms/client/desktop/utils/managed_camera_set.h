@@ -82,6 +82,9 @@ private:
     void removeCamera(const QnVirtualCameraResourcePtr& camera);
     QnVirtualCameraResourceSet filteredCameras() const;
 
+    /** Function to filter out Cross-System cameras. */
+    bool cameraBelongsToLocalResourcePool(const QnVirtualCameraResourcePtr& camera);
+
 private:
     const QnResourcePool* m_resourcePool;
     const Filter m_filter;
