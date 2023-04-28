@@ -71,7 +71,7 @@ TEST(ReleasesInfoTest, newerReleaseIsSelected)
 TEST(ReleasesInfoTest, newerBuildIsSelected)
 {
     auto vmsRelease5_0_0_101 = vmsRelease5_0;
-    vmsRelease5_0_0_101.version.build = 101;
+    vmsRelease5_0_0_101.version = {5, 0, 0, 101};
 
     auto release = selectVmsRelease({vmsRelease5_0, vmsRelease5_0_0_101}, {4, 2});
     EXPECT_EQ(release->version, vmsRelease5_0_0_101.version);
@@ -129,7 +129,11 @@ TEST(ReleasesInfoTest, vmsReleaseCanBeSelectedForClient)
 TEST(ReleasesInfoTest, thereIsNoPreferenceForClientReleases)
 {
     auto vmsRelease = vmsRelease5_0;
-    vmsRelease.version.build = clientRelease5_0.version.build + 1;
+    vmsRelease.version = api::SoftwareVersion(
+        clientRelease5_0.version.major(),
+        clientRelease5_0.version.minor(),
+        clientRelease5_0.version.bugfix(),
+        clientRelease5_0.version.build() + 1);
 
     auto release = selectDesktopClientRelease(
         {clientRelease5_0, vmsRelease},
@@ -178,6 +182,46 @@ TEST(ReleasesInfoTest, clientDoesNotSelectsLessReleasishBuild)
     release = selectDesktopClientRelease(
         {clientRelease},
         {5, 0}, PublicationType::rc, clientRelease.protocol_version);
+    EXPECT_FALSE(release.has_value());
+}
+
+TEST(ReleasesInfoTest, availabilityRangeFromWorks)
+{
+    auto vmsRelease = vmsRelease5_1;
+    vmsRelease.availableForReleasesFrom = {5, 0};
+
+    auto release = selectVmsRelease({vmsRelease}, {4, 2});
+    EXPECT_FALSE(release.has_value());
+
+    release = selectVmsRelease({vmsRelease}, {5, 0});
+    EXPECT_EQ(release->version, vmsRelease.version);
+}
+
+TEST(ReleasesInfoTest, availabilityRangeBeforeWorks)
+{
+    auto vmsRelease = vmsRelease5_1;
+    vmsRelease.availableForReleasesBefore = {5, 0};
+
+    auto release = selectVmsRelease({vmsRelease}, {5, 0});
+    EXPECT_FALSE(release.has_value());
+
+    release = selectVmsRelease({vmsRelease}, {4, 2});
+    EXPECT_EQ(release->version, vmsRelease.version);
+}
+
+TEST(ReleasesInfoTest, availabilityRangeWorksForBothBounds)
+{
+    auto vmsRelease = vmsRelease5_0;
+    vmsRelease.availableForReleasesFrom = {5, 0};
+    vmsRelease.availableForReleasesBefore = {5, 1};
+
+    auto release = selectVmsRelease({vmsRelease}, {5, 0});
+    EXPECT_EQ(release->version, vmsRelease.version);
+
+    release = selectVmsRelease({vmsRelease}, {4, 2});
+    EXPECT_FALSE(release.has_value());
+
+    release = selectVmsRelease({vmsRelease}, {5, 1});
     EXPECT_FALSE(release.has_value());
 }
 
