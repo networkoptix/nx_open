@@ -172,6 +172,8 @@ public:
         const std::string_view& exclude = std::string_view(),
         const std::string_view& include = std::string_view());
 
+    static bool isValidHost(const std::string_view& host);
+
 private:
     QUrl m_url;
 

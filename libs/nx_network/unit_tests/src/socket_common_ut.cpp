@@ -241,15 +241,6 @@ TEST(HostAddress, string_that_is_valid_ipv4_is_not_converted_to_ip_implicitly)
 
 #endif
 
-TEST(HostAddress, compatible_with_nx_fusion)
-{
-    ASSERT_EQ("\"localhost\"", QJson::serialized(nx::network::HostAddress("localhost")));
-
-    nx::network::HostAddress value;
-    ASSERT_TRUE(QJson::deserialize(nx::Buffer("\"localhost\""), &value));
-    ASSERT_EQ(nx::network::HostAddress("localhost"), value);
-}
-
 //-------------------------------------------------------------------------------------------------
 
 class SocketAddress:

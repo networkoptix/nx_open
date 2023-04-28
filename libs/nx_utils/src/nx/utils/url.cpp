@@ -150,6 +150,16 @@ bool Url::isValid() const
     return m_url.isValid();
 }
 
+bool Url::isValidHost(const std::string_view& host)
+{
+    if (host.empty())
+        return false;
+
+    Url url;
+    url.setHost(QString::fromUtf8(host.data(), host.size()));
+    return url.isValid();
+}
+
 QString Url::errorString() const
 {
     return m_url.errorString();
