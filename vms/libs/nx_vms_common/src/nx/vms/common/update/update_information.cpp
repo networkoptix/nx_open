@@ -31,4 +31,9 @@ InformationError fetchErrorToInformationError(const vms::update::FetchError erro
     return InformationError::noError;
 }
 
+NX_VMS_COMMON_API void PrintTo(InformationError value, ::std::ostream* stream)
+{
+    *stream << nx::reflect::enumeration::toString(value);
+}
+
 } // namespace nx::vms::common::update
