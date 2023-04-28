@@ -10,6 +10,8 @@ namespace {
 
 namespace nx::vms::client::desktop::test {
 
+using system_update::test::ClientUpdateTestEnvironment;
+
 using Status = nx::vms::common::update::Status::Code;
 using Error = nx::vms::common::update::Status::ErrorCode;
 
