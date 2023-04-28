@@ -73,4 +73,6 @@ constexpr auto nxReflectVisitAllEnumItems(InformationError*, Visitor&& visitor)
 NX_VMS_COMMON_API InformationError fetchErrorToInformationError(
     const nx::vms::update::FetchError error);
 
+NX_VMS_COMMON_API void PrintTo(InformationError value, ::std::ostream* stream);
+
 } // namespace nx::vms::common::update
