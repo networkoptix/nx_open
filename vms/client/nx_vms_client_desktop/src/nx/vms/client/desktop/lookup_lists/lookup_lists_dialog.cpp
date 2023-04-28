@@ -30,6 +30,8 @@ LookupListsDialog::LookupListsDialog(QWidget* parent):
 
 LookupListsDialog::~LookupListsDialog()
 {
+    QmlProperty<QObject*>(rootObjectHolder(), "dialog") = nullptr;
+    QmlProperty<QObject*>(rootObjectHolder(), "store") = nullptr;
 }
 
 void LookupListsDialog::setData(nx::vms::api::LookupListDataList data)

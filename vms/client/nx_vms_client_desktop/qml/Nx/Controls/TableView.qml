@@ -8,14 +8,34 @@ import QtQuick.Layouts
 import Nx
 import Nx.Controls
 import Nx.Core
+import Nx.Models
 
 import nx.vms.client.desktop
 
+import "private"
+
 TableView
 {
-    id: tableView
+    id: control
 
     property alias horizontalHeaderVisible: columnsHeader.visible
+    property alias headerBackgroundColor: columnsHeader.color
+
+    function getButtonItem(columnIndex)
+    {
+        return repeater.itemAt(columnIndex)
+    }
+
+    function isCheckboxColumn(model, columnIndex)
+    {
+        if (!model)
+            return false
+
+        return model.headerData(
+            columnIndex,
+            Qt.Horizontal,
+            Qt.CheckStateRole) != null
+    }
 
     flickableDirection: Flickable.VerticalFlick
     boundsBehavior: Flickable.StopAtBounds
@@ -25,22 +45,22 @@ TableView
 
     columnWidthProvider: function (column)
     {
-        return tableView.width / (tableView.columns > 0 ? tableView.columns : 1)
+        return control.width / (control.columns || 1)
     }
 
     ScrollBar.vertical: ScrollBar
     {
-        parent: tableView.parent //< The only way to shift ScrollBar yCoord and change height.
+        parent: control.parent //< The only way to shift ScrollBar yCoord and change height.
 
-        x: tableView.x + tableView.width - width
-        y: tableView.y + (columnsHeader.visible ? columnsHeader.height : 0)
-        height: tableView.height - (columnsHeader.visible ? columnsHeader.height : 0)
+        x: control.x + control.width - width
+        y: control.y + (columnsHeader.visible ? columnsHeader.height : 0)
+        height: control.height - (columnsHeader.visible ? columnsHeader.height : 0)
     }
 
     delegate: BasicTableCellDelegate
     {}
 
-    onWidthChanged: tableView.forceLayout()
+    onWidthChanged: control.forceLayout()
 
     Rectangle
     {
@@ -48,12 +68,12 @@ TableView
 
         readonly property int buttonHeight: 32
 
-        y: tableView.contentY
+        y: control.contentY
         z: 2 //< Is needed for hiding scrolled rows.
         width: parent.width
         height: buttonHeight + separator.height + 8
 
-        color: backgroundRect.color
+        color: ColorTheme.colors.dark7
 
         visible: false
 
@@ -63,100 +83,82 @@ TableView
             {
                 id: repeater
 
-                model: tableView.columns > 0 ? tableView.columns : 1
+                model: control.columns > 0 ? control.columns : 1
 
-                Button
+                HeaderButton
                 {
-                    id: button
+                    id: headerButton
 
-                    // We cannot use enum due to QtQuick.TableView namespace collision.
-                    readonly property int kAscendingOrder: 0
-                    readonly property int kDescendingOrder: 1
-                    readonly property int kNoOrder: 2
+                    property var headerDataAccessor: ModelDataAccessor
+                    {
+                        function getCheckState(columnIndex)
+                        {
+                            if (!control.model)
+                                return Qt.Unchecked
 
-                    property int sortOrder: kNoOrder
+                            let state = control.model.headerData(
+                                index,
+                                Qt.Horizontal,
+                                Qt.CheckStateRole)
 
-                    width: tableView.columnWidthProvider(modelData)
+                            return state != null ? state : Qt.Unchecked
+                        }
+
+                        model: control.model
+
+                        Component.onCompleted:
+                        {
+                            headerButton.setCheckState(getCheckState(index))
+                        }
+
+                        onHeaderDataChanged: (orientation, first, last) =>
+                        {
+                            if (index < first || index > last)
+                                return
+
+                            if (orientation !== Qt.Horizontal)
+                                return
+
+                            headerButton.setCheckState(getCheckState(index))
+                        }
+                    }
+
+                    width: control.columnWidthProvider(index)
                     height: columnsHeader.buttonHeight
 
-                    leftPadding: 8
-                    rightPadding: 8
-
-                    clip: true
-
-                    backgroundColor: "transparent"
-                    hoveredColor: ColorTheme.transparent(ColorTheme.colors.dark9, 0.2)
-                    pressedColor: hoveredColor
-
-                    textColor: ColorTheme.colors.light4
-                    font.pixelSize: 14
-                    font.weight: Font.Medium
-
                     text: control.model
-                        ? control.model.headerData(modelData, Qt.Horizontal)
+                        ? control.model.headerData(index, Qt.Horizontal)
                         : ""
 
-                    iconUrl:
+                    isCheckbox: isCheckboxColumn(control.model, index)
+                    onCheckStateChanged: (checkState) =>
                     {
-                        if (sortOrder === kAscendingOrder)
-                            return "qrc:///skin/table_view/ascending.svg"
-
-                        if (sortOrder === kDescendingOrder)
-                            return "qrc:///skin/table_view/descending.svg"
-
-                        return ""
+                        headerDataAccessor.setHeaderData(
+                            index,
+                            Qt.Horizontal,
+                            checkState,
+                            Qt.CheckStateRole)
                     }
 
                     onClicked:
                     {
+                        if (isCheckboxColumn(control.model, index))
+                            return
+
                         for (let i = 0; i < repeater.count; ++i)
                         {
                             if (i !== index)
-                                repeater.itemAt(i).sortOrder = kNoOrder
+                                repeater.itemAt(i).sortOrder = HeaderButton.NoOrder
                         }
 
-                        if (sortOrder === kAscendingOrder)
-                            sortOrder = kDescendingOrder
-                        else if (sortOrder === kDescendingOrder)
-                            sortOrder = kAscendingOrder
+                        if (sortOrder === HeaderButton.AscendingOrder)
+                            sortOrder = HeaderButton.DescendingOrder
+                        else if (sortOrder === HeaderButton.DescendingOrder)
+                            sortOrder = HeaderButton.AscendingOrder
                         else
-                            sortOrder = kAscendingOrder
+                            sortOrder = HeaderButton.AscendingOrder
 
-                        tableView.model.sort(index, sortOrder)
-                    }
-
-                    contentItem: Item
-                    {
-                        Text
-                        {
-                            id: label
-
-                            width: Math.min(implicitWidth, parent.width - iconItem.width - 4)
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            text: button.text
-
-                            color: button.textColor
-                            font: button.font
-                            elide: Text.ElideRight
-                        }
-
-                        IconImage
-                        {
-                            id: iconItem
-
-                            anchors.left: label.right
-                            anchors.leftMargin: 4
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            source: button.icon.source
-                            visible: source != "" && width > 0 && height > 0
-
-                            width: source != "" ? button.icon.width : 0
-                            height: source != "" ? button.icon.height : 0
-
-                            color: button.textColor
-                        }
+                        control.model.sort(index, HeaderButton.sortOrder)
                     }
                 }
             }
@@ -168,7 +170,7 @@ TableView
 
             y: columnsHeader.buttonHeight
 
-            width: tableView.width
+            width: control.width
             height: 1
 
             color: ColorTheme.colors.dark12

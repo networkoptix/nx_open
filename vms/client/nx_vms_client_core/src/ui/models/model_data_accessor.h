@@ -28,6 +28,12 @@ public:
     Q_INVOKABLE QVariant getData(int row, const QString& roleName) const;
     Q_INVOKABLE QVariant getData(const QModelIndex& index, const QString& roleName) const;
 
+    Q_INVOKABLE bool setHeaderData(
+        int section,
+        Qt::Orientation orientation,
+        const QVariant& value,
+        int role = Qt::EditRole);
+
 signals:
     void rowsInserted(int first, int last); //< For now meaningful only for the flat list models.
     void rowsRemoved(int first, int last); //< For now meaningful only for the flat list models.
@@ -35,6 +41,9 @@ signals:
     void modelChanged();
     void countChanged();
     void dataChanged(int startRow, int endRow);
+
+    // Implemented only for the horizontal header because we don't use vertical headers for now.
+    void headerDataChanged(Qt::Orientation orientation, int first, int last);
 
 private:
     QPointer<QAbstractItemModel> m_model;
