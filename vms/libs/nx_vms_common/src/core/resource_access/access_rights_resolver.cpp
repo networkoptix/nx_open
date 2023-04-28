@@ -69,7 +69,7 @@ AccessRightsResolver::AccessRightsResolver(
     const auto internalNotifier = d->inheritedResourceAccessResolver->notifier();
 
     connect(internalNotifier, &InternalNotifier::resourceAccessReset, this,
-        [this]() { emit resourceAccessReset({}); }, Qt::DirectConnection);
+        [this]() { emit resourceAccessReset(QPrivateSignal()); }, Qt::DirectConnection);
 }
 
 AccessRightsResolver::~AccessRightsResolver()
@@ -185,7 +185,7 @@ void AccessRightsResolver::Notifier::setSource(AccessRightsResolver* value)
             [this](const QSet<QnUuid>& changedSubjectIds)
             {
                 if (changedSubjectIds.contains(d->subjectId))
-                    emit resourceAccessChanged(d->subjectId, {});
+                    emit resourceAccessChanged(d->subjectId, QPrivateSignal());
             }, Qt::DirectConnection);
     }
 

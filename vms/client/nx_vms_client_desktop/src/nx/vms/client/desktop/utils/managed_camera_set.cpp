@@ -4,7 +4,6 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
@@ -103,12 +102,12 @@ void ManagedCameraSet::setCameras(Type type, const QnVirtualCameraResourceSet& c
     if (m_type == type && m_cameras == cameras)
         return;
 
-    emit camerasAboutToBeChanged({});
+    emit camerasAboutToBeChanged(QPrivateSignal());
 
     m_type = type;
     m_cameras = cameras;
 
-    emit camerasChanged({});
+    emit camerasChanged(QPrivateSignal());
 }
 
 QnVirtualCameraResourceSet ManagedCameraSet::filteredCameras() const
@@ -144,12 +143,12 @@ void ManagedCameraSet::addCamera(const QnVirtualCameraResourcePtr& camera)
 
     NX_VERBOSE(this, "Applicable camera added to the pool: %1", camera->getName());
 
-    emit camerasAboutToBeChanged({});
+    emit camerasAboutToBeChanged(QPrivateSignal());
 
     m_cameras.insert(camera);
-    emit cameraAdded(camera, {});
+    emit cameraAdded(camera, QPrivateSignal());
 
-    emit camerasChanged({});
+    emit camerasChanged(QPrivateSignal());
 }
 
 void ManagedCameraSet::removeCamera(const QnVirtualCameraResourcePtr& camera)
@@ -165,13 +164,13 @@ void ManagedCameraSet::removeCamera(const QnVirtualCameraResourcePtr& camera)
 
     NX_VERBOSE(this, "Applicable camera removed from the pool: %1", camera->getName());
 
-    emit camerasAboutToBeChanged({});
+    emit camerasAboutToBeChanged(QPrivateSignal());
 
     m_notFilteredCameras.remove(camera);
     m_cameras.remove(camera);
-    emit cameraRemoved(camera, {});
+    emit cameraRemoved(camera, QPrivateSignal());
 
-    emit camerasChanged({});
+    emit camerasChanged(QPrivateSignal());
 }
 
 ManagedCameraSet::Filter ManagedCameraSet::filter() const

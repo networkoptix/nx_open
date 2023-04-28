@@ -679,7 +679,10 @@ nx::utils::Guard EventRibbon::Private::makeUnreadCountGuard()
         [this, oldUnreadCount = m_totalUnreadCount]()
         {
             if (m_totalUnreadCount != oldUnreadCount)
-                emit q->unreadCountChanged(m_totalUnreadCount, highestUnreadImportance(), {});
+            {
+                emit q->unreadCountChanged(
+                    m_totalUnreadCount, highestUnreadImportance(), EventRibbon::QPrivateSignal());
+            }
         });
 }
 
@@ -833,7 +836,7 @@ void EventRibbon::Private::insertNewTiles(
         return;
 
     emit q->countChanged(this->count());
-    emit q->visibleRangeChanged(m_visible, {});
+    emit q->visibleRangeChanged(m_visible, EventRibbon::QPrivateSignal());
 }
 
 void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMode)
@@ -939,7 +942,7 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
         return;
 
     emit q->countChanged(this->count());
-    emit q->visibleRangeChanged(m_visible, {});
+    emit q->visibleRangeChanged(m_visible, EventRibbon::QPrivateSignal());
 }
 
 void EventRibbon::Private::clear()
@@ -970,7 +973,7 @@ void EventRibbon::Private::clear()
         return;
 
     emit q->countChanged(0);
-    emit q->visibleRangeChanged({}, {});
+    emit q->visibleRangeChanged({}, EventRibbon::QPrivateSignal());
 }
 
 int EventRibbon::Private::indexOf(const EventTile* widget) const
@@ -1246,7 +1249,7 @@ void EventRibbon::Private::updateView()
         [this, oldVisibleRange = m_visible]()
         {
             if (m_visible != oldVisibleRange)
-                emit q->visibleRangeChanged(m_visible, {});
+                emit q->visibleRangeChanged(m_visible, EventRibbon::QPrivateSignal());
         });
 
     doUpdateView();

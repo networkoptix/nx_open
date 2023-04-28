@@ -12,8 +12,8 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 
-#include "../flux/camera_settings_dialog_store.h"
 #include "../flux/camera_settings_dialog_state.h"
+#include "../flux/camera_settings_dialog_store.h"
 
 namespace nx::vms::client::desktop {
 
@@ -64,7 +64,7 @@ void VirtualCameraSettingsStateWatcher::setCameras(const QnVirtualCameraResource
                 [this](const VirtualCameraState& virtualCameraState)
                 {
                     if (m_camera && m_camera->getId() == virtualCameraState.cameraId)
-                        emit virtualCameraStateChanged(virtualCameraState, {});
+                        emit virtualCameraStateChanged(virtualCameraState, QPrivateSignal());
                 }));
         virtualCameraState = systemContext->virtualCameraManager()->state(m_camera);
     }
@@ -73,7 +73,7 @@ void VirtualCameraSettingsStateWatcher::setCameras(const QnVirtualCameraResource
         m_managerConnection.reset();
     }
 
-    emit virtualCameraStateChanged(virtualCameraState, {});
+    emit virtualCameraStateChanged(virtualCameraState, QPrivateSignal());
 }
 
 void VirtualCameraSettingsStateWatcher::updateState()

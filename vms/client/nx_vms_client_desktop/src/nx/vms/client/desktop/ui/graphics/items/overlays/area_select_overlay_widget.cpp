@@ -4,15 +4,14 @@
 
 #include <QtGui/QPainter>
 
-#include <ui/processors/drag_processor.h>
-#include <ui/processors/drag_process_handler.h>
-#include <ui/graphics/items/resource/resource_widget.h>
-#include <utils/common/scoped_painter_rollback.h>
-
-#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/processors/drag_process_handler.h>
+#include <ui/processors/drag_processor.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 namespace nx::vms::client::desktop {
 
@@ -89,12 +88,12 @@ void AreaSelectOverlayWidget::Private::dragMove(DragInfo* info)
 void AreaSelectOverlayWidget::Private::finishDrag(DragInfo* info)
 {
     updateRect(info);
-    emit q->selectedAreaChanged(relativeRect, {});
+    emit q->selectedAreaChanged(relativeRect, AreaSelectOverlayWidget::QPrivateSignal());
 }
 
 void AreaSelectOverlayWidget::Private::finishDragProcess(DragInfo* /*info*/)
 {
-    emit q->selectionFinished({});
+    emit q->selectionFinished(AreaSelectOverlayWidget::QPrivateSignal());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -151,7 +150,7 @@ void AreaSelectOverlayWidget::setSelectedArea(const QRectF& value)
         return;
 
     d->relativeRect = value;
-    emit selectedAreaChanged(d->relativeRect, {});
+    emit selectedAreaChanged(d->relativeRect, QPrivateSignal());
 
     update();
 }
@@ -196,7 +195,7 @@ void AreaSelectOverlayWidget::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
 void AreaSelectOverlayWidget::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    emit selectionStarted({});
+    emit selectionStarted(QPrivateSignal());
     d->dragProcessor->mousePressEvent(this, event);
 }
 

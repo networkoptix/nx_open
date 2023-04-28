@@ -2,12 +2,12 @@
 
 #include "network_manager.h"
 
-#include <nx_ec/ec_api_common.h>
-#include <nx/network/http/http_async_client.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_async_client.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/auth/auth_result.h>
+#include <nx_ec/ec_api_common.h>
 
 using AsyncClient = nx::network::http::AsyncClient;
 using Method = nx::network::http::Method;
@@ -165,7 +165,7 @@ void NetworkManager::doRequest(
             if (auto context = d->takeContext(reqId))
             {
                 Response response = parseResponse(context->client.get());
-                emit onRequestDone(reqId, std::move(response), {});
+                emit onRequestDone(reqId, std::move(response), QPrivateSignal());
                 // Here context will be destroyed and connection will be broken.
             }
         };
@@ -202,7 +202,7 @@ void NetworkManager::doConnect(
             if (auto context = d->takeContext(reqId))
             {
                 std::shared_ptr<nx::network::http::AsyncClient> clientPtr = std::move(context->client);
-                emit onConnectDone(reqId, clientPtr, {});
+                emit onConnectDone(reqId, clientPtr, QPrivateSignal());
                 // Connection will be processed in callback.
             }
         };

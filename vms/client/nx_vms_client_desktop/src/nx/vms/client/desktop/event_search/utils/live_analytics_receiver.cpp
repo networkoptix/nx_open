@@ -122,7 +122,7 @@ void LiveAnalyticsReceiver::Private::putData(const QnAbstractDataPacketPtr& data
         return;
 
     lock.unlock();
-    emit q->dataOverflow({});
+    emit q->dataOverflow(LiveAnalyticsReceiver::QPrivateSignal());
 }
 
 // ------------------------------------------------------------------------------------------------

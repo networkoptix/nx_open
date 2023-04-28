@@ -32,8 +32,8 @@
 #include <nx/vms/client/desktop/event_search/widgets/notification_counter_label.h>
 #include <nx/vms/client/desktop/event_search/widgets/notification_list_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/overlappable_search_widget.h>
-#include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/private/notification_bell_widget_p.h>
+#include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -282,7 +282,8 @@ EventPanel::Private::Private(EventPanel* q):
                 NX_VERBOSE(this->q, "Tab changed; previous: %1, current: %2",
                     m_previousTab, m_lastTab);
 
-                emit this->q->currentTabChanged(m_tabIds.value(m_lastTab), {});
+                emit this->q->currentTabChanged(
+                    m_tabIds.value(m_lastTab), EventPanel::QPrivateSignal());
             });
 
         connect(action(ui::action::NotificationsTabAction), &QAction::triggered, this,

@@ -2,6 +2,7 @@
 
 find_package(Qt6
     COMPONENTS
+        Widgets
         OpenGL
         OpenGLWidgets
         QuickWidgets
@@ -10,7 +11,8 @@ find_package(Qt6
         WebEngineQuick
         WebEngineWidgets
         Test
-        ShaderTools)
+        ShaderTools
+    REQUIRED)
 
 find_package(hidapi REQUIRED)
 

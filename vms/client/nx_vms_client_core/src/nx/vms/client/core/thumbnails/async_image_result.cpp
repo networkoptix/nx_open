@@ -18,7 +18,7 @@ void AsyncImageResult::setImage(const QImage& image)
     NX_ASSERT(m_image.isNull());
     m_image = image;
     m_ready = true;
-    emit ready({});
+    emit ready(QPrivateSignal());
 }
 
 std::chrono::microseconds AsyncImageResult::timestamp(const QImage& image)

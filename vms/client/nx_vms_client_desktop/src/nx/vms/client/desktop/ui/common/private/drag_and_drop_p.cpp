@@ -2,15 +2,14 @@
 
 #include "drag_and_drop_p.h"
 
-#include <QtGui/QDropEvent>
 #include <QtCore/QCoreApplication>
+#include <QtGui/QDropEvent>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickWindow>
 
-#include <utils/common/delayed.h>
-
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/utils/qml_utils.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
@@ -78,7 +77,7 @@ void DragMimeDataWatcher::setWatched(QObject* value)
     }
 
     const auto emitWatchedChanged =
-        [this]() { emit watchedChanged({}); };
+        [this]() { emit watchedChanged(QPrivateSignal()); };
 
     m_watched = value;
     if (m_watched)
@@ -104,7 +103,7 @@ void DragMimeDataWatcher::setMimeData(QMimeData* value)
         m_mimeData->disconnect(this);
 
     const auto emitMimeDataChanged =
-        [this]() { emit mimeDataChanged({}); };
+        [this]() { emit mimeDataChanged(QPrivateSignal()); };
 
     m_mimeData = value;
     if (m_mimeData)
@@ -157,9 +156,9 @@ void DragHoverWatcher::setActive(bool value)
     emit activeChanged();
 
     if (m_active)
-        emit started({});
+        emit started(QPrivateSignal());
     else
-        emit stopped({});
+        emit stopped(QPrivateSignal());
 }
 
 bool DragHoverWatcher::eventFilter(QObject* watched, QEvent* event)
@@ -208,7 +207,7 @@ void DragHoverWatcher::handleDrag(const QPoint& globalPos)
     if (recursivelyContains(m_target, itemPos))
     {
         setActive(true);
-        emit positionChanged(itemPos, {});
+        emit positionChanged(itemPos, QPrivateSignal());
     }
     else
     {
