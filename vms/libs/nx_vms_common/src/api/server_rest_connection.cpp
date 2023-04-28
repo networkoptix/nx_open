@@ -2153,6 +2153,13 @@ Handle ServerConnection::debug(
     return executeGet("/api/debug", {{action, value}}, callback, targetThread);
 }
 
+Handle ServerConnection::getLookupLists(
+    Result<ErrorOrData<nx::vms::api::LookupListDataList>>::type&& callback,
+    QThread* targetThread)
+{
+    return executeGet("/rest/v3/lookupLists", {}, std::move(callback), targetThread);
+}
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const nx::network::rest::Params& params) const

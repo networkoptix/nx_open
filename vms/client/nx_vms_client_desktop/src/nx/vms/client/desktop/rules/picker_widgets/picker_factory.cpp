@@ -20,6 +20,7 @@
 #include "http_parameters_picker_widget.h"
 #include "input_port_picker_widget.h"
 #include "keywords_picker_widget.h"
+#include "lookup_picker_widget.h"
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
 #include "oneline_text_picker_widget.h"
@@ -153,6 +154,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new NumberPicker<nx::vms::rules::IntField>(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::KeywordsField>())
         pickerWidget = new KeywordsPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::LookupField>())
+        pickerWidget = new LookupPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceCameraField>())
         pickerWidget = createSourceCameraPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceServerField>())

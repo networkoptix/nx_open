@@ -25,7 +25,7 @@
   <property name="windowTitle">
    <string>Alarm/Event Rules</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0,0,0,0">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -343,6 +343,9 @@
     </widget>
    </item>
    <item>
+    <widget class="nx::vms::client::desktop::AlertBar" name="alertBar" native="true"/>
+   </item>
+   <item>
     <widget class="Line" name="buttomBoxLine">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -379,6 +382,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::AlertBar</class>
+   <extends>QWidget</extends>
+   <header>nx/vms/client/desktop/common/widgets/control_bars.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::Panel</class>
    <extends>QWidget</extends>

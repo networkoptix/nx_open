@@ -84,6 +84,12 @@ void Metatypes::initialize()
 
     QnJsonSerializer::registerSerializer<std::chrono::seconds>();
     QnJsonSerializer::registerSerializer<std::chrono::microseconds>();
+
+    qRegisterMetaType<LookupCheckType>();
+    QnJsonSerializer::registerSerializer<LookupCheckType>();
+
+    qRegisterMetaType<LookupSource>();
+    QnJsonSerializer::registerSerializer<LookupSource>();
 };
 
 } // namespace nx::vms::rules

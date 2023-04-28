@@ -27,4 +27,16 @@ struct UuidSelection
 #define UuidSelection_Fields (ids)(all)
 QN_FUSION_DECLARE_FUNCTIONS(UuidSelection, (json), NX_VMS_RULES_API);
 
+NX_REFLECTION_ENUM_CLASS(LookupCheckType,
+    /* Checks whether the entity exists in the source. */
+    in,
+    /* Checks whether the entity does not exist in the source. */
+    out);
+
+NX_REFLECTION_ENUM_CLASS(LookupSource,
+    /* Space separated string. Transforms to a lookup list with 'keyword' attribute. */
+    keywords,
+    /* Lookup list from the system context manager. */
+    lookupList);
+
 } // namespace nx::vms::rules

@@ -4,7 +4,7 @@
 
 #include "../event_filter_fields/dummy_field.h"
 #include "../event_filter_fields/flag_field.h"
-#include "../event_filter_fields/keywords_field.h"
+#include "../event_filter_fields/lookup_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -64,18 +64,15 @@ Icon GenericEvent::icon() const
 
 const ItemDescriptor& GenericEvent::manifest()
 {
-    static const QString kKeywordFieldDescription = tr("Keywords separated by space");
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<GenericEvent>(),
         .displayName = tr("Generic Event"),
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
             utils::makeStateFieldDescriptor(tr("State"), {}, State::instant),
-            makeFieldDescriptor<KeywordsField>("source", tr("Source"), kKeywordFieldDescription),
-            makeFieldDescriptor<KeywordsField>("caption", tr("Caption"), kKeywordFieldDescription),
-            makeFieldDescriptor<KeywordsField>("description",
-                tr("Description"),
-                kKeywordFieldDescription),
+            makeFieldDescriptor<LookupField>("source", tr("Source")),
+            makeFieldDescriptor<LookupField>("caption", tr("Caption")),
+            makeFieldDescriptor<LookupField>("description", tr("Description")),
             makeFieldDescriptor<EventFlagField>(utils::kOmitLoggingFieldName, tr("Omit logging")),
 
             makeFieldDescriptor<DummyField>(utils::kDeviceIdsFieldName, utils::kDeviceIdsFieldName)

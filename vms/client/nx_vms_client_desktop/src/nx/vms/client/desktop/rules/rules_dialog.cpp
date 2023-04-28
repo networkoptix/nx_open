@@ -6,6 +6,9 @@
 #include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QCloseEvent>
 
+#include <api/server_rest_connection.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/vms/api/data/lookup_list_data.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
@@ -17,11 +20,13 @@
 #include <nx/vms/client/desktop/rules/params_widgets/params_widget.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/events/generic_event.h>
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop::rules {
 
@@ -90,13 +95,17 @@ RulesDialog::RulesDialog(QWidget* parent):
     connect(m_ui->resetDefaultRulesButton, &QPushButton::clicked, this, &RulesDialog::resetToDefaults);
 
     setupRuleTableView();
+    initialiseLookupLists();
 
     m_readOnly = false; //< TODO: Get real readonly state.
     updateReadOnlyState();
 }
 
-// Non-inline destructor is required for member scoped pointers to forward declared classes.
-RulesDialog::~RulesDialog() = default;
+RulesDialog::~RulesDialog()
+{
+    if (m_lookupListsRequestId)
+        connectedServerApi()->cancelRequest(*m_lookupListsRequestId);
+}
 
 bool RulesDialog::tryClose(bool force)
 {
@@ -462,6 +471,48 @@ void RulesDialog::deleteCurrentRule()
 {
     m_rulesTableModel->removeRule(
         m_rulesFilterModel->mapToSource(m_ui->tableView->selectionModel()->currentIndex()));
+}
+
+void RulesDialog::initialiseLookupLists()
+{
+    if (lookupListManager()->isInitialized())
+        return;
+
+    if (m_lookupListsRequestId)
+        connectedServerApi()->cancelRequest(*m_lookupListsRequestId);
+
+    auto callback = nx::utils::guarded(
+        this,
+        [this](
+            bool /*success*/,
+            rest::Handle requestId,
+            const rest::ErrorOrData<api::LookupListDataList>& result)
+        {
+            if (m_lookupListsRequestId != requestId)
+                return;
+
+            m_lookupListsRequestId = std::nullopt;
+
+            if (std::holds_alternative<network::rest::Result>(result))
+            {
+                auto restResult = std::get<network::rest::Result>(result);
+                NX_WARNING(
+                    this,
+                    "Lookup Lists request %1 failed: %2",
+                    requestId, restResult.errorString);
+
+                m_ui->alertBar->setText(tr("Lookup lists network request failed"));
+                return;
+            }
+
+            auto lookupLists = std::get<api::LookupListDataList>(result);
+            NX_VERBOSE(this, "Received %1 Lookup Lists entries", lookupLists.size());
+
+            lookupListManager()->initialize(std::move(lookupLists));
+        });
+
+    m_lookupListsRequestId = connectedServerApi()->getLookupLists(std::move(callback), thread());
+    NX_VERBOSE(this, "Send get lookup lists request (%1)", *m_lookupListsRequestId);
 }
 
 } // namespace nx::vms::client::desktop::rules
