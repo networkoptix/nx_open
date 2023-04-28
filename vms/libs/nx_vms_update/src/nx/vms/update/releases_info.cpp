@@ -63,6 +63,10 @@ std::optional<ReleaseInfo> ReleasesInfo::selectVmsRelease(
     {
         if (release.product == Product::vms
             && release.publication_type == PublicationType::release
+            && (release.availableForReleasesFrom.isNull()
+                || currentVersion >= release.availableForReleasesFrom)
+            && (release.availableForReleasesBefore.isNull()
+                || currentVersion < release.availableForReleasesBefore)
             && release.version >= currentVersion
             && isBuildPublished(release))
         {
@@ -92,6 +96,10 @@ std::optional<ReleaseInfo> ReleasesInfo::selectDesktopClientRelease(
         if ((release.product == Product::vms || release.product == Product::desktop_client)
             && publicationTypeAllowed(publicationType, release.publication_type)
             && release.protocol_version == protocolVersion
+            && (release.availableForReleasesFrom.isNull()
+                || currentVersion >= release.availableForReleasesFrom)
+            && (release.availableForReleasesBefore.isNull()
+                || currentVersion < release.availableForReleasesBefore)
             && release.version >= currentVersion)
         {
             if (!bestRelease || bestRelease->version < release.version)
