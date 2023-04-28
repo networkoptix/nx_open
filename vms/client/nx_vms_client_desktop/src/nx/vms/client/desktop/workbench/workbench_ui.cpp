@@ -13,7 +13,6 @@
 
 #include <camera/fps_calculator.h>
 #include <client/client_meta_types.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
@@ -1642,12 +1641,12 @@ void WorkbenchUi::setFpsVisible(bool fpsVisible)
     m_fpsItem->setText(QString());
 
     action(action::ShowFpsAction)->setChecked(fpsVisible);
-    qnClientModule->performanceMonitor()->setVisible(fpsVisible);
+    appContext()->performanceMonitor()->setVisible(fpsVisible);
 }
 
 void WorkbenchUi::setDebugInfoVisible(bool debugInfoVisible)
 {
-    qnClientModule->performanceMonitor()->setDebugInfoVisible(debugInfoVisible);
+    appContext()->performanceMonitor()->setDebugInfoVisible(debugInfoVisible);
 }
 
 void WorkbenchUi::updateFpsGeometry()

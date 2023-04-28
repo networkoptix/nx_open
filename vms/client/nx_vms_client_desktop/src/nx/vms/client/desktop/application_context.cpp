@@ -42,6 +42,7 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layouts_watcher.h>
+#include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
@@ -540,6 +541,8 @@ struct ApplicationContext::Private
 
     // Miscelaneous modules.
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
+    std::unique_ptr<PerformanceMonitor> performanceMonitor;
+
     std::unique_ptr<nx::vms::utils::TranslationManager> translationManager;
     std::unique_ptr<ApplauncherGuard> applauncherGuard;
     std::unique_ptr<QnClientAutoRunWatcher> autoRunWatcher;
@@ -610,6 +613,7 @@ ApplicationContext::ApplicationContext(
             d->initializeStateModules();
             d->initializeLogging(startupParameters); //< Depends on state modules.
             d->initializePlatformAbstraction();
+            d->performanceMonitor = std::make_unique<PerformanceMonitor>();
             d->initializeTranslations();
             d->statisticsModule = std::make_unique<ContextStatisticsModule>();
             d->initializeNetworkModules();
@@ -833,6 +837,11 @@ SystemContext* ApplicationContext::cloudLayoutsSystemContext() const
 QnResourcePool* ApplicationContext::cloudLayoutsPool() const
 {
     return cloudLayoutsSystemContext()->resourcePool();
+}
+
+PerformanceMonitor* ApplicationContext::performanceMonitor() const
+{
+    return d->performanceMonitor.get();
 }
 
 RadassController* ApplicationContext::radassController() const

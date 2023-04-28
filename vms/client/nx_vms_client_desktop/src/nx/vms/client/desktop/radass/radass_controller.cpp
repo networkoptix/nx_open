@@ -2,11 +2,11 @@
 
 #include "radass_controller.h"
 
-#include <client/client_module.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/camera/abstract_video_display.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -190,8 +190,12 @@ struct RadassController::Private
         if (!ini().considerOverallCpuUsageInRadass)
             return false;
 
-        return lastSystemCpuLoadValue > ini().highSystemCpuUsageInRadass
+        const bool result = lastSystemCpuLoadValue > ini().highSystemCpuUsageInRadass
             || lastProcessCpuLoadValue > ini().highProcessCpuUsageInRadass;
+        if (result)
+            NX_VERBOSE(this, "Overall CPU usage is too high to raise quality.");
+
+        return result;
     }
 
     /** Overall CPU usage is too high, quality should be lowered. */
@@ -200,8 +204,12 @@ struct RadassController::Private
         if (!ini().considerOverallCpuUsageInRadass)
             return false;
 
-        return lastSystemCpuLoadValue > ini().criticalSystemCpuUsageInRadass
+        const bool result = lastSystemCpuLoadValue > ini().criticalSystemCpuUsageInRadass
             || lastProcessCpuLoadValue > ini().criticalProcessCpuUsageInRadass;
+        if (result)
+            NX_VERBOSE(this, "Overall CPU usage is critical.");
+
+        return result;
     }
 
     using SearchCondition = std::function<bool(AbstractVideoDisplay*)>;
@@ -686,7 +694,7 @@ struct RadassController::Private
         // On first issue starting timer.
         if (!cpuIssueTimer->isValid())
         {
-            NX_VERBOSE(this, "CPU usage is critical");
+            NX_VERBOSE(this, "CPU usage is critical, starting timer");
             cpuIssueTimer->restart();
         }
 
@@ -717,7 +725,6 @@ struct RadassController::Private
                 NX_VERBOSE(this, "Cannot find an item to lower it's quality.");
             }
         }
-
     }
 
     void adaptToConsumerChanges(AbstractVideoDisplay* display)
@@ -756,14 +763,21 @@ RadassController::RadassController(TimerFactoryPtr timerFactory, QObject* parent
 
     if (ini().considerOverallCpuUsageInRadass)
     {
-        qnClientModule->performanceMonitor()->setEnabled(true);
-        connect(qnClientModule->performanceMonitor(), &PerformanceMonitor::valuesChanged, this,
+        NX_VERBOSE(this, "Enable overall performance monitor. Parameters:");
+        NX_VERBOSE(this, "High System CPU: %1", ini().highSystemCpuUsageInRadass);
+        NX_VERBOSE(this, "Critical System CPU: %1", ini().criticalSystemCpuUsageInRadass);
+        NX_VERBOSE(this, "High Process CPU: %1", ini().highProcessCpuUsageInRadass);
+        NX_VERBOSE(this, "Critical Process CPU: %1", ini().criticalProcessCpuUsageInRadass);
+        appContext()->performanceMonitor()->setEnabled(true);
+        connect(appContext()->performanceMonitor(), &PerformanceMonitor::valuesChanged, this,
             [this](const QVariantMap& values)
             {
                 const QVariant totalCpuValue = values.value(PerformanceMonitor::kTotalCpu);
                 d->lastSystemCpuLoadValue = totalCpuValue.toFloat();
                 const QVariant processCpuValue = values.value(PerformanceMonitor::kProcessCpu);
                 d->lastProcessCpuLoadValue = processCpuValue.toFloat();
+                NX_VERBOSE(this, "Overall performance: total CPU %1, process CPU %2",
+                    d->lastSystemCpuLoadValue, d->lastProcessCpuLoadValue);
             });
     }
 }

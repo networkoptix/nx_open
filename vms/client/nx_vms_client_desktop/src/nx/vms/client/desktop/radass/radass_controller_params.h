@@ -4,6 +4,8 @@
 
 #include <chrono>
 
+#include <QtCore/QSize>
+
 /**
  * These parameters control operation of RadAss controller.
  * They are used in RadAss controller itself and its tests.
