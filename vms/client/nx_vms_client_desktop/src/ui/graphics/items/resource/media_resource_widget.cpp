@@ -3493,3 +3493,11 @@ void QnMediaResourceWidget::handleSyncStateChanged(bool enabled)
 {
     updateHud(enabled);
 }
+
+bool QnMediaResourceWidget::isTitleUnderMouse() const
+{
+    if (!m_hudOverlay || !m_hudOverlay->title())
+        return false;
+
+    return m_hudOverlay->title()->isUnderMouse();
+}

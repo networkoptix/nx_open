@@ -3,11 +3,12 @@
 #include "move_instrument.h"
 
 #include <QtGui/QMouseEvent>
-
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsItem>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QGraphicsItem>
+
+#include <ui/graphics/items/resource/media_resource_widget.h>
 
 namespace {
 
@@ -37,6 +38,16 @@ void MoveInstrument::moveItem(QGraphicsItem *item, const QPointF &sceneDeltaPos)
     );
 }
 
+QnMediaResourceWidget* findParent(QGraphicsItem* item, int depth = 0)
+{
+    if (!item || depth > 2)
+        return nullptr;
+    if (auto widget = dynamic_cast<QnMediaResourceWidget*>(item))
+        return widget;
+    
+    return findParent(item->parentWidget(), depth + 1);
+}
+
 bool MoveInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if(!dragProcessor()->isWaiting())
         return false;
@@ -50,12 +61,28 @@ bool MoveInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
 
     /* Find the item to drag. */
     QGraphicsItem *draggedItem = item(view, event->pos(), isNonProxyLeftClickableItem);
-    if (draggedItem == nullptr || !(draggedItem->flags() & QGraphicsItem::ItemIsMovable) || !satisfiesItemConditions(draggedItem))
+    if (draggedItem == nullptr)
         return false;
+
+    const auto resWidget = findParent(draggedItem);
+    bool cursorOnTitle = false;
+    bool ptzEnabled = false;
+    if (resWidget)
+    {
+        cursorOnTitle = resWidget->isTitleUnderMouse();
+        ptzEnabled = resWidget->options().testFlag(QnMediaResourceWidget::ControlPtz);
+    }
+
+    if (!(draggedItem->flags() & QGraphicsItem::ItemIsMovable)
+        || (!cursorOnTitle && ptzEnabled)
+        || !satisfiesItemConditions(draggedItem))
+    {
+        return false;
+    }
+
     m_draggedItem = draggedItem;
 
     /* Don't construct a list of all items to drag here, it's expensive. */
-
     dragProcessor()->mousePressEvent(viewport, event);
 
     event->accept();
