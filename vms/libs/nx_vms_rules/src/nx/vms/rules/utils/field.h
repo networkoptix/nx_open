@@ -116,7 +116,8 @@ FieldDescriptor makeTextFormatterFieldDescriptor(
 FieldDescriptor makeTargetUserFieldDescriptor(
     const QString& displayName,
     const QString& description = {},
-    UserFieldPreset preset = UserFieldPreset::Power);
+    UserFieldPreset preset = UserFieldPreset::Power,
+    const QStringList& linkedFields = {});
 
 FieldDescriptor makeActionFlagFieldDescriptor(
     const QString& fieldName,

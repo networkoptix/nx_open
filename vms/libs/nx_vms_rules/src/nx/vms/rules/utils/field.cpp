@@ -77,7 +77,8 @@ FieldDescriptor makeTextFormatterFieldDescriptor(
 FieldDescriptor makeTargetUserFieldDescriptor(
     const QString& displayName,
     const QString& description,
-    UserFieldPreset preset)
+    UserFieldPreset preset,
+    const QStringList& linkedFields)
 {
     QVariantMap props;
     if (preset == UserFieldPreset::All)
@@ -89,7 +90,8 @@ FieldDescriptor makeTargetUserFieldDescriptor(
         utils::kUsersFieldName,
         displayName,
         description,
-        props);
+        props,
+        linkedFields);
 }
 
 FieldDescriptor makeActionFlagFieldDescriptor(

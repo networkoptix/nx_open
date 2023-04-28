@@ -17,7 +17,8 @@ const ItemDescriptor& SendEmailAction::manifest()
         .description = "",
         .flags = {ItemFlag::aggregationByTypeSupported, ItemFlag::omitLogging},
         .fields = {
-            utils::makeTargetUserFieldDescriptor(tr("to")),
+            utils::makeTargetUserFieldDescriptor(
+                tr("to"), {}, utils::UserFieldPreset::Power, {utils::kEmailsFieldName}),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<ActionTextField>(
                 utils::kEmailsFieldName, tr("Additional recipients")),

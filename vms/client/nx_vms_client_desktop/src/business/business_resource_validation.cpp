@@ -577,6 +577,11 @@ void QnSubjectValidationPolicy::analyze(
     }
 }
 
+bool QnSubjectValidationPolicy::isEmptySelectionAllowed() const
+{
+    return m_allowEmptySelection;
+}
+
 // This function is generally faster than QnSubjectValidationPolicy::analyze.
 QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
     const QSet<QnUuid>& subjects) const
