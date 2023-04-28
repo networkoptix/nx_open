@@ -112,18 +112,20 @@ protected:
             AbstractSearchListModel* model, FetchDirection direction, FetchResult result)
             :
             nx::utils::SharedGuard(nx::utils::SharedGuardCallback(
-                [model, result, direction]() { emit model->fetchFinished(result, direction, {}); }))
+                [model, result, direction]()
+                    { emit model->fetchFinished(result, direction, QPrivateSignal()); }))
         {
-            emit model->fetchCommitStarted(direction, {});
+            emit model->fetchCommitStarted(direction, QPrivateSignal());
         }
 
         explicit ScopedFetchCommit(
             AbstractSearchListModel* model, FetchDirection direction, FetchResult* result)
             :
             nx::utils::SharedGuard(nx::utils::SharedGuardCallback(
-                [model, result, direction]() { emit model->fetchFinished(*result, direction, {}); }))
+                [model, result, direction]()
+                    { emit model->fetchFinished(*result, direction, QPrivateSignal()); }))
         {
-            emit model->fetchCommitStarted(direction, {});
+            emit model->fetchCommitStarted(direction, QPrivateSignal());
         }
     };
 
@@ -133,9 +135,9 @@ protected:
     {
         explicit ScopedLiveCommit(AbstractSearchListModel* model):
             nx::utils::SharedGuard(nx::utils::SharedGuardCallback(
-                [model]() { emit model->liveCommitted({}); }))
+                [model]() { emit model->liveCommitted(QPrivateSignal()); }))
         {
-            emit model->liveAboutToBeCommitted({});
+            emit model->liveAboutToBeCommitted(QPrivateSignal());
         }
     };
 

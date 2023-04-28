@@ -81,7 +81,7 @@ void SystemInternetAccessWatcher::setHasInternetAccess(bool value)
         return;
 
     m_hasInternetAccess = value;
-    emit internetAccessChanged(m_hasInternetAccess, {});
+    emit internetAccessChanged(m_hasInternetAccess, QPrivateSignal());
 }
 
 } // namespace nx::vms::client::desktop

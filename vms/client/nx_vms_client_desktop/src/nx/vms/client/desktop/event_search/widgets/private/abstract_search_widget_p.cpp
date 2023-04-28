@@ -263,7 +263,11 @@ void AbstractSearchWidget::Private::setupModels()
         });
 
     connect(m_mainModel.data(), &AbstractSearchListModel::camerasChanged, this,
-        [this]() { emit q->cameraSetChanged(m_mainModel->cameras(), {}); });
+        [this]()
+        {
+            emit q->cameraSetChanged(
+                m_mainModel->cameras(), AbstractSearchWidget::QPrivateSignal());
+        });
 
     connect(m_mainModel.data(), &AbstractSearchListModel::isOnlineChanged, this,
         [this](bool isOnline)
@@ -304,7 +308,10 @@ void AbstractSearchWidget::Private::setupRibbon()
         this, &Private::requestFetchIfNeeded, Qt::QueuedConnection);
 
     connect(ui->ribbon, &EventRibbon::hovered, this,
-        [this](const QModelIndex& idx, EventTile* tile) { emit q->tileHovered(idx, tile, {}); });
+        [this](const QModelIndex& idx, EventTile* tile)
+        {
+            emit q->tileHovered(idx, tile, AbstractSearchWidget::QPrivateSignal());
+        });
 
     TileInteractionHandler::install(ui->ribbon);
 }
@@ -641,7 +648,7 @@ void AbstractSearchWidget::Private::setAllowed(bool value)
         return;
 
     m_isAllowed = value;
-    emit q->allowanceChanged(*m_isAllowed, {});
+    emit q->allowanceChanged(*m_isAllowed, AbstractSearchWidget::QPrivateSignal());
 }
 
 void AbstractSearchWidget::Private::goToLive()

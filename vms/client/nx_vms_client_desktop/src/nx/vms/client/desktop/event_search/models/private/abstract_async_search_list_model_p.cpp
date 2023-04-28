@@ -3,11 +3,10 @@
 #include "abstract_async_search_list_model_p.h"
 
 #include <core/resource/camera_resource.h>
-#include <utils/common/synctime.h>
-
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/synctime.h>
 
 namespace nx::vms::client::desktop {
 
@@ -98,7 +97,7 @@ bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler c
     NX_VERBOSE(q, "Prefetch id: %1", m_request.id);
 
     m_prefetchCompletionHandler = completionHandler;
-    emit q->asyncFetchStarted(m_request.direction, {});
+    emit q->asyncFetchStarted(m_request.direction, AbstractAsyncSearchListModel::QPrivateSignal());
 
     return true;
 }
@@ -124,7 +123,7 @@ bool AbstractAsyncSearchListModel::Private::prefetchWindow(
     NX_VERBOSE(q, "Prefetch id: %1", m_request.id);
 
     m_prefetchCompletionHandler = completionHandler;
-    emit q->asyncFetchStarted(m_request.direction, {});
+    emit q->asyncFetchStarted(m_request.direction, AbstractAsyncSearchListModel::QPrivateSignal());
 
     return true;
 }

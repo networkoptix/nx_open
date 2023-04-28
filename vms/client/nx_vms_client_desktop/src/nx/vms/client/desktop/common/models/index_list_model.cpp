@@ -67,7 +67,8 @@ void IndexListModel::setSource(const QModelIndexList& value)
     if (m_source == newSource)
         return;
 
-    const auto notifier = nx::utils::makeScopeGuard([this]() { emit sourceChanged({}); });
+    const auto notifier = nx::utils::makeScopeGuard(
+        [this]() { emit sourceChanged(QPrivateSignal()); });
 
     ScopedReset scopedReset(this);
     m_source = newSource;

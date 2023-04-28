@@ -9,8 +9,8 @@
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QPointer>
-#include <QtCore/QSet>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QSet>
 #include <QtQml/QtQml>
 
 #include <client_core/client_core_module.h>
@@ -399,7 +399,7 @@ void LinearizationListModel::Private::setSourceModel(QAbstractItemModel* value)
     NX_CRITICAL(!m_operationInProgress);
 
     const auto notifier = nx::utils::makeScopeGuard(
-        [this]() { emit q->sourceModelChanged({}); });
+        [this]() { emit q->sourceModelChanged(LinearizationListModel::QPrivateSignal()); });
 
     ScopedReset scopedReset(q);
     QScopedValueRollback progressRollback(m_operationInProgress, true);
@@ -507,7 +507,7 @@ void LinearizationListModel::Private::setAutoExpandRoleName(const QString& value
     m_autoExpandRoleName = value;
     setAutoExpandRole(calculateAutoExpandRole());
 
-    emit q->autoExpandRoleNameChanged({});
+    emit q->autoExpandRoleNameChanged(LinearizationListModel::QPrivateSignal());
 }
 
 void LinearizationListModel::Private::setAutoExpandRole(int value)

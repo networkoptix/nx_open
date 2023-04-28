@@ -1327,7 +1327,8 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
                 [this, engineId = engineId, actionId = actionDescriptor.id, track, camera]()
                 {
-                    emit q->pluginActionRequested(engineId, actionId, track, camera, {});
+                    emit q->pluginActionRequested(engineId, actionId, track, camera,
+                        AnalyticsSearchListModel::QPrivateSignal());
                 }));
         }
     }

@@ -352,7 +352,7 @@ bool SystemHealthState::Private::setState(SystemHealthIndex index, bool value)
         return false;
 
     m_state[(int) index] = value;
-    emit q->stateChanged(index, value, {});
+    emit q->stateChanged(index, value, SystemHealthState::QPrivateSignal());
 
     return true;
 }
@@ -452,7 +452,7 @@ void SystemHealthState::Private::setResourcesForMessageType(
     {
         m_resourcesForMessageType.insert(message, resources);
         if (!update(message))
-            emit q->dataChanged(message, {});
+            emit q->dataChanged(message, SystemHealthState::QPrivateSignal());
     }
 }
 

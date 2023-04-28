@@ -22,7 +22,7 @@ public:
         if (!NX_ASSERT(m_main) || !flags.testFlag(requiredFlag()))
             return false;
 
-        emit m_main->stateAboutToBeLoaded({});
+        emit m_main->stateAboutToBeLoaded(QmlClientStateDelegate::QPrivateSignal());
 
         forEachQmlProperty(
             [this, &state](const QMetaProperty& prop)
@@ -33,7 +33,7 @@ public:
                 }
             });
 
-        emit m_main->stateLoaded({});
+        emit m_main->stateLoaded(QmlClientStateDelegate::QPrivateSignal());
         return true;
     }
 
@@ -42,7 +42,7 @@ public:
         if (!NX_ASSERT(m_main) || !flags.testFlag(requiredFlag()))
             return;
 
-        emit m_main->stateAboutToBeSaved({});
+        emit m_main->stateAboutToBeSaved(QmlClientStateDelegate::QPrivateSignal());
 
         forEachQmlProperty(
             [this, state](const QMetaProperty& prop)
@@ -50,7 +50,7 @@ public:
                 (*state)[prop.name()] = QJsonValue::fromVariant(prop.read(m_main));
             });
 
-        emit m_main->stateSaved({});
+        emit m_main->stateSaved(QmlClientStateDelegate::QPrivateSignal());
     }
 
     Substate requiredFlag() const

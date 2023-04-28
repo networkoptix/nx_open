@@ -3,10 +3,8 @@
 #include "cursor_override.h"
 
 #include <QtCore/QList>
-
-#include <QtGui/QGuiApplication>
 #include <QtGui/QCursor>
-
+#include <QtGui/QGuiApplication>
 #include <QtQml/QtQml>
 
 #include <nx/utils/log/assert.h>
@@ -48,7 +46,7 @@ void CursorOverrideAttached::setShape(Qt::CursorShape value)
     if (effectivelyActive())
         QGuiApplication::changeOverrideCursor(d->shape);
 
-    emit shapeChanged({});
+    emit shapeChanged(QPrivateSignal());
 }
 
 bool CursorOverrideAttached::active() const
@@ -82,7 +80,7 @@ void CursorOverrideAttached::setActive(bool value)
         }
     }
 
-    emit activeChanged({});
+    emit activeChanged(QPrivateSignal());
 }
 
 bool CursorOverrideAttached::effectivelyActive() const

@@ -1046,7 +1046,7 @@ void QnResourceWidget::setOptions(Options options)
     m_options = options;
 
     optionsChangedNotify(changedOptions);
-    emit optionsChanged(changedOptions, {});
+    emit optionsChanged(changedOptions, QPrivateSignal());
 }
 
 const QSize &QnResourceWidget::channelScreenSize() const
@@ -1307,7 +1307,7 @@ void QnResourceWidget::updateSelectedState()
 
     m_selectionState = selectionState;
     updateHud(display()->animationAllowed());
-    emit selectionStateChanged(m_selectionState, {});
+    emit selectionStateChanged(m_selectionState, QPrivateSignal());
 }
 
 Qn::RenderStatus QnResourceWidget::paintChannelBackground(QPainter* painter, int /*channel*/,

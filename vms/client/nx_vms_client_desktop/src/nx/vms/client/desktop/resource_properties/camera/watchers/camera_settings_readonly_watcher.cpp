@@ -59,7 +59,7 @@ void CameraSettingsReadOnlyWatcher::updateReadOnly()
         return;
 
     m_readOnly = value;
-    emit readOnlyChanged(value, {});
+    emit readOnlyChanged(value, QPrivateSignal());
 }
 
 bool CameraSettingsReadOnlyWatcher::calculateReadOnly() const

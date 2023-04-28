@@ -63,7 +63,7 @@ class NxOpenConan(ConanFile):
     requires = (
         f"ffmpeg/{ffmpeg_version_and_revision}",
         "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
-        "qt/6.4.1" "#96ca0ec284aed22726178b2e0d1d0e16",
+        "qt/6.5.0" "#081e1bd49931aabdf34898e47147f49d",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
     )
 
@@ -77,12 +77,12 @@ class NxOpenConan(ConanFile):
         generate_conan_package_refs(self)
 
     def build_requirements(self):
-        self.build_requires("qt-host/6.4.1" "#32f7f5ac57afb4ee664383966dd2111f")
+        self.build_requires("qt-host/6.5.0" "#91baa27019116ada0e6bae41c4e23182")
 
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
-                self.build_requires("clang/15.0.2" "#0fa5a9fcbe580a0ecff8364eb948f845")
+                self.build_requires("clang/15.0.2" "#a16b73bc47b590db839f3fca74c95b62")
             self.build_requires("sdk-gcc/7.5" "#8e4d5d65d516a14449a95f3c314189f8")
 
         if self.isWindows:
@@ -113,7 +113,7 @@ class NxOpenConan(ConanFile):
 
             if not self.isArm32:
                 self.requires("os_deps_for_desktop_linux/ubuntu_bionic"
-                    "#b979f9ed1c28142391346aaae5abad42")
+                    "#eb589ca476b9b48622da3261e5342d4d")
                 self.requires("legacy_os_deps_from_ubuntu_xenial/1.0"
                     "#665d5fc7371ad819e30bb2d25b529846")
 

@@ -545,14 +545,14 @@ void ResourceTreeModelAdapter::setFilterType(ResourceTree::FilterType value)
     if (d->filterType == value)
         return;
 
-    emit filterAboutToBeChanged({});
+    emit filterAboutToBeChanged(QPrivateSignal());
 
     d->filterType = value;
     emit filterTypeChanged();
 
     d->updateFilter();
 
-    emit filterChanged({});
+    emit filterChanged(QPrivateSignal());
 }
 
 QString ResourceTreeModelAdapter::filterText() const
@@ -566,14 +566,14 @@ void ResourceTreeModelAdapter::setFilterText(const QString& value)
     if (d->filterText == trimmedValue)
         return;
 
-    emit filterAboutToBeChanged({});
+    emit filterAboutToBeChanged(QPrivateSignal());
 
     d->filterText = trimmedValue;
     emit filterTextChanged();
 
     d->updateFilter();
 
-    emit filterChanged({});
+    emit filterChanged(QPrivateSignal());
 }
 
 bool ResourceTreeModelAdapter::isFiltering() const

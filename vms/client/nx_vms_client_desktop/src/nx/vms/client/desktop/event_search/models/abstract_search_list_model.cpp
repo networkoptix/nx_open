@@ -75,7 +75,7 @@ void AbstractSearchListModel::onOnlineChanged(bool isOnline)
         clear();
     }
 
-    emit isOnlineChanged(m_isOnline, {});
+    emit isOnlineChanged(m_isOnline, QPrivateSignal());
 }
 
 bool AbstractSearchListModel::canFetchData() const
@@ -310,7 +310,7 @@ void AbstractSearchListModel::setLive(bool value)
     NX_VERBOSE(this, "Setting live mode to %1", value);
     m_live = value;
 
-    emit liveChanged(m_live, {});
+    emit liveChanged(m_live, QPrivateSignal());
 }
 
 bool AbstractSearchListModel::livePaused() const
@@ -326,7 +326,7 @@ void AbstractSearchListModel::setLivePaused(bool value)
     NX_VERBOSE(this, "Setting live %1", (value ? "paused" : "unpaused"));
     m_livePaused = value;
 
-    emit livePausedChanged(m_livePaused, {});
+    emit livePausedChanged(m_livePaused, QPrivateSignal());
 }
 
 bool AbstractSearchListModel::offlineAllowed() const

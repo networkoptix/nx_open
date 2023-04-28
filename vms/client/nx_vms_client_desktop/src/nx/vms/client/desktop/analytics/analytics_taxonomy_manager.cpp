@@ -116,9 +116,9 @@ TaxonomyManager::TaxonomyManager(QnCommonModule* commonModule, QObject* parent):
     connect(taxonomyStateWatcher, &AbstractStateWatcher::stateChanged, this,
         [this]()
         {
-            emit currentTaxonomyAboutToBeChanged({});
+            emit currentTaxonomyAboutToBeChanged(QPrivateSignal());
             d->reset();
-            emit currentTaxonomyChanged({});
+            emit currentTaxonomyChanged(QPrivateSignal());
         });
 }
 

@@ -761,7 +761,7 @@ void ConnectActionsHandler::setState(LogicalState logicalValue)
         return;
 
     d->logicalState = logicalValue;
-    emit stateChanged(d->logicalState, {});
+    emit stateChanged(d->logicalState, QPrivateSignal());
 }
 
 void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonData& logonData)
