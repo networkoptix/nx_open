@@ -43,7 +43,6 @@
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
-#include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
@@ -177,7 +176,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QOb
     registerResourceDataProviders();
     integrations::initialize(this);
 
-    m_performanceMonitor.reset(new PerformanceMonitor());
     m_licenseHealthWatcher.reset(new LicenseHealthWatcher(
         appContext()->currentSystemContext()->licensePool()));
 
@@ -335,11 +333,6 @@ SystemContext* QnClientModule::systemContext() const
 QnStartupParameters QnClientModule::startupParameters() const
 {
     return d->startupParameters;
-}
-
-PerformanceMonitor* QnClientModule::performanceMonitor() const
-{
-    return m_performanceMonitor.data();
 }
 
 nx::vms::license::VideoWallLicenseUsageHelper* QnClientModule::videoWallLicenseUsageHelper() const

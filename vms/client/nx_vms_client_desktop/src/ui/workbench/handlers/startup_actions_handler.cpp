@@ -10,7 +10,6 @@
 #include <QtWidgets/QAction>
 
 #include <api/helpers/layout_id_helper.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <client/client_startup_parameters.h>
@@ -408,7 +407,7 @@ void StartupActionsHandler::handleStartupParameters()
     if (!traceFile.empty())
     {
         nx::utils::trace::Log::enable(traceFile);
-        qnClientModule->performanceMonitor()->setEnabled(true);
+        appContext()->performanceMonitor()->setEnabled(true);
     }
 }
 
