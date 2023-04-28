@@ -246,6 +246,8 @@ public:
 
     QnIOModuleMonitorPtr getIOModuleMonitor();
 
+    bool isTitleUnderMouse() const;
+
 signals:
     void speedChanged();
     void motionSelectionChanged();

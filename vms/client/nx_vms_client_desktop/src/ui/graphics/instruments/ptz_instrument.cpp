@@ -470,6 +470,7 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
         QnResourceWidget::OverlayFlag::autoRotate, QnResourceWidget::TopControlsLayer});
 
     data.cursorOverlay = new QGraphicsWidget();
+    data.cursorOverlay->setAcceptedMouseButtons(Qt::NoButton);
 
     widget->addOverlayWidget(data.cursorOverlay, {QnResourceWidget::Invisible,
         QnResourceWidget::OverlayFlag::autoRotate, QnResourceWidget::SelectionLayer});
@@ -1182,18 +1183,18 @@ void PtzInstrument::startDragProcess(DragInfo* /*info*/)
 
 void PtzInstrument::startDrag(DragInfo* info)
 {
-    emit ptzProcessStarted(target());
-
     m_isClick = false;
     m_isDoubleClick = false;
     m_ptzStartedEmitted = false;
 
-    if (!target())
+    if (!target() || target()->isTitleUnderMouse())
     {
-        /* Whoops, already destroyed. */
+        // Target is destroyed, or Move instrument should be used instead of Ptz.
         reset();
         return;
     }
+
+    emit ptzProcessStarted(target());
 
     ensureOverlayWidget(target());
 

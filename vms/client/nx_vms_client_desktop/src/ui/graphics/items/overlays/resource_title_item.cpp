@@ -38,6 +38,7 @@ QnResourceTitleItem::QnResourceTitleItem(QGraphicsItem* parent):
     m_extraInfoLabel(createGraphicsLabel())
 {
     setAcceptedMouseButtons(Qt::NoButton);
+    setCursor(Qt::ArrowCursor);
 
     m_leftButtonsPanel->setObjectName("LeftButtonPanel");
     m_rightButtonsPanel->setObjectName("RightButtonPanel");
