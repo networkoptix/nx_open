@@ -181,13 +181,8 @@ bool UniqueKeyGroupListEntity<Key, KeyHasher, KeyEqual>::removeItem(const Key& k
         return false;
 
     GroupEntity* group = keyItr->second.get();
-
-    auto sequenceItr = std::lower_bound(
-        std::begin(m_groupSequence), std::end(m_groupSequence), group,
-        [this](const auto& lhs, const auto& rhs)
-        { return m_itemOrder.comp(lhs->headItem(), rhs->headItem()); });
-
-    const int index = std::distance(std::begin(m_groupSequence), sequenceItr);
+    auto sequenceItr = std::find(std::cbegin(m_groupSequence), std::cend(m_groupSequence), group);
+    const int index = std::distance(std::cbegin(m_groupSequence), sequenceItr);
 
     auto guard = removeRowsGuard(modelMapping(), index);
     unassignEntity(group);
