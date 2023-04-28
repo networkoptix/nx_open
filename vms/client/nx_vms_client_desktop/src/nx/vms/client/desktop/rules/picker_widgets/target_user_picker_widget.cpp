@@ -45,11 +45,30 @@ void TargetUserPicker::updateUi()
     auto field = theField();
     createPolicy();
 
+    UserPickerHelperParameters helperParameters;
+
+    if (m_fieldDescriptor->linkedFields.contains(vms::rules::utils::kEmailsFieldName))
+    {
+        const auto additionalRecipients =
+            getActionField<vms::rules::ActionTextField>(vms::rules::utils::kEmailsFieldName);
+        if (NX_ASSERT(additionalRecipients) && !additionalRecipients->value().isEmpty())
+        {
+            const auto emails = additionalRecipients->value().split(';', Qt::SkipEmptyParts);
+            helperParameters.additionalUsers = emails.size();
+            helperParameters.additionalValidUsers = std::count_if(
+                emails.cbegin(),
+                emails.cend(),
+                [](const QString& s) { return email::isValidAddress(s); });
+        }
+    }
+
     UserPickerHelper helper{
         systemContext(),
         field->acceptAll(),
         field->ids(),
-        m_policy.get()};
+        m_policy.get(),
+        /*isIntermediateStateValid*/ false,
+        helperParameters};
 
     m_selectButton->setText(helper.text());
     m_selectButton->setIcon(helper.icon());

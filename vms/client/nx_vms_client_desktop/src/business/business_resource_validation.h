@@ -210,6 +210,8 @@ public:
         QVector<QnUserResourcePtr>& validUsers,
         QVector<QnUserResourcePtr>& invalidUsers) const;
 
+    bool isEmptySelectionAllowed() const;
+
 private:
     const bool m_allowEmptySelection;
 };

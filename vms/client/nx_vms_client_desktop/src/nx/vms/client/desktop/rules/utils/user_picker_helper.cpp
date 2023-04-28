@@ -16,58 +16,94 @@ using namespace nx::vms::api;
 
 namespace nx::vms::client::desktop::rules {
 
+namespace {
+
+QString makeText(const QString& base, const QString& additional)
+{
+    if (base.isEmpty())
+        return additional;
+
+    if (additional.isEmpty())
+        return base;
+
+    return QString{"%1, %2"}.arg(base).arg(additional);
+}
+
+} // namespace
+
 UserPickerHelper::UserPickerHelper(
     SystemContext* context,
     bool acceptAll,
     const QnUuidSet& ids,
     const QnSubjectValidationPolicy* policy,
-    bool isIntermediateStateValid)
+    bool isIntermediateStateValid,
+    const UserPickerHelperParameters& parameters)
     :
     SystemContextAware{context},
-    m_acceptAll{acceptAll}
+    m_acceptAll{acceptAll},
+    m_parameters{parameters}
 {
+    NX_ASSERT(m_parameters.additionalUsers >= m_parameters.additionalValidUsers);
+
     nx::vms::common::getUsersAndGroups(context, ids, m_users, m_groups);
-    const auto validity = policy->validity(acceptAll, ids);
-    m_isValid = validity == QValidator::Acceptable
-        || (validity == QValidator::Intermediate && isIntermediateStateValid);
+
+    if (!policy->isEmptySelectionAllowed() && !acceptAll && ids.empty())
+    {
+        m_isValid = m_parameters.additionalUsers > 0
+            && m_parameters.additionalValidUsers == m_parameters.additionalUsers;
+    }
+    else
+    {
+        const auto validity = policy->validity(acceptAll, ids);
+        const auto isAdditionalValid =
+            m_parameters.additionalValidUsers == m_parameters.additionalUsers;
+        m_isValid = (validity == QValidator::Acceptable && isAdditionalValid)
+            || (validity == QValidator::Intermediate && isIntermediateStateValid);
+    }
 }
 
 QString UserPickerHelper::text() const
 {
+    const auto additional = m_parameters.additionalUsers == 0
+        ? QString{}
+        : tr("%n additional", "", m_parameters.additionalUsers);
+
     if (m_acceptAll)
-        return tr("All Users");
+        return makeText(tr("All Users"), additional);
 
     if (m_users.empty() && m_groups.empty())
-        return tr("Select at least one user");
+        return m_parameters.additionalUsers == 0 ? tr("Select at least one user") : additional;
 
     if (m_users.size() == 1 && m_groups.empty())
-        return m_users.front()->getName();
+        return makeText(m_users.front()->getName(), additional);
 
     if (m_users.empty() && m_groups.size() == 1)
     {
-        return QString("%1 %2 %3")
+        const auto groupText = QString("%1 %2 %3")
             .arg(tr("Group"))
             .arg(QChar(0x2013)) //< En-dash.
             .arg(m_groups.front().name);
+        return makeText(groupText, additional);
     }
 
     if (m_groups.empty())
-        return tr("%n Users", "", m_users.size());
+        return makeText(tr("%n Users", "", m_users.size()), additional);
 
     if (!m_users.empty())
     {
-        return QString("%1, %2")
+        const auto usersText = QString("%1, %2")
             .arg(tr("%n Groups", "", m_groups.size()))
             .arg(tr("%n Users", "", m_users.size()));
+        return makeText(usersText, additional);
     }
 
     if (m_groups.size() == kAllPowerUserGroupIds.size() && std::all_of(m_groups.cbegin(), m_groups.cend(),
         [](const api::UserGroupData& group) { return kAllPowerUserGroupIds.contains(group.id); }))
     {
-        return tr("All Power Users");
+        return makeText(tr("All Power Users"), additional);
     }
 
-    return tr("%n Groups", "", m_groups.size());
+    return makeText(tr("%n Groups", "", m_groups.size()), additional);
 }
 
 QIcon UserPickerHelper::icon() const
@@ -81,10 +117,11 @@ QIcon UserPickerHelper::icon() const
             /*correctDevicePixelRatio*/ false);
     }
 
-    if (m_users.isEmpty() && m_groups.empty())
+    if (m_users.isEmpty() && m_groups.empty() && m_parameters.additionalUsers == 0)
         return qnSkin->icon("tree/user_alert.svg");
 
-    const bool multiple = m_users.size() > 1 || !m_groups.empty();
+    const auto users = m_users.size() + m_parameters.additionalUsers;
+    const bool multiple = users > 1 || !m_groups.empty();
     const QIcon icon = qnSkin->icon(multiple
         ? (m_isValid ? "tree/users.svg" : "tree/users_alert.svg")
         : (m_isValid ? "tree/user.svg" : "tree/user_alert.svg"));
