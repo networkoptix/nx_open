@@ -573,6 +573,7 @@ void QnClientModule::initSingletons()
     // Depends on QnClientSettings, is never used directly.
     commonModule->store(new QnClientAutoRunWatcher());
 
+    m_performanceMonitor.reset(new nx::vms::client::desktop::PerformanceMonitor());
     m_radassController = commonModule->store(new RadassController());
 
 
@@ -637,7 +638,6 @@ void QnClientModule::initSingletons()
     rest::ServerConnection::setDebugFlag(rest::ServerConnection::DebugFlag::disableThumbnailRequests,
         ini().debugDisableCameraThumbnails);
 
-    m_performanceMonitor.reset(new nx::vms::client::desktop::PerformanceMonitor());
     m_licenseHealthWatcher.reset(new nx::vms::client::desktop::LicenseHealthWatcher(commonModule->licensePool()));
 
     d->debugInfoStorage = std::make_unique<nx::vms::client::desktop::DebugInfoStorage>();
