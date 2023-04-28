@@ -29,13 +29,48 @@ LookupListModel::~LookupListModel()
 
 QVariant LookupListModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (role != Qt::DisplayRole || orientation != Qt::Orientation::Horizontal)
-        return QVariant();
-
-    if (section == kCheckBoxColumnIndex)
+    if (orientation != Qt::Orientation::Horizontal)
         return {};
 
-    return attribute(m_data, section);
+    switch (role)
+    {
+        case Qt::DisplayRole:
+        {
+            if (section == kCheckBoxColumnIndex)
+                return {};
+            else
+                return attribute(m_data, section);
+        }
+        case Qt::CheckStateRole:
+        {
+            if (section == kCheckBoxColumnIndex)
+                return m_tempHeaderCheckBoxState;
+            else
+                return {};
+        }
+    }
+
+    NX_ASSERT("Unexpected header role");
+    return {};
+}
+
+bool LookupListModel::setHeaderData(
+    int section,
+    Qt::Orientation orientation,
+    const QVariant& value,
+    int role)
+{
+    if (section < 0
+        || section >= columnCount()
+        || orientation != Qt::Horizontal
+        || role != Qt::CheckStateRole)
+    {
+        return false;
+    }
+
+    m_tempHeaderCheckBoxState = static_cast<Qt::CheckState>(value.toInt());
+
+    return true;
 }
 
 int LookupListModel::rowCount(const QModelIndex& parent) const

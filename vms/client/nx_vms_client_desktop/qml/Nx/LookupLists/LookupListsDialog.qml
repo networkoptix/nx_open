@@ -185,6 +185,7 @@ Dialog
             LookupListTable
             {
                 id: tableView
+
                 model: store.selectedListModel
 
                 anchors
@@ -218,7 +219,7 @@ Dialog
             ComboBox
             {
                 id: listComboBox
-                model: store.listsModel
+                model: store ? store.listsModel : null
                 enabled: !!currentList
                 textRole: "display"
                 valueRole: "value"

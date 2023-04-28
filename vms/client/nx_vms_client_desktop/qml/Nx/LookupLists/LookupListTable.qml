@@ -13,101 +13,89 @@ import Nx.Dialogs
 
 import nx.vms.client.desktop
 
-Control
+TableView
 {
     id: control
-    property alias model: tableView.model
 
-    contentItem: Column
+    function getColumnWidth(columnIndex)
     {
-        HorizontalHeaderView
-        {
-            id: horizontalHeader
-            syncView: tableView
+        return Math.max(124, getButtonItem(columnIndex).implicitWidth)
+    }
 
-            delegate: Rectangle
+    columnSpacing: 0
+    rowSpacing: 0
+
+    horizontalHeaderVisible: true
+
+    columnWidthProvider: function (columnIndex)
+    {
+        if (isCheckboxColumn(control.model, columnIndex))
+            return Math.min(getButtonItem(columnIndex).implicitWidth, 124)
+
+        // Stretch the last column to the entire free width.
+        if (columnIndex === columns - 1)
+        {
+            let occupiedSpace = 0
+            for (let i = 0; i < columns - 2; ++i)
+                occupiedSpace += getColumnWidth(columnIndex)
+
+            return width - occupiedSpace
+        }
+
+        return getColumnWidth(columnIndex)
+    }
+
+    DelegateChooser
+    {
+        id: chooser
+
+        role: "type"
+
+        DelegateChoice
+        {
+            roleValue: "checkbox"
+
+            Rectangle
+            {
+                implicitWidth: 28
+                implicitHeight: 28
+                color: ColorTheme.colors.dark7
+
+                CheckBox
+                {
+                    x: 8
+                    y: 6
+                    anchors.verticalCenter: parent.verticalCenter
+                    // checked: control.model["checked"]
+                }
+            }
+        }
+
+        DelegateChoice
+        {
+            roleValue: "text"
+
+            Rectangle
             {
                 implicitWidth: Math.max(124, title.implicitWidth)
                 implicitHeight: 28
                 color: ColorTheme.colors.dark7
 
+                required property bool selected
+
                 Text
                 {
                     id: title
+
                     x: 8
                     y: 6
-                    text: display || ""
-                    font.bold: true
-                    color: ColorTheme.text
+
+                    text: display || qsTr("NONE")
+                    color: display ? ColorTheme.light : ColorTheme.colors.dark17
                 }
             }
-        }
-
-        Rectangle
-        {
-            width: control.width
-            height: 1
-            color: ColorTheme.dark
-        }
-
-        TableView
-        {
-            id: tableView
-            width: control.width
-            height: control.height - y
-
-            columnSpacing: 0
-            rowSpacing: 0
-            clip: true
-
-            DelegateChooser
-            {
-                id: chooser
-                role: "type"
-                DelegateChoice
-                {
-                    roleValue: "checkbox"
-
-                    Rectangle
-                    {
-                        implicitWidth: 28
-                        implicitHeight: 28
-                        color: ColorTheme.colors.dark7
-
-                        CheckBox
-                        {
-                            x: 8
-                            y: 6
-                            // checked: tableView.model["checked"]
-                        }
-                    }
-                }
-
-                DelegateChoice
-                {
-                    roleValue: "text"
-
-                    Rectangle
-                    {
-                        implicitWidth: Math.max(124, title.implicitWidth)
-                        implicitHeight: 28
-                        color: ColorTheme.colors.dark7
-
-                        required property bool selected
-
-                        Text
-                        {
-                            id: title
-                            x: 8
-                            y: 6
-                            text: display || qsTr("NONE")
-                            color: display ? ColorTheme.light : ColorTheme.colors.dark17
-                        }
-                    }
-                }
-            }
-
-            delegate: chooser
         }
     }
+
+    delegate: chooser
 }

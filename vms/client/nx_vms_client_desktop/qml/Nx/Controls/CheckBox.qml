@@ -67,6 +67,8 @@ CheckBox
             text: control.text
             opacity: checkIndicator.opacity
             color: checkIndicator.color
+
+            visible: text
         }
     }
 

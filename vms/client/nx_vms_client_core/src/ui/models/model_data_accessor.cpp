@@ -64,11 +64,22 @@ void ModelDataAccessor::setModel(const QVariant& modelVariant)
             emit dataChanged(topLeft.row(), bottomRight.row());
         });
 
+    connect(m_model, &QAbstractItemModel::headerDataChanged, this,
+        [this](Qt::Orientation orientation, int first, int last)
+        {
+            NX_ASSERT(orientation == Qt::Horizontal, "Only Horizontal header is supported");
+            emit headerDataChanged(orientation, first, last);
+        });
+
     emit countChanged();
 
     const auto rowCount = count();
     if (rowCount > 0)
         emit dataChanged(0, rowCount - 1);
+
+    const auto columnCount = m_model ? m_model->columnCount() : 0;
+    if (columnCount > 0)
+        emit headerDataChanged(Qt::Horizontal, 0, columnCount - 1);
 }
 
 int ModelDataAccessor::count() const
@@ -93,6 +104,18 @@ QVariant ModelDataAccessor::getData(const QModelIndex& index, const QString& rol
         return QVariant();
 
     return m_model->data(index, role);
+}
+
+bool ModelDataAccessor::setHeaderData(
+    int section,
+    Qt::Orientation orientation,
+    const QVariant& value,
+    int role)
+{
+    if (!m_model)
+        return false;
+
+    return m_model->setHeaderData(section, orientation, value, role);
 }
 
 } // namespace client
