@@ -135,6 +135,7 @@ SystemContext::SystemContext(
             d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
             break;
         case Mode::unitTests:
+            d->lookupListManager = std::make_unique<LookupListManager>();
             d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(this);
             d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
             break;

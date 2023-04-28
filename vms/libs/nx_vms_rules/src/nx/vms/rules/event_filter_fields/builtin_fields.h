@@ -15,6 +15,7 @@
 #include "input_port_field.h"
 #include "int_field.h"
 #include "keywords_field.h"
+#include "lookup_field.h"
 #include "source_camera_field.h"
 #include "source_server_field.h"
 #include "source_user_field.h"

@@ -41,6 +41,7 @@
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/log_settings.h>
 #include <nx/vms/api/data/login.h>
+#include <nx/vms/api/data/lookup_list_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/overlapped_id_data.h>
@@ -805,6 +806,10 @@ public:
         const QString& action,
         const QString& value,
         PostCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle getLookupLists(
+        Result<ErrorOrData<nx::vms::api::LookupListDataList>>::type&& callback,
         QThread* targetThread = nullptr);
 
     /** Sends POST request with a response to be a JSON */

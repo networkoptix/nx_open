@@ -4,6 +4,7 @@
 
 #include <memory>
 
+#include <api/server_rest_connection_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 #include "model_view/rules_table_model.h"
@@ -53,6 +54,7 @@ private:
     void rejectChanges();
     void resetToDefaults();
     void deleteCurrentRule();
+    void initialiseLookupLists();
 
 private:
     std::unique_ptr<Ui::RulesDialog> m_ui;
@@ -63,6 +65,8 @@ private:
     RulesTableModel* m_rulesTableModel{nullptr};
     QSortFilterProxyModel* m_rulesFilterModel{nullptr};
     std::weak_ptr<SimplifiedRule> m_displayedRule;
+
+    std::optional<rest::Handle> m_lookupListsRequestId;
 };
 
 } // namespace nx::vms::client::desktop::rules

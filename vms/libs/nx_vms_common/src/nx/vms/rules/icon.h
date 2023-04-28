@@ -18,4 +18,4 @@ NX_REFLECTION_ENUM_CLASS(Icon,
     resource,
     custom)
 
-} // namespace nx::vms::api::rules
+} // namespace nx::vms::rules

@@ -493,9 +493,9 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& se
     {
         std::unique_ptr<EventFilterField> field;
         const auto serializedFieldIt = serialized.fields.find(fieldDescriptor.fieldName);
-        if (serializedFieldIt != serialized.fields.end())
+        if (serializedFieldIt != serialized.fields.end()
+            && NX_ASSERT(serializedFieldIt->second.type == fieldDescriptor.id))
         {
-            NX_ASSERT(serializedFieldIt->second.type == fieldDescriptor.id);
             field = buildEventField(serializedFieldIt->second);
         }
         else //< As the field isn't present in the received serialized filter, make a default one.

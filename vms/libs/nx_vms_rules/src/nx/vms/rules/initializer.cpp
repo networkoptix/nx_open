@@ -87,6 +87,9 @@ void Initializer::registerFields() const
     registerEventField<InputPortField>();
     registerEventField<IntField>();
     registerEventField<KeywordsField>();
+    m_engine->registerEventField(
+        fieldMetatype<LookupField>(),
+        [this] { return new LookupField(this->m_context); });
     registerEventField<SourceCameraField>();
     registerEventField<SourceServerField>();
     m_engine->registerEventField(
