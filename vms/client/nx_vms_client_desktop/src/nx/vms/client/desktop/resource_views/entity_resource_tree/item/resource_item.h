@@ -35,8 +35,6 @@ private:
     QVariant cameraGroupIdData() const;
     void initCameraGroupIdNotifications();
 
-    QVariant globalPermissionsData() const;
-
     QVariant customGroupIdData() const;
     void initCustomGroupIdNotifications();
 
@@ -67,9 +65,6 @@ private:
     mutable QVariant m_parentResourceCache;
 
     mutable QVariant m_cameraGroupIdCache;
-
-    mutable std::once_flag m_globalPermissionsFlag;
-    mutable QVariant m_globalPermissionsCache;
 
     mutable QVariant m_customGroupIdCache;
 

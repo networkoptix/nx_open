@@ -8,7 +8,6 @@
 #include <client_core/client_core_module.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>

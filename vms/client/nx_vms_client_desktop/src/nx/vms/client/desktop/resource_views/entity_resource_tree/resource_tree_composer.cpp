@@ -5,7 +5,6 @@
 #include <functional>
 
 #include <client/client_globals.h>
-#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>

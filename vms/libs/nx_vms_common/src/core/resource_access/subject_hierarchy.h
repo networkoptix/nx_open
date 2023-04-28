@@ -50,6 +50,12 @@ public:
     /** Checks whether the subject is a direct or indirect member of any of specified parents. */
     bool isRecursiveMember(const QnUuid& subject, const QSet<QnUuid>& parents) const;
 
+    /**
+     * Checks whether the subject belongs to a set of specified subjects and their direct and
+     * indirect members.
+     */
+    bool isWithin(const QnUuid& subject, const QSet<QnUuid>& subjects) const;
+
     /** Clears the entire hierarchy. Emits `reset` signal. */
     void clear();
 

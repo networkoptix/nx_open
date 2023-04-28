@@ -66,13 +66,6 @@ ResourceAccessSubjectHierarchy* QnCommonModuleAware::accessSubjectHierarchy() co
         : nullptr;
 }
 
-QnGlobalPermissionsManager* QnCommonModuleAware::globalPermissionsManager() const
-{
-    return NX_ASSERT(m_commonModule)
-        ? m_commonModule->systemContext()->globalPermissionsManager()
-        : nullptr;
-}
-
 UserGroupManager* QnCommonModuleAware::userGroupManager() const
 {
     return NX_ASSERT(m_commonModule)

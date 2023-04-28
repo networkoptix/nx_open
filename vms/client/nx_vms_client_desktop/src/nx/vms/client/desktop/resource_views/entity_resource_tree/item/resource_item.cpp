@@ -12,7 +12,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
@@ -124,9 +123,6 @@ QVariant ResourceItem::data(int role) const
 
         case Qn::CameraGroupIdRole:
             return cameraGroupIdData();
-
-        case Qn::GlobalPermissionsRole:
-            return globalPermissionsData();
 
         case Qn::ResourceTreeCustomGroupIdRole:
             return customGroupIdData();
@@ -388,34 +384,6 @@ QVariant ResourceItem::parentResourceData() const
         m_parentResourceCache = QVariant::fromValue<QnResourcePtr>(m_resource->getParentResource());
 
     return m_parentResourceCache;
-}
-
-QVariant ResourceItem::globalPermissionsData() const
-{
-    if (!isUser())
-        return QVariant();
-
-    const auto initNotifications =
-        [this]
-        {
-            const auto user = m_resource.staticCast<QnUserResource>();
-            m_connectionsGuard.add(user->connect(user.get(), &QnUserResource::permissionsChanged,
-                [this] { discardCache(m_globalPermissionsCache, {Qn::GlobalPermissionsRole}); }));
-        };
-
-    std::call_once(m_parentResourceFlag, initNotifications);
-
-    if (m_globalPermissionsCache.isNull())
-    {
-        using namespace nx::vms::api;
-
-        const auto user = m_resource.staticCast<QnUserResource>();
-        const auto permissionsManager = user->systemContext()->globalPermissionsManager();
-        m_globalPermissionsCache =
-            QVariant::fromValue<GlobalPermissions>(permissionsManager->globalPermissions(user));
-    }
-
-    return m_globalPermissionsCache;
 }
 
 QVariant ResourceItem::customGroupIdData() const

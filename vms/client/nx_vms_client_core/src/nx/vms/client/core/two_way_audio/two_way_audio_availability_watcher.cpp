@@ -3,7 +3,6 @@
 #include "two_way_audio_availability_watcher.h"
 
 #include <core/resource/camera_resource.h>
-#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
@@ -77,30 +76,32 @@ void TwoWayAudioAvailabilityWatcher::Private::updateAvailability()
 {
     const bool isAvailable =
         [this]()
-    {
-        if (!audioOutput || !sourceCamera)
-            return false;
+        {
+            if (!audioOutput || !sourceCamera)
+                return false;
 
-        if (!sourceCamera->isTwoWayAudioEnabled() || !audioOutput->hasTwoWayAudio())
-            return false;
+            if (!sourceCamera->isTwoWayAudioEnabled() || !audioOutput->hasTwoWayAudio())
+                return false;
 
-        auto systemContext = SystemContext::fromResource(sourceCamera);
-        const auto user = systemContext->userWatcher()->user();
-        if (!user)
-            return false;
+            auto systemContext = SystemContext::fromResource(sourceCamera);
+            const auto user = systemContext->userWatcher()->user();
+            if (!user)
+                return false;
 
-        const auto manager = systemContext->globalPermissionsManager();
-        if (!manager->hasGlobalPermission(user, GlobalPermission::userInput))
-            return false;
+            if (!systemContext->resourceAccessManager()->hasPermission(
+                user, sourceCamera, Qn::TwoWayAudioPermission))
+            {
+                return false;
+            }
 
-        if (!sourceCamera->isOnline() || !audioOutput->isOnline())
-            return false;
+            if (!sourceCamera->isOnline() || !audioOutput->isOnline())
+                return false;
 
-        if (helper)
-            return helper->status() == nx::vms::license::UsageStatus::used;
+            if (helper)
+                return helper->status() == nx::vms::license::UsageStatus::used;
 
-        return true;
-    }();
+            return true;
+        }();
 
     setAvailable(isAvailable);
 }

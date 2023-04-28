@@ -5,8 +5,9 @@
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -26,20 +27,36 @@ ContextCurrentUserWatcher::ContextCurrentUserWatcher(QObject *parent):
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &ContextCurrentUserWatcher::at_resourcePool_resourceRemoved);
 
-    connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
-        this,
-        [this](const QnResourceAccessSubject& subject, GlobalPermissions /*value*/)
+    connect(systemContext()->globalPermissionsWatcher(),
+        &nx::core::access::GlobalPermissionsWatcher::ownGlobalPermissionsChanged, this,
+        [this](const QnUuid& subjectId)
         {
-            if (!subject.user() || subject.user() != m_user)
+            if (!m_user || m_user->hasFlags(Qn::removed))
                 return;
 
-            /* We may get globalPermissionsChanged when user is removed. */
+            if (systemContext()->accessSubjectHierarchy()->isWithin(m_user->getId(), {subjectId}))
+                reconnect();
+        });
+
+    connect(systemContext()->accessSubjectHierarchy(),
+        &nx::core::access::SubjectHierarchy::changed, this,
+        [this](
+            const QSet<QnUuid>& /*added*/,
+            const QSet<QnUuid>& /*removed*/,
+            const QSet<QnUuid>& /*groupsWithChangedMembers*/,
+            const QSet<QnUuid>& subjectsWithChangedParents)
+        {
+            if (!m_user || m_user->hasFlags(Qn::removed))
+                return;
+
             if (resourcePool()->getResourceById(m_user->getId()))
                 reconnect();
         });
 }
 
-ContextCurrentUserWatcher::~ContextCurrentUserWatcher() {}
+ContextCurrentUserWatcher::~ContextCurrentUserWatcher()
+{
+}
 
 bool ContextCurrentUserWatcher::tryClose(bool force)
 {

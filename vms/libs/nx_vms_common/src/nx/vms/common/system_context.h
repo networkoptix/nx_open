@@ -217,17 +217,16 @@ public:
      * Manages which Resources are directly shared with Users or Roles.
      */
     nx::core::access::AccessRightsManager* accessRightsManager() const;
+
+    /**
+     * Keeps track of User and User Group own global permissions and notifies about their changes.
+     */
     nx::core::access::GlobalPermissionsWatcher* globalPermissionsWatcher() const;
 
     /**
      * Manages which permissions User has on each of its accessible Resources.
      */
     QnResourceAccessManager* resourceAccessManager() const;
-
-    /**
-     * Manages which global permissions each User or Role has.
-     */
-    QnGlobalPermissionsManager* globalPermissionsManager() const;
 
     /**
      * Manages relations between Users and Groups.
