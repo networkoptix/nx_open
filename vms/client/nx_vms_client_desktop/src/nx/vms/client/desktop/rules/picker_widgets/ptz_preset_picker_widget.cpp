@@ -29,7 +29,6 @@ void PtzPresetPicker::updateUi()
     if (!NX_ASSERT(cameraField))
         return;
 
-    m_comboBox->clear();
     m_presets.clear();
     m_ptzController.reset();
 
