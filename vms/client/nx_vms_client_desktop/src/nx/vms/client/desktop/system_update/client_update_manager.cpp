@@ -17,8 +17,11 @@
 #include <nx/build_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/vms/api/data/client_update_settings.h>
+#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -97,8 +100,8 @@ public:
     void handleUpdateContents(UpdateContents newContents);
     void handleUpdateStateChanged(ClientUpdateTool::State state);
 
-    common::api::ClientUpdateSettings globalClientUpdateSettings() const;
-    void setGlobalClientUpdateSettings(const common::api::ClientUpdateSettings& settings);
+    nx::vms::api::ClientUpdateSettings globalClientUpdateSettings() const;
+    void setGlobalClientUpdateSettings(const nx::vms::api::ClientUpdateSettings& settings);
 
 public:
     ClientUpdateManager* q = nullptr;
@@ -145,8 +148,8 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
         this,
         &Private::handleConnectionStateChanged);
 
-    connect(systemSettings(),
-        &SystemSettings::clientUpdateSettingsChanged,
+    connect(systemContext()->systemSettingsManager(),
+        &core::SystemSettingsManager::systemSettingsChanged,
         this,
         &Private::handleClientUpdateSettingsChanged);
 
@@ -356,7 +359,7 @@ void ClientUpdateManager::Private::disableClientAutoUpdateNofitication()
 
     hideClientAutoUpdateNofitication();
 
-    common::api::ClientUpdateSettings settings = globalClientUpdateSettings();
+    auto settings = globalClientUpdateSettings();
     settings.showFeatureInformer = false;
     setGlobalClientUpdateSettings(settings);
 }
@@ -409,10 +412,10 @@ void ClientUpdateManager::Private::setEnabled(bool enabled)
 
     if (connected && enabled != globalClientUpdateSettings().enabled)
     {
-        common::api::ClientUpdateSettings settings;
+        nx::vms::api::ClientUpdateSettings settings;
         settings.enabled = enabled;
         settings.showFeatureInformer = false;
-        settings.updateEnabledTimestamp =
+        settings.updateEnabledTimestampMs =
             enabled ? qnSyncTime->value() : 0ms;
         setGlobalClientUpdateSettings(settings);
     }
@@ -472,13 +475,13 @@ void ClientUpdateManager::Private::planUpdate()
     }
 
     milliseconds kUpdatesProhibitedSinceActivationPeriod = 24h;
-    const auto updateAllowedSince = globalClientUpdateSettings().updateEnabledTimestamp
+    const auto updateAllowedSince = globalClientUpdateSettings().updateEnabledTimestampMs
         + kUpdatesProhibitedSinceActivationPeriod;
 
     const UpdateDate plannedDate = calculateUpdateDate(
         qnSyncTime->value(),
         updateContents.info,
-        systemSettings()->localSystemId(),
+        QnUuid(systemContext()->systemSettings()->localSystemId),
         updateAllowedSince);
 
     generatedUpdateDateTime = plannedDate.date;
@@ -508,16 +511,16 @@ void ClientUpdateManager::Private::handleClientUpdateSettingsChanged()
     if (!connected)
         return;
 
-    const common::api::ClientUpdateSettings settings = globalClientUpdateSettings();
+    const auto settings = globalClientUpdateSettings();
 
     NX_VERBOSE(this,
         "Global client update settings chaged. Enabled: %1, pending version: %2, planned date: %3",
         settings.enabled,
         settings.pendingVersion,
-        QDateTime::fromMSecsSinceEpoch(settings.plannedInstallationDate.count()));
+        QDateTime::fromMSecsSinceEpoch(settings.plannedInstallationDateMs.count()));
 
     setEnabled(settings.enabled);
-    setGlobalPlannedUpdate(settings.pendingVersion, settings.plannedInstallationDate);
+    setGlobalPlannedUpdate(settings.pendingVersion, settings.plannedInstallationDateMs);
 
     if (settings.enabled && settings.showFeatureInformer)
         notifyUserAboutClientAutoUpdate();
@@ -654,16 +657,16 @@ void ClientUpdateManager::Private::handleUpdateStateChanged(ClientUpdateTool::St
     emit q->errorMessageChanged();
 }
 
-common::api::ClientUpdateSettings ClientUpdateManager::Private::globalClientUpdateSettings() const
+nx::vms::api::ClientUpdateSettings ClientUpdateManager::Private::globalClientUpdateSettings() const
 {
-    return systemSettings()->clientUpdateSettings();
+    return systemContext()->systemSettings()->clientUpdateSettings;
 }
 
 void ClientUpdateManager::Private::setGlobalClientUpdateSettings(
-    const common::api::ClientUpdateSettings& settings)
+    const nx::vms::api::ClientUpdateSettings& settings)
 {
-    systemSettings()->setClientUpdateSettings(settings);
-    systemSettings()->synchronizeNow();
+    systemContext()->systemSettings()->clientUpdateSettings = settings;
+    systemContext()->systemSettingsManager()->saveSystemSettings();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -743,9 +746,9 @@ void ClientUpdateManager::speedUpCurrentUpdate()
         return;
     }
 
-    common::api::ClientUpdateSettings settings = d->globalClientUpdateSettings();
+    auto settings = d->globalClientUpdateSettings();
     settings.pendingVersion = d->updateContents.info.version;
-    settings.plannedInstallationDate = qnSyncTime->value();
+    settings.plannedInstallationDateMs = qnSyncTime->value();
     d->setGlobalClientUpdateSettings(settings);
 }
 

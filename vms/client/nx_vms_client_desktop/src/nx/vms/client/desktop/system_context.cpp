@@ -207,6 +207,11 @@ RestApiHelper* SystemContext::restApiHelper() const
     return d->restApiHelper.get();
 }
 
+common::SessionTokenHelperPtr SystemContext::getSessionTokenHelper() const
+{
+    return d->restApiHelper->getSessionTokenHelper();
+}
+
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     base_type::setMessageProcessor(messageProcessor);

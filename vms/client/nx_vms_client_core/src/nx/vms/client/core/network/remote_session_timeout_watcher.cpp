@@ -38,7 +38,7 @@ constexpr auto kLastNotificationTime = 10min;
 struct RemoteSessionTimeoutWatcher::Private
 {
     std::weak_ptr<RemoteSession> session;
-    std::optional<std::chrono::minutes> passwordSessionTimeoutLimit;
+    std::optional<std::chrono::seconds> passwordSessionTimeoutLimit;
     std::optional<std::chrono::microseconds> passwordEnteredAt;
 
     std::optional<std::chrono::seconds> timeLeftWhenCancelled;

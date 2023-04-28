@@ -50,7 +50,7 @@ private:
     };
 
 private:
-    std::optional<std::chrono::minutes> calculateSessionLimit() const;
+    std::optional<std::chrono::seconds> calculateSessionLimit() const;
     void showArchiveEncryptionPasswordDialog(bool viaButton);
     void updateLimitSessionControls();
 

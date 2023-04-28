@@ -22,6 +22,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/data/server_model.h>
+#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/data/user_group_model.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -619,14 +620,8 @@ void ResourcesChangesManager::saveServer(const QnMediaServerResourcePtr& server,
         auto modifiedProperties = resourcePropertyDictionary()->modifiedProperties(server->getId());
 
         std::map<QString, QJsonValue> result;
-
-        auto itr = modifiedProperties.find(server->getId());
-        if (itr != modifiedProperties.end())
-        {
-            const QMap<QString, QString>& properties = itr.value();
-            for (auto itr = properties.begin(); itr != properties.end(); ++itr)
-                result[itr.key()] = QJsonValue(itr.value());
-        }
+        for (auto itr = modifiedProperties.begin(); itr != modifiedProperties.end(); ++itr)
+            result[itr.key()] = QJsonValue(itr.value());
 
         body.parameters = result;
 

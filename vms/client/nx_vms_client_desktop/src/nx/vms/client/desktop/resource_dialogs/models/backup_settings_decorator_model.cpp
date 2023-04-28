@@ -12,6 +12,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/utils.h>
 #include <nx/vms/api/data/backup_settings.h>
+#include <nx/vms/api/data/system_settings.h>
+#include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -495,8 +497,10 @@ void BackupSettingsDecoratorModel::applyChanges()
 
     if (m_changedGlobalBackupSettings)
     {
-        systemSettings()->setBackupSettings(*m_changedGlobalBackupSettings);
-        systemSettings()->synchronizeNow();
+        systemContext()->systemSettings()->backupSettings =
+            m_changedGlobalBackupSettings.value();
+
+        systemContext()->systemSettingsManager()->saveSystemSettings();
     }
 
     m_changedContentTypes.clear();

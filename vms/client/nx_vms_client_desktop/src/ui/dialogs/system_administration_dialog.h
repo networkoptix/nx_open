@@ -36,6 +36,9 @@ public:
     explicit QnSystemAdministrationDialog(QWidget* parent = nullptr);
     virtual ~QnSystemAdministrationDialog() override;
 
+    virtual void applyChanges() override;
+    virtual void loadDataToUi() override;
+
 private:
     Q_DISABLE_COPY(QnSystemAdministrationDialog)
     nx::utils::ImplPtr<Ui::QnSystemAdministrationDialog> ui;
