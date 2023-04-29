@@ -153,7 +153,8 @@ struct LdapSettingsWidget::Private
         state.uri = settings.uri.toString();
         state.adminDn = settings.adminDn;
         state.password = settings.adminPassword.value_or("");
-        state.syncTimeoutS = settings.continuousSyncIntervalS.count();
+        state.syncIntervalS = settings.continuousSyncIntervalS.count();
+        state.searchTimeoutS = settings.searchTimeoutS.count();
         for (const auto& filter: settings.filters)
         {
             state.filters.push_back({
@@ -187,7 +188,9 @@ struct LdapSettingsWidget::Private
         settings.adminPassword = state.password.isEmpty()
             ? std::nullopt
             : std::optional<QString>(state.password);
-        settings.continuousSyncIntervalS = std::chrono::seconds(state.syncTimeoutS);
+        settings.continuousSyncIntervalS = std::chrono::seconds(state.syncIntervalS);
+        settings.searchTimeoutS = std::chrono::seconds(state.searchTimeoutS);
+
         settings.filters.clear();
         for (const auto& filter: state.filters)
         {

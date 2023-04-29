@@ -11,6 +11,7 @@ import Nx.Dialogs 1.0
 
 import nx.vms.client.desktop 1.0
 
+import "Components"
 import "../UserManagement/Components"
 
 Dialog
@@ -20,10 +21,14 @@ Dialog
     property alias allowDigest: digestCheckBox.checked
 
     property alias loginAttribute: loginAttributeTextField.text
+    property alias loginAttributeAuto: loginAttributeTextField.auto
     property alias groupObjectClass: groupAttributeTextField.text
+    property alias groupObjectClassAuto: groupAttributeTextField.auto
     property alias memberAttribute: userMembershipAttributeTextField.text
 
-    property alias syncTimeoutS: syncTimeoutSpinBox.value
+    property alias syncIntervalS: syncIntervalSpinBox.seconds
+    property alias searchTimeoutS: searchTimeoutSpinBox.seconds
+
     property alias preferredSyncServer: serverComboBox.selectedServer
 
     modality: Qt.ApplicationModal
@@ -67,45 +72,10 @@ Dialog
             leftSideMargin: 180
             rightSideMargin: 0
 
-            TextFieldWithValidator
+            AutoTextField
             {
                 id: loginAttributeTextField
-
                 width: parent.width
-                focus: true
-                textField.placeholderText: "cn"
-            }
-        }
-
-        CenteredField
-        {
-            text: qsTr("Full Name Attribute")
-
-            leftSideMargin: 180
-            rightSideMargin: 0
-
-            TextFieldWithValidator
-            {
-                id: fullNameAttributeTextField
-
-                width: parent.width
-                textField.placeholderText: "displayName"
-            }
-        }
-
-        CenteredField
-        {
-            text: qsTr("Email Attribute")
-
-            leftSideMargin: 180
-            rightSideMargin: 0
-
-            TextFieldWithValidator
-            {
-                id: emailAttributeTextField
-
-                width: parent.width
-                textField.placeholderText: "mail"
             }
         }
 
@@ -137,12 +107,10 @@ Dialog
             leftSideMargin: 180
             rightSideMargin: 0
 
-            TextFieldWithValidator
+            AutoTextField
             {
                 id: groupAttributeTextField
-
                 width: parent.width
-                textField.placeholderText: "cn"
             }
         }
 
@@ -153,66 +121,32 @@ Dialog
 
         CenteredField
         {
-            text: qsTr("User Membership Attribute")
+            text: qsTr("Group Attribute")
 
             leftSideMargin: 180
             rightSideMargin: 0
 
-            TextFieldWithValidator
-            {
-                id: userMembershipAttributeTextField
-
-                width: parent.width
-                textField.placeholderText: "member"
-            }
-        }
-
-        CenteredField
-        {
-            text: qsTr("Group Members Attribute")
-
-            leftSideMargin: 180
-            rightSideMargin: 0
-
-            TextFieldWithValidator
-            {
-                id: groupMemebersAttributeTextField
-
-                width: parent.width
-                textField.placeholderText: "memberOf"
-            }
-        }
-
-        CenteredField
-        {
-            text: qsTr("Base membership on")
-            textVCenter: true
-
-            leftSideMargin: 180
-            rightSideMargin: 0
-
-            ColumnLayout
+            RowLayout
             {
                 width: parent.width
-                x: -3
 
-                CheckBox
+                TextFieldWithValidator
                 {
-                    id: groupMembershipCheckBox
+                    id: userMembershipAttributeTextField
 
                     Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.topMargin: 6
-                    text: qsTr("Group members")
+                    textField.placeholderText: "member"
+
+                    validateFunc: (text) =>
+                    {
+                        return text ? "" : qsTr("This field cannot be empty")
+                    }
                 }
 
-                CheckBox
+                Item
                 {
-                    id: userMembershipCheckBox
-
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter
-                    text: qsTr("User’s membership")
+                    implicitWidth: loginAttributeTextField.checkBoxWidth
+                    implicitHeight: userMembershipAttributeTextField.height
                 }
             }
         }
@@ -222,55 +156,68 @@ Dialog
             text: qsTr("Misc")
         }
 
-        RowLayout
+        CenteredField
         {
-            Text
-            {
-                font: Qt.font({pixelSize: 14, weight: Font.Normal})
-                color: ColorTheme.colors.light16
-                text: qsTr("Synchronization Timeout")
-            }
+            text: qsTr("Synchronisation<br>Interval")
 
-            SpinBox
-            {
-                id: syncTimeoutSpinBox
+            leftSideMargin: 180
+            rightSideMargin: 0
 
-                from: 0
-                to: 30
-            }
-
-            Text
+            TimeDuration
             {
-                font: Qt.font({pixelSize: 14, weight: Font.Normal})
-                color: ColorTheme.colors.light16
-                text: qsTr("sec")
+                id: syncIntervalSpinBox
             }
         }
 
-        RowLayout
+        CenteredField
         {
-            width: parent.width
+            text: qsTr("Search Timeout")
 
-            Text
+            leftSideMargin: 180
+            rightSideMargin: 0
+
+            TimeDuration
             {
-                font: Qt.font({pixelSize: 14, weight: Font.Normal})
-                color: ColorTheme.colors.light16
-                text: qsTr("Proxy LDAP requests via server")
+                id: searchTimeoutSpinBox
             }
+        }
 
-            ServerComboBox
+        CenteredField
+        {
+            text: qsTr("Proxy LDAP requests<br>via server")
+
+            leftSideMargin: 180
+            rightSideMargin: 0
+
+            RowLayout
             {
-                id: serverComboBox
+                width: parent.width
 
-                Layout.fillWidth: true
+                ServerComboBox
+                {
+                    id: serverComboBox
+
+                    Layout.fillWidth: true
+                }
+
+                Item
+                {
+                    implicitWidth: loginAttributeTextField.checkBoxWidth
+                    implicitHeight: serverComboBox.height
+                }
             }
         }
     }
 
     function accept()
     {
-        dialog.accepted()
-        dialog.close()
+        if (loginAttributeTextField.validate()
+            && groupAttributeTextField.validate()
+            && userMembershipAttributeTextField.validate())
+        {
+            dialog.accepted()
+            dialog.close()
+        }
     }
 
     buttonBox: DialogButtonBox

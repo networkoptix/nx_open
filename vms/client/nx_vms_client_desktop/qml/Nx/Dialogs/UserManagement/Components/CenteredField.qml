@@ -18,7 +18,7 @@ Item
     property real leftSideMargin: 240
     property real rightSideMargin: 240
 
-    property bool textVCenter: false
+    property real labelHeight: 28
 
     Item
     {
@@ -36,9 +36,14 @@ Item
     Text
     {
         id: label
-        height: 16
+
+        horizontalAlignment: Qt.AlignRight
+        verticalAlignment: Qt.AlignVCenter
+
+        height: control.labelHeight > 0 ? control.labelHeight : implicitHeight
+
         anchors.top: parent.top
-        anchors.topMargin: control.textVCenter ? (control.height / 2 - height / 2) : 4
+        anchors.bottom: control.labelHeight > 0 ? undefined : parent.bottom
         anchors.right: innerItem.left
         anchors.rightMargin: 8
 
