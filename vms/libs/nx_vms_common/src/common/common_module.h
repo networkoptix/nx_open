@@ -296,14 +296,6 @@ public:
     QnUuid videowallGuid() const;
     void setVideowallGuid(const QnUuid &uuid);
 
-    /**
-     * Turn on/off connections to the remove peers.
-     * Media server will not receive connections from another peers while it is disabled.
-     * Hive mode is enabled by default.
-     */
-    void setStandAloneMode(bool value);
-    bool isStandAloneMode() const;
-
     nx::utils::SoftwareVersion engineVersion() const;
     void setEngineVersion(const nx::utils::SoftwareVersion& version);
 
@@ -400,7 +392,6 @@ private:
     nx::analytics::taxonomy::AbstractStateWatcher* m_taxonomyStateWatcher = nullptr;
 
     QnUuid m_videowallGuid;
-    bool m_standaloneMode = false;
     std::atomic<bool> m_needToStop{false};
     nx::utils::SoftwareVersion m_engineVersion;
 

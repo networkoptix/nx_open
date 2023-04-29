@@ -419,17 +419,6 @@ void QnCommonModule::setResourceDiscoveryManager(QnResourceDiscoveryManager* dis
     m_resourceDiscoveryManager = discoveryManager;
 }
 
-void QnCommonModule::setStandAloneMode(bool value)
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    if (m_standaloneMode != value)
-    {
-        m_standaloneMode = value;
-        lock.unlock();
-        emit standAloneModeChanged(value);
-    }
-}
-
 nx::metrics::Storage* QnCommonModule::metrics() const
 {
     return m_metrics.get();
@@ -438,11 +427,6 @@ nx::metrics::Storage* QnCommonModule::metrics() const
 std::weak_ptr<nx::metrics::Storage> QnCommonModule::metricsWeakRef() const
 {
     return std::weak_ptr<nx::metrics::Storage>(m_metrics);
-}
-
-bool QnCommonModule::isStandAloneMode() const
-{
-    return m_standaloneMode;
 }
 
 void QnCommonModule::setAuditManager(QnAuditManager* auditManager)
