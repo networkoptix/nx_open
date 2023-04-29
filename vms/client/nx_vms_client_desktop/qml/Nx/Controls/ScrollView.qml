@@ -1,7 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.0
-import QtQuick.Controls 2.4
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Templates as T
 
 import Nx.Controls 1.0
 
@@ -32,7 +33,7 @@ ScrollView
         for (var i = 0; i < children.length; ++i)
         {
             var child = control.children[i]
-            if ((child instanceof ScrollBar)
+            if ((child instanceof T.ScrollBar)
                 && child !== control.ScrollBar.vertical
                 && child !== control.ScrollBar.horizontal)
             {
