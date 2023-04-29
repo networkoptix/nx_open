@@ -14,7 +14,7 @@ ComboBox
 {
     id: control
 
-    property var selectedServer
+    property var selectedServer: NxGlobals.uuid("")
 
     model: ServerListModel
     {

@@ -29,7 +29,8 @@ Rectangle
     property string loginAttribute
     property string groupObjectClass
     property string memberAttribute
-    property int syncTimeoutS
+    property int syncIntervalS: kDefaultSyncIntervalS
+    property int searchTimeoutS: kDefaultSearchTimeoutS
     property bool syncIsRunning
     property bool syncRequested
     property var preferredSyncServer
@@ -42,6 +43,8 @@ Rectangle
 
     readonly property bool showSpinners: (syncIsRunning || syncRequested) && !modified
     readonly property bool showEmptyLdapWarning: userCount <= 0 && groupCount <= 0 && lastSync
+    readonly property int kDefaultSyncIntervalS: 3600 //< 1 hour.
+    readonly property int kDefaultSearchTimeoutS: 60 //< 1 minute.
 
     property var self
     property var testState: LdapSettings.TestState.initial
@@ -68,7 +71,8 @@ Rectangle
                 control.loginAttribute = loginAttribute
                 control.groupObjectClass = groupObjectClass
                 control.memberAttribute = memberAttribute
-                control.syncTimeoutS = syncTimeoutS
+                control.syncIntervalS = syncIntervalS
+                control.searchTimeoutS = searchTimeoutS
                 control.preferredSyncServer = preferredSyncServer
             }
         }
@@ -178,6 +182,12 @@ Rectangle
                 connectionSettingsDialog.initUri = control.uri
                 connectionSettingsDialog.initAdminDn = control.adminDn
                 connectionSettingsDialog.initPassword = control.password
+
+                control.syncIntervalS = kDefaultSyncIntervalS
+                control.searchTimeoutS = kDefaultSearchTimeoutS
+
+                control.loginAttribute = "" //< Auto.
+                control.groupObjectClass = "" //< Auto.
 
                 connectionSettingsDialog.show()
             }
@@ -451,9 +461,15 @@ Rectangle
                             const advancedSettingsDialog = advancedSettingsComponent.createObject(
                                 control)
                             advancedSettingsDialog.loginAttribute = control.loginAttribute
+                            advancedSettingsDialog.loginAttributeAuto =
+                                control.loginAttribute == ""
                             advancedSettingsDialog.groupObjectClass = control.groupObjectClass
+                            advancedSettingsDialog.groupObjectClassAuto =
+                                control.groupObjectClass == ""
+
                             advancedSettingsDialog.memberAttribute = control.memberAttribute
-                            advancedSettingsDialog.syncTimeoutS = control.syncTimeoutS
+                            advancedSettingsDialog.syncIntervalS = control.syncIntervalS
+                            advancedSettingsDialog.searchTimeoutS = control.searchTimeoutS
                             advancedSettingsDialog.preferredSyncServer = control.preferredSyncServer
                             advancedSettingsDialog.show()
                         }

@@ -38,7 +38,8 @@ struct LdapSettings
     Q_PROPERTY(QList<LdapFilter> filters MEMBER filters)
     Q_PROPERTY(bool continuousSync MEMBER continuousSync)
     Q_PROPERTY(bool continuousSyncEditable MEMBER continuousSyncEditable)
-    Q_PROPERTY(int syncTimeoutS MEMBER syncTimeoutS)
+    Q_PROPERTY(int syncIntervalS MEMBER syncIntervalS)
+    Q_PROPERTY(int searchTimeoutS MEMBER searchTimeoutS)
 
     Q_PROPERTY(QString loginAttribute MEMBER loginAttribute)
     Q_PROPERTY(QString groupObjectClass MEMBER groupObjectClass)
@@ -52,9 +53,10 @@ public:
     QString adminDn;
     QString password;
     QList<LdapFilter> filters;
-    bool continuousSync = false;
+    bool continuousSync = true;
     bool continuousSyncEditable = true;
-    int syncTimeoutS = 30;
+    int syncIntervalS = 3600; //< 1 hour.
+    int searchTimeoutS = 60; //< 1 minute.
 
     QString loginAttribute;
     QString groupObjectClass;
