@@ -242,10 +242,6 @@ public:
 
     bool isStarted() const { return m_started; }
 
-    bool isStandAloneMode() const;
-
-    /** Turn on/off connections to the remove peers. */
-    void setStandAloneMode(bool value);
 protected:
     std::unique_ptr<BidirectionRoutingInfo> m_peers;
     PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
@@ -309,7 +305,6 @@ private:
     std::set<vms::api::PeerData> m_lastAlivePeers;
     std::atomic<bool> m_started{false};
     QMap<QnUuid, Connection::State> m_lastConnectionState;
-    std::atomic_bool m_standAloneMode{false};
 };
 
 } // namespace p2p
