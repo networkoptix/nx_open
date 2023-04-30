@@ -9,6 +9,7 @@ import Nx.Core 1.0
 Item
 {
     property int month: 0
+    property int currentMonth: -1
 
     signal monthClicked(int month)
 
@@ -36,9 +37,7 @@ Item
                 border.width: 1
                 border.color: monthButtonMouseArea.containsMouse
                     ? ColorTheme.colors.light12
-                    : current
-                        ? ColorTheme.highlight
-                        : "transparent"
+                    : "transparent"
 
                 radius: 2
 
@@ -51,7 +50,8 @@ Item
                     font.weight: Font.Medium
                     font.capitalization: Font.AllUppercase
 
-                    color: ColorTheme.buttonText
+                    color: (modelData === currentMonth)
+                        ? ColorTheme.highlight : ColorTheme.buttonText
                 }
 
                 MouseArea

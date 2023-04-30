@@ -23,6 +23,8 @@ Item
     property alias allCamerasPeriodStorage: calendarModel.allCamerasPeriodStorage
     property bool periodsVisible: true
 
+    readonly property alias today: d.today
+
     implicitHeight: 32 * 6
 
     QtObject

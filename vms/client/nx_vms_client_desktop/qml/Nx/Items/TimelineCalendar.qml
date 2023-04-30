@@ -283,6 +283,9 @@ Control
             height: calendar.height
             visible: monthPickerVisible
 
+            currentMonth: (visibleYear === daysSelector.today.getFullYear())
+                ? daysSelector.today.getMonth() : -1
+
             Binding
             {
                 target: monthPicker
