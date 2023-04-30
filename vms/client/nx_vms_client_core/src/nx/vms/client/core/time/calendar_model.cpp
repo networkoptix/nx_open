@@ -161,15 +161,7 @@ void CalendarModel::Private::updateArchiveInfo(PeriodStorageType type)
 
     const QnTimePeriodList timePeriods = store->periods(Qn::RecordingContent);
 
-    const int firstMonthDayPosition =
-        [this]() -> int
-        {
-            const auto it = std::find_if(days.begin(), days.end(),
-                [this](const Day& day) { return currentMonth.containsDay(day); });
-            return it == days.end() ? -1 : it - days.begin();
-        }();
-
-    for (int i = firstMonthDayPosition; i < days.size();)
+    for (int i = 0; i < days.size(); /*no increment*/)
     {
         const auto it = timePeriods.findNearestPeriod(days[i].startTime, true);
         if (it == timePeriods.cend())
