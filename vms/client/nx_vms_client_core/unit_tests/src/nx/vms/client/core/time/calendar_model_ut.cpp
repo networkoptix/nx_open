@@ -17,9 +17,11 @@ namespace {
 static const QLocale kTestLocale(QLocale::Russian, QLocale::RussianFederation);
 static constexpr int kTestYear = 2019;
 static constexpr int kTestMonth = 9;
-static const auto kTestMonthStart = QDateTime(QDate(kTestYear, kTestMonth, 1), QTime());
+static const auto kTestMonthStart =
+    QDateTime(QDate(kTestYear, kTestMonth, 1), QTime()); //< Sunday.
+static const auto kFirstVisibleDay =
+    kTestMonthStart.addDays(Qt::Monday - kTestMonthStart.date().dayOfWeek());
 static const auto kTestMonthEnd = kTestMonthStart.addMonths(1).addMSecs(-1);
-static const QString kExpectedNoItem("no item");
 static const QString kExpectedFirstDayOfMonth("1");
 static const QString kExpectedLastDayOfMonth("30");
 
@@ -166,12 +168,27 @@ struct HighlightTestFixture: public TimeTestFixture<testing::TestWithParam<Displ
     using base_type = TimeTestFixture<testing::TestWithParam<DisplayOffsetParams>>;
 
     virtual void SetUp() override;
-    QString findHighlightedRow(int role) const;
+    QDate findHighlightedCell() const;
 
     qint64 firstDayStartTimestamp() const;
     qint64 lastDayEndTimestamp() const;
-    qint64 beforeFirstDayStartTimestamp();
+    qint64 beforeFirstVisibleDayStartTimestamp();
     qint64 afterLastDayStartTimestamp();
+
+    QVariant cellData(int index, int role) const
+    {
+        return model.data(model.index(index), role);
+    }
+
+    bool isCellHighlighted(int index) const
+    {
+        return cellData(index, CalendarModel::HasArchiveRole).toBool();
+    }
+
+    QDateTime cellDate(int index) const
+    {
+        return cellData(index, CalendarModel::DateRole).toDateTime();
+    }
 };
 
 void HighlightTestFixture::SetUp()
@@ -182,19 +199,15 @@ void HighlightTestFixture::SetUp()
     model.setDisplayOffset(params.displayOffset);
 }
 
-QString HighlightTestFixture::findHighlightedRow(int role) const
+QDate HighlightTestFixture::findHighlightedCell() const
 {
-    for (int row = 0; row != model.rowCount(); ++row)
+    for (int index = 0; index != model.rowCount(); ++index)
     {
-        const auto index = model.index(row);
-
-        if (model.data(index, CalendarModel::DateRole).toDateTime() > kTestMonthEnd)
-            break;
-
-        if (model.data(index, role).toBool())
-            return model.data(index, Qt::DisplayRole).toString();
+        const QDateTime date = cellDate(index);
+        if (date <= kTestMonthEnd && isCellHighlighted(index))
+            return date.date();
     }
-    return kExpectedNoItem;
+    return {};
 }
 
 qint64 HighlightTestFixture::firstDayStartTimestamp() const
@@ -207,9 +220,9 @@ qint64 HighlightTestFixture::lastDayEndTimestamp() const
     return kTestMonthEnd.toMSecsSinceEpoch() - model.displayOffset();
 }
 
-qint64 HighlightTestFixture::beforeFirstDayStartTimestamp()
+qint64 HighlightTestFixture::beforeFirstVisibleDayStartTimestamp()
 {
-    return kTestMonthStart.toMSecsSinceEpoch() - model.displayOffset() - 1;
+    return kFirstVisibleDay.toMSecsSinceEpoch() - model.displayOffset() - 1;
 }
 
 qint64 HighlightTestFixture::afterLastDayStartTimestamp()
@@ -267,21 +280,22 @@ TEST_P(ChunkHighlightTestFixture, ChunkStartsInsideFirstDayTest)
 {
     // If chunk starts at the first day of month - we expect the first day in highlighted state.
     setSingleRecordingPeriod(firstDayStartTimestamp(), ChunkDuration::millisecond);
-    ASSERT_EQ(findHighlightedRow(CalendarModel::HasArchiveRole), kExpectedFirstDayOfMonth);
+    EXPECT_EQ(findHighlightedCell(), kTestMonthStart.date());
 }
 
-TEST_P(ChunkHighlightTestFixture, ChunkHoversFirstDayTest)
+TEST_P(ChunkHighlightTestFixture, ChunkHoversFirstVisibleDayTest)
 {
-    // If chunk hovers the first day - we expect the first day in highlighted state.
-    setSingleRecordingPeriod(beforeFirstDayStartTimestamp(), ChunkDuration::milliseconds);
-    ASSERT_EQ(findHighlightedRow(CalendarModel::HasArchiveRole), kExpectedFirstDayOfMonth);
+    // If chunk hovers the first visible day, we expect the first day in highlighted state.
+    setSingleRecordingPeriod(beforeFirstVisibleDayStartTimestamp(), ChunkDuration::milliseconds);
+    EXPECT_TRUE(isCellHighlighted(0));
+    EXPECT_FALSE(isCellHighlighted(1));
 }
 
-TEST_P(ChunkHighlightTestFixture, ChunkEndsBeforeFirstDayTest)
+TEST_P(ChunkHighlightTestFixture, ChunkEndsBeforeFirstVisibleDayTest)
 {
-    // If chunk ends before the first day - we expect nothing highlighted
-    setSingleRecordingPeriod(beforeFirstDayStartTimestamp(), ChunkDuration::millisecond);
-    ASSERT_EQ(findHighlightedRow(CalendarModel::HasArchiveRole), kExpectedNoItem);
+    // If chunk ends before the first day, we expect nothing is highlighted.
+    setSingleRecordingPeriod(beforeFirstVisibleDayStartTimestamp(), ChunkDuration::millisecond);
+    EXPECT_FALSE(isCellHighlighted(0));
 }
 
 TEST_P(ChunkHighlightTestFixture, ChunkStartsAtLastDayTest)
@@ -289,14 +303,14 @@ TEST_P(ChunkHighlightTestFixture, ChunkStartsAtLastDayTest)
     // If chunk starts at the end of the last day of month -
     // we expect the last day in highlighted state.
     setSingleRecordingPeriod(lastDayEndTimestamp(), ChunkDuration::millisecond);
-    ASSERT_EQ(findHighlightedRow(CalendarModel::HasArchiveRole), kExpectedLastDayOfMonth);
+    EXPECT_EQ(findHighlightedCell(), kTestMonthEnd.date());
 }
 
 TEST_P(ChunkHighlightTestFixture, ChunkStartsAfterLastDayTest)
 {
     // If chunk starts after the last day end - we expect nothing highlighted
     setSingleRecordingPeriod(afterLastDayStartTimestamp(), ChunkDuration::millisecond);
-    ASSERT_EQ(findHighlightedRow(CalendarModel::HasArchiveRole), kExpectedNoItem);
+    EXPECT_EQ(findHighlightedCell(), QDate());
 }
 
 INSTANTIATE_TEST_SUITE_P(CalendarModel, ChunkHighlightTestFixture,
