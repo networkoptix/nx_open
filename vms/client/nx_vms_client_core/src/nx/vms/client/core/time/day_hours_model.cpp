@@ -234,7 +234,7 @@ qint64 DayHoursModel::displayOffset() const
 void DayHoursModel::setDisplayOffset(qint64 value)
 {
     value = std::clamp<qint64>(
-        value, CalendarUtils::kMinDisplayOffset, CalendarUtils::kMaxDisplayOffset);
+        value, calendar_utils::kMinDisplayOffset, calendar_utils::kMaxDisplayOffset);
 
     if (d->displayOffset == value)
         return;

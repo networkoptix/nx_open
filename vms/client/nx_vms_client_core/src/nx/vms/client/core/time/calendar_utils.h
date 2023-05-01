@@ -2,27 +2,22 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QDate>
 #include <QtCore/QLocale>
 
-namespace nx::vms::client::core {
+namespace nx::vms::client::core::calendar_utils {
 
-class NX_VMS_CLIENT_CORE_API CalendarUtils
-{
-public:
-    static const int kMinYear;
-    static const int kMaxYear;
+constexpr int kMinYear = 1970;
 
-    static const int kMinMonth;
-    static const int kMaxMonth;
+constexpr int kMinMonth = 1;
+constexpr int kMaxMonth = 12;
 
-    static const int kMinDisplayOffset;
-    static const int kMaxDisplayOffset;
+// According to the Qt documentation time zones offset range is in [-14..14] hours range.
+constexpr int kMaxDisplayOffset = std::chrono::milliseconds(std::chrono::hours(14)).count();
+constexpr int kMinDisplayOffset = -kMaxDisplayOffset;
 
-    static QDate firstWeekStartDate(const QLocale& locale, int year, int month);
+NX_VMS_CLIENT_CORE_API QDate firstWeekStartDate(const QLocale& locale, int year, int month);
 
-private:
-    CalendarUtils() = default;
-};
-
-} // namespace nx::vms::client::core
+} // namespace nx::vms::client::core::calendar_utils

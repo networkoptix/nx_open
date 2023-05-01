@@ -128,7 +128,7 @@ void CalendarModel::Private::resetDaysModelData()
 
     days.clear();
 
-    auto date = CalendarUtils::firstWeekStartDate(locale, currentMonth.year, currentMonth.month);
+    auto date = calendar_utils::firstWeekStartDate(locale, currentMonth.year, currentMonth.month);
     if (!date.isValid())
         return;
 
@@ -300,7 +300,7 @@ int CalendarModel::year() const
 
 void CalendarModel::setYear(int year)
 {
-    year = std::clamp(year, CalendarUtils::kMinYear, CalendarUtils::kMaxYear);
+    year = std::max(year, calendar_utils::kMinYear);
     if (year == d->currentMonth.year)
         return;
 
@@ -317,7 +317,7 @@ int CalendarModel::month() const
 
 void CalendarModel::setMonth(int month)
 {
-    month = std::clamp(month, CalendarUtils::kMinMonth, CalendarUtils::kMaxMonth);
+    month = std::clamp(month, calendar_utils::kMinMonth, calendar_utils::kMaxMonth);
     if (month == d->currentMonth.month)
         return;
 
@@ -356,7 +356,7 @@ qint64 CalendarModel::displayOffset() const
 void CalendarModel::setDisplayOffset(qint64 value)
 {
     value = std::clamp<qint64>(
-        value, CalendarUtils::kMinDisplayOffset, CalendarUtils::kMaxDisplayOffset);
+        value, calendar_utils::kMinDisplayOffset, calendar_utils::kMaxDisplayOffset);
 
     if (d->displayOffset == value)
         return;
