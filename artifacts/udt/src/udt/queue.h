@@ -357,8 +357,7 @@ private:
      */
     void timerCheck();
 
-    Result<> processUnit(
-        std::shared_ptr<Unit> unit, const detail::SocketAddress& addr);
+    Result<> processUnit(Unit unit, const detail::SocketAddress& addr);
 
     void storePkt(int32_t id, std::unique_ptr<CPacket> pkt);
 
