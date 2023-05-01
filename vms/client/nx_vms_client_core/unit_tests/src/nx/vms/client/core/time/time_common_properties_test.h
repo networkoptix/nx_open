@@ -19,20 +19,18 @@ TYPED_TEST_SUITE_P(CommonTimePropertiesTest);
 
 TYPED_TEST_P(CommonTimePropertiesTest, DisplayOffsetPropertyCheck)
 {
-    using TimeConstants = nx::vms::client::core::CalendarUtils;
-
     TypeParam& object = this->object;
     // Checks if display offset setter/getter works correctly.
-    object.setDisplayOffset(TimeConstants::kMinDisplayOffset);
-    ASSERT_EQ(TimeConstants::kMinDisplayOffset, object.displayOffset());
+    object.setDisplayOffset(calendar_utils::kMinDisplayOffset);
+    ASSERT_EQ(calendar_utils::kMinDisplayOffset, object.displayOffset());
 
     // Checks if minimum display offset value is constrained.
-    object.setDisplayOffset(TimeConstants::kMinDisplayOffset - 1);
-    ASSERT_EQ(TimeConstants::kMinDisplayOffset, object.displayOffset());
+    object.setDisplayOffset(calendar_utils::kMinDisplayOffset - 1);
+    ASSERT_EQ(calendar_utils::kMinDisplayOffset, object.displayOffset());
 
     // Checks if maximum display offset value is constrained.
-    object.setDisplayOffset(TimeConstants::kMaxDisplayOffset + 1);
-    ASSERT_EQ(TimeConstants::kMaxDisplayOffset, object.displayOffset());
+    object.setDisplayOffset(calendar_utils::kMaxDisplayOffset + 1);
+    ASSERT_EQ(calendar_utils::kMaxDisplayOffset, object.displayOffset());
 }
 
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(CommonTimePropertiesTest);

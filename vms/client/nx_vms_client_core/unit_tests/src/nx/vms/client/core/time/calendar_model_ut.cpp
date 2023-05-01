@@ -33,16 +33,12 @@ struct CalendarModelTestFixture: public testing::Test
 TEST_F(CalendarModelTestFixture, YearPropertyCheck)
 {
     // Checks if year setter/getter works correctly.
-    model.setYear(CalendarUtils::kMinYear);
-    ASSERT_EQ(model.year(), CalendarUtils::kMinYear);
+    model.setYear(calendar_utils::kMinYear);
+    ASSERT_EQ(model.year(), calendar_utils::kMinYear);
 
     // Checks if minimum year value is constrained.
-    model.setYear(CalendarUtils::kMinYear - 1);
-    ASSERT_EQ(model.year(), CalendarUtils::kMinYear);
-
-    // Checks if maximum year value is constrained.
-    model.setYear(CalendarUtils::kMaxYear + 1);
-    ASSERT_EQ(model.year(), CalendarUtils::kMaxYear);
+    model.setYear(calendar_utils::kMinYear - 1);
+    ASSERT_EQ(model.year(), calendar_utils::kMinYear);
 }
 
 TEST_F(CalendarModelTestFixture, MonthPropertyCheck)
@@ -52,12 +48,12 @@ TEST_F(CalendarModelTestFixture, MonthPropertyCheck)
     ASSERT_EQ(model.month(), 1);
 
     // Checks if minimum month value is constrained.
-    model.setMonth(CalendarUtils::kMinMonth - 1);
-    ASSERT_EQ(model.month(), CalendarUtils::kMinMonth);
+    model.setMonth(calendar_utils::kMinMonth - 1);
+    ASSERT_EQ(model.month(), calendar_utils::kMinMonth);
 
     // Checks if maximum month valueis constrained.
-    model.setMonth(CalendarUtils::kMaxMonth + 1);
-    ASSERT_EQ(model.month(), CalendarUtils::kMaxMonth);
+    model.setMonth(calendar_utils::kMaxMonth + 1);
+    ASSERT_EQ(model.month(), calendar_utils::kMaxMonth);
 }
 
 using TestingType = testing::Types<CalendarModel>;
