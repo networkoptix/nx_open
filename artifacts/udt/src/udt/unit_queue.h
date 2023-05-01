@@ -5,6 +5,8 @@
 
 #include "packet.h"
 
+class UnitQueue;
+
 struct UDT_API Unit
 {
     enum class Flag
@@ -15,13 +17,18 @@ struct UDT_API Unit
         msgDropped,
     };
 
+    Unit(UnitQueue*, std::unique_ptr<CPacket> packet);
+    Unit(Unit&&) = default;
+    ~Unit();
+
     CPacket& packet();
 
     void setFlag(Flag val);
     Flag flag() const;
 
 private:
-    CPacket m_Packet;
+    UnitQueue* m_unitQueue = nullptr;
+    std::unique_ptr<CPacket> m_packet;
     Flag m_iFlag = Flag::free_;
 };
 
@@ -41,15 +48,15 @@ public:
     UnitQueue(const UnitQueue&) = delete;
     UnitQueue& operator=(const UnitQueue&) = delete;
 
-    // Finds an available unit for incoming packet.
-    // @return Pointer to the available unit, NULL if not found.
-    std::shared_ptr<Unit> takeNextAvailUnit();
+    // Returns an available pre-allocated packet.
+    Unit takeNextAvailUnit();
+
+    // Put packet taken previously with UnitQueue::takeNextAvailUnit back for a later reuse.
+    void putBack(std::unique_ptr<CPacket> packet);
 
 private:
     int m_bufferSize = 0;
-    std::vector<std::unique_ptr<Unit>> m_availableUnits;
-    int m_takenUnits = 0;
+    std::vector<std::unique_ptr<CPacket>> m_availablePackets;
+    int m_takenPackets = 0;
     std::mutex m_mutex;
-
-    void putBack(std::unique_ptr<Unit> unit);
 };

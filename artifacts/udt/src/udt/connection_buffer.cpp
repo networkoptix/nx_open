@@ -334,7 +334,7 @@ ReceiveBuffer::ReceiveBuffer(int bufsize):
 
 ReceiveBuffer::~ReceiveBuffer() = default;
 
-bool ReceiveBuffer::addData(std::shared_ptr<Unit> unit, int offset)
+bool ReceiveBuffer::addData(Unit unit, int offset)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -342,12 +342,11 @@ bool ReceiveBuffer::addData(std::shared_ptr<Unit> unit, int offset)
     if (offset > m_iMaxPos)
         m_iMaxPos = offset;
 
-    if (NULL != m_pUnit[pos])
+    if (m_pUnit[pos])
         return false;
 
-    m_pUnit[pos] = unit;
-
-    unit->setFlag(Unit::Flag::occupied);
+    unit.setFlag(Unit::Flag::occupied);
+    m_pUnit[pos].emplace(std::move(unit));
 
     return true;
 }
@@ -360,7 +359,7 @@ int ReceiveBuffer::readBuffer(char* data, int len)
     int lastack = m_iLastAckPos;
     int rs = len;
 
-    while ((p != lastack) && (rs > 0) && m_pUnit[p] != NULL)
+    while ((p != lastack) && (rs > 0) && m_pUnit[p])
     {
         int unitsize = m_pUnit[p]->packet().getLength() - m_iNotch;
         if (unitsize > rs)
@@ -371,7 +370,7 @@ int ReceiveBuffer::readBuffer(char* data, int len)
 
         if ((rs > unitsize) || (rs == m_pUnit[p]->packet().getLength() - m_iNotch))
         {
-            m_pUnit[p] = nullptr;
+            m_pUnit[p].reset();
 
             if (++p == m_iSize)
                 p = 0;
@@ -396,7 +395,7 @@ int ReceiveBuffer::readBufferToFile(fstream& ofs, int len)
     int lastack = m_iLastAckPos;
     int rs = len;
 
-    while ((p != lastack) && (rs > 0) && (m_pUnit[p] != NULL))
+    while ((p != lastack) && (rs > 0) && m_pUnit[p])
     {
         int unitsize = m_pUnit[p]->packet().getLength() - m_iNotch;
         if (unitsize > rs)
@@ -408,7 +407,7 @@ int ReceiveBuffer::readBufferToFile(fstream& ofs, int len)
 
         if ((rs > unitsize) || (rs == m_pUnit[p]->packet().getLength() - m_iNotch))
         {
-            m_pUnit[p] = nullptr;
+            m_pUnit[p].reset();
 
             if (++p == m_iSize)
                 p = 0;
@@ -465,7 +464,7 @@ void ReceiveBuffer::dropMsg(int32_t msgno)
     std::lock_guard<std::mutex> lock(m_mutex);
 
     for (int i = m_iStartPos, n = (m_iLastAckPos + m_iMaxPos) % m_iSize; i != n; i = (i + 1) % m_iSize)
-        if ((NULL != m_pUnit[i]) && (msgno == m_pUnit[i]->packet().m_iMsgNo))
+        if (m_pUnit[i] && (msgno == m_pUnit[i]->packet().m_iMsgNo))
             m_pUnit[i]->setFlag(Unit::Flag::msgDropped);
 }
 
@@ -479,7 +478,7 @@ int ReceiveBuffer::readMsg(char* data, int len)
         return 0;
 
     int rs = len;
-    while ((p != (q + 1) % m_iSize) && m_pUnit[p] != NULL)
+    while ((p != (q + 1) % m_iSize) && m_pUnit[p])
     {
         int unitsize = m_pUnit[p]->packet().getLength();
         if ((rs >= 0) && (unitsize > rs))
@@ -493,7 +492,7 @@ int ReceiveBuffer::readMsg(char* data, int len)
         }
 
         if (!passack)
-            m_pUnit[p] = nullptr;
+            m_pUnit[p].reset();
         else
             m_pUnit[p]->setFlag(Unit::Flag::outOfOrder);
 
@@ -527,7 +526,7 @@ bool ReceiveBuffer::scanMsg(
     //skip all bad msgs at the beginning
     while (m_iStartPos != m_iLastAckPos)
     {
-        if (NULL == m_pUnit[m_iStartPos])
+        if (!m_pUnit[m_iStartPos])
         {
             if (++m_iStartPos == m_iSize)
                 m_iStartPos = 0;
@@ -541,7 +540,7 @@ bool ReceiveBuffer::scanMsg(
             // look ahead for the whole message
             for (int i = m_iStartPos; i != m_iLastAckPos;)
             {
-                if ((NULL == m_pUnit[i]) || (Unit::Flag::occupied != m_pUnit[i]->flag()))
+                if (!m_pUnit[i] || (Unit::Flag::occupied != m_pUnit[i]->flag()))
                 {
                     good = false;
                     break;
@@ -558,7 +557,7 @@ bool ReceiveBuffer::scanMsg(
                 break;
         }
 
-        m_pUnit[m_iStartPos] = nullptr;
+        m_pUnit[m_iStartPos].reset();
 
         if (++m_iStartPos == m_iSize)
             m_iStartPos = 0;
@@ -572,7 +571,7 @@ bool ReceiveBuffer::scanMsg(
     // looking for the first message
     for (int i = 0, n = m_iMaxPos + getRcvDataSize(lock); i <= n; ++i)
     {
-        if ((NULL != m_pUnit[q]) && (m_pUnit[q]->flag() == Unit::Flag::occupied))
+        if (m_pUnit[q] && (m_pUnit[q]->flag() == Unit::Flag::occupied))
         {
             switch (m_pUnit[q]->packet().getMsgBoundary())
             {
