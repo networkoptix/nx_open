@@ -14,6 +14,8 @@
 #include <nx/vms/client/core/media/abstract_time_period_storage.h>
 #include <recording/time_period_list.h>
 
+using namespace std::chrono;
+
 namespace nx::vms::client::core {
 
 namespace {
@@ -103,7 +105,6 @@ struct CalendarModel::Private
     Private(CalendarModel* owner);
     void resetDaysModelData();
     void updateArchiveInfo(PeriodStorageType type);
-    void clearArchiveMarks(PeriodStorageType type, int dayIndex = 0);
     void setPeriodStorage(AbstractTimePeriodStorage* store, PeriodStorageType type);
 
     CalendarModel* const q;
@@ -153,47 +154,18 @@ void CalendarModel::Private::resetDaysModelData()
 void CalendarModel::Private::updateArchiveInfo(PeriodStorageType type)
 {
     const auto store = periodStorage[(int) type];
-    if (!store)
-    {
-        clearArchiveMarks(type);
-        return;
-    }
 
-    const QnTimePeriodList timePeriods = store->periods(Qn::RecordingContent);
+    const QnTimePeriodList timePeriods =
+        store ? store->periods(Qn::RecordingContent) : QnTimePeriodList();
 
-    for (int i = 0; i < days.size(); /*no increment*/)
-    {
-        const auto it = timePeriods.findNearestPeriod(days[i].startTime, true);
-        if (it == timePeriods.cend())
-        {
-            // No chunks at the right of the first day of month.
-            clearArchiveMarks(type, i);
-            break;
-        }
+    const QBitArray archivePresence = calendar_utils::buildArchivePresence(
+        timePeriods,
+        milliseconds(days.first().startTime),
+        days.size(),
+        [](milliseconds timestamp) -> milliseconds { return timestamp + 24h; });
 
-        const auto chunkStartTime = it->startTimeMs;
-        const auto chunkEndTime = it->isInfinite()
-            ? QDateTime::currentMSecsSinceEpoch()
-            : it->endTimeMs();
-
-        while (i < days.size() && days[i].endTime() < chunkStartTime)
-            days[i++].hasArchive[(int) type] = false;
-
-        while (i < days.size() && days[i].startTime <= chunkEndTime)
-            days[i++].hasArchive[(int) type] = true;
-
-        if (it->isInfinite())
-        {
-            clearArchiveMarks(type, i);
-            break;
-        }
-    }
-}
-
-void CalendarModel::Private::clearArchiveMarks(PeriodStorageType type, int dayIndex)
-{
-    for (int i = dayIndex; i != days.size(); ++i)
-        days[i].hasArchive[(int) type] = false;
+    for (int i = 0; i < days.size(); ++i)
+        days[i].hasArchive[(int) type] = archivePresence[i];
 }
 
 void CalendarModel::Private::setPeriodStorage(
