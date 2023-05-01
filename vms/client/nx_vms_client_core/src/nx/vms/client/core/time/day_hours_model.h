@@ -35,8 +35,7 @@ class NX_VMS_CLIENT_CORE_API DayHoursModel: public QAbstractListModel
 public:
     enum Role
     {
-        DateRole = Qt::UserRole + 1,
-        HourRole,
+        HourRole = Qt::UserRole + 1,
         HasArchiveRole,
         AnyCameraHasArchiveRole,
     };

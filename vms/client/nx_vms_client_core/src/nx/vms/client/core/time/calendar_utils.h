@@ -3,9 +3,13 @@
 #pragma once
 
 #include <chrono>
+#include <functional>
 
+#include <QtCore/QBitArray>
 #include <QtCore/QDate>
 #include <QtCore/QLocale>
+
+#include <recording/time_period_list.h>
 
 namespace nx::vms::client::core::calendar_utils {
 
@@ -19,5 +23,11 @@ constexpr int kMaxDisplayOffset = std::chrono::milliseconds(std::chrono::hours(1
 constexpr int kMinDisplayOffset = -kMaxDisplayOffset;
 
 NX_VMS_CLIENT_CORE_API QDate firstWeekStartDate(const QLocale& locale, int year, int month);
+
+NX_VMS_CLIENT_CORE_API QBitArray buildArchivePresence(
+    const QnTimePeriodList& timePeriods,
+    const std::chrono::milliseconds& startTimestamp,
+    int count,
+    const std::function<std::chrono::milliseconds(std::chrono::milliseconds)>& nextTimestamp);
 
 } // namespace nx::vms::client::core::calendar_utils

@@ -15,6 +15,8 @@
 
 #include "calendar_utils.h"
 
+using namespace std::chrono;
+
 namespace nx::vms::client::core {
 
 namespace {
@@ -46,7 +48,6 @@ struct DayHoursModel::Private
     Private(DayHoursModel* owner);
     void resetModelData();
     void updateArchiveInfo(PeriodStorageType type);
-    void clearArchiveMarks(PeriodStorageType type, int hour = 0);
     void setPeriodStorage(AbstractTimePeriodStorage* store, PeriodStorageType type);
 
     DayHoursModel* const q;
@@ -76,53 +77,20 @@ void DayHoursModel::Private::resetModelData()
 void DayHoursModel::Private::updateArchiveInfo(PeriodStorageType type)
 {
     const auto store = periodStorage[(int) type];
-    if (!store)
-    {
-        clearArchiveMarks(type);
-        return;
-    }
 
-    const QnTimePeriodList timePeriods = store->periods(Qn::RecordingContent);
+    const QnTimePeriodList timePeriods =
+        store ? store->periods(Qn::RecordingContent) : QnTimePeriodList();
 
     const qint64 startPosition = date.startOfDay().toMSecsSinceEpoch() - displayOffset;
-    constexpr qint64 kMsPerHour = 60 * 60 * 1000;
 
-    const auto hourStart = [startPosition](int hour) { return startPosition + hour * kMsPerHour; };
-    const auto hourEnd =
-        [startPosition](int hour) { return startPosition + (hour + 1) * kMsPerHour; };
+    const QBitArray archivePresence = calendar_utils::buildArchivePresence(
+        timePeriods,
+        milliseconds(startPosition),
+        kHoursPerDay,
+        [](milliseconds timestamp) -> milliseconds { return timestamp + 1h; });
 
-    for (int hour = 0; hour < kHoursPerDay;)
-    {
-        const auto it = timePeriods.findNearestPeriod(hourStart(hour), true);
-        if (it == timePeriods.cend())
-        {
-            clearArchiveMarks(type, hour);
-            break;
-        }
-
-        const auto chunkStartTime = it->startTimeMs;
-        const auto chunkEndTime = it->isInfinite()
-            ? QDateTime::currentMSecsSinceEpoch()
-            : it->endTimeMs();
-
-        while (hour < kHoursPerDay && hourEnd(hour) < chunkStartTime)
-            hourHasArchive[(int) type][hour++] = false;
-
-        while (hour < kHoursPerDay && hourStart(hour) <= chunkEndTime)
-            hourHasArchive[(int) type][hour++] = true;
-
-        if (it->isInfinite())
-        {
-            clearArchiveMarks(type, hour);
-            break;
-        }
-    }
-}
-
-void DayHoursModel::Private::clearArchiveMarks(PeriodStorageType type, int hour)
-{
-    for (int i = hour; i != kHoursPerDay; ++i)
-        hourHasArchive[(int) type][i] = false;
+    for (int i = 0; i < kHoursPerDay; ++i)
+        hourHasArchive[(int) type][i] = archivePresence[i];
 }
 
 void DayHoursModel::Private::setPeriodStorage(
