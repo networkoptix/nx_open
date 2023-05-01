@@ -17,7 +17,7 @@ public:
 	}
 
 protected:
-	std::shared_ptr<Unit> getNewUnit()
+	Unit getNewUnit()
 	{
 		return m_unitQueue.takeNextAvailUnit();
 	}
@@ -28,35 +28,34 @@ private:
 
 TEST_F(UnitQueue, unit_of_required_size_is_provided)
 {
-	const auto unit = getNewUnit();
-	ASSERT_NE(nullptr, unit);
-	ASSERT_EQ(kUnitSize, unit->packet().payload().size());
+	auto unit = getNewUnit();
+	ASSERT_EQ(kUnitSize, unit.packet().payload().size());
 }
 
 TEST_F(UnitQueue, unit_in_use_is_not_reused)
 {
-	const auto unit = getNewUnit();
-	unit->setFlag(Unit::Flag::occupied);
+	auto unit = getNewUnit();
+	unit.setFlag(Unit::Flag::occupied);
 
-	const auto unit2 = getNewUnit();
-	ASSERT_NE(unit, unit2);
+	auto unit2 = getNewUnit();
+	ASSERT_NE(&unit.packet(), &unit2.packet());
 }
 
 TEST_F(UnitQueue, unit_is_reused)
 {
-	auto unit = getNewUnit();
+	std::optional<Unit> unit(getNewUnit());
 	unit->setFlag(Unit::Flag::occupied);
-	const auto unitPtr = unit.get();
-	unit = nullptr;
+	const auto packet1Ptr = &unit->packet();
+	unit.reset();
 
-	std::vector<std::shared_ptr<Unit>> units;
+	std::vector<Unit> units;
 	for (int i = 0; i < kUnitQueueSize * 10; ++i)
 	{
-		const auto unit2 = getNewUnit();
-		if (unit2.get() == unitPtr)
+		auto unit2 = getNewUnit();
+		if (&unit2.packet() == packet1Ptr)
 			return;
-		unit2->setFlag(Unit::Flag::occupied);
-		units.push_back(unit2);
+		unit2.setFlag(Unit::Flag::occupied);
+		units.push_back(std::move(unit2));
 	}
 
 	FAIL();

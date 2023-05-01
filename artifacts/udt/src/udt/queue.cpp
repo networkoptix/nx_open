@@ -686,29 +686,10 @@ void CRcvQueue::worker()
 
         // find next available slot for incoming packet
         auto unit = m_UnitQueue.takeNextAvailUnit();
-        if (!unit)
-        {
-            // TODO: #akolesnikov Actual read may happen much later, so buffer size should be checked
-            // after receiving packet.
-
-            // no space, skip this packet
-            CPacket temp;
-            temp.payload().resize(m_iPayloadSize);
-            if (m_channel->recvfrom(addr, temp).ok())
-            {
-                #ifdef TRACE_PACKETS
-                    tracePacket("recv-ign", addr, m_channel->getSockAddr(), temp);
-                #endif
-            }
-
-            timerCheck();
-            continue;
-        }
-
-        unit->packet().payload().resize(m_iPayloadSize);
+        unit.packet().payload().resize(m_iPayloadSize);
 
         // Reading next incoming packet, recvfrom returns -1 if nothing has been received.
-        if (!m_channel->recvfrom(addr, unit->packet()).ok())
+        if (!m_channel->recvfrom(addr, unit.packet()).ok())
         {
             timerCheck();
             continue;
@@ -754,27 +735,25 @@ void CRcvQueue::timerCheck()
     m_pRendezvousQueue->updateConnStatus();
 }
 
-Result<> CRcvQueue::processUnit(
-    std::shared_ptr<Unit> unit,
-    const detail::SocketAddress& addr)
+Result<> CRcvQueue::processUnit(Unit unit, const detail::SocketAddress& addr)
 {
-    int32_t id = unit->packet().m_iID;
+    int32_t id = unit.packet().m_iID;
 
     // ID 0 is for connection request, which should be passed to the listening socket or rendezvous sockets
     if (0 == id)
     {
         if (auto listener = m_listener.lock())
         {
-            listener->processConnectionRequest(addr, unit->packet());
+            listener->processConnectionRequest(addr, unit.packet());
         }
         else if (auto u = m_pRendezvousQueue->getByAddr(addr, id))
         {
             // asynchronous connect: call connect here
             // otherwise wait for the UDT socket to retrieve this packet
             if (!u->synRecving())
-                u->connect(unit->packet()); // TODO: #akolesnikov The result code is ignored here.
+                u->connect(unit.packet()); // TODO: #akolesnikov The result code is ignored here.
             else
-                storePkt(id, unit->packet().clone());
+                storePkt(id, unit.packet().clone());
         }
     }
     else if (id > 0)
@@ -789,10 +768,10 @@ Result<> CRcvQueue::processUnit(
             {
                 if (u->connected() && !u->broken() && !u->isClosing())
                 {
-                    if (unit->packet().getFlag() == PacketFlag::Data)
+                    if (unit.packet().getFlag() == PacketFlag::Data)
                         u->processData(std::move(unit)); // TODO: #akolesnikov It is unclear why the result is ignored.
                     else
-                        u->processCtrl(unit->packet());
+                        u->processCtrl(unit.packet());
 
                     u->checkTimers(false);
                     m_rcvUList.sink(id);
@@ -802,9 +781,9 @@ Result<> CRcvQueue::processUnit(
         else if (auto u = m_pRendezvousQueue->getByAddr(addr, id))
         {
             if (!u->synRecving())
-                u->connect(unit->packet()); // TODO: #akolesnikov The result code is ignored here.
+                u->connect(unit.packet()); // TODO: #akolesnikov The result code is ignored here.
             else
-                storePkt(id, unit->packet().clone());
+                storePkt(id, unit.packet().clone());
         }
     }
 

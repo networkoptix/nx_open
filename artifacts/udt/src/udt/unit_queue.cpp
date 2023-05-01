@@ -2,10 +2,23 @@
 
 #include <algorithm>
 #include <cassert>
+#include <utility>
+
+Unit::Unit(UnitQueue* unitQueue, std::unique_ptr<CPacket> packet):
+    m_unitQueue(unitQueue),
+    m_packet(std::move(packet))
+{
+}
+
+Unit::~Unit()
+{
+    if (m_packet)
+        m_unitQueue->putBack(std::exchange(m_packet, nullptr));
+}
 
 CPacket& Unit::packet()
 {
-    return m_Packet;
+    return *m_packet;
 }
 
 void Unit::setFlag(Flag val)
@@ -23,54 +36,47 @@ Unit::Flag Unit::flag() const
 UnitQueue::UnitQueue(int initialQueueSize, int bufferSize):
     m_bufferSize(bufferSize)
 {
-    m_availableUnits.resize(initialQueueSize);
+    m_availablePackets.resize(initialQueueSize);
 
     std::for_each(
-        m_availableUnits.begin(), m_availableUnits.end(),
-        [this](auto& unit)
+        m_availablePackets.begin(), m_availablePackets.end(),
+        [this](auto& packet)
         {
-            unit = std::make_unique<Unit>();
-            unit->packet().payload().resize(m_bufferSize);
+            packet = std::make_unique<CPacket>();
+            packet->payload().resize(m_bufferSize);
         });
 }
 
 UnitQueue::~UnitQueue()
 {
-    assert(m_takenUnits == 0);
+    assert(m_takenPackets == 0);
 }
 
-std::shared_ptr<Unit> UnitQueue::takeNextAvailUnit()
+Unit UnitQueue::takeNextAvailUnit()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    std::unique_ptr<Unit> unit;
-    if (!m_availableUnits.empty())
+    ++m_takenPackets;
+
+    if (!m_availablePackets.empty())
     {
-        unit = std::move(m_availableUnits.back());
-        m_availableUnits.pop_back();
+        Unit unit(this, std::move(m_availablePackets.back()));
+        m_availablePackets.pop_back();
+        return unit;
     }
     else
     {
-        unit = std::make_unique<Unit>();
-        unit->packet().payload().resize(m_bufferSize);
+        Unit unit(this, std::make_unique<CPacket>());
+        unit.packet().payload().resize(m_bufferSize);
+        return unit;
     }
-
-    ++m_takenUnits;
-
-    return std::shared_ptr<Unit>(
-        unit.release(),
-        [this](Unit* unit) mutable
-        {
-            putBack(std::unique_ptr<Unit>(unit));
-        });
 }
 
-void UnitQueue::putBack(std::unique_ptr<Unit> unit)
+void UnitQueue::putBack(std::unique_ptr<CPacket> packet)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    unit->setFlag(Unit::Flag::free_);
-    m_availableUnits.push_back(std::move(unit));
+    m_availablePackets.push_back(std::move(packet));
 
-    --m_takenUnits;
+    --m_takenPackets;
 }
