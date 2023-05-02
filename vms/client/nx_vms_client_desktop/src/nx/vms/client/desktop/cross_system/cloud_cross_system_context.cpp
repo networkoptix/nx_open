@@ -10,7 +10,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <finders/systems_finder.h>
+#include <licensing/license.h>
 #include <network/system_helpers.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx/fusion/model_functions.h>
@@ -62,6 +64,10 @@ struct CloudCrossSystemContext::Private
             SystemContext::Mode::crossSystem,
             appContext()->peerId(),
             nx::core::access::Mode::direct);
+
+       systemContext->resourceDataPool()->setExternalSource(
+           appContext()->currentSystemContext()->resourceDataPool());
+
         appContext()->addSystemContext(systemContext.get());
 
         connect(systemContext->resourcePool(),
@@ -309,6 +315,7 @@ struct CloudCrossSystemContext::Private
                     systemContext->cameraHistoryPool()->resetServerFootageData(
                         dataLoader->serverFootageData());
                     systemContext->globalSettings()->update(dataLoader->systemSettings());
+                    systemContext->licensePool()->replaceLicenses(dataLoader->licenses());
                 }
                 addCamerasToResourcePool(dataLoader->cameras());
                 updateStatus(Status::connected);

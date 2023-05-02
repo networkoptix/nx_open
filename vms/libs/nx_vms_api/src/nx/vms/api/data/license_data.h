@@ -123,7 +123,7 @@ struct NX_VMS_API LicenseSummaryData
     /**%apidoc Total license channels, including expired licenses. */
     int total = 0;
 
-    /**%apidoc 
+    /**%apidoc
      * Currently available license channels. It could be less than the total number of channels
      * in case of some licenses are not valid now (expired, server is offline e.t.c).
      */
