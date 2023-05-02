@@ -7,13 +7,8 @@
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 
-class QnIOModuleMonitor:
-    public QObject,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+class QnIOModuleMonitor: public QObject
 {
     Q_OBJECT
 public:

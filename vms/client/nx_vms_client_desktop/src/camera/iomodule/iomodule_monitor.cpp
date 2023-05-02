@@ -4,18 +4,20 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <common/common_module.h>
-
-#include <nx/utils/log/log.h>
-#include "core/resource/camera_resource.h"
-#include "core/resource/media_server_resource.h"
-#include "nx/fusion/serialization/json.h"
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <network/router.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/custom_headers.h>
-#include "network/router.h"
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/system_context.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
-    int HTTP_READ_TIMEOUT = 1000 * 10;
+
+int HTTP_READ_TIMEOUT = 1000 * 10;
+
 }
 
 class QnMessageBodyParser: public nx::utils::bstream::AbstractByteStreamFilter
@@ -64,8 +66,15 @@ bool QnIOModuleMonitor::open()
         std::swap(httpClient, m_httpClient);
     }
 
+    if (!m_camera->isOnline())
+        return false;
+
     QnMediaServerResourcePtr server = m_camera->getParentServer();
     if (!server)
+        return false;
+
+    auto systemContext = SystemContext::fromResource(m_camera);
+    if (!NX_ASSERT(systemContext) || !systemContext->connection())
         return false;
 
     m_httpClient =
@@ -86,9 +95,6 @@ bool QnIOModuleMonitor::open()
     m_multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
     m_multipartContentParser->setNextFilter(std::make_shared<QnMessageBodyParser>(this));
 
-    if (!m_camera->isOnline())
-        return false;
-
     m_httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toStdString());
     nx::utils::Url requestUrl(server->getApiUrl());
     requestUrl.setPath(lit("/api/iomonitor"));
@@ -108,7 +114,7 @@ bool QnIOModuleMonitor::open()
         requestUrl.setPort(route.addr.port);
     }
 
-    m_httpClient->setCredentials(connectionCredentials());
+    m_httpClient->setCredentials(systemContext->connectionCredentials());
     m_httpClient->doGet(requestUrl);
     return true;
 }
