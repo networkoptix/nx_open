@@ -283,6 +283,12 @@ Control
             height: calendar.height
             visible: monthPickerVisible
 
+            periodStorage: daysSelector.periodStorage
+            allCamerasPeriodStorage: daysSelector.allCamerasPeriodStorage
+            locale: control.regionLocale
+            displayOffset: daysSelector.displayOffset
+
+            year: visibleYear
             currentMonth: (visibleYear === daysSelector.today.getFullYear())
                 ? daysSelector.today.getMonth() : -1
 

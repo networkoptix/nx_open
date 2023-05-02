@@ -53,6 +53,7 @@
 #include <nx/vms/client/core/time/date_range.h>
 #include <nx/vms/client/core/time/day_hours_model.h>
 #include <nx/vms/client/core/time/display_time_helper.h>
+#include <nx/vms/client/core/time/month_list_model.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/client/core/ui/frame_section.h>
 #include <nx/vms/client/core/utils/file_io.h>
@@ -146,6 +147,7 @@ void initializeMetaTypes()
     OauthClient::registerQmlType();
     CalendarModel::registerQmlType();
     DayHoursModel::registerQmlType();
+    MonthListModel::registerQmlType();
     AbstractTimePeriodStorage::registerQmlType();
     ChunkProvider::registerQmlType();
     ColorTheme::registerQmlType();

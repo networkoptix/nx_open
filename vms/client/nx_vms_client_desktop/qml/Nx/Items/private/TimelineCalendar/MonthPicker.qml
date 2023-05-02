@@ -1,13 +1,21 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.0
+import QtQuick
 import QtQml
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
+
+import nx.vms.client.core
 
 Item
 {
+    property alias year: monthListModel.year
+    property alias displayOffset: monthListModel.displayOffset
+    property alias locale: monthListModel.locale
+    property alias periodStorage: monthListModel.periodStorage
+    property alias allCamerasPeriodStorage: monthListModel.allCamerasPeriodStorage
+
     property int month: 0
     property int currentMonth: -1
 
@@ -24,7 +32,10 @@ Item
 
         Repeater
         {
-            model: 12
+            model: MonthListModel
+            {
+                id: monthListModel
+            }
 
             Rectangle
             {
@@ -43,15 +54,31 @@ Item
 
                 Text
                 {
-                    anchors.centerIn: parent
+                    id: label
 
-                    text: locale.monthName(modelData, Locale.ShortFormat)
+                    anchors.centerIn: parent
+                    anchors.verticalCenterOffset: -4
+
+                    text: locale.monthName(model.month, Locale.ShortFormat)
                     font.pixelSize: 16
                     font.weight: Font.Medium
                     font.capitalization: Font.AllUppercase
 
-                    color: (modelData === currentMonth)
+                    color: (model.month === currentMonth)
                         ? ColorTheme.highlight : ColorTheme.buttonText
+                }
+
+                ArchiveIndicator
+                {
+                    anchors {
+                        top: label.bottom
+                        topMargin: 4
+                        bottom: undefined //< Override the default value.
+                    }
+                    width: 32
+                    height: 4
+                    cameraHasArchive: model.hasArchive
+                    anyCameraHasArchive: model.anyCameraHasArchive
                 }
 
                 MouseArea
@@ -63,7 +90,7 @@ Item
 
                     onClicked:
                     {
-                        month = modelData
+                        month = model.month
                         monthClicked(month)
                     }
                 }
