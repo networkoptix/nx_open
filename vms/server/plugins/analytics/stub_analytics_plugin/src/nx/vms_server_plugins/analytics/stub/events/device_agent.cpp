@@ -154,9 +154,9 @@ DeviceAgent::~DeviceAgent()
 /**
  * DeviceAgent manifest may declare eventTypes and objectTypes similarly to how an Engine declares
  * them - semantically the set from the Engine manifest is joined with the set from the DeviceAgent
- * manifest. Also this manifest should declare supportedEventTypeIds and supportedObjectTypeIds
- * lists which are treated as white-list filters for the respective set from Engine manifest
- * (absent lists are treated as empty lists, thus, disabling all types from the Engine).
+ * manifest. Also this manifest should declare the supportedTypes list which is treated as a
+ + white-list filter for the respective set from Engine manifest (the absent list are treated as an
+ * empty list, thus, disabling all types from the Engine).
  */
 std::string DeviceAgent::manifestString() const
 {
@@ -174,15 +174,22 @@ std::string DeviceAgent::manifestString() const
 R"json(
 {
     "capabilities": "disableStreamSelection",
-    "supportedEventTypeIds": [
-        ")json" + kLineCrossingEventType + R"json(",
-        ")json" + kSuspiciousNoiseEventType + R"json(",
-        ")json" + kObjectInTheAreaEventType + R"json(",
-        ")json" + kLoiteringEventType + R"json(",
-        ")json" + kIntrusionEventType + R"json(",
-        ")json" + kGunshotEventType + R"json(")json"
-        + (m_deviceAgentSettings.declareAdditionalEventTypes ?
-            ",\"" + kAdditionalEventType + "\", \"" + kAdditionalEventType2 + "\"" : "") + R"json(
+    "supportedTypes":
+    [
+        { "eventTypeId": ")json" + kLineCrossingEventType + R"json(" },
+        { "eventTypeId": ")json" + kSuspiciousNoiseEventType + R"json(" },
+        { "eventTypeId": ")json" + kObjectInTheAreaEventType + R"json(" },
+        { "eventTypeId": ")json" + kLoiteringEventType + R"json(" },
+        { "eventTypeId": ")json" + kIntrusionEventType + R"json(" },
+        { "eventTypeId": ")json" + kGunshotEventType + R"json(" })json"
+        + (m_deviceAgentSettings.declareAdditionalEventTypes
+            ? (
+                R"json(",
+        { "eventTypeId": ")json" + kAdditionalEventType + R"json(" },
+        { "eventTypeId": ")json" + kAdditionalEventType2 + R"json(" })json"
+            )
+            : ""
+        ) + R"json(
     ],
     "typeLibrary": {
         "eventTypes": [
