@@ -2,19 +2,19 @@
 
 #include "http_types.h"
 
-#include <stdio.h>
 #include <cstring>
 #include <memory>
 
+#include <stdio.h>
+
 #include <QtCore/QLocale>
 
+#include <nx/branding.h>
+#include <nx/build_info.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/switch.h>
-
-#include <nx/branding.h>
-#include <nx/build_info.h>
 
 namespace nx::network::http {
 
