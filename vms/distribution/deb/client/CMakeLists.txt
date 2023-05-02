@@ -48,6 +48,7 @@ set(required_dependencies_list
     "libsecret-1-0"
     "libx11-6"
     "libx11-xcb1"
+    "libxcb-cursor0"
     "libxcb-glx0"
     "libxcb-icccm4 (>= 0.3.9)"
     "libxcb-image0 (>= 0.3.9)"
