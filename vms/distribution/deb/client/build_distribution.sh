@@ -212,6 +212,7 @@ copyLibs()
         echo "  Copying additional system libs"
         distrib_copySystemLibs "$STAGE_LIB" \
             libXss.so.1 \
+            libxcb-cursor.so.0 \
             libxcb-xinerama.so.0
         distrib_copySystemLibs "$STAGE_LIB" libpng16.so.16 \
             || distrib_copySystemLibs "$STAGE_LIB" libpng.so
