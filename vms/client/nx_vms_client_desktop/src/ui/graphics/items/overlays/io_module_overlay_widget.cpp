@@ -9,14 +9,12 @@
 
 #include <api/server_rest_connection.h>
 #include <camera/iomodule/iomodule_monitor.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/actions_fwd.h>
@@ -42,10 +40,7 @@ constexpr int kStateCheckIntervalMs = 1000;
 
 } // namespace
 
-class QnIoModuleOverlayWidgetPrivate:
-    public QObject,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+class QnIoModuleOverlayWidgetPrivate: public QObject
 {
     using base_type = QObject;
     using Style = QnIoModuleOverlayWidget::Style;
@@ -333,11 +328,14 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     action->setResources({ module->getId() });
     action->setToggleState(it->state.isActive ? vms::api::EventState::inactive : vms::api::EventState::active);
 
+    auto systemContext = SystemContext::fromResource(module);
+    if (!NX_ASSERT(systemContext))
+        return;
+
     auto dstPeer = module->getParentId();
-    auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(dstPeer);
-    if (!connection() || !server)
+    if (!systemContext->connection() || !module->getParentServer())
     {
-        NX_WARNING(this, "Can't delivery event to the  target server %1. Not found", dstPeer);
+        NX_WARNING(this, "Can't delivery event to the target server %1. Not found", dstPeer);
         return;
     }
 
@@ -356,7 +354,8 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     nx::vms::api::EventActionData actionData;
     ec2::fromResourceToApi(action, actionData);
     // we are not interested in client->server transport error code because of real port checking by timer
-    connectedServerApi()->executeEventAction(actionData, callback, thread(), dstPeer);
+    systemContext->connectedServerApi()->executeEventAction(
+        actionData, callback, thread(), dstPeer);
     it->stateChangeTimer.restart();
 }
 
