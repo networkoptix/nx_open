@@ -36,6 +36,7 @@ struct CloudCrossSystemContextDataLoader::Private
     std::optional<ServerInformationList> servers;
     std::optional<ServerFootageDataList> serverFootageData;
     std::optional<SystemSettings> systemSettings;
+    std::optional<LicenseDataList> licenses;
     std::optional<CameraDataExList> cameras;
     QElapsedTimer camerasRefreshTimer;
 
@@ -173,7 +174,7 @@ struct CloudCrossSystemContextDataLoader::Private
                 {
                     NX_WARNING(
                         this,
-                        "Server settings cannot be deserialized, error: %1",
+                        "System settings cannot be deserialized, error: %1",
                         deserializationResult.errorDescription);
                     return;
                 }
@@ -187,6 +188,50 @@ struct CloudCrossSystemContextDataLoader::Private
 
         return connection->getRawResult(
             "/rest/v1/system/settings",
+            {},
+            callback,
+            q->thread());
+    }
+
+    rest::Handle requestLicenses()
+    {
+        NX_VERBOSE(this, "Updating licenses");
+        auto callback = nx::utils::guarded(q,
+            [this](
+                bool success,
+                ::rest::Handle requestId,
+                QByteArray data,
+                nx::network::http::HttpHeaders /*headers*/)
+            {
+                NX_ASSERT(currentRequest && *currentRequest == requestId);
+                currentRequest = std::nullopt;
+
+                if (!success)
+                {
+                     NX_WARNING(this, "Licenses request failed");
+                     return;
+                }
+
+                auto [result, deserializationResult] =
+                    reflect::json::deserialize<LicenseDataList>(data.data());
+                if (!deserializationResult.success)
+                {
+                    NX_WARNING(
+                        this,
+                        "Licenses cannot be deserialized, error: %1",
+                        deserializationResult.errorDescription);
+                    return;
+                }
+
+                NX_VERBOSE(this, "Licenses received");
+
+                licenses = result;
+                requestData();
+            }
+        );
+
+        return connection->getRawResult(
+            "/rest/v2/licenses",
             {},
             callback,
             q->thread());
@@ -257,6 +302,10 @@ struct CloudCrossSystemContextDataLoader::Private
         {
             currentRequest = requestSystemSettings();
         }
+        else if (!licenses)
+        {
+            currentRequest = requestLicenses();
+        }
         else if (!cameras
             || camerasRefreshTimer.hasExpired(milliseconds(kCamerasRefreshPeriod).count()))
         {
@@ -311,6 +360,11 @@ CameraDataExList CloudCrossSystemContextDataLoader::cameras() const
 SystemSettings CloudCrossSystemContextDataLoader::systemSettings() const
 {
     return d->systemSettings.value_or(SystemSettings());
+}
+
+LicenseDataList CloudCrossSystemContextDataLoader::licenses() const
+{
+    return d->licenses.value_or(LicenseDataList());
 }
 
 } // namespace nx::vms::client::desktop

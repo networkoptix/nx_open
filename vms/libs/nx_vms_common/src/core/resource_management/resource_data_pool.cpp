@@ -90,6 +90,9 @@ QnResourceDataPool::~QnResourceDataPool()
 
 QnResourceData QnResourceDataPool::data(const QnConstSecurityCamResourcePtr& camera) const
 {
+    if (m_externalSource)
+        return m_externalSource->data(camera);
+
     if (!camera)
         return QnResourceData();
     return data(camera->getVendor(), camera->getModel(), camera->getFirmware());
@@ -100,7 +103,17 @@ QnResourceData QnResourceDataPool::data(
     const QString& model,
     const QString& firmware) const
 {
+    if (m_externalSource)
+        return m_externalSource->data(vendor, model, firmware);
+
     return data(Key(vendor, model, firmware));
+}
+
+void QnResourceDataPool::setExternalSource(QnResourceDataPool* source)
+{
+    m_externalSource = source;
+    if (source)
+        connect(source, &QnResourceDataPool::changed, this, &QnResourceDataPool::changed);
 }
 
 QnResourceData QnResourceDataPool::data(const Key& key) const

@@ -4,6 +4,7 @@
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 
 #include <core/resource/resource_data.h>
 #include <core/resource/resource_fwd.h>
@@ -28,6 +29,12 @@ public:
         const QString& _vendor,
         const QString& model,
         const QString& firmware = {}) const;
+
+    /**
+     * Resource Data pools in the Cross-System contexts may use shared data source to avoid
+     * excessive data loading.
+     */
+    void setExternalSource(QnResourceDataPool* source);
 
     static nx::utils::SoftwareVersion getVersion(const QByteArray& data);
     static bool validateData(const QByteArray& data);
@@ -76,4 +83,6 @@ private:
 
     /** Cache of the search results to avoid using too much regexps. */
     mutable QHash<Key, QnResourceData> m_cachedResultByKey;
+
+    QPointer<QnResourceDataPool> m_externalSource;
 };
