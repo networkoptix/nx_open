@@ -2347,14 +2347,15 @@ Callback<ResultType> ServerConnection::makeSessionAwareCallback(
             {
                 // Session is expired. Let's try to issue a new token and resend the request.
                 executeInThread(interactionThread,
-                    [this, helper, callback, success, handle, result, request, targetThread]
+                    [self=QPointer(this), helper, callback, success, handle, result, request,
+                        targetThread]
                     {
-                        if (auto token = helper->refreshToken())
+                        if (auto token = helper->refreshToken(); token && self)
                         {
                             {
                                 // Update credentials.
-                                NX_MUTEX_LOCKER lock(&d->mutex);
-                                this->d->directConnect->credentials.authToken =
+                                NX_MUTEX_LOCKER lock(&self->d->mutex);
+                                self->d->directConnect->credentials.authToken =
                                         nx::network::http::BearerAuthToken(token->value);
                             }
 
@@ -2364,17 +2365,21 @@ Callback<ResultType> ServerConnection::makeSessionAwareCallback(
                             // handle to the caller instead of an unknown-to-the-caller resended
                             // request handle.
                             Callback<ResultType> fixedCallback =
-                                [this, callback=std::move(callback), originalHandle](
+                                [self, callback=std::move(callback), originalHandle](
                                     bool success, Handle handle, ResultType result)
                                 {
-                                    NX_VERBOSE(d->logTag,
+                                    NX_VERBOSE(
+                                        self
+                                            ? self->d->logTag
+                                            : NX_SCOPE_TAG,
                                         "Received responce for <%1>, which is a re-send of <%2>",
                                         handle, originalHandle);
 
+                                    if (self)
                                     {
                                         // Request is done. Remove the substitution.
-                                        NX_MUTEX_LOCKER lock(&d->mutex);
-                                        d->substitutions.erase(originalHandle);
+                                        NX_MUTEX_LOCKER lock(&self->d->mutex);
+                                        self->d->substitutions.erase(originalHandle);
                                     }
 
                                     callback(success, originalHandle, result);
@@ -2386,17 +2391,17 @@ Callback<ResultType> ServerConnection::makeSessionAwareCallback(
                                     nx::network::http::BearerAuthToken(token->value);
 
                             // Resend the request.
-                            const auto handle = executeRequest(
+                            const auto handle = self->executeRequest(
                                 fixedRequest, std::move(fixedCallback), targetThread);
 
-                            NX_VERBOSE(d->logTag,
+                            NX_VERBOSE(self->d->logTag,
                                 "<%1> Sending <%2>(%3) with updated credentials",
                                 handle, originalHandle, request.url);
 
                             {
                                 // Store the handles, so we'll be able to cancel the right request.
-                                NX_MUTEX_LOCKER lock(&d->mutex);
-                                d->substitutions[originalHandle] = handle;
+                                NX_MUTEX_LOCKER lock(&self->d->mutex);
+                                self->d->substitutions[originalHandle] = handle;
                             }
                         }
                         else
