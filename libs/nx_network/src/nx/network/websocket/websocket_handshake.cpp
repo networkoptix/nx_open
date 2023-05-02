@@ -1,10 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include "websocket_handshake.h"
+
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/algorithm.h>
-
-#include "websocket_handshake.h"
 
 namespace nx::network::websocket {
 
@@ -211,6 +211,25 @@ void addClientHeaders(
     nx::network::http::HttpHeaders headers;
     addClientHeaders(&headers, protocolName, compressionType);
     request->addRequestHeaders(std::move(headers));
+}
+
+void copyClientHeaders(
+    nx::network::http::HttpHeaders* dstHeaders,
+    const nx::network::http::HttpHeaders* srcHeaders)
+{
+    for (const auto& srcHeader: *srcHeaders)
+    {
+        if (nx::utils::stricmp(srcHeader.first, kUpgrade) == 0
+            || nx::utils::stricmp(srcHeader.first, kConnection) == 0
+            || nx::utils::stricmp(srcHeader.first, kKey) == 0
+            || nx::utils::stricmp(srcHeader.first, kVersion) == 0
+            || nx::utils::stricmp(srcHeader.first, kProtocol) == 0
+            || nx::utils::stricmp(srcHeader.first, kAccept) == 0
+            || nx::utils::stricmp(srcHeader.first, kExtension) == 0)
+        {
+            http::insertOrReplaceHeader(dstHeaders, srcHeader);
+        }
+    }
 }
 
 Error validateResponse(

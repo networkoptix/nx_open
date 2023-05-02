@@ -7,8 +7,8 @@
 #include <nx/utils/byte_stream/custom_output_stream.h>
 #include <nx/utils/gzip/gzip_uncompressor.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx::network::http {
 
@@ -399,7 +399,6 @@ void HttpStreamReader::checkIfMessageBodyIsAppropriateByDefault()
         m_contentLength = 0;
         return;
     }
-
     // All requests except POST, PATCH and PUT do not contain message body unless specified
     // explicitly with "Content-..." headers.
     if (m_httpMessage.type == MessageType::request)

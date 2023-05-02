@@ -38,6 +38,10 @@ NX_NETWORK_API void addClientHeaders(
     const nx::Buffer& protocolName,
     CompressionType compressionType);
 
+NX_NETWORK_API void copyClientHeaders(
+    nx::network::http::HttpHeaders* dstHeaders,
+    const nx::network::http::HttpHeaders* srcHeaders);
+
 NX_NETWORK_API Error validateResponse(
     const nx::network::http::Request& request,
     const nx::network::http::Response& response);
