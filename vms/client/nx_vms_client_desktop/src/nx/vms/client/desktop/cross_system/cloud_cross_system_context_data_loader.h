@@ -7,6 +7,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
+#include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/data/user_model.h>
@@ -42,6 +43,7 @@ public:
     nx::vms::api::ServerFootageDataList serverFootageData() const;
     nx::vms::api::CameraDataExList cameras() const;
     nx::vms::api::SystemSettings systemSettings() const;
+    nx::vms::api::LicenseDataList licenses() const;
 
 signals:
     void ready();

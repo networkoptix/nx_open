@@ -5,14 +5,16 @@
 #include <QtCore/QTimer>
 
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
+#include <client_core/client_core_module.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <finders/systems_finder.h>
 #include <helpers/system_helpers.h>
+#include <licensing/license.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/camera_data_ex.h>
@@ -61,6 +63,10 @@ struct CloudCrossSystemContext::Private
             SystemContext::Mode::crossSystem,
             appContext()->peerId(),
             nx::core::access::Mode::direct);
+
+       systemContext->resourceDataPool()->setExternalSource(
+           appContext()->currentSystemContext()->resourceDataPool());
+
         appContext()->addSystemContext(systemContext.get());
 
         connect(systemContext->resourcePool(),
@@ -308,6 +314,7 @@ struct CloudCrossSystemContext::Private
                     systemContext->cameraHistoryPool()->resetServerFootageData(
                         dataLoader->serverFootageData());
                     systemContext->globalSettings()->update(dataLoader->systemSettings());
+                    systemContext->licensePool()->replaceLicenses(dataLoader->licenses());
                 }
                 addCamerasToResourcePool(dataLoader->cameras());
                 updateStatus(Status::connected);

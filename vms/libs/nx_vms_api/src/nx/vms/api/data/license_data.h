@@ -64,6 +64,7 @@ struct NX_VMS_API LicenseData: LicenseKey
 };
 #define LicenseData_Fields (key)(licenseBlock)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(LicenseData)
+NX_REFLECTION_INSTRUMENT(LicenseData, LicenseData_Fields)
 
 /**
  * Structured representation of LicenseData::licenseBlock.
@@ -120,7 +121,7 @@ struct NX_VMS_API LicenseSummaryData
     /**%apidoc Total license channels, including expired licenses. */
     int total = 0;
 
-    /**%apidoc 
+    /**%apidoc
      * Currently available license channels. It could be less than the total number of channels
      * in case of some licenses are not valid now (expired, server is offline e.t.c).
      */
