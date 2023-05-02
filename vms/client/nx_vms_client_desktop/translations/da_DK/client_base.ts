@@ -255,15 +255,15 @@
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation type="unfinished">Open in Browser...</translation>
+      <translation>Åbn i browser</translation>
     </message>
     <message>
       <source>System Administration...</source>
-      <translation type="unfinished">System Administration...</translation>
+      <translation>Systemadministration...</translation>
     </message>
     <message>
       <source>System Update...</source>
-      <translation type="unfinished">System Update...</translation>
+      <translation>Systemopdatering...</translation>
     </message>
     <message>
       <source>User Management...</source>
@@ -271,7 +271,7 @@
     </message>
     <message>
       <source>Local Settings...</source>
-      <translation type="unfinished">Local Settings...</translation>
+      <translation>Lokale indstillinger...</translation>
     </message>
     <message>
       <source>Audit Trail...</source>
@@ -302,19 +302,19 @@
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Regler For Begivenhed...</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Enhedsliste</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Kameraliste</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Flet systemer...</translation>
     </message>
     <message>
       <source>About...</source>
@@ -390,7 +390,7 @@
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Åben indeholdende mappe</translation>
     </message>
     <message>
       <source>Identify</source>
@@ -410,11 +410,11 @@
     </message>
     <message>
       <source>Save Current Matrix</source>
-      <translation type="unfinished">Save Current Matrix</translation>
+      <translation>Gem nuværende matrix</translation>
     </message>
     <message>
       <source>Load Matrix</source>
-      <translation type="unfinished">Load Matrix</translation>
+      <translation>Indlæs matrix</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -422,11 +422,11 @@
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation type="unfinished">Stop Video Wall</translation>
+      <translation>Stop videovæg</translation>
     </message>
     <message>
       <source>Clear Screen</source>
-      <translation type="unfinished">Clear Screen</translation>
+      <translation>Ryd skærm</translation>
     </message>
     <message>
       <source>Save Layout</source>
@@ -450,59 +450,59 @@
     </message>
     <message>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Håndter...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation type="unfinished">Show Motion/Smart Search</translation>
+      <translation>Vis bevægelse/Smart Søgning</translation>
     </message>
     <message>
       <source>Show Motion</source>
-      <translation type="unfinished">Show Motion</translation>
+      <translation>Vis Bevægelse</translation>
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
-      <translation type="unfinished">Hide Motion/Smart Search</translation>
+      <translation>Skjul Bevægelse/Smart Søgning</translation>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation type="unfinished">Hide Motion</translation>
+      <translation>Skjul Bevægelse</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
-      <translation type="unfinished">Clear Motion Selection</translation>
+      <translation>Ryd Valg Af Bevægelse</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation type="unfinished">Check File Watermark</translation>
+      <translation>Tjek Fil Vandmærke</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
-      <translation type="unfinished">Image Enhancement...</translation>
+      <translation>Billedforbedring...</translation>
     </message>
     <message>
       <source>0 degrees</source>
-      <translation type="unfinished">0 degrees</translation>
+      <translation>0 grader</translation>
     </message>
     <message>
       <source>90 degrees</source>
-      <translation type="unfinished">90 degrees</translation>
+      <translation>90 grader</translation>
     </message>
     <message>
       <source>180 degrees</source>
-      <translation type="unfinished">180 degrees</translation>
+      <translation>180 grader</translation>
     </message>
     <message>
       <source>270 degrees</source>
-      <translation type="unfinished">270 degrees</translation>
+      <translation>270 grader</translation>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation type="unfinished">Remove from Layout</translation>
+      <translation>Fjern fra layout</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation type="unfinished">Stop Sharing Layout</translation>
+      <translation>Stop Deling Af Layout</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -510,83 +510,83 @@
     </message>
     <message>
       <source>Delete from Disk</source>
-      <translation type="unfinished">Delete from Disk</translation>
+      <translation>Slet fra disk</translation>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation type="unfinished">Set as Layout Background</translation>
+      <translation>Indstil som layoutbaggrund</translation>
     </message>
     <message>
       <source>User Settings...</source>
-      <translation type="unfinished">User Settings...</translation>
+      <translation>Brugerindstillinger...</translation>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation type="unfinished">User Roles...</translation>
+      <translation>Brugerroller...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation type="unfinished">Role Settings...</translation>
+      <translation>Filindstillinger...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
-      <translation type="unfinished">Check Device Issues...</translation>
+      <translation>Kontroller Enhedsproblemer...</translation>
     </message>
     <message>
       <source>Check Devices Issues...</source>
-      <translation type="unfinished">Check Devices Issues...</translation>
+      <translation>Kontroller problemer med enheder...</translation>
     </message>
     <message>
       <source>Check Camera Issues...</source>
-      <translation type="unfinished">Check Camera Issues...</translation>
+      <translation>Kontroller kameraproblemer...</translation>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation type="unfinished">Check Cameras Issues...</translation>
+      <translation>Kontroller kameraproblemer...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation type="unfinished">Check I/O Module Issues...</translation>
+      <translation>Kontroller I/O-modulproblemer...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation type="unfinished">Check I/O Modules Issues...</translation>
+      <translation>Kontroller I/O-modulproblemer...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation type="unfinished">Device Rules...</translation>
+      <translation>Enhedsregler...</translation>
     </message>
     <message>
       <source>Devices Rules...</source>
-      <translation type="unfinished">Devices Rules...</translation>
+      <translation>Enhedsregler...</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation type="unfinished">Camera Rules...</translation>
+      <translation>Kameraregler...</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
-      <translation type="unfinished">Cameras Rules...</translation>
+      <translation>Kameraregler...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation type="unfinished">I/O Module Rules...</translation>
+      <translation>I/O-modulregler...</translation>
     </message>
     <message>
       <source>I/O Modules Rules...</source>
-      <translation type="unfinished">I/O Modules Rules...</translation>
+      <translation>I/O-modulregler...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
-      <translation type="unfinished">Device Settings...</translation>
+      <translation>Enhedsindstillinger...</translation>
     </message>
     <message>
       <source>Devices Settings...</source>
-      <translation type="unfinished">Devices Settings...</translation>
+      <translation>Enhedsindstillinger...</translation>
     </message>
     <message>
       <source>Camera Settings...</source>
-      <translation type="unfinished">Camera Settings...</translation>
+      <translation>Kameraindstillinger...</translation>
     </message>
     <message>
       <source>Cameras Settings...</source>

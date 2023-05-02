@@ -6,7 +6,7 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Ejer: %1</translation>
     </message>
     <message>
       <source>Your System</source>
@@ -17,11 +17,11 @@
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation type="unfinished">Sample format of input device %1 is not supported.</translation>
+      <translation>Eksempelformat for inputenheden %1 understøttes ikke.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
-      <translation type="unfinished">Primary audio device is not selected.</translation>
+      <translation>Primær lydenhed er ikke valgt.</translation>
     </message>
   </context>
   <context>
@@ -33,7 +33,7 @@
     <message>
       <source>System (%1)</source>
       <comment>%1 is ip and port of system</comment>
-      <translation type="unfinished">System (%1)</translation>
+      <translation>System (%1)</translation>
     </message>
   </context>
   <context>
@@ -47,7 +47,7 @@
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation type="unfinished">Unnamed System</translation>
+      <translation>Unavngivet system</translation>
     </message>
   </context>
   <context>
@@ -55,7 +55,7 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Ejer: %1</translation>
     </message>
     <message>
       <source>Your System</source>

@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>GPU Information</source>
-      <translation type="unfinished">GPU Information</translation>
+      <translation>Information</translation>
     </message>
     <message>
       <source>Support</source>
@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>System Servers</source>
-      <translation type="unfinished">System Servers</translation>
+      <translation>Systemserver</translation>
     </message>
     <message>
       <source>Developer</source>
@@ -40,15 +40,15 @@
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Billedforbedring:</translation>
     </message>
     <message>
       <source>Enable image enhancement</source>
-      <translation type="unfinished">Enable image enhancement</translation>
+      <translation>Aktiver billedforbedring</translation>
     </message>
     <message>
       <source>Gamma</source>
-      <translation type="unfinished">Gamma</translation>
+      <translation>Gamma</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -56,54 +56,54 @@
     </message>
     <message>
       <source>Black level</source>
-      <translation type="unfinished">Black level</translation>
+      <translation>Sort niveau</translation>
     </message>
     <message>
       <source>White level</source>
-      <translation type="unfinished">White level</translation>
+      <translation>Hvidt niveau</translation>
     </message>
   </context>
   <context>
     <name>AdvancedSettingsWidget</name>
     <message>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation type="unfinished">Downmix Audio from 5.1 to 2.1</translation>
+      <translation>Downmix lyd fra 5.1 til 2.1</translation>
     </message>
     <message>
       <source>Double Buffering</source>
-      <translation type="unfinished">Double Buffering</translation>
+      <translation>Dobbelt Buffering</translation>
     </message>
     <message>
       <source>Maximum Live Buffer Length</source>
-      <translation type="unfinished">Maximum Live Buffer Length</translation>
+      <translation>Maksimal Live Buffer Længde</translation>
     </message>
     <message>
       <source>Browse Logs</source>
-      <translation type="unfinished">Browse Logs</translation>
+      <translation>Gennemse logfiler</translation>
     </message>
     <message>
       <source>Clear Local Cache</source>
-      <translation type="unfinished">Clear Local Cache</translation>
+      <translation>Ryd lokal cache</translation>
     </message>
     <message>
       <source>Reset All Warnings</source>
-      <translation type="unfinished">Reset All Warnings</translation>
+      <translation>Nulstil alle advarsler</translation>
     </message>
     <message>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>Intel HD Graphics display kan få problemer, hvis sløring er aktiveret. Vi anbefaler kraftigt at efterlade indstillingen som det er.</translation>
     </message>
     <message>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Deaktivér sløring</translation>
     </message>
     <message>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Begræns billedhastighed for at spare CPU</translation>
     </message>
     <message>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>Brug hardware videoafkodning</translation>
     </message>
     <message>
       <source>Server certificate validation</source>
@@ -114,34 +114,34 @@
     <name>AggregationWidget</name>
     <message>
       <source>Check to set aggregation period</source>
-      <translation type="unfinished">Check to set aggregation period</translation>
+      <translation>Vælg for at angive aggregationsperiode</translation>
     </message>
     <message>
       <source>Interval of action :</source>
-      <translation type="unfinished">Interval of action :</translation>
+      <translation>Handlingsinterval:</translation>
     </message>
     <message>
       <source>No more than once per</source>
-      <translation type="unfinished">No more than once per</translation>
+      <translation>Ikke mere end én gang pr.</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Øjeblikkelig</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSdkEventWidget</name>
     <message>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Nøgleord adskilt af mellemrum</translation>
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>Billedteksten indeholder:</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>Beskrivelsen indeholder:</translation>
     </message>
     <message>
       <source>Event Type:</source>
@@ -182,7 +182,7 @@
     <name>AudioRedirectPickerWidget</name>
     <message>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Formular</translation>
     </message>
   </context>
   <context>
@@ -193,7 +193,7 @@
     </message>
     <message>
       <source>User actions</source>
-      <translation type="unfinished">User actions</translation>
+      <translation>Brugerhandlinger</translation>
     </message>
     <message>
       <source>Watching archive</source>
@@ -209,7 +209,7 @@
     </message>
     <message>
       <source>Login/logout</source>
-      <translation type="unfinished">Login/logout</translation>
+      <translation>Log ind/Log ud</translation>
     </message>
     <message>
       <source>Event rules</source>
