@@ -1948,7 +1948,7 @@ State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State sta
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    NX_ASSERT(state.isMotionDetectionActive() || state.isObjectDetectionSupported());
+    NX_ASSERT(state.supportsRecordingByEvents());
     state.hasChanges = true;
     state.recording.thresholds.beforeSec.setUser(value);
     state.recordingAlert = updateHighPreRecordingAlert(state);
@@ -1959,7 +1959,7 @@ State CameraSettingsDialogStateReducer::setRecordingAfterThresholdSec(State stat
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    NX_ASSERT(state.isMotionDetectionActive() || state.isObjectDetectionSupported());
+    NX_ASSERT(state.supportsRecordingByEvents());
     state.hasChanges = true;
     state.recording.thresholds.afterSec.setUser(value);
     return state;
