@@ -162,11 +162,16 @@ GroupSettingsDialog::GroupSettingsDialog(
 
     connect(this, &QmlDialogWrapper::rejected, [this] { setGroup({}); });
 
-    connect(this, &QmlDialogWrapper::applied, this,
-        [this]() { d->editingContext.value()->resetAccessibleResourcesFilter(); });
+    const auto resetAccessibleResourcesFilter =
+        [this]()
+        {
+            if (d->editingContext)
+                d->editingContext.value()->resetAccessibleResourcesFilter();
+        };
 
-    connect(this, &QmlDialogWrapper::accepted, this,
-        [this]() { d->editingContext.value()->resetAccessibleResourcesFilter(); });
+    connect(this, &QmlDialogWrapper::applied, this, resetAccessibleResourcesFilter);
+    connect(this, &QmlDialogWrapper::accepted, this, resetAccessibleResourcesFilter);
+    connect(this, &QmlDialogWrapper::rejected, this, resetAccessibleResourcesFilter);
 }
 
 GroupSettingsDialog::~GroupSettingsDialog()
