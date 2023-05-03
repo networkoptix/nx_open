@@ -2,6 +2,8 @@
 
 #include "client_message_processor.h"
 
+#include <QtCore/QMetaEnum>
+
 #include <client_core/client_core_module.h>
 #include <core/resource_management/layout_tour_state_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
@@ -62,8 +64,8 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     {
         // Double init by null is allowed.
         m_connected = false;
-        if (m_autoUnhold)
-            holdConnection(false);
+        if (m_policy == HoldConnectionPolicy::none)
+            holdConnection(HoldConnectionPolicy::none);
 
         NX_DEBUG(this, "Deinit while connected, connection closed");
         emit connectionClosed();
@@ -77,17 +79,17 @@ const QnClientConnectionStatus* QnClientMessageProcessor::connectionStatus() con
     return &m_status;
 }
 
-void QnClientMessageProcessor::holdConnection(bool value, bool autoUnhold)
+void QnClientMessageProcessor::holdConnection(HoldConnectionPolicy policy)
 {
-    m_autoUnhold = autoUnhold;
-
-    NX_DEBUG(this, nx::format("Hold connection set to %1").arg(value));
-    if (m_holdConnection == value)
+    NX_DEBUG(this, nx::format("Hold connection set to %1")
+        .arg(QMetaEnum::fromType<HoldConnectionPolicy>().valueToKey(int(policy))));
+    if (m_policy == policy)
         return;
 
-    m_holdConnection = value;
+    m_policy = policy;
 
-    if (!m_holdConnection && !m_connected && connection()->moduleInformation().id.isNull())
+    if (m_policy == HoldConnectionPolicy::none && !m_connected
+        && connection()->moduleInformation().id.isNull())
     {
         NX_DEBUG(this, "Unholding connection while disconnected, connection closed");
         emit connectionClosed();
@@ -101,7 +103,7 @@ Qt::ConnectionType QnClientMessageProcessor::handlerConnectionType() const
 
 void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr& connection)
 {
-    m_holdConnection = false;
+    m_policy = HoldConnectionPolicy::none;
     base_type::disconnectFromConnection(connection);
     connection->miscNotificationManager()->disconnect(this);
 }
@@ -169,9 +171,7 @@ void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, nx::vms::api::
     NX_DEBUG(this, lit("peer found, state -> Connected"));
     m_status.setState(QnConnectionState::Connected);
     m_connected = true;
-
-    if (m_autoUnhold)
-        holdConnection(false);
+    holdConnection(HoldConnectionPolicy::none);
 
     NX_DEBUG(this, "Remote peer found, connection opened");
     emit connectionOpened();
@@ -207,12 +207,12 @@ void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, nx::vms::api::P
         connection()->moduleInformation().id);
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
-    if (currentServer)
+    if (currentServer && m_policy != HoldConnectionPolicy::reauth)
         currentServer->setStatus(nx::vms::api::ResourceStatus::offline);
 
     m_connected = false;
 
-    if (!m_holdConnection)
+    if (m_policy == HoldConnectionPolicy::none)
     {
         NX_DEBUG(this, "Connection closed");
         emit connectionClosed();
