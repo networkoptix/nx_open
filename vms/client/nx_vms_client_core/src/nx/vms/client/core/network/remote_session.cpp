@@ -240,8 +240,17 @@ void RemoteSession::setAutoTerminate(bool value)
     d->autoTerminate = value;
 }
 
-bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode /*error*/)
+bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode error)
 {
+    // In case of network errors just continue to reconnect.
+    switch (error)
+    {
+        case RemoteConnectionErrorCode::connectionTimeout:
+        case RemoteConnectionErrorCode::genericNetworkError:
+        case RemoteConnectionErrorCode::internalError:
+        case RemoteConnectionErrorCode::networkContentError:
+            return true;
+    }
     return false;
 }
 
@@ -315,10 +324,12 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
                 };
         };
 
+    // Usually this occurs when client reconnects earlier than server manages to note the client
+    // was ever disconnected. Server will cleanup local peer info in a minute, so try again.
     connect(messageBus,
-        &ec2::TransactionMessageBusAdapter::remotePeerIncompatible,
+        &ec2::TransactionMessageBusAdapter::remotePeerForbidden,
         this,
-        makeServerMarkingFunction(RemoteConnectionErrorCode::binaryProtocolVersionDiffers));
+        makeServerMarkingFunction(RemoteConnectionErrorCode::genericNetworkError));
 
     connect(messageBus,
         &ec2::TransactionMessageBusAdapter::remotePeerUnauthorized,
