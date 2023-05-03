@@ -7,6 +7,8 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
+#include "map.h"
+
 namespace nx::vms::api {
 
 using namespace std::chrono_literals;
@@ -55,6 +57,7 @@ struct NX_VMS_API ServerTimePeriod
 };
 
 using ServerTimePeriodList = std::vector<ServerTimePeriod>;
+using ServerTimePeriodMap = Map<QnUuid, ServerTimePeriodList>;
 
 constexpr bool operator<(std::chrono::milliseconds timeMs, const ServerTimePeriod& other)
 {
