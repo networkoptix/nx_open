@@ -527,7 +527,7 @@ void MessageBus::removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef)
     else if (connection->state() == Connection::State::forbidden)
     {
         emitAsync(this,
-            &MessageBus::remotePeerIncompatible,
+            &MessageBus::remotePeerForbidden,
             remotePeer.id,
             connection->lastErrorMessage());
     }
