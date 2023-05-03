@@ -60,12 +60,16 @@ private:
 
     QnUserResourcePtr calculateCurrentUser() const;
 
+    size_t combinedAccessRightsHash() const;
+    bool updateCombinedAccessRights();
+
 private:
     QString m_userName;
     QString m_userPassword;
     QByteArray m_userDigest;
     QnUserResourcePtr m_user;
     bool m_reconnectOnPasswordChange = true;
+    size_t m_accessRightsHash = 0;
 };
 
 } // namespace nx::vms::client::desktop

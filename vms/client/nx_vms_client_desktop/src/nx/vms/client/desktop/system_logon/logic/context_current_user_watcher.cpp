@@ -5,6 +5,7 @@
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
@@ -28,7 +29,8 @@ ContextCurrentUserWatcher::ContextCurrentUserWatcher(QObject *parent):
         &ContextCurrentUserWatcher::at_resourcePool_resourceRemoved);
 
     connect(systemContext()->globalPermissionsWatcher(),
-        &nx::core::access::GlobalPermissionsWatcher::ownGlobalPermissionsChanged, this,
+        &nx::core::access::GlobalPermissionsWatcher::ownGlobalPermissionsChanged,
+        this,
         [this](const QnUuid& subjectId)
         {
             if (!m_user || m_user->hasFlags(Qn::removed))
@@ -38,24 +40,77 @@ ContextCurrentUserWatcher::ContextCurrentUserWatcher(QObject *parent):
                 reconnect();
         });
 
+    connect(
+        systemContext()->accessRightsManager(),
+        &nx::core::access::AbstractAccessRightsManager::ownAccessRightsChanged,
+        this,
+        [this](QSet<QnUuid> subjectIds)
+        {
+            if (!m_user || m_user->hasFlags(Qn::removed))
+                return;
+
+            if (systemContext()->accessSubjectHierarchy()->isWithin(m_user->getId(), subjectIds))
+                reconnect();
+        });
+
     connect(systemContext()->accessSubjectHierarchy(),
         &nx::core::access::SubjectHierarchy::changed, this,
         [this](
             const QSet<QnUuid>& /*added*/,
             const QSet<QnUuid>& /*removed*/,
-            const QSet<QnUuid>& /*groupsWithChangedMembers*/,
+            const QSet<QnUuid>& groupsWithChangedMembers,
             const QSet<QnUuid>& subjectsWithChangedParents)
         {
             if (!m_user || m_user->hasFlags(Qn::removed))
                 return;
 
-            if (resourcePool()->getResourceById(m_user->getId()))
+            if (!resourcePool()->getResourceById(m_user->getId()))
+                return;
+
+            if (groupsWithChangedMembers.empty() && subjectsWithChangedParents.empty())
+                return;
+
+            if (updateCombinedAccessRights())
                 reconnect();
         });
 }
 
 ContextCurrentUserWatcher::~ContextCurrentUserWatcher()
 {
+}
+
+bool ContextCurrentUserWatcher::updateCombinedAccessRights()
+{
+    const auto accessRightsHash = combinedAccessRightsHash();
+    if (accessRightsHash == m_accessRightsHash)
+        return false;
+
+    m_accessRightsHash = accessRightsHash;
+
+    return true;
+}
+
+size_t ContextCurrentUserWatcher::combinedAccessRightsHash() const
+{
+    if (!m_user)
+        return 0;
+
+    const auto directParents = m_user->groupIds();
+    QSet<QnUuid> parentIds = {directParents.begin(), directParents.end()};
+    parentIds += systemContext()->accessSubjectHierarchy()->recursiveParents(parentIds);
+    parentIds.insert(m_user->getId());
+
+    nx::core::access::ResourceAccessMap accessMap;
+
+    for (const auto& id: parentIds)
+    {
+        const auto ownAccessMap = systemContext()->accessRightsManager()->ownResourceAccessMap(id);
+
+        for (const auto& [resourceId, accessRights]: ownAccessMap.asKeyValueRange())
+            accessMap[resourceId] |= accessRights;
+    }
+
+    return qHash(accessMap);
 }
 
 bool ContextCurrentUserWatcher::tryClose(bool force)
@@ -91,6 +146,8 @@ void ContextCurrentUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
         connect(m_user.get(), &QnUserResource::passwordChanged, this,
             &ContextCurrentUserWatcher::at_user_resourceChanged);
     }
+
+    m_accessRightsHash = combinedAccessRightsHash();
 
     emit userChanged(user);
 }
