@@ -13,6 +13,23 @@ class NX_VMS_CLIENT_CORE_API QnClientMessageProcessor: public QnCommonMessagePro
     typedef QnCommonMessageProcessor base_type;
 
 public:
+    enum class HoldConnectionPolicy
+    {
+        /** Connection is broken when peer is lost. Server is marked as offline. */
+        none,
+
+        /**
+         * Server update scenario. Connection is held when peer is lost, should be restored manually
+         * when a client update is installed. Server is marked as offline.
+         */
+        update,
+
+        /** Session password is re-entered, connection will be restored automatically. */
+        reauth,
+    };
+    Q_ENUM(HoldConnectionPolicy)
+
+public:
     explicit QnClientMessageProcessor(
         nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
@@ -20,7 +37,7 @@ public:
 
     const QnClientConnectionStatus* connectionStatus() const;
 
-    void holdConnection(bool value, bool autoUnhold = false);
+    void holdConnection(HoldConnectionPolicy policy);
 
 protected:
     virtual Qt::ConnectionType handlerConnectionType() const override;
@@ -44,8 +61,7 @@ signals:
 private:
     QnClientConnectionStatus m_status;
     bool m_connected = false;
-    bool m_holdConnection = false;
-    bool m_autoUnhold = false;
+    HoldConnectionPolicy m_policy = HoldConnectionPolicy::none;
 };
 
 #define qnClientMessageProcessor \

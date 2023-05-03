@@ -229,8 +229,11 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
                 auto credentials = connection()->credentials();
                 credentials.authToken = refreshSessionResult.token;
 
-                if (NX_ASSERT(qnClientMessageProcessor))
-                    qnClientMessageProcessor->holdConnection(true, true);
+                if (auto messageProcessor = qnClientMessageProcessor; NX_ASSERT(messageProcessor))
+                {
+                    messageProcessor->holdConnection(
+                        QnClientMessageProcessor::HoldConnectionPolicy::reauth);
+                }
 
                 connection()->updateCredentials(
                     credentials,
