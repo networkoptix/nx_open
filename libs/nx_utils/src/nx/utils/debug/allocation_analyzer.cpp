@@ -5,6 +5,7 @@
 #include <chrono>
 #include <map>
 #include <mutex>
+#include <set>
 #include <sstream>
 
 #if defined(__APPLE__) && !defined(_GNU_SOURCE)
@@ -29,42 +30,49 @@ public:
 
 private:
     mutable std::mutex m_mutex;
-    std::map<void*, boost::stacktrace::stacktrace> m_ptrToStack;
+    // There might be multiple ptr -> stack relations when inheritance comes into
+    // play. For example with SocketDelegate used as a base class. So we need to record
+    // multiple creation stacks for the same pointer and remove them several times when the
+    // object is destroyed as well.
+    std::map<void*, std::vector<boost::stacktrace::stacktrace>> m_ptrToStacks;
     std::map<boost::stacktrace::stacktrace, int /*count*/> m_allocationCountPerStack;
 };
 
 void InternalAllocationAnalyzer::recordObjectCreation(void* ptr, boost::stacktrace::stacktrace stack)
 {
     std::lock_guard<decltype(m_mutex)> locker(m_mutex);
-
-    m_ptrToStack[ptr] = stack;
+    m_ptrToStacks[ptr].push_back(stack);
     ++m_allocationCountPerStack[stack];
 }
 
 bool InternalAllocationAnalyzer::recordObjectDestruction(void* ptr)
 {
     std::lock_guard<decltype(m_mutex)> locker(m_mutex);
-
-    const auto it = m_ptrToStack.find(ptr);
-    if (it == m_ptrToStack.end())
+    const auto it = m_ptrToStacks.find(ptr);
+    NX_ASSERT(it != m_ptrToStacks.end());
+    if (it == m_ptrToStacks.end())
         return false;
 
-    auto stackCountIter = m_allocationCountPerStack.find(it->second);
-    if (stackCountIter != m_allocationCountPerStack.end())
+    const auto& stack = it->second.back();
+    auto stackCountIter = m_allocationCountPerStack.find(stack);
+    if (NX_ASSERT(stackCountIter != m_allocationCountPerStack.end()))
     {
-        --stackCountIter->second;
-        if (stackCountIter->second == 0)
+        if (--stackCountIter->second == 0)
             m_allocationCountPerStack.erase(stackCountIter);
     }
 
-    m_ptrToStack.erase(it);
+    // Removing the last stack only to preserve the creation/destruction order in case of
+    // multiple stacks have been recorded due to inheritance hierarchy.
+    it->second.erase(--it->second.end());
+    if (it->second.empty())
+        m_ptrToStacks.erase(it);
+
     return true;
 }
 
 AllocationsByCount InternalAllocationAnalyzer::getAllocationsByCount() const
 {
     std::lock_guard<decltype(m_mutex)> locker(m_mutex);
-
     AllocationsByCount allocations;
     for (const auto& [stack, count]: m_allocationCountPerStack)
         allocations.emplace(count, stack);
