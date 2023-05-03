@@ -23,6 +23,10 @@ static const int kGeometrySize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 
         //< Record duration. Up to 4.5 hours.
         quint32 duration() const { return durationAndRecCount & 0xffffff; }
         quint8 recordCount() const { return (durationAndRecCount >> 24) + 1; }
+        void setRecordCount(quint8 recordCount) 
+        { 
+            durationAndRecCount = (durationAndRecCount & 0xffffff) + ((recordCount - 1) << 24);
+        }
     };
 
     struct IndexHeader
@@ -118,6 +122,7 @@ public:
     int aggregationIntervalSeconds() const;
 
     QString physicalId() const;
+    QString getFilePrefix(const QDate& datetime) const;
 
     static constexpr quint32 kMinimalDurationMs = 125;
 protected:
@@ -135,7 +140,6 @@ protected:
         std::function<bool()> interruptionCallback = nullptr,
         FixDiscontinue fixDiscontinue = onDiscontinueInMatchedResult);
 
-    QString getFilePrefix(const QDate& datetime) const;
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate) const;
     void fillFileNames(qint64 datetimeMs, QFile* motionFile, bool noGeometry, QFile* indexFile) const;
     void fillFileNames(qint64 datetimeMs, QFile* indexFile) const;
