@@ -31,8 +31,8 @@ void TransactionMessageBusAdapter::initInternal()
         this, &AbstractTransactionMessageBus::peerLost, Qt::DirectConnection);
     connect(m_bus.get(), &AbstractTransactionMessageBus::remotePeerUnauthorized,
         this, &AbstractTransactionMessageBus::remotePeerUnauthorized, Qt::DirectConnection);
-    connect(m_bus.get(), &AbstractTransactionMessageBus::remotePeerIncompatible,
-        this, &AbstractTransactionMessageBus::remotePeerIncompatible, Qt::DirectConnection);
+    connect(m_bus.get(), &AbstractTransactionMessageBus::remotePeerForbidden,
+        this, &AbstractTransactionMessageBus::remotePeerForbidden, Qt::DirectConnection);
     connect(m_bus.get(), &AbstractTransactionMessageBus::remotePeerHandshakeError,
         this, &AbstractTransactionMessageBus::remotePeerHandshakeError);
     connect(m_bus.get(), &AbstractTransactionMessageBus::newDirectConnectionEstablished,
