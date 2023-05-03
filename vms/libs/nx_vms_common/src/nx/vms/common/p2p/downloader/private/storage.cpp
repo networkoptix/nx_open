@@ -826,11 +826,19 @@ FileMetadata Storage::loadMetadata(const QString& fileName)
         return fileInfo;
 
     const auto data = file.readAll();
+    file.close();
     const bool deserializeResult = QJson::deserialize(data, &fileInfo);
     NX_DEBUG(
         this,
         "load metadata (%1). Deserialize result: %2. File information valid: %3",
             fileName, deserializeResult ? "success" : "fail", fileInfo.isValid());
+
+    if (!fileInfo.isValid())
+    {
+        file.remove();
+        NX_DEBUG(this, "File metadata removed: %1", fileName);
+        return {};
+    }
 
     const auto previousStatus = fileInfo.status;
     checkDownloadCompleted(fileInfo);
