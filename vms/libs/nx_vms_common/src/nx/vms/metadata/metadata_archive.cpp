@@ -63,20 +63,30 @@ void Index::reset()
     memset(header.dummy, 0, sizeof(header.dummy));
 }
 
-int64_t Index::truncateTo(qint64 mediaRecords)
+int64_t Index::truncateTo(qint64 totalMediaRecords)
 {
     int64_t counter = 0;
     for (int i = 0; i < records.size(); ++i)
     {
-        const int mediaRecord = records[i].recordCount();
-        if (counter + mediaRecord > mediaRecords)
+        const int indexRecords = records[i].recordCount();
+        if (counter + indexRecords > totalMediaRecords)
         {
+            if (counter < totalMediaRecords)
+            {
+                NX_VERBOSE(this, "Truncating index record %1 from %2 to %3",
+                    i, indexRecords, totalMediaRecords - counter);
+                records[i].setRecordCount(totalMediaRecords - counter);
+                counter += totalMediaRecords - counter;
+                ++i;
+                if (i == records.size())
+                    break;
+            }
             NX_VERBOSE(this, "Metadata index is truncated from %1 to %2 records",
                 records.size(), i);
             records.erase(records.begin() + i, records.end());
             break;
         }
-        counter += mediaRecord;
+        counter += indexRecords;
     }
     return counter;
 }
@@ -701,6 +711,11 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
 
             if (recordMatcher->isEmpty() || metadataFile.open(QFile::ReadOnly))
             {
+                const int recordSize = noGeometryMode
+                    ? index.header.noGeometryRecordSize() : index.header.recordSize;
+                if (metadataFile.isOpen())
+                    index.truncateTo(metadataFile.size() / recordSize);
+
                 QVector<IndexRecord>::iterator startItr = index.records.begin();
                 QVector<IndexRecord>::iterator endItr = index.records.end();
 
@@ -746,10 +761,6 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
                 }
                 else
                 {
-                    const int recordSize = noGeometryMode
-                        ? index.header.noGeometryRecordSize() : index.header.recordSize;
-                    index.truncateTo(metadataFile.size() / recordSize);
-
                     if (descendingOrder)
                     {
                         loadDataFromIndexDesc(
