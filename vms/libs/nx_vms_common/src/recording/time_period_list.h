@@ -240,7 +240,8 @@ QnTimePeriodList timePeriodListFromRange(
         if (itr->isInfinite() && excludeInfinite)
             break;
 
-        if (itr->startTimeMs - last.endTimeMs() < detailLevelMs)
+        if (itr->startTimeMs - last.endTimeMs() < detailLevelMs
+            || QnTimePeriod::kInfiniteDuration == detailLevelMs)
         {
             last.durationMs = itr->isInfinite()
                 ? QnTimePeriod::kInfiniteDuration

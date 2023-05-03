@@ -34,11 +34,38 @@ NX_REFLECTION_INSTRUMENT(DevicePasswordRequest, DevicePasswordRequest_Fields)
 
 struct DeviceFootageRequest: IdData
 {
+    /**%apidoc[opt]
+     * Start time of the interval to search for chunks, in milliseconds.
+     */
     std::chrono::milliseconds startTimeMs{0};
+
+    /**%apidoc[opt]
+     * End time of the interval to search for chunks, in milliseconds.
+     */
     std::chrono::milliseconds endTimeMs{std::numeric_limits<qint64>::max()};
+
+    /**%apidoc[opt]
+     * Chunk detail level, in milliseconds. Time periods that are shorter than the detail level are
+     * discarded. Special value "-1" indicates very large detail level so that all non-infinite chunks
+     * are merged into a single chunk ("keepSmallChunks" is ignored in this case).
+     */
     std::chrono::milliseconds detailLevelMs{1};
+
+    /**%apidoc[opt]
+     * If specified, standalone chunks smaller than the detail level are not removed from the
+     * result.
+     */
     bool keepSmallChunks{false};
+
+    /**%apidoc[opt]
+     * If specified, the chunks are precisely cropped to [startTimeMs, endTimeMs]. The default
+     * behavior may produce chunks that exceed these bounds.
+     */
     bool preciseBounds{false};
+
+    /**%apidoc[opt]
+     * Maximum number of chunks to return.
+     */
     size_t maxCount{INT_MAX};
 
     /**%apidoc[opt]
@@ -46,6 +73,9 @@ struct DeviceFootageRequest: IdData
      */
     StorageLocation storageLocation = StorageLocation::both;
 
+    /**%apidoc[opt]
+     * Chunk type.
+     */
     TimePeriodContentType periodType = TimePeriodContentType::recording;
 
     /**%apidoc[opt]
