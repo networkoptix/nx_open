@@ -197,7 +197,7 @@ QnWorkbenchItemBookmarksWatcher::WidgetData::WidgetData(
         this, &WidgetData::updatePos);
 
     m_query->setActive(m_parent->navigator()->bookmarksModeEnabled());
-    connect(m_parent->navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged,
+    connect(m_parent->navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
         [this]()
         {
             const auto bookmarksModeEnabled = m_parent->navigator()->bookmarksModeEnabled();
