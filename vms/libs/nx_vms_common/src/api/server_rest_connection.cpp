@@ -361,7 +361,9 @@ void ServerConnection::updateCredentials(nx::network::http::Credentials credenti
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
 
-    if (NX_ASSERT(d->directConnect))
+    // All requests must be made with session credentials, and should only be changed if the new
+    // credentials are session ones.
+    if (NX_ASSERT(d->directConnect) && credentials.authToken.isBearerToken())
         d->directConnect->credentials = std::move(credentials);
 }
 
@@ -2011,7 +2013,8 @@ Callback<ResultType> ServerConnection::makeSessionAwareCallback(
             const auto targetThread = QThread::currentThread();
 
             if (auto error = std::get_if<nx::network::rest::Result>(&result);
-                error && error->error == nx::network::rest::Result::SessionExpired)
+                error && (error->error == nx::network::rest::Result::SessionExpired
+                || error->error == nx::network::rest::Result::SessionRequired))
             {
                 // Session is expired. Let's try to issue a new token and resend the request.
                 executeInThread(interactionThread,
@@ -2112,7 +2115,8 @@ ServerConnectionBase::Result<QByteArray>::type ServerConnection::makeSessionAwar
             nx::network::rest::Result error;
             QJson::deserialize(body, &error);
 
-            if (error.error == nx::network::rest::Result::SessionExpired)
+            if (error.error == nx::network::rest::Result::SessionExpired
+                || error.error == nx::network::rest::Result::SessionRequired)
             {
                 // Session is expired. Let's try to issue a new token and resend the request.
                 executeInThread(interactionThread,
