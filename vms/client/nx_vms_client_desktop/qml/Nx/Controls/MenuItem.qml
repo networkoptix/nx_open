@@ -33,7 +33,7 @@ MenuItem
 
         opacity: menuItem.enabled ? 1.0 : 0.3
 
-        readonly property int shortcutIndent: 40
+        readonly property int shortcutIndent: action && (action.shortcut !== null) ? 40 : 0
         readonly property int rightPadding: hotkey.visible ? 12 : 28
         readonly property int implicitWidthLeftPart: row.width + row.rightPadding
         readonly property int implicitWidthRightPart: hotkey.visible ? hotkey.width : 0

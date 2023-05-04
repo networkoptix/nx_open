@@ -28,6 +28,7 @@ Item
         anchors.fill: control
         hoverEnabled: true
         menu: menuInstance
+        menuXOffset: width - menuInstance.width
 
         property var selection: undefined
 
@@ -35,11 +36,11 @@ Item
         {
             radius: 3
 
-            color: button.down || menuInstance.shown
+            color: button.down || menuInstance.visible
                 ? ColorTheme.colors.dark5
                 : button.hovered ? ColorTheme.colors.dark8 : "transparent"
 
-            border.color: button.down || menuInstance.shown
+            border.color: button.down || menuInstance.visible
                 ? ColorTheme.colors.dark4
                 : ColorTheme.colors.dark11
         }
@@ -64,29 +65,45 @@ Item
             }
         }
 
-        PlatformMenu
+        Menu
         {
             id: menuInstance
 
-            component MenuAction: Action
+            component MenuAction: MenuItem
             {
-                checked: button.selection === data
+                id: menu
+
+                property int filter
+
+                action: Action
+                {
+                    checked: button.selection === menu.filter
+                    shortcut: null //< Explicitly hide shortcut spacing.
+                }
+
+                icon.source: checked
+                    ? "image://svg/skin/user_settings/access_rights/filter_checked.svg"
+                    : ""
             }
 
-            MenuAction { text: qsTr("With Permissions"); data: 0 }
+            MenuAction
+            {
+                text: qsTr("With Permissions")
+                filter: 0
+            }
 
-            PlatformMenuSeparator {}
+            MenuSeparator {}
 
             MenuAction
             {
                 text: qsTr("Cameras & Devices")
-                data: ResourceTree.ResourceFilter.camerasAndDevices
+                filter: ResourceTree.ResourceFilter.camerasAndDevices
             }
 
             MenuAction
             {
                 text: qsTr("Layouts")
-                data: ResourceTree.ResourceFilter.layouts
+                filter: ResourceTree.ResourceFilter.layouts
             }
 
             MenuAction
@@ -95,24 +112,24 @@ Item
                     ? qsTr("Web Pages & Integrations")
                     : qsTr("Web Pages")
 
-                data: ResourceTree.ResourceFilter.webPages
+                filter: ResourceTree.ResourceFilter.webPages
                     | ResourceTree.ResourceFilter.integrations
             }
 
             MenuAction
             {
                 text: qsTr("Health Monitors")
-                data: ResourceTree.ResourceFilter.healthMonitors
+                filter: ResourceTree.ResourceFilter.healthMonitors
             }
 
             MenuAction
             {
                 text: qsTr("Video Walls")
-                data: ResourceTree.ResourceFilter.videoWalls
+                filter: ResourceTree.ResourceFilter.videoWalls
             }
 
-            onTriggered: (action) =>
-                button.selection = action.checked ? undefined : action.data
+            onTriggered: (source) =>
+                button.selection = source.checked ? undefined : source.filter
 
             onAboutToHide:
                 searchField.forceActiveFocus()
