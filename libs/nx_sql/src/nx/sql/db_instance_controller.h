@@ -23,6 +23,8 @@ public:
 
     bool initialize();
 
+    void stop();
+
 protected:
     DbStructureUpdater& dbStructureUpdater();
 
