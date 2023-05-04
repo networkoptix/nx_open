@@ -26,20 +26,29 @@ function(nx_init_distribution_flavor_list)
     set(existing_flavor_list ${existing_flavors_${targetDevice}})
 
     string(REPLACE "," ";" distribution_flavor_list "${flavors}")
-    if(NOT distribution_flavor_list)
+    if(distribution_flavor_list STREQUAL "")
         set(distribution_flavor_list ${existing_flavor_list} PARENT_SCOPE)
         return()
     endif()
 
+    list(JOIN existing_flavor_list ", " existing_flavor_string)
+
     foreach(flavor ${distribution_flavor_list})
         if(NOT ${flavor} IN_LIST existing_flavor_list)
-            list(JOIN existing_flavor_list "," existing_flavor_string)
-            message(FATAL_ERROR
+            list(REMOVE_ITEM distribution_flavor_list ${flavor})
+            message(WARNING
                 "\nBad flavor \"${flavor}\" for ${targetDevice}. Valid flavors are: "
-                "${existing_flavor_string}.\n"
+                "${existing_flavor_string}\n"
             )
         endif()
     endforeach()
+
+    if(distribution_flavor_list STREQUAL "")
+        message(FATAL_ERROR
+            "\nNo valid flavors specified. Check the value of the `flavors` cached variable; "
+            "valid flavors for ${targetDevice} are: ${existing_flavor_string}\n"
+        )
+    endif()
 
     set(distribution_flavor_list ${distribution_flavor_list} PARENT_SCOPE)
 endfunction()
