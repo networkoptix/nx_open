@@ -1,4 +1,5 @@
-include(windows_x64.profile)
+include(common/windows.profile)
 
 [settings]
+arch=x86_64
 build_type=Debug
