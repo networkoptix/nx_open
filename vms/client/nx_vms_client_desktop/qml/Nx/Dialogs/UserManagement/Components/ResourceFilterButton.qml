@@ -16,10 +16,12 @@ Item
     implicitWidth: button.implicitWidth
     implicitHeight: button.implicitHeight
 
+    property bool editingEnabled: true
+
     readonly property int resourceTypeFilter: button.selection || ResourceTree.FilterType.noFilter
 
     readonly property bool withPermissionsOnly:
-        button.selection === ResourceTree.FilterType.noFilter
+        button.selection === ResourceTree.FilterType.noFilter || !editingEnabled
 
     Button
     {
@@ -90,9 +92,13 @@ Item
             {
                 text: qsTr("With Permissions")
                 filter: 0
+                visible: editingEnabled
             }
 
-            MenuSeparator {}
+            MenuSeparator
+            {
+                visible: editingEnabled
+            }
 
             MenuAction
             {

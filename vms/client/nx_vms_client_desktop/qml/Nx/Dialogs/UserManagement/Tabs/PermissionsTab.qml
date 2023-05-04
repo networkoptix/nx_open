@@ -374,6 +374,8 @@ Item
         anchors.rightMargin: 16
         width: 32
 
+        editingEnabled: control.editingEnabled
+
         onWithPermissionsOnlyChanged:
         {
             if (editingContext)
