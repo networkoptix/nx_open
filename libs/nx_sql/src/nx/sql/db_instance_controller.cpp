@@ -53,6 +53,11 @@ bool InstanceController::initialize()
     return true;
 }
 
+void InstanceController::stop()
+{
+    m_queryExecutor->pleaseStopSync();
+}
+
 AbstractAsyncSqlQueryExecutor& InstanceController::queryExecutor()
 {
     return *m_queryExecutor;
