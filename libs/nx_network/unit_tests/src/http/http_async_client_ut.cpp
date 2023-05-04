@@ -21,8 +21,10 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/message_body.h>
 #include <nx/network/test_support/synchronous_tcp_server.h>
-#include <nx/reflect/string_conversion.h>
 #include <nx/network/aio/timer.h>
+#include <nx/reflect/string_conversion.h>
+#include <nx/utils/gzip/gzip_compressor.h>
+#include <nx/utils/random.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/uuid.h>
 
@@ -112,6 +114,7 @@ static constexpr char kEmptyResourceLimitedByConnectionClosurePath[] =
     "/HttpClientTest/http-10-empty-resource";
 static constexpr char kMalformedResponsePath[] = "/HttpClientTest/malformed-response";
 static constexpr char kPartialBodyResponsePath[] = "/HttpClientTest/partial-body-response";
+static constexpr char kSaveRequestPath[] = "/HttpClientTest/save-request";
 static constexpr auto kPartialBodyReadTimeout = 50ms;
 
 static constexpr char kResponseBody[] = "testtesttest";
@@ -140,15 +143,14 @@ public:
 protected:
     TestHttpServer m_httpServer;
     std::unique_ptr<AsyncClient> m_client;
-    nx::utils::SyncQueue<nx::network::http::RequestContext> m_receivedRequests;
+    nx::utils::SyncQueue<RequestContext> m_receivedRequests;
+    std::optional<RequestContext> m_lastRequestCtx;
 
     virtual void SetUp() override
     {
-        using namespace std::placeholders;
-
         m_httpServer.registerRequestProcessorFunc(
             "",
-            std::bind(&HttpAsyncClient::processHttpRequest, this, _1, _2));
+            [this](auto&&... args) { processHttpRequest(std::forward<decltype(args)>(args)...); });
 
         m_httpServer.registerRequestProcessorFunc(
             kExtraResponseHandlerPath,
@@ -445,12 +447,62 @@ protected:
         configureClient();
     }
 
+    nx::Buffer whenPostRandomBody()
+    {
+        nx::Buffer body = nx::utils::random::generateName(32);
+        m_client->doPost(
+            prepareUrl(kSaveRequestPath),
+            std::make_unique<BufferSource>("text/plain", body),
+            [this]() { saveResponse(); });
+        return body;
+    }
+
+    nx::Buffer whenPostRandomGzippedBody()
+    {
+        nx::Buffer body = nx::utils::random::generateName(32);
+        m_client->addAdditionalHeader("Content-Encoding", "gzip");
+        m_client->doPost(
+            prepareUrl(kSaveRequestPath),
+            std::make_unique<BufferSource>(
+                "text/plain", nx::utils::bstream::gzip::Compressor::compressData(body)),
+            [this]() { saveResponse(); });
+        return body;
+    }
+
+    void thenExpectedBodyWasReceived(const nx::Buffer& expected)
+    {
+        const auto& ctx = thenRequestIsReceived();
+        ASSERT_EQ(expected, ctx.request.messageBody);
+    }
+
+    void andRequestDidNotContainHeader(const std::string& name)
+    {
+        ASSERT_FALSE(lastRequestCtx().request.headers.contains(name));
+    }
+
+    void andRequestContainsHeader(const HttpHeader& header)
+    {
+        const auto [b, e] = lastRequestCtx().request.headers.equal_range(header.first);
+        ASSERT_TRUE(std::any_of(b, e, [&header](const auto& val) { return val == header; }));
+    }
+
+    const RequestContext& thenRequestIsReceived()
+    {
+        m_lastRequestCtx = m_receivedRequests.pop();
+        return *m_lastRequestCtx;
+    }
+
+    const RequestContext& lastRequestCtx() const
+    {
+        return *m_lastRequestCtx;
+    }
+
     void thenCorrectConnectRequestIsReceived()
     {
-        const auto requestReceived = m_receivedRequests.pop().request;
+        const auto& ctx = thenRequestIsReceived();
 
-        ASSERT_EQ(nx::network::http::Method::connect, requestReceived.requestLine.method);
-        ASSERT_EQ(m_proxyHost, requestReceived.requestLine.url.authority().toStdString());
+        ASSERT_EQ(nx::network::http::Method::connect, ctx.request.requestLine.method);
+        ASSERT_EQ(m_proxyHost, ctx.request.requestLine.url.authority().toStdString());
     }
 
     void thenSuccessResponseIsReceived()
@@ -881,6 +933,22 @@ TEST_F(HttpAsyncClient, body_reading_is_resumed_with_correct_timeout)
 
     thenResponseBodyReadingTimedOut();
     thenExpectedMessageBodyIsRead();
+}
+
+TEST_F(HttpAsyncClient, upload_resource)
+{
+    const auto body = whenPostRandomBody();
+
+    thenExpectedBodyWasReceived(body);
+    andRequestDidNotContainHeader("Content-Encoding");
+}
+
+TEST_F(HttpAsyncClient, upload_gzipped_resource)
+{
+    const auto body = whenPostRandomGzippedBody();
+
+    thenExpectedBodyWasReceived(body);
+    andRequestContainsHeader({"Content-Encoding", "gzip"});
 }
 
 //-------------------------------------------------------------------------------------------------

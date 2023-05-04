@@ -1264,7 +1264,6 @@ void AsyncClient::addBodyToRequest()
             std::to_string(*m_requestBody->contentLength()));
     }
     // TODO: #akolesnikov Support chunked encoding & compression.
-    m_request.headers.emplace("Content-Encoding", "identity");
 
     // TODO: #akolesnikov Add support for any body.
     NX_CRITICAL(
