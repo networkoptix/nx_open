@@ -375,7 +375,10 @@ Item
         width: 32
 
         onWithPermissionsOnlyChanged:
-            editingContext.resetAccessibleResourcesFilter()
+        {
+            if (editingContext)
+                editingContext.resetAccessibleResourcesFilter()
+        }
     }
 
     // Lines and shadow.

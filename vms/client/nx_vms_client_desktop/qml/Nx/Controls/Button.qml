@@ -34,6 +34,8 @@ Button
     property alias iconHeight: control.icon.height
     property alias iconSpacing: iconLabel.spacing
 
+    property real menuXOffset: 0
+
     icon.color: textColor
     icon.width: action ? action.icon.width : 20
     icon.height: action ? action.icon.height : 20
@@ -53,7 +55,7 @@ Button
 
     property bool showBackground: true
 
-    property PlatformMenu menu: null
+    property Menu menu: null
 
     leftPadding: icon.source.toString() ? 4 : 16
     rightPadding: 16
@@ -137,6 +139,6 @@ Button
     onClicked:
     {
         if (menu)
-            menu.open(this)
+            menu.popup(this, menuXOffset, height)
     }
 }
