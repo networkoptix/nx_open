@@ -523,13 +523,15 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
 {
     if (remotePeer().isClient())
         NX_ASSERT(messageType == MessageType::pushTransactionData
-            || messageType == MessageType::ping);
+            || messageType == MessageType::ping
+            || messageType == MessageType::pong);
 
     if (remotePeer().isCloudServer())
     {
         NX_ASSERT(messageType == MessageType::pushTransactionData
             || messageType == MessageType::subscribeAll
-            || messageType == MessageType::ping);
+            || messageType == MessageType::ping
+            || messageType == MessageType::pong);
     }
 
     nx::Buffer buffer;
