@@ -5643,7 +5643,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Administrator</source>
-      <translation>管理者</translation>
+      <translation>アドミニストレーター</translation>
     </message>
     <message>
       <source>View live video</source>
@@ -6587,7 +6587,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation>このグループを %1 と統合しますか？</translation>
+      <translation>このグループを %1 と結合しますか？</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
@@ -7262,7 +7262,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Open door</source>
-      <translation>ドアを開く</translation>
+      <translation>ドアを開ける</translation>
     </message>
   </context>
   <context>

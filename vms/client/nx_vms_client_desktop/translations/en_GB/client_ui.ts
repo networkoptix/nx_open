@@ -1759,7 +1759,7 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>Advanced settings</translation>
     </message>
   </context>
   <context>

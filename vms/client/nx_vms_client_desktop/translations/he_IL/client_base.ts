@@ -977,7 +977,7 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>סובב ל</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -993,7 +993,7 @@
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>מרווח בין תאים</translation>
     </message>
     <message>
       <source>Show Panel</source>
@@ -1009,7 +1009,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>מתקדם...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1755,7 +1755,7 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>מומלץ</translation>
     </message>
     <message>
       <source>Strict</source>
@@ -3119,7 +3119,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>שמור גבוי מסד נתונים</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -7804,11 +7804,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>בחר התקנים</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>בחר מצלמות</translation>
     </message>
     <message>
       <source>Select Device</source>
@@ -10657,7 +10657,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Export</source>
-      <translation>יצא</translation>
+      <translation>ייצא</translation>
     </message>
     <message>
       <source>On-device recordings were found</source>
@@ -11215,7 +11215,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>פתח פריסה</translation>
     </message>
     <message>
       <source>Modifier</source>

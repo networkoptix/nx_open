@@ -1759,7 +1759,7 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>Додаткові налаштування</translation>
     </message>
   </context>
   <context>

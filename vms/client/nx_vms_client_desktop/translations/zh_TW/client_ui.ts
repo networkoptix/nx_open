@@ -636,7 +636,7 @@
     </message>
     <message>
       <source>Web Page</source>
-      <translation>網頁</translation>
+      <translation>網頁介面</translation>
     </message>
     <message>
       <source>Web Page Port</source>

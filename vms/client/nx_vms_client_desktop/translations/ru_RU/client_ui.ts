@@ -636,7 +636,7 @@
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Web-интерфейс</translation>
+      <translation>Web-страница</translation>
     </message>
     <message>
       <source>Web Page Port</source>

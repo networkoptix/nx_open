@@ -10371,7 +10371,7 @@ Du kan se %2 eller läsa den här %3 för att lära dig mer om det aktuella prob
     </message>
     <message>
       <source>Export</source>
-      <translation>Exportera</translation>
+      <translation>Export</translation>
     </message>
     <message>
       <source>On-device recordings were found</source>

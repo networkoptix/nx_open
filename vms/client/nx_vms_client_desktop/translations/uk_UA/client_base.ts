@@ -977,7 +977,7 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Обертати на</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -993,7 +993,7 @@
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Відстань між Комірками</translation>
     </message>
     <message>
       <source>Show Panel</source>
@@ -1009,7 +1009,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Розширені...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1755,7 +1755,7 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Рекомендовані</translation>
     </message>
     <message>
       <source>Strict</source>
@@ -3122,7 +3122,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Зберегти Резервну Копію бази даних</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -7807,7 +7807,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Оберіть пристрої</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -10296,7 +10296,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
+      <translation>Сертифікат Сервера недійсний.</translation>
     </message>
   </context>
   <context>
@@ -10360,11 +10360,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
+      <translation>Не можу перевірити справжність %1</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation type="unfinished">Connecting to %1 for the first time?</translation>
+      <translation>З’єднання з %1 вперше?</translation>
     </message>
     <message>
       <source>Review the %1 to ensure you trust the server you are connecting to.
@@ -10375,15 +10375,15 @@ Read this %2 to learn more about certificate validation.</translation>
     </message>
     <message>
       <source>certificate details</source>
-      <translation type="unfinished">certificate details</translation>
+      <translation>деталі сертифікату</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>стаття з довідки</translation>
     </message>
     <message>
       <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+      <translation>Це повідомлення може відображатися кілька разів під час підключення до багатосерверної системи.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
@@ -10394,7 +10394,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>the server&apos;s certificate</source>
-      <translation type="unfinished">the server&apos;s certificate</translation>
+      <translation>сертифікат серверу&apos;</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -11218,7 +11218,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Відкрити Розкладку</translation>
     </message>
     <message>
       <source>Modifier</source>

@@ -973,7 +973,7 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Rodar a</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -989,7 +989,7 @@
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Espaçamento entre células</translation>
     </message>
     <message>
       <source>Show Panel</source>
@@ -1005,7 +1005,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Avançado...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1721,7 +1721,7 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Recomendado</translation>
     </message>
     <message>
       <source>Strict</source>
@@ -3046,7 +3046,7 @@ a %1</translation>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Gravar Backup da Base de Dados</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -7581,11 +7581,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Seleccionar Dispositivos</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Seleccionar Câmaras</translation>
     </message>
     <message>
       <source>Select Device</source>
@@ -10924,7 +10924,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Abrir Layout</translation>
     </message>
     <message>
       <source>Modifier</source>

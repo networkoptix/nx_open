@@ -4770,7 +4770,7 @@ to %1</source>
     </message>
     <message>
       <source>Failover</source>
-      <translation>Sao lưu</translation>
+      <translation>Chuyển đổi dự phòng</translation>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
@@ -8317,7 +8317,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Medium</source>
-      <translation>Trong</translation>
+      <translation>Trung bình</translation>
     </message>
     <message>
       <source>High</source>
@@ -8325,7 +8325,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>No Failover</source>
-      <translation>Không có chuyển đổi dự phòng</translation>
+      <translation>Không chuyển đổi dự phòng</translation>
     </message>
   </context>
   <context>

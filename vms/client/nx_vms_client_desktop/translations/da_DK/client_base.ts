@@ -267,7 +267,7 @@
     </message>
     <message>
       <source>User Management...</source>
-      <translation type="unfinished">User Management...</translation>
+      <translation>Brugeradministration...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
@@ -594,7 +594,7 @@
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation type="unfinished">I/O Module Settings...</translation>
+      <translation>I/O-modulindstillinger...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
@@ -602,7 +602,7 @@
     </message>
     <message>
       <source>File Settings...</source>
-      <translation type="unfinished">File Settings...</translation>
+      <translation>Filindstillinger...</translation>
     </message>
     <message>
       <source>Layout Settings...</source>
@@ -634,7 +634,7 @@
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation type="unfinished">Server Web Page...</translation>
+      <translation>Server webside...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
@@ -1620,7 +1620,7 @@
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Er du sikker på, at du vil forlade denne side? Ændringer, du har foretaget, bliver muligvis ikke gemt.</translation>
     </message>
   </context>
   <context>
@@ -1690,7 +1690,7 @@
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Billedforbedring:</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
@@ -2167,7 +2167,7 @@
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Øjeblikkelig</translation>
     </message>
     <message>
       <source>Stops</source>
@@ -2519,11 +2519,11 @@
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Enhedsliste</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Kameraliste</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
@@ -2711,7 +2711,7 @@ devices</translation>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Open %1 Portal</translation>
+      <translation>Åbn %1 portalen</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
@@ -2994,7 +2994,7 @@ to %1</translation>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation type="unfinished">Save Database Backup...</translation>
+      <translation>Gem Databasesikkerhedskopi...</translation>
     </message>
     <message>
       <source>Downloading Database Backup</source>
@@ -3354,7 +3354,7 @@ to %1</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regler For Begivenhed</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -3362,7 +3362,7 @@ to %1</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Handlings Log</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -3681,7 +3681,7 @@ to %1</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>Licensen er udløbet</translation>
     </message>
     <message>
       <source>Expires soon</source>
@@ -3992,7 +3992,7 @@ to %1</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
   </context>
   <context>
@@ -4300,7 +4300,7 @@ to %1</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Øjeblikkelig</translation>
     </message>
     <message>
       <source>Position</source>
@@ -6288,7 +6288,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation type="unfinished">Stop Video Wall?</translation>
+      <translation>Stop videovæg?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -6296,7 +6296,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
@@ -6327,7 +6327,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktivér licens...</translation>
     </message>
   </context>
   <context>
@@ -6683,7 +6683,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
@@ -7019,7 +7019,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>slettet kamera</translation>
     </message>
     <message>
       <source>Unknown track</source>
@@ -7324,7 +7324,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>slettet kamera</translation>
     </message>
   </context>
   <context>
@@ -7461,15 +7461,15 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation type="unfinished">Device Rules</translation>
+      <translation>Enhedsregler</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation type="unfinished">Camera Rules</translation>
+      <translation>Kameraregler</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation type="unfinished">I/O Module Rules</translation>
+      <translation>I/O-modulregler</translation>
     </message>
     <message>
       <source>More Info</source>
@@ -7660,7 +7660,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Devices Settings</source>
-      <translation type="unfinished">Devices Settings</translation>
+      <translation>Enhedsindstillinger</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -7999,7 +7999,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Indtast adgangskode...</translation>
     </message>
     <message>
       <source>Administrator password</source>
@@ -8919,7 +8919,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>slettet kamera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -9414,7 +9414,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Intern serverfejl.</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
@@ -10216,7 +10216,7 @@ Du kan se %2 eller læse denne %3 for at lære mere om det aktuelle problem.</tr
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Installerer...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -10637,7 +10637,7 @@ Du kan se %2 eller læse denne %3 for at lære mere om det aktuelle problem.</tr
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Vælg mappe til upload</translation>
     </message>
   </context>
   <context>
@@ -10922,7 +10922,7 @@ Du kan se %2 eller læse denne %3 for at lære mere om det aktuelle problem.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Åbn layout</translation>
     </message>
     <message>
       <source>Modifier</source>
@@ -11517,7 +11517,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Åben indeholdende mappe</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

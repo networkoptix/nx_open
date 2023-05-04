@@ -544,7 +544,7 @@
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation type="unfinished">Joystick Settings</translation>
+      <translation>Impostazioni joystick</translation>
     </message>
     <message>
       <source>joystick</source>

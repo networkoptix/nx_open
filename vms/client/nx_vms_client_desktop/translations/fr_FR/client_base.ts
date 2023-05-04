@@ -7377,7 +7377,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Open door</source>
-      <translation>Ouvrir la porte</translation>
+      <translation>Ouverture porte</translation>
     </message>
   </context>
   <context>
@@ -10380,15 +10380,15 @@ Vous pouvez consulter %2 ou lire ce %3 pour en savoir plus sur le problème actu
     </message>
     <message>
       <source>Export archive from %1 stopped</source>
-      <translation type="unfinished">Export archive from %1 stopped</translation>
+      <translation>L'exportation de l'archive de %1 s'est arrêtée</translation>
     </message>
     <message>
       <source>The archive stream settings have been changed by user</source>
-      <translation type="unfinished">The archive stream settings have been changed by user</translation>
+      <translation>Les paramètres du flux d'archives ont été modifiés par l'utilisateur</translation>
     </message>
     <message>
       <source>The recording settings have been changed by user</source>
-      <translation type="unfinished">The recording settings have been changed by user</translation>
+      <translation>Les paramètres d'enregistrement ont été modifiés par l'utilisateur</translation>
     </message>
   </context>
   <context>

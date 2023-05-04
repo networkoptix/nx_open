@@ -999,7 +999,7 @@
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>조이스틱 설정...</translation>
     </message>
     <message>
       <source>Advanced...</source>
@@ -10774,7 +10774,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>레이아웃 열기</translation>
     </message>
     <message>
       <source>Modifier</source>
