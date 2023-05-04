@@ -59,7 +59,7 @@ class NxOpenConan(ConanFile):
         "customization": "default",
     }
 
-    ffmpeg_version_and_revision = "4.4#c466a4cd83fb41e24104060a371c688c"
+    ffmpeg_version_and_revision = "4.4#3798b16fa0e0317daf710c96f2c794c3"
     requires = (
         f"ffmpeg/{ffmpeg_version_and_revision}",
         "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
