@@ -24,4 +24,9 @@ size_t Worker::size() const
     return m_impl->size();
 }
 
+void Worker::stop()
+{
+    m_impl->stop();
+}
+
 } // namespace nx::utils

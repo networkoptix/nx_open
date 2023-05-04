@@ -31,6 +31,7 @@ public:
 
     void post(Task task);
     size_t size() const;
+    void stop();
 
 private:
     std::unique_ptr<detail::Impl> m_impl;
