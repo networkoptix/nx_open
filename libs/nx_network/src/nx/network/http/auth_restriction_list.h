@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include <QtCore/QRegularExpression>
-
 #include <nx/network/http/http_types.h>
 #include <nx/utils/thread/rw_lock.h>
 
@@ -105,8 +103,7 @@ private:
     struct Rule
     {
         Filter filter;
-        // TODO: #akolesnikov Replace with std::regex.
-        QRegularExpression pathRegexp;
+        std::regex pathRegexp;
         AuthMethod::Values methods;
 
         Rule(const Filter& filter, AuthMethod::Values methods);
