@@ -871,11 +871,19 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCloudOtherSystemsEntity() con
             return createCloudSystemCamerasEntity(systemId);
         };
 
-    auto cloudSystemsEntity =
-        makeUniqueKeyGroupList<QString>(systemItemCreator, cameraListCreator, numericOrder());
-
-    cloudSystemsEntity->installItemSource(m_itemKeySourcePool->cloudSystemsSource());
-    return cloudSystemsEntity;
+    if (user() && user()->isCloud())
+    {
+        auto cloudSystemsEntity =
+            makeUniqueKeyGroupList<QString>(systemItemCreator, cameraListCreator, numericOrder());
+        cloudSystemsEntity->installItemSource(m_itemKeySourcePool->cloudSystemsSource());
+        return cloudSystemsEntity;
+    }
+    else
+    {
+        auto cloudSystemsEntity = makeKeyList<QString>(systemItemCreator, numericOrder());
+        cloudSystemsEntity->installItemSource(m_itemKeySourcePool->cloudSystemsSource());
+        return cloudSystemsEntity;
+    }
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createCloudSystemCamerasEntity(
@@ -889,9 +897,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCloudSystemCamerasEntity(
         };
 
     auto list = makeKeyList<QnResourcePtr>(itemCreator, numericOrder());
-
-    if (user() && user()->isCloud())
-        list->installItemSource(m_itemKeySourcePool->cloudSystemCamerasSource(systemId));
+    list->installItemSource(m_itemKeySourcePool->cloudSystemCamerasSource(systemId));
 
     return makeFlatteningGroup(
         m_itemFactory->createCloudSystemStatusItem(systemId),
