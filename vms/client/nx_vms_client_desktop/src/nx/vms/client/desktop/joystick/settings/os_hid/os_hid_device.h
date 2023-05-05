@@ -23,8 +23,6 @@ class OsHidDevice: public QObject
 public:
     virtual OsHidDeviceInfo info() const = 0;
 
-    virtual bool isValid() const = 0;
-
 protected:
     virtual int read(unsigned char* buffer, int bufferSize) = 0;
 

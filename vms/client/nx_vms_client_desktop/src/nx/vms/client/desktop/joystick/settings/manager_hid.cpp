@@ -32,7 +32,7 @@ void ManagerHid::onHidDeviceListChanged()
         if (m_devices.contains(deviceInfo.path))
             return;
 
-        NX_VERBOSE(this,
+        NX_DEBUG(this,
             "A new Joystick has been found. "
             "Manufacturer: %1, model: %2, id: %3, path: %4",
             deviceInfo.manufacturerName, deviceInfo.modelName, deviceInfo.id, deviceInfo.path);
@@ -48,16 +48,7 @@ void ManagerHid::onHidDeviceListChanged()
 
         auto device = new DeviceHid(config, deviceInfo.path, pollTimer());
 
-        if (device->isValid())
-        {
-            initializeDevice(DevicePtr(device), config);
-        }
-        else
-        {
-            NX_VERBOSE(this, "Device is invalid. Model: %1, path: %2", device->modelName(),
-                device->path());
-            delete device;
-        }
+        initializeDevice(DevicePtr(device), config);
     }
 
     removeUnpluggedJoysticks(foundDevices);

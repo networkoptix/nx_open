@@ -2,9 +2,11 @@
 
 #include "os_hid_device_mac.h"
 
-#include <QtCore/QTimer>
+#include <memory>
 
 #include <hidapi/hidapi.h>
+
+#include <QtCore/QTimer>
 
 using namespace std::chrono;
 
@@ -21,7 +23,7 @@ namespace nx::vms::client::desktop::joystick {
 struct OsHidDeviceMac::Private
 {
     hid_device* dev = nullptr;
-    QTimer* pollingTimer = nullptr;
+    std::unique_ptr<QTimer> pollingTimer;
     OsHidDeviceInfo deviceInfo;
     QBitArray state;
 };
@@ -29,15 +31,6 @@ struct OsHidDeviceMac::Private
 OsHidDeviceMac::OsHidDeviceMac(const OsHidDeviceInfo& info):
     d(new Private{.deviceInfo = info})
 {
-    d->dev = hid_open_path(d->deviceInfo.path.toStdString().c_str());
-
-    if (d->dev)
-    {
-        d->pollingTimer = new QTimer(this);
-        d->pollingTimer->setInterval(kDevicePollingInterval);
-        connect(d->pollingTimer, &QTimer::timeout, this, &OsHidDeviceMac::poll);
-        d->pollingTimer->start();
-    }
 }
 
 OsHidDeviceMac::~OsHidDeviceMac()
@@ -50,14 +43,39 @@ OsHidDeviceInfo OsHidDeviceMac::info() const
     return d->deviceInfo;
 }
 
-bool OsHidDeviceMac::isValid() const
+bool OsHidDeviceMac::isOpened() const
 {
     return d->dev;
 }
 
+bool OsHidDeviceMac::open()
+{
+    d->dev = hid_open_path(d->deviceInfo.path.toStdString().c_str());
+
+    if (!d->dev)
+        return false;
+
+    int res = hid_set_nonblocking(d->dev, 1);
+
+    if (res != 0)
+    {
+        hid_close(d->dev);
+        d->dev = nullptr;
+        return false;
+    }
+
+    if (!d->pollingTimer)
+        d->pollingTimer = std::make_unique<QTimer>(this);
+    d->pollingTimer->setInterval(kDevicePollingInterval);
+    connect(d->pollingTimer.get(), &QTimer::timeout, this, &OsHidDeviceMac::poll);
+    d->pollingTimer->start();
+
+    return true;
+}
+
 int OsHidDeviceMac::read(unsigned char* buffer, int bufferSize)
 {
-    if (!isValid())
+    if (!isOpened())
         return -1;
 
     return hid_read(d->dev, buffer, bufferSize);
