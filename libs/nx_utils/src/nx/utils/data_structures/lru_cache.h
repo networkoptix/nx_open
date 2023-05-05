@@ -118,7 +118,9 @@ public:
         if (it != m_cacheMap.end())
         {
             m_cacheList.splice(m_cacheList.begin(), m_cacheList, it->second);
-            m_cacheList.begin()->second = std::forward<V>(value);
+            // Do not require Value type to provide the move operator.
+            std::destroy_at(&m_cacheList.begin()->second);
+            std::construct_at(&m_cacheList.begin()->second, std::forward<V>(value));
             m_cacheMap[key] = m_cacheList.begin();
         }
         else

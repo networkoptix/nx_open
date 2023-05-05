@@ -24,95 +24,6 @@ public:
 
 } // namespace std
 
-namespace {
-
-class SocketKeeper: public nx::network::aio::BasicPollable
-{
-    using base_type = nx::network::aio::BasicPollable;
-
-public:
-    SocketKeeper(
-        ConnectionCache* cache,
-        const nx::network::ConnectionCache::ConnectionInfo& addr,
-        std::unique_ptr<AbstractStreamSocket> socket)
-        :
-        m_socket(std::move(socket)),
-        m_buf(std::make_unique<nx::Buffer>())
-    {
-        m_socket->bindToAioThread(BasicPollable::getAioThread());
-        m_buf->reserve(1);
-        m_socket->readSomeAsync(
-            m_buf.get(),
-            [this, cache, addr](
-                SystemError::ErrorCode result, std::size_t bytesRead)
-            {
-                // Unexpected read or connection closed. Remove connection from the cache.
-                if (result != SystemError::noError)
-                {
-                    NX_DEBUG(this, "Connection closed due to an error: ", result);
-                }
-                else if (bytesRead > 0)
-                {
-                    NX_DEBUG(this, "Unexpected read from server.");
-                }
-                cache->take(addr, [](std::unique_ptr<AbstractStreamSocket>) {});
-            });
-    }
-
-    SocketKeeper(SocketKeeper&& other) noexcept
-    {
-        std::swap(m_socket, other.m_socket);
-        std::swap(m_buf, other.m_buf);
-        NX_ASSERT(!m_socket || m_socket->isInSelfAioThread());
-    }
-
-    SocketKeeper& operator=(SocketKeeper&& rhs) noexcept
-    {
-        if (&rhs != this)
-        {
-            BasicPollable::pleaseStopSync();
-            std::swap(m_socket, rhs.m_socket);
-            std::swap(m_buf, rhs.m_buf);
-            NX_ASSERT(!m_socket || m_socket->isInSelfAioThread());
-        }
-        return *this;
-    }
-
-    virtual ~SocketKeeper() noexcept override
-    {
-        NX_ASSERT(BasicPollable::isInSelfAioThread());
-        BasicPollable::pleaseStopSync();
-    }
-
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
-    {
-        base_type::bindToAioThread(aioThread);
-        if (m_socket)
-            m_socket->bindToAioThread(aioThread);
-    }
-
-    std::unique_ptr<AbstractStreamSocket> take() noexcept
-    {
-        NX_ASSERT(BasicPollable::isInSelfAioThread());
-        if (m_socket)
-            m_socket->cancelRead(); // I/O cancellation is non-blocking in socket's AIO thread.
-        return std::exchange(m_socket, nullptr);
-    }
-
-protected:
-    virtual void stopWhileInAioThread() override
-    {
-        BasicPollable::stopWhileInAioThread();
-        m_socket.reset();
-    }
-
-private:
-    std::unique_ptr<AbstractStreamSocket> m_socket;
-    std::unique_ptr<nx::Buffer> m_buf;
-};
-
-} // anonymous namespace
-
 class ConnectionCache::Private
 {
 public:
@@ -130,7 +41,7 @@ public:
     {
     public:
         PollableContext(
-            nx::utils::TimeOutCache<ConnectionInfo, SocketKeeper>& cache,
+            nx::utils::TimeOutCache<ConnectionInfo, std::unique_ptr<AbstractStreamSocket>>& cache,
             std::atomic<size_t>& size)
             :
             m_cache(cache),
@@ -147,11 +58,11 @@ public:
         }
 
     private:
-        nx::utils::TimeOutCache<ConnectionInfo, SocketKeeper>& m_cache;
+        nx::utils::TimeOutCache<ConnectionInfo, std::unique_ptr<AbstractStreamSocket>>& m_cache;
         std::atomic<size_t>& m_size;
     };
 
-    nx::utils::TimeOutCache<ConnectionInfo, SocketKeeper> cache;
+    nx::utils::TimeOutCache<ConnectionInfo, std::unique_ptr<AbstractStreamSocket>> cache;
     std::atomic<size_t> size;
     PollableContext pollableContext;
 };
@@ -196,8 +107,9 @@ void ConnectionCache::put(ConnectionInfo addr, std::unique_ptr<AbstractStreamSoc
     d->pollableContext.dispatch(
         [this, addr, socket = std::move(socket)]() mutable
         {
-            SocketKeeper keeper(this, addr, std::move(socket));
-            d->cache.put(std::move(addr), std::move(keeper));
+            socket->bindToAioThread(d->pollableContext.getAioThread());
+            startMonitoringConnection(addr, socket.get());
+            d->cache.put(std::move(addr), std::move(socket));
             ++d->size;
         });
 }
@@ -212,10 +124,11 @@ void ConnectionCache::take(
             auto result = d->cache.getValue(info);
             if (result.has_value())
             {
-                auto value = std::move(result.value().get());
+                auto conn = std::move(result.value().get());
                 d->cache.erase(info);
                 --d->size;
-                handler(value.take());
+                conn->cancelRead();
+                handler(std::move(conn));
             }
             else
             {
@@ -227,4 +140,27 @@ void ConnectionCache::take(
 size_t ConnectionCache::size() const
 {
     return d->size;
+}
+
+void ConnectionCache::startMonitoringConnection(
+    const ConnectionInfo& addr,
+    AbstractStreamSocket* conn)
+{
+    auto buf = std::make_unique<nx::Buffer>();
+    buf->reserve(1);
+    auto bufPtr = buf.get();
+
+    conn->readSomeAsync(
+        bufPtr,
+        [this, buf = std::move(buf), addr](
+            SystemError::ErrorCode result, std::size_t bytesRead)
+        {
+            // Unexpected read or connection closed. Remove connection from the cache.
+            if (result != SystemError::noError)
+                NX_DEBUG(this, "Connection closed due to an error: ", result);
+            else if (bytesRead > 0)
+                NX_DEBUG(this, "Unexpected read from server.");
+
+            take(addr, [](auto&&...) {});
+        });
 }
