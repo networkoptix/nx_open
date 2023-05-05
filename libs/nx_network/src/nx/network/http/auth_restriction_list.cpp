@@ -95,11 +95,7 @@ AuthMethodRestrictionList::Rule::Rule(
     methods(methods)
 {
     if (filter.path)
-    {
-        pathRegexp = QRegularExpression(
-            QRegularExpression::anchoredPattern(
-                (QLatin1String("/*") + filter.path->c_str() + QLatin1String("/?"))));
-    }
+        pathRegexp = std::regex(filter.path->c_str());
 }
 
 bool AuthMethodRestrictionList::Rule::matches(const Request& request) const
@@ -113,7 +109,8 @@ bool AuthMethodRestrictionList::Rule::matches(const Request& request) const
     if (filter.method && *filter.method != request.requestLine.method)
         return false;
 
-    if (filter.path && !pathRegexp.match(request.requestLine.url.path()).hasMatch())
+    using namespace std;
+    if (filter.path && !regex_match(request.requestLine.url.path().toUtf8().data(), pathRegexp))
         return false;
 
     return true;
