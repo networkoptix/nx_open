@@ -169,11 +169,14 @@ TEST_F(SystemUriTest, genericCloudValidDomain)
     EXPECT_TRUE(m_uri.isValid()) << m_uri;
 }
 
-// Login to Cloud command. Credentials are not supported anymore.
+// Login to Cloud command. Credentials are not supported anymore. Auth code shall be used instead.
 TEST_F(SystemUriTest, genericCloudValidAuth)
 {
     m_uri.clientCommand = SystemUri::ClientCommand::LoginToCloud;
     m_uri.cloudHost = kCloudHost;
+    EXPECT_FALSE(m_uri.isValid()) << m_uri;
+
+    m_uri.authCode = kAuthCode;
     EXPECT_TRUE(m_uri.isValid()) << m_uri;
 
     m_uri.credentials = kPasswordCredentials;
@@ -236,6 +239,7 @@ TEST_F(SystemUriTest, directSystemValidProtocol)
     m_uri.scope = SystemUri::Scope::direct;
     m_uri.clientCommand = SystemUri::ClientCommand::Client;
     m_uri.systemAddress = kLocalSystemAddress;
+    m_uri.credentials = kPasswordCredentials;
 
     EXPECT_FALSE(m_uri.isValid()) << m_uri;
 
@@ -273,36 +277,8 @@ TEST_F(SystemUriTest, directSystemValidSystemIdWithAuth)
     m_uri.systemAddress = kLocalSystemAddress;
     EXPECT_TRUE(m_uri.isValid()) << m_uri;
 
+    // Password credentials are not valid for Cloud Systems.
     m_uri.systemAddress = kCloudSystemAddress;
-    EXPECT_TRUE(m_uri.isValid()) << m_uri;
-}
-
-/** Direct system command. Valid client commands for native protocol without auth. */
-TEST_F(SystemUriTest, directSystemNativeClient)
-{
-    m_uri.scope = SystemUri::Scope::direct;
-    m_uri.protocol = SystemUri::Protocol::Native;
-    m_uri.systemAddress = kLocalSystemAddress;
-    EXPECT_FALSE(m_uri.isValid()) << m_uri;
-
-    m_uri.clientCommand = SystemUri::ClientCommand::LoginToCloud;
-    EXPECT_TRUE(m_uri.isValid()) << m_uri;
-
-    m_uri.clientCommand = SystemUri::ClientCommand::OpenOnPortal;
-    EXPECT_FALSE(m_uri.isValid()) << m_uri;
-
-    m_uri.clientCommand = SystemUri::ClientCommand::Client;
-    EXPECT_TRUE(m_uri.isValid()) << m_uri;
-}
-
-/** Direct system command. Login to cloud for native protocol. */
-TEST_F(SystemUriTest, directSystemNativeCloud)
-{
-    m_uri.scope = SystemUri::Scope::direct;
-    m_uri.protocol = SystemUri::Protocol::Native;
-    m_uri.systemAddress = kLocalSystemAddress;
-    m_uri.clientCommand = SystemUri::ClientCommand::LoginToCloud;
-    m_uri.credentials = kPasswordCredentials;
     EXPECT_FALSE(m_uri.isValid()) << m_uri;
 }
 
@@ -365,27 +341,27 @@ TEST_F(SystemUriTest, universalLinkLocalSystem)
         .arg(kCloudHost).arg(kLocalSystemAddress).arg(kEncodedAuthKey));
 }
 
-// http://example.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
-// http://example.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
-// https://example.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
-// https://example.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+// http://example.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08?code=nxcdb-5e2f4fb9-654e-46e4-b0e5-8dcb4f9f3753
+// http://example.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08/view?code=nxcdb-5e2f4fb9-654e-46e4-b0e5-8dcb4f9f3753
+// https://example.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08?code=nxcdb-5e2f4fb9-654e-46e4-b0e5-8dcb4f9f3753
+// https://example.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08/view?code=nxcdb-5e2f4fb9-654e-46e4-b0e5-8dcb4f9f3753
 TEST_F(SystemUriTest, universalLinkCloudSystem)
 {
     m_uri.cloudHost = kCloudHost;
     m_uri.clientCommand = SystemUri::ClientCommand::Client;
-    m_uri.credentials = kPasswordCredentials;
+    m_uri.authCode = kAuthCode;
     m_uri.systemAddress = kCloudSystemAddress;
 
-    validateLink(QString("http://%1/client/%2?auth=%3")
-        .arg(kCloudHost).arg(kCloudSystemAddress).arg(kEncodedAuthKey));
-    validateLink(QString("http://%1/client/%2/view?auth=%3")
-        .arg(kCloudHost).arg(kCloudSystemAddress).arg(kEncodedAuthKey));
+    validateLink(QString("http://%1/client/%2?code=%3")
+        .arg(kCloudHost).arg(kCloudSystemAddress).arg(kAuthCode));
+    validateLink(QString("http://%1/client/%2/view?code=%3")
+        .arg(kCloudHost).arg(kCloudSystemAddress).arg(kAuthCode));
 
     m_uri.protocol = SystemUri::Protocol::Https;
-    validateLink(QString("https://%1/client/%2?auth=%3")
-        .arg(kCloudHost).arg(kCloudSystemAddress).arg(kEncodedAuthKey));
-    validateLink(QString("https://%1/client/%2/view?auth=%3")
-        .arg(kCloudHost).arg(kCloudSystemAddress).arg(kEncodedAuthKey));
+    validateLink(QString("https://%1/client/%2?code=%3")
+        .arg(kCloudHost).arg(kCloudSystemAddress).arg(kAuthCode));
+    validateLink(QString("https://%1/client/%2/view?code=%3")
+        .arg(kCloudHost).arg(kCloudSystemAddress).arg(kAuthCode));
 }
 
 // nx-vms://example.com/ - just open the client
@@ -457,38 +433,21 @@ TEST_F(SystemUriTest, nativeLinkLocalSystem)
         .arg(kEncodedAuthKey));
 }
 
-// nx-vms://example.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
-// nx-vms://example.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
-// nx-vms://example.com/systems/d0b73d03-3e2e-405d-8226-019c83b13a08?auth=YWJyYTprYWRhYnJh
-// nx-vms://example.com/systems/d0b73d03-3e2e-405d-8226-019c83b13a08/view?auth=YWJyYTprYWRhYnJh
+// Open the client and login to the Cloud System.
+// nx-vms://nxvms.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08?code=nxcdb-5e2f4fb9-654e-46e4-b0e5-8dcb4f9f3753
 TEST_F(SystemUriTest, nativeLinkCloudSystem)
 {
     m_uri.protocol = SystemUri::Protocol::Native;
     m_uri.cloudHost = kCloudHost;
     m_uri.clientCommand = SystemUri::ClientCommand::Client;
-    m_uri.credentials = kPasswordCredentials;
+    m_uri.authCode = kAuthCode;
     m_uri.systemAddress = kCloudSystemAddress;
 
-    validateLink(QString("%1://%2/client/%3?auth=%4")
+    validateLink(QString("%1://%2/client/%3?code=%4")
         .arg(nx::branding::nativeUriProtocol())
         .arg(kCloudHost)
         .arg(kCloudSystemAddress)
-        .arg(kEncodedAuthKey));
-    validateLink(QString("%1://%2/client/%3/view?auth=%4")
-        .arg(nx::branding::nativeUriProtocol())
-        .arg(kCloudHost)
-        .arg(kCloudSystemAddress)
-        .arg(kEncodedAuthKey));
-    validateLink(QString("%1://%2/systems/%3?auth=%4")
-        .arg(nx::branding::nativeUriProtocol())
-        .arg(kCloudHost)
-        .arg(kCloudSystemAddress)
-        .arg(kEncodedAuthKey));
-    validateLink(QString("%1://%2/systems/%3/view?auth=%4")
-        .arg(nx::branding::nativeUriProtocol())
-        .arg(kCloudHost)
-        .arg(kCloudSystemAddress)
-        .arg(kEncodedAuthKey));
+        .arg(kAuthCode));
 }
 
 // nx-vms://example.com/client/localhost:7001?auth=vms-a9e6c2caf6f34942a3aa414375295d29-DvU3vLK9c7
@@ -577,10 +536,10 @@ TEST_F(SystemUriTest, genericSystemCloudSystemIdToString)
 {
     m_uri.cloudHost = kCloudHost;
     m_uri.clientCommand = SystemUri::ClientCommand::Client;
-    m_uri.credentials = kPasswordCredentials;
+    m_uri.authCode = kAuthCode;
     m_uri.systemAddress = kCloudSystemAddress;
-    validateToString(QString("http://%1/client/%2/view?auth=%3")
-        .arg(kCloudHost).arg(kCloudSystemAddress).arg(kEncodedAuthKey));
+    validateToString(QString("http://%1/client/%2/view?code=%3")
+        .arg(kCloudHost).arg(kCloudSystemAddress).arg(kAuthCode));
 }
 
 TEST_F(SystemUriTest, genericSystemLocalSystemIdToString)
@@ -612,12 +571,12 @@ TEST_F(SystemUriTest, directSystemCloudSystemIdToString)
     m_uri.protocol = SystemUri::Protocol::Native;
     m_uri.cloudHost = kCloudSystemAddress;
     m_uri.clientCommand = SystemUri::ClientCommand::Client;
-    m_uri.credentials = kPasswordCredentials;
+    m_uri.authCode = kAuthCode;
     m_uri.systemAddress = kCloudSystemAddress;
-    validateToString(QString("%1://%2/view?auth=%3")
+    validateToString(QString("%1://%2/view?code=%3")
         .arg(nx::branding::nativeUriProtocol())
         .arg(kCloudSystemAddress)
-        .arg(kEncodedAuthKey));
+        .arg(kAuthCode));
 }
 
 TEST_F(SystemUriTest, referralLinkToString)
