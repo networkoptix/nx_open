@@ -26,11 +26,6 @@ OsHidDeviceInfo OsHidDeviceVirtual::info() const
     return OsHidDeviceVirtual::deviceInfo();
 }
 
-bool OsHidDeviceVirtual::isValid() const
-{
-    return true;
-}
-
 int OsHidDeviceVirtual::read(unsigned char* buffer, int bufferSize)
 {
     const int size = std::min((int)(m_state.size() / 8), bufferSize);

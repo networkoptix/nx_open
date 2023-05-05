@@ -16,8 +16,6 @@ public:
 
     virtual OsHidDeviceInfo info() const override;
 
-    virtual bool isValid() const override;
-
     virtual int read(unsigned char* buffer, int bufferSize) override;
 
     QBitArray state() const { return m_state; }

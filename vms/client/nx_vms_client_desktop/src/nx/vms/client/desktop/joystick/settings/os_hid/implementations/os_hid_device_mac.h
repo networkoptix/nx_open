@@ -15,7 +15,9 @@ public:
     virtual ~OsHidDeviceMac() override;
 
     virtual OsHidDeviceInfo info() const override;
-    virtual bool isValid() const override;
+
+    bool isOpened() const;
+    bool open();
 
     void stall();
 

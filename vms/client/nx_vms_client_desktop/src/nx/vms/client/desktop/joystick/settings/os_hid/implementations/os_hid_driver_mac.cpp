@@ -2,12 +2,13 @@
 
 #include "os_hid_driver_mac.h"
 
+#include <hidapi/hidapi.h>
+
 #include <QtCore/QMap>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSet>
 #include <QtCore/QTimer>
 
-#include <hidapi/hidapi.h>
 #include <nx/utils/log/log.h>
 
 #include "os_hid_device_mac.h"
@@ -144,16 +145,6 @@ void OsHidDriverMac::enumerateDevices()
 
             hidDevice = new OsHidDeviceMac(deviceInfo);
 
-            if (!hidDevice->isValid())
-            {
-                NX_DEBUG(this, "Failed to open HID device: %1 %2 (%3), ignoring.",
-                    deviceInfo.manufacturerName,
-                    deviceInfo.modelName,
-                    deviceInfo.path);
-                delete hidDevice;
-                continue;
-            }
-
             d->deviceInfos[deviceInfo.path] = OsHidDeviceInfo{deviceInfo.id, deviceInfo.path,
                 deviceInfo.modelName, deviceInfo.manufacturerName};
             d->deviceInfos[deviceInfo.path] = deviceInfo;
@@ -173,6 +164,18 @@ void OsHidDriverMac::enumerateDevices()
             {
                 if (subscription.isConnected)
                     continue;
+
+                if (!hidDevice->isOpened())
+                {
+                    if (!hidDevice->open())
+                    {
+                        NX_DEBUG(this, "Failed to open HID device: %1 %2 (%3), ignoring.",
+                            deviceInfo.manufacturerName,
+                            deviceInfo.modelName,
+                            deviceInfo.path);
+                        continue;
+                    }
+                }
 
                 connect(hidDevice, SIGNAL(stateChanged(QBitArray)),
                     subscription.subscriber, SLOT(onStateChanged(QBitArray)));
