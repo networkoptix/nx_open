@@ -320,6 +320,7 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
     base_type::paintEvent(event);
 
     QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
 
     painter.fillRect(d->thumbnailRect(), colorTheme()->color("dark4"));
     if (!isEnabled())
