@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>User Management...</source>
-      <translation type="unfinished">User Management...</translation>
+      <translation>Brugeradministration...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
@@ -578,7 +578,7 @@
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation type="unfinished">I/O Module Settings...</translation>
+      <translation>I/O-modulindstillinger...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
@@ -586,7 +586,7 @@
     </message>
     <message>
       <source>File Settings...</source>
-      <translation type="unfinished">File Settings...</translation>
+      <translation>Filindstillinger...</translation>
     </message>
     <message>
       <source>Layout Settings...</source>
@@ -618,7 +618,7 @@
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation type="unfinished">Server Web Page...</translation>
+      <translation>Server webside...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
@@ -1017,19 +1017,19 @@
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
-      <translation type="unfinished">Save Current Layout As Cloud...</translation>
+      <translation>Gem Nuværende Layout Som Cloud...</translation>
     </message>
     <message>
       <source>Save Layout As Cloud...</source>
-      <translation type="unfinished">Save Layout As Cloud...</translation>
+      <translation>Gem Layout Som Sky...</translation>
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>Gem Sky-layout</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>Gem Sky-layout Som...</translation>
     </message>
   </context>
   <context>
@@ -1318,7 +1318,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>Hardware ID</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1326,7 +1326,7 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>Kunne ikke aktivere gratis licens</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1335,20 +1335,20 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>Hardware-ID: %1
+Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>Kopier Parametre</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Hvis dit system ikke har adgang til internettet, send venligst den angivne Licensnøgle og Hardware ID til %1 for at modtage aktiveringsfilen.</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Hvis dit system ikke har adgang til internettet, send venligst det angivne Licensnøgle og Hardware ID til dit Regionale / Licenssupportteam for at modtage aktiveringsfilen:</translation>
     </message>
   </context>
   <context>
@@ -1493,11 +1493,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
+      <translation>Usikker</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Tjek</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -1505,7 +1505,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>URL er ikke gyldig.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -1513,11 +1513,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Aktiv</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>Ikke konfigureret</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1525,7 +1525,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>Angiv din e-mailadresse eller SMTP server</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
@@ -1767,7 +1767,7 @@ License Key: %2</translation>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Er du sikker på, at du vil forlade denne side? Ændringer, du har foretaget, bliver muligvis ikke gemt.</translation>
     </message>
   </context>
   <context>
@@ -1823,7 +1823,7 @@ License Key: %2</translation>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Billedforbedring:</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
@@ -1890,7 +1890,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Vælg mappe...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
@@ -2332,7 +2332,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Øjeblikkelig</translation>
     </message>
     <message>
       <source>Stops</source>
@@ -2684,11 +2684,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Enhedsliste</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Kameraliste</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
@@ -2876,7 +2876,7 @@ devices</translation>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Open %1 Portal</translation>
+      <translation>Åbn %1 portalen</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
@@ -3159,7 +3159,7 @@ to %1</translation>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation type="unfinished">Save Database Backup...</translation>
+      <translation>Gem Databasesikkerhedskopi...</translation>
     </message>
     <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
@@ -3601,7 +3601,7 @@ to %1</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regler For Begivenhed</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -3609,7 +3609,7 @@ to %1</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Handlings Log</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -3920,7 +3920,7 @@ to %1</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>Licensen er udløbet</translation>
     </message>
     <message>
       <source>Expires soon</source>
@@ -4231,7 +4231,7 @@ to %1</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
   </context>
   <context>
@@ -4531,7 +4531,7 @@ to %1</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Øjeblikkelig</translation>
     </message>
     <message>
       <source>Position</source>
@@ -5498,15 +5498,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Brugeradministration</translation>
     </message>
     <message>
       <source>Time Sync</source>
-      <translation type="unfinished">Time Sync</translation>
+      <translation>Tidssynkronisering</translation>
     </message>
     <message>
       <source>Routing</source>
-      <translation type="unfinished">Routing</translation>
+      <translation>Routing</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -6274,7 +6274,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation type="unfinished">Stop Video Wall?</translation>
+      <translation>Stop videovæg?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -6282,7 +6282,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
@@ -6313,7 +6313,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktivér licens...</translation>
     </message>
   </context>
   <context>
@@ -6669,7 +6669,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
@@ -7072,7 +7072,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>slettet kamera</translation>
     </message>
     <message>
       <source>Unknown track</source>
@@ -7377,7 +7377,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>slettet kamera</translation>
     </message>
   </context>
   <context>
@@ -7524,15 +7524,15 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation type="unfinished">Device Rules</translation>
+      <translation>Enhedsregler</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation type="unfinished">Camera Rules</translation>
+      <translation>Kameraregler</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation type="unfinished">I/O Module Rules</translation>
+      <translation>I/O-modulregler</translation>
     </message>
     <message>
       <source>More Info</source>
@@ -7779,7 +7779,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Devices Settings</source>
-      <translation type="unfinished">Devices Settings</translation>
+      <translation>Enhedsindstillinger</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -8197,7 +8197,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Indtast adgangskode...</translation>
     </message>
     <message>
       <source>Administrator password</source>
@@ -9282,7 +9282,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>slettet kamera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -9799,7 +9799,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Intern serverfejl.</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
@@ -10556,7 +10556,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Installerer...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -11126,7 +11126,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Vælg mappe til upload</translation>
     </message>
   </context>
   <context>
@@ -11411,7 +11411,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Åbn layout</translation>
     </message>
     <message>
       <source>Modifier</source>
@@ -11483,7 +11483,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Øjeblikkelig</translation>
     </message>
   </context>
   <context>
@@ -12074,7 +12074,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Åben indeholdende mappe</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

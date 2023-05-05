@@ -248,7 +248,7 @@
     </message>
     <message>
       <source>Select all</source>
-      <translation type="unfinished">Select all</translation>
+      <translation>Vælg alt</translation>
     </message>
     <message>
       <source>Sessions</source>
@@ -260,7 +260,7 @@
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Handlings Log</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -276,7 +276,7 @@
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regler For Begivenhed</translation>
     </message>
   </context>
   <context>
@@ -487,7 +487,7 @@
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regler For Begivenhed</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -752,7 +752,7 @@
     <name>CameraLicensePanelWidget</name>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktivér licens...</translation>
     </message>
   </context>
   <context>
@@ -828,7 +828,7 @@
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktivér licens...</translation>
     </message>
     <message>
       <source>Copying Schedule</source>
@@ -994,15 +994,15 @@
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Nøgleord adskilt af mellemrum</translation>
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>Billedteksten indeholder:</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>Beskrivelsen indeholder:</translation>
     </message>
     <message>
       <source>Omit Logging</source>
@@ -1095,7 +1095,7 @@
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message>
       <source>Add all Devices</source>
@@ -1160,7 +1160,7 @@
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Regler For Begivenhed...</translation>
     </message>
   </context>
   <context>
@@ -1534,7 +1534,7 @@
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Formular</translation>
     </message>
     <message>
       <source>Enable tile interface</source>
@@ -1781,14 +1781,14 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>Hardware ID</translation>
     </message>
   </context>
   <context>
     <name>LocalSettingsDialog</name>
     <message>
       <source>Local Settings</source>
-      <translation type="unfinished">Local Settings</translation>
+      <translation>Lokale indstillinger</translation>
     </message>
   </context>
   <context>
@@ -1935,7 +1935,7 @@
     <name>MergeSystemsDialog</name>
     <message>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Flet systemer...</translation>
     </message>
     <message>
       <source>Server URL:</source>
@@ -1951,7 +1951,7 @@
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Tjek</translation>
     </message>
     <message>
       <source>Take system name and settings from:</source>
@@ -2122,7 +2122,7 @@
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Håndter...</translation>
     </message>
     <message>
       <source>Volume:</source>
@@ -2145,15 +2145,15 @@
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>Billedteksten indeholder:</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Nøgleord adskilt af mellemrum</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>Beskrivelsen indeholder:</translation>
     </message>
     <message>
       <source>Level:</source>
@@ -2224,7 +2224,7 @@
     <name>PtzManageDialog</name>
     <message>
       <source>Save Current Position</source>
-      <translation type="unfinished">Save Current Position</translation>
+      <translation>Gem nuværende position</translation>
     </message>
     <message>
       <source>Go To Position</source>
@@ -2275,7 +2275,7 @@
     </message>
     <message>
       <source>Hotkey:</source>
-      <translation type="unfinished">Hotkey:</translation>
+      <translation>Genvejstast:</translation>
     </message>
   </context>
   <context>
@@ -2765,7 +2765,7 @@
     </message>
     <message>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>Skift adgangskode...</translation>
     </message>
     <message>
       <source>Encrypting video traffic will significantly increase CPU usage.</source>
@@ -2861,7 +2861,7 @@
     </message>
     <message>
       <source>Failover Priority...</source>
-      <translation type="unfinished">Failover Priority...</translation>
+      <translation>Failover prioritet...</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2993,7 +2993,7 @@
     <name>StorageConfigWidget</name>
     <message>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Tilføj Ekstern Lagerplads...</translation>
     </message>
     <message>
       <source>Storage Locations</source>
@@ -3035,7 +3035,7 @@
     <name>StorageUrlDialog</name>
     <message>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Tilføj Ekstern Lagerplads...</translation>
     </message>
     <message>
       <source>Protocol:</source>
@@ -3077,7 +3077,7 @@
     <name>SystemSettingsWidget</name>
     <message>
       <source>(recommended)</source>
-      <translation type="unfinished">(recommended)</translation>
+      <translation>(anbefalet)</translation>
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>
@@ -3183,7 +3183,7 @@
     <name>UserProfileWidget</name>
     <message>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>Skift adgangskode...</translation>
     </message>
   </context>
   <context>
@@ -3205,7 +3205,7 @@
     <name>UserRolesDialog</name>
     <message>
       <source>User Roles</source>
-      <translation type="unfinished">User Roles</translation>
+      <translation>Brugerroller</translation>
     </message>
     <message>
       <source>New role</source>
@@ -3272,7 +3272,7 @@
     <name>VirtualCameraTimeZoneWidget</name>
     <message>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Formular</translation>
     </message>
     <message>
       <source>Time</source>

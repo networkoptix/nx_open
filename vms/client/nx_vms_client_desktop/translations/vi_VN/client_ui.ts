@@ -1291,7 +1291,7 @@
     <name>FailoverPriorityDialog</name>
     <message>
       <source>Failover Priority</source>
-      <translation>Failover ưu tiên</translation>
+      <translation>Ưu tiên chuyển đổi dự phòng</translation>
     </message>
   </context>
   <context>
@@ -1306,7 +1306,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>Trong (M)</translation>
+      <translation>Trung bình (M)</translation>
     </message>
     <message>
       <source>High</source>
@@ -1318,7 +1318,7 @@
     </message>
     <message>
       <source>No Failover</source>
-      <translation>Không có chuyển đổi dự phòng</translation>
+      <translation>Không chuyển đổi dự phòng</translation>
     </message>
   </context>
   <context>
@@ -2857,11 +2857,11 @@
     </message>
     <message>
       <source>Failover</source>
-      <translation>Sao lưu</translation>
+      <translation>Chuyển đổi dự phòng</translation>
     </message>
     <message>
       <source>Failover Priority...</source>
-      <translation>Failover ưu tiên...</translation>
+      <translation>Ưu tiên chuyển đổi dự phòng...</translation>
     </message>
     <message>
       <source>Name</source>

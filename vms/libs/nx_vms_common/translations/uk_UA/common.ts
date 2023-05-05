@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Цей користувач був деактивований системним адміністратором.</translation>
     </message>
   </context>
   <context>

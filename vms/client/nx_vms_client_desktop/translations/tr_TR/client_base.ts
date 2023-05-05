@@ -7089,7 +7089,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya kamera eklentisi ayarlarında nesne algılamayı yapılandırın</translation>
     </message>
   </context>
   <context>
@@ -7390,7 +7390,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Zaman çizelgesinde bir zaman aralığı seçin ve bir yer imi oluşturmak için vurgulanan bölüme sağ tıklayın</translation>
     </message>
   </context>
   <context>

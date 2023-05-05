@@ -957,7 +957,7 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Forgatás mértéke</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -973,7 +973,7 @@
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Cellatávolság</translation>
     </message>
     <message>
       <source>Show Panel</source>
@@ -989,7 +989,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Haladó...</translation>
     </message>
     <message>
       <source>Archive filter...</source>
@@ -1850,7 +1850,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Ajánlott</translation>
     </message>
     <message>
       <source>Strict</source>
@@ -3193,7 +3193,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Adatbázis biztonsági mentése</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -7698,7 +7698,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Eszközök kiválasztása</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -11411,7 +11411,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Elrendezés megnyitása</translation>
     </message>
     <message>
       <source>Modifier</source>

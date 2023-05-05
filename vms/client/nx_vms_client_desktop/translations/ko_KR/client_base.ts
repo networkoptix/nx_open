@@ -983,7 +983,7 @@
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>조이스틱 설정...</translation>
     </message>
     <message>
       <source>Advanced...</source>
@@ -11255,7 +11255,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>레이아웃 열기</translation>
     </message>
     <message>
       <source>Modifier</source>

@@ -7697,11 +7697,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Seleziona dispositivi</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Seleziona telecamere</translation>
     </message>
     <message>
       <source>Select Device</source>
@@ -9931,11 +9931,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
+      <translation>Aggiungi pagina Web da proxy</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>Aggiungi pagina Web</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -11410,7 +11410,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Aprire il layout</translation>
     </message>
     <message>
       <source>Modifier</source>

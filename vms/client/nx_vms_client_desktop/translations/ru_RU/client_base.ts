@@ -3269,7 +3269,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Сохранить резервную копию БД</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -7484,7 +7484,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Какие данные копировать</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7926,19 +7926,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Выберите устройства</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Выберите камеры</translation>
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Выбрать устройство</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Выберите камеру</translation>
     </message>
     <message>
       <source>No cameras available</source>
@@ -10210,11 +10210,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
+      <translation>Добавить проксированную веб-страницу</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>Добавить веб-страницу</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>

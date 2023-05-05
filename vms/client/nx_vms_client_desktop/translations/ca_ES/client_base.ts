@@ -957,7 +957,7 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Gira a</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -973,7 +973,7 @@
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Espaiat de la cel·la</translation>
     </message>
     <message>
       <source>Show Panel</source>
@@ -989,7 +989,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Avançat...</translation>
     </message>
     <message>
       <source>Archive filter...</source>
@@ -1850,7 +1850,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Recomanat</translation>
     </message>
     <message>
       <source>Strict</source>
@@ -3194,7 +3194,7 @@ a %1</translation>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Desa la còpia de seguretat de la base de dades</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -7699,7 +7699,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Selecciona els dispositius</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -11412,7 +11412,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Disseny obert</translation>
     </message>
     <message>
       <source>Modifier</source>

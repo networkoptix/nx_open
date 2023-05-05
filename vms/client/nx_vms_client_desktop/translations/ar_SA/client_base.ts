@@ -965,7 +965,7 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Rotate to</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -981,7 +981,7 @@
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>تباعد الخلايا</translation>
     </message>
     <message>
       <source>Show Panel</source>
@@ -997,7 +997,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Advanced...</translation>
     </message>
     <message>
       <source>Archive filter...</source>
@@ -1914,7 +1914,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Recommended</translation>
     </message>
     <message>
       <source>Strict</source>
@@ -3170,7 +3170,7 @@ to %1</translation>
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Connect to Server</translation>
     </message>
   </context>
   <context>
@@ -3343,7 +3343,7 @@ to %1</translation>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Save Database Backup</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -8152,11 +8152,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Select Devices</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Select Cameras</translation>
     </message>
     <message>
       <source>Select Device</source>
@@ -9675,7 +9675,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Merge Systems</source>
-      <translation type="unfinished">Merge Systems</translation>
+      <translation>Merge Systems</translation>
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
@@ -12033,7 +12033,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Open Layout</translation>
     </message>
     <message>
       <source>Modifier</source>

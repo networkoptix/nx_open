@@ -683,9 +683,9 @@
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Denne linje kræver mindst %n point.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>Denne linje kræver mindst %n point.</numerusform>
       </translation>
     </message>
     <message>
@@ -694,9 +694,9 @@
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Det maksimale antal punkter er nået(%n point).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>Det maksimale antal punkter er nået(%n point).</numerusform>
       </translation>
     </message>
     <message>
@@ -786,9 +786,9 @@
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Denne polygon kræver mindst %n point.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>Denne polygon kræver mindst %n point.</numerusform>
       </translation>
     </message>
     <message>
@@ -797,9 +797,9 @@
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Det maksimale antal punkter er nået(%n point).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>Det maksimale antal punkter er nået(%n point).</numerusform>
       </translation>
     </message>
   </context>

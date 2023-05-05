@@ -238,12 +238,12 @@
     <message>
       <source>Read this %1 to learn more about certificate validation.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">Read this %1 to learn more about certificate validation.</translation>
+      <translation>Læs denne %1 for at lære mere om certifikatvalidering.</translation>
     </message>
     <message>
       <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
       <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.%2</translation>
+      <translation>Gennemgå %1 for at sikre, at du har tillid til den server, du opretter forbindelse til.%2</translation>
     </message>
     <message>
       <source>the server&apos;s certificate</source>
@@ -252,12 +252,12 @@
     <message>
       <source>You can view %1 or read this %2 to learn more about the current problem.</source>
       <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">You can view %1 or read this %2 to learn more about the current problem.</translation>
+      <translation>Du kan se %1 eller læse denne %2 for at lære mere om det aktuelle problem.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
       <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</translation>
+      <translation>Dette kan skyldes et udløbet servercertifikat eller en person, der forsøger at efterligne %1 for at stjæle dine personlige oplysninger.%2</translation>
     </message>
     <message>
       <source>This message may be shown multiple times when connecting to a multi-server system.</source>

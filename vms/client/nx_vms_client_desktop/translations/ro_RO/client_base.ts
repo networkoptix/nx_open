@@ -10076,7 +10076,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>Adăugați o pagină web</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>

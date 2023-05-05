@@ -843,15 +843,15 @@ Do you want to delete it anyway?</translation>
     <name>QLineEdit</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>&amp;Fortryd</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>Gendan</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>Kli&amp;p</translation>
     </message>
     <message>
       <source>&amp;Copy</source>

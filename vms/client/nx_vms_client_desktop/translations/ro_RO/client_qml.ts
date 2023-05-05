@@ -133,7 +133,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Orice plugin</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>

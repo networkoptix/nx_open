@@ -1998,7 +1998,7 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>Haladó beállítások</translation>
     </message>
     <message>
       <source>Get Update File</source>
