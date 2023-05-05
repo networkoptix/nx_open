@@ -245,65 +245,15 @@ bool isValidSystemAddress(const SystemUri& uri)
         || isValidLocalAddress();
 }
 
-bool isValidGenericUri(const SystemUri& uri)
+bool hasValidAuth(const SystemUri& uri)
 {
-    const bool hasValidAuth =
-        [credentials = uri.credentials]()
-        {
-            if (credentials.authToken.isPassword())
-                return !credentials.username.empty() && !credentials.authToken.empty();
-            else if (credentials.authToken.isBearerToken())
-                return !credentials.authToken.empty();
-            return false;
-        }();
+    const auto& credentials = uri.credentials;
+    if (credentials.authToken.isPassword())
+        return !credentials.username.empty() && !credentials.authToken.empty();
 
-    if (uri.cloudHost.isEmpty())
-        return false;
+    if (credentials.authToken.isBearerToken())
+        return !credentials.authToken.empty();
 
-    const bool hasSystemAddress = !uri.systemAddress.isEmpty();
-
-    switch (uri.clientCommand)
-    {
-        case SystemUri::ClientCommand::Client:
-            return hasSystemAddress ? isValidSystemAddress(uri) && hasValidAuth : !hasValidAuth;
-
-        // Login to Cloud with credentials is not supported anymore.
-        case SystemUri::ClientCommand::LoginToCloud:
-            return !hasValidAuth;
-
-        case SystemUri::ClientCommand::OpenOnPortal:
-            return hasValidAuth && isValidSystemAddress(uri);
-        default:
-            break;
-    }
-
-    return false;
-}
-
-bool isValidDirectUri(const SystemUri& uri)
-{
-    // Universal links cannot be handled for the direct uri, so only native protocol is supported.
-    if (uri.protocol != SystemUri::Protocol::Native)
-        return false;
-
-    // Direct links are starting with system address.
-    if (uri.systemAddress.isEmpty())
-        return false;
-
-    const bool hasAuth = !uri.credentials.authToken.empty();
-
-    switch (uri.clientCommand)
-    {
-        case SystemUri::ClientCommand::Client:
-            // Simply open the client - or login to the System.
-            return !hasAuth || isValidSystemAddress(uri);
-        case SystemUri::ClientCommand::LoginToCloud:
-            return !hasAuth;
-        case SystemUri::ClientCommand::OpenOnPortal:
-            return hasAuth && isValidSystemAddress(uri);
-        default:
-            break;
-    }
     return false;
 }
 
@@ -338,16 +288,52 @@ bool SystemUri::hasCloudSystemAddress() const
 
 bool SystemUri::isValid() const
 {
-    switch (scope)
+    if (scope == Scope::generic)
     {
-        case SystemUri::Scope::generic:
-            return isValidGenericUri(*this);
-        case SystemUri::Scope::direct:
-            return isValidDirectUri(*this);
+        if (cloudHost.isEmpty())
+            return false;
+    }
+    else
+    {
+        // Universal links cannot be handled for the direct uri, only native protocol is supported.
+        if (protocol != SystemUri::Protocol::Native)
+            return false;
+
+        // Direct links are starting with system address.
+        if (systemAddress.isEmpty())
+            return false;
+    }
+
+    const bool hasSystemAddress = !systemAddress.isEmpty();
+    const bool hasValidAuth = ::hasValidAuth(*this);
+    const bool isValidSystemAddress = ::isValidSystemAddress(*this);
+
+    switch (clientCommand)
+    {
+        case SystemUri::ClientCommand::Client:
+        {
+            if (!hasSystemAddress || !isValidSystemAddress)
+                return !hasValidAuth;
+
+            // Login to a Cloud System is allowed only by using auth code.
+            return isCloudHostname(systemAddress) ? !authCode.isEmpty() : hasValidAuth;
+        }
+
+        // Login to Cloud with credentials is not supported anymore. Auth code should be used.
+        case SystemUri::ClientCommand::LoginToCloud:
+        {
+            return !hasValidAuth && !authCode.isEmpty();
+        }
+
+        case SystemUri::ClientCommand::OpenOnPortal:
+        {
+            return isValidSystemAddress;
+        }
+
         default:
-            NX_ASSERT(false, "Unhandled switch case");
             break;
     }
+
     return false;
 }
 
