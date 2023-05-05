@@ -29,7 +29,7 @@ namespace {
     const int queriesCheckTimeoutMs = 1000;
 
     /** Reserved value for invalid requests. */
-    const int kInvalidRequestId = 0;
+    constexpr auto kInvalidRequestId = rest::Handle();
 
     /** Cache of bookmarks we have just added or removed. */
     const int pendingDiscardTimeout = 30000;
@@ -210,7 +210,9 @@ int QnCameraBookmarksManagerPrivate::sendPostRequest(
     QnMultiserverRequestData &request,
     std::optional<QnUuid> serverId)
 {
-    if (!connection())
+    auto serverApi = connectedServerApi();
+
+    if (!serverApi)
         return kInvalidRequestId;
 
     request.format = Qn::SerializationFormat::UbjsonFormat;
@@ -224,7 +226,7 @@ int QnCameraBookmarksManagerPrivate::sendPostRequest(
             handleBookmarkOperation(success, handle);
         });
 
-    return connectedServerApi()->postEmptyResult(
+    return serverApi->postEmptyResult(
         path,
         request.toParams(),
         /*body*/ {},
@@ -350,18 +352,21 @@ void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(
     addRemovePendingBookmark(bookmarkId);
 }
 
-void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(int status, int handle)
+void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(bool success, int handle)
 {
-    if (!m_operations.contains(handle))
+    const auto opIt = m_operations.find(handle);
+    if (opIt == m_operations.end())
         return;
 
-    auto operationInfo = m_operations.take(handle);
-    if (operationInfo.callback)
-        operationInfo.callback(status == 0);
+    const auto operationInfo = std::move(*opIt);
+    m_operations.erase(opIt);
 
-    auto it = m_pendingBookmarks.find(operationInfo.bookmarkId);
-    if (it != m_pendingBookmarks.end())
-        it->discardTimer.start();
+    if (operationInfo.callback)
+        operationInfo.callback(success);
+
+    const auto bookIt = m_pendingBookmarks.find(operationInfo.bookmarkId);
+    if (bookIt != m_pendingBookmarks.end())
+        bookIt->discardTimer.start();
 }
 
 bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId)

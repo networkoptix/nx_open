@@ -83,10 +83,9 @@ public:
     /// @param callback         Callback for receiving bookmarks data.
     void executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback);
 
-private slots:
-    void handleBookmarkOperation(int status, int handle);
-
 private:
+    void handleBookmarkOperation(bool success, int handle);
+
     /// @brief                  Register bookmarks search query to auto-update it if needed.
     /// @param query            Target query.
     void registerQuery(const QnCameraBookmarksQueryPtr &query);
