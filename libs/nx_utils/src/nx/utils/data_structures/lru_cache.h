@@ -3,6 +3,7 @@
 #pragma once
 
 #include <list>
+#include <memory>
 #include <optional>
 #include <unordered_map>
 
@@ -118,7 +119,14 @@ public:
         if (it != m_cacheMap.end())
         {
             m_cacheList.splice(m_cacheList.begin(), m_cacheList, it->second);
-            m_cacheList.begin()->second = std::forward<V>(value);
+            // Do not require Value type to provide the move operator.
+            std::destroy_at(&m_cacheList.begin()->second);
+            // TODO: #akolesnikov replace the following with
+            // std::construct_at(&m_cacheList.begin()->second, std::forward<V>(value)); when c++20
+            // is fully available here.
+            std::allocator<Value> alloc;
+            std::allocator_traits<std::allocator<Value>>::construct(
+                alloc, &m_cacheList.begin()->second, std::forward<V>(value));
             m_cacheMap[key] = m_cacheList.begin();
         }
         else

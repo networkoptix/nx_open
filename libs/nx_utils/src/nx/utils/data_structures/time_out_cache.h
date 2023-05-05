@@ -102,7 +102,7 @@ public:
     {
         removeExpiredItems();
 
-        Item item = Item{std::forward<V>(value), nx::utils::monotonicTime()};
+        Item item{std::forward<V>(value), nx::utils::monotonicTime()};
 
         m_lruCache.put(std::forward<K>(key), std::move(item));
     }
