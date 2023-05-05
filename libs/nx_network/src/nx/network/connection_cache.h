@@ -35,8 +35,8 @@ public:
     {
         bool operator==(const ConnectionInfo&) const = default;
 
-        SocketAddress addr;
-        bool isTls;
+        const SocketAddress addr;
+        const bool isTls;
     };
 
     /**
@@ -60,6 +60,9 @@ public:
      * @return Number of elements in the cache.
      */
     size_t size() const;
+
+private:
+    void startMonitoringConnection(const ConnectionInfo& addr, AbstractStreamSocket* conn);
 
 private:
     class Private;
