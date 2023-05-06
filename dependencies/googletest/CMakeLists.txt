@@ -8,6 +8,12 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 set(INSTALL_GMOCK OFF CACHE INTERNAL "")
 set(INSTALL_GTEST OFF CACHE INTERNAL "")
 
+if(MACOSX)
+    # This LLVM optimization causes random crashes in the gtest code (primarily in testcases
+    # destruction).
+    add_compile_options("SHELL:-mllvm -disable-machine-cse")
+endif()
+
 add_subdirectory(
     ${open_source_root}/artifacts/googletest
     ${CMAKE_BINARY_DIR}/artifacts/googletest
