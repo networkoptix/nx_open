@@ -95,7 +95,6 @@ QN_FUSION_DECLARE_FUNCTIONS(PtzMovement, (json), NX_VMS_API)
 
 struct NX_VMS_API PtzPresetFilter
 {
-    /**%apidoc Internal preset name. */
     QString id;
 
     /**%apidoc:string
