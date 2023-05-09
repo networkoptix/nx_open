@@ -4516,11 +4516,11 @@ to %1</source>
     </message>
     <message>
       <source>Native</source>
-      <translation>モニタ解像度と同じ</translation>
+      <translation>スクリーン解像度の値を利用</translation>
     </message>
     <message>
       <source>Quarter Native</source>
-      <translation>モニタ解像度の1/4</translation>
+      <translation>スクリーン解像度の縦横半値を利用</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -6097,7 +6097,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recorded Video</source>
-      <translation>ビデオ録画</translation>
+      <translation>録画映像</translation>
     </message>
     <message>
       <source>Save Recording As...</source>
