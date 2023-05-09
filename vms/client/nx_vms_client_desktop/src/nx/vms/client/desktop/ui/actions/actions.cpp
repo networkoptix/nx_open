@@ -330,8 +330,8 @@ void initialize(Manager* manager, Action* root)
         factory(OpenNewTabAction)
             .flags(Main | TitleBar | SingleTarget | NoTarget | GlobalHotkey)
             .mode(DesktopMode)
-            .text(ContextMenu::tr("Tab"))
-            .pulledText(ContextMenu::tr("New Tab"))
+            .text(ContextMenu::tr("Layout"))
+            .pulledText(ContextMenu::tr("New Layout"))
             .shortcut("Ctrl+T")
             .condition(!condition::showreelIsRunning())
             .icon(qnSkin->icon("titlebar/new_layout.png"));
@@ -346,10 +346,11 @@ void initialize(Manager* manager, Action* root)
                  && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow)));
 
         factory(OpenWelcomeScreenAction)
-            .flags(Main)
+            .flags(Main | GlobalHotkey)
             .mode(DesktopMode)
             .text(ContextMenu::tr("Welcome Screen"))
-            .pulledText(ContextMenu::tr("Welcome Screen"))
+            .pulledText(ContextMenu::tr("New Welcome Screen"))
+            .shortcut("Ctrl+Shift+T")
             .condition(new LightModeCondition(Qn::LightModeNoNewWindow));
     }
     factory.endSubMenu();
