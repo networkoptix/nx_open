@@ -372,7 +372,8 @@ bool calcDigestResponse(
     else
     {
         std::string nonceCount = fieldOrDefault(inputParams, "nc", "00000001");
-        constexpr std::string_view clientNonce = "0a4f113b";    //TODO #akolesnikov generate it
+        std::string clientNonce = fieldOrDefault(
+            inputParams, "cnonce", nx::utils::random::generateName(16));
 
         digestResponse = calcResponseAuthInt(
             ha1, nonce, nonceCount, clientNonce, qop, ha2, algorithm);

@@ -54,7 +54,7 @@ public:
     void givenHttpServerWithAuthorization(
         std::vector<AuthHttpServer::AuthHeader> authData);
     void whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth, const char* username = nullptr);
-    void thenClientAuthenticatedBy(const char* exptectedHeaderResponse);
+    void thenClientRequestContainsAuthAttrs(const char* exptectedHeaderResponse);
     void thenClientGotResponseWithCode(int expectedHttpCode);
     void thenLastRequestAuthorizedOnServerAsUser(const std::string& username);
 

@@ -101,6 +101,21 @@ TEST(HttpAuthDigest, calcDigestResponse)
     }
 }
 
+TEST(HttpAuthDigest, cnonce_is_supported_properly)
+{
+    static constexpr char kUsername[] = "username";
+    static constexpr char kPassword[] = "password";
+    static constexpr char kDigestHeaderValue[] = "Digest "
+        "username=\"username\",realm=\"VMS\",nonce=\"uHL2gGl\",uri=\"/relay/statistics/metrics/\","
+        "qop=\"auth\",algorithm=\"MD5\",response=\"e4c1402a074b4e3d0f041bd8879f2c2e\","
+        "nc=\"00000001\",cnonce=\"ddf59e5bc50f176863eeccedf7f478c92fe5186063f4c994\"";
+
+    header::DigestAuthorization authz;
+
+    ASSERT_TRUE(authz.parse(kDigestHeaderValue));
+    ASSERT_TRUE(validateAuthorization("GET", kUsername, kPassword, std::nullopt, authz));
+}
+
 namespace {
 
 static const std::string kUser("user");
