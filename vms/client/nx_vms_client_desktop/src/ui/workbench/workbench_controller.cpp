@@ -732,6 +732,12 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
             // If two arrow keys are pressed simultaneously, change direction to the next one.
             if (m_rewindTimer->isActive() && m_rewindDirection == direction)
                 return true;
+            
+            if (navigator()->isPlaying())
+            {
+                m_isPlayingOnShift = true;
+                navigator()->setPlaying(false);
+            }
 
             m_rewindTimer->start(500);
             m_rewindDirection = direction;
@@ -900,6 +906,11 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
     const auto stopShift =
         [this]()
         {
+            if (m_isPlayingOnShift)
+            {
+                navigator()->setPlaying(true);
+                m_isPlayingOnShift = false;
+            }
             m_rewindTimer->stop();
         };
 
