@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <compare>
 #include <functional>
 #include <map>
 #include <optional>
@@ -16,6 +17,7 @@
 #include <nx/utils/buffer.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/std/cpp20.h>
 #include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/utils/string.h>
 #include <nx/utils/type_utils.h>
@@ -649,6 +651,8 @@ class NX_NETWORK_API UserCredentials
 public:
     std::string userid;
     std::string password;
+
+    auto operator<=>(const UserCredentials&) const = default;
 };
 
 /** rfc2617, section 2. */
