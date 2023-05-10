@@ -19,8 +19,6 @@ using namespace std::chrono_literals;
 class PreloadedTranslationReference;
 class ScopedLocale;
 
-const static std::chrono::milliseconds kDefaultInstallTranslationTimeout = 2500ms;
-
 /**
  * Loads all translation files from the external resources. Provides interface to install
  * translation on an application level as well as separately for each thread.
@@ -48,6 +46,8 @@ public:
 
     /** Install the provided translation on an application level. */
     static void installTranslation(const Translation& translation);
+
+    static std::chrono::milliseconds defaultInstallTranslationTimeout();
 
     /*
      * Prepare and asynchronously install the specific locale translation data.
@@ -90,7 +90,7 @@ public:
     [[nodiscard]]
     std::unique_ptr<ScopedLocale> installScopedLocale(
         const QString& locale,
-        std::chrono::milliseconds maxWaitTime = kDefaultInstallTranslationTimeout);
+        std::chrono::milliseconds maxWaitTime = defaultInstallTranslationTimeout());
 
     /**
      * Overloaded method.
@@ -101,7 +101,7 @@ public:
     [[nodiscard]]
     std::unique_ptr<ScopedLocale> installScopedLocale(
         const std::vector<QString>& preferredLocales,
-        std::chrono::milliseconds maxWaitTime = kDefaultInstallTranslationTimeout);
+        std::chrono::milliseconds maxWaitTime = defaultInstallTranslationTimeout());
 
     /**
      * Get current thread-level translation.
