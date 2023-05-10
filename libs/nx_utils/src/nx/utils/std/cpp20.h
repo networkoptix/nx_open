@@ -5,15 +5,20 @@
 /**
  * Some c++20 features missing in Clang are defined here
  */
-#if defined(__clang__) && defined(_LIBCPP_COMPILER_CLANG_BASED)
+#if defined(__clang__)
 
-#include <algorithm>
-#include <chrono>
-#include <compare>
-#include <cstring>
-#include <map>
-#include <string>
-#include <type_traits>
+#if defined(_LIBCPP_COMPILER_CLANG_BASED) || \
+    defined(__ANDROID_MIN_SDK_VERSION__) && __ANDROID_MIN_SDK_VERSION__ <= 21
+
+    #include <algorithm>
+    #include <chrono>
+    #include <concepts>
+    #include <compare>
+    #include <cstring>
+    #include <map>
+    #include <optional>
+    #include <string>
+    #include <type_traits>
 
 namespace std {
 
@@ -50,6 +55,30 @@ constexpr auto operator<=>(
 
 } // namespace chrono
 
+template <typename Tp, typename = decltype(std::declval<Tp>() <=> std::declval<Tp>())>
+constexpr auto operator<=>(
+    const optional<Tp>& x,
+    const optional<Tp>& y)
+{
+    return x && y ? *x <=> *y : bool(x) <=> bool(y);
+}
+
+template <typename Tp, typename = decltype(std::declval<Tp>() <=> std::declval<Tp>())>
+constexpr auto operator<=>(
+    const optional<Tp>& x,
+    const Tp& v)
+{
+    return bool(x) ? *x <=> v : strong_ordering::less;
+}
+
+} // namespace std
+
+#endif
+
+#if defined(_LIBCPP_COMPILER_CLANG_BASED)
+
+namespace std {
+
 template<class I1, class I2, class Cmp>
 constexpr auto lexicographical_compare_three_way(I1 f1, I1 l1, I2 f2, I2 l2, Cmp comp)
     -> decltype(comp(*f1, *f2))
@@ -71,8 +100,7 @@ constexpr auto lexicographical_compare_three_way(I1 f1, I1 l1, I2 f2, I2 l2, Cmp
                      : std::strong_ordering::equal;
 }
 
-namespace detail
-{
+namespace detail {
 
 template<typename Tp, typename Up>
 concept three_way_builtin_ptr_cmp
@@ -206,15 +234,6 @@ struct compare_three_way
     using is_transparent = void;
 };
 
-template<typename T1, typename T2>
-constexpr common_comparison_category_t<detail::synth3way_t<T1>,
-    detail::synth3way_t<T2>> operator<=>(const pair<T1, T2>& x, const pair<T1, T2>& y)
-{
-    if (auto c = detail::synth3way(x.first, y.first); c != 0)
-        return c;
-    return detail::synth3way(x.second, y.second);
-}
-
 template<typename Key, typename Tp, typename Compare, typename Alloc>
 constexpr detail::synth3way_t<pair<const Key, Tp>> operator<=>(
     const std::map<Key, Tp, Compare, Alloc>& x, const std::map<Key, Tp, Compare, Alloc>& y)
@@ -238,22 +257,8 @@ inline detail::synth3way_t<Tp> operator<=>(
         detail::synth3way);
 }
 
-template <typename Tp>
-constexpr auto operator<=>(
-    const optional<Tp>& x,
-    const optional<Tp>& y)
-{
-    return x && y ? *x <=> y : bool(x) <=> bool(y);
-}
-
-template <typename Tp>
-constexpr auto operator<=>(
-    const optional<Tp>& x,
-    const Tp& v)
-{
-    return bool(x) ? *x <=> v : strong_ordering::less;
-}
-
 } // namespace std
 
-#endif // defined(__clang__) && defined(_LIBCPP_COMPILER_CLANG_BASED)
+#endif // defined(_LIBCPP_COMPILER_CLANG_BASED)
+
+#endif // defined(__clang__)

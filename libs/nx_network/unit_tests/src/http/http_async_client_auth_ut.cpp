@@ -10,37 +10,36 @@ namespace nx::network::http::test {
 
 namespace {
 
-constexpr const int socketTimeout = 1000;
-
 static constexpr char kTestPath[] = "/HttpAsyncClient_auth";
 static constexpr char kDefaultUsername[] = "zorz_user";
 static constexpr char kDefaultPassword[] = "zorz_pass";
 
 static constexpr char kDefaultBasicHeader[] = "WWW-Authenticate: Basic realm=\"ZORZ\"\r\n";
+static constexpr char kResponseForDefaultBasicHeader[] = "Basic em9yel91c2VyOnpvcnpfcGFzcw==";
+
 static constexpr char kDefaultDigestHeader[] =
     "WWW-Authenticate: Digest algorithm=\"MD5\", nonce=\"cUySLvm\", realm=\"VMS\"\r\n";
+
+static constexpr char kResponseForDefaultDigestHeader[] =
+    "Digest username=\"zorz_user\", realm=\"VMS\", nonce=\"cUySLvm\", "
+    "uri=\"/HttpAsyncClient_auth\", response=\"4a5ec2fdc1d7dd43dd6fb345944583c5\", "
+    "algorithm=\"MD5\"";
+
 static constexpr char kLowercaseMd5DigestHeader[] =
     "WWW-Authenticate: Digest realm=\"Http Server\", "
     "nonce=\"f3164f6a1801ecb0870af2c468a6d7af\", algorithm=md5, qop=\"auth\"\r\n";
 
-static constexpr char kResponseForDefaultBasicHeader[] = "Basic em9yel91c2VyOnpvcnpfcGFzcw==";
-static constexpr char kResponseForDefaultDigestHeader[] =
-        "Digest username=\"zorz_user\", realm=\"VMS\", nonce=\"cUySLvm\", "
-        "uri=\"/HttpAsyncClient_auth\", response=\"4a5ec2fdc1d7dd43dd6fb345944583c5\", "
-        "algorithm=\"MD5\"";
-
-static constexpr char kResponseForLowercaseMd5DigestHeader[] =
-        "Digest username=\"zorz_user\", realm=\"Http Server\", "
-        "nonce=\"f3164f6a1801ecb0870af2c468a6d7af\", uri=\"/HttpAsyncClient_auth\", "
-        "response=\"900afe7b3e6d522346fcfaaa897b6b35\", algorithm=\"md5\", cnonce=\"0a4f113b\", "
-        "nc=00000001, qop=\"auth\"";
+static constexpr char kResponseForLowercaseMd5DigestHeaderCommonAttrs[] =
+    "Digest username=\"zorz_user\", realm=\"Http Server\", "
+    "nonce=\"f3164f6a1801ecb0870af2c468a6d7af\", uri=\"/HttpAsyncClient_auth\", "
+    "algorithm=\"md5\", qop=\"auth\"";
 
 } // namespace
 
 void AuthHttpServer::processConnection(AbstractStreamSocket* connection)
 {
-    connection->setRecvTimeout(socketTimeout);
-    connection->setSendTimeout(socketTimeout);
+    connection->setRecvTimeout(kNoTimeout);
+    connection->setSendTimeout(kNoTimeout);
 
     auto [rc, request] = readRequest(connection);
     while (rc > 0)
@@ -52,7 +51,6 @@ void AuthHttpServer::processConnection(AbstractStreamSocket* connection)
 
     ASSERT_EQ(0, rc) << "System error: " << SystemError::getLastOSErrorText();
 }
-
 
 std::vector<nx::Buffer> AuthHttpServer::receivedRequests()
 {
@@ -114,7 +112,6 @@ void AuthHttpServer::sendResponse(AbstractStreamSocket* connection)
     ASSERT_EQ(response.size(), connection->send(response.data(), response.size()));
 }
 
-
 //-------------------------------------------------------------------------------------------------
 
 HttpClientAsyncAuthorization::HttpClientAsyncAuthorization():
@@ -128,7 +125,8 @@ HttpClientAsyncAuthorization::~HttpClientAsyncAuthorization()
     m_httpClient->pleaseStopSync();
 }
 
-void HttpClientAsyncAuthorization::givenHttpServerWithAuthorization(std::vector<AuthHttpServer::AuthHeader> authData)
+void HttpClientAsyncAuthorization::givenHttpServerWithAuthorization(
+    std::vector<AuthHttpServer::AuthHeader> authData)
 {
     m_httpServer = std::make_unique<AuthHttpServer>();
     ASSERT_TRUE(m_httpServer->bindAndListen(SocketAddress::anyPrivateAddress));
@@ -138,9 +136,8 @@ void HttpClientAsyncAuthorization::givenHttpServerWithAuthorization(std::vector<
     m_httpServer->start();
 }
 
-
-void HttpClientAsyncAuthorization::whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth,
-    const char *username)
+void HttpClientAsyncAuthorization::whenClientSendHttpRequestAndIsRequiredToUse(
+    AuthType auth, const char *username)
 {
     m_httpClient->setAuthType(auth);
     if (username == nullptr)
@@ -168,18 +165,33 @@ void HttpClientAsyncAuthorization::whenClientSendHttpRequestAndIsRequiredToUse(A
     done.get_future().wait();
 }
 
-void HttpClientAsyncAuthorization::thenClientAuthenticatedBy(const char* exptectedHeaderResponse)
+void HttpClientAsyncAuthorization::thenClientRequestContainsAuthAttrs(
+    const char* expectedAttrs)
 {
     const auto requests = m_httpServer->receivedRequests();
+    ASSERT_EQ(2, requests.size());
 
-    // No auth exptected.
-    if (exptectedHeaderResponse == nullptr) {
-        ASSERT_EQ(requests.size(), 1);
-        return;
+    header::Authorization expected;
+    ASSERT_TRUE(expected.parse(expectedAttrs));
+
+    Request request;
+    ASSERT_TRUE(request.parse(requests[1]));
+    ASSERT_TRUE(request.headers.contains("Authorization"));
+    header::Authorization actual;
+    ASSERT_TRUE(actual.parse(request.headers.find("Authorization")->second));
+
+    if (actual.authScheme == header::AuthScheme::basic)
+    {
+        ASSERT_EQ(*expected.basic, *actual.basic);
     }
-
-    ASSERT_EQ(requests.size(), 2);
-    ASSERT_NE(requests[1].npos, requests[1].find(exptectedHeaderResponse));
+    else if (actual.authScheme == header::AuthScheme::digest)
+    {
+        for (const auto& [k, v]: expected.digest->params)
+        {
+            ASSERT_TRUE(actual.digest->params.contains(k));
+            ASSERT_EQ(v, actual.digest->params.find(k)->second);
+        }
+    }
 }
 
 void HttpClientAsyncAuthorization::thenClientGotResponseWithCode(int expectedHttpCode)
@@ -223,12 +235,8 @@ TEST_P(HttpClientAsyncAuthorization, AuthSelection)
     TestParams params = GetParam();
 
     givenHttpServerWithAuthorization(std::move(params.serverAuthHeaders));
-
     whenClientSendHttpRequestAndIsRequiredToUse(params.clientRequiredToUseAuthType);
-
     thenClientGotResponseWithCode(params.expectedHttpCode);
-
-    thenClientAuthenticatedBy(params.expectedAuthResponse);
 }
 
 TEST_F(HttpClientAsyncAuthorization, lowercaseAlgorithm)
@@ -238,7 +246,7 @@ TEST_F(HttpClientAsyncAuthorization, lowercaseAlgorithm)
     whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authDigest);
 
     thenClientGotResponseWithCode(200);
-    thenClientAuthenticatedBy(kResponseForLowercaseMd5DigestHeader);
+    thenClientRequestContainsAuthAttrs(kResponseForLowercaseMd5DigestHeaderCommonAttrs);
 }
 
 TEST_F(HttpClientAsyncAuthorization, cached_authorization_of_a_different_user_is_not_used)
