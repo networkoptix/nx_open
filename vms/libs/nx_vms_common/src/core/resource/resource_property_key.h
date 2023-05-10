@@ -139,6 +139,8 @@ NX_VMS_COMMON_API extern const QString kManualRemoteArchiveSynchronizationTrigge
  */
 NX_VMS_COMMON_API extern const QString kTimeSyncEnabledOnceDueToRemoteArchiveSync;
 
+NX_VMS_COMMON_API extern const QString kNoVideoSupport;
+
 namespace Onvif {
 
 NX_VMS_COMMON_API extern const QString kMediaUrl;

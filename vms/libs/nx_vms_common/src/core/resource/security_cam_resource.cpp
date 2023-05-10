@@ -164,8 +164,6 @@ QnSecurityCamResource::QnSecurityCamResource():
                 getProperty(ResourcePropertyKey::kDeviceType).toStdString(),
                 nx::vms::api::DeviceType::unknown);
         }),
-    m_cachedHasVideo(
-        [this]() { return !resourceData().value(ResourceDataKey::kNoVideoSupport, false); }),
     m_cachedMotionStreamIndex([this]{ return calculateMotionStreamIndex(); })
 {
     NX_VERBOSE(this, "Creating");
@@ -447,7 +445,11 @@ int QnSecurityCamResource::reservedSecondStreamFps() const
 
 bool QnSecurityCamResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
-    return m_cachedHasVideo.get();
+    auto result = getProperty(ResourcePropertyKey::kNoVideoSupport);
+    if (!result.isEmpty())
+        return result.toInt() == 0;
+
+    return !resourceData().value<bool>(ResourceDataKey::kNoVideoSupport);
 }
 
 Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
@@ -1707,7 +1709,6 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();
     m_cachedExplicitDeviceType.reset();
-    m_cachedHasVideo.reset();
     m_cachedMotionStreamIndex.reset();
 }
 

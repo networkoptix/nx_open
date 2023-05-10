@@ -87,6 +87,8 @@ const QString kManualRemoteArchiveSynchronizationTriggered(
 
 const QString kTimeSyncEnabledOnceDueToRemoteArchiveSync("timeSyncEnabledOnceDueToRemoteArchiveSync");
 
+const QString kNoVideoSupport("noVideoSupport");
+
 namespace Onvif {
 
 const QString kMediaUrl("MediaUrl");
