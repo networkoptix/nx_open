@@ -10,6 +10,7 @@ ScrollBar
 {
     id: control
 
+    property color thumbColor: ColorTheme.midlight
     padding: 0
 
     visible: policy === ScrollBar.AlwaysOn || (policy === ScrollBar.AsNeeded && size < 1.0)
@@ -34,12 +35,14 @@ ScrollBar
 
     contentItem: Rectangle
     {
+        id: thumb
+
         implicitWidth: 8
         implicitHeight: 8
 
         color:
         {
-            const color = ColorTheme.midlight
+            const color = control.thumbColor
             if (control.pressed)
                 return ColorTheme.lighter(color, 1)
             if (control.hovered)

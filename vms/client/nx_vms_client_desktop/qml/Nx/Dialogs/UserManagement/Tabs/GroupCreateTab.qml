@@ -19,47 +19,65 @@ Item
     property alias description: descriptionTextArea.text
 
     property var self
+    property alias model: groupsComboBox.model
 
     function validate()
     {
         return groupNameTextField.validate()
     }
 
-    Column
+    Scrollable
     {
-        spacing: 8
-        anchors.left: parent.left
-        anchors.leftMargin: 16
-        anchors.right: parent.right
-        anchors.rightMargin: 16
+        id: scroll
 
-        SectionHeader
+        anchors.fill: parent
+
+        contentItem: Column
         {
-            text: qsTr("New Group")
-        }
+            spacing: 8
+            x: 16
+            width: scroll.width - 16 * 2
 
-        CenteredField
-        {
-            text: qsTr("Name")
-
-            TextFieldWithValidator
+            SectionHeader
             {
-                id: groupNameTextField
-                width: parent.width
-                validateFunc: self ? self.validateName : null
+                text: qsTr("New Group")
             }
-        }
 
-        CenteredField
-        {
-            text: qsTr("Description")
-
-            TextArea
+            CenteredField
             {
-                id: descriptionTextArea
-                width: parent.width
-                height: 60
-                wrapMode: TextEdit.Wrap
+                text: qsTr("Name")
+
+                TextFieldWithValidator
+                {
+                    id: groupNameTextField
+                    width: parent.width
+                    validateFunc: self ? self.validateName : null
+                }
+            }
+
+            CenteredField
+            {
+                text: qsTr("Description")
+
+                TextArea
+                {
+                    id: descriptionTextArea
+                    width: parent.width
+                    height: 60
+                    wrapMode: TextEdit.Wrap
+                }
+            }
+
+            CenteredField
+            {
+                text: qsTr("Permission Groups")
+
+                GroupsComboBox
+                {
+                    id: groupsComboBox
+
+                    width: parent.width
+                }
             }
         }
     }

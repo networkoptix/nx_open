@@ -39,7 +39,7 @@ Item
 
     property var summaryPlaceholder: []
 
-    readonly property color highlightColor: "#E1A700"
+    readonly property color highlightColor: ColorTheme.colors.yellow_d1
 
     function highlightMatchingText(text)
     {

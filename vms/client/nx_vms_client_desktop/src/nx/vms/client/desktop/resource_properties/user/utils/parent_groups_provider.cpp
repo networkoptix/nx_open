@@ -46,6 +46,31 @@ void ParentGroupsProvider::setContext(AccessSubjectEditingContext* value)
     emit contextChanged();
 }
 
+void ParentGroupsProvider::setMembersModel(nx::vms::client::desktop::MembersModel* model)
+{
+    if (model == m_membersModel)
+        return;
+
+    if (m_membersModel)
+        m_membersModel->disconnect(this);
+
+    m_membersModel = model;
+    emit membersModelChanged();
+
+    const auto updateModel =
+        [this]()
+        {
+            const auto count = rowCount();
+
+            if (count > 0)
+                emit dataChanged(index(0), index(count - 1), {canEditMembers});
+        };
+
+    connect(m_membersModel, &QAbstractItemModel::modelReset, this, updateModel);
+    connect(m_membersModel, &QAbstractItemModel::rowsInserted, this, updateModel);
+    connect(m_membersModel, &QAbstractItemModel::rowsRemoved, this, updateModel);
+}
+
 QVariant ParentGroupsProvider::data(const QModelIndex& index, int role) const
 {
     if (index.row() < 0 || index.row() >= (int) m_groups.size() || !m_context)
@@ -169,11 +194,26 @@ void ParentGroupsProvider::updateInfo()
     }
 }
 
-class ParentGroupsModel: public QSortFilterProxyModel
+bool ParentGroupsModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
-    using base_type = QSortFilterProxyModel;
-public:
-};
+    if (!sourceModel() || !m_directOnly)
+        return base_type::filterAcceptsRow(sourceRow, sourceParent);
+
+    const auto sourceIndex = sourceModel()->index(sourceRow, 0);
+    return sourceModel()->data(sourceIndex, MembersModel::IsParentRole).toBool()
+        && base_type::filterAcceptsRow(sourceRow, sourceParent);
+}
+
+void ParentGroupsModel::setDirectOnly(bool value)
+{
+    if (value == m_directOnly)
+        return;
+
+    m_directOnly = value;
+    emit directOnlyChanged();
+
+    invalidateRowsFilter();
+}
 
 void ParentGroupsProvider::registerQmlTypes()
 {

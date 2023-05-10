@@ -104,6 +104,7 @@ DialogWithState
                 anchors.fill: parent
                 self: dialog.self
                 enabled: !dialog.isSaving
+                model: membersModel
             }
         }
         Tab

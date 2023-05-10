@@ -666,7 +666,8 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
 
 bool MembersModel::canEditMembers(const QnUuid& id) const
 {
-    return !m_cache->info(id).isLdap
+    return m_cache
+        && !m_cache->info(id).isLdap
         && systemContext()->accessController()->canCreateUser(
             /*targetPermissions*/ {},
             /*targetGroups*/ {id});

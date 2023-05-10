@@ -99,9 +99,8 @@ DialogWithState
 
                 self: dialog.self
 
-                groups: dialog.parentGroups
-                globalPermissions: dialog.globalPermissions
-                sharedResources: dialog.sharedResources
+                model: membersModel
+                parentGroupsEditable: dialog.parentGroupsEditable
                 enabled: !dialog.isSaving
                 ldapError: dialog.ldapError
 
