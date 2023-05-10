@@ -39,10 +39,8 @@ Item
     property alias allowInsecure: allowInsecureCheckBox.checked
     property bool allowInsecureEditable: true
 
-    property alias globalPermissions: accessSummaryModel.globalPermissions
-    property alias sharedResources: accessSummaryModel.sharedResources
-
-    property var groups: []
+    property alias model: groupsComboBox.model
+    property alias parentGroupsEditable: groupsComboBox.enabled
 
     property bool enabled: true
     property int userType: UserSettingsGlobal.LocalUser
@@ -72,126 +70,136 @@ Item
         return result
     }
 
-    Scrollable
+    ColumnLayout
     {
         anchors.fill: parent
 
-        ColumnLayout
+        spacing: 0
+
+        Rectangle
         {
-            width: parent.width
-            spacing: 0
+            id: loginPanel
 
-            Rectangle
+            color: ColorTheme.colors.dark8
+            Layout.fillWidth: true
+
+            Layout.preferredHeight: Math.max(
+                103,
+                enabledUserSwitch.y + enabledUserSwitch.height + 22)
+
+            Image
             {
-                id: loginPanel
+                id: userTypeIcon
 
-                color: ColorTheme.colors.dark8
-                Layout.fillWidth: true
-                Layout.preferredHeight: Math.max(
-                    103,
-                    enabledUserSwitch.y + enabledUserSwitch.height + 22)
+                x: 24
+                y: 24
+                width: 64
+                height: 64
 
-                Image
+                source:
                 {
-                    id: userTypeIcon
-                    x: 24
-                    y: 24
-                    width: 64
-                    height: 64
-                    source:
+                    switch (control.userType)
                     {
-                        switch (control.userType)
-                        {
-                            case UserSettingsGlobal.LocalUser:
-                                return "image://svg/skin/user_settings/user_type_local.svg"
-                            case UserSettingsGlobal.CloudUser:
-                                return "image://svg/skin/user_settings/user_type_cloud.svg"
-                            case UserSettingsGlobal.LdapUser:
-                                return "image://svg/skin/user_settings/user_type_ldap.svg"
-                        }
-                    }
-                    sourceSize: Qt.size(width, height)
-                }
-
-                EditableLabel
-                {
-                    id: userLoginText
-
-                    enabled: control.loginEditable && control.enabled
-
-                    anchors.left: userTypeIcon.right
-                    anchors.leftMargin: 24
-                    anchors.top: userTypeIcon.top
-
-                    anchors.right: parent.right
-                    anchors.rightMargin: 16
-
-                    validateFunc: control.self
-                        ? (control.userType == UserSettingsGlobal.CloudUser
-                            ? control.self.validateEmail : control.self.validateLogin)
-                        : null
-                }
-
-                UserEnabledSwitch
-                {
-                    id: enabledUserSwitch
-
-                    enabled: control.userEnabledEditable && control.enabled
-
-                    anchors.top: userLoginText.bottom
-                    anchors.topMargin: 14
-                    anchors.left: userLoginText.left
-                }
-
-                Row
-                {
-                    anchors.top: userLoginText.bottom
-                    anchors.topMargin: 14
-                    anchors.right: parent.right
-                    anchors.rightMargin: 20
-                    spacing: 12
-
-                    TextButton
-                    {
-                        id: auditTrailButton
-                        icon.source: "image://svg/skin/user_settings/audit_trail.svg"
-                        icon.width: 12
-                        icon.height: 14
-                        spacing: 8
-                        text: qsTr("Audit Trail")
-                        visible: control.auditAvailable
-                        onClicked: control.auditTrailRequested()
-                    }
-
-                    TextButton
-                    {
-                        id: deleteButton
-                        visible: control.deleteAvailable
-                        enabled: control.enabled
-                        icon.source: "image://svg/skin/user_settings/user_delete.svg"
-                        icon.width: 12
-                        icon.height: 14
-                        spacing: 8
-                        text: qsTr("Delete")
-                        onClicked: control.deleteRequested()
+                        case UserSettingsGlobal.LocalUser:
+                            return "image://svg/skin/user_settings/user_type_local.svg"
+                        case UserSettingsGlobal.CloudUser:
+                            return "image://svg/skin/user_settings/user_type_cloud.svg"
+                        case UserSettingsGlobal.LdapUser:
+                            return "image://svg/skin/user_settings/user_type_ldap.svg"
                     }
                 }
+
+                sourceSize: Qt.size(width, height)
             }
 
-            Rectangle
+            EditableLabel
             {
-                color: ColorTheme.colors.dark6
+                id: userLoginText
 
-                Layout.fillWidth: true
-                height: 1
+                enabled: control.loginEditable && control.enabled
+
+                anchors.left: userTypeIcon.right
+                anchors.leftMargin: 24
+                anchors.top: userTypeIcon.top
+
+                anchors.right: parent.right
+                anchors.rightMargin: 16
+
+                validateFunc: control.self
+                    ? (control.userType == UserSettingsGlobal.CloudUser
+                        ? control.self.validateEmail : control.self.validateLogin)
+                    : null
             }
 
-            Rectangle
+            UserEnabledSwitch
+            {
+                id: enabledUserSwitch
+
+                enabled: control.userEnabledEditable && control.enabled
+
+                anchors.top: userLoginText.bottom
+                anchors.topMargin: 14
+                anchors.left: userLoginText.left
+            }
+
+            Row
+            {
+                anchors.top: userLoginText.bottom
+                anchors.topMargin: 14
+                anchors.right: parent.right
+                anchors.rightMargin: 20
+                spacing: 12
+
+                TextButton
+                {
+                    id: auditTrailButton
+
+                    icon.source: "image://svg/skin/user_settings/audit_trail.svg"
+                    icon.width: 12
+                    icon.height: 14
+                    spacing: 8
+                    text: qsTr("Audit Trail")
+                    visible: control.auditAvailable
+                    onClicked: control.auditTrailRequested()
+                }
+
+                TextButton
+                {
+                    id: deleteButton
+
+                    visible: control.deleteAvailable
+                    enabled: control.enabled
+                    icon.source: "image://svg/skin/user_settings/user_delete.svg"
+                    icon.width: 12
+                    icon.height: 14
+                    spacing: 8
+                    text: qsTr("Delete")
+                    onClicked: control.deleteRequested()
+                }
+            }
+        }
+
+        Rectangle
+        {
+            color: ColorTheme.colors.dark6
+
+            Layout.fillWidth: true
+            height: 1
+        }
+
+        Scrollable
+        {
+            id: scroll
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            contentItem: Rectangle
             {
                 color: ColorTheme.colors.dark7
 
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                width: scroll.width
+                height: childrenRect.height
 
                 Column
                 {
@@ -382,6 +390,7 @@ Item
                         CheckBox
                         {
                             id: allowInsecureCheckBox
+
                             text: qsTr("Allow insecure (digest) authentication")
                             enabled: control.allowInsecureEditable && control.enabled
 
@@ -405,45 +414,15 @@ Item
                         }
                     }
 
-                    SectionHeader
+                    CenteredField
                     {
-                        text: qsTr("Groups")
-                    }
+                        text: qsTr("Permission Groups")
 
-                    GroupsFlow
-                    {
-                        id: groupsFlow
-
-                        width: parent.width
-
-                        rowLimit: 2
-                        items: control.groups
-                        enabled: control.enabled
-
-                        onGroupClicked: (id) => { control.groupClicked(id) }
-                        onMoreClicked: control.moreGroupsClicked()
-                    }
-
-                    Text
-                    {
-                        visible: control.groups.length === 0
-                        font: Qt.font({pixelSize: 14, weight: Font.Normal})
-                        color: ColorTheme.colors.light16
-                        text: qsTr("Not a member of any group")
-                    }
-
-                    SectionHeader
-                    {
-                        text: qsTr("Permissions")
-                    }
-
-                    PermissionSummary
-                    {
-                        Layout.topMargin: 8
-
-                        model: CustomAccessSummaryModel
+                        GroupsComboBox
                         {
-                            id: accessSummaryModel
+                            id: groupsComboBox
+
+                            width: parent.width
                         }
                     }
                 }

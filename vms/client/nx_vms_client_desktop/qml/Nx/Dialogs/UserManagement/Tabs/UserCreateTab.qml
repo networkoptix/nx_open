@@ -30,6 +30,7 @@ Item
     property int userType: UserSettingsGlobal.LocalUser
 
     property var self
+    property alias model: groupsComboBox.model
 
     function validate()
     {
@@ -46,192 +47,210 @@ Item
         return emailTextField.validate()
     }
 
-    Column
+    Scrollable
     {
-        spacing: 8
-        anchors.left: parent.left
-        anchors.leftMargin: 16
-        anchors.right: parent.right
-        anchors.rightMargin: 16
+        id: scroll
+        anchors.fill: parent
 
-        SectionHeader
+        contentItem: Column
         {
-            text: qsTr("New User")
-        }
+            spacing: 8
 
-        CenteredField
-        {
-            UserEnabledSwitch
+            x: 16
+            width: scroll.width - 16 * 2
+
+            SectionHeader
             {
-                id: enabledUserSwitch
+                text: qsTr("New User")
             }
-        }
 
-        CenteredField
-        {
-            text: qsTr("Type")
-
-            visible: control.self ? control.self.isConnectedToCloud() : false
-
-            ButtonGroup
+            CenteredField
             {
-                buttons: typeButtonsRow.children
-                exclusive: true
-                onCheckedButtonChanged:
+                UserEnabledSwitch
                 {
-                    control.userType = localUserButton.checked
-                        ? UserSettingsGlobal.LocalUser
-                        : UserSettingsGlobal.CloudUser
+                    id: enabledUserSwitch
                 }
             }
 
-            Row
+            CenteredField
             {
-                id: typeButtonsRow
+                text: qsTr("Type")
 
-                spacing: 0
+                visible: control.self ? control.self.isConnectedToCloud() : false
 
-                ToggleButton
+                ButtonGroup
                 {
-                    id: localUserButton
-                    text: qsTr("Local")
-                    icon.source: "image://svg/skin/user_settings/toggle_local_user.svg"
-                    icon.width: 20
-                    icon.height: 20
-                    flatSide: -1 //< Rigth.
-                    checked: control.userType == UserSettingsGlobal.LocalUser
+                    buttons: typeButtonsRow.children
+                    exclusive: true
+                    onCheckedButtonChanged:
+                    {
+                        control.userType = localUserButton.checked
+                            ? UserSettingsGlobal.LocalUser
+                            : UserSettingsGlobal.CloudUser
+                    }
                 }
 
-                ToggleButton
+                Row
                 {
-                    text: qsTr("Cloud")
-                    icon.source: "image://svg/skin/user_settings/toggle_cloud_user.svg"
-                    icon.width: 20
-                    icon.height: 20
-                    flatSide: 1 //< Left.
-                    checked: control.userType == UserSettingsGlobal.CloudUser
+                    id: typeButtonsRow
+
+                    spacing: 0
+
+                    ToggleButton
+                    {
+                        id: localUserButton
+                        text: qsTr("Local")
+                        icon.source: "image://svg/skin/user_settings/toggle_local_user.svg"
+                        icon.width: 20
+                        icon.height: 20
+                        flatSide: -1 //< Rigth.
+                        checked: control.userType == UserSettingsGlobal.LocalUser
+                    }
+
+                    ToggleButton
+                    {
+                        text: qsTr("Cloud")
+                        icon.source: "image://svg/skin/user_settings/toggle_cloud_user.svg"
+                        icon.width: 20
+                        icon.height: 20
+                        flatSide: 1 //< Left.
+                        checked: control.userType == UserSettingsGlobal.CloudUser
+                    }
                 }
             }
-        }
 
-        CenteredField
-        {
-            visible: control.userType != UserSettingsGlobal.CloudUser
-
-            text: qsTr("Login")
-
-            TextFieldWithValidator
+            CenteredField
             {
-                id: loginTextField
-                width: parent.width
-                validateFunc: control.self ? control.self.validateLogin : null
-                focus: control.userType != UserSettingsGlobal.CloudUser
-            }
-        }
+                visible: control.userType != UserSettingsGlobal.CloudUser
 
-        CenteredField
-        {
-            visible: control.userType != UserSettingsGlobal.CloudUser
+                text: qsTr("Login")
 
-            text: qsTr("Full Name")
-
-            TextField
-            {
-                id: fullNameTextField
-                width: parent.width
-            }
-        }
-
-        CenteredField
-        {
-            text: qsTr("Email")
-
-            TextFieldWithValidator
-            {
-                id: emailTextField
-                focus: control.userType == UserSettingsGlobal.CloudUser
-                width: parent.width
-                validateFunc: (text) =>
+                TextFieldWithValidator
                 {
-                    return control.self
-                        ? control.self.validateEmail(
-                            text, control.userType == UserSettingsGlobal.CloudUser)
-                        : ""
+                    id: loginTextField
+                    width: parent.width
+                    validateFunc: control.self ? control.self.validateLogin : null
+                    focus: control.userType != UserSettingsGlobal.CloudUser
                 }
             }
-        }
 
-        CenteredField
-        {
-            visible: control.userType != UserSettingsGlobal.CloudUser
-
-            text: qsTr("Password")
-
-            PasswordFieldWithWarning
+            CenteredField
             {
-                id: passwordTextField
-                width: parent.width
-                validateFunc: UserSettingsGlobal.validatePassword
-                onTextChanged: confirmPasswordTextField.warningState = false
-            }
-        }
+                visible: control.userType != UserSettingsGlobal.CloudUser
 
-        CenteredField
-        {
-            visible: control.userType != UserSettingsGlobal.CloudUser
+                text: qsTr("Full Name")
 
-            text: qsTr("Confirm Password")
-
-            PasswordFieldWithWarning
-            {
-                id: confirmPasswordTextField
-                width: parent.width
-                showStrength: false
-                validateFunc: (text) =>
+                TextField
                 {
-                    return passwordTextField.text == confirmPasswordTextField.text
-                        ? ""
-                        : qsTr("Passwords do not match.")
+                    id: fullNameTextField
+                    width: parent.width
                 }
             }
-        }
 
-        CenteredField
-        {
-            visible: control.userType != UserSettingsGlobal.CloudUser
-
-            CheckBox
+            CenteredField
             {
-                id: allowInsecureCheckBox
-                text: qsTr("Allow insecure (digest) authentication")
+                text: qsTr("Email")
+
+                TextFieldWithValidator
+                {
+                    id: emailTextField
+                    focus: control.userType == UserSettingsGlobal.CloudUser
+                    width: parent.width
+                    validateFunc: (text) =>
+                    {
+                        return control.self
+                            ? control.self.validateEmail(
+                                text, control.userType == UserSettingsGlobal.CloudUser)
+                            : ""
+                    }
+                }
             }
-        }
 
-        CenteredField
-        {
-            visible: allowInsecureCheckBox.checked
-
-            InsecureWarning
+            CenteredField
             {
-                width: parent.width
+                visible: control.userType != UserSettingsGlobal.CloudUser
+
+                text: qsTr("Password")
+
+                PasswordFieldWithWarning
+                {
+                    id: passwordTextField
+                    width: parent.width
+                    validateFunc: UserSettingsGlobal.validatePassword
+                    onTextChanged: confirmPasswordTextField.warningState = false
+                }
             }
-        }
 
-        CenteredField
-        {
-            visible: control.userType == UserSettingsGlobal.CloudUser
-
-            Text
+            CenteredField
             {
-                width: parent.width
-                wrapMode: Text.WordWrap
-                font: Qt.font({pixelSize: 14, weight: Font.Normal})
-                color: ColorTheme.colors.light16
-                text: qsTr("You need to specify only user's email address.")
-                    + "\n\n"
-                    + qsTr("If user already has an account, he will see this system and will be "
-                    + "able to log in to it. If not, we'll send an invitation to this address and "
-                    + "user will see this system right after he creates an account.")
+                visible: control.userType != UserSettingsGlobal.CloudUser
+
+                text: qsTr("Confirm Password")
+
+                PasswordFieldWithWarning
+                {
+                    id: confirmPasswordTextField
+                    width: parent.width
+                    showStrength: false
+                    validateFunc: (text) =>
+                    {
+                        return passwordTextField.text == confirmPasswordTextField.text
+                            ? ""
+                            : qsTr("Passwords do not match.")
+                    }
+                }
+            }
+
+            CenteredField
+            {
+                visible: control.userType != UserSettingsGlobal.CloudUser
+
+                CheckBox
+                {
+                    id: allowInsecureCheckBox
+                    text: qsTr("Allow insecure (digest) authentication")
+                }
+            }
+
+            CenteredField
+            {
+                visible: allowInsecureCheckBox.checked
+
+                InsecureWarning
+                {
+                    width: parent.width
+                }
+            }
+
+            CenteredField
+            {
+                visible: control.userType == UserSettingsGlobal.CloudUser
+
+                Text
+                {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    font: Qt.font({pixelSize: 14, weight: Font.Normal})
+                    color: ColorTheme.colors.light16
+                    text: qsTr("You need to specify only user's email address.")
+                        + "\n\n"
+                        + qsTr("If user already has an account, he will see this system and will"
+                        + " be able to log in to it. If not, we'll send an invitation to this"
+                        + " address and user will see this system right after he creates an"
+                        + " account.")
+                }
+            }
+
+            CenteredField
+            {
+                text: qsTr("Permission Groups")
+
+                GroupsComboBox
+                {
+                    id: groupsComboBox
+
+                    width: parent.width
+                }
             }
         }
     }

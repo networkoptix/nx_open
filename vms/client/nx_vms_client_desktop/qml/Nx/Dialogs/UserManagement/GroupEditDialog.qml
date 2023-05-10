@@ -107,8 +107,8 @@ DialogWithState
                 groupCount: membersModel.groups.length
                 deleteAvailable: !dialog.isLdap && !dialog.isPredefined && !dialog.isSaving
                 editingContext: membersModel.editingContext
-                globalPermissions: dialog.globalPermissions
-                sharedResources: dialog.sharedResources
+                model: membersModel
+                parentGroupsEditable: dialog.parentGroupsEditable
 
                 onDeleteRequested: dialog.deleteRequested()
                 onGroupClicked: (id) => { dialog.groupClicked(id) }

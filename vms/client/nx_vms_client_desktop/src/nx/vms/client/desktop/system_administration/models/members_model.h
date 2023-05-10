@@ -153,6 +153,8 @@ public:
 
     bool canEditMembers(const QnUuid& id) const;
 
+    Q_INVOKABLE void removeParent(const QnUuid& groupId);
+
 signals:
     void groupIdChanged();
     void userIdChanged();
@@ -172,7 +174,6 @@ private:
     bool isAllowedParent(const QnUuid& groupId) const;
 
     void addParent(const QnUuid& groupId);
-    void removeParent(const QnUuid& groupId);
     void addMember(const QnUuid& memberId);
     void removeMember(const QnUuid& memberId);
 

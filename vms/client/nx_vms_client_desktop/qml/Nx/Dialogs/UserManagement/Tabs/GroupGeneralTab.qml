@@ -30,8 +30,9 @@ Item
     property int groupCount: 0
     property bool deleteAvailable: true
     property var editingContext
-    property alias globalPermissions: accessSummaryModel.globalPermissions
-    property alias sharedResources: accessSummaryModel.sharedResources
+
+    property alias model: groupsComboBox.model
+    property alias parentGroupsEditable: groupsComboBox.enabled
 
     property var self
 
@@ -115,15 +116,15 @@ Item
 
         Scrollable
         {
+            id: scroll
+
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            Column
+            contentItem: Column
             {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: 16
-                anchors.rightMargin: 16
+                x: 16
+                width: scroll.width - 16 * 2
 
                 spacing: 8
 
@@ -146,47 +147,15 @@ Item
                     }
                 }
 
-                SectionHeader
+                CenteredField
                 {
-                    text: qsTr("Groups")
-                    visible: !control.isPredefined
-                }
+                    text: qsTr("Permission Groups")
 
-                GroupsFlow
-                {
-                    id: groupsFlow
-
-                    visible: !control.isPredefined
-
-                    width: parent.width
-
-                    rowLimit: 2
-                    items: control.groups
-
-                    onGroupClicked: (id) => { control.groupClicked(id) }
-                    onMoreClicked: control.moreGroupsClicked()
-                }
-
-                Text
-                {
-                    visible: control.groups.length === 0 && !control.isPredefined
-                    font: Qt.font({pixelSize: 14, weight: Font.Normal})
-                    color: ColorTheme.colors.light16
-                    text: qsTr("Not a member of any group")
-                }
-
-                SectionHeader
-                {
-                    text: qsTr("Permissions")
-                }
-
-                PermissionSummary
-                {
-                    Layout.topMargin: 8
-
-                    model: CustomAccessSummaryModel
+                    GroupsComboBox
                     {
-                        id: accessSummaryModel
+                        id: groupsComboBox
+
+                        width: parent.width
                     }
                 }
 
