@@ -636,7 +636,6 @@ private:
     nx::utils::CachedValue<bool> m_cachedCanConfigureRemoteRecording;
     nx::utils::CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     nx::utils::CachedValue<nx::vms::api::DeviceType> m_cachedExplicitDeviceType;
-    nx::utils::CachedValue<bool> m_cachedHasVideo;
     nx::utils::CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
 
 protected slots:
