@@ -7,6 +7,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QTranslator>
 
+#include <nx/build_info.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -123,6 +124,12 @@ void TranslationManager::installTranslation(const Translation& translation)
         if (translator->load(file))
             qApp->installTranslator(translator.take());
     }
+}
+
+std::chrono::milliseconds TranslationManager::defaultInstallTranslationTimeout()
+{
+    static const std::chrono::seconds value([] { return nx::build_info::isArm() ? 5 : 3; }());
+    return value;
 }
 
 PreloadedTranslationReference TranslationManager::preloadTranslation(
