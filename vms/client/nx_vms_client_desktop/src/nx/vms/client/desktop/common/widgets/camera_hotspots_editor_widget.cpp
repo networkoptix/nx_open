@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/camera_hotspots/camera_hotspots_display_utils.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
+#include <nx/vms/client/desktop/resource_properties/camera/widgets/camera_hotspots_item_delegate.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -178,7 +179,11 @@ void CameraHotspotsEditorWidget::Private::processContextMenuRequest(const QPoint
         QObject::connect(createAction, &QAction::triggered, q,
             [this, pos]
             {
+                static const auto kHotspotsPalette = CameraHotspotsItemDelegate::hotspotsPalette();
+
                 CameraHotspotData hotspot;
+                if (NX_ASSERT(!kHotspotsPalette.empty()))
+                    hotspot.accentColorName = kHotspotsPalette.first().name();
                 camera_hotspots::setHotspotPositionFromPointInRect(thumbnailRect(), pos, hotspot);
                 q->appendHotspot(hotspot);
             });
