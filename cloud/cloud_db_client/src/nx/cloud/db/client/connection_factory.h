@@ -13,6 +13,7 @@ class ConnectionFactory:
 {
 public:
     ConnectionFactory();
+    virtual ~ConnectionFactory() override;
 
     virtual void connect(
         std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler) override;
