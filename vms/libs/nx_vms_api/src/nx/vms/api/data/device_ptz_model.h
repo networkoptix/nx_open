@@ -53,7 +53,7 @@ struct NX_VMS_API PtzPosition: PtzPositionFilter
      * A position on the X-axis. Range depends on the `type` parameter. In the case of an absolute
      * position, the range is defined by the Device. In the case of a logical position, the range
      * is -180 to +180.
-     * %example 10
+     * %example 1.0
      */
     std::optional<float> pan = std::nullopt;
 
@@ -61,7 +61,7 @@ struct NX_VMS_API PtzPosition: PtzPositionFilter
      * A position on the Y-axis. Range depends on the `type` parameter. In the case of an absolute
      * position, the range is defined by the Device. In the case of a logical position, the range
      * is -180 to +180.
-     * %example 10
+     * %example 1.0
      */
     std::optional<float> tilt = std::nullopt;
 
@@ -69,7 +69,7 @@ struct NX_VMS_API PtzPosition: PtzPositionFilter
      * A position on the Z-axis. Range depends on the `type` parameter. In the case of an absolute
      * position, the range is defined by the Device. In the case of a logical position, the range
      * is 0 to +180.
-     * %example 10
+     * %example 1.0
      */
     std::optional<float> zoom = std::nullopt;
 
