@@ -15,6 +15,11 @@ ConnectionFactory::ConnectionFactory()
 {
 }
 
+ConnectionFactory::~ConnectionFactory()
+{
+    m_endPointFetcher.pleaseStopSync();
+}
+
 void ConnectionFactory::connect(
     std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler)
 {
