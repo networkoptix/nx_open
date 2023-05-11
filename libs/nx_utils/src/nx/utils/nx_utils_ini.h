@@ -66,6 +66,13 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
 
     NX_INI_STRING("dd.MM.yyyy HH:mm:ss.zzz UTC", debugTimeRepresentation,
         "Representation for timestamp in developer logs (see `timestampToDebugString` function)");
+
+    NX_INI_FLAG(0, checkCameraTimestamps,
+        "Enable checking timestamps of analytic objects and events. If timestamp is sooner or later\n"
+        "by `cameraTimestampThresholdS` seconds from current time, assert will be fired.");
+
+    NX_INI_INT(86400, cameraTimestampThresholdS,
+        "Threshold in seconds for analytic timestamps checking.");
 };
 
 NX_UTILS_API Ini& ini();
