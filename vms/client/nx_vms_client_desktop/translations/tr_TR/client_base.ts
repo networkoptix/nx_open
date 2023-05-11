@@ -2900,7 +2900,7 @@ to %1</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>%1 ile Sistem bağlantısını kesmek için hesap şifrenizi girin</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2936,7 +2936,7 @@ to %1</source>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>%1 ile Sistem bağlantısı kesilemiyor</translation>
     </message>
   </context>
   <context>
@@ -7927,7 +7927,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>Kendinizi %1 üzerinde doğrulamak için bir sertifika seçin:</translation>
     </message>
     <message>
       <source>Select</source>
@@ -10392,7 +10392,7 @@ Dikkat: Bu parola sıfırlanamaz. Kaybederseniz arşiv kurtarılamaz.</translati
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
       <source>The certificate was presented by %1</source>
-      <translation type="unfinished">The certificate was presented by %1</translation>
+      <translation>Sertifika %1 tarafından sunuldu</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
@@ -12041,7 +12041,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     <name>nx::vms::client::desktop::ui::workbench::ResourceGroupingActionHandler</name>
     <message>
       <source>Maximum level of nesting is reached</source>
-      <translation type="unfinished">Maximum level of nesting is reached</translation>
+      <translation>Maksimum yerleştirme düzeyine ulaşıldı</translation>
     </message>
   </context>
   <context>
