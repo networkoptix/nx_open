@@ -3,6 +3,7 @@
 #include "amend_transaction_data.h"
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/json.h>
@@ -109,6 +110,36 @@ bool amendOutputDataIfNeeded(
         url.setPassword(kHiddenPasswordFiller);
 
     storageData->url = url.toString();
+    return true;
+}
+
+bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
+    nx::vms::api::UserData* userData)
+{
+    if (accessData == Qn::kSystemAccess)
+        return true;
+
+    if (userData->id == QnUserResource::kAdminGuid)
+    {
+       // Only admin should see it's own password hashes!
+       if (accessData.userId == userData->id)
+           return true;
+    }
+    else if (accessManager->hasGlobalPermission(accessData, GlobalPermission::administrator))
+    {
+        return true;
+    }
+    else if (const auto user = accessManager->systemContext()->resourcePool()
+             ->getResourceById<QnUserResource>(userData->id);
+        accessManager->hasPermission(accessData, user, Qn::SavePermission))
+    {
+        return true;
+    }
+
+    userData->digest.clear();
+    userData->hash.clear();
+    userData->cryptSha512Hash.clear();
     return true;
 }
 
