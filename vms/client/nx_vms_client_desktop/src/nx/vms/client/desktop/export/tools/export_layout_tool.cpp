@@ -20,6 +20,7 @@
 #include <nx/build_info.h>
 #include <nx/core/watermark/watermark.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/reflect/json/serializer.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
@@ -30,10 +31,13 @@
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     #include <launcher/nov_launcher_win.h>
 #endif
 
+#include "../data/nov_metadata.h"
+
+using QIODevicePtr = QScopedPointer<QIODevice>;
 
 namespace {
 
@@ -250,49 +254,58 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
 
 bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
 {
-
-    /* Names of exported resources. */
+    // NOV-file metadata.
     {
-        QByteArray names;
-        QTextStream itemNames(&names, QIODevice::WriteOnly);
-        for (const ItemInfo &info : items)
-            itemNames << info.name << lit("\n");
-        itemNames.flush();
+        NovMetadata metadata{.version=NovMetadata::kVersion51};
 
-        if (!writeData(lit("item_names.txt"), names))
+        QByteArray rawData = QByteArray::fromStdString(nx::reflect::json::serialize(metadata));
+        if (!writeData("metadata.json", rawData))
             return false;
     }
 
-    /* Timezones of exported resources. */
+    // Names of exported resources.
+    {
+        QByteArray names;
+        QTextStream itemNames(&names, QIODevice::WriteOnly);
+        itemNames.setCodec("UTF-8"); // As of Qt5, local encoding is used by default (ANSI on Windows).
+        for (const ItemInfo& info: items)
+            itemNames << info.name << "\n";
+        itemNames.flush();
+
+        if (!writeData("item_names.txt", names))
+            return false;
+    }
+
+    // Timezones of exported resources.
     {
         QByteArray timezones;
         QTextStream itemTimeZonesStream(&timezones, QIODevice::WriteOnly);
         for (const ItemInfo &info : items)
-            itemTimeZonesStream << info.timezone << lit("\n");
+            itemTimeZonesStream << info.timezone << "\n";
         itemTimeZonesStream.flush();
 
-        if (!writeData(lit("item_timezones.txt"), timezones))
+        if (!writeData("item_timezones.txt", timezones))
             return false;
     }
 
-    /* Layout items. */
+    // Layout items.
     {
         QByteArray layoutData;
         nx::vms::api::LayoutData layoutObject;
         ec2::fromResourceToApi(d->layout, layoutObject);
         QJson::serialize(layoutObject, &layoutData);
         /* Old name for compatibility issues. */
-        if (!writeData(lit("layout.pb"), layoutData))
+        if (!writeData("layout.pb", layoutData))
             return false;
     }
 
-    /* Exported period. */
+    // Exported period.
     {
-        if (!writeData(lit("range.bin"), d->settings.period.serialize()))
+        if (!writeData("range.bin", d->settings.period.serialize()))
             return false;
     }
 
-    /* Additional flags. */
+    // Additional flags.
     {
         quint32 flags = d->settings.readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
         for (const QnMediaResourcePtr resource : d->resources)
@@ -306,7 +319,7 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
 
         if (!tryInLoop([this, flags]
         {
-            QScopedPointer<QIODevice> miscFile(d->storage->open(lit("misc.bin"), QIODevice::WriteOnly));
+            QIODevicePtr miscFile(d->storage->open("misc.bin", QIODevice::WriteOnly));
             if (!miscFile)
                 return false;
             miscFile->write((const char*)&flags, sizeof(flags));
@@ -315,13 +328,13 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
             return false;
     }
 
-    /* Layout id. */
+    // Layout id.
     {
-        if (!writeData(lit("uuid.bin"), d->layout->getId().toByteArray()))
+        if (!writeData("uuid.bin", d->layout->getId().toByteArray()))
             return false;
     }
 
-    /* Chunks. */
+    // Chunks.
     for (const auto& resource: d->resources)
     {
         QByteArray data;
@@ -359,7 +372,7 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
             return false;
     }
 
-    /* Layout background */
+    // Layout background.
     if (!d->layout->backgroundImageFilename().isEmpty())
     {
         bool exportedLayout = d->layout->isFile();  // we have changed background to an exported layout
@@ -375,7 +388,8 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
 
             if (!tryInLoop([this, background]
             {
-                QScopedPointer<QIODevice> imageFile(d->storage->open(d->layout->backgroundImageFilename(), QIODevice::WriteOnly));
+                QIODevicePtr imageFile(d->storage->open(d->layout->backgroundImageFilename(),
+                    QIODevice::WriteOnly));
                 if (!imageFile)
                     return false;
                 background.save(imageFile.data(), "png");
@@ -388,14 +402,13 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
         }
     }
 
-    /* Watermark */
-    if (d->layout->data(Qn::LayoutWatermarkRole).isValid())
+    // Watermark.
+    const auto watermarkData = d->layout->data(Qn::LayoutWatermarkRole);
+    if (watermarkData.isValid())
     {
-        if (!writeData(lit("watermark.txt"),
-            QJson::serialized(d->layout->data(Qn::LayoutWatermarkRole).value<nx::core::Watermark>())))
-        {
+        const auto watermark = watermarkData.value<nx::core::Watermark>();
+        if (!writeData("watermark.txt", QJson::serialized(watermark)))
             return false;
-        }
     }
 
     return true;
@@ -614,7 +627,7 @@ bool ExportLayoutTool::writeData(const QString &fileName, const QByteArray &data
     return tryInLoop(
         [this, fileName, data]
         {
-            QScopedPointer<QIODevice> file(d->storage->open(fileName, QIODevice::WriteOnly));
+            QIODevicePtr file(d->storage->open(fileName, QIODevice::WriteOnly));
             if (!file)
                 return false;
             file->write(data);
