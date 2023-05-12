@@ -204,4 +204,22 @@ std::string generateWhereClauseExpression(const InnerJoinFilterFields& filter)
     return result;
 }
 
+//-------------------------------------------------------------------------------------------------
+
+std::string Range::toString() const
+{
+    std::string text = " LIMIT :limit";
+    if (offset)
+        text += " OFFSET :offset";
+
+    return text;
+}
+
+void Range::bind(AbstractSqlQuery* query) const
+{
+    query->bindValue(":limit", limit);
+    if (offset)
+        query->bindValue(":offset", *offset);
+}
+
 } // namespace nx::sql

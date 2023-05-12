@@ -199,4 +199,18 @@ NX_SQL_API void bindFields(AbstractSqlQuery* query, const InnerJoinFilterFields&
 
 NX_SQL_API std::string generateWhereClauseExpression(const InnerJoinFilterFields& filter);
 
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Represents LIMIT <int> [OFFSET <int>].
+ */
+struct NX_SQL_API Range
+{
+    int limit = 0;
+    std::optional<int> offset;
+
+    std::string toString() const;
+    void bind(AbstractSqlQuery* query) const;
+};
+
 } // namespace nx::sql
