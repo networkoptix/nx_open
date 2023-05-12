@@ -2,6 +2,7 @@
 
 #include "layout_reader.h"
 
+#include <QtCore/QTextStream>
 #include <QtCore/QThread>
 
 #include <client/client_globals.h>
@@ -13,6 +14,8 @@
 #include <managers/resource_manager.h>
 #include <nx/core/watermark/watermark.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/reflect/json/deserializer.h>
+#include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
@@ -27,7 +30,17 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
 {
     // Create storage handler and read layout info.
     QnLayoutFileStorageResource layoutStorage(layoutUrl);
-    QScopedPointer<QIODevice> layoutFile(layoutStorage.open("layout.pb", QIODevice::ReadOnly));
+
+    using QIODevicePtr = QScopedPointer<QIODevice>;
+
+    NovMetadata metadata;
+    {
+        QIODevicePtr metadataFile(layoutStorage.open("metadata.json", QIODevice::ReadOnly));
+        if (metadataFile)
+            nx::reflect::json::deserialize(metadataFile->readAll().toStdString(), &metadata);
+    }
+
+    QIODevicePtr layoutFile(layoutStorage.open("layout.pb", QIODevice::ReadOnly));
     if (!layoutFile)
         return QnFileLayoutResourcePtr();
 
@@ -87,7 +100,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         ec2::fromApiToResource(item, orderedItems.last());
     }
 
-    QScopedPointer<QIODevice> rangeFile(layoutStorage.open("range.bin", QIODevice::ReadOnly));
+    QIODevicePtr rangeFile(layoutStorage.open("range.bin", QIODevice::ReadOnly));
     if (rangeFile)
     {
         QByteArray data = rangeFile->readAll();
@@ -95,7 +108,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         rangeFile.reset();
     }
 
-    QScopedPointer<QIODevice> miscFile(layoutStorage.open("misc.bin", QIODevice::ReadOnly));
+    QIODevicePtr miscFile(layoutStorage.open("misc.bin", QIODevice::ReadOnly));
     bool layoutWithCameras = false;
     if (miscFile)
     {
@@ -114,7 +127,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
 
     if (!layout->backgroundImageFilename().isEmpty())
     {
-        QScopedPointer<QIODevice> backgroundFile(layoutStorage.open(layout->backgroundImageFilename(), QIODevice::ReadOnly));
+        QIODevicePtr backgroundFile(layoutStorage.open(layout->backgroundImageFilename(), QIODevice::ReadOnly));
         if (backgroundFile)
         {
             QByteArray data = backgroundFile->readAll();
@@ -125,7 +138,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         }
     }
 
-    QScopedPointer<QIODevice> watermarkFile(layoutStorage.open("watermark.txt", QIODevice::ReadOnly));
+    QIODevicePtr watermarkFile(layoutStorage.open("watermark.txt", QIODevice::ReadOnly));
     if (watermarkFile)
     {
         QByteArray data = watermarkFile->readAll();
@@ -139,10 +152,12 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
 
     nx::vms::common::LayoutItemDataMap updatedItems;
 
-    QScopedPointer<QIODevice> itemNamesIO(layoutStorage.open("item_names.txt", QIODevice::ReadOnly));
+    QIODevicePtr itemNamesIO(layoutStorage.open("item_names.txt", QIODevice::ReadOnly));
     QTextStream itemNames(itemNamesIO.data());
+    if (metadata.version < NovMetadata::kVersion51)
+        itemNames.setEncoding(QStringConverter::System);
 
-    QScopedPointer<QIODevice> itemTimeZonesIO(layoutStorage.open("item_timezones.txt", QIODevice::ReadOnly));
+    QIODevicePtr itemTimeZonesIO(layoutStorage.open("item_timezones.txt", QIODevice::ReadOnly));
     QTextStream itemTimeZones(itemTimeZonesIO.data());
 
     // TODO: #sivanov Here is bad place to add resources to the pool. Need refactor.
@@ -190,7 +205,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel)
         {
             QString normMotionName = path.mid(path.lastIndexOf('?') + 1);
-            QScopedPointer<QIODevice> motionIO(layoutStorage.open(
+            QIODevicePtr motionIO(layoutStorage.open(
                 nx::format(
                     "motion%1_%2.bin", channel, QFileInfo(normMotionName).completeBaseName()),
                 QIODevice::ReadOnly));
