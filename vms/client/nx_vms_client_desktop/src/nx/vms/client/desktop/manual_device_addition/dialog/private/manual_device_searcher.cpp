@@ -2,12 +2,16 @@
 
 #include "manual_device_searcher.h"
 
+#include <algorithm>
+
 #include <QtNetwork/QHostAddress>
 
 #include <api/server_rest_connection.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 
 namespace {
 
@@ -21,7 +25,7 @@ SetType subtract(SetType first, const SetType& second)
 
 namespace nx::vms::client::desktop {
 
-bool operator==(const QnManualResourceSearchStatus& left, const QnManualResourceSearchStatus& right)
+bool operator==(const api::DeviceSearchStatus& left, const api::DeviceSearchStatus& right)
 {
     return left.state == right.state
         && left.current == right.current
@@ -35,6 +39,7 @@ ManualDeviceSearcher::ManualDeviceSearcher(
     const QString& password,
     std::optional<int> port)
     :
+    SystemContextAware(core::SystemContext::fromResource(server)),
     m_server(server),
     m_login(login),
     m_password(password)
@@ -46,13 +51,15 @@ ManualDeviceSearcher::ManualDeviceSearcher(
     searchForDevices(url, QString(), login, password, port);
 }
 
-ManualDeviceSearcher::ManualDeviceSearcher(const QnMediaServerResourcePtr& server,
+ManualDeviceSearcher::ManualDeviceSearcher(
+    const QnMediaServerResourcePtr& server,
     const QString& startAddress,
     const QString& endAddress,
     const QString& login,
     const QString& password,
     std::optional<int> port)
     :
+    SystemContextAware(core::SystemContext::fromResource(server)),
     m_server(server),
     m_login(login),
     m_password(password)
@@ -69,7 +76,7 @@ ManualDeviceSearcher::~ManualDeviceSearcher()
     stop(); //< Last try to stop search.
 }
 
-const QnManualResourceSearchStatus& ManualDeviceSearcher::status() const
+const api::DeviceSearchStatus& ManualDeviceSearcher::status() const
 {
     return m_status;
 }
@@ -84,9 +91,14 @@ QnMediaServerResourcePtr ManualDeviceSearcher::server() const
     return m_server;
 }
 
-QnManualResourceSearchEntryList ManualDeviceSearcher::devices() const
+std::vector<api::DeviceModelForSearch> ManualDeviceSearcher::devices() const
 {
-    return m_devices.values();
+    std::vector<api::DeviceModelForSearch> devices;
+    devices.reserve(m_devices.size());
+    std::transform(m_devices.begin(), m_devices.end(), std::back_inserter(devices),
+        [](const auto& item) { return item; });
+
+    return devices;
 }
 
 void ManualDeviceSearcher::stop()
@@ -188,46 +200,37 @@ void ManualDeviceSearcher::searchForDevices(
         return;
 
     const auto startCallback = nx::utils::guarded(this,
-        [this](bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& result)
+        [this](bool success,
+            rest::Handle /*handle*/,
+            const rest::ErrorOrData<api::DeviceSearch>& errorOrData)
         {
-            if (!success || result.error != nx::network::rest::Result::NoError)
+            auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
+            if (!success || (error && error->error != nx::network::rest::Result::NoError))
             {
                 setLastErrorText(tr("Can not start the search process"));
                 abort();
             }
-            else
+            else if (auto result = std::get_if<api::DeviceSearch>(&errorOrData))
             {
-                const auto reply = result.deserialized<QnManualCameraSearchReply>();
-                m_searchProcessId = reply.processUuid;
+                m_searchProcessId = result->id;
                 m_updateProgressTimer.start();
-                setStatus(reply.status);
+                setStatus(result->status.value_or(
+                    api::DeviceSearchStatus{api::DeviceSearchStatus::Init, 0, 0}));
             }
         });
 
-
-    if (endAddress.isEmpty())
-    {
-        connectedServerApi()->searchCameraStart(
-            m_server->getId(),
-            urlOrStartAddress,
-            login,
-            password,
-            port,
-            startCallback,
-            QThread::currentThread());
-    }
+    nx::vms::api::DeviceSearch deviceSearchData;
+    deviceSearchData.credentials = {login, password};
+    deviceSearchData.port = port;
+    if (endAddress.isEmpty()) 
+        deviceSearchData.target = nx::vms::api::DeviceSearchIp{urlOrStartAddress};
     else
-    {
-        connectedServerApi()->searchCameraRangeStart(
-            m_server->getId(),
-            urlOrStartAddress,
-            endAddress,
-            login,
-            password,
-            port,
-            startCallback,
-            QThread::currentThread());
-    }
+        deviceSearchData.target = nx::vms::api::DeviceSearchIpRange{urlOrStartAddress, endAddress};
+
+    connectedServerApi()->searchCamera(deviceSearchData,
+        systemContext()->getSessionTokenHelper(),
+        startCallback,
+        QThread::currentThread());
 }
 
 bool ManualDeviceSearcher::searching() const
@@ -241,7 +244,7 @@ void ManualDeviceSearcher::abort()
     setStatus(QnManualResourceSearchStatus());
 }
 
-void ManualDeviceSearcher::setStatus(const QnManualResourceSearchStatus& value)
+void ManualDeviceSearcher::setStatus(const api::DeviceSearchStatus& value)
 {
     if (m_status == value)
         return;
@@ -259,7 +262,7 @@ void ManualDeviceSearcher::setLastErrorText(const QString& text)
     emit lastErrorTextChanged();
 }
 
-void ManualDeviceSearcher::updateDevices(const QnManualResourceSearchEntryList& devices)
+void ManualDeviceSearcher::updateDevices(const std::vector<api::DeviceModelForSearch>& devices)
 {
     DevicesHash newDevices;
     for (const auto& device: devices)
@@ -275,11 +278,12 @@ void ManualDeviceSearcher::updateDevices(const QnManualResourceSearchEntryList& 
 
     emit devicesRemoved(removedIds.values());
 
-    QnManualResourceSearchEntryList addedDevices;
+    std::vector<api::DeviceModelForSearch> addedDevices;
+    addedDevices.reserve(addedIds.size());
     for (const auto& idForAdd: addedIds)
     {
         const auto& device = newDevices[idForAdd];
-        addedDevices.append(device);
+        addedDevices.push_back(device);
         m_devices.insert(idForAdd, device);
     }
 
@@ -291,23 +295,26 @@ void ManualDeviceSearcher::updateStatus()
     if (!searching() || !connection() || !m_server)
         return;
 
-    const auto updateProgressCallback = nx::utils::guarded(this,
-        [this](bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& result)
+    const auto startCallback = nx::utils::guarded(this,
+        [this](bool success,
+            rest::Handle /*handle*/,
+            const rest::ErrorOrData<api::DeviceSearch>& errorOrData)
         {
-            if (!success || result.error != nx::network::rest::Result::NoError)
+            auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
+            if (!success || (error && error->error != nx::network::rest::Result::NoError))
                 return;
 
             NX_ASSERT(!m_searchProcessId.isNull());
 
-            const auto reply = result.deserialized<QnManualCameraSearchReply>();
-            setStatus(reply.status);
-            updateDevices(reply.cameras);
+            auto result = std::get_if<api::DeviceSearch>(&errorOrData);
+            setStatus(result->status.value_or(
+                api::DeviceSearchStatus{api::DeviceSearchStatus::Init, 0, 0}));
+            updateDevices(result->devices.value_or(std::vector<api::DeviceModelForSearch>{}));
         });
 
-    connectedServerApi()->searchCameraStatus(
-        m_server->getId(),
-        m_searchProcessId,
-        updateProgressCallback,
+    connectedServerApi()->searchCameraStatus(m_searchProcessId,
+        systemContext()->getSessionTokenHelper(),
+        startCallback,
         QThread::currentThread());
 }
 

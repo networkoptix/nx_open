@@ -7,6 +7,7 @@
 #include <string_view>
 #include <tuple>
 #include <type_traits>
+#include <variant>
 
 #include <rapidjson/document.h>
 
@@ -95,6 +96,24 @@ DeserializationResult deserialize(
         *data = (T) std::stod(std::string(ctx.value.GetString(), ctx.value.GetStringLength()));
 
     return DeserializationResult(true);
+}
+
+template<typename T, typename... Args>
+DeserializationResult deserializeVariantType(
+    const DeserializationContext& ctx, std::variant<Args...>* data)
+{
+    T typedData;
+    auto r = deserializeValue(ctx, &typedData);
+    if (r)
+        *data = typedData;
+
+    return r;
+}
+
+template<typename... Args>
+DeserializationResult deserialize(const DeserializationContext& ctx, std::variant<Args...>* data)
+{
+    return (... || deserializeVariantType<Args>(ctx, data));
 }
 
 template<typename... Args>
