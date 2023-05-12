@@ -10,6 +10,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/analytics/integration_request.h>
 #include <nx/vms/api/data/user_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 struct PasswordHashes;
 
@@ -80,6 +81,8 @@ class NX_VMS_COMMON_API QnUserResource: public QnResource
     typedef QnResource base_type;
 
 public:
+    friend void ec2::fromResourceToApi(const QnUserResourcePtr&, nx::vms::api::UserData&);
+
     static const QnUuid kAdminGuid;
     static const QString kIntegrationRequestDataProperty;
 

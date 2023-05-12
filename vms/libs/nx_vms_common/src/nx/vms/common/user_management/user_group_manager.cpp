@@ -29,6 +29,19 @@ UserGroupManager::~UserGroupManager()
     // Required here for forward-declared scoped pointer destruction.
 }
 
+std::unordered_map<QnUuid, UserGroupData> UserGroupManager::customGroups(
+    std::function<bool(const nx::vms::api::UserGroupData&)> predicate) const
+{
+    std::unordered_map<QnUuid, UserGroupData> result;
+    NX_MUTEX_LOCKER lk(&d->mutex);
+    for (const auto& it: d->customGroups)
+    {
+        if (predicate(it.second))
+            result.insert(it);
+    }
+    return result;
+}
+
 UserGroupDataList UserGroupManager::groups(Selection types) const
 {
     UserGroupDataList result;
