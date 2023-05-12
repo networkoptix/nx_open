@@ -44,6 +44,10 @@ public:
         std::optional<std::chrono::milliseconds> timeout,
         QueueReaderId readerId = kInvalidQueueReaderId);
 
+    /**
+     * Extracts queue element that satisfies conditionFunc.
+     * Note: has O(n) run-time complexity.
+     */
     template<typename ConditionFunc>
     OptionalResultType popIf(
         ConditionFunc conditionFunc,
