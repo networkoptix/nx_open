@@ -2,7 +2,7 @@
 
 #include "scale_image_filter.h"
 
-#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <utils/media/frame_info.h>
 
 QnScaleImageFilter::QnScaleImageFilter(
@@ -17,11 +17,13 @@ QnScaleImageFilter::QnScaleImageFilter(
 CLVideoDecoderOutputPtr QnScaleImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
     auto result = frame->scaled(m_size, m_format);
+    if (!result)
+    {
+        NX_DEBUG(this, "Error while scaling frame to %1 (%2)", m_size, m_format);
+        return frame;
+    }
 
-    // `scaled()` can return an empty pointer. Better process as is than crash.
-    return NX_ASSERT(result, "Error while scaling frame to %1 (%2)", m_size, m_format)
-        ? result
-        : frame;
+    return result;
 }
 
 QSize QnScaleImageFilter::updatedResolution(const QSize& /*srcSize*/)
