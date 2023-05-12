@@ -14,14 +14,15 @@
 #include <core/resource/videowall_control_message.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_management/resource_properties.h>
 #include <licensing/license.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/app_info.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
-#include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/email_settings_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
@@ -35,6 +36,7 @@
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/action_factory.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
@@ -586,18 +588,26 @@ void fromApiToResource(const UserData& src, QnUserResourcePtr& dst, bool setPass
 
 void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
 {
-    fromResourceToApi(src, static_cast<ResourceData&>(dst));
-    dst.hash = src->getHash().toString();
-    dst.digest = src->getDigest();
+    dst.id = src->getId();
     dst.isEnabled = src->isEnabled();
     dst.permissions = src->getRawPermissions();
-    dst.email = src->getEmail();
-    dst.cryptSha512Hash = src->getCryptSha512Hash();
-    dst.groupIds = src->groupIds();
-    dst.fullName = src->fullName();
-    dst.externalId = src->externalId();
-    dst.type = src->userType();
-    dst.attributes = src->attributes();
+    if (auto context = src->systemContext())
+        dst.fullName = context->resourcePropertyDictionary()->value(dst.id, Qn::USER_FULL_NAME);
+
+    NX_MUTEX_LOCKER locker(&src->m_mutex);
+    dst.parentId = src->m_parentId;
+    dst.name = src->m_name;
+    dst.url = src->m_url;
+    dst.hash = src->m_hash.toString();
+    dst.digest = src->m_digest;
+    dst.email = src->m_email;
+    dst.cryptSha512Hash = src->m_cryptSha512Hash;
+    dst.groupIds = src->m_groupIds;
+    dst.externalId = src->m_externalId;
+    dst.type = src->m_userType;
+    dst.attributes = src->m_attributes;
+    if (dst.fullName.isNull())
+        dst.fullName = src->m_fullName;
 }
 
 void fromApiToResource(const VideowallItemData& src, QnVideoWallItem& dst)

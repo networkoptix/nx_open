@@ -3,6 +3,7 @@
 #pragma once
 
 #include <optional>
+#include <unordered_map>
 
 #include <QtCore/QList>
 #include <QtCore/QObject>
@@ -26,6 +27,9 @@ public:
         custom,
         all
     };
+
+    std::unordered_map<QnUuid, nx::vms::api::UserGroupData> customGroups(
+        std::function<bool(const nx::vms::api::UserGroupData&)> predicate) const;
 
     /** Returns list of all user groups of specified types. */
     nx::vms::api::UserGroupDataList groups(Selection types = Selection::all) const;
