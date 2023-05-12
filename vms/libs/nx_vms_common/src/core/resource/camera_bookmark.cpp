@@ -554,18 +554,27 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark)
 
 bool QnCameraBookmarkSearchFilter::isValid() const
 {
-    return startTimeMs <= endTimeMs && limit > 0;
+    if (limit <= 0)
+        return false;
+
+    if (startTimeMs != milliseconds::zero() && endTimeMs != milliseconds::zero())
+        return startTimeMs <= endTimeMs;
+
+     return true;
 }
 
 bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmark) const
 {
-    if (bookmark.startTimeMs >= endTimeMs || bookmark.endTime() <= startTimeMs)
+    if (startTimeMs != milliseconds::zero() && bookmark.endTime() < startTimeMs)
+        return false;
+
+    if (endTimeMs != milliseconds::zero() && bookmark.startTimeMs > endTimeMs)
         return false;
 
     if (text.isEmpty())
         return true;
 
-    for (const QString &word: text.split(QRegularExpression(QLatin1String("[\\W]")), Qt::SkipEmptyParts))
+    for (const QString &word: text.split(QRegularExpression("[\\W]"), Qt::SkipEmptyParts))
     {
         bool tagFound = false;
 
@@ -579,7 +588,8 @@ bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmar
         if (tagFound)
             continue;
 
-        QRegularExpression wordRegExp(QString(QLatin1String("\\b%1")).arg(word));
+        QRegularExpression wordRegExp(QString("\\b%1").arg(word),
+            QRegularExpression::CaseInsensitiveOption);
 
         if (wordRegExp.match(bookmark.name).hasMatch() ||
             wordRegExp.match(bookmark.description).hasMatch())
@@ -594,15 +604,6 @@ bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmar
 }
 
 const int QnCameraBookmarkSearchFilter::kNoLimit = std::numeric_limits<int>::max();
-
-QnCameraBookmarkSearchFilter QnCameraBookmarkSearchFilter::invalidFilter()
-{
-    QnCameraBookmarkSearchFilter filter;
-    filter.startTimeMs = 0ms;
-    filter.endTimeMs = -1ms;
-    filter.limit = 0;
-    return filter;
-}
 
 QString bookmarkToString(const QnCameraBookmark& bookmark)
 {

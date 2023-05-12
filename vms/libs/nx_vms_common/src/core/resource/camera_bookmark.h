@@ -133,17 +133,17 @@ nx::reflect::DeserializationResult NX_VMS_COMMON_API deserialize(
     const nx::reflect::json::DeserializationContext& ctx, QnCameraBookmarkTags* data);
 
 /**
- * @brief The QnCameraBookmarkSearchFilter struct   Bookmarks search request parameters. Used for loading bookmarks for the fixed time period
- *                                                  with length exceeding fixed minimal, with name and/or tags containing fixed string.
+ * Bookmarks search request parameters. Used for loading bookmarks for the fixed time period with
+ * length exceeding fixed minimal, with name and/or tags containing fixed string.
  */
 struct NX_VMS_COMMON_API QnCameraBookmarkSearchFilter
 {
     using milliseconds = std::chrono::milliseconds;
-    /** Minimum start time for the bookmark. */
+    /** Minimum start time for the bookmark. Zero means no limit. */
     milliseconds startTimeMs{};
 
-    /** Maximum end time for the bookmark. */
-    milliseconds endTimeMs{}; // TODO: #sivanov Bookmarks now work as maximum start time.
+    /** Maximum end time for the bookmark. Zero means no limit. */
+    milliseconds endTimeMs{};
 
     /** Text-search filter string. */
     QString text;
@@ -165,8 +165,6 @@ struct NX_VMS_COMMON_API QnCameraBookmarkSearchFilter
     bool isValid() const;
 
     bool checkBookmark(const QnCameraBookmark &bookmark) const;
-
-    static QnCameraBookmarkSearchFilter invalidFilter();
 
     static const int kNoLimit;
 };
