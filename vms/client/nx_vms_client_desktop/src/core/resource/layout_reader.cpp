@@ -2,6 +2,8 @@
 
 #include "layout_reader.h"
 
+#include <QtCore/QTextCodec>
+#include <QtCore/QTextStream>
 #include <QtCore/QThread>
 
 #include <client/client_globals.h>
@@ -13,6 +15,8 @@
 #include <managers/resource_manager.h>
 #include <nx/core/watermark/watermark.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/reflect/json/deserializer.h>
+#include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
@@ -27,7 +31,17 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
 {
     // Create storage handler and read layout info.
     QnLayoutFileStorageResource layoutStorage(layoutUrl);
-    QScopedPointer<QIODevice> layoutFile(layoutStorage.open(lit("layout.pb"), QIODevice::ReadOnly));
+
+    using QIODevicePtr = QScopedPointer<QIODevice>;
+
+    NovMetadata metadata;
+    {
+        QIODevicePtr metadataFile(layoutStorage.open("metadata.json", QIODevice::ReadOnly));
+        if (metadataFile)
+            nx::reflect::json::deserialize(metadataFile->readAll().toStdString(), &metadata);
+    }
+
+    QIODevicePtr layoutFile(layoutStorage.open("layout.pb", QIODevice::ReadOnly));
     if (!layoutFile)
         return QnFileLayoutResourcePtr();
 
@@ -87,7 +101,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         ec2::fromApiToResource(item, orderedItems.last());
     }
 
-    QScopedPointer<QIODevice> rangeFile(layoutStorage.open(lit("range.bin"), QIODevice::ReadOnly));
+    QIODevicePtr rangeFile(layoutStorage.open("range.bin", QIODevice::ReadOnly));
     if (rangeFile)
     {
         QByteArray data = rangeFile->readAll();
@@ -95,7 +109,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         rangeFile.reset();
     }
 
-    QScopedPointer<QIODevice> miscFile(layoutStorage.open(lit("misc.bin"), QIODevice::ReadOnly));
+    QIODevicePtr miscFile(layoutStorage.open("misc.bin", QIODevice::ReadOnly));
     bool layoutWithCameras = false;
     if (miscFile)
     {
@@ -114,7 +128,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
 
     if (!layout->backgroundImageFilename().isEmpty())
     {
-        QScopedPointer<QIODevice> backgroundFile(layoutStorage.open(layout->backgroundImageFilename(), QIODevice::ReadOnly));
+        QIODevicePtr backgroundFile(layoutStorage.open(layout->backgroundImageFilename(), QIODevice::ReadOnly));
         if (backgroundFile)
         {
             QByteArray data = backgroundFile->readAll();
@@ -125,7 +139,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         }
     }
 
-    QScopedPointer<QIODevice> watermarkFile(layoutStorage.open(lit("watermark.txt"), QIODevice::ReadOnly));
+    QIODevicePtr watermarkFile(layoutStorage.open("watermark.txt", QIODevice::ReadOnly));
     if (watermarkFile)
     {
         QByteArray data = watermarkFile->readAll();
@@ -139,10 +153,14 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
 
     QnLayoutItemDataMap updatedItems;
 
-    QScopedPointer<QIODevice> itemNamesIO(layoutStorage.open(lit("item_names.txt"), QIODevice::ReadOnly));
+    QIODevicePtr itemNamesIO(layoutStorage.open("item_names.txt", QIODevice::ReadOnly));
     QTextStream itemNames(itemNamesIO.data());
+    if (metadata.version >= NovMetadata::kVersion51)
+        itemNames.setCodec("UTF-8");
+    else
+        itemNames.setCodec(QTextCodec::codecForLocale());
 
-    QScopedPointer<QIODevice> itemTimeZonesIO(layoutStorage.open(lit("item_timezones.txt"), QIODevice::ReadOnly));
+    QIODevicePtr itemTimeZonesIO(layoutStorage.open("item_timezones.txt", QIODevice::ReadOnly));
     QTextStream itemTimeZones(itemTimeZonesIO.data());
 
     // TODO: #sivanov Here is bad place to add resources to the pool. Need refactor.
@@ -153,8 +171,8 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         QnLayoutItemData& item = items[i];
         QString path = item.resource.path;
         NX_ASSERT(!path.isEmpty(), "Resource path should not be empty. Exported file is not valid.");
-        if (!path.endsWith(lit(".mkv")))
-            path += lit(".mkv");
+        if (!path.endsWith(".mkv"))
+            path += ".mkv";
         item.resource.path = QnLayoutFileStorageResource::itemUniqueId(layoutUrl, path);
 
         QnLayoutFileStorageResourcePtr fileStorage(new QnLayoutFileStorageResource(layoutUrl));
@@ -190,7 +208,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel)
         {
             QString normMotionName = path.mid(path.lastIndexOf('?') + 1);
-            QScopedPointer<QIODevice> motionIO(layoutStorage.open(lit("motion%1_%2.bin")
+            QIODevicePtr motionIO(layoutStorage.open(QString("motion%1_%2.bin")
                 .arg(channel)
                 .arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly));
             // Doing some additional checks in case data is broken.
