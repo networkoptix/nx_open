@@ -689,95 +689,64 @@ Handle ServerConnection::addFileDownload(
 }
 
 Handle ServerConnection::addCamera(
-    const QnUuid& targetServerId,
-    const QnManualResourceSearchEntryList& cameras,
-    const QString& userName,
-    const QString& password,
-    GetCallback callback,
+    const nx::vms::api::DeviceModelForSearch& device,
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrData<nx::vms::api::DeviceModelForSearch>>::type&& callback,
     QThread* thread)
 {
-    static const QString kUrlParam("url");
-    static const QString kManufacturerParam("manufacturer");
-    static const QString kUniqueIdParam("physicalId");
+    auto request = prepareRequest(nx::network::http::Method::post,
+        prepareUrl(QString("/rest/v3/devices"), {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        nx::reflect::json::serialize(device));
 
-    nx::network::rest::Params parameters;
-    for (int i = 0; i < cameras.size(); i++)
-    {
-        const auto camera = cameras.at(i);
-        const auto number = QString::number(i);
-        parameters.insert(kUrlParam + number, camera.url);
-        parameters.insert(kManufacturerParam + number, camera.manufacturer);
-        parameters.insert(kUniqueIdParam + number, camera.physicalId);
-    }
-    parameters.insert("user", userName);
-    parameters.insert("password", password);
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
-    return executePost("/api/manualCamera/add", parameters, callback, thread, targetServerId);
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), thread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
 }
 
-Handle ServerConnection::searchCameraStart(
-    const QnUuid& targetServerId,
-    const QString& cameraUrl,
-    const QString& userName,
-    const QString& password,
-    std::optional<int> port,
-    GetCallback callback,
+Handle ServerConnection::searchCamera(
+    const nx::vms::api::DeviceSearch& deviceSearchData,
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
     QThread* targetThread)
 {
-    auto parameters = nx::network::rest::Params{
-        {"url", cameraUrl},
-        {"user", userName},
-        {"password", password}};
-    if (port.has_value())
-        parameters.insert("port", *port);
+    auto request = prepareRequest(nx::network::http::Method::post,
+        prepareUrl(QString("/rest/v3/devices/*/searches/"), {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        nx::reflect::json::serialize(deviceSearchData));
 
-    return executePost(
-        "/api/manualCamera/search",
-        parameters,
-        callback,
-        targetThread,
-        targetServerId);
-}
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
-Handle ServerConnection::searchCameraRangeStart(
-    const QnUuid& targetServerId,
-    const QString& startAddress,
-    const QString& endAddress,
-    const QString& userName,
-    const QString& password,
-    std::optional<int> port,
-    GetCallback callback,
-    QThread* targetThread)
-{
-    NX_ASSERT(!endAddress.isEmpty());
-    auto parameters = nx::network::rest::Params{
-        {"start_ip", startAddress},
-        {"user", userName},
-        {"password", password},
-        {"end_ip", endAddress}};
-    if (port.has_value())
-        parameters.insert("port", *port);
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
 
-    return executePost(
-        "/api/manualCamera/search",
-        parameters,
-        callback,
-        targetThread,
-        targetServerId);
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
 }
 
 Handle ServerConnection::searchCameraStatus(
-    const QnUuid& targetServerId,
-    const QnUuid& processUuid,
-    GetCallback callback,
+    const QnUuid& searchId,
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
     QThread* targetThread)
 {
-    return executeGet(
-        "/api/manualCamera/status",
-        nx::network::rest::Params{{"uuid", processUuid.toString()}},
-        callback,
-        targetThread,
-        targetServerId);
+    auto request = prepareRequest(nx::network::http::Method::get,
+        prepareUrl(NX_FMT("/rest/v3/devices/*/searches/%1", searchId), {}));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
 }
 
 Handle ServerConnection::searchCameraStop(

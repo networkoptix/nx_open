@@ -5,13 +5,14 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
-#include <api/model/manual_camera_seach_reply.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/api/data/device_model.h>
+#include <nx/vms/api/data/device_search.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class ManualDeviceSearcher: public QObject, public core::RemoteConnectionAware
+class ManualDeviceSearcher: public QObject, public core::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -34,13 +35,13 @@ public:
 
     virtual ~ManualDeviceSearcher() override;
 
-    const QnManualResourceSearchStatus& status() const;
+    const api::DeviceSearchStatus& status() const;
 
     QString initialError() const;
 
     QnMediaServerResourcePtr server() const;
 
-    QnManualResourceSearchEntryList devices() const;
+    std::vector<api::DeviceModelForSearch> devices() const;
 
     bool searching() const;
 
@@ -53,7 +54,7 @@ public:
 signals:
     void statusChanged();
     void lastErrorTextChanged();
-    void devicesAdded(const QnManualResourceSearchEntryList& devices);
+    void devicesAdded(const std::vector<api::DeviceModelForSearch>& devices);
     void devicesRemoved(const QStringList& deviceIds);
 
 private:
@@ -72,10 +73,10 @@ private:
         std::optional<int> port);
 
     void abort();
-    void setStatus(const QnManualResourceSearchStatus& value);
+    void setStatus(const api::DeviceSearchStatus& value);
     void setLastErrorText(const QString& text);
 
-    void updateDevices(const QnManualResourceSearchEntryList& devices);
+    void updateDevices(const std::vector<api::DeviceModelForSearch>& devices);
 
     void updateStatus();
     void handleProgressChanged();
@@ -84,13 +85,13 @@ private:
     const QnMediaServerResourcePtr m_server;
     const QString m_login;
     const QString m_password;
-    QnManualResourceSearchStatus m_status = {QnManualResourceSearchStatus::Finished, 0, 0};
+    api::DeviceSearchStatus m_status = {api::DeviceSearchStatus::Finished, 0, 0};
     QString m_lastErrorText;
 
     QTimer m_updateProgressTimer;
     QnUuid m_searchProcessId;
 
-    using DevicesHash = QHash<QString, QnManualResourceSearchEntry>;
+    using DevicesHash = QHash<QString, api::DeviceModelForSearch>;
     DevicesHash m_devices;
 };
 

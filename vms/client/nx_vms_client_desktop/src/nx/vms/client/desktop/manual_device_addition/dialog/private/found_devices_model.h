@@ -6,6 +6,7 @@
 
 #include <api/model/manual_camera_seach_reply.h>
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/vms/api/data/device_model.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 
 namespace nx::vms::client::desktop {
@@ -44,7 +45,7 @@ public:
 
     FoundDevicesModel(QObject* parent = nullptr);
 
-    void addDevices(const QnManualResourceSearchEntryList& devices);
+    void addDevices(const std::vector<api::DeviceModelForSearch>& devices);
     void removeDevices(QStringList ids);
     int deviceCount(PresentedState presentedState) const;
     int deviceCount(PresentedState presentedState, bool isChecked) const;
@@ -74,7 +75,7 @@ public:
 private:
     bool isCorrectRow(const QModelIndex& index) const;
 
-    QnManualResourceSearchEntry device(const QModelIndex& index) const;
+    api::DeviceModelForSearch device(const QModelIndex& index) const;
 
     QVariant getDisplayData(const QModelIndex& index) const;
     QVariant getCheckStateData(const QModelIndex& index) const;
@@ -90,7 +91,7 @@ private:
     using DeviceRowStateHash = QHash<QString, PresentedStateWithCheckState>;
     using DeviceCountHash = QHash<PresentedStateWithCheckState, int>;
 
-    QnManualResourceSearchEntryList m_devices;
+    std::vector<api::DeviceModelForSearch> m_devices;
     DeviceRowStateHash m_deviceRowState;
     DeviceCountHash m_deviceCount;
 };

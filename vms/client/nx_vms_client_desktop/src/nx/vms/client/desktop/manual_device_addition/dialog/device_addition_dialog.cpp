@@ -19,6 +19,7 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/resource_views/views/fake_resource_list_view.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
@@ -490,18 +491,20 @@ void DeviceAdditionDialog::handleStartSearchClicked()
             ui->addressEdit->validate();
             return;
         }
-        m_lastSearchLogin = login();
-        m_lastSearchPassword = password();
         m_currentSearch.reset(new ManualDeviceSearcher(ui->selectServerMenuButton->currentServer(),
-            ui->addressEdit->text().simplified(), login(), password(), port()));
+            ui->addressEdit->text().simplified(),
+            login(),
+            password(),
+            port()));
     }
     else
     {
-        m_lastSearchLogin = login();
-        m_lastSearchPassword = password();
         m_currentSearch.reset(new ManualDeviceSearcher(ui->selectServerMenuButton->currentServer(),
-            ui->startAddressEdit->text().trimmed(), ui->endAddressEdit->text().trimmed(),
-            login(), password(), port()));
+            ui->startAddressEdit->text().trimmed(),
+            ui->endAddressEdit->text().trimmed(),
+            login(),
+            password(),
+            port()));
     }
 
     if (m_currentSearch->status().state == QnManualResourceSearchStatus::Aborted)
@@ -588,8 +591,6 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     if (!server || server->getStatus() != nx::vms::api::ResourceStatus::online || !m_model)
         return;
 
-    QnManualResourceSearchEntryList devices;
-
     const bool checkSelection = ui->foundDevicesTable->getCheckedCount();
     const int rowsCount = m_model->rowCount();
     for (int row = 0; row != rowsCount; ++row)
@@ -605,7 +606,7 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
 
         const auto dataIndex = m_model->index(row);
         const auto device = m_model->data(dataIndex, FoundDevicesModel::dataRole)
-            .value<QnManualResourceSearchEntry>();
+            .value<api::DeviceModelForSearch>();
 
         m_model->setData(stateIndex, FoundDevicesModel::addingInProgressState,
             FoundDevicesModel::presentedStateRole);
@@ -613,18 +614,11 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
         m_model->setData(stateIndex.siblingAtColumn(FoundDevicesModel::checkboxColumn),
             Qt::Unchecked, Qt::CheckStateRole);
 
-        devices.append(device);
+        connectedServerApi()->addCamera(
+            device,
+            systemContext()->getSessionTokenHelper(),
+            /*callback*/ {});
     }
-
-    if (devices.isEmpty())
-        return;
-
-    connectedServerApi()->addCamera(
-        server->getId(),
-        devices,
-        m_lastSearchLogin,
-        m_lastSearchPassword,
-        /*callback*/ {});
 }
 
 void DeviceAdditionDialog::showAdditionFailedDialog(const FakeResourceList& resources)

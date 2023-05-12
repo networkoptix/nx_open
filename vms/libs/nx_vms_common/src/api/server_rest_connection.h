@@ -35,7 +35,9 @@
 #include <nx/vms/api/data/backup_position.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/database_dump_data.h>
+#include <nx/vms/api/data/device_model.h>
 #include <nx/vms/api/data/device_replacement.h>
+#include <nx/vms/api/data/device_search.h>
 #include <nx/vms/api/data/email_settings_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/ldap.h>
@@ -496,36 +498,21 @@ public:
         std::optional<QnUuid> proxyToServer = {});
 
     Handle addCamera(
-        const QnUuid& targetServerId,
-        const QnManualResourceSearchEntryList& cameras,
-        const QString& userName,
-        const QString& password,
-        GetCallback callback,
-        QThread* thread = nullptr);
-
-    Handle searchCameraStart(
-        const QnUuid& targetServerId,
-        const QString& cameraUrl,
-        const QString& userName,
-        const QString& password,
-        std::optional<int> port,
-        GetCallback callback,
+        const nx::vms::api::DeviceModelForSearch& devices,
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrData<nx::vms::api::DeviceModelForSearch>>::type&& callback,
         QThread* targetThread = nullptr);
 
-    Handle searchCameraRangeStart(
-        const QnUuid& targetServerId,
-        const QString& startAddress,
-        const QString& endAddress,
-        const QString& userName,
-        const QString& password,
-        std::optional<int> port,
-        GetCallback callback,
+    Handle searchCamera(
+        const nx::vms::api::DeviceSearch& deviceSearchData,
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle searchCameraStatus(
-        const QnUuid& targetServerId,
-        const QnUuid& processUuid,
-        GetCallback callback,
+        const QnUuid& searchId,
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle searchCameraStop(

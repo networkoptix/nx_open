@@ -13,7 +13,7 @@
 namespace {
 
 using IdsSet = QSet<QString>;
-IdsSet extractIds(const QnManualResourceSearchEntryList& devices)
+IdsSet extractIds(const std::vector<nx::vms::api::DeviceModelForSearch>& devices)
 {
     IdsSet result;
     for (const auto& device: devices)
@@ -39,7 +39,7 @@ FoundDevicesModel::FoundDevicesModel(QObject* parent):
 {
 }
 
-void FoundDevicesModel::addDevices(const QnManualResourceSearchEntryList& devices)
+void FoundDevicesModel::addDevices(const std::vector<api::DeviceModelForSearch>& devices)
 {
     auto newIds = extractIds(devices);
     const auto currentIds = extractIds(m_devices);
@@ -59,11 +59,12 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchEntryList& device
             const auto& id = device.physicalId;
             if (addedIds.contains(id))
             {
-                const PresentedState presentedState =
-                    device.existsInPool ? alreadyAddedState : notPresentedState;
+                const PresentedState presentedState = device.wasAlreadyFound
+                    ? alreadyAddedState
+                    : notPresentedState;
                 const bool isChecked = false;
 
-                m_devices.append(device);
+                m_devices.push_back(device);
                 m_deviceRowState.insert(id, {presentedState, isChecked});
                 incrementDeviceCount({presentedState, isChecked});
                 emit headerDataChanged(Qt::Horizontal, FoundDevicesModel::presentedStateColumn,
@@ -81,7 +82,7 @@ void FoundDevicesModel::removeDevices(QStringList ids)
         ids.removeLast();
 
         const auto it = std::find_if(m_devices.begin(), m_devices.end(),
-            [id](const QnManualResourceSearchEntry& entry)
+            [id](const api::DeviceModelForSearch& entry)
             {
                 return entry.physicalId == id;
             });
@@ -114,7 +115,7 @@ int FoundDevicesModel::deviceCount(PresentedState presentedState, bool isChecked
 QModelIndex FoundDevicesModel::indexByPhysicalId(const QString& physicalId, int column)
 {
     const auto it = std::find_if(m_devices.begin(), m_devices.end(),
-        [physicalId](const QnManualResourceSearchEntry& entry)
+        [physicalId](const api::DeviceModelForSearch& entry)
         {
             return entry.physicalId == physicalId;
         });
@@ -142,11 +143,11 @@ bool FoundDevicesModel::isCorrectRow(const QModelIndex& index) const
     return correct;
 }
 
-QnManualResourceSearchEntry FoundDevicesModel::device(const QModelIndex& index) const
+api::DeviceModelForSearch FoundDevicesModel::device(const QModelIndex& index) const
 {
     return isCorrectRow(index)
         ? m_devices[index.row()]
-        : QnManualResourceSearchEntry();
+        : api::DeviceModelForSearch();
 }
 
 QVariant FoundDevicesModel::getDisplayData(const QModelIndex& index) const

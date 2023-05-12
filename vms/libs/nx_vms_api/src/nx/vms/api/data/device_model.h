@@ -90,6 +90,18 @@ struct NX_VMS_API DeviceModelGeneral
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModelGeneral, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceModelGeneral, DeviceModelGeneral_Fields);
 
+struct NX_VMS_API DeviceModelForSearch: DeviceModelGeneral
+{
+    /**%apidoc Whether Device was already found. */
+    bool wasAlreadyFound = false;
+
+    DeviceModelForSearch() = default;
+    explicit DeviceModelForSearch(CameraData cameraData);
+};
+#define DeviceModelForSearch_Fields DeviceModelGeneral_Fields(wasAlreadyFound)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceModelForSearch, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceModelForSearch, DeviceModelForSearch_Fields);
+
 struct DeviceOptions
 {
     /**%apidoc[opt] */

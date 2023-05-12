@@ -68,7 +68,7 @@ struct NX_VMS_API DeviceSearchBase
     std::optional<DeviceSearchStatus> status;
 
     /**%apidoc Already found Devices. */
-    std::optional<std::vector<DeviceModelGeneral>> devices;
+    std::optional<std::vector<DeviceModelForSearch>> devices;
 
     QnUuid getId() const { return id; }
     void setId(QnUuid value) { id = std::move(value); }

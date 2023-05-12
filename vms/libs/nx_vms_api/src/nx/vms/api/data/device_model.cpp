@@ -55,7 +55,13 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceOptions, (json), DeviceOptions_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceScheduleSettings, (json), DeviceScheduleSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceMotionSettings, (json), DeviceMotionSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModel, (json), DeviceModel_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelForSearch, (json), DeviceModelForSearch_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceTypeModel, (json), DeviceTypeModel_Fields)
+
+DeviceModelForSearch::DeviceModelForSearch(CameraData cameraData):
+    DeviceModelGeneral{std::move(cameraData)}
+{
+}
 
 DeviceModel::DeviceModel(CameraData cameraData):
     DeviceModelGeneral{std::move(cameraData)}
