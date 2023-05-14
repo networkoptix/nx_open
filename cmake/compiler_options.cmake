@@ -295,6 +295,10 @@ if(compilerMsvc)
 
         # non - DLL-interface class 'class_1' used as base for DLL-interface class 'class_2'
         /wd4275
+
+        # operator '|': deprecated between enumerations of different types
+        # Suppressed as it is used in rapidjson headers and thus generates tons of warnings.
+        /wd5054
     )
     add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
     add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
