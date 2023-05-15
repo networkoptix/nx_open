@@ -760,22 +760,32 @@ void QnUserSettingsDialog::updateControlsVisibility()
     setPageVisible(CamerasPage,     customAccessRights);
     setPageVisible(LayoutsPage,     customAccessRights);
 
-    const bool canEditUser = mode == QnUserSettingsModel::NewUser
-        || (m_user && accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission));
+    if (m_user)
+    {
+        auto hasPermission =
+            [=](const Qn::Permission permission)
+            {
+                return (mode == QnUserSettingsModel::NewUser)
+                    || accessController()->hasPermissions(m_user, permission);
+            };
 
-    m_userEnabledButton->setVisible(settingsPageVisible && canEditUser);
+        const bool canEditUser = hasPermission(Qn::WriteAccessRightsPermission);
 
-    const bool digestEnabled = m_model->digestAuthorizationEnabled();
-    const bool canChangeDigestMode = mode == QnUserSettingsModel::NewUser
-        || (m_user && accessController()->hasPermissions(m_user, Qn::WriteDigestPermission));
+        m_userEnabledButton->setVisible(settingsPageVisible && canEditUser);
 
-    const bool canEnableDigest = mode == QnUserSettingsModel::NewUser || (canChangeDigestMode
-        && accessController()->hasPermissions(m_user, Qn::WritePasswordPermission));
+        const bool digestEnabled = m_model->digestAuthorizationEnabled();
 
-    ui->warningBanner->setVisible(digestEnabled);
+        const bool canChangeDigestMode =
+            !m_user->isCloud() && hasPermission(Qn::WriteDigestPermission);
 
-    ui->forceSecureAuthButton->setVisible(canChangeDigestMode);
-    m_digestMenuButton->setVisible(canEnableDigest && !digestEnabled);
+        const bool canEnableDigest = canChangeDigestMode && hasPermission(
+            m_user->isLdap() ? Qn::WriteDigestPermission : Qn::WritePasswordPermission);
+
+        ui->warningBanner->setVisible(digestEnabled);
+
+        ui->forceSecureAuthButton->setVisible(canChangeDigestMode);
+        m_digestMenuButton->setVisible(canEnableDigest && !digestEnabled);
+    }
 
     // Buttons state takes into account pages visibility, so we must recalculate it.
     updateButtonBox();
