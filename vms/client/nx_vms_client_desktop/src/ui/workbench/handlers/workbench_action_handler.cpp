@@ -1279,8 +1279,9 @@ void ActionHandler::moveResourcesToServer(
         camerasToMove = resources.filtered<QnVirtualCameraResource>(
             [serverId = server->getId()](const auto& camera)
             {
-                // Moving camera into its owner does nothing.
-                return camera->getParentId() != serverId;
+                // Moving camera into its owner does nothing, also skip cameras from other systems.
+                return camera->getParentId() != serverId
+                    && !camera->flags().testFlag(Qn::cross_system);
             });
 
         QnVirtualCameraResourceList nonMovableCameras;
