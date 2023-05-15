@@ -379,7 +379,8 @@ void QnTCPConnectionProcessor::logRequestOrResponse(
     {
         // Do not print out media.
     }
-    else if (contentType == "application/octet-stream" || contentType == "application/ubjson")
+    else if (contentType == "application/octet-stream" || contentType == "application/ubjson"
+        || contentType == "application/x-periods")
     {
         bodyToPrint = uncompressDataIfNeeded().toHex();
     }
