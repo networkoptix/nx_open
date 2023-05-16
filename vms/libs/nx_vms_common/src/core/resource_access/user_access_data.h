@@ -62,7 +62,7 @@ struct NX_VMS_COMMON_API UserAccessData
 private:
     Token m_token;
     std::optional<TimePoint> m_issued;
-    Duration m_duration;
+    Duration m_duration{0};
 };
 
 struct UserSession
