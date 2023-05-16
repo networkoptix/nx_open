@@ -450,8 +450,8 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
 
                         case HeaderItem::camera:
                         {
-                            ::utils::QnCameraNamesWatcher cameraNamesWatcher(systemContext());
-                            cellValue = cameraNamesWatcher.getCameraName(bookmark.cameraId);
+                            cellValue = systemContext()->cameraNamesWatcher()->getCameraName(
+                                bookmark.cameraId);
                             break;
                         }
 
@@ -477,7 +477,8 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
                             break;
 
                         case HeaderItem::creator:
-                            cellValue = helpers::getBookmarkCreatorName(bookmark, resourcePool());
+                            cellValue = helpers::getBookmarkCreatorName(
+                                bookmark.creatorId, resourcePool());
                             break;
 
                         case HeaderItem::tags:

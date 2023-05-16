@@ -86,6 +86,9 @@ struct NX_VMS_API Bookmark
     /**%apidoc Device id. */
     QString deviceId;
 
+    /**%apidoc[opt] Server id where Bookmark is stored. */
+    QnUuid serverId;
+
     /**%apidoc Caption of the Bookmark.
      * %example Bookmark
      */
@@ -118,7 +121,16 @@ struct NX_VMS_API Bookmark
     void setId(QnUuid id_) { id = std::move(id_); }
 };
 #define Bookmark_Fields \
-    (id)(deviceId)(name)(description)(startTimeMs)(durationMs)(tags)(creatorUserId)(creationTimeMs)
+    (id) \
+    (deviceId) \
+    (serverId) \
+    (name) \
+    (description) \
+    (startTimeMs) \
+    (durationMs) \
+    (tags) \
+    (creatorUserId) \
+    (creationTimeMs)
 QN_FUSION_DECLARE_FUNCTIONS(Bookmark, (json), NX_VMS_API)
 
 struct NX_VMS_API BookmarkWithRule: Bookmark

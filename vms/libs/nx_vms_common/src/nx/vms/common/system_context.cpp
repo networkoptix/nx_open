@@ -29,6 +29,7 @@
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/event/rule_manager.h>
+#include <utils/camera/camera_names_watcher.h>
 
 namespace nx::vms::common {
 
@@ -68,6 +69,7 @@ struct SystemContext::Private
     QPointer<AbstractCertificateVerifier> certificateVerifier;
     QPointer<nx::vms::discovery::Manager> moduleDiscoveryManager;
     nx::vms::rules::Engine* vmsRulesEngine = {};
+    std::unique_ptr<QnCameraNamesWatcher> cameraNamesWatcher;
 };
 
 SystemContext::SystemContext(
@@ -134,6 +136,8 @@ SystemContext::SystemContext(
             d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
             break;
     }
+
+    d->cameraNamesWatcher = std::make_unique<QnCameraNamesWatcher>((this));
 }
 
 SystemContext::~SystemContext()
@@ -347,6 +351,11 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     d->messageProcessor = messageProcessor;
     runtimeInfoManager()->setMessageProcessor(messageProcessor);
     cameraHistoryPool()->setMessageProcessor(messageProcessor);
+}
+
+QnCameraNamesWatcher* SystemContext::cameraNamesWatcher() const
+{
+    return d->cameraNamesWatcher.get();
 }
 
 } // namespace nx::vms::common

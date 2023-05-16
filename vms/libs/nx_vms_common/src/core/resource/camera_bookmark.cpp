@@ -161,12 +161,7 @@ void QnCameraBookmark::sortBookmarks(
 
 milliseconds QnCameraBookmark::creationTime() const
 {
-    return isCreatedInOlderVMS() ? startTimeMs : creationTimeStampMs;
-}
-
-bool QnCameraBookmark::isCreatedInOlderVMS() const
-{
-    return creatorId.isNull();
+    return creatorId.isNull() ? startTimeMs : creationTimeStampMs;
 }
 
 bool QnCameraBookmark::isCreatedBySystem() const

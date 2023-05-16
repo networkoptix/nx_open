@@ -55,7 +55,7 @@ struct BookmarkFacade<QnCameraBookmark>: public BookmarkSort
 
     static QString creatorName(const Bookmark& bookmark, QnResourcePool* resourcePool)
     {
-        return helpers::getBookmarkCreatorName(bookmark, resourcePool);
+        return helpers::getBookmarkCreatorName(bookmark.creatorId, resourcePool);
     }
 
     static QString cameraName(const Bookmark& bookmark, QnResourcePool* resourcePool)

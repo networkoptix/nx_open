@@ -86,8 +86,6 @@ struct NX_VMS_COMMON_API QnCameraBookmark
       */
     milliseconds creationTime() const;
 
-    bool isCreatedInOlderVMS() const;
-
     bool isCreatedBySystem() const;
 
     /** @return True if bookmark is null, false otherwise. */
