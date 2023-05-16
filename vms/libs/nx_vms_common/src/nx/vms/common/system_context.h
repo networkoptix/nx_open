@@ -10,6 +10,7 @@
 
 #include "system_context_aware.h"  //< Forward declarations.
 
+class QnCameraNamesWatcher;
 class QnLicensePool;
 class QnResourceAccessSubjectsCache;
 class QnResourceDataPool;
@@ -249,6 +250,8 @@ public:
     nx::analytics::taxonomy::AbstractStateWatcher* analyticsTaxonomyStateWatcher() const;
 
     std::shared_ptr<nx::analytics::taxonomy::AbstractState> analyticsTaxonomyState() const;
+
+    QnCameraNamesWatcher* cameraNamesWatcher() const;
 
 protected:
     Mode mode() const;

@@ -8,8 +8,6 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/common/system_context_aware.h>
 
-namespace utils {
-
 class NX_VMS_COMMON_API QnCameraNamesWatcher:
     public QObject,
     public nx::vms::common::SystemContextAware
@@ -29,5 +27,3 @@ signals:
 public:
     QHash<QnUuid, QString> m_names;
 };
-
-} // namespace utils
