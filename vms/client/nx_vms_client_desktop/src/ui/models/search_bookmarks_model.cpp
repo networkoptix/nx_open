@@ -114,19 +114,17 @@ private:
     QnCameraBookmarkSearchFilter m_filter;
     QnCameraBookmarksQueryPtr m_query;
     QnCameraBookmarkList m_bookmarks;
-    mutable utils::QnCameraNamesWatcher m_cameraNamesWatcher;
 };
 
 QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksModel* owner):
     QObject(owner),
     QnWorkbenchContextAware(owner),
-    q_ptr(owner),
-    m_cameraNamesWatcher(systemContext())
+    q_ptr(owner)
 {
     m_filter.limit = kMaxVisibleRows;
     m_filter.orderBy = QnSearchBookmarksModel::defaultSortOrder();
 
-    connect(&m_cameraNamesWatcher, &utils::QnCameraNamesWatcher::cameraNameChanged, this,
+    connect(systemContext()->cameraNamesWatcher(), &QnCameraNamesWatcher::cameraNameChanged, this,
         [this](/*const QString &cameraUuid*/)
         {
             if (m_updatingWeakGuard.lock())
@@ -308,7 +306,7 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
             return qnResIconCache->icon(QnResourceIconCache::Camera);
         if (index.column() == QnSearchBookmarksModel::kCreator)
         {
-            if (bookmark.isCreatedInOlderVMS())
+            if (bookmark.creatorId.isNull())
                 return QVariant();
 
             return bookmark.isCreatedBySystem()
@@ -339,7 +337,7 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
         case QnSearchBookmarksModel::kCreationTime:
             return displayTime(bookmark.creationTime().count());
         case QnSearchBookmarksModel::kCreator:
-            return helpers::getBookmarkCreatorName(bookmark, resourcePool());
+            return helpers::getBookmarkCreatorName(bookmark.creatorId, resourcePool());
         case QnSearchBookmarksModel::kLength:
         {
             const auto duration = std::chrono::milliseconds(std::abs(bookmark.durationMs.count()));
@@ -357,7 +355,7 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
                 ? bookmark.description
                 : nx::utils::elideString(bookmark.description, kMaxDescriptionLength);
         case QnSearchBookmarksModel::kCamera:
-            return m_cameraNamesWatcher.getCameraName(bookmark.cameraId);
+            return systemContext()->cameraNamesWatcher()->getCameraName(bookmark.cameraId);
         default:
             return QString();
     }

@@ -31,23 +31,19 @@ bool isChangedEnough(milliseconds first, milliseconds second, milliseconds minDi
 
 } // namespace
 
-QString helpers::getBookmarkCreatorName(
-    const QnCameraBookmark& bookmark,
-    QnResourcePool* resourcePool)
+QString helpers::getBookmarkCreatorName(const QnUuid& creatorId, QnResourcePool* resourcePool)
 {
     static const auto kSystemEventText =
         QObject::tr("System Event", "Shows that the bookmark was created by a system event");
 
-    if (bookmark.isCreatedInOlderVMS())
+    if (creatorId.isNull())
         return QString();
 
-    if (bookmark.isCreatedBySystem())
+    if (creatorId == QnCameraBookmark::systemUserId())
         return kSystemEventText;
 
-    const auto userResource = resourcePool->getResourceById<QnUserResource>(
-        bookmark.creatorId);
-    return userResource ? userResource->getName() : QString();
-
+    const auto userResource = resourcePool->getResourceById<QnUserResource>(creatorId);
+    return userResource ? userResource->getName() : creatorId.toSimpleString();
 }
 
 QnCameraBookmark helpers::bookmarkFromAction(
