@@ -12,7 +12,8 @@ namespace nx::media::nvidia {
 
 LibraryLoader::~LibraryLoader()
 {
-    dlclose(m_libraryHandle);
+    if (m_libraryHandle)
+        dlclose(m_libraryHandle);
 }
 
 bool LibraryLoader::load(const char* name)
@@ -48,7 +49,8 @@ namespace nx::media::nvidia {
 
 LibraryLoader::~LibraryLoader()
 {
-    FreeLibrary(m_libraryHandle);
+    if (m_libraryHandle)
+        FreeLibrary(m_libraryHandle);
 }
 
 bool LibraryLoader::load(const char* name)
@@ -77,4 +79,3 @@ void* LibraryLoader::getFunction(const char* name)
 } // namespace nx::media::nvidia
 
 #endif // _WIN32
-
