@@ -26,7 +26,7 @@ namespace ec2
             CacheKey() {}
             CacheKey(const QnAbstractTransaction::PersistentInfo& persistentInfo, const ApiCommand::Value& command): persistentInfo(persistentInfo), command(command) {}
             QnAbstractTransaction::PersistentInfo persistentInfo;
-            ApiCommand::Value command;
+            ApiCommand::Value command = ApiCommand::Value::NotDefined;
 
             bool operator== (const CacheKey& other) const {
                 return persistentInfo == other.persistentInfo && command == other.command;
