@@ -5,6 +5,7 @@
 #include <QtCore/QJsonValue>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/api/json/value_or_array.h>
 
 #include "../data/server_time_period.h"
 #include "common.h"
@@ -12,19 +13,16 @@
 
 namespace nx::vms::api::rules {
 
-struct NX_VMS_API EventLogFilter
+struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
 {
-    /**%apidoc[opt] Period of event log timestamps, infinite by default. */
-    ServerTimePeriod period;
-
-    /**%apidoc[opt] List of event resource ids. */
-    std::vector<QnUuid> eventResourceIds; //< TODO: #amalov Consider adding action resources.
+    /**%apidoc[opt] List of event resource flexible ids. */
+    nx::vms::api::json::ValueOrArray<QString> eventResourceId;
 
     /**%apidoc[opt]
      * List of event types. See /rest/v{3-}/events/manifest/events for event manifests
      * with possible event types.
      */
-    QStringList eventTypes;
+    nx::vms::api::json::ValueOrArray<QString> eventType;
 
     /**%apidoc[opt]
      * Event subtype, for advanced analytics event filtering.
@@ -38,7 +36,7 @@ struct NX_VMS_API EventLogFilter
      * List of action types. See /rest/v{3-}/events/manifest/actions for action manifests
      * with possible action types.
      */
-    QStringList actionTypes;
+    nx::vms::api::json::ValueOrArray<QString> actionType;
 
     /**%apidoc[opt] VMS Rule id. */
     QnUuid ruleId;
@@ -58,19 +56,31 @@ struct NX_VMS_API EventLogFilter
 
     /**%apidoc[opt] Event log record limit, zero value is no limit. */
     size_t limit = 0;
+
+    EventLogFilter():
+        ServerTimePeriod(ServerTimePeriod::infinite())
+    {}
 };
+
+#define EventLogFilter_Fields \
+    ServerTimePeriod_Fields(eventResourceId)(eventType)(eventSubtype)(actionType)(ruleId)(text)(eventsOnly)(order)(limit)
+
+QN_FUSION_DECLARE_FUNCTIONS(EventLogFilter, (json), NX_VMS_API)
 
 struct NX_VMS_API EventLogRecord
 {
+    /**%apidoc Event timestamp. Used for sorting multiserver response.*/
+    std::chrono::milliseconds timestampMs;
+
     /**%apidoc Event data. Key is 'fieldName' from event manifest and value is serialized field
      * data. See /rest/v{3-}/events/manifest/events for event manifests.
      */
-    PropertyMap eventData;
+    QMap<QString, QJsonValue> eventData;
 
     /**%apidoc[opt] Action data. Key is 'fieldName' from action manifest and value is serialized field
      * data. See /rest/v{3-}/events/manifest/actions for action manifests.
      */
-    PropertyMap actionData;
+    QMap<QString, QJsonValue> actionData;
 
     /**%apidoc[opt] Event aggregation count in the rule period. */
     size_t aggregationCount = 0;
@@ -80,7 +90,7 @@ struct NX_VMS_API EventLogRecord
 };
 
 #define EventLogRecord_Fields \
-    (eventData)(actionData)(aggregationCount)(ruleId)
+    (timestampMs)(eventData)(actionData)(aggregationCount)(ruleId)
 
 QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(sql_record), NX_VMS_API)
 

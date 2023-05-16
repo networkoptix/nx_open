@@ -54,6 +54,8 @@ struct NX_VMS_API ServerTimePeriod
 
     static constexpr auto kMaxTimeValue =
         std::chrono::milliseconds(std::numeric_limits<qint64>::max());
+
+    static ServerTimePeriod infinite();
 };
 
 using ServerTimePeriodList = std::vector<ServerTimePeriod>;
