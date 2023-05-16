@@ -1011,23 +1011,23 @@
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>更換攝影機...</translation>
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
-      <translation type="unfinished">Save Current Layout As Cloud...</translation>
+      <translation>將目前佈局儲存至Cloud...</translation>
     </message>
     <message>
       <source>Save Layout As Cloud...</source>
-      <translation type="unfinished">Save Layout As Cloud...</translation>
+      <translation>將佈局儲存至Cloud...</translation>
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>儲存Cloud佈局...</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>另存Cloud佈局為…</translation>
     </message>
   </context>
   <context>
@@ -2358,7 +2358,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation>源攝影機</translation>
+      <translation>來源攝影機</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>

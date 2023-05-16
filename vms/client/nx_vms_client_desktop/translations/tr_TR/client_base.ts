@@ -1189,7 +1189,7 @@
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>Yürütülebilir %1 Medya Dosyası</translation>
     </message>
   </context>
   <context>
@@ -5461,7 +5461,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>Depolama alanı mevcuttur, ancak halihazırda mevcut olan depolama birimlerine kıyasla çok küçük olduğu için yazılamaz</translation>
     </message>
   </context>
   <context>
@@ -6707,7 +6707,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB veya web kameraları sunucular arasında taşınamaz. Bu cihazlar %1 üzerinde kalacak:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
@@ -7334,7 +7334,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
-      <translation type="unfinished">Skip backup for existing footage?</translation>
+      <translation>Mevcut kayıtlar için yedekleme atlansın mı?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7588,11 +7588,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for.</translation>
+      <translation>Seçilen hassasiyeti ayarlamak için önizlemede alanları seçin.</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for.</translation>
+      <translation>Bir hareket algılama hassasiyeti seçin ve bunu ayarlamak için önizlemede bazı alanları seçin.</translation>
     </message>
   </context>
   <context>
@@ -7802,7 +7802,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+      <translation>Kayıt programının bazı hücreleri geçersiz bir kayıt moduna ayarlanmıştır: %1. Geçersiz bir kayıt moduna ayarlanan saatlerde kamera &quot;Her Zaman Kayıt&quot; modunda kayıt yapacaktır.</translation>
     </message>
     <message>
       <source>Motion Only</source>

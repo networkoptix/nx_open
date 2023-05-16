@@ -2201,7 +2201,7 @@
     </message>
     <message>
       <source>Failed to backup file %1</source>
-      <translation>檔案備份失敗 %1</translation>
+      <translation>%1 檔案備份失敗</translation>
     </message>
     <message>
       <source>Show Intercom Informer</source>
@@ -2265,7 +2265,7 @@
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>亦顯示於來源攝影機</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
