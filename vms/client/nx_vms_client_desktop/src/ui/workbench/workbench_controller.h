@@ -4,6 +4,7 @@
 
 #include <array>
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtGui/QVector3D>
@@ -289,4 +290,5 @@ private:
 
     /** Whether the video was playing when user started to rewind or fast forward. */
     bool m_isPlayingOnShift = false;
+    QElapsedTimer m_rewindButtonPressedTimer;
 };

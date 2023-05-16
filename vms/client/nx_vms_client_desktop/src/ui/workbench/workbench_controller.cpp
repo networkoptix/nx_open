@@ -739,6 +739,14 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 navigator()->setPlaying(false);
             }
 
+            if (direction == ShiftDirection::rewind
+                && m_rewindButtonPressedTimer.restart() < 1000)
+            {
+                m_rewindTimer->stop();
+                navigator()->rewind(/*jumpToPreviousChunk*/ true);
+                return true;
+            }
+
             m_rewindTimer->start(500);
             m_rewindDirection = direction;
             if (direction == ShiftDirection::fastForward)

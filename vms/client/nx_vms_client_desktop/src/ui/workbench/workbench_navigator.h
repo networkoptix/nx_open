@@ -141,7 +141,7 @@ public:
     void stepForward();
 
     void fastForward();
-    void rewind();
+    void rewind(bool jumpToPreviousChunk = false);
 
     virtual nx::vms::client::desktop::ui::action::ActionScope currentScope() const override;
     virtual nx::vms::client::desktop::ui::action::Parameters currentParameters(
