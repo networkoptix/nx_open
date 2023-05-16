@@ -191,16 +191,17 @@ BinaryPredicate createPredicate(SystemContext* systemContext, const QnBookmarkSo
                 [systemContext](const QnCameraBookmark& bookmark)
                 {
                     auto resourcePool = systemContext->resourcePool();
-                    return helpers::getBookmarkCreatorName(bookmark, resourcePool);
+                    return helpers::getBookmarkCreatorName(bookmark.creatorId, resourcePool);
                 };
             return makePredByGetter(creatorGetter, isAscending);
         }
         case nx::vms::api::BookmarkSortField::cameraName:
         {
-            static utils::QnCameraNamesWatcher namesWatcher(systemContext);
-            static const auto cameraNameGetter = [](const QnCameraBookmark &bookmark)
-                { return namesWatcher.getCameraName(bookmark.cameraId); };
-
+            const auto cameraNameGetter =
+                [systemContext](const QnCameraBookmark &bookmark)
+                {
+                    return systemContext->cameraNamesWatcher()->getCameraName(bookmark.cameraId);
+                };
             return makePredByGetter(cameraNameGetter, isAscending);
         }
         default:
@@ -354,12 +355,7 @@ void QnCameraBookmark::sortBookmarks(
 
 milliseconds QnCameraBookmark::creationTime() const
 {
-    return isCreatedInOlderVMS() ? startTimeMs : creationTimeStampMs;
-}
-
-bool QnCameraBookmark::isCreatedInOlderVMS() const
-{
-    return creatorId.isNull();
+    return creatorId.isNull() ? startTimeMs : creationTimeStampMs;
 }
 
 bool QnCameraBookmark::isCreatedBySystem() const
