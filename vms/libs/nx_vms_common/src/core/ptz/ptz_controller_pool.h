@@ -37,7 +37,7 @@ public:
     QnPtzControllerPtr controller(const QnResourcePtr& resource) const;
 
     virtual void init();
-    void stop();
+    virtual void stop();
 
 signals:
     void controllerAboutToBeChanged(const QnResourcePtr& resource);
@@ -56,9 +56,6 @@ protected:
 
     void updateController(const QnResourcePtr& resource);
 
-    virtual void deinitialize();
-
-private:
     friend class QnPtzControllerCreationCommand;
     struct Private;
     nx::utils::ImplPtr<Private> d;
