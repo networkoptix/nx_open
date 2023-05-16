@@ -9,18 +9,18 @@
 
 using namespace nx::vms::common;
 
-utils::QnCameraNamesWatcher::QnCameraNamesWatcher(SystemContext* systemContext):
+QnCameraNamesWatcher::QnCameraNamesWatcher(SystemContext* systemContext):
     base_type(nullptr),
     SystemContextAware(systemContext),
     m_names()
 {
 }
 
-utils::QnCameraNamesWatcher::~QnCameraNamesWatcher()
+QnCameraNamesWatcher::~QnCameraNamesWatcher()
 {
 }
 
-QString utils::QnCameraNamesWatcher::getCameraName(const QnUuid& cameraId)
+QString QnCameraNamesWatcher::getCameraName(const QnUuid& cameraId)
 {
     const auto it = m_names.find(cameraId);
     if (it != m_names.end())
