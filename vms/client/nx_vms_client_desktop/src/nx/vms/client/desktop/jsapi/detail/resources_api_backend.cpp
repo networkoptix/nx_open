@@ -7,7 +7,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -55,9 +54,9 @@ ResourcesApiBackend::ResourcesApiBackend(QObject* parent):
                 emit removed(resource->getId());
         };
 
-    const auto pool = appContext()->unifiedResourcePool();
-    connect(pool, &UnifiedResourcePool::resourcesAdded, this, addResources);
-    connect(pool, &UnifiedResourcePool::resourcesRemoved, this, removeResources);
+    const auto pool = appContext()->currentSystemContext()->resourcePool();
+    connect(pool, &QnResourcePool::resourcesAdded, this, addResources);
+    connect(pool, &QnResourcePool::resourcesRemoved, this, removeResources);
 }
 
 ResourcesApiBackend::~ResourcesApiBackend()
@@ -66,7 +65,7 @@ ResourcesApiBackend::~ResourcesApiBackend()
 
 detail::Resource::List ResourcesApiBackend::resources() const
 {
-    const auto resources = appContext()->unifiedResourcePool()->resources(
+    const auto resources = appContext()->currentSystemContext()->resourcePool()->getResources(
         [](const QnResourcePtr& resource)
         {
             return isResourceAvailable(resource);
@@ -76,8 +75,8 @@ detail::Resource::List ResourcesApiBackend::resources() const
 
 detail::ResourceResult ResourcesApiBackend::resource(const QUuid& resourceId) const
 {
-    const auto pool = appContext()->unifiedResourcePool();
-    const auto resource = pool->resource(resourceId);
+    const auto pool = appContext()->currentSystemContext()->resourcePool();
+    const auto resource = pool->getResourceById(resourceId);
     if (isResourceAvailable(resource))
         return detail::ResourceResult{Error::success(), detail::Resource::from(resource)};
 
