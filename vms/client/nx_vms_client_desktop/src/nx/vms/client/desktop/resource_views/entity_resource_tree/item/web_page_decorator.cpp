@@ -21,14 +21,22 @@ WebPageDecorator::WebPageDecorator(
     m_sourceItem->setDataChangedCallback(
         [this](const QVector<int>& roles) { notifyDataChanged(roles); });
 
-    if (WebPageIconCache* iconCache = appContext()->webPageIconCache())
+    const auto webPage = getWebPage();
+
+    if (!NX_ASSERT(webPage))
+        return;
+
+    if (const auto iconCache = appContext()->webPageIconCache())
     {
         connect(iconCache, &WebPageIconCache::iconChanged, this,
-            [this](const QUrl& webPageUrl)
+            [this, webPage](const QUrl& webPageUrl)
             {
-                if (const auto webPage = getWebPage(); webPage && webPage->getUrl() == webPageUrl)
+                if (webPage->getUrl() == webPageUrl)
                     notifyDataChanged({Qn::DecorationPathRole});
             });
+
+        connect(webPage.get(), &QnWebPageResource::urlChanged,
+            this, [this] { notifyDataChanged({Qn::DecorationPathRole}); });
     }
 }
 
@@ -62,7 +70,7 @@ QVariant WebPageDecorator::data(int role) const
                 return {};
 
             if (const auto parentServer = webPage->getParentResource())
-                return "\U0001F816 " + parentServer->getName(); //< Right arrow + server name.
+                return "\u2B62 " + parentServer->getName(); //< Right arrow + server name.
         }
     }
 

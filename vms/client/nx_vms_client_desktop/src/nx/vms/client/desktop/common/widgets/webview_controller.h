@@ -24,6 +24,7 @@ class QnWorkbenchItem;
 namespace nx::vms::client::desktop {
 
 class GraphicsQmlView;
+class WebPageIconCache;
 
 /**
  * C++ part of `WebEngineView` QML component which is used for controlling its behavior.
@@ -221,6 +222,10 @@ public:
      * returns false (i.e. only valid public certificates are accepted by the Chromium engine).
      */
     Q_INVOKABLE bool verifyCertificate(const QWebEngineCertificateError& error);
+
+    Q_INVOKABLE QUrl resourceUrl() const;
+
+    Q_INVOKABLE nx::vms::client::desktop::WebPageIconCache* iconCache() const;
 
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
 

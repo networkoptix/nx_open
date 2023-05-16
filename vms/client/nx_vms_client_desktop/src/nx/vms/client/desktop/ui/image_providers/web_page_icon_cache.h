@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <optional>
 
@@ -11,6 +12,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSize>
 #include <QtCore/QUrl>
+#include <QtGui/QImage>
 
 class QTimer;
 class QWebEnginePage;
@@ -39,13 +41,21 @@ public:
     /** Refreshes the icon associated with webPageUrl. */
     void refresh(const QUrl& webPageUrl);
 
+    /** Updates the icon associated with webPageUrl if there is no loaded icon. */
+    Q_INVOKABLE void update(const QUrl& webPageUrl, const QImage& image);
+
+    void callOnUpdate(
+        const QUrl& targetWebPageUrl,
+        QObject* receiver,
+        std::function<void()> updateFunction);
+
 signals:
     /** Emitted when the icon associated with webPageUrl changes. */
     void iconChanged(const QUrl& webPageUrl);
 
 private:
     void loadNext();
-    void iconLoaded(const QUrl& webPageUrl);
+    void saveIcon(const QUrl& webPageUrl, const QImage& icon, const QImage& icon2x = {});
 
 private:
     QMap<QUrl /*webPageUrl*/, QUrl /*iconUrl*/> m_iconPaths;

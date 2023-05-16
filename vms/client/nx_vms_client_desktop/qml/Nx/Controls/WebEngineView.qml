@@ -1,10 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
 import QtWebEngine
-import QtWebChannel 1.0
+import QtWebChannel
 
-import nx.vms.client.desktop.utils 1.0
+import nx.vms.client.desktop.utils
 
 Item
 {
@@ -283,6 +283,25 @@ Item
         {
             id: nxWebChannel
             objectName: "nxWebChannel"
+        }
+    }
+
+    Image
+    {
+        id: icon
+
+        visible: false
+        sourceSize: Qt.size(40, 40)
+
+        // Load the icon directly (favicon image provider can not load some formats).
+        source: String(webView.icon).replace("image://favicon/", "")
+
+        onStatusChanged:
+        {
+            const resourceUrl = controller && controller.resourceUrl()
+            const iconCache = controller && controller.iconCache()
+            if (status === Image.Ready && resourceUrl && iconCache)
+                icon.grabToImage((result) => iconCache.update(resourceUrl, result.image))
         }
     }
 }

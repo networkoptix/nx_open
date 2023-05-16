@@ -75,6 +75,7 @@
 #include <nx/vms/client/desktop/ui/common/item_grabber.h>
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/common/whats_this.h>
+#include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/ui/scene/item_model_utils.h>
@@ -311,6 +312,15 @@ void QnClientMetaTypes::registerQmlTypes()
         {
             qmlEngine->setObjectOwnership(appContext()->localSettings(), QQmlEngine::CppOwnership);
             return appContext()->localSettings();
+        });
+
+    qmlRegisterSingletonType<WebPageIconCache>("nx.vms.client.desktop", 1, 0, "WebPageIconCache",
+        [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+        {
+            qmlEngine->setObjectOwnership(
+                appContext()->webPageIconCache(), QQmlEngine::CppOwnership);
+
+            return appContext()->webPageIconCache();
         });
 
     ui::scene::Instrument::registerQmlType();
