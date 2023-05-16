@@ -221,6 +221,8 @@ const QString kDisableRtspMetadataStream("disableRtspMetadataStream");
 
 const QString kOnvifRemoteArchiveDisableFastDownload("onvifRemoteArchiveDisableFastDownload");
 
+const QString kGsoapAdditionalFlags("gsoapAdditionalFlags");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
