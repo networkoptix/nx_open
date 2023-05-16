@@ -101,6 +101,8 @@ enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
 
 QAtomicInt qn_threadedMergeHandle(1);
 
+constexpr std::chrono::milliseconds kShiftStepMs = 10s;
+
 bool isLivePosition(const QPointer<QnResourceWidget> widget)
 {
     const auto time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
@@ -1106,8 +1108,8 @@ void QnWorkbenchNavigator::fastForward()
             return; //< Reader currently in some invalid state.
 
         std::chrono::milliseconds posMs;
-        if (curPeriod->contains(currentTimeMs + 10s))
-            posMs = currentTimeMs + 10s;
+        if (curPeriod->contains(currentTimeMs + kShiftStepMs))
+            posMs = currentTimeMs + kShiftStepMs;
         else if (auto next = curPeriod + 1; next != periods.end())
             posMs = (curPeriod+1)->startTime();
         else
@@ -1128,7 +1130,7 @@ void QnWorkbenchNavigator::fastForward()
     emit positionChanged();
 }
 
-void QnWorkbenchNavigator::rewind()
+void QnWorkbenchNavigator::rewind(bool jumpToPreviousChunk)
 {
     if (!m_currentMediaWidget)
         return;
@@ -1157,20 +1159,18 @@ void QnWorkbenchNavigator::rewind()
         if (curPeriod == periods.end())
             return; //< Reader currently in some invalid state.
 
-        std::chrono::milliseconds posMs;
-        if (!curPeriod->contains(currentTimeMs - 2s))
+        std::chrono::milliseconds posMs = currentTimeMs - kShiftStepMs;
+        if (!curPeriod->contains(posMs))
         {
-            posMs = curPeriod == periods.begin()
-                ? curPeriod->startTime()
-                : std::max((curPeriod-1)->startTime(), (curPeriod-1)->endTime() - 10s);
-        }
-        else if (!curPeriod->contains(currentTimeMs - 10s))
-        {
-            posMs = curPeriod->startTime();
-        }
-        else
-        {
-            posMs = currentTimeMs - 10s;
+            if (jumpToPreviousChunk && curPeriod != periods.begin())
+            {
+                const auto prevPeriod = std::prev(curPeriod);
+                posMs = std::max(prevPeriod->startTime(), prevPeriod->endTime() - kShiftStepMs);
+            }
+            else
+            {
+                posMs = curPeriod->startTime();
+            }
         }
 
         pos = posMs.count() * 1000;
