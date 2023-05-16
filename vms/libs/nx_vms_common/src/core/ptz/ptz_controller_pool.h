@@ -37,7 +37,7 @@ public:
     QnPtzControllerPtr controller(const QnResourcePtr& resource) const;
 
     virtual void init();
-    void stop();
+    virtual void stop();
 
 signals:
     void controllerAboutToBeChanged(const QnResourcePtr& resource);
