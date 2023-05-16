@@ -160,7 +160,9 @@ LayoutItemCreator layoutItemCreator(
                 return {};
 
             return std::make_unique<MainTreeResourceItemDecorator>(
-                factory->createResourceItem(itemResource),
+                itemResource->hasFlags(Qn::web_page)
+                    ? std::make_unique<WebPageDecorator>(factory->createResourceItem(itemResource))
+                    : factory->createResourceItem(itemResource),
                 permissionsSummary(user, itemResource),
                 NodeType::layoutItem,
                 itemData.uuid);

@@ -14,7 +14,9 @@ class WebPageDecorator:
     public entity_item_model::AbstractItem
 {
 public:
-    WebPageDecorator(entity_item_model::AbstractItemPtr sourceItem, bool hasPowerUserPermissions);
+    WebPageDecorator(
+        entity_item_model::AbstractItemPtr sourceItem,
+        bool hasPowerUserPermissions = false);
 
     virtual QVariant data(int role) const override;
     virtual Qt::ItemFlags flags() const override;

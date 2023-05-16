@@ -7,6 +7,7 @@
 
 #include <QtCore/QVariant>
 #include <QtGui/private/qinputcontrol_p.h>
+#include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
 #include <QtWebChannel/QWebChannel>
 #include <QtWebEngineCore/QWebEngineCertificateError>
@@ -28,6 +29,7 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/nx_network_ini.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/integrations/c2p/jsapi/external.h>
 #include <nx/vms/client/desktop/jsapi/auth.h>
 #include <nx/vms/client/desktop/jsapi/globals.h>
@@ -36,6 +38,7 @@
 #include <nx/vms/client/desktop/jsapi/self.h>
 #include <nx/vms/client/desktop/jsapi/tab.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
+#include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
 #include <ui/dialogs/common/certificate_selection_dialog.h>
 #include <ui/dialogs/common/password_dialog.h>
 #include <ui/graphics/items/standard/graphics_qml_view.h>
@@ -1150,6 +1153,18 @@ bool WebViewController::verifyCertificate(const QWebEngineCertificateError& erro
     return d->certificateValidator
         ? d->certificateValidator(pemString, error.url())
         : false;
+}
+
+QUrl WebViewController::resourceUrl() const
+{
+    return urlFromResource(d->resource);
+}
+
+WebPageIconCache* WebViewController::iconCache() const
+{
+    const auto iconCache = appContext()->webPageIconCache();
+    QQmlEngine::setObjectOwnership(iconCache, QQmlEngine::CppOwnership);
+    return iconCache;
 }
 
 } // namespace nx::vms::client::desktop
