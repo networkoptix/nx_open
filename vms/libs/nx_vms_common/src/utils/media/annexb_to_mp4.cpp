@@ -9,6 +9,27 @@
 #include <utils/media/utils.h>
 
 
+namespace {
+std::vector<uint8_t> buildExtraData(const QnCompressedVideoData* frame)
+{
+    std::vector<uint8_t> extradata;
+    auto extraDataBuilder = frame->compressionType == AV_CODEC_ID_H264
+        ? nx::media::h264::buildExtraDataMp4
+        : nx::media::hevc::buildExtraDataMp4;
+    if (frame->context && frame->context->getExtradata() && frame->context->getExtradataSize())
+    {
+        extradata = extraDataBuilder(
+            (const uint8_t*)frame->context->getExtradata(), frame->context->getExtradataSize());
+    }
+    if (extradata.empty())
+    {
+        extradata = extraDataBuilder((const uint8_t*)frame->data(), frame->dataSize());
+    }
+    return extradata;
+}
+
+}
+
 namespace nx::media {
 
 QnCompressedVideoDataPtr convertStartCodesToSizes(const QnCompressedVideoData* videoData)
@@ -56,6 +77,14 @@ bool isMp4Format(const QnCompressedVideoData* data)
     return false;
 }
 
+bool isAnnexb(const QnCompressedVideoData* data)
+{
+    if (data->compressionType != AV_CODEC_ID_H264 && data->compressionType != AV_CODEC_ID_H265)
+        return false;
+
+    return !isMp4Format(data);
+}
+
 QnCompressedVideoDataPtr AnnexbToMp4::process(const QnCompressedVideoData* frame)
 {
     if (frame->compressionType != AV_CODEC_ID_H264 && frame->compressionType != AV_CODEC_ID_H265)
@@ -69,20 +98,7 @@ QnCompressedVideoDataPtr AnnexbToMp4::process(const QnCompressedVideoData* frame
 
     if (frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
     {
-        std::vector<uint8_t> extradata;
-        if (frame->compressionType == AV_CODEC_ID_H264)
-        {
-            extradata = nx::media::h264::buildExtraDataMp4(
-                (const uint8_t*)frame->data(), frame->dataSize());
-        }
-        else if (frame->compressionType == AV_CODEC_ID_H265)
-        {
-            extradata = nx::media::hevc::buildExtraDataMp4(
-                (const uint8_t*)frame->data(), frame->dataSize());
-        }
-        else
-            return nullptr;
-
+        std::vector<uint8_t> extradata = buildExtraData(frame);
         if (!m_context && extradata.empty())
         {
             NX_WARNING(this, "Failed to build extra data");
