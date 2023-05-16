@@ -121,21 +121,31 @@ size_t MultipartContentParser::flush()
 
 bool MultipartContentParser::setContentType(const std::string& str)
 {
-    const auto [tokens, tokenCount] = nx::utils::split_n<2>(str, ';');
-    if (tokenCount != 2)
-        return false; //< Unexpected content type.
+    std::vector<std::string_view> tokens;
+    nx::utils::split(str, ';',
+        [&tokens](auto token)
+        {
+            if (auto trimmed = nx::utils::trim(token); !trimmed.empty())
+                tokens.push_back(trimmed);
+        });
 
-    const auto& contentType = tokens[0];
-    if (!nx::utils::startsWith(contentType, "multipart/"))
-        return false;
+    if (std::none_of(tokens.begin(), tokens.end(),
+        [](auto token){ return nx::utils::startsWith(token, "multipart/", nx::utils::CaseSensitivity::off); }))
+    {
+        return false; //< Non-multipart content type.
+    }
+
+    const auto it = std::find_if(tokens.begin(), tokens.end(),
+        [](auto token){ return nx::utils::startsWith(token, "boundary=", nx::utils::CaseSensitivity::off); });
+    if (it == tokens.end())
+        return false; //< Multipart boundary not present.
 
     // "boundary=xxx"
-    const auto& boundaryStr = nx::utils::trim(tokens[1]);
-    const auto [boundaryTokens, boundaryTokenCount] = nx::utils::split_n<2>(boundaryStr, '=');
-    if (boundaryTokens[0] != "boundary" || boundaryTokens[1].empty())
-        return false;
+    const auto boundary = it->substr(it->find('=') + 1);
+    if (boundary.empty())
+        return false; //< Invalid value.
 
-    setBoundary(std::string(boundaryTokens[1]));
+    setBoundary(std::string(boundary));
     return true;
 }
 
