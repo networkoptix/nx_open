@@ -22,6 +22,7 @@
 #include <QtQuick/QQuickRenderControl>
 #include <QtQuick/QQuickRenderTarget>
 #include <QtQuick/QQuickWindow>
+#include <QtQuick/private/qquickrendercontrol_p.h>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsSceneHoverEvent>
@@ -97,13 +98,48 @@ void initializeQuadBuffer(
 
 namespace nx::vms::client::desktop {
 
+/**
+ * Copied from QQuickWidgetRenderControlPrivate because of
+ * https://bugreports.qt.io/browse/QTBUG-91479
+ */
+class RenderControlPrivate: public QQuickRenderControlPrivate
+{
+    using base_type = QQuickRenderControlPrivate;
+
+public:
+    RenderControlPrivate(
+        QQuickRenderControl* renderControl,
+        GraphicsQmlView* graphicsQmlView)
+        :
+        base_type(renderControl),
+        m_graphicsQmlView(graphicsQmlView)
+    {}
+
+    virtual bool isRenderWindow(const QWindow* w) override
+    {
+        if (auto* scene = m_graphicsQmlView->scene())
+        {
+            for (const auto &view: scene->views())
+            {
+                if (view->window()->windowHandle() == w)
+                    return true;
+            }
+        }
+
+        return base_type::isRenderWindow(w);
+    }
+
+private:
+    GraphicsQmlView* m_graphicsQmlView;
+};
+
 class RenderControl: public QQuickRenderControl
 {
     using base_type = QQuickRenderControl;
 
 public:
     RenderControl(GraphicsQmlView* parent):
-        QQuickRenderControl(parent),
+        base_type(*(new RenderControlPrivate(this, parent)), parent),
         m_graphicsQmlView(parent)
     {}
 
