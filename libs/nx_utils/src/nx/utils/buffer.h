@@ -214,7 +214,7 @@ private:
 
     std::optional<std::basic_string<value_type>> m_str;
     std::optional<QByteArray> m_qByteArray;
-    char m_buf[kPreallocatedBufSize + 1];
+    char m_buf[kPreallocatedBufSize + 1]{0};
 
     value_type* m_data = m_buf;
     size_type m_size = 0;

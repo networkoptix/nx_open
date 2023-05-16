@@ -285,7 +285,7 @@ private:
         }
 
         QnUuid peerId;
-        nx::vms::api::PeerType peerType;
+        nx::vms::api::PeerType peerType = nx::vms::api::PeerType::notDefined;
         nx::utils::Url url;
         std::optional<nx::network::http::Credentials> credentials;
         nx::network::ssl::AdapterFunc adapterFunc;
