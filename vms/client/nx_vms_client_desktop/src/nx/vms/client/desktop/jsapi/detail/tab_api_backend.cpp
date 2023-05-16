@@ -698,7 +698,8 @@ ItemResult TabApiBackend::addItem(
             Error::failed(tr("Cannot add the resource to the layout")));
     }
 
-    QnLayoutItemData itemData = layoutItemFromResource(resource);
+    QnLayoutItemData itemData = layoutItemFromResource(resource,
+        /*forceCloud*/ d->layout->resource()->hasFlags(Qn::cross_system));
     itemData.flags = Qn::PendingGeometryAdjustment;
 
     const auto itemId = itemData.uuid.toQUuid();
