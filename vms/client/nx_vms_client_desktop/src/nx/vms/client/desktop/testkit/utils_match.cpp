@@ -5,10 +5,10 @@
 #include <QtCore/QRegularExpression>
 #include <QtQml/QQmlContext>
 #include <QtQuick/QQuickItem>
+#include <QtQuick/QQuickWindow>
 #include <QtWidgets/QGraphicsItem>
 #include <QtWidgets/QTabBar>
 #include <QtWidgets/QWidget>
-
 
 #include "model_index_wrapper.h"
 #include "tab_item_wrapper.h"
@@ -123,7 +123,7 @@ bool objectMatches(const QObject* object, QJSValue properties)
         bool matches = false;
 
         // QML type name looks like QQuickText or Text_QMLTYPE_123
-        if (auto item = qobject_cast<const QQuickItem*>(object))
+        if (qobject_cast<const QQuickItem*>(object) || qobject_cast<const QQuickWindow*>(object))
         {
             // TODO: Also use QML.Element from classInfo.
             matches = className.startsWith(typeString + "_QMLTYPE_") ||
