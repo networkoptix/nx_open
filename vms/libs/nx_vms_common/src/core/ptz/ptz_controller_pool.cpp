@@ -50,7 +50,7 @@ struct QnPtzControllerPool::Private
     QThread *executorThread = nullptr;
     QThreadPool *commandThreadPool = nullptr;
     QnPtzControllerPool *q;
-    std::atomic<bool> deinitialized = false;
+    std::atomic<bool> stopped = false;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ QnPtzControllerPool::QnPtzControllerPool(SystemContext* systemContext, QObject* 
 
 QnPtzControllerPool::~QnPtzControllerPool()
 {
-    deinitialize();
+    stop();
 }
 
 void QnPtzControllerPool::init()
@@ -109,22 +109,15 @@ void QnPtzControllerPool::init()
         registerResource(resource);
 }
 
-void QnPtzControllerPool::deinitialize()
-{
-    if (!d->deinitialized)
-    {
-        while (!d->controllerByResource.isEmpty())
-        {
-            auto resourcePtr = d->controllerByResource.begin().key();
-            unregisterResource(resourcePtr);
-        }
-        stop();
-        d->deinitialized = true;
-    }
-}
-
 void QnPtzControllerPool::stop()
 {
+    d->stopped = true;
+    while (!d->controllerByResource.isEmpty())
+    {
+        auto resourcePtr = d->controllerByResource.begin().key();
+        unregisterResource(resourcePtr);
+    }
+    
     // Have to wait until all posted events are processed, deleteLater() can be called
     // within the event slot, that's why we specify the second parameter.
     if (d->executorThread->isRunning())
@@ -172,7 +165,8 @@ QnPtzControllerPtr QnPtzControllerPool::createController(const QnResourcePtr& /*
 
 void QnPtzControllerPool::registerResource(const QnResourcePtr& resource)
 {
-    updateController(resource);
+    if (!d->stopped)
+        updateController(resource);
 }
 
 void QnPtzControllerPool::unregisterResource(const QnResourcePtr& resource)
