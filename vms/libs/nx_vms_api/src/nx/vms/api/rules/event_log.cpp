@@ -7,9 +7,11 @@
 #include <nx/utils/buffer.h>
 #include <nx/utils/serialization/qjson.h>
 #include <nx/utils/serialization/qt_containers_reflect_json.h>
+#include <nx/utils/serialization/qt_core_types.h>
 
 namespace nx::vms::api::rules {
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventLogFilter, (json), EventLogFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventLogRecord, (json)(sql_record), EventLogRecord_Fields)
 
 } // namespace nx::vms::rules

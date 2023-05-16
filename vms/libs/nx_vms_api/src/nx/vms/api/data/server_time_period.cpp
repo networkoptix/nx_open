@@ -47,4 +47,12 @@ void ServerTimePeriod::resetDuration()
     durationMs.reset();
 }
 
+ServerTimePeriod ServerTimePeriod::infinite()
+{
+    return ServerTimePeriod{
+        .startTimeMs = 0ms,
+        .durationMs = std::nullopt,
+    };
+}
+
 } // namespace nx::vms::api
