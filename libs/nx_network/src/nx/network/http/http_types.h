@@ -1043,6 +1043,8 @@ struct NX_NETWORK_API ContentType
 
     bool operator==(const ContentType& rhs) const;
     bool operator!=(const ContentType& rhs) const { return !(*this == rhs); }
+    bool operator==(const std::string& rhs) const;
+
     operator std::string() const { return toString(); }
 };
 
