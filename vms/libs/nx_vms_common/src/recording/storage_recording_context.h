@@ -10,6 +10,7 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <nx/streaming/video_data_packet.h>
+#include <utils/media/annexb_to_mp4.h>
 
 extern "C"
 {
@@ -92,6 +93,7 @@ private:
     QString m_container = "matroska";
     bool m_packetWritten = false;
     std::optional<nx::recording::Error> m_lastError;
+    nx::media::AnnexbToMp4 m_annexbToMp4;
 
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
 
