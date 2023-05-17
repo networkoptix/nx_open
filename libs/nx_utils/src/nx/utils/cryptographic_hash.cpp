@@ -16,7 +16,8 @@ namespace nx::utils {
 // -------------------------------------------------------------------------- //
 // QnCryptographicHashPrivate
 // -------------------------------------------------------------------------- //
-class QnCryptographicHashPrivate {
+class QnCryptographicHashPrivate
+{
 public:
     QnCryptographicHashPrivate() {}
     virtual ~QnCryptographicHashPrivate() {}
@@ -30,10 +31,11 @@ public:
 private:
     friend class QnCryptographicHash;
 
-    QByteArray result;
+    QByteArray m_result;
 };
 
-class QnMd4CryptographicHashPrivate : public QnCryptographicHashPrivate {
+class QnMd4CryptographicHashPrivate: public QnCryptographicHashPrivate
+{
 public:
     virtual void init() override { MD4_Init(&ctx); }
     virtual void update(const char *data, int length) override { MD4_Update(&ctx, data, length); }
@@ -45,7 +47,8 @@ private:
     MD4_CTX ctx;
 };
 
-class QnMd5CryptographicHashPrivate : public QnCryptographicHashPrivate {
+class QnMd5CryptographicHashPrivate: public QnCryptographicHashPrivate
+{
 public:
     virtual void init() override { MD5_Init(&ctx); }
     virtual void update(const char *data, int length) override { MD5_Update(&ctx, data, length); }
@@ -57,7 +60,8 @@ private:
     MD5_CTX ctx;
 };
 
-class QnSha1CryptographicHashPrivate : public QnCryptographicHashPrivate {
+class QnSha1CryptographicHashPrivate: public QnCryptographicHashPrivate
+{
 public:
     virtual void init() override { SHA1_Init(&ctx); }
     virtual void update(const char *data, int length) override { SHA1_Update(&ctx, data, length); }
@@ -69,7 +73,8 @@ private:
     SHA_CTX ctx;
 };
 
-class QnSha256CryptographicHashPrivate : public QnCryptographicHashPrivate {
+class QnSha256CryptographicHashPrivate: public QnCryptographicHashPrivate
+{
 public:
     virtual void init() override { SHA256_Init(&ctx); }
     virtual void update(const char *data, int length) override { SHA256_Update(&ctx, data, length); }
@@ -107,7 +112,10 @@ public:
         EVP_DigestInit_ex(m_ctx, m_evpFunc(), nullptr);
     }
 
-    virtual void update(const char* data, int length) override { EVP_DigestUpdate(m_ctx, data, length); }
+    virtual void update(const char* data, int length) override
+    {
+        EVP_DigestUpdate(m_ctx, data, length);
+    }
 
     virtual void final(unsigned char* result) override
     {
@@ -131,8 +139,7 @@ private:
     EVP_MD_CTX* m_ctx = nullptr;
 };
 
-class QnSha3256CryptographicHashPrivate:
-    public EvpDigestCalculator
+class QnSha3256CryptographicHashPrivate: public EvpDigestCalculator
 {
 public:
     QnSha3256CryptographicHashPrivate():
@@ -141,8 +148,7 @@ public:
     }
 };
 
-class QnSha3512CryptographicHashPrivate:
-    public EvpDigestCalculator
+class QnSha3512CryptographicHashPrivate: public EvpDigestCalculator
 {
 public:
     QnSha3512CryptographicHashPrivate():
@@ -154,8 +160,10 @@ public:
 // -------------------------------------------------------------------------- //
 // QnCryptographicHash
 // -------------------------------------------------------------------------- //
-QnCryptographicHash::QnCryptographicHash(Algorithm algorithm) {
-    switch (algorithm) {
+QnCryptographicHash::QnCryptographicHash(Algorithm algorithm)
+{
+    switch (algorithm)
+    {
     case Md4:
         d.reset(new QnMd4CryptographicHashPrivate());
         break;
@@ -175,7 +183,8 @@ QnCryptographicHash::QnCryptographicHash(Algorithm algorithm) {
         d.reset(new QnSha3512CryptographicHashPrivate());
         break;
     default:
-        std::printf("%s: Invalid cryptographic hash algorithm %d.\n", Q_FUNC_INFO, static_cast<int>(algorithm));
+        std::printf("%s: Invalid cryptographic hash algorithm %d.\n",
+            Q_FUNC_INFO, static_cast<int>(algorithm));
         d.reset(new QnMd5CryptographicHashPrivate());
         break;
     }
@@ -183,45 +192,55 @@ QnCryptographicHash::QnCryptographicHash(Algorithm algorithm) {
     d->init();
 }
 
-QnCryptographicHash::~QnCryptographicHash() {
+QnCryptographicHash::~QnCryptographicHash()
+{
     return;
 }
 
-QnCryptographicHash::QnCryptographicHash(const QnCryptographicHash &other) {
+QnCryptographicHash::QnCryptographicHash(const QnCryptographicHash &other)
+{
     d.reset(other.d->clone());
 }
 
-QnCryptographicHash &QnCryptographicHash::operator=(const QnCryptographicHash &other) {
+QnCryptographicHash &QnCryptographicHash::operator=(const QnCryptographicHash &other)
+{
     this->~QnCryptographicHash();
     new (this) QnCryptographicHash(other);
     return *this;
 }
 
-void QnCryptographicHash::addData(const char *data, int length) {
+void QnCryptographicHash::addData(const char *data, int length)
+{
     d->update(data, length);
 }
 
-void QnCryptographicHash::addData(const QByteArray& data) {
+void QnCryptographicHash::addData(const QByteArray& data)
+{
     d->update(data.data(), data.size());
 }
 
-void QnCryptographicHash::addData(const nx::Buffer& data) {
+void QnCryptographicHash::addData(const nx::Buffer& data)
+{
     d->update(data.data(), (int) data.size());
 }
 
-void QnCryptographicHash::addData(const std::string_view& data) {
+void QnCryptographicHash::addData(const std::string_view& data)
+{
     d->update(data.data(), (int) data.size());
 }
 
-void QnCryptographicHash::addData(const std::string& data) {
+void QnCryptographicHash::addData(const std::string& data)
+{
     d->update(data.data(), (int) data.size());
 }
 
-void QnCryptographicHash::addData(const char* data) {
+void QnCryptographicHash::addData(const char* data)
+{
     d->update(data, (int) std::strlen(data));
 }
 
-bool QnCryptographicHash::addData(QIODevice* device) {
+bool QnCryptographicHash::addData(QIODevice* device)
+{
     if (!device->isReadable())
         return false;
 
@@ -237,21 +256,25 @@ bool QnCryptographicHash::addData(QIODevice* device) {
     return device->atEnd();
 }
 
-void QnCryptographicHash::reset() {
-    d->result = QByteArray();
+void QnCryptographicHash::reset()
+{
+    d->m_result = QByteArray();
     d->init();
 }
 
-QByteArray QnCryptographicHash::result() const {
-    if (d->result.isEmpty()) {
-        d->result.resize(d->size());
-        d->final(reinterpret_cast<unsigned char *>(d->result.data()));
+QByteArray QnCryptographicHash::result() const
+{
+    if (d->m_result.isEmpty())
+    {
+        d->m_result.resize(d->size());
+        d->final(reinterpret_cast<unsigned char*>(d->m_result.data()));
     }
 
-    return d->result;
+    return d->m_result;
 }
 
-QByteArray QnCryptographicHash::hash(const QByteArray &data, Algorithm algorithm) {
+QByteArray QnCryptographicHash::hash(const QByteArray &data, Algorithm algorithm)
+{
     QnCryptographicHash hash(algorithm);
     hash.addData(data);
     return hash.result();
