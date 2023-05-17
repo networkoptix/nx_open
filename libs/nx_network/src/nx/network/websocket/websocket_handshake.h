@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/buffer.h>
 
@@ -35,6 +36,11 @@ NX_NETWORK_API void addClientHeaders(
 
 NX_NETWORK_API void addClientHeaders(
     nx::network::http::AsyncClient* request,
+    const nx::Buffer& protocolName,
+    CompressionType compressionType);
+
+NX_NETWORK_API void addClientHeaders(
+    nx::network::http::HttpClient* client,
     const nx::Buffer& protocolName,
     CompressionType compressionType);
 
