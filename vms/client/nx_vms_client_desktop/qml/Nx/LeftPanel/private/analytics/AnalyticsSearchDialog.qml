@@ -445,6 +445,18 @@ Window
 
                     Component.onCompleted:
                         commonSetup.cameraSelection = RightPanel.CameraSelection.layout
+
+                    onAnalyticsSetupChanged:
+                    {
+                        const engineId = analyticsSetup.engine
+                        tabBar.selectEngine(engineId)
+
+                        analyticsFilters.setSelectedAnalyticsObjectTypeIds(
+                            analyticsSetup.objectTypes)
+
+                        analyticsFilters.setSelectedAttributeFilters(
+                            analyticsSetup.attributeFilters)
+                    }
                 }
 
                 Shortcut
