@@ -2161,6 +2161,11 @@ bool ContentType::operator==(const ContentType& rhs) const
     return charset == rhs.charset;
 }
 
+bool ContentType::operator==(const std::string& rhs) const
+{
+    return value == rhs;
+}
+
 //-------------------------------------------------------------------------------------------------
 
 Host::Host(const SocketAddress& endpoint):
