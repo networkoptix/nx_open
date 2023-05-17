@@ -1885,7 +1885,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>Sunucuya ilk bağlantıda, hata içeriyorsa sertifikanın kabul edilmesi için onayınız istenecektir</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -7199,7 +7199,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>Seçilen kamera başka bir sunucuya bağlı. Ses akışı mevcut değil.</translation>
     </message>
   </context>
   <context>
@@ -7323,7 +7323,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
+      <translation>Yedeklemeyi etkinleştirmek için %1 üzerine yedek depolama olarak kullanmak üzere disk ekleyin</translation>
     </message>
   </context>
   <context>
@@ -7798,7 +7798,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Geçersiz programı &quot;Her Zaman Kaydet&quot; olarak değiştir</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
@@ -8256,7 +8256,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+      <translation>Kayıt Takvimi, seçilen kameralar tarafından desteklenmeyen kayıt modları içermektedir. Desteklenmeyen kayıt modları &quot;Her Zaman Kayıt&quot; olarak değiştirilecektir.</translation>
     </message>
   </context>
   <context>
@@ -9194,7 +9194,7 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</translation>
+      <translation>Seçilen Sistem, mevcut Sistem ile uyumsuz olan daha eski bir yazılım sürümüne sahiptir. Geçerli olan Sistem ile birleştirmek için seçili Sistemi en son sürüme güncelleyin.</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -9944,7 +9944,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
+      <translation>&lt;b&gt;Genel&lt;/b&gt; sekmesinde web sayfası proxy'sini açın.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
