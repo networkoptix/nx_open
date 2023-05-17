@@ -213,6 +213,17 @@ void addClientHeaders(
     request->addRequestHeaders(std::move(headers));
 }
 
+void addClientHeaders(
+    nx::network::http::HttpClient* client,
+    const nx::Buffer& protocolName,
+    CompressionType compressionType)
+{
+    nx::network::http::HttpHeaders headers;
+    addClientHeaders(&headers, protocolName, compressionType);
+    for (const auto& [k, v]: headers)
+        client->addAdditionalHeader(k, v);
+}
+
 void copyClientHeaders(
     nx::network::http::HttpHeaders* dstHeaders,
     const nx::network::http::HttpHeaders* srcHeaders)
