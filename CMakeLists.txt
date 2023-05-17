@@ -2,6 +2,8 @@
 
 cmake_minimum_required(VERSION 3.20.0 FATAL_ERROR) #< This version is bundled with MSVC 2019.
 
+set(open_source_root "${CMAKE_SOURCE_DIR}")
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(cmake/find_python.cmake)
@@ -34,8 +36,6 @@ set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
 include(cmake/distribution/flavors.cmake)
 nx_init_distribution_flavor_list()
 
-# This variable is used in utils.cmake and ninja_tool.cmake.
-set(open_source_root "${CMAKE_SOURCE_DIR}")
 include(cmake/utils.cmake)
 nx_init_known_files_list()
 include(cmake/ninja_tool.cmake)

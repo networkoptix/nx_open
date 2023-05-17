@@ -2,6 +2,8 @@
 
 include_guard(GLOBAL)
 
+include(${open_source_root}/cmake/utils.cmake)
+
 set(customizationPackageFile "" CACHE STRING "Customization package archive")
 
 function(_unpack_customization_package source_file target_directory log_file)
