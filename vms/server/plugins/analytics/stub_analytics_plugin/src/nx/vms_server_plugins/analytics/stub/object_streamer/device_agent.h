@@ -4,12 +4,11 @@
 
 #include <set>
 
-#include "stream_parser.h"
-
+#include <nx/kit/json.h>
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 
-#include <nx/kit/json.h>
+#include "stream_parser.h"
 
 namespace nx {
 namespace vms_server_plugins {
