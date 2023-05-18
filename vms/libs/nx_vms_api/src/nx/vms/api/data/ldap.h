@@ -18,13 +18,6 @@ namespace nx::vms::api {
 
 using namespace std::chrono_literals;
 
-NX_VMS_API extern const QString kDefaultLdapLoginAttribute;
-NX_VMS_API extern const QString kDefaultLdapGroupObjectClass;
-NX_VMS_API extern const QString kDefaultLdapMemberAttribute;
-constexpr std::chrono::minutes kDefaultLdapPasswordExpirationPeriod = 5min;
-constexpr std::chrono::seconds kDefaultLdapSearchTimeout = 30s;
-constexpr int kDefaultLdapSearchPageSize = 1000;
-
 struct NX_VMS_API LdapSettingsBase
 {
     /**%apidoc:string
@@ -42,37 +35,32 @@ struct NX_VMS_API LdapSettingsBase
      */
     std::optional<QString> adminPassword;
 
-    /**%apidoc[opt]
-     * LDAP User login attribute.
-     * %value "uid"
+    /**%apidoc
+     * LDAP User login attribute, autodetect by vendor if null.
      * %example uid
      */
-    QString loginAttribute = kDefaultLdapLoginAttribute;
+    std::optional<QString> loginAttribute;
 
-    /**%apidoc[opt]
-     * LDAP Group objectClass.
-     * %value "groupOfNames"
-     * %value "groupOfUniqueNames"
+    /**%apidoc
+     * LDAP Group objectClass, autodetect by vendor if null.
      * %example groupOfNames
      */
-    QString groupObjectClass = kDefaultLdapGroupObjectClass;
+    std::optional<QString> groupObjectClass;
 
     /**%apidoc[opt]
-     * LDAP Group member attribute.
-     * %value "member"
-     * %value "uniqueMember"
+     * LDAP Group member attribute, autodetect by vendor if null.
      * %example member
      */
-    QString memberAttribute = kDefaultLdapMemberAttribute;
+    std::optional<QString> memberAttribute;
 
     /**%apidoc[opt] */
-    std::chrono::milliseconds passwordExpirationPeriodMs = kDefaultLdapPasswordExpirationPeriod;
+    std::chrono::milliseconds passwordExpirationPeriodMs = 5min;
 
     /**%apidoc[opt] */
-    std::chrono::seconds searchTimeoutS = kDefaultLdapSearchTimeout;
+    std::chrono::seconds searchTimeoutS = 30s;
 
     /**%apidoc[opt] */
-    int searchPageSize = kDefaultLdapSearchPageSize;
+    int searchPageSize = 1000;
 
     bool operator==(const LdapSettingsBase&) const = default;
     bool isValid(bool checkPassword = true) const;

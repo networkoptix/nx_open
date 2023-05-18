@@ -168,9 +168,9 @@ struct LdapSettingsWidget::Private
         state.continuousSyncEditable =
             settings.continuousSync != nx::vms::api::LdapSettings::Sync::disabled;
 
-        state.loginAttribute = settings.loginAttribute;
-        state.groupObjectClass = settings.groupObjectClass;
-        state.memberAttribute = settings.memberAttribute;
+        state.loginAttribute = settings.loginAttribute.value_or("");
+        state.groupObjectClass = settings.groupObjectClass.value_or("");
+        state.memberAttribute = settings.memberAttribute.value_or("");
 
         state.preferredSyncServer = settings.preferredMasterSyncServer;
 
@@ -212,9 +212,20 @@ struct LdapSettingsWidget::Private
             settings.continuousSync = nx::vms::api::LdapSettings::Sync::disabled;
         }
 
-        settings.loginAttribute = state.loginAttribute;
-        settings.groupObjectClass = state.groupObjectClass;
-        settings.memberAttribute = state.memberAttribute;
+        if (state.loginAttribute.isEmpty())
+            settings.loginAttribute = std::nullopt;
+        else
+            settings.loginAttribute = state.loginAttribute;
+
+        if (state.groupObjectClass.isEmpty())
+            settings.groupObjectClass = std::nullopt;
+        else
+            settings.groupObjectClass = state.groupObjectClass;
+
+        if (state.memberAttribute.isEmpty())
+            settings.memberAttribute = std::nullopt;
+        else
+            settings.memberAttribute = state.memberAttribute;
 
         settings.preferredMasterSyncServer = state.preferredSyncServer;
 
