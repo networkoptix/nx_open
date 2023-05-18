@@ -29,10 +29,7 @@ public:
     static const ItemDescriptor& manifest();
 
 private:
-    QString m_caption;
-    QString m_description;
-
-    QString description() const;
+    QString detailing() const;
 };
 
 } // namespace nx::vms::rules

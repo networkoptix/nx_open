@@ -26,13 +26,13 @@ QVariantMap DebugEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
-    utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
+    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
 }
 
-QString DebugEvent::description() const
+QString DebugEvent::detailing() const
 {
     return QString("%1 action with %2 value").arg(m_action).arg(m_value);
 }

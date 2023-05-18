@@ -20,6 +20,7 @@ static constexpr auto kCaptionDetailName = "caption";
 static constexpr auto kClientActionDetailName = "clientAction";
 static constexpr auto kCountDetailName = "count";
 static constexpr auto kCustomIconDetailName = "customIcon";
+// Keep in sync with StringHelper::notificationDescription().
 static constexpr auto kDescriptionDetailName = "description";
 // Keep in sync with StringsHelper::eventDetails().
 static constexpr auto kDetailingDetailName = "detailing";

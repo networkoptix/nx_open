@@ -28,10 +28,7 @@ const ItemDescriptor& TextOverlayAction::manifest()
                 tr("Display text for"),
                 {},
                 {.initialValue = 5s, .maximumValue = 30s, .minimumValue = 5s}),
-            makeFieldDescriptor<TextWithFields>("text", tr("Text"), {},
-                {
-                    { "text", "{@EventCaption}" }
-                }),
+            makeFieldDescriptor<TextWithFields>("text", tr("Text")),
 
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
             utils::makeExtractDetailFieldDescriptor("extendedCaption", utils::kExtendedCaptionDetailName),
