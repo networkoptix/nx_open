@@ -12,6 +12,7 @@
 #include <recording/abstract_recording_context.h>
 #include <recording/abstract_recording_context_callback.h>
 #include <recording/stream_recorder_data.h>
+#include <utils/media/annexb_to_mp4.h>
 
 namespace nx {
 
@@ -87,6 +88,7 @@ private:
     QString m_container = "matroska";
     bool m_packetWritten = false;
     std::optional<nx::recording::Error> m_lastError;
+    nx::media::AnnexbToMp4 m_annexbToMp4;
 
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
 

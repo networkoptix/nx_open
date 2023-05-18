@@ -8,8 +8,9 @@
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
 
-namespace {
-std::vector<uint8_t> buildExtraData(const QnCompressedVideoData* frame)
+namespace nx::media {
+
+std::vector<uint8_t> buildExtraDataMp4(const QnCompressedVideoData* frame)
 {
     std::vector<uint8_t> extradata;
     auto extraDataBuilder = frame->compressionType == AV_CODEC_ID_H264
@@ -26,10 +27,6 @@ std::vector<uint8_t> buildExtraData(const QnCompressedVideoData* frame)
     }
     return extradata;
 }
-
-}
-
-namespace nx::media {
 
 QnCompressedVideoDataPtr convertStartCodesToSizes(const QnCompressedVideoData* videoData)
 {
@@ -97,7 +94,7 @@ QnCompressedVideoDataPtr AnnexbToMp4::process(const QnCompressedVideoData* frame
 
     if (frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
     {
-        std::vector<uint8_t> extradata = buildExtraData(frame);
+        std::vector<uint8_t> extradata = buildExtraDataMp4(frame);
         if (!m_context && extradata.empty())
         {
             NX_WARNING(this, "Failed to build extra data");
