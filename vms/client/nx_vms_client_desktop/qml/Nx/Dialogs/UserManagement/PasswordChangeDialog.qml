@@ -146,7 +146,7 @@ Dialog
             Layout.fillWidth: true
             Layout.bottomMargin: 8
             showStrength: false
-            validateFunc: currentPasswordValidator
+            validateFunc: dialog.currentPasswordValidator
         }
 
         Label
