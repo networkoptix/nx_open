@@ -12,6 +12,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/algorithm/comparator.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
 #include <nx/vms/api/data/bookmark_models.h>
@@ -119,61 +120,49 @@ struct BookmarkFacade<nx::vms::api::Bookmark>: public BookmarkSort
 
 template<typename Bookmark, typename GetterFunc>
 std::function<bool(const Bookmark&, const Bookmark&)>
-    createSortPredicate(Qt::SortOrder sortOrder, GetterFunc getterFunc)
+    createSortPredicate(bool ascending, GetterFunc getterFunc)
 {
-    const bool descending = sortOrder == Qt::DescendingOrder;
-
-    const auto sortPredicate =
-        [getterFunc, descending](const Bookmark& left, const Bookmark& right)
-        {
-            const auto l = getterFunc(left);
-            const auto r = getterFunc(right);
-
-            return descending ^ ((l != r)
-                ? (l < r)
-                : (BookmarkFacade<Bookmark>::id(left) < BookmarkFacade<Bookmark>::id(right)));
-        };
-
-    return sortPredicate;
+    return nx::utils::algorithm::Comparator(ascending, getterFunc, &BookmarkFacade<Bookmark>::id);
 }
 
 template<typename Bookmark>
 std::function<bool(const Bookmark&, const Bookmark&)>
     createGenericBookmarkSortPredicate(
         BookmarkSortField sortField,
-        Qt::SortOrder sortOrder,
+        bool ascending,
         QnResourcePool* resourcePool)
 {
+    using nx::utils::algorithm::Comparator;
     switch (sortField)
     {
         case BookmarkSortField::name:
-            return createSortPredicate<Bookmark>(sortOrder, &BookmarkFacade<Bookmark>::name);
+            return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::name);
 
         case BookmarkSortField::description:
-            return createSortPredicate<Bookmark>(sortOrder, &BookmarkFacade<Bookmark>::description);
+            return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::description);
 
         case BookmarkSortField::startTime:
-            return createSortPredicate<Bookmark>(sortOrder, &BookmarkFacade<Bookmark>::startTimeMs);
+            return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::startTimeMs);
 
         case BookmarkSortField::duration:
-            return createSortPredicate<Bookmark>(sortOrder, &BookmarkFacade<Bookmark>::durationMs);
+            return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::durationMs);
 
         case BookmarkSortField::creationTime:
             return createSortPredicate<Bookmark>(
-                sortOrder, &BookmarkFacade<Bookmark>::creationTimeMs);
+                ascending, &BookmarkFacade<Bookmark>::creationTimeMs);
 
         case BookmarkSortField::tags:
-            return createSortPredicate<Bookmark>(sortOrder, &BookmarkFacade<Bookmark>::tags);
+            return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::tags);
 
         case BookmarkSortField::creator:
-            return createSortPredicate<Bookmark>(sortOrder,
+            return createSortPredicate<Bookmark>(ascending,
                 [resourcePool](const Bookmark& bookmark)
                 {
                     return BookmarkFacade<Bookmark>::creatorName(bookmark, resourcePool);
                 });
 
         case BookmarkSortField::cameraName:
-            return createSortPredicate<Bookmark>(sortOrder,
+            return createSortPredicate<Bookmark>(ascending,
                 [resourcePool](const Bookmark& bookmark)
                 {
                     return BookmarkFacade<Bookmark>::cameraName(bookmark, resourcePool);
@@ -181,7 +170,7 @@ std::function<bool(const Bookmark&, const Bookmark&)>
     }
 
     NX_ASSERT(false, "Invalid bookmark sort field: '%1'", sortField);
-    return createSortPredicate<Bookmark>(sortOrder, &BookmarkFacade<Bookmark>::id);
+    return createSortPredicate<Bookmark>(ascending, &BookmarkFacade<Bookmark>::id);
 }
 
 } // namespace
@@ -192,7 +181,8 @@ std::function<bool(const QnCameraBookmark&, const QnCameraBookmark&)>
         Qt::SortOrder sortOrder,
         QnResourcePool* resourcePool)
 {
-    return createGenericBookmarkSortPredicate<QnCameraBookmark>(sortField, sortOrder, resourcePool);
+    return createGenericBookmarkSortPredicate<QnCameraBookmark>(
+        sortField, sortOrder == Qt::AscendingOrder, resourcePool);
 }
 
 namespace nx::vms::api {
@@ -202,7 +192,8 @@ std::function<bool(const Bookmark&, const Bookmark&)> createBookmarkSortPredicat
     Qt::SortOrder sortOrder,
     QnResourcePool* resourcePool)
 {
-    return createGenericBookmarkSortPredicate<Bookmark>(sortField, sortOrder, resourcePool);
+    return createGenericBookmarkSortPredicate<Bookmark>(
+        sortField, sortOrder == Qt::AscendingOrder, resourcePool);
 }
 
 } // namespace nx::vms::api
