@@ -156,6 +156,17 @@ Item
                     id: emailTextField
                     focus: control.userType == UserSettingsGlobal.CloudUser
                     width: parent.width
+
+                    readonly property bool isLocalUser:
+                        control.userType == UserSettingsGlobal.LocalUser
+
+                    onIsLocalUser:
+                    {
+                        // Hide empty email warning when switching user type cloud -> local.
+                        if (isLocalUser && !text)
+                            textField.warningState = false
+                    }
+
                     validateFunc: (text) =>
                     {
                         return control.self
