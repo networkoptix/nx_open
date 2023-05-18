@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <thread>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -12,6 +14,7 @@
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/api.h>
+#include <utils/common/synctime.h>
 
 #include "mock_engine_events.h"
 #include "test_action.h"
@@ -48,6 +51,7 @@ protected:
         engine.reset();
     }
 
+    QnSyncTime syncTime;
     std::unique_ptr<Engine> engine;
     Engine::EventConstructor testEventConstructor = [] { return new TestEvent; };
     Engine::ActionConstructor testActionConstructor = [] { return new TestAction; };
@@ -471,6 +475,102 @@ TEST_F(EngineTest, onlyValidProlongedActionRegistered)
         }
     };
     ASSERT_TRUE(engine->registerAction(withIntervalAndDurationFields, testActionConstructor));
+}
+
+TEST_F(EngineTest, cacheKey)
+{
+    engine->registerEvent(TestEvent::manifest(), testEventConstructor);
+
+    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    rule->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+    engine->updateRule(serialize(rule.get()));
+
+    auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::instant);
+
+    // Empty cache key events are not cached.
+    EXPECT_EQ(engine->processEvent(event), 1);
+    EXPECT_EQ(engine->processEvent(event), 1);
+
+    // Same cache events are ignored.
+    event->setCacheKey("a");
+    EXPECT_EQ(engine->processEvent(event), 1);
+    EXPECT_EQ(engine->processEvent(event), 0);
+
+    // Different cache events are matched.
+    event->setCacheKey("b");
+    EXPECT_EQ(engine->processEvent(event), 1);
+    EXPECT_EQ(engine->processEvent(event), 0);
+}
+
+TEST_F(EngineTest, cacheTimeout)
+{
+    using namespace std::chrono;
+
+    engine->registerEvent(TestEvent::manifest(), testEventConstructor);
+
+    auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    rule->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+    engine->updateRule(serialize(rule.get()));
+
+    auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::instant);
+
+    // Same cache events are ignored.
+    event->setCacheKey("a");
+    EXPECT_EQ(engine->processEvent(event), 1);
+    EXPECT_EQ(engine->processEvent(event), 0);
+
+    // Same cache events are matched after timeout.
+    std::this_thread::sleep_for(5ms);
+    engine->eventCache()->cleanupOldEventsFromCache(1ms, 1ms);
+    EXPECT_EQ(engine->processEvent(event), 1);
+    EXPECT_EQ(engine->processEvent(event), 0);
+}
+
+TEST_F(EngineTest, cacheState)
+{
+    engine->registerEvent(TestEvent::manifest(), testEventConstructor);
+
+    // Both rules accept any event.
+    auto rule1 = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    rule1->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+    engine->updateRule(serialize(rule1.get()));
+
+    auto rule2 = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    rule2->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+    engine->updateRule(serialize(rule2.get()));
+
+    auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::started);
+
+    // Event state is cached.
+    EXPECT_EQ(engine->processEvent(event), 2);
+    // As state is not changed, ignore the event.
+    EXPECT_EQ(engine->processEvent(event), 0);
+
+    // New state must be handled and cached.
+    event->setState(State::stopped);
+    EXPECT_EQ(engine->processEvent(event), 2);
+    // Cached state is ignored.
+    EXPECT_EQ(engine->processEvent(event), 0);
+
+    // State is not cached for the instant event.
+    event->setState(State::instant);
+    EXPECT_EQ(engine->processEvent(event), 2);
+    EXPECT_EQ(engine->processEvent(event), 2);
+}
+
+TEST_F(EngineTest, notStartedEventIsNotProcessed)
+{
+    engine->registerEvent(TestEvent::manifest(), testEventConstructor);
+
+    // The rule accept any event.
+    auto rule1 = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
+    rule1->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+    engine->updateRule(serialize(rule1.get()));
+
+    auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::stopped);
+
+    // Event with stopped state without previous started state is ignored.
+    EXPECT_EQ(engine->processEvent(event), 0);
 }
 
 } // namespace nx::vms::rules::test
