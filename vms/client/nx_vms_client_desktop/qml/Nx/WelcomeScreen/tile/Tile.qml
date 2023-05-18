@@ -367,6 +367,11 @@ Button
             {
                 target: tile
                 parent: openedParent
+            }
+
+            PropertyChanges
+            {
+                target: tile
                 x: Math.floor((openedParent.width - tile.width) / 2)
                 y: Math.floor((openedParent.height - tile.height) / 2)
 
