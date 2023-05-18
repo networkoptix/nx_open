@@ -86,7 +86,6 @@ struct SystemSettingNames
         lastMergeSlaveId,
         ldap,
         localSystemId,
-        primaryTimeServer,
         specificFeatures,
         statisticsReportLastNumber,
         statisticsReportLastTime,
