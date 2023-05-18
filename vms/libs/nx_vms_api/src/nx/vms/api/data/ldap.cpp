@@ -6,10 +6,6 @@
 
 namespace nx::vms::api {
 
-const QString kDefaultLdapLoginAttribute = QStringLiteral("uid");
-const QString kDefaultLdapGroupObjectClass = QStringLiteral("groupOfNames");
-const QString kDefaultLdapMemberAttribute = QStringLiteral("member");
-
 bool LdapSettingsBase::isValid(bool checkPassword) const
 {
     return !uri.isEmpty()
