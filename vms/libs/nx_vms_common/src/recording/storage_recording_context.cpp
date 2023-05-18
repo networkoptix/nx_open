@@ -82,10 +82,24 @@ int StorageRecordingContext::streamCount() const
 CodecParametersConstPtr StorageRecordingContext::getVideoCodecParameters(
     const QnConstCompressedVideoDataPtr& videoData)
 {
-    auto codecParameters = videoData->context;
+    CodecParametersPtr codecParameters;
+    if (videoData->context)
+        codecParameters = std::make_shared<CodecParameters>(videoData->context->getAvCodecParameters());
+
     if (!codecParameters)
         codecParameters = QnFfmpegHelper::createVideoCodecParameters(videoData.get());
 
+    if (nx::media::isAnnexb(videoData.get())) // Video data will be converted before call av_write_frame.
+    {
+        auto extradata = nx::media::buildExtraDataMp4(videoData.get());
+        if (extradata.empty())
+        {
+            NX_WARNING(this, "Failed to build extradata in mp4 format");
+            return nullptr;
+        }
+        if (codecParameters)
+            codecParameters->setExtradata(extradata.data(), extradata.size());
+    }
     return codecParameters;
 }
 
@@ -214,8 +228,20 @@ AVMediaType StorageRecordingContext::streamAvMediaType(
     return m_recordingContext.formatCtx->streams[streamIndex]->codecpar->codec_type;
 }
 
-void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex)
+void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& mediaData, int streamIndex)
 {
+    auto md = mediaData;
+    auto videoData = dynamic_cast<const QnCompressedVideoData*>(mediaData.get());
+    if (videoData && nx::media::isAnnexb(videoData))
+    {
+        md = m_annexbToMp4.process(videoData);
+        if (!md)
+        {
+            NX_WARNING(this, "Conversion failed, cannot convert to MP4 format");
+            md = mediaData;
+        }
+    }
+
     using namespace std::chrono;
     AVRational srcRate = { 1, 1000000 };
 
