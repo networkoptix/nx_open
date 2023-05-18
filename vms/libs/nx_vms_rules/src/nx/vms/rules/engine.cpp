@@ -694,13 +694,23 @@ std::unique_ptr<ActionBuilderField> Engine::buildActionField(const QString& fiel
     return field;
 }
 
-void Engine::processEvent(const EventPtr& event)
+size_t Engine::processEvent(const EventPtr& event)
 {
     if (!m_enabled)
-        return;
+        return {};
 
     checkOwnThread();
     NX_DEBUG(this, "Processing Event: %1, state: %2", event->type(), event->state());
+
+    const auto cacheKey = event->cacheKey();
+    if (m_eventCache->eventWasCached(cacheKey))
+    {
+        NX_VERBOSE(this, "Skipping cached event with key: %1", cacheKey);
+        return {};
+    }
+
+    if (!m_eventCache->checkEventState(event))
+        return {};
 
     EventData eventData;
     QSet<QByteArray> eventFields; // TODO: #spanasenko Cache data.
@@ -746,20 +756,29 @@ void Engine::processEvent(const EventPtr& event)
             }
         }
     }
+
     NX_DEBUG(this, "Matched with %1 rules", ruleIds.size());
 
     if (!ruleIds.empty())
     {
+        m_eventCache->cacheEvent(cacheKey);
+
         eventData = serializeProperties(event.get(), eventFields);
         m_router->routeEvent(eventData, ruleIds, resources);
     }
+
+    return ruleIds.size();
 }
 
-void Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
+size_t Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
 {
     checkOwnThread();
+
+    size_t matchedRules{};
     for (const auto& event: events)
-        processEvent(event);
+        matchedRules += processEvent(event);
+
+    return matchedRules;
 }
 
 // TODO: #spanasenko Use a wrapper with additional checks instead of QHash.

@@ -154,8 +154,11 @@ public:
     std::unique_ptr<ActionBuilder> buildActionBuilder(const QString& actionType) const;
 
 // Runtime event processing methods.
-    void processEvent(const EventPtr& event);
-    void processAnalyticsEvents(const std::vector<EventPtr>& events);
+    /** Processes incoming event and returns matched rule count. */
+    size_t processEvent(const EventPtr& event);
+
+    /** Processes incoming analytics events and returns matched rule count. */
+    size_t processAnalyticsEvents(const std::vector<EventPtr>& events);
 
     EventCache* eventCache() const;
 

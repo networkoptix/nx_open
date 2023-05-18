@@ -41,7 +41,7 @@ void testSimpleTypeField(
         field.setValue(value);
         EXPECT_EQ(field.value(), value);
 
-        EXPECT_TRUE(field.match(QVariant::fromValue(value)));
+        EXPECT_TRUE(field.match(QVariant::fromValue<ValueType>(value)));
     }
 }
 
