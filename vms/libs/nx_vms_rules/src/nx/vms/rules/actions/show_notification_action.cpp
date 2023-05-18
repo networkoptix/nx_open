@@ -33,7 +33,7 @@ const ItemDescriptor& NotificationAction::manifest()
                 }),
             makeFieldDescriptor<TextWithFields>("tooltip", tr("Tooltip"), QString(),
                 {
-                    { "text", "{@EventTooltip}" }
+                    { "text", "{@ExtendedEventDescription}" }
                 }),
             makeFieldDescriptor<EventDevicesField>(utils::kDeviceIdsFieldName, "Event devices"),
 

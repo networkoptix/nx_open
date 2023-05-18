@@ -4,9 +4,11 @@
 
 #include <unordered_map>
 
+#include <QtCore/QDateTime>
 #include <QtCore/QVariant>
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/time/formatter.h>
 
 #include "utils/event_details.h"
 
@@ -51,15 +53,15 @@ QVariantMap AggregatedEvent::details(common::SystemContext* context) const
 
     auto eventDetails = initialEvent()->details(context);
 
-    const auto eventCount = m_aggregatedEvents.size();
-    if (eventCount > 1)
+    const auto count = m_aggregatedEvents.size();
+    eventDetails[utils::kCountDetailName] = QVariant::fromValue(count);
+
+    if (count > 1)
     {
         const auto eventName = initialEvent()->name(context);
         eventDetails[utils::kExtendedCaptionDetailName] =
             tr("Multiple %1 events have occurred").arg(eventName);
     }
-
-    eventDetails[utils::kCountDetailName] = QVariant::fromValue(eventCount);
 
     return eventDetails;
 }

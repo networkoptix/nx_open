@@ -8,9 +8,6 @@
 #include <nx/vms/common/system_context.h>
 
 #include "../aggregated_event.h"
-#include "../basic_event.h"
-#include "../engine.h"
-#include "../manifest.h"
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
 
@@ -39,12 +36,12 @@ QString propertyToString(const AggregatedEventPtr& event, const char* key)
     return value.canConvert<QString>() ? value.toString() : QString();
 }
 
-QString createGuid(const AggregatedEventPtr&, common::SystemContext* context = nullptr)
+QString createGuid(const AggregatedEventPtr& /*eventAggregator*/, common::SystemContext* /*context*/)
 {
     return QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
 }
 
-QString eventType(const AggregatedEventPtr& eventAggregator, common::SystemContext* constext = nullptr)
+QString eventType(const AggregatedEventPtr& eventAggregator, common::SystemContext* /*context*/)
 {
     return eventAggregator ? eventAggregator->type() : QString();
 }
@@ -74,72 +71,68 @@ QString eventCaption(const AggregatedEventPtr& eventAggregator, common::SystemCo
 
 QString eventDescription(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
 {
-    const auto description = eventAggregator->details(context).value(utils::kDescriptionDetailName);
-    if (description.canConvert<QString>())
-        return description.toString();
+    auto result = detailToString(eventAggregator->details(context), utils::kDescriptionDetailName);
 
-    if (const auto value = eventAggregator->property("description"); value.canConvert<QString>())
-        return value.toString();
+    if (result.isEmpty())
+        result = propertyToString(eventAggregator, "description");
 
-    const auto engine = context->vmsRulesEngine();
-    if (NX_ASSERT(engine))
-    {
-        if (auto descriptor = engine->eventDescriptor(eventType(eventAggregator)))
-            return descriptor->description;
-    }
-
-    return {};
+    return result;
 }
 
-QString eventTooltip(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+// Keep in sync with StringHelper::eventDescription().
+QString extendedEventDescription(
+    const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
 {
-    QStringList result;
-    const utils::StringHelper stringsHelper(context);
+    const auto eventDetails = eventAggregator->details(context);
 
-    const auto details = eventAggregator->details(context);
+    QStringList extendedDescription;
+    if (const auto it = eventDetails.find(utils::kNameDetailName); it != eventDetails.end())
+        extendedDescription << TextWithFields::tr("Event: %1").arg(it->toString());
 
-    const auto name = details.value(utils::kNameDetailName);
-    if (name.canConvert<QString>())
-        result << TextWithFields::tr("Event: %1").arg(name.toString());
+    if (const auto it = eventDetails.find(utils::kSourceNameDetailName); it != eventDetails.end())
+        extendedDescription << TextWithFields::tr("Source: %1").arg(it->toString());
 
-    QString sourceName;
-    if (const auto sourceId = details.value(utils::kSourceIdDetailName);
-        sourceId.canConvert<QnUuid>())
+    const utils::StringHelper stringHelper{context};
+    extendedDescription << stringHelper.timestamp(
+        eventAggregator->initialEvent()->timestamp(), static_cast<int>(eventAggregator->count()));
+
+    if (const auto it = eventDetails.find(utils::kPluginIdDetailName); it != eventDetails.end())
+        extendedDescription << TextWithFields::tr("Plugin: %1").arg(stringHelper.plugin(it->value<QnUuid>()));
+
+    if (const auto it = eventDetails.find(utils::kExtraCaptionDetailName); it != eventDetails.end())
+        extendedDescription << TextWithFields::tr("Caption: %1").arg(it->toString());
+
+    if (const auto it = eventDetails.find(utils::kReasonDetailName); it != eventDetails.end())
     {
-        sourceName = stringsHelper.resource(sourceId.value<QnUuid>());
+        QString reason;
+
+        if (it->canConvert<QString>())
+        {
+            reason = TextWithFields::tr("Reason: %1").arg(it->toString());
+        }
+        else
+        {
+            auto reasonValue = it->toStringList();
+            if (!reasonValue.empty())
+                reason = TextWithFields::tr("Reason: %1").arg(reasonValue.takeFirst()); //< Reason text.
+
+            if (!reasonValue.empty())
+                reason += " " + reasonValue.join(", "); //< Affected devices.
+        }
+
+        if (!reason.isEmpty())
+            extendedDescription << reason;
     }
 
-    if (sourceName.isEmpty())
-        sourceName = details.value(utils::kSourceNameDetailName).toString();
-    if (!sourceName.isEmpty())
-        result << TextWithFields::tr("Source: %1").arg(sourceName);
-
-    const auto pluginId = details.value(utils::kPluginIdDetailName);
-    if (pluginId.canConvert<QnUuid>())
+    if (const auto it = eventDetails.find(utils::kDetailingDetailName); it != eventDetails.end())
     {
-        const auto pluginName = stringsHelper.plugin(pluginId.value<QnUuid>());
-        result << TextWithFields::tr("Plugin: %1").arg(pluginName);
+        if (it->canConvert<QString>())
+            extendedDescription << it->toString();
+        else
+            extendedDescription << it->toStringList();
     }
 
-    if (const auto caption = details.value(utils::kExtraCaptionDetailName).toString();
-        !caption.isEmpty())
-    {
-        result << TextWithFields::tr("Caption: %1").arg(caption);
-    }
-
-    const auto count = details.value(utils::kCountDetailName);
-    if (count.canConvert<size_t>())
-        result << stringsHelper.timestamp(eventAggregator->timestamp(), count.value<size_t>());
-
-    if (auto reason = toStringList(details.value(utils::kReasonDetailName)); !reason.isEmpty())
-    {
-        reason.front() = TextWithFields::tr("Reason: %1").arg(reason.front());
-        result << reason;
-    }
-
-    result << toStringList(details.value(utils::kDetailingDetailName));
-
-    return result.join(common::html::kLineBreak);
+    return toStringList(extendedDescription).join(common::html::kLineBreak);
 }
 
 const QMap<QString, FormatFunction> kFormatFunctions = {
@@ -148,7 +141,7 @@ const QMap<QString, FormatFunction> kFormatFunctions = {
     { "@EventName", &eventName },
     { "@EventCaption", &eventCaption },
     { "@EventDescription", &eventDescription },
-    { "@EventTooltip", &eventTooltip }
+    { "@ExtendedEventDescription", &extendedEventDescription }
 };
 
 FormatFunction formatFunction(const QString& name)
