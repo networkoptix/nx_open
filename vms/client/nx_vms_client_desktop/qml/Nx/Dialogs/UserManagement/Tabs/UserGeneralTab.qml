@@ -392,7 +392,18 @@ Item
                             id: allowInsecureCheckBox
 
                             text: qsTr("Allow insecure (digest) authentication")
+                            font.pixelSize: 14
+
                             enabled: control.allowInsecureEditable && control.enabled
+
+                            wrapMode: Text.WordWrap
+
+                            anchors
+                            {
+                                left: parent.left
+                                right: parent.right
+                                leftMargin: -3
+                            }
 
                             nextCheckState: () =>
                             {

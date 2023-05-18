@@ -560,7 +560,7 @@ Rectangle
             Image
             {
                 Layout.alignment: Qt.AlignTop
-                source: "image://svg/skin/user_settings/ldap_warning.svg"
+                source: "image://svg/skin/user_settings/warning_icon.svg"
                 sourceSize: Qt.size(20, 20)
             }
 

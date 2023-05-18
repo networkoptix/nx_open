@@ -11,8 +11,8 @@ RowLayout
     Image
     {
         Layout.alignment: Qt.AlignTop
-        source: "image://svg/skin/user_settings/warning_triangle.svg"
-        sourceSize: Qt.size(16, 16)
+        source: "image://svg/skin/user_settings/warning_icon.svg"
+        sourceSize: Qt.size(20, 20)
     }
 
     Text
