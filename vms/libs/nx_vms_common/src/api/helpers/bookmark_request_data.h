@@ -29,7 +29,7 @@ struct NX_VMS_COMMON_API QnGetBookmarkTagsRequestData: public QnMultiserverReque
 
     static int unlimited();
 
-    int limit;
+    int limit = unlimited();
 };
 
 struct NX_VMS_COMMON_API QnUpdateBookmarkRequestData: public QnMultiserverRequestData
