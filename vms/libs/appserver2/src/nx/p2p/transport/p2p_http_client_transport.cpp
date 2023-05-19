@@ -6,6 +6,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 #include <nx/network/http/custom_headers.h>
+#include "nx/p2p/transport/ping_headers.h"
+#include "nx/utils/scope_guard.h"
+#include "nx/utils/system_error.h"
 
 namespace nx::p2p {
 
@@ -19,17 +22,22 @@ namespace {
 
 } // namespace
 
+std::optional<std::chrono::milliseconds> P2PHttpClientTransport::s_pingTimeout = std::nullopt;
+bool P2PHttpClientTransport::s_pingPongDisabled = false;
+
 P2PHttpClientTransport::P2PHttpClientTransport(
     HttpClientPtr readHttpClient,
     const nx::String& connectionGuid,
     network::websocket::FrameType messageType,
-    const nx::utils::Url& url)
+    const nx::utils::Url& url,
+    std::optional<std::chrono::milliseconds> pingTimeout)
     :
     m_writeHttpClient(new network::http::AsyncClient({readHttpClient->adapterFunc()})),
     m_readHttpClient(std::move(readHttpClient)),
     m_messageType(messageType),
     m_url(url),
-    m_connectionGuid(connectionGuid)
+    m_connectionGuid(connectionGuid),
+    m_pingTimeout(pingTimeout)
 {
     using namespace std::chrono_literals;
 
@@ -44,6 +52,8 @@ P2PHttpClientTransport::P2PHttpClientTransport(
 
     bindToAioThread(m_readHttpClient->getAioThread());
     m_writeHttpClient->setCredentials(m_readHttpClient->credentials());
+
+    initiatePingPong();
 }
 
 void P2PHttpClientTransport::start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart)
@@ -56,6 +66,88 @@ void P2PHttpClientTransport::start(utils::MoveOnlyFunc<void(SystemError::ErrorCo
         });
 }
 
+void P2PHttpClientTransport::setPingTimeout(std::optional<std::chrono::milliseconds> pingTimeout)
+{
+    s_pingTimeout = pingTimeout;
+}
+
+void P2PHttpClientTransport::setPingPongDisabled(bool value)
+{
+    s_pingPongDisabled = value;
+}
+
+std::optional<std::chrono::milliseconds> P2PHttpClientTransport::pingTimeout() const
+{
+    if (s_pingTimeout)
+        return s_pingTimeout;
+
+    return m_pingTimeout;
+}
+
+void P2PHttpClientTransport::sendPingOrPong(const std::string& name)
+{
+    NX_ASSERT(name == "ping" || name == "pong");
+    post(
+        [this, name]() mutable
+        {
+            NX_VERBOSE(this, "Sending %1", name);
+            m_outgoingMessageQueue.push(OutgoingData{
+                std::nullopt,
+                [name, this](SystemError::ErrorCode error, size_t transferred)
+                {
+                    NX_VERBOSE(
+                        this, "%1 sent. Error: %2, transferred: %3",
+                        name, error, transferred);
+                },
+                network::http::HttpHeaders{}});
+
+            m_outgoingMessageQueue.back().headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
+            if (name == "ping")
+                m_outgoingMessageQueue.back().headers.emplace(kPingHeaderName, name);
+            else
+                m_outgoingMessageQueue.back().headers.emplace(kPongHeaderName, name);
+
+            sendNextMessage();
+        });
+}
+
+void P2PHttpClientTransport::setFailedState()
+{
+    m_failed = true;
+    if (m_userReadHandlerPair)
+        m_userReadHandlerPair->second(SystemError::timedOut, 0);
+}
+
+void P2PHttpClientTransport::initiatePingPong()
+{
+    if (!pingTimeout())
+    {
+        NX_DEBUG(this, "Ping-pong is disabled");
+        return;
+    }
+
+    if (s_pingPongDisabled)
+    {
+        NX_DEBUG(this, "Ping-pong is disabled for tests");
+        return;
+    }
+
+    NX_DEBUG(this, "Ping-pong is enabled. Starting with %1 timeout", *pingTimeout());
+    m_timer.start(
+        *pingTimeout(),
+        [this]()
+        {
+            sendPingOrPong("ping");
+            m_timer.start(
+                *pingTimeout() / 2,
+                [this]()
+                {
+                    NX_DEBUG(this, "Closing connection because there was no answer to ping");
+                    setFailedState();
+                });
+        });
+}
+
 P2PHttpClientTransport::~P2PHttpClientTransport()
 {
     pleaseStopSync();
@@ -63,6 +155,7 @@ P2PHttpClientTransport::~P2PHttpClientTransport()
 
 void P2PHttpClientTransport::stopWhileInAioThread()
 {
+    m_timer.cancelSync();
     m_writeHttpClient.reset();
     m_readHttpClient.reset();
 }
@@ -115,6 +208,76 @@ void P2PHttpClientTransport::readSomeAsync(
         });
 }
 
+void P2PHttpClientTransport::sendNextMessage()
+{
+    if (m_sendInProgress || m_outgoingMessageQueue.empty())
+    {
+        NX_VERBOSE(
+            this, "%1: Can't intiate send. in progress: %2, message queue size: %3",
+            __func__, m_sendInProgress, m_outgoingMessageQueue.size());
+
+        return;
+    }
+
+    auto& next = m_outgoingMessageQueue.front();
+    if (m_failed)
+    {
+        NX_DEBUG(this, "%1: Transport is in the failed state. Can't send anything", __func__);
+        next.handler(SystemError::connectionAbort, 0);
+        return;
+    }
+
+    NX_VERBOSE(
+        this, "%1: Sending message. Queue size: %2",
+        __func__, m_outgoingMessageQueue.size());
+
+    if (next.buffer)
+    {
+        m_writeHttpClient->setRequestBody(std::make_unique<PostBodySource>(
+            m_messageType,
+            m_messageType == network::websocket::FrameType::binary
+                ? nx::utils::toBase64(*next.buffer) : *next.buffer));
+    }
+
+    next.headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
+    m_writeHttpClient->setAdditionalHeaders(next.headers);
+
+    NX_VERBOSE(this, "%1: Sending POST request to %2", __func__, m_url);
+    m_sendInProgress = true;
+    m_writeHttpClient->doPost(
+        m_url,
+        [this]()
+        {
+            const auto& next = m_outgoingMessageQueue.front();
+            const bool isResponseValid = m_writeHttpClient->response()
+                && m_writeHttpClient->response()->statusLine.statusCode
+                    == network::http::StatusCode::ok;
+
+            NX_VERBOSE(
+                this, "%1: Received response to POST from %2. Result: %3",
+                __func__, m_url, isResponseValid);
+
+            const auto resultCode = !m_writeHttpClient->failed() && isResponseValid
+                ? SystemError::noError : SystemError::connectionAbort;
+
+            std::size_t transferred = 0;
+            if (next.buffer && resultCode == SystemError::noError)
+                transferred = next.buffer->size();
+
+            if (m_writeHttpClient->failed() || !isResponseValid)
+                setFailedState();
+
+            utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
+            next.handler(resultCode, transferred);
+            if (watcher.interrupted())
+                return;
+
+            m_outgoingMessageQueue.pop();
+            m_sendInProgress = false;
+            sendNextMessage();
+        });
+}
+
 void P2PHttpClientTransport::sendAsync(
     const nx::Buffer* buffer,
     network::IoCompletionHandler handler)
@@ -123,38 +286,10 @@ void P2PHttpClientTransport::sendAsync(
         [this, buffer = *buffer, bufferSize = buffer->size(),
             handler = std::move(handler)]() mutable
         {
-            NX_VERBOSE(this, "sendAsync: Starting..");
-            if (m_failed)
-                return handler(SystemError::connectionAbort, 0);
+            m_outgoingMessageQueue.push(OutgoingData{
+                buffer, std::move(handler), network::http::HttpHeaders{}});
 
-            m_writeHttpClient->setRequestBody(std::make_unique<PostBodySource>(
-                m_messageType,
-                m_messageType == network::websocket::FrameType::binary
-                    ? nx::utils::toBase64(buffer) : buffer));
-
-            network::http::HttpHeaders additionalHeaders;
-            additionalHeaders.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
-            m_writeHttpClient->setAdditionalHeaders(additionalHeaders);
-
-            NX_VERBOSE(this, "sendAsync: Sending POST request to %1", m_url);
-            m_writeHttpClient->doPost(
-                m_url,
-                [this, handler = std::move(handler), bufferSize = buffer.size()]()
-                {
-                    const bool isResponseValid = m_writeHttpClient->response()
-                        && m_writeHttpClient->response()->statusLine.statusCode
-                            == network::http::StatusCode::ok;
-
-                    NX_VERBOSE(
-                        this, "sendAsync: Received response to POST from %1. Result: %2",
-                        m_url, isResponseValid);
-                    const auto resultCode = !m_writeHttpClient->failed() && isResponseValid
-                        ? SystemError::noError : SystemError::connectionAbort;
-                    const std::size_t transferred = resultCode == SystemError::noError
-                        ? bufferSize : 0;
-
-                    handler(resultCode, transferred);
-                });
+            sendNextMessage();
         });
 }
 
@@ -164,10 +299,12 @@ void P2PHttpClientTransport::bindToAioThread(network::aio::AbstractAioThread* ai
     m_readHttpClient->bindToAioThread(aioThread);
     if (m_writeHttpClient)
         m_writeHttpClient->bindToAioThread(aioThread);
+    m_timer.bindToAioThread(aioThread);
 }
 
 void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
+    m_timer.cancelSync();
     m_readHttpClient->socket()->cancelIOSync(eventType);
     if (m_writeHttpClient)
         m_writeHttpClient->socket()->cancelIOSync(eventType);
@@ -209,6 +346,33 @@ void P2PHttpClientTransport::startReading()
             auto nextFilter = nx::utils::bstream::makeCustomOutputStream(
                 [this](const nx::ConstBufferRefType& data)
                 {
+                    utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
+                    const auto onExit = nx::utils::makeScopeGuard(
+                        [&]()
+                        {
+                            if (watcher.interrupted())
+                                return;
+
+                            initiatePingPong();
+                        });
+
+                    NX_VERBOSE(
+                        this, "Got next multipart frame. Headers: %1",
+                        m_multipartContentParser.prevFrameHeaders());
+
+                    if (m_multipartContentParser.prevFrameHeaders().contains(kPingHeaderName))
+                    {
+                        NX_DEBUG(this, "Ping received, sending pong");
+                        sendPingOrPong("pong");
+                        return;
+                    }
+
+                    if (m_multipartContentParser.prevFrameHeaders().contains(kPongHeaderName))
+                    {
+                        NX_DEBUG(this, "Pong received");
+                        return;
+                    }
+
                     stopOrResumeReaderWhileInAioThread();
                     if (!m_userReadHandlerPair)
                     {
@@ -221,7 +385,6 @@ void P2PHttpClientTransport::startReading()
                             ? nx::utils::fromBase64(data)
                             : data);
 
-                        utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
                         m_userReadHandlerPair->second(SystemError::noError, data.size());
                         if (watcher.interrupted())
                             return;

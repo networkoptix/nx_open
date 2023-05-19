@@ -81,14 +81,13 @@ public:
         P2pTransportPtr p2pTransport,
         const QUrlQuery& requestUrlQuery,
         std::unique_ptr<QObject> opaqueObject,
-        std::unique_ptr<ConnectionLockGuard> connectionLockGuard,
-        bool pingSupported);
+        std::unique_ptr<ConnectionLockGuard> connectionLockGuard);
 
     virtual ~ConnectionBase();
 
     void gotPostConnection(
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        nx::Buffer requestBody);
+        nx::network::http::Request request);
 
     static const SendCounters& sendCounters() { return m_sendCounters;  }
 
@@ -118,7 +117,7 @@ public:
 
             case nx::p2p::FilterResult::deny:
                 // As if the transaction has been sent.
-                m_pingTimer.post([this]() { emit allDataSent(weakPointer()); });
+                m_timer.post([this]() { emit allDataSent(weakPointer()); });
                 return true;
 
             case nx::p2p::FilterResult::deserializedTransactionRequired:
@@ -135,7 +134,7 @@ public:
         if (shouldTransactionBeSentToPeer(tran) != nx::p2p::FilterResult::deny)
             sendMessage(std::forward<Args>(args)...);
         else
-            m_pingTimer.post([this]() { emit allDataSent(weakPointer()); });
+            m_timer.post([this]() { emit allDataSent(weakPointer()); });
     }
 
     void sendMessage(MessageType messageType, const nx::Buffer& data);
@@ -173,11 +172,10 @@ public:
 
     void setScopeGuards(std::vector<nx::utils::Guard> guards) { m_scopeGuards = std::move(guards); }
 
+    static constexpr auto kPingTimeout = std::chrono::seconds(30);
+
     // For tests.
     static std::chrono::milliseconds pingTimeout();
-    static void setPingTimeout(std::chrono::milliseconds value);
-    static void setNoClientPing(bool value);
-    static void setNoServerPing(bool value);
     static void setNoPingSupportClientHeader(bool value);
 
 signals:
@@ -201,8 +199,6 @@ private:
     bool handleMessage(const nx::Buffer& message);
     int messageHeaderSize(bool isClient) const;
     MessageType getMessageType(const nx::Buffer& buffer, bool isClient) const;
-    void initiatePingPong();
-    bool isPingPongDisabledForTests() const;
 
 private:
     enum class CredentialsSource
@@ -257,7 +253,7 @@ private:
 
     static SendCounters m_sendCounters;
 
-    network::aio::Timer m_pingTimer;
+    network::aio::Timer m_timer;
     std::chrono::seconds m_keepAliveTimeout;
     std::unique_ptr<QObject> m_opaqueObject;
     std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
@@ -276,14 +272,10 @@ private:
     int64_t m_extraBufferSize = 0;
     size_t m_maxBufferSize = 0;
     std::vector<nx::utils::Guard> m_scopeGuards;
-    bool m_pingSupported = false;
     nx::network::aio::Timer m_pongTimer;
     const bool m_isClient;
 
     // For tests.
-    static std::chrono::milliseconds s_pingTimeout;
-    static bool s_noClientPing;
-    static bool s_noServerPing;
     static bool s_noPingSupportClientHeader;
 };
 

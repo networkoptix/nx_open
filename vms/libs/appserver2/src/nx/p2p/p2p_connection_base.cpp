@@ -10,6 +10,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/p2p/p2p_fwd.h>
 #include <nx/p2p/p2p_serialization.h>
@@ -27,9 +28,6 @@ namespace p2p {
 
 SendCounters ConnectionBase::m_sendCounters = {};
 
-std::chrono::milliseconds ConnectionBase::s_pingTimeout = std::chrono::seconds(60);
-bool ConnectionBase::s_noClientPing = false;
-bool ConnectionBase::s_noServerPing = false;
 bool ConnectionBase::s_noPingSupportClientHeader = false;
 
 #if defined(CHECK_SEQUENCE)
@@ -91,8 +89,7 @@ ConnectionBase::ConnectionBase(
         m_httpClient->setAuthType(nx::network::http::AuthType::authDigest);
     }
 
-    m_httpClient->bindToAioThread(m_pingTimer.getAioThread());
-    m_pongTimer.bindToAioThread(m_pingTimer.getAioThread());
+    m_httpClient->bindToAioThread(m_timer.getAioThread());
     NX_DEBUG(this, "Created client p2p connection");
 }
 
@@ -102,8 +99,7 @@ ConnectionBase::ConnectionBase(
     P2pTransportPtr p2pTransport,
     const QUrlQuery& requestUrlQuery,
     std::unique_ptr<QObject> opaqueObject,
-    std::unique_ptr<ConnectionLockGuard> connectionLockGuard,
-    bool pingSupported)
+    std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
 :
     m_direction(Direction::incoming),
     m_remotePeer(remotePeer),
@@ -112,13 +108,11 @@ ConnectionBase::ConnectionBase(
     m_state(State::Connected),
     m_opaqueObject(std::move(opaqueObject)),
     m_connectionLockGuard(std::move(connectionLockGuard)),
-    m_pingSupported(pingSupported),
     m_isClient(false)
 {
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
 
-    m_pingTimer.bindToAioThread(m_p2pTransport->getAioThread());
-    m_pongTimer.bindToAioThread(m_p2pTransport->getAioThread());
+    m_timer.bindToAioThread(m_p2pTransport->getAioThread());
 
     const auto& queryItems = requestUrlQuery.queryItems();
     std::transform(
@@ -127,21 +121,20 @@ ConnectionBase::ConnectionBase(
         [](const QPair<QString, QString>& item)
             { return std::make_pair(item.first, item.second); });
 
-    initiatePingPong();
     NX_DEBUG(this, "Created server p2p connection");
 }
 
 void ConnectionBase::gotPostConnection(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    nx::Buffer requestBody)
+    nx::network::http::Request request)
 {
-    m_pingTimer.post(
-        [this, socket = std::move(socket), requestBody = std::move(requestBody)]() mutable
+    m_timer.post(
+        [this, socket = std::move(socket), request = std::move(request)]() mutable
         {
             using namespace nx::network;
             if(auto httpTransport = dynamic_cast<P2PHttpServerTransport*>(m_p2pTransport.get()))
             {
-                httpTransport->gotPostConnection(std::move(socket), std::move(requestBody));
+                httpTransport->gotPostConnection(std::move(socket), std::move(request));
             }
             else
             {
@@ -153,8 +146,7 @@ void ConnectionBase::gotPostConnection(
 void ConnectionBase::stopWhileInAioThread()
 {
     // All objects in the same AIO thread
-    m_pingTimer.pleaseStopSync();
-    m_pongTimer.pleaseStopSync();
+    m_timer.pleaseStopSync();
     m_p2pTransport.reset();
     m_httpClient.reset();
 }
@@ -167,8 +159,7 @@ void ConnectionBase::pleaseStopSync()
             "Please call pleaseStopSync() in the destructor of the nested class.");
     }
 
-    m_pingTimer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
-    m_pongTimer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
+    m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
 }
 
 ConnectionBase::~ConnectionBase()
@@ -344,13 +335,19 @@ void ConnectionBase::onHttpClientDone()
 
     auto compressionType = websocket::compressionType(m_httpClient->response()->headers);
     const auto pingSupportedHeaderIt = headers.find(Qn::EC2_PING_ENABLED_HEADER_NAME);
-    m_pingSupported =
+    const auto pingSupported =
         !s_noPingSupportClientHeader
         && !useWebsocketMode
         && pingSupportedHeaderIt != headers.cend()
         && pingSupportedHeaderIt->second == "true";
 
-    initiatePingPong();
+    NX_DEBUG(
+        this, "Ping supported: %1. useWebsocket: %2, "
+        "ping supported header present: %3, header value: %4",
+        pingSupported,
+        useWebsocketMode,
+        pingSupportedHeaderIt != headers.cend(),
+        pingSupportedHeaderIt->second == "true");
 
     if (useWebsocketMode)
     {
@@ -373,11 +370,14 @@ void ConnectionBase::onHttpClientDone()
             std::move(m_httpClient),
             m_connectionGuid,
             network::websocket::FrameType::binary,
-            url));
+            url,
+            pingSupported
+                ? std::optional<std::chrono::milliseconds>(kPingTimeout)
+                : std::nullopt));
     }
 
     m_httpClient.reset();
-    m_p2pTransport->bindToAioThread(m_pingTimer.getAioThread());
+    m_p2pTransport->bindToAioThread(m_timer.getAioThread());
     m_p2pTransport->start([this](SystemError::ErrorCode errorCode)
         {
             if (errorCode == SystemError::noError)
@@ -393,53 +393,6 @@ void ConnectionBase::onHttpClientDone()
                     nx::format("P2P Http transport connection failed %1").arg(errorCode));
             }
         });
-}
-
-bool ConnectionBase::isPingPongDisabledForTests() const
-{
-    return (m_isClient && s_noClientPing) || (!m_isClient && s_noServerPing);
-}
-
-void ConnectionBase::initiatePingPong()
-{
-    if (!m_pingSupported)
-        return;
-
-    if (isPingPongDisabledForTests())
-        return;
-
-    m_pingTimer.start(
-        pingTimeout(),
-        [this]()
-        {
-            sendMessage(MessageType::ping, QByteArray());
-            m_pingTimer.start(
-                pingTimeout() / 2,
-                [this]()
-                {
-                    cancelConnecting(State::Error, "No pong");
-                });
-        });
-}
-
-std::chrono::milliseconds ConnectionBase::pingTimeout()
-{
-    return s_pingTimeout;
-}
-
-void ConnectionBase::setPingTimeout(std::chrono::milliseconds value)
-{
-    s_pingTimeout = value;
-}
-
-void ConnectionBase::setNoClientPing(bool value)
-{
-    s_noClientPing = value;
-}
-
-void ConnectionBase::setNoServerPing(bool value)
-{
-    s_noServerPing = value;
 }
 
 void ConnectionBase::setNoPingSupportClientHeader(bool value)
@@ -522,16 +475,12 @@ void ConnectionBase::setState(State state)
 void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data)
 {
     if (remotePeer().isClient())
-        NX_ASSERT(messageType == MessageType::pushTransactionData
-            || messageType == MessageType::ping
-            || messageType == MessageType::pong);
+        NX_ASSERT(messageType == MessageType::pushTransactionData);
 
     if (remotePeer().isCloudServer())
     {
         NX_ASSERT(messageType == MessageType::pushTransactionData
-            || messageType == MessageType::subscribeAll
-            || messageType == MessageType::ping
-            || messageType == MessageType::pong);
+            || messageType == MessageType::subscribeAll);
     }
 
     nx::Buffer buffer;
@@ -559,7 +508,7 @@ MessageType ConnectionBase::getMessageType(const nx::Buffer& buffer, bool isClie
 
 void ConnectionBase::setMaxSendBufferSize(size_t value)
 {
-    m_pingTimer.post(
+    m_timer.post(
         [this, value]()
         {
             m_extraBufferSize = m_dataToSend.dataSize();
@@ -585,7 +534,7 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
         }
     }
 
-    m_pingTimer.post(
+    m_timer.post(
         [this, data]()
         {
 #ifdef CHECK_SEQUENCE
@@ -701,22 +650,7 @@ bool ConnectionBase::handleMessage(const nx::Buffer& message)
 
     const bool isClient = localPeer().isClient();
     MessageType messageType = getMessageType(message, isClient);
-    if (messageType == MessageType::ping)
-    {
-        NX_VERBOSE(this, "Ping received, sending pong");
-        if (!isPingPongDisabledForTests())
-            sendMessage(MessageType::pong, QByteArray());
-    }
-    else if (messageType == MessageType::pong)
-    {
-        NX_VERBOSE(this, "Pong received");
-    }
-    else
-    {
-        emit gotMessage(weakPointer(), messageType, message.substr(messageHeaderSize(isClient)));
-    }
-
-    initiatePingPong();
+    emit gotMessage(weakPointer(), messageType, message.substr(messageHeaderSize(isClient)));
 
     return true;
 }
@@ -733,7 +667,7 @@ QObject* ConnectionBase::opaqueObject()
 
 void ConnectionBase::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
-    m_pingTimer.bindToAioThread(aioThread);
+    m_timer.bindToAioThread(aioThread);
     if (m_httpClient)
         m_httpClient->bindToAioThread(aioThread);
 
