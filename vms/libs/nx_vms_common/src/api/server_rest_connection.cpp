@@ -774,6 +774,17 @@ Handle ServerConnection::executeAnalyticsAction(
         targetThread);
 }
 
+Handle ServerConnection::getRemoteArchiveSynchronizationStatus(
+    Result<ErrorOrData<nx::vms::api::RemoteArchiveSynchronizationStatusList>>::type&& callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        "/rest/v3/servers/this/remoteArchive/*/sync",
+        nx::network::rest::Params(),
+        std::move(callback),
+        targetThread);
+}
+
 Handle ServerConnection::getOverlappedIds(
     const QString& nvrGroupId,
     Result<nx::vms::api::OverlappedIdResponse>::type callback,

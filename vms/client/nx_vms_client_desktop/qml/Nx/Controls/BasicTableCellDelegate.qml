@@ -20,5 +20,5 @@ Text
 
     color: model.foregroundColor ?? ColorTheme.colors.light4
 
-    GlobalToolTip.text: model.tooltipText || ""
+    GlobalToolTip.text: model.toolTip || ""
 }

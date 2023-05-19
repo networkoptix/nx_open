@@ -30,7 +30,6 @@ enum HelpTopic
     CameraSettings_Expert_DisableArchivePrimary_Help,
     CameraSettings_Expert_Rtp_Help,
     CameraSettings_Expert_SettingsControl_Help,
-    CameraSettings_Expert_ManualImport_Help,
     CameraSettings_Expert_AutomaticImport_Help,
     CameraSettings_Help,
     CameraSettings_Motion_Help,

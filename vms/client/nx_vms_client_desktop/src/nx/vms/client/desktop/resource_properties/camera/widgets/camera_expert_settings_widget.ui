@@ -105,7 +105,7 @@
            <x>0</x>
            <y>0</y>
            <width>1343</width>
-           <height>1152</height>
+           <height>1157</height>
           </rect>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1">
@@ -396,7 +396,7 @@
              <item>
               <widget class="QGroupBox" name="remoteArchiveAutoExportGroupBox">
                <property name="title">
-                <string>Import From Device</string>
+                <string>Import Video From Device</string>
                </property>
                <property name="flat">
                 <bool>true</bool>
@@ -410,16 +410,9 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="nx::vms::client::desktop::RadioButtonWithHint" name="manualImportFromDeviceRadioButton">
+                 <widget class="nx::vms::client::desktop::RadioButtonWithHint" name="enableImportFromDeviceRadioButton">
                   <property name="text">
-                   <string>Import video manually</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="nx::vms::client::desktop::RadioButtonWithHint" name="autoImportFromDeviceRadioButton">
-                  <property name="text">
-                   <string>Import video automatically</string>
+                   <string>Import camera or server offline periods</string>
                   </property>
                  </widget>
                 </item>

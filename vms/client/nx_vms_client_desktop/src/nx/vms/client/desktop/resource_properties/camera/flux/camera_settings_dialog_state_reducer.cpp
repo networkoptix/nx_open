@@ -2424,37 +2424,16 @@ State CameraSettingsDialogStateReducer::setForcedSecondaryProfile(
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setRemoteArchiveSyncronizationDisabled(
-    State state)
+State CameraSettingsDialogStateReducer::setRemoteArchiveSyncronizationEnabled(
+    State state,
+    bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1", __func__);
 
     state.expert.remoteArchiveSyncronizationMode.setUser(
-        nx::vms::common::RemoteArchiveSyncronizationMode::off);
-    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
-    state.hasChanges = true;
-    return state;
-}
-
-State CameraSettingsDialogStateReducer::setRemoteArchiveSyncronizationManual(
-    State state)
-{
-    NX_VERBOSE(NX_SCOPE_TAG, "%1", __func__);
-
-    state.expert.remoteArchiveSyncronizationMode.setUser(
-        nx::vms::common::RemoteArchiveSyncronizationMode::manual);
-    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
-    state.hasChanges = true;
-    return state;
-}
-
-State CameraSettingsDialogStateReducer::setRemoteArchiveSyncronizationAuto(
-    State state)
-{
-    NX_VERBOSE(NX_SCOPE_TAG, "%1", __func__);
-
-    state.expert.remoteArchiveSyncronizationMode.setUser(
-        nx::vms::common::RemoteArchiveSyncronizationMode::automatic);
+        value
+        ? nx::vms::common::RemoteArchiveSyncronizationMode::automatic
+        : nx::vms::common::RemoteArchiveSyncronizationMode::off);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
     return state;
@@ -2591,7 +2570,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setRtpTransportType(std::move(state), nx::vms::api::RtpTransportType::automatic);
     state = setForcedPrimaryProfile(std::move(state), QString());
     state = setForcedSecondaryProfile(std::move(state), QString());
-    state = setRemoteArchiveSyncronizationDisabled(std::move(state));
+    state = setRemoteArchiveSyncronizationEnabled(std::move(state), false);
     state = setCustomWebPagePort(std::move(state), 0);
     state = setCustomMediaPortUsed(std::move(state), false);
     state = setTrustCameraTime(std::move(state), false);

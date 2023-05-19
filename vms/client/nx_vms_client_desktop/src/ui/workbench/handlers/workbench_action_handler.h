@@ -240,6 +240,8 @@ protected slots:
 
     void at_openAdvancedSearchDialog_triggered();
 
+    void at_openImportFromDevicesDialog_triggered();
+
     void handleBetaUpdateWarning();
 
 private:

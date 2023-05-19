@@ -37,6 +37,8 @@ struct NX_VMS_API RemoteArchiveSynchronizationStatus: ServerAndDeviceIdData
     (durationToImportMs)
 
 QN_FUSION_DECLARE_FUNCTIONS(RemoteArchiveSynchronizationStatus, (json)(ubjson), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(RemoteArchiveSynchronizationStatus,
+    RemoteArchiveSynchronizationStatus_Fields)
 
 using RemoteArchiveSynchronizationStatusList = std::vector<RemoteArchiveSynchronizationStatus>;
 

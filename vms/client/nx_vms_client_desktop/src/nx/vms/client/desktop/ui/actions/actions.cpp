@@ -772,6 +772,16 @@ void initialize(Manager* manager, Action* root)
         .flags(Main)
         .separator();
 
+    factory(OpenImportFromDevices)
+        .flags(Main | NoTarget)
+        .mode(DesktopMode)
+        .text(ContextMenu::tr("Import From Devices..."))
+        .condition(condition::isLoggedIn());
+
+    factory()
+        .flags(Main)
+        .separator();
+
     factory(AboutAction)
         .flags(Main | GlobalHotkey)
         .mode(DesktopMode)
