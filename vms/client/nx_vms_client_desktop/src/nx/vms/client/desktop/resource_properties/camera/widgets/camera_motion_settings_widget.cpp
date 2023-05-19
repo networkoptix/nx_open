@@ -51,6 +51,8 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     m_sensitivityButtons(new QButtonGroup(this)),
     m_motionWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), this))
 {
+    m_motionWidget->setObjectName("CameraMotionSettingsWidget");
+
     ui->setupUi(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);

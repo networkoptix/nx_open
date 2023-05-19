@@ -41,6 +41,7 @@ Window
     color: ColorTheme.colors.dark3
 
     title: qsTr("Advanced Object Search")
+    objectName: "AnalyticsSearchDialog"
 
     onVisibleChanged:
     {

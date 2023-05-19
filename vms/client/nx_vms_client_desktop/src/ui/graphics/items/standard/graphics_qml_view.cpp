@@ -245,6 +245,7 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
     );
 
     d->quickWindow.reset(new QQuickWindow(d->renderControl.data()));
+    d->quickWindow->setObjectName("GraphicsQmlView");
     d->quickWindow->setTitle(QString::fromLatin1("Offscreen"));
     d->quickWindow->setGeometry(0, 0, 640, 480); //< Will be resized later.
 

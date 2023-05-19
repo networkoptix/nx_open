@@ -27,7 +27,7 @@ std::pair<QObject*, QScreen*> getTopLevelAt(QPoint globalPos)
 
     if (QWindow* window = QGuiApplication::topLevelAt(globalPos))
         return {window, window->screen()};
-    
+
     return {nullptr, nullptr};
 }
 
@@ -50,6 +50,7 @@ public:
             | Qt::WindowDoesNotAcceptFocus
             | Qt::BypassGraphicsProxyWidget);
 
+        setObjectName("FullScreenOverlay");
         setWindowFlags(kExtraFlags);
         setAttribute(Qt::WA_TranslucentBackground);
         setClearColor(Qt::transparent);

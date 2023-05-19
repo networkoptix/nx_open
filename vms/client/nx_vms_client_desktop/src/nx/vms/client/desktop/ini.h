@@ -331,6 +331,8 @@ struct Ini: nx::kit::IniConfig
         "[Support] Disable analytics attribute tables for graphics debugging purposes");
     NX_INI_FLAG(false, debugDisableQmlTooltips,
         "[Support] Disable tooltips rendered to an offscreen buffer for graphics debugging purposes");
+    NX_INI_FLAG(false, debugEnableQmlContextLogging,
+        "[Support] Enable tracking of QtQuick OpenGL context creation and destruction");
 
     // VMS-37975.
     NX_INI_FLAG(false, considerOverallCpuUsageInRadass,

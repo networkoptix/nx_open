@@ -25,6 +25,7 @@ CameraAnalyticsSettingsWidget::CameraAnalyticsSettingsWidget(
     :
     base_type(engine, parent)
 {
+    setObjectName("CameraAnalyticsSettingsWidget");
     setClearColor(palette().window().color());
     setResizeMode(QQuickWidget::SizeRootObjectToView);
     setSource(QUrl("Nx/Dialogs/CameraSettings/AnalyticsSettings.qml"));

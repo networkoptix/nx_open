@@ -44,6 +44,8 @@ QmlResourceBrowserWidget::QmlResourceBrowserWidget(QnWorkbenchContext* context, 
     QnWorkbenchContextAware(context),
     d(new Private{this})
 {
+    setObjectName("ResourceBrowserWidget");
+
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     setMouseTracking(true);
 

@@ -83,6 +83,8 @@ EmbeddedPopup::EmbeddedPopup(QObject* parent):
     d->quickWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
     d->quickWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
     d->quickWidget->setVisible(d->visible);
+
+    connect(this, &QObject::objectNameChanged, d->quickWidget.get(), &QObject::setObjectName);
 }
 
 EmbeddedPopup::~EmbeddedPopup()
