@@ -2,6 +2,8 @@
 
 #include "server_time_watcher.h"
 
+#include <QtCore/QTimeZone>
+
 #include <api/model/time_reply.h>
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
@@ -10,9 +12,14 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/system_context.h>
 #include <utils/common/synctime.h>
+
+using namespace std::chrono;
 
 namespace {
 
@@ -93,12 +100,11 @@ qint64 ServerTimeWatcher::utcOffset(
         return 0;
     }
 
-    if (auto server = resource->toResource()->getParentResource()
-        .dynamicCast<QnMediaServerResource>())
+    if (auto server = resource->toResource()->getParentResource().dynamicCast<ServerResource>())
     {
         NX_ASSERT(resource->toResourcePtr()->hasFlags(Qn::utc),
             "Only utc resources should have offset.");
-        return server->utcOffset(defaultValue);
+        return server->timeZoneInfo().utcOffset.count();
     }
 
     return defaultValue;
@@ -106,42 +112,61 @@ qint64 ServerTimeWatcher::utcOffset(
 
 qint64 ServerTimeWatcher::displayOffset(const QnMediaResourcePtr& resource) const
 {
-    return timeMode() == clientTimeMode ? 0 : localOffset(resource, 0);
+    return timeMode() == clientTimeMode
+        ? 0
+        : localOffset(resource, 0);
 }
 
 QDateTime ServerTimeWatcher::serverTime(
-    const QnMediaServerResourcePtr& server,
+    const ServerResourcePtr& server,
     qint64 msecsSinceEpoch)
 {
-    const auto utcOffsetMs = server
-        ? server->utcOffset()
-        : Qn::InvalidUtcOffset;
-
-    QDateTime result;
-    if (utcOffsetMs != Qn::InvalidUtcOffset)
+    // Try to use actual server timezone when possible.
+    if (NX_ASSERT(server) && ini().useNativeServerTimeZone)
     {
+        NX_VERBOSE(NX_SCOPE_TAG, "Calculating time based on server timezone %1",
+            server->timeZoneInfo().timezoneId);
+        QByteArray timezoneId = server->timeZoneInfo().timezoneId.toUtf8();
+        const bool isTzAvailable = QTimeZone::isTimeZoneIdAvailable(timezoneId);
+        QTimeZone tz(timezoneId);
+        if (!timezoneId.isEmpty() && isTzAvailable && tz.isValid())
+        {
+            QDateTime result;
+            result.setTimeSpec(Qt::TimeZone);
+            result.setTimeZone(tz);
+            result.setMSecsSinceEpoch(msecsSinceEpoch);
+            NX_VERBOSE(NX_SCOPE_TAG, "Actual time is %1", result);
+            return result;
+        }
+        else
+        {
+            NX_VERBOSE(NX_SCOPE_TAG, "Timezone is not available, using default calculation.");
+        }
+    }
+
+    // Intentionally fall-through to default calculation.
+    {
+        const auto utcOffset = duration_cast<seconds>(server->timeZoneInfo().utcOffset);
+        NX_VERBOSE(NX_SCOPE_TAG, "Calculating time based on server utc offset %1", utcOffset);
+
+        QDateTime result;
         result.setTimeSpec(Qt::OffsetFromUTC);
-        result.setOffsetFromUtc(utcOffsetMs / 1000);
+        result.setOffsetFromUtc(utcOffset.count());
         result.setMSecsSinceEpoch(msecsSinceEpoch);
+        NX_VERBOSE(NX_SCOPE_TAG, "Actual time is %1", result);
+        return result;
     }
-    else
-    {
-        result.setTimeSpec(Qt::UTC);
-        result.setMSecsSinceEpoch(msecsSinceEpoch);
-    }
-
-    return result;
 }
 
 QDateTime ServerTimeWatcher::displayTime(qint64 msecsSinceEpoch) const
 {
-    return displayTime(currentServer(), msecsSinceEpoch);
+    return displayTime(currentServer().dynamicCast<ServerResource>(), msecsSinceEpoch);
 }
 
-QDateTime ServerTimeWatcher::displayTime(
-    const QnMediaServerResourcePtr& server, qint64 msecsSinceEpoch) const
+QDateTime ServerTimeWatcher::displayTime(const ServerResourcePtr& server,
+    qint64 msecsSinceEpoch) const
 {
-    if (timeMode() == clientTimeMode)
+    if (!server || timeMode() == clientTimeMode)
         return QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch);
 
     return serverTime(server, msecsSinceEpoch);
@@ -153,7 +178,7 @@ qint64 ServerTimeWatcher::localOffset(
 {
     const qint64 utcOffsetMs = utcOffset(resource, Qn::InvalidUtcOffset);
 
-    if(utcOffsetMs == Qn::InvalidUtcOffset)
+    if (utcOffsetMs == Qn::InvalidUtcOffset)
         return defaultValue;
 
     auto localDateTime = QDateTime::currentDateTime();
@@ -179,17 +204,12 @@ void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
             if (!success)
                 return;
 
-            const auto server = resourcePool()->getResourceById<QnMediaServerResource>(id);
+            const auto server = resourcePool()->getResourceById<ServerResource>(id);
             if (!server)
                 return;
 
             const auto result = reply.deserialized<QnTimeReply>();
-            const qint64 offset = result.timeZoneOffset;
-            if (server->utcOffset() == offset)
-                return;
-
-            server->setUtcOffset(offset);
-            emit displayOffsetsChanged();
+            server->setTimeZoneInfo({result.timezoneId, milliseconds(result.timeZoneOffset)});
         });
 
     connectedServerApi()->getServerLocalTime(
@@ -200,7 +220,7 @@ void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
 
 void ServerTimeWatcher::handleResourceAdded(const QnResourcePtr& resource)
 {
-    const auto server = resource.dynamicCast<QnMediaServerResource>();
+    const auto server = resource.dynamicCast<ServerResource>();
     if (!server || server->hasFlags(Qn::fake))
         return;
 
@@ -209,6 +229,9 @@ void ServerTimeWatcher::handleResourceAdded(const QnResourcePtr& resource)
     connect(server.get(), &QnMediaServerResource::apiUrlChanged, this, updateServer);
     connect(server.get(), &QnMediaServerResource::statusChanged, this, updateServer);
     updateServer();
+
+    connect(server.get(), &ServerResource::timeZoneInfoChanged, this,
+        &ServerTimeWatcher::displayOffsetsChanged);
 }
 
 void ServerTimeWatcher::handleResourceRemoved(const QnResourcePtr& resource)

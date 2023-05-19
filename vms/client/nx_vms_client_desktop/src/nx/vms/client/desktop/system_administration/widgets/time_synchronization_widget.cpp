@@ -8,12 +8,12 @@
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
@@ -164,15 +164,19 @@ void TimeSynchronizationWidget::loadDataToUi()
 {
     // Create state.
     QList<State::ServerInfo> servers;
-    for (const auto& server: resourcePool()->servers())
+    for (const auto& resource: resourcePool()->servers())
     {
+        const auto server = resource.dynamicCast<core::ServerResource>();
+        if (!NX_ASSERT(server))
+            continue;
+
         State::ServerInfo serverInfo;
         serverInfo.id = server->getId();
         serverInfo.name = server->getName();
         serverInfo.ipAddress = QnResourceDisplayInfo(server).host();
         serverInfo.online = server->getStatus() == nx::vms::api::ResourceStatus::online;
         serverInfo.hasInternet = server->hasInternetAccess();
-        serverInfo.timeZoneOffset = milliseconds(server->utcOffset());
+        serverInfo.timeZoneOffset = server->timeZoneInfo().utcOffset;
         servers.push_back(serverInfo);
     }
 

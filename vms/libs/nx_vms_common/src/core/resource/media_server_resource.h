@@ -78,8 +78,6 @@ public:
     QnStorageResourceList getStorages() const;
     QnStorageResourcePtr getStorageByUrl(const QString& url) const;
 
-    virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
-
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
 
@@ -134,10 +132,6 @@ public:
 
     qint64 currentStatusTime() const;
 
-    /** Server local timezone. */
-    qint64 utcOffset(qint64 defaultValue = Qn::InvalidUtcOffset) const;
-    void setUtcOffset(qint64 value);
-
     /**
      * This function is needed for the Client. Client may insert a fake Server with overridden Id
      * along with the reference to the original Id. So, the overridden method for the fake Server
@@ -165,6 +159,9 @@ public:
     void setWebCamerasDiscoveryEnabled(bool value);
     bool isGuidConflictDetected() const;
     void setGuidConflictDetected(bool value);
+
+protected:
+    virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
 
 private slots:
     void at_propertyChanged(const QnResourcePtr& /*res*/, const QString& key);
@@ -217,7 +214,4 @@ private:
     // This extension is initialized only for Edge Servers.
     nx::core::resource::edge::EdgeServerStateTracker* edgeServerStateTracker();
     QScopedPointer<nx::core::resource::edge::EdgeServerStateTracker> m_edgeServerStateTracker;
-
-    // TODO: #sivanov Move to the client code, it's used only there.
-    std::atomic<qint64> m_utcOffset = Qn::InvalidUtcOffset;
 };

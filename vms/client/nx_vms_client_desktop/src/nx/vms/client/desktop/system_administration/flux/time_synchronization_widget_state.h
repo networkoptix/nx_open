@@ -80,7 +80,9 @@ struct TimeSynchronizationWidgetState: AbstractFluxState
                 initialized = true;
             }
             else if (commonUtcOffset != utcOffset)
-                return 0ms; //< Show time in UTC when time zones are different
+            {
+                return 0ms; //< Show time in UTC when time zones are different.
+            }
         }
 
         return commonUtcOffset;
