@@ -77,6 +77,7 @@ MainWindow::MainWindow(QQmlEngine* engine, QnWorkbenchContext* context, QWidget*
     engine->addImageProvider("right_panel", new RightPanelImageProvider());
 
     d->sceneWidget = new QuickWidget(engine, this);
+    d->sceneWidget->setObjectName("MainWindow");
 
     d->sceneWidget->rootContext()->setContextProperty(lit("workbench"), workbench());
     d->sceneWidget->rootContext()->setContextProperty(

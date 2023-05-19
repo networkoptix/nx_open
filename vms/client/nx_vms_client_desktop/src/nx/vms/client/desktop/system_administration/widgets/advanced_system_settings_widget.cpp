@@ -47,6 +47,7 @@ AdvancedSystemSettingsWidget::Private::Private(AdvancedSystemSettingsWidget* q):
     q(q)
 {
     m_menu = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), q);
+    m_menu->setObjectName("AdvancedSettingsMenu");
     m_menu->setClearColor(q->palette().window().color());
     m_menu->setResizeMode(QQuickWidget::SizeRootObjectToView);
     m_menu->setSource(QUrl("Nx/Dialogs/SystemSettings/AdvancedSettingsMenu.qml"));

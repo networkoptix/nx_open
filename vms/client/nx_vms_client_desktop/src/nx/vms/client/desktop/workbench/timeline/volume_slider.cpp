@@ -35,6 +35,8 @@ VolumeSlider::VolumeSlider(QnWorkbenchContext* context, QWidget* parent):
     QnWorkbenchContextAware(context),
     m_tooltip(new SliderToolTip(context))
 {
+    m_tooltip->setObjectName("VolumeSliderTooltip");
+
     setRange(0, 100);
     //setWheelFactor(kMouseWheelFactor);
 

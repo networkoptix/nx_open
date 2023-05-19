@@ -30,6 +30,8 @@ BubbleToolTip
 
     color: ColorTheme.colors.resourceTree.tooltip.background
 
+    objectName: "ResourceToolTip"
+
     ResourceHelper
     {
         id: resourceHelper

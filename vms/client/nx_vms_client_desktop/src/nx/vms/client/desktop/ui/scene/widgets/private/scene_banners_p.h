@@ -26,6 +26,7 @@ public:
         container(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), parentWidget))
     {
         NX_CRITICAL(parentWidget, "Parent widget must be specified");
+        container->setObjectName("SceneBanners");
         container->setResizeMode(QQuickWidget::SizeViewToRootObject);
         container->setClearColor(Qt::transparent);
         container->setAttribute(Qt::WA_TransparentForMouseEvents);

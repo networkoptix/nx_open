@@ -128,6 +128,7 @@ ThumbnailTooltip::ThumbnailTooltip(QnWorkbenchContext* context):
     BubbleToolTip(context, QUrl("qrc:/qml/Nx/RightPanel/private/ThumbnailTooltip.qml")),
     d(new Private{this})
 {
+    setObjectName("ThumbnailTooltip");
 }
 
 ThumbnailTooltip::~ThumbnailTooltip()

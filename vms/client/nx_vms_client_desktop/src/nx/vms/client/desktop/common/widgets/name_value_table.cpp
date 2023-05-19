@@ -148,6 +148,8 @@ private:
             QQmlComponent::CompilationMode::PreferSynchronous)),
         rootItem(qobject_cast<QQuickItem*>(rootComponent->create()))
     {
+        quickWindow->setObjectName("NameValueTable_SharedOffscreenRenderer");
+
         NX_CRITICAL(qApp && !qApp->closingDown());
         QObject::connect(qApp, &QCoreApplication::aboutToQuit,
             []()

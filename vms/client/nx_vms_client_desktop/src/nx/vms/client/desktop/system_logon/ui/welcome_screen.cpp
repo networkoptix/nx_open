@@ -87,6 +87,7 @@ WelcomeScreen::WelcomeScreen(QWidget* parent):
     QnWorkbenchContextAware(parent)
 {
     NX_ASSERT(qnRuntime->isDesktopMode());
+    setObjectName("WelcomeScreen");
 
     setPaletteColor(this, QPalette::Window, colorTheme()->color("dark3"));
 

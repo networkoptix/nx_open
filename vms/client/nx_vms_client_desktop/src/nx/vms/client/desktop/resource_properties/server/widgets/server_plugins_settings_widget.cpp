@@ -17,6 +17,7 @@ ServerPluginsSettingsWidget::ServerPluginsSettingsWidget(
     :
     base_type(engine, parent)
 {
+    setObjectName("ServerPluginsSettingsWidget");
     setClearColor(palette().window().color());
     setResizeMode(QQuickWidget::SizeRootObjectToView);
     setSource(QUrl("Nx/Dialogs/ServerSettings/PluginsInformation.qml"));

@@ -70,6 +70,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
+#include <nx/vms/client/desktop/utils/opengl_context_logger.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <statistics/statistics_manager.h>
 #include <ui/graphics/instruments/gl_checker_instrument.h>
@@ -234,6 +235,9 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     // We use a global Event Filter to prevent QComboBox instances from receiving Wheel events.
     ComboboxWheelFilter wheelFilter;
     qApp->installEventFilter(&wheelFilter);
+
+    if (ini().debugEnableQmlContextLogging)
+        new OpenGLContextLogger(qApp);
 
     /* Create workbench context. */
     auto workbenchContext = std::make_unique<QnWorkbenchContext>(client.systemContext());

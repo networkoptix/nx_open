@@ -186,6 +186,7 @@ void LoginDialog::setupIntroView()
         introWidget->rootContext()->setContextProperty("maxTextureSize",
             QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
 
+        introWidget->setObjectName("LoginDialog_IntroWidget");
         introWidget->setSource({ "Nx/Intro/Intro.qml" });
         introWidget->rootObject()->setProperty("introPath", QString("file:///") + introPath);
         introWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);

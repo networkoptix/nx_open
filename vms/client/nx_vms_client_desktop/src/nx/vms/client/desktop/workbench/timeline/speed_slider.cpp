@@ -58,6 +58,8 @@ SpeedSlider::SpeedSlider(QnWorkbenchContext* context, QWidget* parent):
     m_animator(new VariantAnimator(this)),
     m_tooltip(new SliderToolTip(context))
 {
+    m_tooltip->setObjectName("SpeedSliderTooltip");
+
     setSpeedRange(-16.0, 16.0);
     setSpeed(1.0);
     setPageStep(1000);

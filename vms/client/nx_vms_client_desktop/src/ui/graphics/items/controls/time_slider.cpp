@@ -613,7 +613,6 @@ QnTimeSlider::QnTimeSlider(
     m_isLive(false)
 {
     setObjectName("TimeSlider");
-    m_tooltip->setObjectName("TimeSliderTooltip");
 
     setOrientation(Qt::Horizontal);
     setFlag(ItemSendsScenePositionChanges, true);
