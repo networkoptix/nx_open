@@ -9,10 +9,10 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -341,8 +341,9 @@ void BackupStatusWidget::onBackupTimePointCalculated(
         };
 
     const auto serverTimeWatcher = SystemContext::fromResource(m_server)->serverTimeWatcher();
-    const auto backupPointDateTime =
-        serverTimeWatcher->displayTime(m_server, backupTimePoint.count());
+    const auto backupPointDateTime = serverTimeWatcher->displayTime(
+        m_server.dynamicCast<core::ServerResource>(),
+        backupTimePoint.count());
 
     ui->backupTimePointLabel->setText(backupTimePointLabelText
         .arg(formatDateTime(time::toString(backupPointDateTime.date())))

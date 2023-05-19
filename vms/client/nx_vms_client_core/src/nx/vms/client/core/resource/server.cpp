@@ -23,4 +23,31 @@ void ServerResource::setStatus(
     }
 }
 
+ServerResource::TimeZoneInfo ServerResource::timeZoneInfo() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_timeZoneInfo;
+}
+
+void ServerResource::setTimeZoneInfo(TimeZoneInfo value)
+{
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (m_timeZoneInfo == value)
+            return;
+
+        m_timeZoneInfo = value;
+    }
+    emit timeZoneInfoChanged();
+}
+
+void ServerResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)
+{
+    base_type::updateInternal(source, notifiers);
+
+    auto localOther = dynamic_cast<ServerResource*>(source.data());
+    if (NX_ASSERT(localOther))
+        m_timeZoneInfo = localOther->m_timeZoneInfo;
+}
+
 } // namespace nx::vms::client::core

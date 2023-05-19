@@ -14,6 +14,9 @@ struct QnTimeReply;
 
 namespace nx::vms::client::core {
 
+class ServerResource;
+using ServerResourcePtr = QnSharedResourcePointer<ServerResource>;
+
 class NX_VMS_CLIENT_CORE_API ServerTimeWatcher:
     public QObject,
     public SystemContextAware
@@ -42,11 +45,11 @@ public:
     qint64 displayOffset(const QnMediaResourcePtr& resource) const;
 
     /** Current time on the given server. Really, sync time is used, but with correct utc offset. */
-    static QDateTime serverTime(const QnMediaServerResourcePtr& server, qint64 msecsSinceEpoch);
+    static QDateTime serverTime(const ServerResourcePtr& server, qint64 msecsSinceEpoch);
 
     /** Time value, than takes into account user time mode settings. */
     QDateTime displayTime(qint64 msecsSinceEpoch) const; //< Using current server.
-    QDateTime displayTime(const QnMediaServerResourcePtr& server, qint64 msecsSinceEpoch) const;
+    QDateTime displayTime(const ServerResourcePtr& server, qint64 msecsSinceEpoch) const;
 
 signals:
     void displayOffsetsChanged();

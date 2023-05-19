@@ -13,6 +13,9 @@ namespace nx::vms::rules { class Rule;}
 
 namespace nx::vms::client::core {
 
+class ServerResource;
+using ServerResourcePtr = QnSharedResourcePointer<ServerResource>;
+
 class NX_VMS_CLIENT_CORE_API SoftwareTriggersWatcher:
     public QObject,
     public SystemContextAware
@@ -77,7 +80,7 @@ private:
 
 private:
     QnUuid m_resourceId;
-    QnMediaServerResourcePtr m_server;
+    ServerResourcePtr m_server;
     DescriptionsHash m_data;
 };
 

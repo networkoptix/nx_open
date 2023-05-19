@@ -5,11 +5,11 @@
 #include <QtCore/QPointer>
 
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/resource/server.h>
 
 #include "../flux/time_synchronization_widget_store.h"
 
@@ -43,7 +43,7 @@ public:
 private:
     void onServerAdded(const QnResourcePtr& resource)
     {
-        const auto& server = resource.dynamicCast<QnMediaServerResource>();
+        const auto server = resource.dynamicCast<core::ServerResource>();
         if (server && !server->hasFlags(Qn::fake))
         {
             onServerAddedInternal(server);
@@ -54,7 +54,7 @@ private:
             serverInfo.ipAddress = QnResourceDisplayInfo(server).host();
             serverInfo.online = server->getStatus() == nx::vms::api::ResourceStatus::online;
             serverInfo.hasInternet = server->hasInternetAccess();
-            serverInfo.timeZoneOffset = milliseconds(server->utcOffset());
+            serverInfo.timeZoneOffset = server->timeZoneInfo().utcOffset;
 
             m_store->addServer(serverInfo);
         }

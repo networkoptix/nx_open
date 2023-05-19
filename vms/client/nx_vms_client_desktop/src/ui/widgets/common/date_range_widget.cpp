@@ -7,9 +7,9 @@
 
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/current_date_monitor.h>
@@ -22,7 +22,6 @@ using namespace nx::vms::client::desktop;
 
 namespace {
 
-constexpr int kMillisecondsInSeconds = 1000;
 constexpr int kMillisecondsInDay = 60 * 60 * 24 * 1000;
 constexpr int kDefaultDaysOffset = -7;
 
@@ -138,15 +137,16 @@ QDateTime QnDateRangeWidget::actualDateTime(const QDate& userDate) const
     if (appContext()->localSettings()->timeMode() == Qn::ClientTimeMode)
         return userDate.startOfDay();
 
-    const auto server = currentServer();
-    const auto serverUtcOffsetMs = server
-        ? server->utcOffset()
-        : Qn::InvalidUtcOffset;
-
     static const QTime kMidnight(0, 0);
-    return (serverUtcOffsetMs != Qn::InvalidUtcOffset)
-        ? QDateTime(userDate, kMidnight, Qt::OffsetFromUTC, serverUtcOffsetMs / kMillisecondsInSeconds)
-        : QDateTime(userDate, kMidnight, Qt::UTC);
+
+    const auto server = currentServer().dynamicCast<nx::vms::client::core::ServerResource>();
+    if (!server)
+        return QDateTime(userDate, kMidnight, Qt::UTC);
+
+    return QDateTime(userDate,
+        kMidnight,
+        Qt::OffsetFromUTC,
+        duration_cast<std::chrono::seconds>(server->timeZoneInfo().utcOffset).count());
 }
 
 QDate QnDateRangeWidget::displayDate(qint64 timestampMs) const

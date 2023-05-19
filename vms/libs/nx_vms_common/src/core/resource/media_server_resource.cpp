@@ -457,8 +457,6 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr& source, Notifier
         m_serverFlags = localOther->m_serverFlags;
         m_netAddrList = localOther->m_netAddrList;
         m_authKey = localOther->m_authKey;
-        m_utcOffset = localOther->m_utcOffset.load();
-
     }
 
     const auto currentAddress = getPrimaryAddress();
@@ -695,17 +693,6 @@ qint64 QnMediaServerResource::currentStatusTime() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_statusTimer.elapsed();
-}
-
-qint64 QnMediaServerResource::utcOffset(qint64 defaultValue) const
-{
-    const qint64 value = m_utcOffset;
-    return value == Qn::InvalidUtcOffset ? defaultValue : value;
-}
-
-void QnMediaServerResource::setUtcOffset(qint64 value)
-{
-    m_utcOffset = value;
 }
 
 QString QnMediaServerResource::getAuthKey() const

@@ -2,7 +2,6 @@
 
 #include "software_triggers_watcher.h"
 
-#include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_watcher.h>
@@ -13,6 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
@@ -215,7 +215,7 @@ void SoftwareTriggersWatcher::setResourceId(const QnUuid& resourceId)
     if (const auto camera =
         resourcePool()->getResourceById<QnSecurityCamResource>(m_resourceId))
     {
-        m_server = camera->getParentServer();
+        m_server = camera->getParentServer().dynamicCast<ServerResource>();
     }
 
     emit resourceIdChanged();
