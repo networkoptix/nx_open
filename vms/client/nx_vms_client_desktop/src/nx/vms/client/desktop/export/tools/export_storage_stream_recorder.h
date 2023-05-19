@@ -69,7 +69,7 @@ private:
     virtual void onSuccessfulPacketWrite(
         AVCodecParameters* avCodecParams, const uint8_t* data, int size) override;
 
-    virtual CodecParametersConstPtr getVideoCodecParameters(
+    virtual CodecParametersPtr getVideoCodecParameters(
         const QnConstCompressedVideoDataPtr& videoData) override;
     virtual CodecParametersConstPtr getAudioCodecParameters(
         const CodecParametersConstPtr& sourceCodecpar, const QString& container) override;
