@@ -1456,8 +1456,15 @@ enum IDType
      */
     UndoReplaceCameraAction,
 
-    /** Opens Lookup Lists dialog. */
+    /**
+     * Opens Lookup Lists dialog.
+     */
     OpenLookupListsDialogAction,
+
+    /**
+     * Open Import From Devices dialog.
+     */
+    OpenImportFromDevices,
 
     ActionCount,
 

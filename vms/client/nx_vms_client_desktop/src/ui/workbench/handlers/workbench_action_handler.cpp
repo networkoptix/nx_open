@@ -77,6 +77,7 @@
 #include <nx/vms/client/desktop/cross_system/dialogs/cloud_layouts_intro_dialog.h>
 #include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/integrations/profile_g/import_from_device_dialog.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
@@ -419,6 +420,9 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(action(action::OpenAdvancedSearchDialog), &QAction::triggered,
         this, &ActionHandler::at_openAdvancedSearchDialog_triggered);
+
+    connect(action(action::OpenImportFromDevices), &QAction::triggered,
+        this, &ActionHandler::at_openImportFromDevicesDialog_triggered);
 }
 
 ActionHandler::~ActionHandler()
@@ -3253,6 +3257,14 @@ void ActionHandler::at_openAdvancedSearchDialog_triggered()
 
     m_advancedSearchDialog->open();
     m_advancedSearchDialog->raise();
+}
+
+void ActionHandler::at_openImportFromDevicesDialog_triggered()
+{
+    std::unique_ptr<integrations::ImportFromDeviceDialog> dialog(
+        new integrations::ImportFromDeviceDialog(mainWindowWidget()));
+
+    dialog->exec();
 }
 
 void ActionHandler::deleteDialogs() {

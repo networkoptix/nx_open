@@ -52,8 +52,6 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "setting_up_camera_transport_pr.html";
         case Qn::HelpTopic::CameraSettings_Expert_SettingsControl_Help:
             return "preventing_vms_from_c.html";
-        case Qn::HelpTopic::CameraSettings_Expert_ManualImport_Help:
-            return "Disabling-Automatic-Export-SD.html";
         case Qn::HelpTopic::CameraSettings_Expert_AutomaticImport_Help:
             return "Disabling-Automatic-Export-SD.html";
         case Qn::HelpTopic::CameraSettings_Help:

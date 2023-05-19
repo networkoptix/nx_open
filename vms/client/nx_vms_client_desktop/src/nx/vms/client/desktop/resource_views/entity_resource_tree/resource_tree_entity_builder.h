@@ -77,6 +77,8 @@ public:
     AbstractEntityPtr createAllCamerasEntity() const;
     AbstractEntityPtr createAllLayoutsEntity() const;
 
+    AbstractEntityPtr createFlatCamerasListEntity() const;
+
     AbstractEntityPtr createServerCamerasEntity(const QnMediaServerResourcePtr& server) const;
     AbstractEntityPtr createVideowallsEntity() const;
     AbstractEntityPtr createLayoutItemListEntity(const QnResourcePtr& layoutResource) const;

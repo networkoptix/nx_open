@@ -60,9 +60,9 @@ OverlappedIdDialog::OverlappedIdDialog(OverlappedIdStore* store, QWidget* parent
     QmlProperty<QObject*>(rootObjectHolder(), "model") = d->filterModel;
 
     d->currentId = store->state().currentId;
-    d->currentId.connectNotifySignal(this, SLOT(updateCurrentId()));
+    d->currentId.connectNotifySignal(this, [this]{ updateCurrentId(); });
 
-    d->filter.connectNotifySignal(this, SLOT(updateFilter()));
+    d->filter.connectNotifySignal(this, [this]{ updateFilter();} );
 }
 
 OverlappedIdDialog::~OverlappedIdDialog()

@@ -592,30 +592,12 @@ void CameraSettingsDialogStore::setForcedSecondaryProfile(const QString& value)
         [&](State state) { return Reducer::setForcedSecondaryProfile(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setRemoteArchiveSyncronizationDisabled()
+void CameraSettingsDialogStore::setRemoteArchiveSyncronizationEnabled(bool value)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::setRemoteArchiveSyncronizationDisabled(std::move(state));
-        });
-}
-
-void CameraSettingsDialogStore::setRemoteArchiveSyncronizationManual()
-{
-    d->executeAction(
-        [&](State state)
-        {
-            return Reducer::setRemoteArchiveSyncronizationManual(std::move(state));
-        });
-}
-
-void CameraSettingsDialogStore::setRemoteArchiveSyncronizationAuto()
-{
-    d->executeAction(
-        [&](State state)
-        {
-            return Reducer::setRemoteArchiveSyncronizationAuto(std::move(state));
+            return Reducer::setRemoteArchiveSyncronizationEnabled(std::move(state), value);
         });
 }
 

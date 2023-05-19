@@ -57,8 +57,7 @@ TableView
         height: control.height - (columnsHeader.visible ? columnsHeader.height : 0)
     }
 
-    delegate: BasicTableCellDelegate
-    {}
+    delegate: BasicTableCellDelegate {}
 
     onWidthChanged: control.forceLayout()
 
@@ -158,7 +157,11 @@ TableView
                         else
                             sortOrder = HeaderButton.AscendingOrder
 
-                        control.model.sort(index, HeaderButton.sortOrder)
+                        let modelSortOrder = sortOrder == HeaderButton.AscendingOrder
+                            ? Qt.AscendingOrder
+                            : Qt.DescendingOrder
+
+                        control.model.sort(index, modelSortOrder)
                     }
                 }
             }

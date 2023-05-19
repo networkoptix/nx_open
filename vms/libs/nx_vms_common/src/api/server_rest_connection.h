@@ -47,6 +47,7 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/overlapped_id_data.h>
+#include <nx/vms/api/data/remote_archive_synchronization_status.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/data/user_data.h>
@@ -524,6 +525,10 @@ public:
     Handle executeAnalyticsAction(
         const AnalyticsAction& action,
         Result<nx::network::rest::JsonResult>::type callback,
+        QThread* targetThread = nullptr);
+
+    Handle getRemoteArchiveSynchronizationStatus(
+        Result<ErrorOrData<nx::vms::api::RemoteArchiveSynchronizationStatusList>>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle getOverlappedIds(

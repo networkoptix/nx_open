@@ -438,6 +438,9 @@ action::IDType SystemHealthListModel::Private::action(int index) const
         case MessageType::cameraRecordingScheduleIsInvalid:
             return action::CameraSettingsAction;
 
+        case MessageType::remoteArchiveSyncError:
+            return action::OpenImportFromDevices;
+
         default:
             return action::NoAction;
     }

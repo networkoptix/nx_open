@@ -611,6 +611,16 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createAllLayoutsEntity() const
     return allLayoutsList;
 }
 
+AbstractEntityPtr ResourceTreeEntityBuilder::createFlatCamerasListEntity() const
+{
+    auto allCamerasList = makeKeyList<QnResourcePtr>(
+        simpleResourceItemCreator(m_itemFactory.get()), numericOrder());
+
+    allCamerasList->installItemSource(m_itemKeySourcePool->devicesSource(user(), {}, {}));
+
+    return allCamerasList;
+}
+
 AbstractEntityPtr ResourceTreeEntityBuilder::createServerCamerasEntity(
     const QnMediaServerResourcePtr& server) const
 {
