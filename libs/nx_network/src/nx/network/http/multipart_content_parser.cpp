@@ -155,13 +155,13 @@ void MultipartContentParser::setBoundary(const std::string& boundary)
     m_boundary = nx::utils::startsWith(boundary, "--")
         ? boundary.substr(2, boundary.size() - 2)
         : boundary;
-    
+
     // Dropping starting and trailing quotes.
     while (!m_boundary.empty() && m_boundary[0] == '"')
         m_boundary.erase(0, 1);
     while (!m_boundary.empty() && m_boundary[m_boundary.size() - 1] == '"')
         m_boundary.erase(m_boundary.size() - 1, 1);
-    
+
     m_startBoundaryLine = "--" + m_boundary/*+"\r\n"*/; //--boundary\r\n
     m_startBoundaryForUnsizedBinaryParsing = "\r\n" + m_startBoundaryLine + "\r\n";
     m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF = "\r\n" + m_startBoundaryLine;
@@ -210,8 +210,16 @@ bool MultipartContentParser::processLine(const ConstBufferRefType& lineBuffer)
                 {
                     // Content-Length is known.
                     m_contentLength = nx::utils::stoul(contentLengthIter->second);
-                    m_state = depleteLineFeedBeforeBinaryData;
-                    m_nextState = readingSizedBinaryData;
+                    if (m_contentLength == 0)
+                    {
+                        m_state = waitingBoundary;
+                        m_nextFilter->processData("");
+                    }
+                    else
+                    {
+                        m_state = depleteLineFeedBeforeBinaryData;
+                        m_nextState = readingSizedBinaryData;
+                    }
                 }
                 else
                 {
@@ -232,7 +240,7 @@ bool MultipartContentParser::processLine(const ConstBufferRefType& lineBuffer)
                 }
                 break;
             }
-            
+
             std::string headerName;
             std::string headerValue;
             parseHeader(lineBuffer, &headerName, &headerValue);

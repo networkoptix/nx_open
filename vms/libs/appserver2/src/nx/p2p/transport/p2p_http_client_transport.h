@@ -4,12 +4,13 @@
 
 #include <queue>
 
-#include <nx/p2p/transport/i_p2p_transport.h>
-#include <nx/network/websocket/websocket_common_types.h>
+#include <nx/network/abstract_socket.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/multipart_content_parser.h>
-#include <nx/utils/interruption_flag.h>
+#include <nx/network/websocket/websocket_common_types.h>
+#include <nx/p2p/transport/i_p2p_transport.h>
 #include <nx/string.h>
+#include <nx/utils/interruption_flag.h>
 
 namespace nx::p2p {
 
@@ -26,7 +27,8 @@ public:
         HttpClientPtr readHttpClient,
         const nx::String& connectionGuid,
         network::websocket::FrameType frameType,
-        const nx::utils::Url& url);
+        const nx::utils::Url& url,
+        std::optional<std::chrono::milliseconds> pingTimeout);
 
     virtual ~P2PHttpClientTransport() override;
 
@@ -42,6 +44,10 @@ public:
     network:: SocketAddress getForeignAddress() const override;
     virtual void start(
         utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
+
+    // For tests.
+    static void setPingTimeout(std::optional<std::chrono::milliseconds> pingTimeout);
+    static void setPingPongDisabled(bool value);
 
 private:
     class PostBodySource: public network::http::AbstractMsgBodySource
@@ -60,6 +66,13 @@ private:
         const nx::Buffer m_data;
     };
 
+    struct OutgoingData
+    {
+        std::optional<nx::Buffer> buffer;
+        network::IoCompletionHandler handler;
+        network::http::HttpHeaders headers;
+    };
+
     using UserReadHandlerPair =
         std::unique_ptr<std::pair<nx::Buffer* const, network::IoCompletionHandler>>;
 
@@ -74,10 +87,23 @@ private:
     utils::InterruptionFlag m_destructionFlag;
     nx::String m_connectionGuid;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onStartHandler;
+    std::optional<std::chrono::milliseconds> m_pingTimeout;
+    network::aio::Timer m_timer;
+    std::queue<OutgoingData> m_outgoingMessageQueue;
+    bool m_sendInProgress = false;
+
+    // For tests.
+    static std::optional<std::chrono::milliseconds> s_pingTimeout;
+    static bool s_pingPongDisabled;
 
     void startReading();
     void stopOrResumeReaderWhileInAioThread();
     virtual void stopWhileInAioThread() override;
+    std::optional<std::chrono::milliseconds> pingTimeout() const;
+    void sendPingOrPong(const std::string& name);
+    void initiatePingPong();
+    void setFailedState();
+    void sendNextMessage();
 };
 
 } // namespace nx::network
