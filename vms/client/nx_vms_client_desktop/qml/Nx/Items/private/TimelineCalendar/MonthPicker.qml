@@ -39,7 +39,7 @@ Item
 
             Rectangle
             {
-                property bool current: month === modelData
+                property bool current: month === model.month
 
                 width: grid.width / grid.columns
                 height: grid.height / grid.rows
@@ -59,7 +59,7 @@ Item
                     anchors.centerIn: parent
                     anchors.verticalCenterOffset: -4
 
-                    text: locale.monthName(model.month, Locale.ShortFormat)
+                    text: locale.standaloneMonthName(model.month, Locale.ShortFormat)
                     font.pixelSize: 16
                     font.weight: Font.Medium
                     font.capitalization: Font.AllUppercase
