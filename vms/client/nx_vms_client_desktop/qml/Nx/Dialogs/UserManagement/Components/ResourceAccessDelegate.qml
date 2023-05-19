@@ -39,12 +39,13 @@ Item
     {
         id: mainDelegate
 
-        width: delegateRoot.width - cellsRow.width
+        width: delegateRoot.width - cellsRow.width - 1
         height: delegateRoot.height
 
         highlighted: delegateRoot.enabled && (delegateRoot.rowHovered || delegateRoot.hoveredCell)
         customSelectionIndicator: true
         wholeRowToggleable: false
+        clip: true
     }
 
     ResourceAccessRightsModel
@@ -77,11 +78,26 @@ Item
 
                     hoverEnabled: true
 
-                    acceptedButtons: delegateRoot.enabled && toggleable
-                        ? Qt.LeftButton
-                        : Qt.NoButton
+                    acceptedButtons:
+                    {
+                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
+                            return Qt.NoButton
 
-                    GlobalToolTip.text: model.toolTip
+                        return delegateRoot.enabled && cell.toggleable
+                            ? Qt.LeftButton
+                            : Qt.NoButton
+                    }
+
+                    GlobalToolTip.text:
+                    {
+                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup
+                            && delegateRoot.enabled)
+                        {
+                            return qsTr("Access granted by parent node. Deselect it to enable editing")
+                        }
+
+                        return model.toolTip
+                    }
 
                     readonly property bool toggleable:
                         (accessRightsModel.resource || accessRightsModel.isResourceGroup)
@@ -92,6 +108,53 @@ Item
                     readonly property bool highlighted: delegateRoot.enabled && (containsMouse
                         || delegateRoot.rowHovered
                         || delegateRoot.hoveredAccessRight == accessRight)
+
+                    readonly property color backgroundColor:
+                    {
+                        if (!delegateRoot.enabled)
+                            return ColorTheme.colors.dark7
+
+                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
+                            return ColorTheme.transparent(ColorTheme.colors.brand_core, 0.12)
+
+                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.own)
+                        {
+                            return cell.highlighted
+                                ? ColorTheme.transparent(ColorTheme.colors.brand_core, 0.6)
+                                : ColorTheme.transparent(ColorTheme.colors.brand_core, 0.4)
+                        }
+
+                        return cell.highlighted
+                            ? ColorTheme.colors.dark6
+                            : ColorTheme.colors.dark5
+                    }
+
+                    readonly property color foregroundColor:
+                    {
+                        if (!delegateRoot.enabled)
+                        {
+                            if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
+                                return ColorTheme.colors.dark13
+
+                            return model.providedVia == ResourceAccessInfo.ProvidedVia.own
+                                ? ColorTheme.colors.brand_core
+                                : ColorTheme.colors.light16
+                        }
+
+                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
+                            return ColorTheme.transparent(ColorTheme.colors.light13, 0.3)
+
+                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.own)
+                        {
+                            return cell.highlighted
+                                ? ColorTheme.colors.light4
+                                : ColorTheme.colors.light10
+                        }
+
+                        return cell.highlighted
+                            ? ColorTheme.colors.dark14
+                            : ColorTheme.colors.dark13
+                    }
 
                     onContainsMouseChanged:
                     {
@@ -114,13 +177,12 @@ Item
 
                         Rectangle
                         {
-                            x: 1
-                            y: 1
-                            width: cell.width - 1
-                            height: cell.height - 1
+                            width: cell.width + 1
+                            height: cell.height + 1
+                            color: cell.backgroundColor
 
-                            color: cell.highlighted
-                                ? ColorTheme.colors.dark8
+                            border.color: delegateRoot.enabled
+                                ? ColorTheme.colors.dark4
                                 : ColorTheme.colors.dark6
                         }
 
@@ -135,6 +197,7 @@ Item
                                 switch (model.providedVia)
                                 {
                                     case ResourceAccessInfo.ProvidedVia.own:
+                                    case ResourceAccessInfo.ProvidedVia.ownResourceGroup:
                                         return "image://svg/skin/user_settings/sharing/own.svg"
 
                                     case ResourceAccessInfo.ProvidedVia.layout:
@@ -151,22 +214,23 @@ Item
                                 }
                             }
 
-                            color: model.providedVia == ResourceAccessInfo.ProvidedVia.own
-                                ? ColorTheme.colors.brand_core
-                                : ColorTheme.colors.light10
+                            color: cell.foregroundColor
 
                             Text
                             {
                                 id: checkedChildResourceCounter
 
                                 anchors.fill: parent
-                                visible: accessRightsModel.isResourceGroup
-                                    && model.providedVia != ResourceAccessInfo.ProvidedVia.own
-                                    && model.checkedChildCount
-
-                                color: ColorTheme.colors.brand_core
                                 horizontalAlignment: Qt.AlignHCenter
                                 verticalAlignment: Qt.AlignVCenter
+
+                                visible: accessRightsModel.isResourceGroup
+                                    && model.providedVia != ResourceAccessInfo.ProvidedVia.own
+                                    && model.providedVia !=
+                                            ResourceAccessInfo.ProvidedVia.ownResourceGroup
+                                    && model.checkedChildCount
+
+                                color: cell.foregroundColor
                                 text: model.checkedChildCount
                             }
                         }

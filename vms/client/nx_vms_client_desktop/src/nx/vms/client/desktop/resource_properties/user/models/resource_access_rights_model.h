@@ -32,6 +32,7 @@ public:
         layout,
         videowall,
         parentUserGroup,
+        ownResourceGroup,
         unknown
     };
     Q_ENUM(ProvidedVia);
