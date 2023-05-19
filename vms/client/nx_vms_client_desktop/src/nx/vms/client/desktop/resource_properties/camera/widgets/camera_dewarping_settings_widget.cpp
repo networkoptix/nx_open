@@ -28,6 +28,7 @@ CameraDewarpingSettingsWidget::CameraDewarpingSettingsWidget(
     base_type(engine, parent),
     m_thumbnail(thumbnail)
 {
+    setObjectName("CameraDewarpingSettingsWidget");
     setClearColor(palette().window().color());
     setResizeMode(QQuickWidget::SizeRootObjectToView);
     setSource(QUrl("Nx/Dialogs/CameraSettings/CameraDewarpingSettings.qml"));

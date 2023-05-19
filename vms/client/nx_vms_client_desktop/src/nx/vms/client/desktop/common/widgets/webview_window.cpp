@@ -24,6 +24,7 @@ WebViewWindow::Private::Private(WebViewWindow* webViewWindow):
     quickWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), webViewWindow)),
     controller(new WebViewController(webViewWindow))
 {
+    quickWidget->setObjectName("WebViewWindow");
 }
 
 namespace {

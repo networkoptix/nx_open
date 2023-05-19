@@ -155,6 +155,7 @@ AnalyticsSettingsWidget::Private::Private(AnalyticsSettingsWidget* q):
     view(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), q)),
     enginesWatcher(new AnalyticsEnginesWatcher(this))
 {
+    view->setObjectName("AnalyticsSettingsWidget");
     view->setClearColor(q->palette().window().color());
     view->setResizeMode(QQuickWidget::SizeRootObjectToView);
     view->setSource(QUrl("Nx/Dialogs/SystemSettings/AnalyticsSettings.qml"));

@@ -33,6 +33,8 @@ NxObject
     property alias text: bubble.text
     property alias font: bubble.font
 
+    objectName: "BubbleToolTip"
+
     enum State
     {
         Shown,
@@ -57,6 +59,8 @@ NxObject
     EmbeddedPopup
     {
         id: popup
+
+        objectName: toolTip.objectName
 
         viewport: workbenchContext.mainWindow
 

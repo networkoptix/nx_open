@@ -12,7 +12,7 @@ import nx.vms.client.desktop 1.0
 
 Bubble
 {
-	id: bubble
+    id: bubble
 
     property EventGrid view: null
 

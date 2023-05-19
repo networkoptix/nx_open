@@ -24,6 +24,8 @@ InteractiveSettingsTestDialog::InteractiveSettingsTestDialog(QWidget* parent):
     ui(new Ui::InteractiveSettingsTestDialog()),
     m_settingsWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), this))
 {
+    m_settingsWidget->setObjectName("InteractiveSettingsTest");
+
     ui->setupUi(this);
     ui->valuesTableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->settingsTab->layout()->addWidget(m_settingsWidget);

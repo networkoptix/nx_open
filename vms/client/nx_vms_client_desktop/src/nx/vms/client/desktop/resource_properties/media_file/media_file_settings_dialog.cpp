@@ -71,6 +71,7 @@ MediaFileSettingsDialog::MediaFileSettingsDialog(QWidget* parent):
 
     contentLayout->addWidget(d->quickWidget);
 
+    d->quickWidget->setObjectName("MediaFileSettingsDialog_DewarpingSettings");
     d->quickWidget->setClearColor(palette().window().color());
     d->quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
     d->quickWidget->setSource(QUrl("Nx/Items/DewarpingSettings.qml"));

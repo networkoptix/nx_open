@@ -96,6 +96,8 @@ QmlTestDialog::QmlTestDialog(QWidget* parent):
     base_type(parent),
     d(new Private{this})
 {
+    d->qmlWidget->setObjectName("QmlTestDialog");
+
     setWindowTitle("QML Component Test");
     resize(800, 600);
 

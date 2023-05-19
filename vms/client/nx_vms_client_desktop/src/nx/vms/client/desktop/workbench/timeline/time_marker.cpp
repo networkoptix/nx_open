@@ -59,13 +59,13 @@ TimeMarker::TimeMarker(const QUrl& sourceUrl, QnWorkbenchContext* context, QObje
     base_type(context, sourceUrl, parent),
     d(new Private{this})
 {
+    setObjectName("TimeSliderTooltip");
     setOrientation(Qt::Vertical);
 
     if (ini().debugDisableQmlTooltips)
         return;
 
     widget()->setAttribute(Qt::WA_TransparentForMouseEvents, false);
-    widget()->setObjectName("TimeMarker");
 }
 
 TimeMarker::~TimeMarker()

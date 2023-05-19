@@ -77,6 +77,7 @@ BubbleToolTip::BubbleToolTip(
     if (!d->widget)
         return;
 
+    d->widget->setObjectName("BubbleTooltip");
     d->widget->setVisible(false);
     d->widget->setResizeMode(QQuickWidget::SizeViewToRootObject);
     d->widget->setClearColor(Qt::transparent);
@@ -86,7 +87,8 @@ BubbleToolTip::BubbleToolTip(
     d->widget->setAttribute(Qt::WA_AlwaysStackOnTop);
     d->widget->setMouseTracking(true);
     d->widget->setSource(componentUrl);
-    d->widget->setObjectName("BubbleTooltip");
+
+    connect(this, &QObject::objectNameChanged, d->widget.get(), &QObject::setObjectName);
 
     QmlProperty<bool>(d->widget.get(), "containDecorationsInside") = true;
 

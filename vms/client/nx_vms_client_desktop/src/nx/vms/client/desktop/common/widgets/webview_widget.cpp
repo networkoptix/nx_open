@@ -15,6 +15,7 @@ WebViewWidget::WebViewWidget(QWidget* parent, QQmlEngine* engine):
     base_type(engine ? engine : qnClientCoreModule->mainQmlEngine(), parent),
     d(new Private())
 {
+    setObjectName("WebViewWidget");
     d->controller.reset(new WebViewController(this));
     d->controller->loadIn(this);
 }

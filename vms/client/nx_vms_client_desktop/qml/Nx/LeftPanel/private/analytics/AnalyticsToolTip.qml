@@ -24,6 +24,8 @@ BubbleToolTip
 
     minIntersection: 64
 
+    objectName: "AnalyticsToolTip"
+
     contentItem: Item
     {
         id: content

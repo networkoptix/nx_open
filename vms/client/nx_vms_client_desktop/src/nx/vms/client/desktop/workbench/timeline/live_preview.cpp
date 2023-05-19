@@ -40,6 +40,8 @@ LivePreview::LivePreview(QnTimeSlider* slider, QObject* parent):
     base_type(QUrl("Nx/Timeline/private/LivePreview.qml"), slider->context(), parent),
     d(new Private{this, slider})
 {
+    setObjectName("LivePreviewTooltip");
+
     if (ini().debugDisableQmlTooltips)
         return;
 
