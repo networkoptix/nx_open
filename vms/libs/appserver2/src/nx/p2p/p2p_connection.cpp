@@ -71,8 +71,7 @@ Connection::Connection(
     const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::unique_ptr<QObject> opaqueObject,
-    ConnectionLockGuard connectionLockGuard,
-    bool pingSupported)
+    ConnectionLockGuard connectionLockGuard)
     :
     ConnectionBase(
         remotePeer,
@@ -80,8 +79,7 @@ Connection::Connection(
         std::move(p2pTransport),
         requestUrlQuery,
         std::move(opaqueObject),
-        std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard)),
-        pingSupported),
+        std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
     nx::vms::common::SystemContextAware(systemContext),
     m_userAccessData(userAccessData)
 {
