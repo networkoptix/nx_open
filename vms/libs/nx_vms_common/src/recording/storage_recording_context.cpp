@@ -37,6 +37,23 @@ QString fileExtensionFromContainer(const QString& container)
     return QString(outputCtx->extensions).split(',')[0];
 }
 
+bool convertExtraDataToMp4(
+    const QnCompressedVideoData* videoData, CodecParametersPtr codecParameters)
+{
+    if (nx::media::isAnnexb(videoData)) // Video data will be converted before call av_write_frame.
+    {
+        auto extradata = nx::media::buildExtraDataMp4(videoData);
+        if (extradata.empty())
+        {
+            NX_WARNING(NX_SCOPE_TAG, "Failed to build extradata in mp4 format");
+            return false;
+        }
+        if (codecParameters)
+            codecParameters->setExtradata(extradata.data(), extradata.size());
+    }
+    return true;
+}
+
 } // namespace
 
 StorageRecordingContext::StorageRecordingContext()
@@ -77,7 +94,7 @@ int StorageRecordingContext::streamCount() const
     return m_recordingContext.formatCtx->nb_streams;
 }
 
-CodecParametersConstPtr StorageRecordingContext::getVideoCodecParameters(
+CodecParametersPtr StorageRecordingContext::getVideoCodecParameters(
     const QnConstCompressedVideoDataPtr& videoData)
 {
     CodecParametersPtr codecParameters;
@@ -87,17 +104,6 @@ CodecParametersConstPtr StorageRecordingContext::getVideoCodecParameters(
     if (!codecParameters)
         codecParameters = QnFfmpegHelper::createVideoCodecParameters(videoData.get());
 
-    if (nx::media::isAnnexb(videoData.get())) // Video data will be converted before call av_write_frame.
-    {
-        auto extradata = nx::media::buildExtraDataMp4(videoData.get());
-        if (extradata.empty())
-        {
-            NX_WARNING(this, "Failed to build extradata in mp4 format");
-            return nullptr;
-        }
-        if (codecParameters)
-            codecParameters->setExtradata(extradata.data(), extradata.size());
-    }
     return codecParameters;
 }
 
@@ -122,6 +128,11 @@ void StorageRecordingContext::allocateFfmpegObjects(
                 auto codecParams = getVideoCodecParameters(videoData);
                 if (!codecParams)
                     throw ErrorEx(Error::Code::incompatibleCodec, "No video codec parameters");
+                if (m_container == "matroska")
+                {
+                    if (!convertExtraDataToMp4(videoData.get(), codecParams))
+                        throw ErrorEx(Error::Code::incompatibleCodec, "Failed to convert codecpar");
+                }
                 auto avCodecParams = codecParams->getAvCodecParameters();
                 if (!avCodecParams)
                     throw ErrorEx(Error::Code::invalidAudioCodec, "Invalid audio codec");
@@ -230,7 +241,7 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
 {
     auto md = mediaData;
     auto videoData = dynamic_cast<const QnCompressedVideoData*>(mediaData.get());
-    if (videoData && nx::media::isAnnexb(videoData))
+    if (m_container == "matroska" && videoData && nx::media::isAnnexb(videoData))
     {
         md = m_annexbToMp4.process(videoData);
         if (!md)
