@@ -66,7 +66,7 @@ public:
 protected:
     StorageContext m_recordingContext;
 
-    virtual CodecParametersConstPtr getVideoCodecParameters(
+    virtual CodecParametersPtr getVideoCodecParameters(
         const QnConstCompressedVideoDataPtr& videoData);
     virtual CodecParametersConstPtr getAudioCodecParameters(
         const CodecParametersConstPtr& sourceCodecParams, const QString& container);

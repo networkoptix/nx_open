@@ -205,7 +205,7 @@ void ExportStorageStreamRecorder::initMetadataStream(StorageContext& /*context*/
 {
 }
 
-CodecParametersConstPtr ExportStorageStreamRecorder::getVideoCodecParameters(
+CodecParametersPtr ExportStorageStreamRecorder::getVideoCodecParameters(
     const QnConstCompressedVideoDataPtr& videoData)
 {
     if (isTranscodingEnabled())
@@ -239,7 +239,7 @@ CodecParametersConstPtr ExportStorageStreamRecorder::getVideoCodecParameters(
     }
 
     if (videoData->context)
-        return videoData->context;
+        return std::make_shared<CodecParameters>(videoData->context->getAvCodecParameters());
 
     QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
     QnFfmpegVideoDecoder decoder(
