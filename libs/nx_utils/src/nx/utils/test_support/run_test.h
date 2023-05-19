@@ -10,6 +10,7 @@
     #include <gmock/gmock.h>
 #endif
 
+#include <QtCore/QCollator>
 #include <QtCore/QFileInfo>
 
 #include <nx/kit/ini_config.h>
@@ -117,6 +118,10 @@ inline int runTest(
         deinitFunctions = extraInit(args);
 
     nx::utils::rlimit::setMaxFileDescriptors();
+
+    // In macOS QCollator initialization is not thread-safe, so we need to initialize it before the
+    // tests may try to initialize it simultaneously from different threads.
+    QCollator collator;
 
     const int result = RUN_ALL_TESTS();
     for (const auto& deinit: deinitFunctions)
