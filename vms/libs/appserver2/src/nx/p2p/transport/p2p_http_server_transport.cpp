@@ -1,9 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "p2p_http_server_transport.h"
+
+#include <nx/network/abstract_socket.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
+#include <nx/p2p/transport/ping_headers.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log_main.h>
+#include <nx/utils/system_error.h>
 
 namespace nx::p2p {
 
@@ -19,20 +24,25 @@ static void resetBuffer(nx::Buffer* buffer)
 
 } // namespace
 
+std::optional<std::chrono::milliseconds> P2PHttpServerTransport::s_pingTimeout = std::nullopt;
+bool P2PHttpServerTransport::s_pingPongDisabled = false;
+
 P2PHttpServerTransport::P2PHttpServerTransport(
     std::unique_ptr<network::AbstractStreamSocket> socket,
-    network::websocket::FrameType messageType)
+    network::websocket::FrameType messageType,
+    std::optional<std::chrono::milliseconds> pingTimeout)
     :
     m_sendSocket(std::move(socket)),
-    m_messageType(messageType)
+    m_messageType(messageType),
+    m_pingTimeout(pingTimeout)
 {
-    m_readContext.parser.setMessage(&m_readContext.message);
     bindToAioThread(m_sendSocket->getAioThread());
     m_sendSocket->setNonBlockingMode(true);
     m_sendSocket->setRecvTimeout(0);
     m_sendBuffer.reserve(kBufferSize);
-    m_readContext.buffer.reserve(kBufferSize);
     m_sendChannelReadBuffer.reserve(kBufferSize);
+    m_readBuffer.reserve(kBufferSize);
+    m_httpParser.setMessage(&m_httpMessage);
 }
 
 void P2PHttpServerTransport::start(
@@ -46,6 +56,8 @@ void P2PHttpServerTransport::start(
         {
             if (m_onGetRequestReceived)
                 m_onGetRequestReceived(SystemError::connectionAbort);
+            else
+                initiatePingPong();
         });
 
     m_sendSocket->readSomeAsync(
@@ -77,18 +89,92 @@ void P2PHttpServerTransport::start(
         });
 }
 
+void P2PHttpServerTransport::initiatePingPong()
+{
+    if (!pingTimeout())
+    {
+        NX_DEBUG(this, "Ping-pong is disabled");
+        return;
+    }
+
+    if (s_pingPongDisabled)
+    {
+        NX_DEBUG(this, "Ping-pong is disabled for tests");
+        return;
+    }
+
+    NX_DEBUG(this, "Ping-pong is enabled. Starting with %1 timeout", *pingTimeout());
+    m_timer.start(
+        *pingTimeout(),
+        [this]()
+        {
+            sendPingOrPong(Headers::ping);
+            m_timer.start(
+                *pingTimeout() / 2,
+                [this]()
+                {
+                    NX_DEBUG(this, "Closing connection because there was no answer to ping");
+                    setFailedState(SystemError::connectionAbort);
+                });
+        });
+}
+
+void P2PHttpServerTransport::sendPingOrPong(Headers type)
+{
+    post(
+        [this, type]()
+        {
+            auto handler =
+                [this, type](SystemError::ErrorCode code, size_t transferred)
+                {
+                    NX_VERBOSE(
+                        this, "%1 sent. code: %2, transferred: %3",
+                        (type == Headers::ping ? "ping" : "pong"), code, transferred);
+                };
+
+            m_outgoingMessageQueue.push(OutgoingData{
+                std::nullopt, std::move(handler), type});
+
+            sendNextMessage();
+        });
+}
+
+void P2PHttpServerTransport::setPingPongDisabled(bool value)
+{
+    s_pingPongDisabled = value;
+}
+
+std::optional<std::chrono::milliseconds> P2PHttpServerTransport::pingTimeout() const
+{
+    if (s_pingTimeout)
+        return s_pingTimeout;
+
+    return m_pingTimeout;
+}
+
+void P2PHttpServerTransport::setPingTimeout(std::optional<std::chrono::milliseconds> pingTimeout)
+{
+    s_pingTimeout = pingTimeout;
+}
+
+void P2PHttpServerTransport::setFailedState(SystemError::ErrorCode errorCode)
+{
+    NX_DEBUG(this, "Going to failed state");
+    m_failed = true;
+    if (m_userReadHandlerPair)
+    {
+        auto userReadHandlerPair = std::move(m_userReadHandlerPair);
+        userReadHandlerPair->second(errorCode, 0);
+    }
+}
+
 void P2PHttpServerTransport::onReadFromSendSocket(
     SystemError::ErrorCode error,
     size_t transferred)
 {
     if (error != SystemError::noError || transferred == 0)
     {
-        m_failed = true;
-        if (m_userReadHandlerPair)
-        {
-            auto userReadHandlerPair = std::move(m_userReadHandlerPair);
-            userReadHandlerPair->second(error, 0);
-        }
+        setFailedState(error);
     }
     else
     {
@@ -107,51 +193,85 @@ P2PHttpServerTransport::~P2PHttpServerTransport()
     pleaseStopSync();
 }
 
+void P2PHttpServerTransport::onRead(SystemError::ErrorCode error, size_t transferred)
+{
+    if (error != SystemError::noError || transferred <= 0)
+    {
+        NX_DEBUG(
+            this, "%1: failed. Error: %2, transferred: %3",
+            __func__, error, transferred);
+        setFailedState(SystemError::connectionAbort);
+        return;
+    }
+
+    NX_VERBOSE(this, "%1: Read %2 bytes. buf: %3", __func__, transferred, m_readBuffer);
+    size_t bytesProcessed = 0;
+    while (true)
+    {
+        auto state = m_httpParser.parse(m_readBuffer, &bytesProcessed);
+        NX_VERBOSE(this, "%1. Parsing state: %2", __func__, state);
+        switch (state)
+        {
+            case nx::network::server::ParserState::readingBody:
+            case nx::network::server::ParserState::readingMessage:
+            {
+                m_readBuffer.erase(0, bytesProcessed);
+                break;
+            }
+            case nx::network::server::ParserState::done:
+            {
+                network::http::Request httpRequest;
+                httpRequest.headers = m_httpMessage.headers();
+                httpRequest.messageBody = m_httpParser.fetchMessageBody();
+                onIncomingPost(std::move(httpRequest));
+                m_httpParser.reset();
+                m_readBuffer.erase(0, bytesProcessed);
+                break;
+            }
+            case nx::network::server::ParserState::init:
+            {
+                NX_ASSERT(false);
+                break;
+            }
+            case nx::network::server::ParserState::failed:
+            {
+                setFailedState(SystemError::connectionAbort);
+                return;
+            }
+        }
+
+        if (m_readBuffer.size() == 0 || bytesProcessed == 0)
+            break;
+    }
+
+    m_readSocket->readSomeAsync(
+        &m_readBuffer,
+        [this](auto error, auto transferred)
+        {
+            onRead(error, transferred);
+        });
+}
+
 void P2PHttpServerTransport::gotPostConnection(
     std::unique_ptr<network::AbstractStreamSocket> socket,
-    const nx::Buffer& restOfBuffer)
+    nx::network::http::Request request)
 {
-    nx::Buffer body;
-    if (m_messageType == network::websocket::FrameType::binary)
-        body = nx::utils::fromBase64(restOfBuffer);
-    else
-        body = restOfBuffer;
-
     post(
-        [this, socket = std::move(socket), body]() mutable
+        [this, socket = std::move(socket), request = std::move(request)]() mutable
         {
             m_readSocket = std::move(socket);
             m_readSocket->setNonBlockingMode(true);
             m_readSocket->bindToAioThread(getAioThread());
             m_readSocket->setRecvTimeout(0);
 
-            if (m_userReadHandlerPair)
-            {
-                auto userReadHandlerPair = std::move(m_userReadHandlerPair);
-                if (body.empty())
+            NX_VERBOSE(this, "Got post connection");
+            onIncomingPost(std::move(request));
+            m_readSocket->readSomeAsync(
+                &m_readBuffer,
+                [this](auto error, auto transferred)
                 {
-                    readFromSocket(
-                        userReadHandlerPair->first,
-                        std::move(userReadHandlerPair->second));
-                }
-                else
-                {
-                    sendPostResponse(
-                        SystemError::noError,
-                        std::move(userReadHandlerPair->second),
-                        [body, buffer = userReadHandlerPair->first](
-                            SystemError::ErrorCode error,
-                            network::IoCompletionHandler handler)
-                        {
-                            buffer->append(body);
-                            handler(error, body.size());
-                        });
-                }
-            }
-            else if (!body.empty())
-            {
-                m_providedPostBody = body;
-            }
+                    onRead(error, transferred);
+                });
         });
 }
 
@@ -165,136 +285,67 @@ void P2PHttpServerTransport::readSomeAsync(
             if (m_onGetRequestReceived || m_failed)
                 return handler(SystemError::connectionAbort, 0);
 
-            if (!m_providedPostBody.empty())
-            {
-                sendPostResponse(
-                    SystemError::noError,
-                    std::move(handler),
-                    [this, buffer](SystemError::ErrorCode error, network::IoCompletionHandler handler)
-                    {
-                        if (m_messageType == network::websocket::FrameType::binary)
-                            buffer->append(nx::utils::fromBase64(m_providedPostBody));
-                        else
-                            buffer->append(m_providedPostBody);
-                        const auto bodySize = m_providedPostBody.size();
-                        m_providedPostBody = nx::Buffer();
-                        handler(error, bodySize);
-                    });
-            }
-            else
-            {
-                readFromSocket(buffer, std::move(handler));
-            }
+            NX_ASSERT(!m_userReadHandlerPair);
+            m_userReadHandlerPair = std::make_unique<std::pair<nx::Buffer* const, network::IoCompletionHandler>>(
+                std::make_pair(buffer, std::move(handler)));
         });
 }
 
-void P2PHttpServerTransport::readFromSocket(
-    nx::Buffer* const buffer,
-    network::IoCompletionHandler handler)
+void P2PHttpServerTransport::onIncomingPost(nx::network::http::Request request)
 {
-    if (!m_readSocket)
+    bool pingOrPong = false;
+    if (request.headers.contains(kPingHeaderName))
     {
-        NX_ASSERT(!m_userReadHandlerPair);
-        if (m_userReadHandlerPair)
-        {
-            m_userReadHandlerPair = nullptr;
-            handler(SystemError::notSupported, 0);
-        }
-
-        m_userReadHandlerPair = UserReadHandlerPair(
-            new std::pair<nx::Buffer* const, network::IoCompletionHandler>(
-                buffer,
-                std::move(handler)));
-
-        return;
+        NX_VERBOSE(this, "Ping received. Sending pong");
+        sendPingOrPong(Headers::pong);
+        pingOrPong = true;
     }
 
-    m_readSocket->readSomeAsync(
-        &m_readContext.buffer,
-        [this, handler = std::move(handler), buffer](
-            SystemError::ErrorCode error,
-            size_t transferred) mutable
-        {
-            onBytesRead(error, transferred, buffer, std::move(handler));
-        });
-}
-
-void P2PHttpServerTransport::onBytesRead(
-    SystemError::ErrorCode error,
-    size_t transferred,
-    nx::Buffer* const buffer,
-    network::IoCompletionHandler handler)
-{
-    if (error != SystemError::noError)
+    if (request.headers.contains(kPongHeaderName))
     {
-        handler(error, transferred);
-        return;
+        NX_VERBOSE(this, "Pong received");
+        pingOrPong = true;
     }
 
-    if (transferred == 0)
+    if (!pingOrPong)
     {
-        NX_VERBOSE(this, "onBytesRead: Connection seems to have been closed by a remote peer.");
-        m_readSocket.reset();
-        handler(SystemError::connectionAbort, 0);
-        return;
+        sendPostResponse(
+            [this, request = std::move(request)](SystemError::ErrorCode error, size_t transferred)
+            {
+                if (error != SystemError::noError || transferred <= 0)
+                {
+                    NX_VERBOSE(this, "Response to POST failed");
+                    setFailedState(error);
+                }
+                else if (NX_ASSERT(m_userReadHandlerPair))
+                {
+                    NX_VERBOSE(this, "Response to POST succeeded");
+                    UserReadHandlerPair userReadHandlerPair;
+                    userReadHandlerPair.swap(m_userReadHandlerPair);
+
+                    *userReadHandlerPair->first = m_messageType == network::websocket::FrameType::binary
+                        ? nx::utils::fromBase64(request.messageBody)
+                        : request.messageBody;
+
+                    userReadHandlerPair->second(SystemError::noError, userReadHandlerPair->first->size());
+                }
+            });
+    }
+    else
+    {
+        sendPostResponse(
+            [this](SystemError::ErrorCode error, size_t transferred)
+            {
+                NX_VERBOSE(
+                    this, "Response to POST (ping or pong). Error: %1, transferred: %2",
+                    error, transferred);
+
+                if (error != SystemError::noError || transferred <= 0)
+                    setFailedState(error);
+            });
     }
 
-    auto completionHandler =
-        [this, buffer](SystemError::ErrorCode error, network::IoCompletionHandler handler)
-        {
-            if (m_messageType == network::websocket::FrameType::binary)
-                m_readContext.buffer = nx::utils::fromBase64(*buffer);
-            else
-                m_readContext.buffer = *buffer;
-
-            *buffer = m_readContext.buffer;
-            utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
-            handler(error, m_readContext.bytesParsed);
-            if (watcher.interrupted())
-                return;
-
-            m_readContext.reset();
-
-            if (error != SystemError::noError)
-                m_readSocket.reset();
-        };
-
-    auto lastBufferSize = m_readContext.buffer.size();
-    while (true)
-    {
-        size_t bytesProcessed = 0;
-        const auto parserState = m_readContext.parser.parse(m_readContext.buffer, &bytesProcessed);
-        m_readContext.bytesParsed += bytesProcessed;
-        switch (parserState)
-        {
-            case network::server::ParserState::done:
-                buffer->append(m_readContext.parser.fetchMessageBody());
-                sendPostResponse(
-                    SystemError::noError, std::move(handler), std::move(completionHandler));
-                return;
-            case network::server::ParserState::failed:
-                sendPostResponse(
-                    SystemError::invalidData, std::move(handler), std::move(completionHandler));
-                return;
-            case network::server::ParserState::readingBody:
-            case network::server::ParserState::readingMessage:
-                buffer->append(m_readContext.parser.fetchMessageBody());
-                m_readContext.buffer.erase(0, bytesProcessed);
-                break;
-            case network::server::ParserState::init:
-                NX_ASSERT(false, "Should never get here");
-                sendPostResponse(
-                    SystemError::invalidData, std::move(handler), std::move(completionHandler));
-                return;
-        }
-
-        if (m_readContext.buffer.empty() || lastBufferSize == m_readContext.buffer.size())
-            break;
-
-        lastBufferSize = m_readContext.buffer.size();
-    }
-
-    readFromSocket(buffer, std::move(handler));
+    initiatePingPong();
 }
 
 void P2PHttpServerTransport::addDateHeader(network::http::HttpHeaders* headers)
@@ -305,15 +356,11 @@ void P2PHttpServerTransport::addDateHeader(network::http::HttpHeaders* headers)
     headers->emplace("Date", network::http::formatDateTime(dateTime));
 }
 
-void P2PHttpServerTransport::sendPostResponse(
-    SystemError::ErrorCode error,
-    network::IoCompletionHandler userHandler,
-    utils::MoveOnlyFunc<void(SystemError::ErrorCode, network::IoCompletionHandler)> completionHandler)
+void P2PHttpServerTransport::sendPostResponse(network::IoCompletionHandler handler)
 {
+    NX_VERBOSE(this, "Sending response to POST.");
     network::http::Response response;
-    response.statusLine.statusCode = error == SystemError::noError
-        ? network::http::StatusCode::ok
-        : network::http::StatusCode::internalServerError;
+    response.statusLine.statusCode = network::http::StatusCode::ok;
     response.statusLine.version = network::http::http_1_1;
     response.statusLine.reasonPhrase = "Ok";
 
@@ -325,21 +372,74 @@ void P2PHttpServerTransport::sendPostResponse(
 
     m_readSocket->sendAsync(
         &m_responseBuffer,
-        [this,
-        readError = error,
-        userHandler = std::move(userHandler),
-        completionHandler = std::move(completionHandler)](
-            SystemError::ErrorCode error,
-            size_t /*transferred*/) mutable
+        [this, handler = std::move(handler)](SystemError::ErrorCode error, size_t transferred)
         {
             m_responseBuffer.clear();
-            if (readError != SystemError::noError)
-                return completionHandler(readError, std::move(userHandler));
+            handler(error, transferred);
+        });
+}
 
-            if (error != SystemError::noError)
-                return completionHandler(error, std::move(userHandler));
+void P2PHttpServerTransport::sendNextMessage()
+{
+    if (m_sendInProgress || m_outgoingMessageQueue.empty())
+    {
+        NX_VERBOSE(
+            this, "%1: Can't intiate send. in progress: %2, message queue size: %3",
+            __func__, m_sendInProgress, m_outgoingMessageQueue.size());
 
-            completionHandler(SystemError::noError, std::move(userHandler));
+        return;
+    }
+
+    const auto& next = m_outgoingMessageQueue.front();
+    if (m_onGetRequestReceived || m_failed)
+    {
+        NX_DEBUG(this, "%1: Transport is in the failed state. Can't send anything", __func__);
+        next.handler(SystemError::connectionAbort, 0);
+        return;
+    }
+
+    if (m_firstSend)
+    {
+        m_sendBuffer = makeInitialResponse();
+        m_firstSend = false;
+    }
+
+    if (next.buffer)
+    {
+        nx::utils::append(
+            &m_sendBuffer, makeFrameHeader(Headers::contentType, next.buffer->size() + 2),
+            *next.buffer, "\r\n");
+    }
+    else
+    {
+        nx::utils::append(&m_sendBuffer, makeFrameHeader(next.headerMask, /*length*/ 0));
+    }
+
+    NX_VERBOSE(
+        this, "%1: Sending next message. Queue size: %2",
+        __func__, m_outgoingMessageQueue.size());
+
+    m_sendInProgress = true;
+    m_sendSocket->sendAsync(
+        &m_sendBuffer,
+        [this](SystemError::ErrorCode error, size_t transferred)
+        {
+            NX_VERBOSE(
+                this,
+                nx::format("Send completed. error: %1, transferred: %2").args(error, transferred));
+
+            if (error != SystemError::noError || transferred == 0)
+                setFailedState(error);
+
+            resetBuffer(&m_sendBuffer);
+            utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
+            m_outgoingMessageQueue.front().handler(error, transferred);
+            if (watcher.interrupted())
+                return;
+
+            m_outgoingMessageQueue.pop();
+            m_sendInProgress = false;
+            sendNextMessage();
         });
 }
 
@@ -355,28 +455,10 @@ void P2PHttpServerTransport::sendAsync(
     post(
         [this, encodedBuffer = std::move(encodedBuffer), handler = std::move(handler)]() mutable
         {
-            if (m_onGetRequestReceived || m_failed)
-                return handler(SystemError::connectionAbort, 0);
+            m_outgoingMessageQueue.push(OutgoingData{
+                encodedBuffer, std::move(handler), Headers::contentType});
 
-            if (m_firstSend)
-            {
-                m_sendBuffer = makeInitialResponse();
-                m_firstSend = false;
-            }
-
-            nx::utils::append(&m_sendBuffer, encodedBuffer, "\r\n", makeFrameHeader());
-            m_sendSocket->sendAsync(
-                &m_sendBuffer,
-                [this, handler = std::move(handler)](
-                    SystemError::ErrorCode error,
-                    size_t transferred)
-                {
-                    NX_VERBOSE(
-                        this,
-                        nx::format("Send completed. error: %1, transferred: %2").args(error, transferred));
-                    resetBuffer(&m_sendBuffer);
-                    handler(error, transferred);
-                });
+            sendNextMessage();
         });
 }
 
@@ -396,21 +478,38 @@ nx::Buffer P2PHttpServerTransport::makeInitialResponse() const
 
     nx::Buffer result;
     initialResponse.serialize(&result);
-    result += makeFrameHeader();
 
     return result;
 }
 
-nx::Buffer P2PHttpServerTransport::makeFrameHeader() const
+nx::Buffer P2PHttpServerTransport::makeFrameHeader(int headers, int length) const
 {
     nx::Buffer headerBuffer;
 
+    if (headers & Headers::contentType)
+    {
+        network::http::serializeHeaders(
+            {network::http::HttpHeader(
+                "Content-Type",
+                m_messageType == network::websocket::FrameType::text
+                    ? "application/json" : "application/ubjson")},
+            &headerBuffer);
+    }
+
+    if (headers & Headers::ping)
+    {
+        network::http::serializeHeaders(
+            {network::http::HttpHeader(kPingHeaderName, "ping")}, &headerBuffer);
+    }
+
+    if (headers & Headers::pong)
+    {
+        network::http::serializeHeaders(
+            {network::http::HttpHeader(kPingHeaderName, "pong")}, &headerBuffer);
+    }
+
     network::http::serializeHeaders(
-        {network::http::HttpHeader(
-            "Content-Type",
-            m_messageType == network::websocket::FrameType::text
-                ? "application/json" : "application/ubjson")},
-        &headerBuffer);
+        {network::http::HttpHeader("Content-Length", std::to_string(length))}, &headerBuffer);
 
     return nx::utils::buildString<nx::Buffer>("--ec2boundary\r\n", headerBuffer, "\r\n");
 }
@@ -446,14 +545,6 @@ void P2PHttpServerTransport::stopWhileInAioThread()
     m_timer.cancelSync();
     m_sendSocket.reset();
     m_readSocket.reset();
-}
-
-void P2PHttpServerTransport::ReadContext::reset()
-{
-    message = network::http::Message();
-    parser.reset();
-    resetBuffer(&buffer);
-    bytesParsed = 0;
 }
 
 } // namespace nx::network

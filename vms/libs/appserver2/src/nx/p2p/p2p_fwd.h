@@ -29,8 +29,6 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
      * this request sends all other data which are not mentioned in request.
      */
     subscribeAll,
-    ping,
-    pong,
     counter
 )
 
