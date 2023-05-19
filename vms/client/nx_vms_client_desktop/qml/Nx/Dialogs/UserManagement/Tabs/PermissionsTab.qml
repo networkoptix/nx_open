@@ -1,15 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Controls.impl 2.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.impl
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Items 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+import Nx.Items
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 import "../Components"
 
@@ -39,7 +39,7 @@ Item
         id: accessRightsHeader
 
         anchors.right: control.right
-        anchors.rightMargin: 8
+        anchors.rightMargin: 9
 
         height: 64
         width: control.columnCount * control.kColumnWidth
@@ -51,7 +51,6 @@ Item
             : tree.hoveredCell
                 ? tree.hoveredCell.accessRight
                 : 0
-
         Row
         {
             Repeater
@@ -96,17 +95,12 @@ Item
         anchors
         {
             left: accessRightsHeader.left
-            leftMargin: -1
             right: tree.right
-            rightMargin: -2
             top: tree.top
-            topMargin: -1
             bottom: tree.bottom
-            bottomMargin: -2
         }
 
-        color: ColorTheme.colors.dark4
-        border.color: ColorTheme.colors.dark8
+        color: control.editingEnabled ? ColorTheme.colors.dark4 : ColorTheme.colors.dark7
     }
 
     ResourceSelectionTree
@@ -126,6 +120,7 @@ Item
         expandsOnDoubleClick: false
         hoverHighlightColor: "transparent"
         showResourceStatus: false
+        clipDelegates: false
         topMargin: 0
 
         resourceTypes:
@@ -229,5 +224,46 @@ Item
 
         onWithPermissionsOnlyChanged:
             editingContext.resetAccessibleResourcesFilter()
+    }
+
+    // Lines and shadow.
+
+    Rectangle
+    {
+        x: permissionsBackground.x
+        y: permissionsBackground.y
+        width: permissionsBackground.width
+        height: 1
+        color: ColorTheme.colors.dark5
+    }
+
+    Rectangle
+    {
+        x: permissionsBackground.x
+        width: 1
+        height: permissionsBackground.y + permissionsBackground.height
+        color: ColorTheme.colors.dark5
+    }
+
+    Rectangle
+    {
+        x: permissionsBackground.x - 1
+        width: 1
+        height: permissionsBackground.y + permissionsBackground.height
+        color: ColorTheme.colors.dark8
+    }
+
+    Rectangle
+    {
+        y: permissionsBackground.y
+        width: control.width
+        height: 16
+        opacity: MathUtils.bound(0.0, tree.contentY / height, 1.0)
+
+        gradient: Gradient
+        {
+            GradientStop { position: 0.0; color: ColorTheme.transparent("black", 0.4) }
+            GradientStop { position: 1.0; color: "transparent" }
+        }
     }
 }

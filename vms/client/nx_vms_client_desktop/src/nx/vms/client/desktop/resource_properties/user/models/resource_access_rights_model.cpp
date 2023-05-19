@@ -419,7 +419,15 @@ void ResourceAccessRightsModel::Private::updateInfo(bool suppressSignals)
                 const auto providers = details.value(context->currentSubjectId());
                 if (providers.contains(resource))
                 {
-                    newInfo.providedVia = ResourceAccessInfo::ProvidedVia::own;
+                    const auto resourceGroupId =
+                        AccessSubjectEditingContext::specialResourceGroupFor(resource);
+
+                    const auto accessViaResourceGroup = !resourceGroupId.isNull()
+                        && context->hasOwnAccessRight(resourceGroupId, accessRightList[i]);
+
+                    newInfo.providedVia = accessViaResourceGroup
+                        ? ResourceAccessInfo::ProvidedVia::ownResourceGroup
+                        : ResourceAccessInfo::ProvidedVia::own;
                 }
                 else
                 {

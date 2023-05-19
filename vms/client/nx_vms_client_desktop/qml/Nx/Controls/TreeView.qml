@@ -81,6 +81,8 @@ FocusScope
     readonly property alias contentX: listView.contentX
     readonly property alias contentY: listView.contentY
 
+    property bool clipDelegates: true
+
     clip: true
 
     implicitWidth: listView.implicitWidth
@@ -330,7 +332,6 @@ FocusScope
                 width: parent ? parent.width : 0
                 implicitHeight: Math.max(button.implicitHeight, delegateLoader.implicitHeight)
                 enabled: itemFlags & Qt.ItemIsEnabled
-                clip: true
 
                 opacity: enabled ? 1.0 : 0.3
 
@@ -638,6 +639,8 @@ FocusScope
 
                     signal startEditing()
                     signal finishEditing()
+
+                    clip: treeView.clipDelegates
 
                     sourceComponent: treeView.delegate
 
