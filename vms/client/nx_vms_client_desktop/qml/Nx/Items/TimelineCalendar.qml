@@ -285,7 +285,7 @@ Control
 
             periodStorage: daysSelector.periodStorage
             allCamerasPeriodStorage: daysSelector.allCamerasPeriodStorage
-            locale: control.regionLocale
+            locale: control.locale
             displayOffset: daysSelector.displayOffset
 
             year: visibleYear
