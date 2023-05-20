@@ -202,4 +202,45 @@ void WidgetUtils::elideDocumentLines(
     }
 }
 
+void WidgetUtils::elideTextRight(
+    QTextDocument* document,
+    int width,
+    const QString& tail)
+{
+    // This line is required to force the document to create the layout, which will then be used
+    // to count the lines.
+    document->documentLayout();
+
+    QTextBlock block = document->firstBlock();
+    if (!block.isValid())
+        return;
+
+    const QTextLayout* layout = block.layout();
+
+    if (layout->lineCount() <= 0)
+        return;
+
+    const QTextLine line = layout->lineAt(0);
+
+    if (document->idealWidth() <= width)
+        return;
+
+    // Cut the line at required width.
+    auto x = line.xToCursor(width, QTextLine::CursorOnCharacter);
+
+    QTextCursor cursor(document);
+
+    cursor.setPosition(x);
+    cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+    cursor.removeSelectedText();
+
+    // Add the tail.
+    cursor.insertText(tail);
+
+    // Remove characters before the tail to fit the line into required width.
+    cursor.setPosition(x);
+    while (document->idealWidth() > width && cursor.position() > 0)
+        cursor.deletePreviousChar();
+}
+
 } // namespace nx::vms::client::desktop
