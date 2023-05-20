@@ -962,7 +962,9 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createOtherSystemsGroupEntity() con
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
-    ResourceTree::ResourceFilters resourceTypes, bool alwaysCreateGroupElements) const
+    ResourceTree::ResourceFilters resourceTypes,
+    bool alwaysCreateGroupElements,
+    bool combineWebPagesAndIntegrations) const
 {
     std::vector<AbstractEntityPtr> entities;
 
@@ -1000,50 +1002,90 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
             flatteningPolicy));
     }
 
-    if (resourceTypes.testFlag(ResourceTree::ResourceFilter::integrations)
-        && ini().webPagesAndIntegrations)
+    if (combineWebPagesAndIntegrations)
     {
-        auto integrationList = makeKeyList<QnResourcePtr>(
-            simpleResourceItemCreator(m_itemFactory.get()),
-            numericOrder());
+        constexpr ResourceTree::ResourceFilters webPagesAndIntegrations =
+            ResourceTree::ResourceFilter::webPages
+            | ResourceTree::ResourceFilter::integrations;
 
-        integrationList->installItemSource(
-            m_itemKeySourcePool->integrationsSource(user(), /*includeProxied*/ true));
-
-        if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::integrations)
-            return integrationList; //< Only integrations, return without a group element.
-
-        entities.push_back(makeFlatteningGroup(
-            m_itemFactory->createIntegrationsItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
-            std::move(integrationList),
-            flatteningPolicy));
-    }
-
-    if (resourceTypes.testFlag(ResourceTree::ResourceFilter::webPages))
-    {
-        auto webPagesList = makeKeyList<QnResourcePtr>(
-            simpleResourceItemCreator(m_itemFactory.get()),
-            numericOrder());
-
-        if (ini().webPagesAndIntegrations)
+        if (resourceTypes.testFlags(webPagesAndIntegrations))
         {
-            webPagesList->installItemSource(
-                m_itemKeySourcePool->webPagesSource(user(), /*includeProxiedWebPages*/ true));
-        }
-        else
-        {
+            auto webPagesList = makeKeyList<QnResourcePtr>(
+                simpleResourceItemCreator(m_itemFactory.get()),
+                numericOrder());
+
             webPagesList->installItemSource(
                 m_itemKeySourcePool->webPagesAndIntegrationsSource(
                     user(), /*includeProxied*/ true));
+
+            // If only web pages & integrations, return without a group element.
+            if (maySkipGroup && resourceTypes == (int) webPagesAndIntegrations)
+                return webPagesList;
+
+            if (ini().webPagesAndIntegrations)
+            {
+                entities.push_back(makeFlatteningGroup(
+                    m_itemFactory->createWebPagesAndIntegrationsItem(
+                        Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+                    std::move(webPagesList),
+                    flatteningPolicy));
+            }
+            else
+            {
+                entities.push_back(makeFlatteningGroup(
+                    m_itemFactory->createWebPagesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+                    std::move(webPagesList),
+                    flatteningPolicy));
+            }
+        }
+    }
+    else
+    {
+        if (resourceTypes.testFlag(ResourceTree::ResourceFilter::integrations)
+            && ini().webPagesAndIntegrations)
+        {
+            auto integrationList = makeKeyList<QnResourcePtr>(
+                simpleResourceItemCreator(m_itemFactory.get()),
+                numericOrder());
+
+            integrationList->installItemSource(
+                m_itemKeySourcePool->integrationsSource(user(), /*includeProxied*/ true));
+
+            if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::integrations)
+                return integrationList; //< Only integrations, return without a group element.
+
+            entities.push_back(makeFlatteningGroup(
+                m_itemFactory->createIntegrationsItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+                std::move(integrationList),
+                flatteningPolicy));
         }
 
-        if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::webPages)
-            return webPagesList; //< Only web pages, return without a group element.
+        if (resourceTypes.testFlag(ResourceTree::ResourceFilter::webPages))
+        {
+            auto webPagesList = makeKeyList<QnResourcePtr>(
+                simpleResourceItemCreator(m_itemFactory.get()),
+                numericOrder());
 
-        entities.push_back(makeFlatteningGroup(
-            m_itemFactory->createWebPagesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
-            std::move(webPagesList),
-            flatteningPolicy));
+            if (ini().webPagesAndIntegrations)
+            {
+                webPagesList->installItemSource(
+                    m_itemKeySourcePool->webPagesSource(user(), /*includeProxiedWebPages*/ true));
+            }
+            else
+            {
+                webPagesList->installItemSource(
+                    m_itemKeySourcePool->webPagesAndIntegrationsSource(
+                        user(), /*includeProxied*/ true));
+            }
+
+            if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::webPages)
+                return webPagesList; //< Only web pages, return without a group element.
+
+            entities.push_back(makeFlatteningGroup(
+                m_itemFactory->createWebPagesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+                std::move(webPagesList),
+                flatteningPolicy));
+        }
     }
 
     if (resourceTypes.testFlag(ResourceTree::ResourceFilter::healthMonitors))

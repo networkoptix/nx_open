@@ -84,7 +84,7 @@ public:
     AbstractEntityPtr createLayoutItemListEntity(const QnResourcePtr& layoutResource) const;
 
     AbstractEntityPtr createDialogEntities(ResourceTree::ResourceFilters resourceTypes,
-        bool alwaysCreateGroupElements = false) const;
+        bool alwaysCreateGroupElements = false, bool combineWebPagesAndIntegrations = false) const;
 
     AbstractEntityPtr addPinnedItem(AbstractEntityPtr baseEntity, AbstractItemPtr pinnedItem) const;
 

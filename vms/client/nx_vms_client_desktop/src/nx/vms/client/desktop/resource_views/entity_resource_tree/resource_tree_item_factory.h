@@ -38,6 +38,7 @@ public:
     AbstractItemPtr createShowreelsItem() const;
     AbstractItemPtr createIntegrationsItem(Qt::ItemFlags flags) const;
     AbstractItemPtr createWebPagesItem(Qt::ItemFlags flags) const;
+    AbstractItemPtr createWebPagesAndIntegrationsItem(Qt::ItemFlags flags) const;
     AbstractItemPtr createUsersItem() const;
     AbstractItemPtr createOtherSystemsItem() const;
     AbstractItemPtr createLocalFilesItem() const;

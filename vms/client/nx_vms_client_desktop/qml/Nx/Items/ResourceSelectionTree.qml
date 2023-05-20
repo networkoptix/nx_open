@@ -28,6 +28,7 @@ TreeView
     property int selectionMode: { return ResourceTree.ResourceSelection.multiple }
     property int topLevelNodesPolicy:
         { return ResourceSelectionModel.TopLevelNodesPolicy.hideEmpty }
+    property bool webPagesAndIntegrationsCombined: false
     property string filterText
 
     topMargin: 8
@@ -50,6 +51,7 @@ TreeView
         resourceTypes: resourceSelectionTree.resourceTypes
         selectionMode: resourceSelectionTree.selectionMode
         topLevelNodesPolicy: resourceSelectionTree.topLevelNodesPolicy
+        webPagesAndIntegrationsCombined: resourceSelectionTree.webPagesAndIntegrationsCombined
         filterText: resourceSelectionTree.filterText
     }
 

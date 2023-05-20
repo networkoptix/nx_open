@@ -30,6 +30,8 @@ class ResourceSelectionModelAdapter: public ScopedModelOperations<FilterProxyMod
     Q_PROPERTY(bool extraInfoRequired READ isExtraInfoRequired NOTIFY extraInfoRequiredChanged)
     Q_PROPERTY(TopLevelNodesPolicy topLevelNodesPolicy READ topLevelNodesPolicy
         WRITE setTopLevelNodesPolicy NOTIFY topLevelNodesPolicyChanged)
+    Q_PROPERTY(bool webPagesAndIntegrationsCombined READ webPagesAndIntegrationsCombined
+        WRITE setWebPagesAndIntegrationsCombined NOTIFY webPagesAndIntegrationsCombinedChanged)
 
     using base_type = ScopedModelOperations<FilterProxyModel>;
 
@@ -63,6 +65,9 @@ public:
     TopLevelNodesPolicy topLevelNodesPolicy() const;
     void setTopLevelNodesPolicy(TopLevelNodesPolicy value);
 
+    bool webPagesAndIntegrationsCombined() const;
+    void setWebPagesAndIntegrationsCombined(bool value);
+
     bool isExtraInfoRequired() const;
 
     Q_INVOKABLE bool isExtraInfoForced(QnResource* resource) const;
@@ -86,6 +91,7 @@ signals:
     void resourceFilterChanged();
     void resourceTypesChanged();
     void topLevelNodesPolicyChanged();
+    void webPagesAndIntegrationsCombinedChanged();
     void selectionModeChanged();
     void extraInfoRequiredChanged();
     void selectedResourcesChanged();
