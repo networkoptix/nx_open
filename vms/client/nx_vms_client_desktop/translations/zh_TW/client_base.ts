@@ -991,7 +991,7 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation type="unfinished">Archive filter...</translation>
+      <translation>錄影資料過濾器</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1336,7 +1336,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>複製參數</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
@@ -1482,7 +1482,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
+      <translation>不安全的</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1502,7 +1502,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>啟用</translation>
     </message>
     <message>
       <source>Not configured</source>
@@ -1519,7 +1519,7 @@ License Key: %2</source>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>%1 使用者正在接收電子郵件</translation>
     </message>
     <message>
       <source>%1 is not available</source>
@@ -1874,7 +1874,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>選擇資料夾...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
@@ -2522,7 +2522,7 @@ License Key: %2</source>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
-      <translation type="unfinished">%1 Running</translation>
+      <translation>%1 執行中</translation>
     </message>
   </context>
   <context>
@@ -7498,11 +7498,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation type="unfinished">Will be transferred partially:</translation>
+      <translation>將部份轉移:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation type="unfinished">Will not be transferred:</translation>
+      <translation>將不會轉移:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7514,15 +7514,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera for Replacement</source>
-      <translation type="unfinished">Camera for Replacement</translation>
+      <translation>更換的攝影機</translation>
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation type="unfinished">Data for Transfer</translation>
+      <translation>轉移的資料</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
-      <translation>已替換攝影機！</translation>
+      <translation>已更換攝影機！</translation>
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
@@ -7824,11 +7824,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Main storage only</source>
-      <translation type="unfinished">Main storage only</translation>
+      <translation>僅主要的儲存裝置</translation>
     </message>
     <message>
       <source>Backup storage only</source>
-      <translation type="unfinished">Backup storage only</translation>
+      <translation>僅備份的儲存裝置</translation>
     </message>
   </context>
   <context>
@@ -7840,7 +7840,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Allow</source>
-      <translation type="unfinished">Allow</translation>
+      <translation>允許</translation>
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
@@ -7945,7 +7945,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>點擊以顯示攝影機</translation>
     </message>
   </context>
   <context>
@@ -7961,7 +7961,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Read more on the %1</source>
-      <translation type="unfinished">Read more on the %1</translation>
+      <translation>請參閱 %1 以了解更多</translation>
     </message>
     <message>
       <source>help page</source>
@@ -7973,12 +7973,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 (Copy)</source>
       <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
+      <translation>%1 (副本)</translation>
     </message>
     <message>
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
+      <translation>%1 (副本 %2)</translation>
     </message>
   </context>
   <context>
@@ -8145,7 +8145,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>未知的攝影機</translation>
     </message>
   </context>
   <context>
@@ -8559,7 +8559,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>選擇資料夾...</translation>
     </message>
   </context>
   <context>
@@ -8842,11 +8842,11 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LogsManagementModel</name>
     <message>
       <source>Unit</source>
-      <translation type="unfinished">Unit</translation>
+      <translation>伺服器</translation>
     </message>
     <message>
       <source>Current Level</source>
-      <translation type="unfinished">Current Level</translation>
+      <translation>目前日誌等級</translation>
     </message>
     <message>
       <source>Client</source>
@@ -8901,11 +8901,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logs downloaded</source>
-      <translation type="unfinished">Logs downloaded</translation>
+      <translation>日誌已下載完成</translation>
     </message>
     <message>
       <source>Logs downloading failed</source>
-      <translation type="unfinished">Logs downloading failed</translation>
+      <translation>日誌下載失敗</translation>
     </message>
     <message>
       <source>Debug logging is enabled on the Client</source>
@@ -8913,12 +8913,12 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled, resulting in degraded system performance.</source>
-      <translation type="unfinished">Debug logging is enabled, resulting in degraded system performance.</translation>
+      <translation>目前已啟用除錯日誌，將可能降低系統效能。</translation>
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+      <translation>
+        <numerusform>在 %n 伺服器上已啟用除錯日誌設定</numerusform>
       </translation>
     </message>
     <message>
@@ -11789,7 +11789,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
+      <translation>由於相容性問題，某些設定可能無法套用於欲更換的攝影機。</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>

@@ -896,7 +896,7 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Создать</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
@@ -1910,7 +1910,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Настройки безопасности изменены</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -1918,7 +1918,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>При первом подключении к серверу будет запрошено ваше подтверждение для принятия сертификата, если он содержит ошибки</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -2977,7 +2977,7 @@ to %1</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>Введите пароль своей учетной записи, чтобы отключить систему от %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2986,12 +2986,12 @@ to %1</source>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>Система отключена от %1</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>Вы собираетесь отключить систему от %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -3004,7 +3004,7 @@ to %1</source>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Система будет доступна через локальную сеть с учетной записью локального администратора.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -3013,7 +3013,7 @@ to %1</source>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>Не удается отключить систему от %1</translation>
     </message>
   </context>
   <context>
@@ -3195,7 +3195,7 @@ to %1</source>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>Система не совместима с двухфакторной аутентификацией</translation>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
@@ -5327,7 +5327,7 @@ to %1</source>
     </message>
     <message>
       <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
+      <translation>ДОСТУП ЗАПРЕЩЕН</translation>
     </message>
   </context>
   <context>
@@ -7636,19 +7636,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Нагреватель</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Стеклоочиститель</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Без звука</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Включить звук</translation>
     </message>
     <message>
       <source>Open Door</source>
@@ -7724,7 +7724,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>Сервер не будет передавать настройки времени на камеру.</translation>
     </message>
     <message>
       <source>default</source>
@@ -7918,7 +7918,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>Показать все устройства</translation>
     </message>
     <message>
       <source>Show all cameras</source>
@@ -7942,7 +7942,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Нет доступных камер</translation>
     </message>
   </context>
   <context>
@@ -8036,7 +8036,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Изменить неверное расписание на "Записывать всегда"</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
@@ -8048,11 +8048,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Только объекты</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Только движение и объекты</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -8060,11 +8060,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Объекты + низкое разрешение</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>Движение и объекты + низкое разрешение</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -8119,7 +8119,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>Двустороннее аудио будет отключено</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
@@ -8142,7 +8142,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 требуется</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
@@ -8165,11 +8165,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>Неверный адрес потока</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>Несоответствие протокола потоковой передачи</translation>
     </message>
   </context>
   <context>
@@ -8177,7 +8177,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>Выберите сертификат для аутентификации в %1:</translation>
     </message>
     <message>
       <source>Select</source>
@@ -8255,11 +8255,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
+      <translation>Не могу скачать файл обновления</translation>
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
+      <translation>Недостаточно места для загрузки файла обновления</translation>
     </message>
   </context>
   <context>
@@ -9175,7 +9175,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>Ваша сессия скоро истечет</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
@@ -9183,7 +9183,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>Осталось меньше минуты</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
@@ -9879,7 +9879,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>На вашем компьютере недостаточно места для загрузки обновления клиента. Пожалуйста, освободите место на жестком диске и повторите попытку.</translation>
     </message>
   </context>
   <context>
@@ -10417,7 +10417,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
+      <translation>Устройство отключено</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -10484,23 +10484,23 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Движение, Объекты</translation>
     </message>
     <message>
       <source>Motion, Objects
  + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
+      <translation>Движение, объекты
+ + низкое разрешение</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Только объекты</translation>
     </message>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>Объекты
+ + Низкое разрешение</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -10517,11 +10517,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>Обнаружение движения отключено для этой камеры</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>Обнаружение движения отключено для некоторых выбранных камер</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
@@ -10537,7 +10537,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>Обнаружение объектов отключено для некоторых выбранных устройств</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
@@ -10553,11 +10553,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>Обнаружение движения и объектов отключено для этой камеры</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+      <translation>Обнаружение движения и объектов отключено для некоторых выбранных камер</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>

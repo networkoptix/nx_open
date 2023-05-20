@@ -2927,7 +2927,7 @@ to %1</source>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Sisteme yerel bir yönetici hesabıyla yerel ağ üzerinden erişilebilecektir.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -7159,11 +7159,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Seçilen cihazın ses girişi yok veya doğru şekilde yapılandırılmamış. Ses akışı mevcut değil.</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Seçilen cihazın ses çıkışı yok veya doğru şekilde yapılandırılmamış. Ses akışı mevcut değil.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>

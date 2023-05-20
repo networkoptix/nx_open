@@ -1472,7 +1472,7 @@
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>Включить автоматическое обнаружение</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
