@@ -40,10 +40,10 @@ public:
 
 public:
     QnCameraBookmarkList bookmarksAtPosition(
-        milliseconds position, milliseconds msecdsPerDp = milliseconds(0));
+        milliseconds position, milliseconds msecdsPerDp = milliseconds(0)) const;
 
     QnCameraBookmarkList rawBookmarksAtPosition(
-        const QnVirtualCameraResourcePtr& camera, qint64 positionMs);
+        const QnVirtualCameraResourcePtr& camera, qint64 positionMs) const;
 
     QString textFilter() const;
     void setTextFilter(const QString& value);
@@ -52,21 +52,21 @@ private:
     void onResourcesRemoved(const QnResourceList& resources);
 
 private:
-    void setupTimelineWindowQuery();
     void updateCurrentCamera();
-    void onBookmarkRemoved(const QnUuid& id);
-    void tryUpdateTimelineBookmarks(const QnVirtualCameraResourcePtr& camera);
+    void updateTimelineBookmarks();
 
     void setTimelineBookmarks(const QnCameraBookmarkList& bookmarks);
 
 private:
     void setCurrentCamera(const QnVirtualCameraResourcePtr& camera);
 
-    /** Create static query, which will request 5000 bookmarks at once for the given camera. */
-    void ensureStaticQueryForCamera(const QnVirtualCameraResourcePtr& camera);
+    /**
+     * Create query for the given camera. It will request all bookmarks at once and periodically
+     * update bookmarks near live.
+     */
+    QnCameraBookmarksQueryPtr ensureQueryForCamera(const QnVirtualCameraResourcePtr& camera);
 
 private:
-    typedef QScopedPointer<QTimer> TimerPtr;
     typedef QScopedPointer<QnBookmarkQueriesCache> QnBookmarkQueriesCachePtr;
     typedef QScopedPointer<QnCameraBookmarkAggregation> QnCameraBookmarkAggregationPtr;
     typedef QSharedPointer<QnBookmarkMergeHelper> QnBookmarkMergeHelperPtr;
@@ -77,12 +77,7 @@ private:
     /** Queries for the whole timeline window. */
     const QnBookmarkQueriesCachePtr m_queriesCache;
 
-    /** Query for the current selected item and actual zoom level. */
-    QnCameraBookmarksQueryPtr m_timelineWindowQuery;
-    QnCameraBookmarkSearchFilter m_timelineWindowQueryFilter;
-
     QnVirtualCameraResourcePtr m_currentCamera;
 
-    TimerPtr m_updateStaticQueriesTimer;
     QString m_textFilter;
 };

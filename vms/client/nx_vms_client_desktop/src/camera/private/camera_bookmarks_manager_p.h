@@ -73,17 +73,36 @@ public:
     /// @returns                Search query that is ready to be used.
     QnCameraBookmarksQueryPtr createQuery(const QnCameraBookmarkSearchFilter& filter);
 
-    /// @brief                  Get search query cached value from local data.
-    /// @param query            Target query.
-    /// @returns                Locally cached bookmarks, filtered by the query.
-    QnCameraBookmarkList cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const;
+    /**
+     * Asynchronously execute search query.
+     * @param query Target query.
+     * @param callback Callback for received bookmarks data. Will be called when data is fully
+     *     loaded.
+     */
+    void sendQueryRequest(
+        const QnCameraBookmarksQueryPtr& query,
+        BookmarksCallbackType callback);
 
-    /// @brief                  Asynchronously execute search query on remote (actual) data.
-    /// @param query            Target query.
-    /// @param callback         Callback for receiving bookmarks data.
-    void executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback);
+    /**
+     * Asynchronously execute search query, requesting data only from the given timepoint.
+     * @param query Target query.
+     * @param timePoint Minimal start time for the request filter
+     * @param callback Callback for received bookmarks data. Will be called when data is fully
+     *     loaded.
+     */
+    void sendQueryTailRequest(
+        const QnCameraBookmarksQueryPtr& query,
+        std::chrono::milliseconds timePoint,
+        BookmarksCallbackType callback);
 
 private:
+    void handleQueryReply(
+        const QUuid& queryId,
+        bool success,
+        int requestId,
+        QnCameraBookmarkList bookmarks,
+        BookmarksCallbackType callback);
+
     void handleBookmarkOperation(bool success, int handle);
 
     /// @brief                  Register bookmarks search query to auto-update it if needed.
@@ -104,9 +123,6 @@ private:
 
     /// @brief                  Send request to update query with actual data.
     void updateQueryAsync(const QUuid &queryId);
-
-    /// @brief                  Update cache with provided value and emit signals if needed.
-    void updateQueryCache(const QUuid &queryId, const QnCameraBookmarkList &bookmarks);
 
     /** @brief                  Add the added or updated bookmark to the pending bookmarks list.
      *  Pending bookmark is the bookmark that was created, modified or deleted on the client
@@ -130,8 +146,6 @@ private:
         const QnCameraBookmark& bookmark,
         const QnUuid& eventRuleId,
         OperationCallbackType callback = OperationCallbackType());
-
-    void executeCallbackDelayed(BookmarksCallbackType callback);
 
     int sendPostRequest(
         const QString& path,
@@ -166,17 +180,9 @@ private:
 
     QMap<int, OperationInfo> m_operations;
 
-    struct QueryInfo {
-        enum class QueryState {
-            Invalid,                                        /**< Query was not requested yet. */
-            Queued,                                         /**< Query will be requested when timeout will pass. */
-            Requested,                                      /**< Waiting for the server response. */
-            Actual                                          /**< Data is actual. */
-        };
-
+    struct QueryInfo
+    {
         QnCameraBookmarksQueryWeakPtr   queryRef;           /**< Weak reference to Query object. */
-        QnCameraBookmarkList            bookmarksCache;     /**< Cached bookmarks. */
-        QueryState                      state;              /**< Current query state. */
         QElapsedTimer                   requestTimer;       /**< Time of the last request. */
         int                             requestId;          /**< Id of the last request. */
 
