@@ -66,14 +66,27 @@ public:
     /// @returns                Search query that is ready to be used.
     QnCameraBookmarksQueryPtr createQuery(const QnCameraBookmarkSearchFilter& filter = {});
 
-    /// @brief                  Get locally cached bookmarks for the given query.
-    /// @param query            Target query.
-    QnCameraBookmarkList cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const;
+    /**
+     * Asynchronously execute search query.
+     * @param query Target query.
+     * @param callback Callback for received bookmarks data. Will be called when data is fully
+     *     loaded.
+     */
+    void sendQueryRequest(
+        const QnCameraBookmarksQueryPtr& query,
+        BookmarksCallbackType callback = {});
 
-    /// @brief                  Asynchronously execute search query on remote (actual) data.
-    /// @param query            Target query.
-    /// @param callback         Callback for receiving bookmarks data.
-    void executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback);
+    /**
+     * Asynchronously execute search query, requesting data only from the given timepoint.
+     * @param query Target query.
+     * @param timePoint Minimal start time for the request filter
+     * @param callback Callback for received bookmarks data. Will be called when data is fully
+     *     loaded.
+     */
+    void sendQueryTailRequest(
+        const QnCameraBookmarksQueryPtr& query,
+        std::chrono::milliseconds timePoint,
+        BookmarksCallbackType callback = {});
 
     int getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback);
 
