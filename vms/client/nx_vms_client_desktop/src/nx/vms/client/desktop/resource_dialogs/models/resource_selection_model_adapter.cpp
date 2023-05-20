@@ -37,6 +37,7 @@ struct ResourceSelectionModelAdapter::Private
     QString filterText;
     nx::vms::common::ResourceFilter resourceFilter;
     TopLevelNodesPolicy topLevelNodesPolicy = TopLevelNodesPolicy::hideEmpty;
+    bool webPagesAndIntegrationsCombined = false;
 
     Private(ResourceSelectionModelAdapter* q):
         q(q),
@@ -53,7 +54,8 @@ struct ResourceSelectionModelAdapter::Private
         if (treeEntityBuilder && treeEntityBuilder->user() && resourceTypes != 0)
         {
             auto entity = treeEntityBuilder->createDialogEntities(resourceTypes,
-               /*alwaysCreateGroupElements*/ topLevelNodesPolicy == TopLevelNodesPolicy::showAlways);
+               /*alwaysCreateGroupElements*/ topLevelNodesPolicy == TopLevelNodesPolicy::showAlways,
+                webPagesAndIntegrationsCombined);
             resourceTreeModel->setRootEntity(entity.get());
             rootEntity = std::move(entity);
         }
@@ -245,6 +247,22 @@ void ResourceSelectionModelAdapter::setTopLevelNodesPolicy(TopLevelNodesPolicy v
     d->updateRootEntity();
 
     emit topLevelNodesPolicyChanged();
+}
+
+bool ResourceSelectionModelAdapter::webPagesAndIntegrationsCombined() const
+{
+    return d->webPagesAndIntegrationsCombined;
+}
+
+void ResourceSelectionModelAdapter::setWebPagesAndIntegrationsCombined(bool value)
+{
+    if (d->webPagesAndIntegrationsCombined == value)
+        return;
+
+    d->webPagesAndIntegrationsCombined = value;
+    d->updateRootEntity();
+
+    emit webPagesAndIntegrationsCombinedChanged();
 }
 
 bool ResourceSelectionModelAdapter::isExtraInfoRequired() const

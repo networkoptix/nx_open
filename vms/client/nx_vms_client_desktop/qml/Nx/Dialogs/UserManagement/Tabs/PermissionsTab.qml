@@ -136,6 +136,7 @@ Item
         }
 
         topLevelNodesPolicy: ResourceSelectionModel.TopLevelNodesPolicy.showAlways
+        webPagesAndIntegrationsCombined: true
 
         filterText: searchField.text
 

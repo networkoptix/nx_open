@@ -427,6 +427,17 @@ AbstractItemPtr ResourceTreeItemFactory::createWebPagesItem(Qt::ItemFlags flags)
         .withFlags(flags);
 }
 
+AbstractItemPtr ResourceTreeItemFactory::createWebPagesAndIntegrationsItem(
+    Qt::ItemFlags flags) const
+{
+    return GenericItemBuilder()
+        .withRole(Qt::DisplayRole, tr("Web Pages & Integrations"))
+        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::WebPages))
+        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::webPages))
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MainWindow_Tree_WebPage_Help))
+        .withFlags(flags);
+}
+
 AbstractItemPtr ResourceTreeItemFactory::createUsersItem() const
 {
     return GenericItemBuilder()

@@ -91,15 +91,12 @@ Item
 
             MenuAction
             {
-                text: qsTr("Integrations")
-                data: ResourceTree.ResourceFilter.integrations
-                visible: LocalSettings.iniConfigValue("webPagesAndIntegrations")
-            }
+                text: LocalSettings.iniConfigValue("webPagesAndIntegrations")
+                    ? qsTr("Web Pages & Integrations")
+                    : qsTr("Web Pages")
 
-            MenuAction
-            {
-                text: qsTr("Web Pages")
                 data: ResourceTree.ResourceFilter.webPages
+                    | ResourceTree.ResourceFilter.integrations
             }
 
             MenuAction
