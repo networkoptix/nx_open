@@ -45,6 +45,12 @@ public:
         int maxLines,
         bool trimLastLine = false,
         const QString& tail = "...");
+
+    /** Limit text width, adding specified text (default to "...") at the end. */
+    static void elideTextRight(
+        QTextDocument* document,
+        int width,
+        const QString& tail = "...");
 };
 
 } // namespace nx::vms::client::desktop
