@@ -44,6 +44,8 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
+#include "private/highlighted_text_item_delegate.h"
+
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::client::desktop::ui;
@@ -57,14 +59,18 @@ static constexpr int kMaximumColumnWidth = 200;
 // -----------------------------------------------------------------------------------------------
 // UserListWidget::Delegate
 
-class UserListWidget::Delegate: public QStyledItemDelegate
+class UserListWidget::Delegate: public HighlightedTextItemDelegate
 {
-    using base_type = QStyledItemDelegate;
+    using base_type = HighlightedTextItemDelegate;
     Q_DECLARE_TR_FUNCTIONS(UserListWidget)
 
 public:
     explicit Delegate(QObject* parent = nullptr):
-        base_type(parent)
+        base_type(parent, {
+            UserListModel::LoginColumn,
+            UserListModel::FullNameColumn,
+            UserListModel::EmailColumn,
+            UserListModel::UserGroupsColumn})
     {
     }
 
@@ -89,6 +95,9 @@ public:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& option,
         const QModelIndex& index) const override
     {
+        auto opt = option;
+        initStyleOption(&opt, index);
+
         // Determine item opacity based on user enabled state:
         QnScopedPainterOpacityRollback opacityRollback(painter);
         if (index.data(Qn::DisabledRole).toBool())
@@ -109,13 +118,13 @@ public:
             const auto rect = QStyle::alignedRect(Qt::LeftToRight,
                 horizontalAlignment | Qt::AlignVCenter,
                 core::Skin::maximumSize(icon),
-                option.rect.adjusted(padding, 0, -padding, 0));
+                opt.rect.adjusted(padding, 0, -padding, 0));
 
             icon.paint(painter, rect);
             return;
         }
 
-        base_type::paint(painter, option, index);
+        base_type::paint(painter, opt, index);
     }
 
 protected:
@@ -400,7 +409,11 @@ void UserListWidget::Private::setupUi()
     connect(forceSecureAuthButton, &QPushButton::clicked, this, &Private::forceSecureAuth);
 
     connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this,
-        [this](const QString& text) { sortModel->setFilterWildcard(text); });
+        [this](const QString& text)
+        {
+            sortModel->setFilterWildcard(text);
+            q->update();
+        });
 
     // By [Space] toggle checkbox:
     connect(ui->usersTable, &TreeView::spacePressed, this,
