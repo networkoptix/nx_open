@@ -361,6 +361,11 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark)
     return dbg.space();
 }
 
+QString QnCameraBookmarkSearchFilter::toString() const
+{
+    return QString::fromStdString(nx::reflect::json::serialize(*this));
+}
+
 bool QnCameraBookmarkSearchFilter::isValid() const
 {
     if (limit <= 0)

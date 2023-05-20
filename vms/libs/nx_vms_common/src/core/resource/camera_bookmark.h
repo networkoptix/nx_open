@@ -9,6 +9,7 @@
 
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/bookmark_models.h>
@@ -32,6 +33,7 @@ struct NX_VMS_COMMON_API QnBookmarkSortOrder
     static const QnBookmarkSortOrder defaultOrder;
 };
 #define QnBookmarkSortOrder_Fields (column)(order)
+NX_REFLECTION_INSTRUMENT(QnBookmarkSortOrder, QnBookmarkSortOrder_Fields)
 
 /**
  * Bookmarked part of the camera archive.
@@ -161,6 +163,9 @@ struct NX_VMS_COMMON_API QnCameraBookmarkSearchFilter
 
     bool operator==(const QnCameraBookmarkSearchFilter& other) const = default;
 
+    /** Log operator. */
+    QString toString() const;
+
     bool isValid() const;
 
     bool checkBookmark(const QnCameraBookmark &bookmark) const;
@@ -169,6 +174,7 @@ struct NX_VMS_COMMON_API QnCameraBookmarkSearchFilter
 };
 #define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(orderBy)\
     (minVisibleLengthMs)(creationStartTimeMs)(creationEndTimeMs)(id)(cameras)
+NX_REFLECTION_INSTRUMENT(QnCameraBookmarkSearchFilter, QnCameraBookmarkSearchFilter_Fields)
 
 struct NX_VMS_COMMON_API QnCameraBookmarkTag
 {

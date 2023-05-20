@@ -65,16 +65,20 @@ void QnCameraBookmarksManager::deleteCameraBookmark(const QnUuid &bookmarkId, Op
     emit bookmarkRemoved(bookmarkId);
 }
 
-QnCameraBookmarkList QnCameraBookmarksManager::cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const
+void QnCameraBookmarksManager::sendQueryRequest(
+    const QnCameraBookmarksQueryPtr& query,
+    BookmarksCallbackType callback)
 {
     NX_ASSERT(query);
-    return d->cachedBookmarks(query);
+    d->sendQueryRequest(query, callback);
 }
 
-void QnCameraBookmarksManager::executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback)
+void QnCameraBookmarksManager::sendQueryTailRequest(
+    const QnCameraBookmarksQueryPtr& query,
+    std::chrono::milliseconds timePoint,
+    BookmarksCallbackType callback)
 {
-    NX_ASSERT(query);
-    d->executeQueryRemoteAsync(query, callback);
+    d->sendQueryTailRequest(query, timePoint, callback);
 }
 
 QnCameraBookmarksQueryPtr QnCameraBookmarksManager::createQuery(const QnCameraBookmarkSearchFilter& filter)

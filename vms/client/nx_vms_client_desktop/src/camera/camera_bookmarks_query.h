@@ -5,14 +5,12 @@
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
-#include <utils/common/from_this_to_shared.h>
 
 /**
  * Main interface class to load bookmarks in all common cases.
  */
 class QnCameraBookmarksQuery:
     public QObject,
-    public QnFromThisToShared<QnCameraBookmarksQuery>,
     public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
@@ -21,10 +19,34 @@ class QnCameraBookmarksQuery:
 public:
     virtual ~QnCameraBookmarksQuery() override;
 
+    enum State
+    {
+        /** Query was not executed yet. */
+        invalid,
+
+        /** Query will be executed when timeout will pass. */
+        queued,
+
+        /** Waiting for the server response. */
+        requested,
+
+        /** Part of the data is received. */
+        partial,
+
+        /** Cached data is actual. */
+        actual,
+    };
+
     /**
      * Unique query id.
      */
     QUuid id() const;
+
+    /** Current query state. */
+    State state() const;
+
+    /** Update query state. */
+    void setState(State value);
 
     /**
      * Check if query is valid. Invalid queries cannot be executed. If the query become invalid
@@ -95,15 +117,27 @@ public:
     void setFilter(const QnCameraBookmarkSearchFilter& value);
 
     /**
+     * If set, request bookmarks count will be limited to the given value, but if the result size
+     * will be equal to the chunk size (which means there are way more bookmarks on the server),
+     * then the next chunk request will be sent. Supposed to work only with default ordering, so
+     * requests can be specified by the bookmark start time.
+     */
+    int requestChunkSize() const;
+
+    /**
+     * If set, request bookmarks count will be limited to the given value, but if the result size
+     * will be equal to the chunk size (which means there are way more bookmarks on the server),
+     * then the next chunk request will be sent. Supposed to work only with default ordering, so
+     * requests can be specified by the bookmark start time.
+     */
+    void setRequestChunkSize(int value);
+
+    /**
      * Get locally cached bookmarks.
      */
     QnCameraBookmarkList cachedBookmarks() const;
 
-    /**
-     * Asynchronously gathers actual bookmarks from the server.
-     * @param callback Callback for receiving bookmarks data.
-     */
-    void executeRemoteAsync(BookmarksCallbackType callback);
+    void setCachedBookmarks(QnCameraBookmarkList value);
 
     /**
      * Refreshes bookmark data using current parameters. Does nothing if query is not in the active
@@ -112,7 +146,9 @@ public:
     void refresh();
 
 signals:
+    /** Signal to manager that query was changed and needs to be invalidated. */
     void queryChanged();
+
     void bookmarksChanged(const QnCameraBookmarkList& bookmarks);
 
 private:
@@ -123,10 +159,13 @@ private:
         const QnCameraBookmarkSearchFilter& filter,
         QObject* parent = nullptr);
 
-    QnCameraBookmarksQueryPtr toSharedPointer() const;
-
 private:
     const QUuid m_id;
+    State m_state = State::invalid;
     QnCameraBookmarkSearchFilter m_filter;
     bool m_active = false;
+    int m_requestChunkSize = 0;
+
+    /** Cached bookmarks. */
+    QnCameraBookmarkList m_cache;
 };
