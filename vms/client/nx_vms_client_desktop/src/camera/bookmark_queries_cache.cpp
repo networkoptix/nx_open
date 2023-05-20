@@ -2,37 +2,36 @@
 
 #include "bookmark_queries_cache.h"
 
-#include <chrono>
-
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <utils/common/scoped_timer.h>
 
 using namespace nx::vms::client::desktop;
 
-using std::chrono::milliseconds;
-
-QnBookmarkQueriesCache::QnBookmarkQueriesCache(qint64 timeWindowMinChange
-    , QObject *parent)
-    : QObject(parent)
-    , m_timeWindowMinChange(timeWindowMinChange)
-    , m_queries()
-{}
-
-QnBookmarkQueriesCache::~QnBookmarkQueriesCache()
-{}
-
-bool QnBookmarkQueriesCache::hasQuery(const QnVirtualCameraResourcePtr &camera) const
+void QnBookmarkQueriesCache::clear()
 {
-    return (camera && (m_queries.find(camera) != m_queries.end()));
+    m_queries.clear();
 }
 
-QnCameraBookmarksQueryPtr QnBookmarkQueriesCache::getOrCreateQuery(const QnVirtualCameraResourcePtr &camera)
+bool QnBookmarkQueriesCache::hasQuery(const QnVirtualCameraResourcePtr& camera) const
 {
-    QN_LOG_TIME(Q_FUNC_INFO);
+    return camera && (m_queries.find(camera) != m_queries.end());
+}
 
+QnCameraBookmarksQueryPtr QnBookmarkQueriesCache::getQuery(
+    const QnVirtualCameraResourcePtr& camera) const
+{
+    auto it = m_queries.find(camera);
+    if (it != m_queries.end())
+        return it->second;
+
+    return {};
+}
+
+QnCameraBookmarksQueryPtr QnBookmarkQueriesCache::getOrCreateQuery(
+    const QnVirtualCameraResourcePtr& camera)
+{
     if (!camera || !camera->systemContext())
         return QnCameraBookmarksQueryPtr();
 
@@ -48,7 +47,7 @@ QnCameraBookmarksQueryPtr QnBookmarkQueriesCache::getOrCreateQuery(const QnVirtu
     return it->second;
 }
 
-void QnBookmarkQueriesCache::removeQueryByCamera(const QnVirtualCameraResourcePtr &camera)
+void QnBookmarkQueriesCache::removeQueryByCamera(const QnVirtualCameraResourcePtr& camera)
 {
     if (!camera)
         return;
@@ -56,104 +55,8 @@ void QnBookmarkQueriesCache::removeQueryByCamera(const QnVirtualCameraResourcePt
     m_queries.erase(camera);
 }
 
-bool QnBookmarkQueriesCache::updateQueries(const QnCameraBookmarkSearchFilter &filter)
-{
-    bool result = true;
-    std::for_each(m_queries.begin(), m_queries.end()
-        , [this, filter, &result](const QueriesMap::value_type &value)
-    {
-        const auto camera = value.first;
-        result &= updateQuery(camera, filter);
-    });
-    return result;
-}
-
-bool QnBookmarkQueriesCache::updateQuery(const QnVirtualCameraResourcePtr &camera
-    , const QnCameraBookmarkSearchFilter &filter)
-{
-    const auto needUpdateFunctor = [this, filter](QnCameraBookmarkSearchFilter &oldFilter)
-    {
-        const bool textUpdated = updateFilterText(oldFilter, filter.text);
-        const bool windowUpdated = updateFilterTimeWindow(oldFilter,
-            filter.startTimeMs.count(), filter.endTimeMs.count());
-        return (textUpdated || windowUpdated);
-    };
-
-    return updateDataImpl(camera, needUpdateFunctor);
-}
-
-bool QnBookmarkQueriesCache::updateQueryTimeWindow(const QnVirtualCameraResourcePtr &camera
-    , qint64 startTimeMs
-    , qint64 endTimeMs)
-{
-    const auto needUpdateFunctor = [this, startTimeMs, endTimeMs](QnCameraBookmarkSearchFilter &filter)
-        { return updateFilterTimeWindow(filter, startTimeMs, endTimeMs); };
-
-    return updateDataImpl(camera, needUpdateFunctor);
-}
-
-bool QnBookmarkQueriesCache::updateQueryFilterText(const QnVirtualCameraResourcePtr &camera
-    , const QString &text)
-{
-    const auto needUpdateFunctor = [this, text](QnCameraBookmarkSearchFilter &filter)
-        { return updateFilterText(filter, text); };
-
-    return updateDataImpl(camera, needUpdateFunctor);
-}
-
-bool QnBookmarkQueriesCache::updateDataImpl(const QnVirtualCameraResourcePtr &camera
-    , const NeedUpdateFilterFunctor &needUpdateFunctor)
-{
-    if (!needUpdateFunctor || !camera)
-        return false;
-
-    const auto query = getOrCreateQuery(camera);
-    auto filter = query->filter();
-    if (!needUpdateFunctor(filter))
-        return false;
-
-    query->setFilter(filter);
-    return true;
-}
-
-void QnBookmarkQueriesCache::refreshQueries()
-{
-    for (auto queryData: m_queries)
-    {
-        auto &query = queryData.second;
-        query->refresh();
-    }
-}
-
 void QnBookmarkQueriesCache::setQueriesActive(bool active)
 {
-    for (const auto& queryData: m_queries)
-        queryData.second->setActive(active);
-}
-
-bool QnBookmarkQueriesCache::updateFilterTimeWindow(QnCameraBookmarkSearchFilter &filter
-    , qint64 startTimeMs
-    , qint64 endTimeMs)
-{
-    const bool updateStartTime =
-        (std::abs(filter.startTimeMs.count() - startTimeMs) > m_timeWindowMinChange);
-    const bool updateEndTime =
-        (std::abs(filter.endTimeMs.count() - endTimeMs) > m_timeWindowMinChange);
-    if (!updateStartTime && !updateEndTime)
-        return false;
-
-    filter.startTimeMs = milliseconds(startTimeMs);
-    filter.endTimeMs = milliseconds(endTimeMs);
-
-    return true;
-}
-
-bool QnBookmarkQueriesCache::updateFilterText(QnCameraBookmarkSearchFilter &filter
-    , const QString &text)
-{
-    if (filter.text == text)
-        return false;
-
-    filter.text = text;
-    return true;
+    for (const auto& [_, query]: m_queries)
+        query->setActive(active);
 }

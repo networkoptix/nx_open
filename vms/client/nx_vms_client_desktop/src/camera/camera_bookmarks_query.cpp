@@ -29,6 +29,16 @@ QUuid QnCameraBookmarksQuery::id() const
     return m_id;
 }
 
+QnCameraBookmarksQuery::State QnCameraBookmarksQuery::state() const
+{
+    return m_state;
+}
+
+void QnCameraBookmarksQuery::setState(State value)
+{
+    m_state = value;
+}
+
 bool QnCameraBookmarksQuery::isValid() const
 {
     return m_filter.isValid();
@@ -57,6 +67,7 @@ void QnCameraBookmarksQuery::setCameras(const std::set<QnUuid>& value)
 {
     if (m_filter.cameras == value)
         return;
+
     m_filter.cameras = value;
     emit queryChanged();
 }
@@ -83,6 +94,7 @@ bool QnCameraBookmarksQuery::removeCamera(const QnUuid& value)
 {
     if (!m_filter.cameras.contains(value))
         return false;
+
     m_filter.cameras.erase(value);
     emit queryChanged();
     return true;
@@ -97,26 +109,39 @@ void QnCameraBookmarksQuery::setFilter(const QnCameraBookmarkSearchFilter& value
 {
     if (m_filter == value)
         return;
+
     m_filter = value;
     emit queryChanged();
 }
 
-QnCameraBookmarkList QnCameraBookmarksQuery::cachedBookmarks() const
+int QnCameraBookmarksQuery::requestChunkSize() const
 {
-    return systemContext()->cameraBookmarksManager()->cachedBookmarks(toSharedPointer());
+    return m_requestChunkSize;
 }
 
-void QnCameraBookmarksQuery::executeRemoteAsync(BookmarksCallbackType callback)
+void QnCameraBookmarksQuery::setRequestChunkSize(int value)
 {
-    systemContext()->cameraBookmarksManager()->executeQueryRemoteAsync(toSharedPointer(), callback);
+    NX_ASSERT(value >= 0);
+    NX_ASSERT(m_filter.orderBy == QnBookmarkSortOrder::defaultOrder);
+
+    m_requestChunkSize = value;
+}
+
+QnCameraBookmarkList QnCameraBookmarksQuery::cachedBookmarks() const
+{
+    return m_cache;
+}
+
+void QnCameraBookmarksQuery::setCachedBookmarks(QnCameraBookmarkList value)
+{
+    if (m_cache == value)
+        return;
+
+    m_cache = std::move(value);
+    emit bookmarksChanged(m_cache);
 }
 
 void QnCameraBookmarksQuery::refresh()
 {
     emit queryChanged();
-}
-
-QnCameraBookmarksQueryPtr QnCameraBookmarksQuery::toSharedPointer() const
-{
-    return QnFromThisToShared<QnCameraBookmarksQuery>::toSharedPointer();
 }

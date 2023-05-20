@@ -13,5 +13,5 @@ using OperationCallbackType = std::function<void (bool)>;
 using BookmarksCallbackType = std::function<void (bool, int, const QnCameraBookmarkList&)>;
 using BookmarkTagsCallbackType = std::function<void (bool, int, const QnCameraBookmarkTagList&)>;
 
-typedef QnSharedResourcePointer<QnCameraBookmarksQuery> QnCameraBookmarksQueryPtr;
+typedef QSharedPointer<QnCameraBookmarksQuery> QnCameraBookmarksQueryPtr;
 typedef QWeakPointer<QnCameraBookmarksQuery> QnCameraBookmarksQueryWeakPtr;
