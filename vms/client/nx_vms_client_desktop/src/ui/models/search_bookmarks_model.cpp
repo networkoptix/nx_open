@@ -244,10 +244,10 @@ void QnSearchBookmarksModelPrivate::applyFilter()
 
     // FIXME: #sivanov Ensure request is sent to the correct system context (or to all required).
     auto bookmarksManager = appContext()->currentSystemContext()->cameraBookmarksManager();
-    m_query = bookmarksManager->createQuery();
-    m_query->setFilter(m_filter);
-    m_query->executeRemoteAsync(
-        [this, endUpdateOperationGuard](bool success, int /*requestId*/, const QnCameraBookmarkList& bookmarks)
+    m_query = bookmarksManager->createQuery(m_filter);
+    bookmarksManager->sendQueryRequest(m_query,
+        [this, endUpdateOperationGuard]
+        (bool success, int /*requestId*/, const QnCameraBookmarkList& bookmarks)
         {
             if (m_updatingWeakGuard.lock().get() != endUpdateOperationGuard.get())
                 return; //< Operation was cancelled

@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/network/rest/params.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <utils/common/delayed.h>
@@ -22,20 +23,19 @@
 using namespace nx::vms::client::desktop;
 
 namespace {
-    /** Each query can be updated no more often than once in that period. */
-    const int minimimumRequestTimeoutMs = 10000;
 
-    /** Timer precision to update all queries. */
-    const int queriesCheckTimeoutMs = 1000;
+/** Each query can be updated no more often than once in that period. */
+static constexpr int kMinimimumRequestTimeoutMs = 10000;
 
-    /** Reserved value for invalid requests. */
-    constexpr auto kInvalidRequestId = rest::Handle();
+/** Timer precision to update all queries. */
+static constexpr int kQueriesCheckTimeoutMs = 1000;
 
-    /** Cache of bookmarks we have just added or removed. */
-    const int pendingDiscardTimeout = 30000;
-}
+/** Reserved value for invalid requests. */
+static constexpr auto kInvalidRequestId = rest::Handle();
 
-namespace {
+/** Cache of bookmarks we have just added or removed. */
+static constexpr int kPendingDiscardTimeoutMs = 30000;
+
 QnCameraBookmarkList::iterator findBookmark(QnCameraBookmarkList &list, const QnUuid &bookmarkId)
 {
     return std::find_if(list.begin(), list.end(), [&bookmarkId](const QnCameraBookmark &bookmark)
@@ -83,8 +83,17 @@ std::function<void (bool, rest::Handle, QByteArray, nx::network::http::HttpHeade
         };
 }
 
+QString debugBookmarksRange(const QnCameraBookmarkList& bookmarks)
+{
+    if (bookmarks.empty())
+        return "empty";
+
+    return nx::format("%1 - %2",
+        nx::utils::timestampToDebugString(bookmarks.first().startTimeMs),
+        nx::utils::timestampToDebugString(bookmarks.last().endTime()));
 }
 
+} // namespace
 
 /************************************************************************/
 /* OperationInfo                                                        */
@@ -111,8 +120,6 @@ QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(
 /************************************************************************/
 QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo()
     : queryRef()
-    , bookmarksCache()
-    , state(QueryState::Invalid)
     , requestTimer()
     , requestId(kInvalidRequestId)
 {
@@ -120,8 +127,6 @@ QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo()
 
 QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo(const QnCameraBookmarksQueryPtr &query)
     : queryRef(query.toWeakRef())
-    , bookmarksCache()
-    , state(QueryState::Invalid)
     , requestTimer()
     , requestId(kInvalidRequestId)
 {
@@ -169,7 +174,7 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(
      * update chunks on history change and bookmarks adding/deleting, then forcefully re-request required periods
      */
 
-    m_operationsTimer->setInterval(queriesCheckTimeoutMs);
+    m_operationsTimer->setInterval(kQueriesCheckTimeoutMs);
     m_operationsTimer->setSingleShot(false);
     connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkPendingBookmarks);
     connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
@@ -381,23 +386,26 @@ bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId
     if (!NX_ASSERT(query, "Interface does not allow query to be null") || !query->active())
         return false;
 
-    switch (info.state)
+    switch (query->state())
     {
-        case QueryInfo::QueryState::Invalid:
+        case QnCameraBookmarksQuery::State::invalid:
             return true;
-        case QueryInfo::QueryState::Queued:
+
+        case QnCameraBookmarksQuery::State::queued:
             return !info.requestTimer.isValid()
-                || info.requestTimer.hasExpired(minimimumRequestTimeoutMs) || !query->isValid();
-        case QueryInfo::QueryState::Requested:
-        case QueryInfo::QueryState::Actual:
+                || info.requestTimer.hasExpired(kMinimimumRequestTimeoutMs) || !query->isValid();
+
+        case QnCameraBookmarksQuery::State::requested:
+        case QnCameraBookmarksQuery::State::partial:
+        case QnCameraBookmarksQuery::State::actual:
             return false;
+
         default:
             NX_ASSERT(false, "Should never get here");
             break;
     }
     return false;
 }
-
 
 void QnCameraBookmarksManagerPrivate::checkQueriesUpdate()
 {
@@ -409,11 +417,10 @@ void QnCameraBookmarksManagerPrivate::checkQueriesUpdate()
 
         const QueryInfo info = m_queries[queryId];
         QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
-        NX_ASSERT(query, "Interface does not allow query to be null");
-        if (!query)
+        if (!NX_ASSERT(query, "Interface does not allow query to be null"))
             continue;
 
-        executeQueryRemoteAsync(query, BookmarksCallbackType());
+        sendQueryRequest(query, BookmarksCallbackType());
     }
 }
 
@@ -422,13 +429,17 @@ void QnCameraBookmarksManagerPrivate::registerQuery(const QnCameraBookmarksQuery
     NX_ASSERT(query, "Interface does not allow query to be null");
     NX_ASSERT(!m_queries.contains(query->id()), "Query should be registered and unregistered only once");
 
-    /* Do not store shared pointer in the functor so it can be safely unregistered. */
+    // Do not store shared pointer in the functor so it can be safely unregistered.
+    NX_VERBOSE(this, "Register query %1, filter is %2",
+        query->id(),
+        query->filter());
     QUuid queryId = query->id();
     m_queries.insert(queryId, QueryInfo(query));
-    connect(query.get(), &QnCameraBookmarksQuery::queryChanged, this, [this, queryId]
-    {
-        updateQueryAsync(queryId);
-    });
+    connect(query.get(), &QnCameraBookmarksQuery::queryChanged, this,
+        [this, queryId]
+        {
+            updateQueryAsync(queryId);
+        });
 
     updateQueryAsync(queryId);
     startOperationsTimer();
@@ -436,47 +447,24 @@ void QnCameraBookmarksManagerPrivate::registerQuery(const QnCameraBookmarksQuery
 
 void QnCameraBookmarksManagerPrivate::unregisterQuery(const QUuid &queryId)
 {
+    NX_VERBOSE(this, "Unregister query %1", queryId);
     NX_ASSERT(m_queries.contains(queryId), "Query should be registered and unregistered only once");
     m_queries.remove(queryId);
 }
 
-QnCameraBookmarkList QnCameraBookmarksManagerPrivate::cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const
+void QnCameraBookmarksManagerPrivate::sendQueryRequest(
+    const QnCameraBookmarksQueryPtr& query,
+    BookmarksCallbackType callback)
 {
-    NX_ASSERT(query, "Interface does not allow query to be null");
-
-    /* Check if we have already cached query result. */
-    if (m_queries.contains(query->id()))
-        return m_queries[query->id()].bookmarksCache;
-
-    return QnCameraBookmarkList();
-}
-
-void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(
-    const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback)
-{
-    NX_ASSERT(query, "Interface does not allow query to be null");
-    if (!query)
-    {
-        executeCallbackDelayed(callback);
-        return;
-    }
-
-    /* Do not store shared pointer here so it can be safely unregistered in the process. */
+    // Do not store shared pointer here so it can be safely unregistered in the process.
     QUuid queryId = query->id();
-
     NX_ASSERT(m_queries.contains(queryId), "Query must be registered");
-    if (!m_queries.contains(queryId))
-    {
-        executeCallbackDelayed(callback);
-        return;
-    }
 
     QueryInfo &info = m_queries[queryId];
-    info.requestTimer.restart();
 
     if (!query->isValid())
     {
-        info.state = QueryInfo::QueryState::Actual;
+        query->setState(QnCameraBookmarksQuery::State::actual);
 
         if (callback)
             callback(false, kInvalidRequestId, QnCameraBookmarkList());
@@ -484,136 +472,198 @@ void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(
         return;
     }
 
-    info.state = QueryInfo::QueryState::Requested;
-    info.requestId = getBookmarksAsync(query->filter(),
-        [this, queryId, callback](bool success, int requestId, QnCameraBookmarkList bookmarks)
-    {
-        if (success && m_queries.contains(queryId) && requestId != kInvalidRequestId)
-        {
-            QueryInfo &info = m_queries[queryId];
-            if (info.requestId == requestId)
-            {
-                const QnCameraBookmarksQueryPtr &query = info.queryRef.toStrongRef();
-                if (!query)
-                    return;
+    query->setState(QnCameraBookmarksQuery::State::requested);
 
-                mergeWithPendingBookmarks(query, bookmarks);
-                updateQueryCache(queryId, bookmarks);
-                if (info.state == QueryInfo::QueryState::Requested)
-                    info.state = QueryInfo::QueryState::Actual;
-            }
-        }
+    QnCameraBookmarkSearchFilter filter = query->filter();
+    if (query->requestChunkSize() > 0)
+        filter.limit = query->requestChunkSize();
+
+    auto internalCallback =
+        [this, queryId, callback]
+        (bool success, int requestId, QnCameraBookmarkList bookmarks)
+        {
+            handleQueryReply(queryId, success, requestId, std::move(bookmarks), callback);
+        };
+
+    info.requestId = getBookmarksAsync(filter, internalCallback);
+    info.requestTimer.restart();
+    NX_VERBOSE(this, "Sending initial request [%1] with filter %2",
+        info.requestId,
+        filter);
+}
+
+void QnCameraBookmarksManagerPrivate::sendQueryTailRequest(
+    const QnCameraBookmarksQueryPtr& query,
+    std::chrono::milliseconds timePoint,
+    BookmarksCallbackType callback)
+{
+    query->setState(QnCameraBookmarksQuery::State::partial);
+    QnCameraBookmarkSearchFilter filter = query->filter();
+    filter.limit = query->requestChunkSize();
+    filter.startTimeMs = timePoint;
+    filter.endTimeMs = std::chrono::milliseconds(DATETIME_NOW);
+
+    auto internalCallback =
+        [this, queryId = query->id(), callback]
+        (bool success, int requestId, QnCameraBookmarkList bookmarks)
+        {
+            handleQueryReply(queryId, success, requestId, std::move(bookmarks), callback);
+        };
+
+    QueryInfo& info = m_queries[query->id()];
+    info.requestId = getBookmarksAsync(filter, internalCallback);
+    info.requestTimer.restart();
+    NX_VERBOSE(this,
+        "Sending partial request [%1] with filter %2",
+        info.requestId,
+        filter);
+}
+
+void QnCameraBookmarksManagerPrivate::handleQueryReply(
+    const QUuid& queryId,
+    bool success,
+    int requestId,
+    QnCameraBookmarkList bookmarks,
+    BookmarksCallbackType callback)
+{
+    const bool isReplyActual = success
+        && requestId != kInvalidRequestId
+        && m_queries.contains(queryId)
+        && m_queries[queryId].requestId == requestId;
+
+    if (!isReplyActual)
+    {
+        NX_VERBOSE(this, "Reply %1 for query %2 is not actual", requestId, queryId);
         if (callback)
             callback(success, requestId, bookmarks);
-    });
-}
-
-void QnCameraBookmarksManagerPrivate::updateQueryAsync(const QUuid &queryId)
-{
-    if (!m_queries.contains(queryId))
         return;
+    }
 
-    QueryInfo &info = m_queries[queryId];
-    info.state = QueryInfo::QueryState::Queued;
-}
-
-void QnCameraBookmarksManagerPrivate::updateQueryCache(
-    const QUuid &queryId, const QnCameraBookmarkList &bookmarks)
-{
-    NX_ASSERT(m_queries.contains(queryId), "Query must be registered");
-    if (!m_queries.contains(queryId))
-        return;
-
-    QnCameraBookmarksQueryPtr query = m_queries[queryId].queryRef.toStrongRef();
-    NX_ASSERT(query, "Interface does not allow query to be null");
+    QueryInfo& info = m_queries[queryId];
+    NX_VERBOSE(this,
+        "Processing reply [%1]: %2 bookmarks received (%3)",
+        requestId,
+        bookmarks.size(),
+        debugBookmarksRange(bookmarks));
+    const QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
     if (!query)
         return;
 
-    auto cachedValue = m_queries[queryId].bookmarksCache;
-    m_queries[queryId].bookmarksCache = bookmarks;
-    if (cachedValue != bookmarks)
-        emit query->bookmarksChanged(bookmarks);
+    const bool isPartialData =
+        query->requestChunkSize() > 0 && bookmarks.size() == query->requestChunkSize();
+
+    NX_ASSERT(query->state() == QnCameraBookmarksQuery::State::requested
+        || query->state() == QnCameraBookmarksQuery::State::partial);
+
+    // On initial request reply, reset cached data with received, otherwise merge loaded
+    // data with already cached. Only default sort order is supported yet.
+    if (query->state() == QnCameraBookmarksQuery::State::partial)
+    {
+        NX_ASSERT(query->filter().orderBy == QnBookmarkSortOrder::defaultOrder);
+        bookmarks = QnCameraBookmark::mergeCameraBookmarks(
+            query->systemContext(), {query->cachedBookmarks(), bookmarks});
+    }
+    query->setCachedBookmarks(bookmarks);
+    const bool limitExceeded =
+        query->filter().limit > 0 && bookmarks.size() >= query->filter().limit;
+
+    if (isPartialData && !limitExceeded)
+    {
+        sendQueryTailRequest(query, bookmarks.last().startTimeMs, callback);
+    }
+    else
+    {
+        query->setState(QnCameraBookmarksQuery::State::actual);
+        info.requestId = kInvalidRequestId;
+        mergeWithPendingBookmarks(query, bookmarks);
+        NX_VERBOSE(this, "Query %1 is actual, bookmarks count %2", queryId, bookmarks.size());
+        if (callback)
+            callback(success, requestId, bookmarks);
+    }
 }
 
-QnCameraBookmarksQueryPtr QnCameraBookmarksManagerPrivate::createQuery(const QnCameraBookmarkSearchFilter& filter)
+void QnCameraBookmarksManagerPrivate::updateQueryAsync(const QUuid& queryId)
+{
+    if (!m_queries.contains(queryId))
+        return;
+
+    QueryInfo& info = m_queries[queryId];
+    info.requestId = kInvalidRequestId;
+    const QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
+    if (NX_ASSERT(query))
+    {
+        query->setState(QnCameraBookmarksQuery::State::queued);
+        query->setCachedBookmarks({});
+    }
+}
+
+QnCameraBookmarksQueryPtr QnCameraBookmarksManagerPrivate::createQuery(
+    const QnCameraBookmarkSearchFilter& filter)
 {
     QnCameraBookmarksQueryPtr query(new QnCameraBookmarksQuery(systemContext(), filter));
     QUuid queryId = query->id();
     registerQuery(query);
 
-    connect(query.get(), &QObject::destroyed, this, [this, queryId]()
-    {
-        unregisterQuery(queryId);
-    });
+    connect(query.get(), &QObject::destroyed, this,
+        [this, queryId]()
+        {
+            unregisterQuery(queryId);
+        });
 
     return query;
 }
 
-void QnCameraBookmarksManagerPrivate::executeCallbackDelayed(BookmarksCallbackType callback)
-{
-    if (!callback)
-        return;
-
-    const auto timerCallback =
-        [callback]
-        {
-            callback(false, kInvalidRequestId, QnCameraBookmarkList());
-        };
-
-    executeDelayedParented(timerCallback, this);
-}
-
-void QnCameraBookmarksManagerPrivate::addUpdatePendingBookmark(const QnCameraBookmark &bookmark)
+void QnCameraBookmarksManagerPrivate::addUpdatePendingBookmark(const QnCameraBookmark& bookmark)
 {
     m_pendingBookmarks.insert(bookmark.guid, PendingInfo(bookmark, PendingInfo::AddBookmark));
     startOperationsTimer();
 
-    for (QueryInfo &info : m_queries)
+    for (QueryInfo& info: m_queries)
     {
         QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
-        NX_ASSERT(query, "Interface does not allow query to be null");
-        if (!query)
+        if (!NX_ASSERT(query, "Interface does not allow query to be null"))
             continue;
 
         if (!checkBookmarkForQuery(query, bookmark))
             continue;
 
-        auto it = findBookmark(info.bookmarksCache, bookmark.guid);
-        if (it != info.bookmarksCache.end())
-            info.bookmarksCache.erase(it);
+        auto bookmarks = query->cachedBookmarks();
+        auto it = findBookmark(bookmarks, bookmark.guid);
+        if (it != bookmarks.end())
+            bookmarks.erase(it);
 
-        it = std::lower_bound(info.bookmarksCache.begin(), info.bookmarksCache.end(), bookmark);
-        info.bookmarksCache.insert(it, bookmark);
-
-        emit query->bookmarksChanged(info.bookmarksCache);
+        it = std::lower_bound(bookmarks.begin(), bookmarks.end(), bookmark);
+        bookmarks.insert(it, bookmark);
+        query->setCachedBookmarks(std::move(bookmarks));
     }
 }
 
-void QnCameraBookmarksManagerPrivate::addRemovePendingBookmark(const QnUuid &bookmarkId)
+void QnCameraBookmarksManagerPrivate::addRemovePendingBookmark(const QnUuid& bookmarkId)
 {
     m_pendingBookmarks.insert(bookmarkId, PendingInfo(bookmarkId, PendingInfo::RemoveBookmark));
     startOperationsTimer();
 
-    for (QueryInfo &info : m_queries)
+    for (QueryInfo& info: m_queries)
     {
         QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
-        NX_ASSERT(query, "Interface does not allow query to be null");
-        if (!query)
+        if (!NX_ASSERT(query, "Interface does not allow query to be null"))
             continue;
 
-        auto it = findBookmark(info.bookmarksCache, bookmarkId);
-        if (it == info.bookmarksCache.end())
+        auto bookmarks = query->cachedBookmarks();
+        auto it = findBookmark(bookmarks, bookmarkId);
+        if (it == bookmarks.end())
             continue;
 
-        info.bookmarksCache.erase(it);
-
-        emit query->bookmarksChanged(info.bookmarksCache);
+        bookmarks.erase(it);
+        query->setCachedBookmarks(std::move(bookmarks));
     }
 }
 
-void QnCameraBookmarksManagerPrivate::mergeWithPendingBookmarks(const QnCameraBookmarksQueryPtr query, QnCameraBookmarkList &bookmarks)
+void QnCameraBookmarksManagerPrivate::mergeWithPendingBookmarks(
+    const QnCameraBookmarksQueryPtr query,
+    QnCameraBookmarkList& bookmarks)
 {
-    for (const PendingInfo &info : m_pendingBookmarks)
+    for (const PendingInfo& info: m_pendingBookmarks)
     {
         if (info.type == PendingInfo::RemoveBookmark)
         {
@@ -638,7 +688,6 @@ void QnCameraBookmarksManagerPrivate::mergeWithPendingBookmarks(const QnCameraBo
                 it = std::lower_bound(bookmarks.begin(), bookmarks.end(), info.bookmark);
                 bookmarks.insert(it, info.bookmark);
             }
-
         }
     }
 }
@@ -647,7 +696,7 @@ void QnCameraBookmarksManagerPrivate::checkPendingBookmarks()
 {
     for (auto it = m_pendingBookmarks.begin(); it != m_pendingBookmarks.end(); /* no inc */)
     {
-        if (it->discardTimer.isValid() && it->discardTimer.hasExpired(pendingDiscardTimeout))
+        if (it->discardTimer.isValid() && it->discardTimer.hasExpired(kPendingDiscardTimeoutMs))
             it = m_pendingBookmarks.erase(it);
         else
             ++it;
@@ -662,32 +711,23 @@ void QnCameraBookmarksManagerPrivate::removeCameraFromQueries(const QnResourcePt
 
     QnUuid cameraId = camera->getId();
 
-    for (QueryInfo &info : m_queries)
+    for (QueryInfo& info: m_queries)
     {
         QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
-        NX_ASSERT(query, "Interface does not allow query to be null");
-        if (!query)
+        if (!NX_ASSERT(query, "Interface does not allow query to be null"))
             continue;
 
         if (!query->removeCamera(camera->getId()))
             continue;
 
-        bool changed = false;
-        for (auto it = info.bookmarksCache.begin(); it != info.bookmarksCache.end(); )
+        auto bookmarks = query->cachedBookmarks();
+        for (auto it = bookmarks.begin(); it != bookmarks.end();)
         {
             if (it->cameraId == cameraId)
-            {
-                it = info.bookmarksCache.erase(it);
-                changed = true;
-            }
+                it = bookmarks.erase(it);
             else
-            {
                 ++it;
-            }
         }
-
-        if (changed)
-            emit query->bookmarksChanged(info.bookmarksCache);
+        query->setCachedBookmarks(std::move(bookmarks));
     }
-
 }

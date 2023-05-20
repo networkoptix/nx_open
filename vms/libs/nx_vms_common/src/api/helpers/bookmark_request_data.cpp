@@ -166,8 +166,7 @@ nx::network::rest::Params QnGetBookmarksRequestData::toParams() const
 
 bool QnGetBookmarksRequestData::isValid() const
 {
-    return filter.endTimeMs >= filter.startTimeMs
-        && format != Qn::UnsupportedFormat;
+    return format != Qn::UnsupportedFormat;
 }
 
 //-------------------------------------------------------------------------------------------------
