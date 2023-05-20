@@ -35,6 +35,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include "private/highlighted_text_item_delegate.h"
+
 using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
@@ -50,18 +52,24 @@ static constexpr int kDefaultInteractiveColumnWidth = 200;
 // -----------------------------------------------------------------------------------------------
 // UserGroupsWidget::Delegate
 
-class UserGroupsWidget::Delegate : public QStyledItemDelegate
+class UserGroupsWidget::Delegate : public HighlightedTextItemDelegate
 {
-    using base_type = QStyledItemDelegate;
+    using base_type = HighlightedTextItemDelegate;
 
 public:
-    explicit Delegate(QObject* parent = nullptr) : base_type(parent) {}
+    explicit Delegate(QObject* parent = nullptr):
+        base_type(parent, {
+            UserGroupListModel::NameColumn,
+            UserGroupListModel::ParentGroupsColumn})
+    {
+    }
 
     virtual QSize sizeHint(
         const QStyleOptionViewItem& option, const QModelIndex& index) const override
     {
         switch (index.column())
         {
+            case UserGroupListModel::GroupWarningColumn:
             case UserGroupListModel::GroupTypeColumn:
                 return core::Skin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>());
 
@@ -84,6 +92,9 @@ public:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& option,
         const QModelIndex& index) const override
     {
+        auto opt = option;
+        initStyleOption(&opt, index);
+
         // Paint center-aligned group type icon or left-aligned custom permissions icon:
         const bool isUserTypeColumn = index.column() == UserGroupListModel::GroupTypeColumn;
         if (isUserTypeColumn || index.column() == UserGroupListModel::PermissionsColumn)
@@ -98,13 +109,13 @@ public:
             const auto rect = QStyle::alignedRect(Qt::LeftToRight,
                 horizontalAlignment | Qt::AlignVCenter,
                 core::Skin::maximumSize(icon),
-                option.rect.adjusted(padding, 0, -padding, 0));
+                opt.rect.adjusted(padding, 0, -padding, 0));
 
             icon.paint(painter, rect);
             return;
         }
 
-        base_type::paint(painter, option, index);
+        base_type::paint(painter, opt, index);
     }
 
 protected:
@@ -325,7 +336,11 @@ void UserGroupsWidget::Private::setupUi()
     buttonsLayout->addStretch();
 
     connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this,
-        [this](const QString& text) { sortModel->setFilterWildcard(text); });
+        [this](const QString& text)
+        {
+            sortModel->setFilterWildcard(text);
+            q->update();
+        });
 
     setHelpTopic(q, Qn::SystemSettings_UserManagement_Help);
 
