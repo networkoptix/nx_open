@@ -186,7 +186,27 @@ void CameraHotspotItem::paint(
         paintedHotspotData.direction = rotationMatrix.map(d->hotspotData.direction);
     }
 
-    camera_hotspots::paintHotspot(painter, paintedHotspotData, option->rect.center(), hotspotOption);
+    // Paint the hotspot to a pixmap first to get the proper antialiased look.
+
+    QSize hotspotPixmapSize(option->rect.size() * 2); //< Larger pixmap size to avoid clipping.
+    QPixmap hotspotPixmap(hotspotPixmapSize * painter->device()->devicePixelRatio());
+    hotspotPixmap.setDevicePixelRatio(painter->device()->devicePixelRatio());
+    hotspotPixmap.fill(QColor(0, 0, 0, 0));
+
+    QPainter hotspotPixmapPaiter(&hotspotPixmap);
+    hotspotPixmapPaiter.setRenderHint(QPainter::Antialiasing);
+
+    camera_hotspots::paintHotspot(
+        &hotspotPixmapPaiter,
+        paintedHotspotData,
+        QPoint(hotspotPixmapSize.width() / 2, hotspotPixmapSize.height() / 2),
+        hotspotOption);
+
+    QPoint pixmapOffset(
+        (option->rect.width() - hotspotPixmapSize.width()) / 2,
+        (option->rect.height() - hotspotPixmapSize.height()) / 2);
+
+    painter->drawPixmap(option->rect.topLeft() + pixmapOffset, hotspotPixmap);
 }
 
 void CameraHotspotItem::hoverEnterEvent(QGraphicsSceneHoverEvent*)
