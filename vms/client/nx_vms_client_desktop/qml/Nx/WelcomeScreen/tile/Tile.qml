@@ -156,7 +156,7 @@ Button
 
     Component.onDestruction: shrink()
 
-    Keys.onPressed:
+    Keys.onPressed: function(event)
     {
         if (!isExpanded)
             return
