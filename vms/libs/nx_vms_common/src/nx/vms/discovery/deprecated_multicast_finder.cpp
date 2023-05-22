@@ -26,32 +26,27 @@
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/common/system_settings.h>
 
-namespace nx {
-namespace vms {
-namespace discovery {
-
-static const int MAX_CACHE_SIZE_BYTES = 1024 * 64;
+namespace nx::vms::discovery {
 
 namespace {
 
-const unsigned defaultPingTimeoutMs = 1000 * 5;
-const unsigned defaultKeepAliveMultiply = 5;
-const unsigned errorWaitTimeoutMs = 1000;
-const unsigned checkInterfacesTimeoutMs = 60 * 1000;
+constexpr int kMaxCacheSize = 64 * 1024;
+constexpr unsigned kDefaultPingTimeoutMs = 5'000;
+constexpr unsigned kDefaultKeepAliveMultiply = 5;
+constexpr unsigned kErrorWaitTimeoutMs = 1'000;
+constexpr unsigned kCheckInterfacesTimeoutMs = 60'000;
 
-const QHostAddress defaultModuleRevealMulticastGroup = QHostAddress("239.255.11.11");
-const quint16 defaultModuleRevealMulticastGroupPort = 5007;
+const QHostAddress kDefaultModuleRevealMulticastGroup = QHostAddress("239.255.11.11");
+constexpr quint16 kDefaultModuleRevealMulticastGroupPort = 5007;
 
-const QByteArray revealRequestStr("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
-const QString moduleInfoStr(", { seed: \"%1\" }, {peerType: \"%2\"}");
+constexpr QByteArrayView kRevealRequestStr = "{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }";
+constexpr QStringView kModuleInfoStr = u", { seed: \"%1\" }, {peerType: \"%2\"}";
 
-static const QString kDeprecatedEcId = "Enterprise Controller";
+constexpr QStringView kDeprecatedEcId = u"Enterprise Controller";
 
 } // namespace
 
 using namespace nx::network;
-
-const size_t DeprecatedMulticastFinder::Options::kUnlimited = std::numeric_limits<size_t>::max();
 
 //-------------------------------------------------------------------------------------------------
 // DeprecatedMulticastFinder::RevealRequest
@@ -67,19 +62,19 @@ DeprecatedMulticastFinder::RevealRequest::RevealRequest(
 
 QByteArray DeprecatedMulticastFinder::RevealRequest::serialize()
 {
-    QByteArray result = revealRequestStr;
+    QByteArray result{kRevealRequestStr.constData(), kRevealRequestStr.size()};
     QString moduleGuid = m_moduleGuid.toSimpleString();
-    result += moduleInfoStr.arg(moduleGuid, nx::reflect::toString(m_peerType).c_str()).toLatin1();
+    result += kModuleInfoStr.arg(moduleGuid, nx::reflect::toString(m_peerType).c_str()).toLatin1();
     return result;
 }
 
 bool DeprecatedMulticastFinder::RevealRequest::isValid(
     const quint8* bufStart, const quint8* bufEnd)
 {
-    if (bufEnd - bufStart < revealRequestStr.size())
+    if (bufEnd - bufStart < kRevealRequestStr.size())
         return false;
 
-    if (memcmp(bufStart, revealRequestStr.data(), revealRequestStr.size()) != 0)
+    if (memcmp(bufStart, kRevealRequestStr.data(), kRevealRequestStr.size()) != 0)
         return false;
 
     return true;
@@ -87,7 +82,6 @@ bool DeprecatedMulticastFinder::RevealRequest::isValid(
 
 //-------------------------------------------------------------------------------------------------
 // DeprecatedMulticastFinder::RevealResponse
-
 
 DeprecatedMulticastFinder::RevealResponse::RevealResponse(
     const nx::vms::api::ModuleInformation& other)
@@ -162,14 +156,16 @@ DeprecatedMulticastFinder::DeprecatedMulticastFinder(
     :
     m_options(options),
     m_serverSocket(nullptr),
-    m_pingTimeoutMillis(pingTimeoutMillis == 0 ? defaultPingTimeoutMs : pingTimeoutMillis),
-    m_keepAliveMultiply(keepAliveMultiply == 0 ? defaultKeepAliveMultiply : keepAliveMultiply),
+    m_pingTimeoutMillis(pingTimeoutMillis == 0 ? kDefaultPingTimeoutMs : pingTimeoutMillis),
+    m_keepAliveMultiply(keepAliveMultiply == 0 ? kDefaultKeepAliveMultiply : keepAliveMultiply),
     m_prevPingClock(0),
-    m_checkInterfacesTimeoutMs(checkInterfacesTimeoutMs),
+    m_checkInterfacesTimeoutMs(kCheckInterfacesTimeoutMs),
     m_lastInterfacesCheckMs(0),
-    m_multicastGroupAddress(multicastGroupAddress.isNull() ? defaultModuleRevealMulticastGroup : multicastGroupAddress),
-    m_multicastGroupPort(multicastGroupPort == 0 ? defaultModuleRevealMulticastGroupPort : multicastGroupPort),
-    m_cachedResponse(MAX_CACHE_SIZE_BYTES)
+    m_multicastGroupAddress(multicastGroupAddress.isNull()
+        ? kDefaultModuleRevealMulticastGroup : multicastGroupAddress),
+    m_multicastGroupPort(multicastGroupPort == 0
+        ? kDefaultModuleRevealMulticastGroupPort : multicastGroupPort),
+    m_cachedResponse(kMaxCacheSize)
 {
 }
 
@@ -347,7 +343,7 @@ bool DeprecatedMulticastFinder::processDiscoveryRequest(UDPSocket *udpSocket)
         return false;
     };
 
-    NX_VERBOSE(this, "Reveal respose is sent to address (%1)", remoteEndpoint);
+    NX_VERBOSE(this, "Reveal response is sent to address (%1)", remoteEndpoint);
     return true;
 }
 
@@ -515,7 +511,7 @@ void DeprecatedMulticastFinder::run()
                 continue;
 
             NX_WARNING(this, "Poll failed. %1", SystemError::toString(prevErrorCode));
-            msleep(errorWaitTimeoutMs);
+            msleep(kErrorWaitTimeoutMs);
             continue;
         }
 
@@ -545,6 +541,4 @@ void DeprecatedMulticastFinder::run()
     NX_DEBUG(this, "Stopped");
 }
 
-} // namespace discovery
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::discovery::discovery
