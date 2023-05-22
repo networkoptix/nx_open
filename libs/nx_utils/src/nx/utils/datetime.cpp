@@ -41,7 +41,7 @@ QString timestampToDebugString(qint64 timestampMs, const QString& format)
     if (timestampMs == DATETIME_INVALID)
         return "DATETIME_INVALID";
 
-    static const qint64 kMaxTimeMs = 4102444800000; //< 2100.01.01.
+    static const qint64 kMaxTimeMs = 4'102'444'800'000; //< 2100.01.01.
     if (timestampMs > kMaxTimeMs)
         timestampMs /= 1000; //< Most probably time is in microseconds.
 

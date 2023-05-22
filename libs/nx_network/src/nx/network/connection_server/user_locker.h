@@ -23,7 +23,7 @@ struct NX_NETWORK_API UserLockerSettings
 {
     std::chrono::milliseconds checkPeriod = std::chrono::minutes(5);
     int authFailureCount = 10;
-    int maxLockerCount = 10000;
+    int maxLockerCount = 10'000;
     std::chrono::milliseconds lockPeriod = std::chrono::minutes(1);
 
     void load(const SettingsReader&);

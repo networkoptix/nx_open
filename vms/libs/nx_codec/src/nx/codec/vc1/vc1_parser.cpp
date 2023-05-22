@@ -104,24 +104,24 @@ bool VC1SequenceHeader::setFPS(double value)
     if (m_fpsFieldBitVal > 0) {
         int time_scale = (uint32_t)(value +0.5)  * 1000;
         int num_units_in_tick = time_scale / value + 0.5;
-        if ((time_scale == 24000 || time_scale == 25000 || time_scale == 30000 || time_scale == 50000 || time_scale == 60000)
+        if ((time_scale == 24'000 || time_scale == 25'000 || time_scale == 30'000 || time_scale == 50'000 || time_scale == 60'000)
              && (num_units_in_tick == 1000 || num_units_in_tick == 1001)) {
             time_base_den = time_scale;
             time_base_num = num_units_in_tick;
         }
         else {
-            qWarning() << "Can't overwrite stream fps. Non standart fps values not supported for VC-1 streams";
+            qWarning() << "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams";
             return false;
         }
-        if (time_scale == 24000)
+        if (time_scale == 24'000)
             nr = 1;
-        else if (time_scale == 25000)
+        else if (time_scale == 25'000)
             nr = 2;
-        else if (time_scale == 30000)
+        else if (time_scale == 30'000)
             nr = 3;
-        else if (time_scale == 50000)
+        else if (time_scale == 50'000)
             nr = 4;
-        else //if (time_scale == 60000)
+        else //if (time_scale == 60'000)
             nr = 5;
         if (num_units_in_tick == 1000)
             dr = 1;
@@ -132,7 +132,7 @@ bool VC1SequenceHeader::setFPS(double value)
         return true;
     }
     else {
-        qWarning() << "Can't overwrite stream fps. Non standart fps values not supported for VC-1 streams";
+        qWarning() << "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams";
         return false;
     }
 }

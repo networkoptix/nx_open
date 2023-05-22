@@ -115,9 +115,9 @@ template<> struct DurationTraits<std::chrono::hours>:
 } // namespace detail
 
 /**
- * Converts duration to string suffixing it with a correposnding
+ * Converts duration to string suffixing it with a corresponding
  * suffix: ns (nanoseconds), us (microseconds), ms (milliseconds), s, m, h.
- * E.g., `std::chrono::milliseconds(60000)` is represented with a string `1m`.
+ * E.g., `std::chrono::milliseconds(60'000)` is represented with a string `1m`.
  * The resulting string can be passed to parseDuration.
  */
 template<typename Rep, typename Period>

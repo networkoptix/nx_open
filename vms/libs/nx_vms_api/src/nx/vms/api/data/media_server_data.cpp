@@ -11,7 +11,7 @@ namespace api {
 
 namespace {
 
-static constexpr int kBitsPerMegabit = 1000000;
+static constexpr int kBitsPerMegabit = 1'000'000;
 static constexpr int kBitsPerByte = 8;
 
 const auto kKeyAttributeName = "key";

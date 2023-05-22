@@ -120,13 +120,13 @@ int64_t RtpParser::getTimestamp(uint32_t rtpTime, const nx::rtp::RtcpSenderRepor
     // rtcp
     if (senderReport.ntpTimestamp > 0)
     {
-        const int64_t rtpTimeDiff =
-            int32_t(rtpTime - senderReport.rtpTimestamp) * 1000000LL / m_codecParser->getFrequency();
+        const int64_t rtpTimeDiff = int32_t(rtpTime - senderReport.rtpTimestamp)
+            * 1'000'000LL / m_codecParser->getFrequency();
         return senderReport.ntpTimestamp + rtpTimeDiff;
     }
 
     // rtp
-    return m_linearizer.linearize(rtpTime) * 1000000LL / m_codecParser->getFrequency();
+    return m_linearizer.linearize(rtpTime) * 1'000'000LL / m_codecParser->getFrequency();
 }
 
 } // namespace nx::rtp

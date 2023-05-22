@@ -38,7 +38,7 @@ namespace hevc = nx::media::hevc;
 
 HevcParser::HevcParser()
 {
-    StreamParser::setFrequency(90000);
+    StreamParser::setFrequency(90'000);
 }
 
 Result HevcParser::processData(

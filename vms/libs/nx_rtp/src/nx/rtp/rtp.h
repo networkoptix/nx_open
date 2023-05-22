@@ -17,10 +17,10 @@
 
 namespace nx::rtp {
 
-// 1900 - 1970 time diff
-static const std::chrono::seconds kNtpEpochTimeDiff(2208988800);
+// 1970 - 1900 time diff
+static const std::chrono::seconds kNtpEpochTimeDiff(2'208'988'800);
 
-using rtptime = std::chrono::duration<int32_t, std::ratio<1, 90000>>;
+using rtptime = std::chrono::duration<int32_t, std::ratio<1, 90'000>>;
 
 #pragma pack(push, 1)
 struct RtpHeader

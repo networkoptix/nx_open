@@ -317,7 +317,7 @@ void MjpegParser::updateHeaderTables(const quint8* lumaTable, const quint8* chro
 
 MjpegParser::MjpegParser()
 {
-    StreamParser::setFrequency(90000);
+    StreamParser::setFrequency(90'000);
     memset(m_lumaTable, 0, sizeof(m_lumaTable));
     memset(m_chromaTable, 0, sizeof(m_chromaTable));
     m_frameWidth = 0;

@@ -499,7 +499,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "maxRtpRetryCount", 0, this, [] { return tr("RTP retry count"); });
 
     m_rtpFrameTimeoutMs = new QnLexicalResourcePropertyAdaptor<int>(
-        "rtpTimeoutMs", 10000, this, [] { return tr("RTP timeout (milliseconds)"); });
+        "rtpTimeoutMs", 10'000, this, [] { return tr("RTP timeout (milliseconds)"); });
 
     m_maxRtspConnectDuration = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRtspConnectDurationSeconds", 0, this,
@@ -563,11 +563,11 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("Authorization Session token lifetime (seconds)"); });
 
     m_sessionsLimitAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::sessionsLimit, 100000, [](const int& value) { return value >= 0; }, this,
+        Names::sessionsLimit, 10'0000, [](const int& value) { return value >= 0; }, this,
         [] { return tr("Session token count limit on a single Server"); });
 
     m_sessionsLimitPerUserAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::sessionsLimitPerUser, 5000, [](const int& value) { return value >= 0; }, this,
+        Names::sessionsLimitPerUser, 5'000, [](const int& value) { return value >= 0; }, this,
         [] { return tr("Max session token count per user on single Server"); });
 
     m_remoteSessionUpdateAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
@@ -658,7 +658,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("Force analytics DB storage mount point permissions in case of failure"); });
 
     m_checkVideoStreamPeriodMsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        "checkVideoStreamPeriodMs", 10000, this,
+        "checkVideoStreamPeriodMs", 10'000, this,
         [] { return tr("Check video stream period (milliseconds)"); });
 
     m_useStorageEncryptionAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
