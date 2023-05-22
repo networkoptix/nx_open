@@ -31,7 +31,7 @@ WebPageDecorator::WebPageDecorator(
         connect(iconCache, &WebPageIconCache::iconChanged, this,
             [this, webPage](const QUrl& webPageUrl)
             {
-                if (webPage->getUrl() == webPageUrl)
+                if (webPage->getUrl() == webPageUrl.toString())
                     notifyDataChanged({Qn::DecorationPathRole});
             });
 
