@@ -143,6 +143,9 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createLiveDataProvider()
     connect(delegate, &QnRtspClientArchiveDelegate::dataDropped, this,
         &QnClientCameraResource::dataDropped);
 
+    connect(delegate, &QnRtspClientArchiveDelegate::needUpdateTimeLine, this,
+        &QnClientCameraResource::footageAdded);
+
     if (auto session = context->session())
     {
         connect(session.get(),

@@ -42,6 +42,7 @@ public:
 
 signals:
     void dataDropped();
+    void footageAdded();
 
 protected slots:
     virtual void resetCachedValues() override;

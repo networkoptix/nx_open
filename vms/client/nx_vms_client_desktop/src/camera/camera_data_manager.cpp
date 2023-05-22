@@ -9,6 +9,7 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
@@ -139,6 +140,13 @@ core::CachingCameraDataLoaderPtr QnCameraDataManager::loader(
         "Resource belongs to another System Context");
 
     core::CachingCameraDataLoaderPtr loader(new core::CachingCameraDataLoader(resource));
+
+    const auto camera = resource->toResourcePtr().dynamicCast<QnClientCameraResource>();
+    if (camera)
+    {
+        connect(camera.get(), &QnClientCameraResource::footageAdded,
+            loader.data(), &core::CachingCameraDataLoader::discardCachedData);
+    }
 
     connect(loader.data(), &core::CachingCameraDataLoader::periodsChanged, this,
         [this, resource](Qn::TimePeriodContent type, qint64 startTimeMs)
