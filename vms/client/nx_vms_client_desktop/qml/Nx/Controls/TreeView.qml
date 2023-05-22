@@ -78,8 +78,12 @@ FocusScope
     property alias footer: listView.footer
     property alias footerPositioning: listView.footerPositioning
     readonly property alias footerItem: listView.footerItem
+
+    readonly property alias contentItem: listView.contentItem
     readonly property alias contentX: listView.contentX
     readonly property alias contentY: listView.contentY
+
+    readonly property alias autoScroller: autoScroller
 
     property bool clipDelegates: true
 
@@ -168,6 +172,15 @@ FocusScope
     {
         const rowItem = rowItemAtIndex(modelIndex)
         return rowItem && rowItem.delegateItem
+    }
+
+    function rowIndexes(firstRow, lastRow)
+    {
+        let result = []
+        for (let row = firstRow; row <= lastRow; ++row)
+            result.push(linearizationListModel.mapToSource(linearizationListModel.index(row, 0)))
+
+        return result
     }
 
     signal activated(var modelIndex, var selection, var activationType, var modifiers)

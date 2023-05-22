@@ -601,6 +601,16 @@ QRectF Geometry::intersection(const QRectF& r1, const QRectF& r2)
     return r1.intersected(r2);
 }
 
+bool Geometry::intersects(const QRect& r1, const QRect& r2)
+{
+    return r1.intersects(r2);
+}
+
+bool Geometry::intersects(const QRectF& r1, const QRectF& r2)
+{
+    return r1.intersects(r2);
+}
+
 QRectF Geometry::movedInto(const QRectF& rect, const QRectF& target)
 {
     qreal dx = 0.0;

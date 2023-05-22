@@ -4,6 +4,9 @@
 
 #include <memory>
 
+#include <QtCore/QAbstractItemModel>
+
+#include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -16,6 +19,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/common/system_context.h>
 
@@ -378,21 +382,64 @@ QnUuid AccessSubjectEditingContext::specialResourceGroupFor(const QnResourcePtr&
     return {};
 }
 
-bool AccessSubjectEditingContext::isRelevant(nx::vms::api::SpecialResourceGroup group,
-    AccessRight accessRight)
+AccessRights AccessSubjectEditingContext::relevantAccessRights(SpecialResourceGroup group)
 {
-    if (accessRight == AccessRight::view)
-        return true;
-
     switch (group)
     {
         case SpecialResourceGroup::allDevices:
+            return kFullAccessRights;
+
         case SpecialResourceGroup::allVideowalls:
-            return true;
+            return AccessRight::view;
 
         default:
-            return false;
+            return AccessRight::view;
     }
+}
+
+AccessRights AccessSubjectEditingContext::relevantAccessRights(const QnResourcePtr& resource)
+{
+    if (resource.objectCast<QnLayoutResource>())
+        return kFullAccessRights;
+
+    if (const auto group = specialResourceGroup(specialResourceGroupFor(resource)))
+        return relevantAccessRights(*group);
+
+    NX_ASSERT(false, "Unexpected resource type: %1", resource);
+    return {};
+}
+
+void AccessSubjectEditingContext::modifyAccessRights(ResourceAccessMap& accessMap,
+    const QnUuid& resourceOrGroupId, AccessRights accessRightsMask, bool value)
+{
+    const auto accessRights = accessMap.value(resourceOrGroupId);
+    const auto newAccessRights = value
+        ? accessRights | accessRightsMask
+        : accessRights & ~accessRightsMask;
+
+    if (newAccessRights == accessRights)
+        return;
+
+    if (newAccessRights != 0)
+        accessMap.emplace(resourceOrGroupId, newAccessRights);
+    else
+        accessMap.remove(resourceOrGroupId);
+}
+
+void AccessSubjectEditingContext::modifyAccessRights(const QList<QnResource*>& resources,
+    AccessRights accessRights, bool value)
+{
+    auto map = ownResourceAccessMap();
+    for (const auto& resource: resources)
+    {
+        if (!resource)
+            continue;
+
+        modifyAccessRights(map, resource->getId(),
+            accessRights & relevantAccessRights(resource->toSharedPointer()), value);
+    }
+
+    setOwnResourceAccessMap(map);
 }
 
 } // namespace nx::vms::client::desktop

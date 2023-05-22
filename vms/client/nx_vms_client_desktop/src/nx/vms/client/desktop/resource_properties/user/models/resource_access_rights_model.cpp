@@ -94,6 +94,8 @@ struct ResourceAccessRightsModel::Private
     void countGroupResources(const QnUuid& groupId, AccessRight accessRight,
         int& checked, int& total) const;
 
+    AccessRights relevantAccessRights() const;
+
     bool isEditable(int index) const;
 
     QString accessDetailsText(const ResourceAccessInfo& accessInfo) const;
@@ -621,18 +623,20 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
     return descriptions.join("<br>");
 }
 
+AccessRights ResourceAccessRightsModel::Private::relevantAccessRights() const
+{
+    if (resource)
+        return AccessSubjectEditingContext::relevantAccessRights(resource);
+
+    if (const auto group = nx::vms::api::specialResourceGroup(q->groupId()))
+        return AccessSubjectEditingContext::relevantAccessRights(*group);
+
+    return {};
+}
+
 bool ResourceAccessRightsModel::Private::isEditable(int index) const
 {
-    if (!resource.objectCast<QnLayoutResource>().isNull())
-        return true;
-
-    const auto group = nx::vms::api::specialResourceGroup(resource
-        ? AccessSubjectEditingContext::specialResourceGroupFor(resource)
-        : q->groupId());
-
-    return group
-        ? AccessSubjectEditingContext::isRelevant(*group, accessRightList[index])
-        : false;
+    return relevantAccessRights().testFlag(accessRightList[index]);
 }
 
 } // namespace nx::vms::client::desktop

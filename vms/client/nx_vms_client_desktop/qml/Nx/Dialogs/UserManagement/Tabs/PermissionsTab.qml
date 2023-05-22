@@ -7,8 +7,10 @@ import QtQuick.Controls.impl
 import Nx
 import Nx.Core
 import Nx.Controls
+import Nx.Instruments
 import Nx.Items
 
+import nx.client.core
 import nx.vms.client.desktop
 
 import "../Components"
@@ -22,6 +24,8 @@ Item
     required property AccessSubjectEditingContext editingContext
 
     readonly property int columnCount: availableAccessRightDescriptors.length
+
+    readonly property int kRowHeight: 28
     readonly property int kColumnWidth: 64
 
     property var buttonBox
@@ -161,7 +165,7 @@ Item
             showResourceStatus: tree.showResourceStatus
             columnWidth: control.kColumnWidth
             rowHovered: tree.hoveredItem === this
-            enabled: control.editingEnabled
+            editingEnabled: control.editingEnabled
 
             accessRightsList: control.availableAccessRights
 
@@ -169,12 +173,140 @@ Item
                 ? accessRightsHeader.hoveredAccessRight
                 : 0
 
+            implicitHeight: control.kRowHeight
+
+            frameSelectionActive: frameSelector.dragging
+
+            frameSelectionRect:
+            {
+                if (!frameSelector.dragging || !control.editingEnabled)
+                    return Qt.rect(0, 0, 0, 0)
+
+                return rowAccess.mapFromItem(tree, tree.mapFromItem(selectionArea,
+                    selectionArea.frameRect))
+            }
+
             onHoveredCellChanged:
             {
                 if (hoveredCell)
                     tree.hoveredRow = rowAccess
                 else if (tree.hoveredRow == rowAccess)
                     tree.hoveredRow = null
+            }
+        }
+
+        MouseArea
+        {
+            id: selectionArea
+
+            x: accessRightsHeader.x - tree.x + 1
+            y: 1
+            width: accessRightsHeader.width
+            height: tree.height - 1
+
+            hoverEnabled: false
+            propagateComposedEvents: true
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+            property point start
+
+            readonly property point current: Qt.point(
+                frameSelector.position.x,
+                frameSelector.position.y - tree.contentItem.y)
+
+            readonly property point topLeft: Qt.point(
+                Math.max(0, Math.min(start.x, current.x)),
+                Math.max(0, Math.min(start.y, current.y)) + tree.contentItem.y);
+
+            readonly property point bottomRight: Qt.point(
+                Math.min(width - 1, Math.max(start.x, current.x)),
+                Math.min(Math.max(height, tree.contentItem.height) - 1,
+                    Math.max(start.y, current.y)) + tree.contentItem.y);
+
+            readonly property rect frameRect: Qt.rect(
+                topLeft.x,
+                topLeft.y,
+                bottomRight.x - topLeft.x,
+                bottomRight.y - topLeft.y)
+
+            onCanceled: //< Called when another item grabs mouse exclusively.
+                frameSelector.cancel()
+
+            SimpleDragInstrument
+            {
+                id: frameSelector
+
+                item: selectionArea
+                enabled: control.editingEnabled
+
+                onStarted:
+                {
+                    selectionArea.start = Qt.point(
+                        pressPosition.x,
+                        pressPosition.y - tree.contentItem.y)
+                }
+
+                onFinished:
+                {
+                    if (!control.editingContext
+                        || selectionArea.frameRect.width === 0
+                        || selectionArea.frameRect.height === 0)
+                    {
+                        return
+                    }
+
+                    const rect = Qt.rect(
+                        selectionArea.frameRect.left,
+                        selectionArea.frameRect.top - tree.contentItem.y,
+                        selectionArea.frameRect.width,
+                        selectionArea.frameRect.height)
+
+                    const firstRow = Math.floor(rect.top / control.kRowHeight)
+                    const lastRow = Math.floor(rect.bottom / control.kRowHeight)
+                    const firstColumn = Math.floor(rect.left / control.kColumnWidth)
+                    const lastColumn = Math.floor(rect.right / control.kColumnWidth)
+
+                    let accessRights = 0
+                    for (let column = firstColumn; column <= lastColumn; ++column)
+                        accessRights |= control.availableAccessRights[column];
+
+                    const indexes = tree.rowIndexes(firstRow, lastRow)
+                    const resources = indexes.map(index => NxGlobals.modelData(index, "resource"))
+                        .filter(resource => !!resource)
+
+                    control.editingContext.modifyAccessRights(resources, accessRights, true)
+                }
+            }
+
+            Binding
+            {
+                when: frameSelector.dragging
+                target: tree.autoScroller
+                property: "velocity"
+
+                value:
+                {
+                    const rect = Qt.rect(
+                        0, -tree.contentItem.y, selectionArea.width, selectionArea.height)
+
+                    return ProximityScrollHelper.velocity(rect,
+                        Geometry.bounded(selectionArea.current, rect))
+                }
+            }
+
+            Rectangle
+            {
+                id: selectionFrame
+
+                visible: frameSelector.dragging
+                color: ColorTheme.transparent(ColorTheme.colors.brand_core, 0.2)
+                border.color: ColorTheme.colors.brand_core
+                z: 2
+
+                x: selectionArea.frameRect.left
+                y: selectionArea.frameRect.top
+                width: selectionArea.frameRect.width
+                height: selectionArea.frameRect.height
             }
         }
     }
