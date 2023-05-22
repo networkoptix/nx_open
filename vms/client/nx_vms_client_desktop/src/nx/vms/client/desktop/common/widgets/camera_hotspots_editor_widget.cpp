@@ -335,7 +335,15 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
         return;
 
     if (d->cameraThumbnail->status() == LiveCameraThumbnail::Status::ready)
-        painter.drawImage(d->thumbnailRect(), d->cameraThumbnail->image());
+    {
+        const auto thumbnailImageSize =
+            d->thumbnailRect().size() * painter.device()->devicePixelRatio();
+
+        const auto thumbnailImage = d->cameraThumbnail->image()
+            .scaled(thumbnailImageSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+        painter.drawImage(d->thumbnailRect(), thumbnailImage);
+    }
 
     painter.setFont(noDataPlaceholderFont());
     if (d->cameraThumbnail->status() == LiveCameraThumbnail::Status::unavailable)
