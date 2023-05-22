@@ -17,8 +17,9 @@ class NX_VMS_RULES_API ShowOnAlarmLayoutAction: public NotificationActionBase
     FIELD(bool, forceOpen, setForceOpen)
 
 public:
-    ShowOnAlarmLayoutAction() = default;
     static const ItemDescriptor& manifest();
+
+    ShowOnAlarmLayoutAction();
 };
 
 } // namespace nx::vms::rules

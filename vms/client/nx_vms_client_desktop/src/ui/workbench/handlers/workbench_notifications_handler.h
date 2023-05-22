@@ -12,8 +12,6 @@
 #include <ui/workbench/workbench_state_manager.h>
 
 namespace nx::vms::common { class BusinessEventFilterResourcePropertyAdaptor; }
-namespace nx::vms::rules { class NotificationAction; }
-namespace nx::vms::client::desktop { class CrossSystemNotificationsListener; }
 
 class QnWorkbenchNotificationsHandler:
     public QObject,
@@ -40,10 +38,6 @@ signals:
 
     void notificationAdded(const nx::vms::event::AbstractActionPtr& action);
     void notificationRemoved(const nx::vms::event::AbstractActionPtr& action);
-    void notificationActionReceived(
-        const QSharedPointer<nx::vms::rules::NotificationAction>& notificationAction,
-        const QString& cloudSystemId);
-
     void cleared();
 
 private:
@@ -70,5 +64,4 @@ private:
 
 private:
     nx::vms::common::BusinessEventFilterResourcePropertyAdaptor* m_adaptor;
-    std::unique_ptr<nx::vms::client::desktop::CrossSystemNotificationsListener> m_listener;
 };

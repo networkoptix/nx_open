@@ -39,11 +39,12 @@ public:
 
 private:
     void onNotificationActionBase(
-        const QSharedPointer<nx::vms::rules::NotificationActionBase>& action);
+        const QSharedPointer<nx::vms::rules::NotificationActionBase>& action,
+        const QString& cloudSystemId);
 
     void onNotificationAction(
         const QSharedPointer<nx::vms::rules::NotificationAction>& action,
-        QString cloudSystemId);
+        const QString& cloudSystemId);
 
     void onRepeatSoundAction(
         const QSharedPointer<nx::vms::rules::RepeatSoundAction>& action);

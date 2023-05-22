@@ -35,6 +35,7 @@ class NX_VMS_RULES_API NotificationActionBase: public nx::vms::rules::BasicActio
 
     // Notification look and feel fields.
     FIELD(QString, sourceName, setSourceName)
+    FIELD(nx::vms::event::Level, level, setLevel)
 
 protected:
     NotificationActionBase() = default;

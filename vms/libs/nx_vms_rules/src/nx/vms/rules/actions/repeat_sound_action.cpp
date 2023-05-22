@@ -36,4 +36,9 @@ const ItemDescriptor& RepeatSoundAction::manifest()
     return kDescriptor;
 }
 
+RepeatSoundAction::RepeatSoundAction()
+{
+    setLevel(nx::vms::event::Level::common);
+}
+
 } // namespace nx::vms::rules

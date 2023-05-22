@@ -19,7 +19,6 @@
 #include <nx/reflect/json.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/rules/cross_system_notifications_listener.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -353,22 +352,7 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged()
     m_adaptor->setResource(user);
 
     if (!user)
-    {
         clear();
-        m_listener.reset();
-    }
-    else if (user->isCloud())
-    {
-        m_listener = std::make_unique<CrossSystemNotificationsListener>();
-        connect(m_listener.get(),
-            &CrossSystemNotificationsListener::notificationActionReceived,
-            this,
-            &QnWorkbenchNotificationsHandler::notificationActionReceived);
-    }
-    else
-    {
-        m_listener.reset();
-    }
 }
 
 void QnWorkbenchNotificationsHandler::at_businessActionReceived(

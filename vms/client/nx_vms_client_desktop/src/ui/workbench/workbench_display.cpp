@@ -2,7 +2,6 @@
 
 #include "workbench_display.h"
 
-#include <cassert>
 #include <cmath> //< For std::fmod.
 
 #include <QtCore/QScopedValueRollback>
@@ -28,6 +27,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/math/math.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -45,10 +45,12 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
 #include <nx/vms/client/desktop/workbench/resource/resource_widget_factory.h>
 #include <nx/vms/client/desktop/workbench/state/thumbnail_search_state.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
+#include <nx/vms/rules/actions/notification_action_base.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/animation/curtain_animator.h>
 #include <ui/animation/opacity_animator.h>
@@ -332,8 +334,13 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_viewportAnimator, SIGNAL(finished()), this, SLOT(at_viewportAnimator_finished()));
 
     // Connect to context.
-    connect(context()->instance<QnWorkbenchNotificationsHandler>(), &QnWorkbenchNotificationsHandler::notificationAdded,
-        this, &QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded);
+    connect(context()->instance<QnWorkbenchNotificationsHandler>(),
+        &QnWorkbenchNotificationsHandler::notificationAdded,
+        this, &QnWorkbenchDisplay::at_notificationAdded);
+
+    connect(context()->instance<NotificationActionExecutor>(),
+        &NotificationActionExecutor::notificationActionReceived,
+        this, &QnWorkbenchDisplay::at_notificationAction);
 
     connect(&appContext()->localSettings()->playAudioForAllItems,
         &nx::utils::property_storage::BaseProperty::changed,
@@ -2453,7 +2460,7 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged()
     fitInView(false);
 }
 
-void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::event::AbstractActionPtr &businessAction)
+void QnWorkbenchDisplay::at_notificationAdded(const vms::event::AbstractActionPtr& businessAction)
 {
     if (qnRuntime->lightMode().testFlag(Qn::LightModeNoNotifications))
         return;
@@ -2497,9 +2504,9 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
     for (const QnResourcePtr &resource : targetResources)
     {
         const auto callback =
-            [this, resource, businessAction]
+            [this, resource, level = QnNotificationLevel::valueOf(businessAction)]
             {
-                showSplashOnResource(resource, businessAction);
+                showSplashOnResource(resource, level);
             };
 
         for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
@@ -2507,7 +2514,48 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
     }
 }
 
-void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, const vms::event::AbstractActionPtr &businessAction)
+void QnWorkbenchDisplay::at_notificationAction(
+    const QSharedPointer<nx::vms::rules::NotificationActionBase>& action)
+{
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeNoNotifications))
+        return;
+
+    if (workbench()->currentLayout()->isPreviewSearchLayout())
+        return;
+
+    if (workbench()->currentLayout()->isShowreelReviewLayout())
+        return;
+
+    QSet<QnResourcePtr> targetResources;
+
+    if (!action->deviceIds().empty())
+    {
+        targetResources = nx::utils::toQSet(
+            resourcePool()->getResourcesByIds(action->deviceIds()));
+    }
+    else
+    {
+        targetResources.insert(resourcePool()->getResourceById(action->serverId()));
+    }
+
+    targetResources.remove({});
+
+    for (const QnResourcePtr& resource: targetResources)
+    {
+        const auto callback =
+            [this, resource, level = QnNotificationLevel::convert(action->level())]
+        {
+            showSplashOnResource(resource, level);
+        };
+
+        for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
+            executeDelayedParented(callback, timeMs, this);
+    }
+}
+
+void QnWorkbenchDisplay::showSplashOnResource(
+    const QnResourcePtr& resource,
+    QnNotificationLevel::Value level)
 {
     if (qnRuntime->lightMode().testFlag(Qn::LightModeNoNotifications))
         return;
@@ -2528,10 +2576,7 @@ void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, con
         splashItem->setSplashType(QnSplashItem::Rectangular);
         splashItem->setPos(rect.center() + widget->pos());
         splashItem->setRect(QRectF(-Geometry::toPoint(rect.size()) / 2, rect.size()));
-        splashItem->setColor(
-            withAlpha(
-                QnNotificationLevel::notificationColor(QnNotificationLevel::valueOf(businessAction)),
-                128));
+        splashItem->setColor(withAlpha(QnNotificationLevel::notificationColor(level), 128));
         splashItem->setOpacity(0.0);
         splashItem->setRotation(widget->rotation());
         splashItem->animate(1000, Geometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
