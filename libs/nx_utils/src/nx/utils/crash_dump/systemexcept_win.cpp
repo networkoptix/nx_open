@@ -215,7 +215,7 @@ static void dumpCrtError()
     if( DuplicateHandle( GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &currentThreadExtHandle, 0, FALSE, DUPLICATE_SAME_ACCESS ) &&
         CreateThread( NULL, 0, dumpStackProc, currentThreadExtHandle, 0, NULL ) != NULL )
     {
-        ::Sleep( 10000 );
+        ::Sleep( 10'000 );
         return;
     }
     WriteDump(currentThreadExtHandle,NULL);

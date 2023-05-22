@@ -791,8 +791,8 @@ double SPSUnit::getFPS() const
 
 void SPSUnit::setFps(double fps)
 {
-    time_scale = (quint32)(fps+0.5) * 1000000;
-    //time_scale = (quint32)(fps+0.5) * 1000;
+    time_scale = (quint32)(fps+0.5) * 1'000'000;
+    //time_scale = (quint32)(fps+0.5) * 1'000;
     num_units_in_tick = time_scale / fps + 0.5;
     time_scale *= 2;
 

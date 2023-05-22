@@ -14,7 +14,7 @@ namespace {
 
 static const int kNxPayloadType = 102;
 static const QString kNxPayloadTypeName("FFMPEG");
-static const uint32_t kNxBasicSsrc = 20000;
+static const uint32_t kNxBasicSsrc = 20'000;
 
 QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metrics::Storage* metrics)
     :
@@ -206,7 +206,7 @@ QString QnRtspFfmpegEncoder::getSdpMedia(bool isVideo, int trackId, int port)
     stream << "m=" << (isVideo ? "video " : "audio ") << port << " RTP/AVP ";
     stream << kNxPayloadType << "\r\n";
     stream << "a=control:trackID=" << trackId << "\r\n";
-    stream << "a=rtpmap:" << kNxPayloadType << " " << kNxPayloadTypeName << "/" << 1000000 <<"\r\n";
+    stream << "a=rtpmap:" << kNxPayloadType << " " << kNxPayloadTypeName << "/" << 1'000'000 <<"\r\n";
 
     if (!m_codecParamsData.isEmpty())
         stream << "a=fmtp:" << kNxPayloadType << " config=" << m_codecParamsData.toBase64() <<"\r\n";

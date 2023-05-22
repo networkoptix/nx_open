@@ -21,7 +21,7 @@ namespace nx::rtp {
 
 Mpeg4Parser::Mpeg4Parser()
 {
-    StreamParser::setFrequency(90000);
+    StreamParser::setFrequency(90'000);
 }
 
 void Mpeg4Parser::setSdpInfo(const Sdp::Media& sdp)

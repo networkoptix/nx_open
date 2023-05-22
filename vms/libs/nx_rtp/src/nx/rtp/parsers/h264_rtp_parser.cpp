@@ -24,7 +24,7 @@ H264Parser::H264Parser():
         m_videoFrameSize(0),
         m_lastRtpTime(0)
 {
-    StreamParser::setFrequency(90000);
+    StreamParser::setFrequency(90'000);
 }
 
 void H264Parser::setSdpInfo(const Sdp::Media& sdp)

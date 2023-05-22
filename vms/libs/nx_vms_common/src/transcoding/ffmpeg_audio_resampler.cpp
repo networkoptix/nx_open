@@ -118,7 +118,7 @@ AVFrame* FfmpegAudioResampler::nextFrame()
     m_samplePts.front().sampleCount -= sampleCount;
     NX_ASSERT(m_samplePts.front().sampleCount > 0);
     m_samplePts.front().ptsUs +=
-        (1000000LL * sampleCount) / m_config.dstSampleRate;
+        (1'000'000LL * sampleCount) / m_config.dstSampleRate;
 
     return m_frame;
 }

@@ -41,7 +41,7 @@ NX_VMS_COMMON_API QString getValueFromString(const QString& line);
 NX_VMS_COMMON_API int timeZone(QDateTime dt1);
 NX_VMS_COMMON_API int currentTimeZone();
 
-static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
+static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1'000'000ll * 3600*24*100;
 
 /**
  * \returns                             has of string. Added for compatibility with QT4 code

@@ -161,7 +161,6 @@ void convertMetadataFromOldFormat(QnCompressedMetadata* packet, int version)
     }
     newPacket.streamIndex = oldPacket.streamIndex;
 
-
     packet->setData(QnUbjson::serialized(newPacket));
 }
 
@@ -630,7 +629,7 @@ bool QnAviArchiveDelegate::findStreams()
                 const auto dtsRange = stream->first_dts == AV_NOPTS_VALUE
                     ? stream->cur_dts
                     : stream->cur_dts - stream->first_dts;
-                const static AVRational r{1, 1000000};
+                const static AVRational r{1, 1'000'000};
                 m_durationUs = av_rescale_q(dtsRange, stream->time_base, r);
             }
             av_seek_frame(m_formatContext, /*stream_index*/ -1, 0, AVSEEK_FLAG_ANY);
@@ -731,7 +730,7 @@ bool QnAviArchiveDelegate::initMetadata()
 qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
 {
     AVStream* stream = m_formatContext->streams[packet.stream_index];
-    double timeBase = av_q2d(stream->time_base) * 1000000;
+    double timeBase = av_q2d(stream->time_base) * 1'000'000;
     qint64 packetTime = packet.dts != qint64(AV_NOPTS_VALUE) ? packet.dts : packet.pts;
     if (packetTime == qint64(AV_NOPTS_VALUE))
         return AV_NOPTS_VALUE;
@@ -742,7 +741,7 @@ qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
 void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet)
 {
     AVStream* stream = m_formatContext->streams[packet.stream_index];
-    double timeBase = av_q2d(stream->time_base) * 1000000;
+    double timeBase = av_q2d(stream->time_base) * 1'000'000;
     qint64 packetTime = packet.dts != qint64(AV_NOPTS_VALUE) ? packet.dts : packet.pts;
     if (packetTime == qint64(AV_NOPTS_VALUE))
         video->timestamp = AV_NOPTS_VALUE;
@@ -833,7 +832,6 @@ QIODevice* QnAviArchiveDelegate::ioDevice() const
 {
     return m_IOContext ? (QIODevice*) m_IOContext->opaque : nullptr;
 }
-
 
 void QnAviArchiveDelegate::setBeforeOpenInputCallback(BeforeOpenInputCallback callback)
 {

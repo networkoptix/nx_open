@@ -254,7 +254,7 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
     }
 
     using namespace std::chrono;
-    AVRational srcRate = { 1, 1000000 };
+    AVRational srcRate = { 1, 1'000'000 };
 
     auto& context = m_recordingContext;
     const uint8_t* packetData = nullptr;

@@ -8,8 +8,8 @@
 namespace nx::rtp {
 
 constexpr uint8_t kRtpVersion = 2;
-constexpr std::chrono::microseconds kRtcpInterval(5000000);
-constexpr std::chrono::microseconds kRtcpDiscontinuityThreshold(1000000);
+constexpr std::chrono::seconds kRtcpInterval(5);
+constexpr std::chrono::seconds kRtcpDiscontinuityThreshold(1);
 
 uint32_t getRtcpSsrc(const uint8_t* data, int size)
 {
@@ -123,7 +123,7 @@ int RtcpSenderReport::write(uint8_t* data, int size) const
 {
     try
     {
-        auto fraction = makeFraction(ntpTimestamp + kNtpEpochTimeDiff.count() * 1000000, 1000000);
+        auto fraction = makeFraction(ntpTimestamp + kNtpEpochTimeDiff.count() * 1'000'000, 1'000'000);
 
         nx::utils::BitStreamWriter bitstream(data, data + size);
         bitstream.putBits(2, kRtpVersion);
@@ -169,8 +169,8 @@ bool RtcpSenderReport::read(const uint8_t* data, int size)
         packetCount = reader.getBits(32);
         octetCount = reader.getBits(32);
 
-        uint64_t usec = fractions * 1000000ULL / std::numeric_limits<uint32_t>::max();
-        ntpTimestamp = (seconds - kNtpEpochTimeDiff.count()) * 1000000ULL + usec;
+        uint64_t usec = fractions * 1'000'000ULL / std::numeric_limits<uint32_t>::max();
+        ntpTimestamp = (seconds - kNtpEpochTimeDiff.count()) * 1'000'000ULL + usec;
     }
     catch(const nx::utils::BitStreamException&)
     {

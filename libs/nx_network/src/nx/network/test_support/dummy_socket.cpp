@@ -8,7 +8,7 @@ namespace nx {
 namespace network {
 
 DummySocket::DummySocket():
-    m_localAddress(HostAddress::localhost, nx::utils::random::number<quint16>(5000, 50000))
+    m_localAddress(HostAddress::localhost, nx::utils::random::number<quint16>(5'000, 50'000))
 {
 }
 

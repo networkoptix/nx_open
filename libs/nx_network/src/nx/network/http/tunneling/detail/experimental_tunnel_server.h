@@ -182,7 +182,7 @@ std::unique_ptr<AbstractMsgBodySource>
 
     return std::make_unique<EmptyMessageBodySource>(
         "application/octet-stream",
-        10000000000ULL);
+        10'000'000'000ULL);
 }
 
 template<typename ...ApplicationData>

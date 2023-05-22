@@ -256,7 +256,6 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         return -3;
     }
 
-
     if (auto ret = transcodePacketImpl(video, result))
         return ret;
 
@@ -357,7 +356,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         return 0;
     }
 
-    static AVRational r = { 1, 1000000 };
+    static AVRational r = { 1, 1'000'000 };
     if (m_fixedFrameRate)
     {
         m_frameNumToPts[m_encoderCtx->frame_number] = decodedFrame->pts;
