@@ -606,15 +606,19 @@ protected:
         return m_sentData;
     }
 
-    void whenSendAsyncRandomDataToServer()
+    void whenSendAsyncRandomDataToServer(
+        std::function<void()> auxiliaryHandler = nullptr)
     {
         ASSERT_TRUE(m_connection->setNonBlockingMode(true));
 
         m_sentData = nx::utils::generateRandomName(16*1024);
         m_connection->sendAsync(
             &m_sentData,
-            [](SystemError::ErrorCode /*systemErrorCode*/, std::size_t /*bytesSent*/)
+            [auxiliaryHandler = std::move(auxiliaryHandler)](
+                SystemError::ErrorCode, std::size_t)
             {
+                if (auxiliaryHandler)
+                    auxiliaryHandler();
             });
     }
 
@@ -1918,6 +1922,33 @@ TYPED_TEST_P(StreamSocketAcceptance, socket_is_ready_for_io_after_read_cancellat
 
 TYPED_TEST_P(
     StreamSocketAcceptance,
+    socket_is_usable_after_exception_is_thrown_by_read_completion_handler)
+{
+    this->givenPingPongServer();
+    this->givenConnectedSocket();
+
+    this->whenClientSentPing();
+    this->whenReceivedMessageFromServerAsync([]() { throw std::runtime_error("test"); });
+
+    this->assertConnectionCanDoSyncIo();
+    this->assertConnectionCanDoAsyncIo();
+}
+
+TYPED_TEST_P(
+    StreamSocketAcceptance,
+    socket_is_usable_after_exception_is_thrown_by_send_completion_handler)
+{
+    this->givenListeningServerSocket();
+    this->givenConnectedSocket();
+
+    this->whenSendAsyncRandomDataToServer([]() { throw std::runtime_error("test"); });
+    this->whenServerReadsWithFlags(MSG_WAITALL);
+
+    this->thenServerReceivedData();
+}
+
+TYPED_TEST_P(
+    StreamSocketAcceptance,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_connect_completion)
 {
     this->givenPingPongServer();
@@ -2307,6 +2338,8 @@ REGISTER_TYPED_TEST_SUITE_P(StreamSocketAcceptance,
     socket_removed_while_receiving_data,
     cancel_io,
     socket_is_ready_for_io_after_read_cancellation,
+    socket_is_usable_after_exception_is_thrown_by_read_completion_handler,
+    socket_is_usable_after_exception_is_thrown_by_send_completion_handler,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_connect_completion,
     socket_aio_thread_can_be_changed_after_io_cancellation_during_send_completion,
     change_aio_thread_of_accepted_connection,

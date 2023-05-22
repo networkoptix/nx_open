@@ -6,6 +6,7 @@
 #include <memory>
 #include <tuple>
 
+#include <nx/reflect/enum_instrument.h>
 #include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/interruption_flag.h>
 #include <nx/utils/std/optional.h>
@@ -13,6 +14,20 @@
 #include "abstract_async_channel.h"
 
 namespace nx::network::aio {
+
+namespace detail {
+
+NX_REFLECTION_ENUM_CLASS(UserTaskType,
+    read,
+    write
+);
+
+NX_REFLECTION_ENUM_CLASS(UserTaskStatus,
+    inProgress,
+    done
+);
+
+} // namespace detail
 
 using UserIoHandler = IoCompletionHandler;
 
@@ -58,28 +73,15 @@ protected:
     virtual void cancelIoInAioThread(aio::EventType eventType) override;
 
 private:
-    enum class UserTaskType
-    {
-        read,
-        write,
-    };
-
-    enum UserTaskStatus
-    {
-        inProgress,
-        done,
-    };
-
     struct UserTask
     {
-        UserTaskType type;
+        const detail::UserTaskType type;
         UserIoHandler handler;
-        UserTaskStatus status;
+        detail::UserTaskStatus status = detail::UserTaskStatus::inProgress;
 
-        UserTask(UserTaskType type, UserIoHandler handler):
+        UserTask(detail::UserTaskType type, UserIoHandler handler):
             type(type),
-            handler(std::move(handler)),
-            status(UserTaskStatus::inProgress)
+            handler(std::move(handler))
         {
         }
     };
@@ -89,7 +91,7 @@ private:
         nx::Buffer* buffer;
 
         ReadTask(nx::Buffer* const buffer, UserIoHandler handler):
-            UserTask(UserTaskType::read, std::move(handler)),
+            UserTask(detail::UserTaskType::read, std::move(handler)),
             buffer(buffer)
         {
         }
@@ -100,7 +102,7 @@ private:
         const nx::Buffer* buffer;
 
         WriteTask(const nx::Buffer* buffer, UserIoHandler handler):
-            UserTask(UserTaskType::write, std::move(handler)),
+            UserTask(detail::UserTaskType::write, std::move(handler)),
             buffer(buffer)
         {
         }
@@ -169,7 +171,7 @@ private:
     void reportFailureOfEveryUserTask(SystemError::ErrorCode sysErrorCode);
     void reportFailureToTasksFilteredByType(
         SystemError::ErrorCode sysErrorCode,
-        std::optional<UserTaskType> userTypeFilter);
+        std::optional<detail::UserTaskType> userTypeFilter);
 
     void removeUserTask(UserTask* task);
 

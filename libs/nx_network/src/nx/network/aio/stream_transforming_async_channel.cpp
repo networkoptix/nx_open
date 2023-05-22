@@ -99,26 +99,35 @@ void StreamTransformingAsyncChannel::tryToCompleteUserTasks(
     for (const std::shared_ptr<UserTask>& task: tasksToProcess)
     {
         nx::utils::InterruptionFlag::Watcher watcher(&m_aioInterruptionFlag);
-        processTask(task.get());
+
+        try
+        {
+            processTask(task.get());
+        }
+        catch (const std::exception& e)
+        {
+            NX_WARNING(this, "Exception caught while reporting SSL I/O completion. %1", e.what());
+        }
+
         if (watcher.interrupted())
             return;
 
-        if (task->status == UserTaskStatus::done)
+        if (task->status == detail::UserTaskStatus::done)
             removeUserTask(task.get());
     }
 }
 
 void StreamTransformingAsyncChannel::processTask(UserTask* task)
 {
-    NX_CRITICAL(task->status != UserTaskStatus::done, toString(*task));
+    NX_CRITICAL(task->status != detail::UserTaskStatus::done, toString(*task));
 
     switch (task->type)
     {
-        case UserTaskType::read:
+        case detail::UserTaskType::read:
             processReadTask(static_cast<ReadTask*>(task));
             break;
 
-        case UserTaskType::write:
+        case detail::UserTaskType::write:
             processWriteTask(static_cast<WriteTask*>(task));
             break;
 
@@ -155,9 +164,9 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
     if (sysErrorCode == SystemError::noError && bytesRead > 0)
         task->buffer->resize(bufferSizeBak + bytesRead);
 
-    task->status = UserTaskStatus::done;
-    auto userHandler = std::move(task->handler);
-    userHandler(sysErrorCode, bytesRead);
+    task->status = detail::UserTaskStatus::done;
+
+    nx::utils::swapAndCall(task->handler, sysErrorCode, bytesRead);
 }
 
 void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
@@ -180,7 +189,7 @@ void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
         return; //< Could not schedule user data send.
     }
 
-    task->status = UserTaskStatus::done;
+    task->status = detail::UserTaskStatus::done;
 
     NX_TRACE(this, "Write task completed. Result %1, bytesWritten %2",
         sysErrorCode, bytesWritten);
@@ -203,8 +212,7 @@ void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
         }
         else
         {
-            m_rawWriteQueue.back().userHandler =
-                std::exchange(task->handler, nullptr);
+            m_rawWriteQueue.back().userHandler = std::exchange(task->handler, nullptr);
         }
         m_rawWriteQueue.back().userByteCount = task->buffer->size();
     }
@@ -354,7 +362,7 @@ void StreamTransformingAsyncChannel::onSomeRawDataRead(
         return reportFailureOfEveryUserTask(sysErrorCode);
 
     // Reporting failure to user task(s) that depend on this read.
-    reportFailureToTasksFilteredByType(sysErrorCode, UserTaskType::read);
+    reportFailureToTasksFilteredByType(sysErrorCode, detail::UserTaskType::read);
 }
 
 int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count)
@@ -403,7 +411,7 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
     if (socketCannotRecoverFromError(resultCode))
         reportFailureOfEveryUserTask(resultCode);
     else
-        reportFailureToTasksFilteredByType(resultCode, UserTaskType::write);
+        reportFailureToTasksFilteredByType(resultCode, detail::UserTaskType::write);
 }
 
 template<typename Range>
@@ -428,13 +436,20 @@ bool StreamTransformingAsyncChannel::completeRawSendTasks(
         if (!sendTask.userHandler)
             continue;
 
-        nx::utils::InterruptionFlag::Watcher interruptionWatcher(&m_aioInterruptionFlag);
-        nx::utils::swapAndCall(
-            sendTask.userHandler,
-            sysErrorCode,
-            sysErrorCode == SystemError::noError ? sendTask.userByteCount : (size_t) -1);
-        if (interruptionWatcher.interrupted())
-            return false;
+        try
+        {
+            nx::utils::InterruptionFlag::Watcher interruptionWatcher(&m_aioInterruptionFlag);
+            nx::utils::swapAndCall(
+                sendTask.userHandler,
+                sysErrorCode,
+                sysErrorCode == SystemError::noError ? sendTask.userByteCount : (size_t) -1);
+            if (interruptionWatcher.interrupted())
+                return false;
+        }
+        catch (const std::exception& e)
+        {
+            NX_WARNING(this, "Exception caught while reporting SSL raw send completion. %1", e.what());
+        }
     }
 
     return true;
@@ -461,7 +476,7 @@ void StreamTransformingAsyncChannel::reportFailureOfEveryUserTask(
 
 void StreamTransformingAsyncChannel::reportFailureToTasksFilteredByType(
     SystemError::ErrorCode sysErrorCode,
-    std::optional<UserTaskType> userTypeFilter)
+    std::optional<detail::UserTaskType> userTypeFilter)
 {
     // We can have SystemError::noError here in case of a connection closure.
     decltype(m_userTaskQueue) userTaskQueue;
@@ -484,7 +499,7 @@ void StreamTransformingAsyncChannel::reportFailureToTasksFilteredByType(
         nx::utils::InterruptionFlag::Watcher interruptionWatcher(&m_aioInterruptionFlag);
         if (sysErrorCode == SystemError::noError) //< Connection closed.
         {
-            if (userTask->type == UserTaskType::read)
+            if (userTask->type == detail::UserTaskType::read)
                 handler(sysErrorCode, 0);
             else
                 handler(SystemError::connectionReset, (std::size_t)-1);
@@ -518,7 +533,7 @@ void StreamTransformingAsyncChannel::cancelIoInAioThread(aio::EventType eventTyp
 
     for (auto it = m_userTaskQueue.begin(); it != m_userTaskQueue.end();)
     {
-        if (it->get()->type == UserTaskType::read &&
+        if (it->get()->type == detail::UserTaskType::read &&
             (eventType == aio::EventType::etRead ||
                 eventType == aio::EventType::etNone))
         {
@@ -529,7 +544,7 @@ void StreamTransformingAsyncChannel::cancelIoInAioThread(aio::EventType eventTyp
                 m_asyncReadInProgress = false;
             }
         }
-        else if (it->get()->type == UserTaskType::write &&
+        else if (it->get()->type == detail::UserTaskType::write &&
             (eventType == aio::EventType::etWrite ||
                 eventType == aio::EventType::etNone))
         {
@@ -573,7 +588,7 @@ std::string StreamTransformingAsyncChannel::toString(const UserTask& task)
 {
     std::ostringstream os;
     os << "t " << (int)task.type << ", s " << (int)task.status;
-    if (task.type == UserTaskType::write)
+    if (task.type == detail::UserTaskType::write)
         os << " (" << nx::utils::toBase64(*static_cast<const WriteTask&>(task).buffer) << ")";
 
     return os.str();
