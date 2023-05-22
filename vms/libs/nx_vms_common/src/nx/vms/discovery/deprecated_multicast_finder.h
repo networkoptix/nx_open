@@ -3,6 +3,7 @@
 #pragma once
 
 #include <memory>
+#include <limits>
 
 #include <QtCore/QCache>
 #include <QtNetwork/QHostAddress>
@@ -13,17 +14,15 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/types/connection_types.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class UDPSocket;
 class HostAddress;
 class SocketAddress;
 
-} // namespace network
+} // namespace nx::network
 
-namespace vms {
-namespace discovery {
+namespace nx::vms::discovery {
 
 /**
  * Searches for all compatible servers in local network environment using multicast.
@@ -48,7 +47,7 @@ public:
         std::function<bool()> responseEnabled;
         QnUuid peerId;
 
-        static const size_t kUnlimited;
+        static constexpr size_t kUnlimited = std::numeric_limits<size_t>::max();
     };
 
     //!Creates socket and binds it to random unused udp port
@@ -137,6 +136,4 @@ private:
     mutable nx::Mutex m_moduleInfoMutex;
 };
 
-} // namespace discovery
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::discovery
