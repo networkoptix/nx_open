@@ -275,7 +275,10 @@ Item
 
                     onTextChanged: openedTileItem.errorMessage = ""
 
-                    Keys.onPressed: openedTileItem.handleKeyPressed(event)
+                    Keys.onPressed: function(event)
+                    {
+                        openedTileItem.handleKeyPressed(event)
+                    }
 
                     KeyNavigation.tab: savePasswordCheckbox
                 }
