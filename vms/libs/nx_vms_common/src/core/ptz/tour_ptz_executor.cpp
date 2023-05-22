@@ -24,9 +24,9 @@ using namespace nx::vms::common::ptz;
 
 namespace {
     const int pingTimeout = 333;
-    const int samePositionTimeout = 5000;
+    const int samePositionTimeout = 5'000;
     const int repeatTimeoutMultilier = 3;
-    const int maxRepeatTimeout = 10000;
+    const int maxRepeatTimeout = 10'000;
 }
 
 // -------------------------------------------------------------------------- //

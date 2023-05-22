@@ -13,24 +13,24 @@ namespace detail {
 
 static inline bool fuzzyIsNull(double d)
 {
-    return std::fabs(d) <= 0.000000000001;
+    return std::fabs(d) <= 0.000'000'000'001;
 }
 
 static inline bool fuzzyIsNull(float f)
 {
-    return std::fabs(f) <= 0.00001f;
+    return std::fabs(f) <= 0.000'01f;
 }
 
 static inline bool fuzzyEquals(double p1, double p2)
 {
-    constexpr double kPrecision = 1000000000000.0;
+    constexpr double kPrecision = 1'000'000'000'000.0;
     return (fuzzyIsNull(p1) && fuzzyIsNull(p2)) ||
         (std::fabs(p1 - p2) * kPrecision <= std::min(std::fabs(p1), std::fabs(p2)));
 }
 
 static inline bool fuzzyEquals(float p1, float p2)
 {
-    constexpr float kPrecision = 100000.0f;
+    constexpr float kPrecision = 100'000.0f;
     return (fuzzyIsNull(p1) && fuzzyIsNull(p2)) ||
         (std::fabs(p1 - p2) * kPrecision <= std::min(std::fabs(p1), std::fabs(p2)));
 }

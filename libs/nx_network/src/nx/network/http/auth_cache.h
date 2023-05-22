@@ -27,7 +27,7 @@ class NX_NETWORK_API AuthInfoCache
 {
 public:
     static constexpr auto kDefaultEntryLifeTime = std::chrono::minutes(5);
-    static constexpr std::size_t kDefaultCacheSize = 100000;
+    static constexpr std::size_t kDefaultCacheSize = 100'000;
 
     AuthInfoCache();
 

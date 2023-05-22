@@ -85,9 +85,9 @@ public:
      * Stop monitoring sock for event eventType.
      * Guarantees that no AIOEventHandler::eventTriggered will be called after return of this method.
      * If AIOEventHandler::eventTriggered is running and stopMonitoring called not from AIOEventHandler::eventTriggered,
-     *   method blocks untill AIOEventHandler::eventTriggered had returned.
+     *   method blocks until AIOEventHandler::eventTriggered had returned.
      * NOTE: Calling this method with same parameters simultaneously from
-     *   multiple threads can cause undefined behavour.
+     *   multiple threads can cause undefined behavior.
      */
     void stopMonitoring(Pollable* const sock, aio::EventType eventType);
 

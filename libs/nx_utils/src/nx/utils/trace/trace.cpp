@@ -24,7 +24,7 @@ namespace nx::utils::trace {
 
 namespace {
 
-constexpr auto kCapacity = 10000;
+constexpr auto kCapacity = 10'000;
 constexpr auto kDumpPeriod = 1s;
 
 class Queue

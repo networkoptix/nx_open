@@ -71,8 +71,8 @@ int getDefaultDstSampleRate(int srcSampleRate, AVCodec* avCodec)
 int getDefaultBitrate(AVCodecContext* context)
 {
     if (context->codec_id == AV_CODEC_ID_ADPCM_G726)
-        return 16000; // G726 supports bitrate in range [16000..40000] Kbps only.
-    return 64000 * context->channels;
+        return 16'000; // G726 supports bitrate in range [16'000..40'000] Kbps only.
+    return 64'000 * context->channels;
 }
 
 } // namespace

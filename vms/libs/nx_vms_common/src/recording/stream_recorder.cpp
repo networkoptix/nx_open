@@ -109,7 +109,7 @@ qint64 QnStreamRecorder::isPrimaryKeyFrame(const QnConstAbstractMediaDataPtr& md
 {
     if (!m_hasVideo)
         return md->dataType == QnAbstractMediaData::AUDIO;
-    return md->dataType == QnAbstractMediaData::VIDEO 
+    return md->dataType == QnAbstractMediaData::VIDEO
         && md->channelNumber == 0
         && md->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
 }
@@ -239,7 +239,7 @@ bool QnStreamRecorder::dataHoleDetected(const QnConstAbstractMediaDataPtr& md)
     {
         NX_DEBUG(
             this, "Time translated into the past for %1 s. Closing file",
-            (md->timestamp - m_startDateTimeUs) / 1000000);
+            (md->timestamp - m_startDateTimeUs) / 1'000'000);
 
         return true;
     }

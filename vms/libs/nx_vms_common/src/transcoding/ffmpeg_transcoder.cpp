@@ -368,7 +368,7 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
     }
 
     AVStream* stream = m_formatCtx->streams[streamIndex];
-    AVRational srcRate = {1, 1000000};
+    constexpr AVRational srcRate = {1, 1'000'000};
     QnFfmpegAvPacket packet;
 
     if (m_config.useAbsoluteTimestamp)

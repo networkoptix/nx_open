@@ -24,8 +24,7 @@ namespace aio { class AbstractAioThread; }
 
 namespace deprecated {
 
-static constexpr std::chrono::milliseconds kDefaultConnectTimeout =
-    std::chrono::milliseconds(10000);
+static constexpr std::chrono::milliseconds kDefaultConnectTimeout = std::chrono::seconds(10);
 
 } // namespace deprecated
 

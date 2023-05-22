@@ -5,7 +5,7 @@
 #include <nx/vms/event/action_parameters.h>
 
 namespace {
-static const int kInstantActionAutoResetTimeoutMs = 30000;
+static const int kInstantActionAutoResetTimeoutMs = 30'000;
 } // namespace
 
 namespace nx {

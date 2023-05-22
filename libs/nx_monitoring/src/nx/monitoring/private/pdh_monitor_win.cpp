@@ -290,7 +290,7 @@ void PdhMonitor::readGpuTimeCounterValues(std::chrono::milliseconds interval)
     const auto runningDelta = maxGpuRunningTime - m_lastGpuRunningTime;
     m_lastGpuRunningTime = maxGpuRunningTime;
 
-    m_thisProcessGpuUsage = (qreal) runningDelta / (interval.count() * 10000.0);
+    m_thisProcessGpuUsage = (qreal) runningDelta / (interval.count() * 10'000.0);
 }
 
 void PdhMonitor::readDiskCounterValues()
