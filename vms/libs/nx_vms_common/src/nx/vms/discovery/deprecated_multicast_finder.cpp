@@ -39,7 +39,7 @@ constexpr unsigned kCheckInterfacesTimeoutMs = 60'000;
 const QHostAddress kDefaultModuleRevealMulticastGroup = QHostAddress("239.255.11.11");
 constexpr quint16 kDefaultModuleRevealMulticastGroupPort = 5007;
 
-constexpr QByteArrayView kRevealRequestStr = "{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }";
+const QByteArray kRevealRequestStr = "{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }";
 constexpr QStringView kModuleInfoStr = u", { seed: \"%1\" }, {peerType: \"%2\"}";
 
 constexpr QStringView kDeprecatedEcId = u"Enterprise Controller";
@@ -62,7 +62,7 @@ DeprecatedMulticastFinder::RevealRequest::RevealRequest(
 
 QByteArray DeprecatedMulticastFinder::RevealRequest::serialize()
 {
-    QByteArray result{kRevealRequestStr.constData(), kRevealRequestStr.size()};
+    QByteArray result = kRevealRequestStr;
     QString moduleGuid = m_moduleGuid.toSimpleString();
     result += kModuleInfoStr.arg(moduleGuid, nx::reflect::toString(m_peerType).c_str()).toLatin1();
     return result;
