@@ -369,6 +369,8 @@ public:
     */
     Q_INVOKABLE static QRect intersection(const QRect& r1, const QRect& r2);
     Q_INVOKABLE static QRectF intersection(const QRectF& r1, const QRectF& r2);
+    Q_INVOKABLE static bool intersects(const QRect& r1, const QRect& r2);
+    Q_INVOKABLE static bool intersects(const QRectF& r1, const QRectF& r2);
 
     /**
      * @return Area of the provided rectangle or 0 if it is not valid.

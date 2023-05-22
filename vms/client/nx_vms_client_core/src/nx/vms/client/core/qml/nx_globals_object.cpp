@@ -84,17 +84,30 @@ QPersistentModelIndex NxGlobalsObject::toPersistent(const QModelIndex& index) co
     return QPersistentModelIndex(index);
 }
 
-Q_INVOKABLE QModelIndex NxGlobalsObject::fromPersistent(const QPersistentModelIndex& index) const
+QModelIndex NxGlobalsObject::fromPersistent(const QPersistentModelIndex& index) const
 {
     return index;
 }
 
-Q_INVOKABLE bool NxGlobalsObject::hasChildren(const QModelIndex& index) const
+QVariant NxGlobalsObject::modelData(const QModelIndex& index, const QString& roleName) const
+{
+    if (!index.isValid())
+        return {};
+
+    constexpr int kNoRole = -1;
+    const int role = index.model()->roleNames().key(roleName.toUtf8(), kNoRole);
+    if (!NX_ASSERT(role != kNoRole, "Role '%1' not found", roleName))
+        return {};
+
+    return index.data(role);
+}
+
+bool NxGlobalsObject::hasChildren(const QModelIndex& index) const
 {
     return index.isValid() && index.model()->hasChildren(index);
 }
 
-Q_INVOKABLE Qt::ItemFlags NxGlobalsObject::itemFlags(const QModelIndex& index) const
+Qt::ItemFlags NxGlobalsObject::itemFlags(const QModelIndex& index) const
 {
     return index.isValid()
         ? index.model()->flags(index)

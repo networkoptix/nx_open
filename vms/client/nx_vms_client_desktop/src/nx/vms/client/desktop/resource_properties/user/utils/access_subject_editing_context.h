@@ -85,8 +85,16 @@ public:
 
     static QnUuid specialResourceGroupFor(const QnResourcePtr& resource);
 
-    static bool isRelevant(
-        nx::vms::api::SpecialResourceGroup group, nx::vms::api::AccessRight accessRight);
+    static nx::vms::api::AccessRights relevantAccessRights(
+        nx::vms::api::SpecialResourceGroup group);
+
+    static nx::vms::api::AccessRights relevantAccessRights(const QnResourcePtr& resource);
+
+    static void modifyAccessRights(nx::core::access::ResourceAccessMap& accessMap,
+        const QnUuid& resourceOrGroupId, nx::vms::api::AccessRights accessRightsMask, bool value);
+
+    Q_INVOKABLE void modifyAccessRights(const QList<QnResource*>& resources,
+        nx::vms::api::AccessRights accessRights, bool value);
 
 signals:
     void subjectChanged();
