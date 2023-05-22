@@ -101,6 +101,7 @@ Rectangle
                 {
                     control.continuousSync = true
                     control.continuousSyncEditable = true
+                    control.lastSync = ""
                 }
 
                 control.uri = ldapScheme + hostAndPort
