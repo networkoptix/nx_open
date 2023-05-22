@@ -1340,11 +1340,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>若你的系統沒有對外網路連線，請將授權序號與硬體ID提供給%1 以取得離線授權啟用檔案。</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>若你的系統沒有對外網路連線，請將授權序號與硬體ID提供給當地經銷商或者授權支援團隊以取得離線授權啟用檔案。</translation>
     </message>
   </context>
   <context>
@@ -1553,12 +1553,12 @@ License Key: %2</source>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
+      <translation>因伺服器皆無對外網路連線，故無法執行電子郵件測試。</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <translation>在套用這些設定後，%1 使用者將會開始收到電子郵件。</translation>
     </message>
   </context>
   <context>
@@ -1878,7 +1878,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>無法將日誌保存到所選資料夾</translation>
     </message>
     <message>
       <source>Download complete!</source>
@@ -1886,7 +1886,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation type="unfinished">NVIDIA hardware acceleration is in beta mode</translation>
+      <translation>NVIDIA 硬體加速功能目前仍為beta測試模式</translation>
     </message>
   </context>
   <context>
@@ -2204,12 +2204,12 @@ License Key: %2</source>
     <message>
       <source>Connected to %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <translation>已透過%2 連線至 %1</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <translation>%2 已中斷與 %1的連線。</translation>
     </message>
   </context>
   <context>
@@ -2480,7 +2480,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>退出前是否套用變更?</translation>
     </message>
   </context>
   <context>
@@ -3542,7 +3542,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>選擇資料夾...</translation>
     </message>
   </context>
   <context>
@@ -4346,7 +4346,7 @@ to %1</source>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>退出前是否套用變更?</translation>
     </message>
   </context>
   <context>
@@ -5118,7 +5118,7 @@ to %1</source>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>必要資訊</translation>
     </message>
     <message>
       <source>Provide</source>
@@ -6632,7 +6632,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move Partially</source>
-      <translation type="unfinished">Move Partially</translation>
+      <translation>部分移動</translation>
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
@@ -7820,7 +7820,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
     <message>
       <source>No filter</source>
-      <translation type="unfinished">No filter</translation>
+      <translation>無篩選條件</translation>
     </message>
     <message>
       <source>Main storage only</source>
@@ -8322,7 +8322,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>必要資訊</translation>
     </message>
   </context>
   <context>
