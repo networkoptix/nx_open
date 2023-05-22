@@ -16,6 +16,7 @@ nx_configure_file("${CMAKE_BINARY_DIR}/conan_refs.txt"
 function(nx_generate_compatible_servers_txt)
     if(buildNumber STREQUAL "0")
         file(WRITE "${SERVER_REFS_FILE_NAME}" "# No compatible Server version was detected.")
+        nx_store_known_file("${SERVER_REFS_FILE_NAME}")
         return()
     endif()
 
