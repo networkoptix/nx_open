@@ -35,4 +35,9 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
     return kDescriptor;
 }
 
+ShowOnAlarmLayoutAction::ShowOnAlarmLayoutAction()
+{
+    setLevel(nx::vms::event::Level::critical);
+}
+
 } // namespace nx::vms::rules

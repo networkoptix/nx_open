@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "workbench_notifications_executor.h"
+#include "workbench_action_executor.h"
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_resource.h>
@@ -21,9 +21,6 @@
 #include <nx/vms/rules/actions/open_layout_action.h>
 #include <nx/vms/rules/actions/play_sound_action.h>
 #include <nx/vms/rules/actions/ptz_preset_action.h>
-#include <nx/vms/rules/actions/repeat_sound_action.h>
-#include <nx/vms/rules/actions/show_notification_action.h>
-#include <nx/vms/rules/actions/show_on_alarm_layout_action.h>
 #include <nx/vms/rules/actions/speak_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/utils/field.h>
@@ -36,19 +33,19 @@
 #include <utils/common/synctime.h>
 #include <utils/media/audio_player.h>
 
-using namespace nx::vms::client::desktop;
+namespace nx::vms::client::desktop {
+
 using namespace nx::vms::rules;
 
 namespace {
 
-// TODO: #amalov Consider moving this check to client router.
-// TODO: #amalov Check access to source.
+// TODO: #amalov Remove when routing is ready.
 bool checkUserPermissions(const QnUserResourcePtr& user, const ActionPtr& action)
 {
     if (!user)
         return false;
 
-    const auto propValue = action->property(utils::kUsersFieldName);
+    const auto propValue = action->property(rules::utils::kUsersFieldName);
     if (!propValue.isValid() || !propValue.canConvert<UuidSelection>())
         return false;
 
@@ -62,40 +59,31 @@ bool checkUserPermissions(const QnUserResourcePtr& user, const ActionPtr& action
 
 } // namespace
 
-QnWorkbenchNotificationsExecutor::QnWorkbenchNotificationsExecutor(QObject* parent):
+WorkbenchActionExecutor::WorkbenchActionExecutor(QObject* parent):
     QnWorkbenchContextAware(parent)
 {
     auto engine = systemContext()->vmsRulesEngine();
 
-    engine->addActionExecutor(utils::type<EnterFullscreenAction>(), this);
-    engine->addActionExecutor(utils::type<ExitFullscreenAction>(), this);
-    engine->addActionExecutor(utils::type<NotificationAction>(), this);
-    engine->addActionExecutor(utils::type<OpenLayoutAction>(), this);
-    engine->addActionExecutor(utils::type<PlaySoundAction>(), this);
-    engine->addActionExecutor(utils::type<PtzPresetAction>(), this);
-    engine->addActionExecutor(utils::type<RepeatSoundAction>(), this);
-    engine->addActionExecutor(utils::type<ShowOnAlarmLayoutAction>(), this);
-    engine->addActionExecutor(utils::type<SpeakAction>(), this);
+    engine->addActionExecutor(rules::utils::type<EnterFullscreenAction>(), this);
+    engine->addActionExecutor(rules::utils::type<ExitFullscreenAction>(), this);
+    engine->addActionExecutor(rules::utils::type<OpenLayoutAction>(), this);
+    engine->addActionExecutor(rules::utils::type<PlaySoundAction>(), this);
+    engine->addActionExecutor(rules::utils::type<PtzPresetAction>(), this);
+    engine->addActionExecutor(rules::utils::type<SpeakAction>(), this);
+
 }
 
-void QnWorkbenchNotificationsExecutor::execute(const ActionPtr& action)
+WorkbenchActionExecutor::~WorkbenchActionExecutor()
+{}
+
+void WorkbenchActionExecutor::execute(const ActionPtr& action)
 {
     if (!checkUserPermissions(context()->user(), action))
         return;
 
     const auto& actionType = action->type();
 
-    if (actionType == utils::type<NotificationAction>()
-        || actionType == utils::type<RepeatSoundAction>()
-        || actionType == utils::type<ShowOnAlarmLayoutAction>())
-    {
-        auto notificationAction = action.dynamicCast<NotificationActionBase>();
-        if (!NX_ASSERT(notificationAction, "Unexpected action: %1", actionType))
-            return;
-
-        emit notificationActionReceived(notificationAction);
-    }
-    else if (action->type() == utils::type<PlaySoundAction>())
+    if (action->type() == rules::utils::type<PlaySoundAction>())
     {
         auto soundAction = action.dynamicCast<PlaySoundAction>();
         if (!NX_ASSERT(soundAction))
@@ -107,7 +95,7 @@ void QnWorkbenchNotificationsExecutor::execute(const ActionPtr& action)
         // It should not be played when downloaded.
         AudioPlayer::playFileAsync(filePath);
     }
-    else if (action->type() == utils::type<SpeakAction>())
+    else if (action->type() == rules::utils::type<SpeakAction>())
     {
         auto speakAction = action.dynamicCast<SpeakAction>();
         if (!NX_ASSERT(speakAction))
@@ -128,7 +116,7 @@ void QnWorkbenchNotificationsExecutor::execute(const ActionPtr& action)
             AudioPlayer::sayTextAsync(speakAction->text(), this, std::move(callback));
         }
     }
-    else if (action->type() == utils::type<EnterFullscreenAction>())
+    else if (action->type() == rules::utils::type<EnterFullscreenAction>())
     {
         auto enterFullscreenAction = action.dynamicCast<EnterFullscreenAction>();
         if (!NX_ASSERT(enterFullscreenAction))
@@ -169,22 +157,20 @@ void QnWorkbenchNotificationsExecutor::execute(const ActionPtr& action)
             }
         }
     }
-    else if (action->type() == utils::type<ExitFullscreenAction>())
+    else if (action->type() == rules::utils::type<ExitFullscreenAction>())
     {
         auto exitFullscreenAction = action.dynamicCast<ExitFullscreenAction>();
         if (!NX_ASSERT(exitFullscreenAction))
             return;
 
-        const auto currentLayoutResource = workbench()->currentLayout()->resource();
-        if (!currentLayoutResource
-            || exitFullscreenAction->layoutIds().contains(currentLayoutResource->getId()))
+        if (const auto currentLayoutResource = workbench()->currentLayout()->resource();
+            currentLayoutResource
+            && exitFullscreenAction->layoutIds().contains(currentLayoutResource->getId()))
         {
-            return;
+            workbench()->setItem(Qn::ZoomedRole, nullptr);
         }
-
-        workbench()->setItem(Qn::ZoomedRole, nullptr);
     }
-    else if (action->type() == utils::type<PtzPresetAction>())
+    else if (action->type() == rules::utils::type<PtzPresetAction>())
     {
         auto ptzAction = action.dynamicCast<PtzPresetAction>();
         if (!NX_ASSERT(ptzAction))
@@ -210,7 +196,7 @@ void QnWorkbenchNotificationsExecutor::execute(const ActionPtr& action)
             }
         }
     }
-    else if (action->type() == utils::type<OpenLayoutAction>())
+    else if (action->type() == rules::utils::type<OpenLayoutAction>())
     {
         auto layoutAction = action.dynamicCast<OpenLayoutAction>();
         if (!NX_ASSERT(layoutAction))
@@ -231,4 +217,10 @@ void QnWorkbenchNotificationsExecutor::execute(const ActionPtr& action)
                 ui::action::Parameters().withArgument(Qn::TimestampRole, navigationTime));
         }
     }
+    else
+    {
+        NX_ASSERT(false, "Unexpected action: %1", actionType);
+    }
 }
+
+} // namespace nx::vms::client::desktop

@@ -26,6 +26,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/aggregation_info.h>
@@ -40,7 +41,6 @@
 #include <ui/common/notification_levels.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/help/business_help.h>
-#include <ui/workbench/handlers/workbench_notifications_executor.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -231,13 +231,9 @@ NotificationListModel::Private::Private(NotificationListModel* q):
             m_itemsByLoadingSound.remove(fileName);
         });
 
-    connect(context()->instance<QnWorkbenchNotificationsExecutor>(),
-        &QnWorkbenchNotificationsExecutor::notificationActionReceived,
+    connect(context()->instance<NotificationActionExecutor>(),
+        &NotificationActionExecutor::notificationActionReceived,
         this, &NotificationListModel::Private::onNotificationActionBase);
-
-    connect(context()->instance<QnWorkbenchNotificationsHandler>(),
-        &QnWorkbenchNotificationsHandler::notificationActionReceived,
-        this, &NotificationListModel::Private::onNotificationAction);
 
     auto processNewSystem = [this](const QString& systemId)
     {
@@ -317,7 +313,8 @@ void NotificationListModel::Private::onRowsAboutToBeRemoved(
 }
 
 void NotificationListModel::Private::onNotificationActionBase(
-    const QSharedPointer<nx::vms::rules::NotificationActionBase>& action)
+    const QSharedPointer<nx::vms::rules::NotificationActionBase>& action,
+    const QString& cloudSystemId)
 {
     using namespace nx::vms::rules;
 
@@ -327,7 +324,7 @@ void NotificationListModel::Private::onNotificationActionBase(
         actionType, action->state(), action->id());
 
     if (actionType == rules::utils::type<NotificationAction>())
-        onNotificationAction(action.dynamicCast<NotificationAction>(), {});
+        onNotificationAction(action.dynamicCast<NotificationAction>(), cloudSystemId);
     else if (actionType == rules::utils::type<RepeatSoundAction>())
         onRepeatSoundAction(action.dynamicCast<RepeatSoundAction>());
     else if (actionType == rules::utils::type<ShowOnAlarmLayoutAction>())
@@ -338,7 +335,7 @@ void NotificationListModel::Private::onNotificationActionBase(
 
 void NotificationListModel::Private::onNotificationAction(
     const QSharedPointer<nx::vms::rules::NotificationAction>& action,
-    QString cloudSystemId)
+    const QString& cloudSystemId)
 {
     NX_VERBOSE(this, "Cloud system id: %1", cloudSystemId);
 

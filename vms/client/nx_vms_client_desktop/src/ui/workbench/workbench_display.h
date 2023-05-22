@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
 #include <nx/vms/event/event_fwd.h>
 #include <ui/animation/animation_timer_listener.h>
+#include <ui/common/notification_levels.h>
 #include <ui/common/scene_transformations.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -28,21 +29,21 @@ class ForwardingInstrument;
 class SignalingInstrument;
 class SelectionOverlayTuneInstrument;
 class FocusListenerInstrument;
-namespace nx::vms::client::desktop { class FrameTimePointsProviderInstrument; }
-
-class QnWorkbenchItem;
-
-class QnWorkbenchLayout;
-class QnResourceWidget;
 class ViewportAnimator;
 class WidgetAnimator;
+
+class QnWorkbenchItem;
+class QnWorkbenchLayout;
+class QnResourceWidget;
 class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
 class QnGridBackgroundItem;
-
 class QnClientVideoCamera;
 class QnCamDisplay;
+
+namespace nx::vms::client::desktop { class FrameTimePointsProviderInstrument; }
+namespace nx::vms::rules { class NotificationActionBase; }
 
 /**
  * This class ties a workbench, a scene and a view together.
@@ -361,8 +362,10 @@ protected slots:
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
 
-    void at_notificationsHandler_businessActionAdded(const nx::vms::event::AbstractActionPtr &businessAction);
-    void showSplashOnResource(const QnResourcePtr &resource, const nx::vms::event::AbstractActionPtr &businessAction);
+    void at_notificationAdded(const nx::vms::event::AbstractActionPtr& businessAction);
+    void at_notificationAction(
+        const QSharedPointer<nx::vms::rules::NotificationActionBase>& notificationAction);
+    void showSplashOnResource(const QnResourcePtr& resource, QnNotificationLevel::Value level);
 
     bool canShowLayoutBackground() const;
 

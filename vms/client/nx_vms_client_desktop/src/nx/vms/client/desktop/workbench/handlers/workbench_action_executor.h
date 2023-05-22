@@ -7,19 +7,20 @@
 
 namespace nx::vms::rules { class NotificationActionBase; }
 
-class QnWorkbenchNotificationsExecutor:
+namespace nx::vms::client::desktop {
+
+class WorkbenchActionExecutor:
     public nx::vms::rules::ActionExecutor,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
 
 public:
-    QnWorkbenchNotificationsExecutor(QObject* parent);
-
-signals:
-    void notificationActionReceived(
-        const QSharedPointer<nx::vms::rules::NotificationActionBase>& notificationAction);
+    explicit WorkbenchActionExecutor(QObject* parent);
+    ~WorkbenchActionExecutor();
 
 private:
     virtual void execute(const nx::vms::rules::ActionPtr& action) override;
 };
+
+} // namespace nx::vms::client::desktop

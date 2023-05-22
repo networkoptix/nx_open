@@ -35,7 +35,6 @@
 #include <nx/vms/rules/utils/type.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
-#include <ui/workbench/handlers/workbench_notifications_executor.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -43,6 +42,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/delayed.h>
+
+#include "notification_action_executor.h"
 
 namespace nx::vms::client::desktop {
 
@@ -172,8 +173,8 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
         });
 
     connect(
-        context()->instance<QnWorkbenchNotificationsExecutor>(),
-        &QnWorkbenchNotificationsExecutor::notificationActionReceived,
+        context()->instance<NotificationActionExecutor>(),
+        &NotificationActionExecutor::notificationActionReceived,
         this,
         &AlarmLayoutHandler::onNotificationActionReceived);
 }

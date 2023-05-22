@@ -22,6 +22,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -47,6 +48,8 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/workbench/handlers/alarm_layout_handler.h>
+#include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
+#include <nx/vms/client/desktop/workbench/handlers/workbench_action_executor.h>
 #include <nx/vms/client/desktop/workbench/watchers/keyboard_modifiers_watcher.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
@@ -60,7 +63,6 @@
 #include <ui/graphics/view/graphics_view.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <ui/workaround/vsync_workaround.h>
@@ -69,7 +71,6 @@
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
-#include <ui/workbench/handlers/workbench_notifications_executor.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_resource_grouping_action_handler.h>
@@ -97,17 +98,16 @@
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
-#include "nx/utils/guarded_callback.h"
-
 #ifdef Q_OS_WIN
-#include <nx/vms/client/desktop/platforms/windows/gdi_win.h>
+    #include <nx/vms/client/desktop/platforms/windows/gdi_win.h>
 #endif
 
 #ifdef Q_OS_MACX
-#include <ui/workaround/mac_utils.h>
+    #include <ui/workaround/mac_utils.h>
 #endif
 
 #include "layout_tab_bar.h"
+#include "main_window_title_bar_widget.h"
 
 using nx::vms::client::core::Geometry;
 
@@ -269,7 +269,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<ui::workbench::ActionHandler>();
     context->instance<ConnectActionsHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
-    context->instance<QnWorkbenchNotificationsExecutor>();
+    context->instance<NotificationActionExecutor>();
+    context->instance<WorkbenchActionExecutor>();
     context->instance<QnWorkbenchScreenshotHandler>();
     context->instance<WorkbenchExportHandler>();
     context->instance<ui::workbench::LayoutsHandler>();

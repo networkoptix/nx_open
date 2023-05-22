@@ -17,6 +17,8 @@ class NX_VMS_RULES_API RepeatSoundAction: public NotificationActionBase
 
 public:
     static const ItemDescriptor& manifest();
+
+    RepeatSoundAction();
 };
 
 } // namespace nx::vms::rules

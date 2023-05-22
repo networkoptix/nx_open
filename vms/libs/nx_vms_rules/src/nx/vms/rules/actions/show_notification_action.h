@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <nx/vms/event/level.h>
 #include <nx/vms/rules/client_action.h>
 #include <nx/vms/rules/icon.h>
 
@@ -20,7 +19,6 @@ class NX_VMS_RULES_API NotificationAction: public NotificationActionBase
     FIELD(bool, acknowledge, setAcknowledge)
 
     // Notification look and feel fields.
-    FIELD(nx::vms::event::Level, level, setLevel)
     FIELD(nx::vms::rules::Icon, icon, setIcon)
     FIELD(QString, customIcon, setCustomIcon)
     FIELD(nx::vms::rules::ClientAction, clientAction, setClientAction)
