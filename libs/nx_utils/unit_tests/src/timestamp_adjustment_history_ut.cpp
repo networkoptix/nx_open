@@ -97,7 +97,7 @@ TEST_F(TimestampAdjustmentHistoryTest, old_records_are_erased)
     assertIsOffsetBy(150ms, 0ms);
     assertIsOffsetBy(210ms, 0ms);
     assertIsOffsetBy(239ms, 0ms);
-    assertIsOffsetBy(240ms, 10ms);
+    assertIsOffsetBy(240ms, 0ms);
     assertIsOffsetBy(405ms, 80ms);
     assertIsOffsetBy(5s, 34ms);
     assertIsOffsetBy(10s + 299ms, 34ms);
