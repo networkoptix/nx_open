@@ -18,8 +18,8 @@
 
 using namespace std::chrono_literals;
 
-static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
-static const qint64 kMinFrameDurationUsec = 1000;
+static const qint64 TIME_RESYNC_THRESHOLD = 15'000'000ll;
+static const qint64 kMinFrameDurationUsec = 1'000;
 static const int kMaxErrorsToReportIssue = 2;
 
 static std::chrono::microseconds sMediaStatisticsWindowSize = 2s;

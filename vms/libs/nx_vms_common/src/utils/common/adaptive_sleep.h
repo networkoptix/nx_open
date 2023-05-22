@@ -9,8 +9,7 @@
 #include "sleep.h"
 #include <nx/utils/elapsed_timer.h>
 
-#define MAX_VALID_SLEEP_TIME 5000000
-
+#define MAX_VALID_SLEEP_TIME 5'000'000
 
 class QnAdaptiveSleep
 {

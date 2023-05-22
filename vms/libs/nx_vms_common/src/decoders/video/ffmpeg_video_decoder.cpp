@@ -387,7 +387,7 @@ bool QnFfmpegVideoDecoder::decode(
                     qint64 frameDistance = data->timestamp - m_prevTimestamp;
                     if (frameDistance > 0)
                     {
-                        const double fps = 1000000.0 / frameDistance;
+                        const double fps = 1'000'000.0 / frameDistance;
                         qint64 megapixels = m_context->width * m_context->height * fps;
                         static const qint64 kThreshold = 1920*2 * 1080*2 * 20; //< 4k, 20fps
                         if (megapixels >= kThreshold)

@@ -76,7 +76,7 @@ int64_t MediaStreamStatistics::bitrateBitsPerSecond() const
 
     const auto interval = intervalUnsafe().count();
     if (interval > 0)
-        return ((m_totalSizeBytes - m_data.rbegin()->size) * 8000000) / interval;
+        return ((m_totalSizeBytes - m_data.rbegin()->size) * 8'000'000) / interval;
     return 0;
 }
 
@@ -94,7 +94,7 @@ float MediaStreamStatistics::getFrameRate() const
         return 0;
     const auto interval = intervalUnsafe().count();
     if (interval > 0)
-        return (m_data.size() - 1) * 1000000.0F / interval;
+        return (m_data.size() - 1) * 1'000'000.0F / interval;
     return 0;
 }
 

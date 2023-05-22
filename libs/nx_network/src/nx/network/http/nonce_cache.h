@@ -25,7 +25,7 @@ class NonceCache
 {
 public:
     static constexpr auto kDefaultEntryLifetime = std::chrono::minutes(5);
-    static constexpr int kDefaultCacheSize = 100000;
+    static constexpr int kDefaultCacheSize = 100'000;
 
     NonceCache();
 
