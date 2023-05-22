@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state_reducer.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_settings_dialog_state_conversion_functions.h>
+#include <nx/vms/client/desktop/resource_properties/camera/widgets/private/motion_stream_alerts.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -518,6 +519,76 @@ TEST_F(CameraSettingsDialogStateReducerTest, deviceControlDisabledDoesntAffectDu
         std::move(disabledDualStreaming), false);
 
     ASSERT_FALSE(disableDeviceOptimization.isDualStreamingEnabled());
+}
+
+/**
+ * Switch "Disable secondary stream" option on;
+ *      Check that MD is in the mid state on primary stream.
+ * Apply changes;
+ *      Check that MD is in the mid state on primary stream.
+ * Switch "Disable secondary stream" option off;
+ *      Check that MD is turned ON on secondary stream.
+ * Apply changes;
+ *      Check that MD is turned ON on secondary stream.
+ */
+TEST_F(CameraSettingsDialogStateReducerTest, reEnableDualStreaming)
+{
+    // Global option to allow expert settings editing must be enabled first.
+    State enableDeviceOptimization = Reducer::setSettingsOptimizationEnabled({}, true);
+
+    const auto camera = createCamera();
+    camera->setHasDualStreaming(true);
+
+    State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), {camera});
+    ASSERT_TRUE(initial.isDualStreamingEnabled());
+    ASSERT_TRUE(initial.motion.enabled.hasValue());
+    ASSERT_TRUE(initial.motion.enabled.get());
+    ASSERT_EQ(initial.motion.stream.getBase(), State::StreamIndex::secondary);
+
+    // Turn dual streaming off.
+    State disabledDualStreaming = Reducer::setDualStreamingDisabled(
+        std::move(initial), true);
+    
+    ASSERT_FALSE(disabledDualStreaming.isDualStreamingEnabled());
+    ASSERT_TRUE(disabledDualStreaming.isMotionImplicitlyDisabled());
+    ASSERT_TRUE(disabledDualStreaming.motion.enabled.hasValue());
+    ASSERT_TRUE(disabledDualStreaming.motion.enabled.get());
+    ASSERT_EQ(disabledDualStreaming.motion.stream.getBase(), State::StreamIndex::secondary);
+    ASSERT_EQ(disabledDualStreaming.effectiveMotionStream(), State::StreamIndex::primary);
+
+    // Press Apply button.
+    CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
+        disabledDualStreaming, {camera});
+    State reloadedDiabledDualStreaming = Reducer::loadCameras({}, {camera});
+
+    ASSERT_FALSE(reloadedDiabledDualStreaming.isDualStreamingEnabled());
+    ASSERT_TRUE(reloadedDiabledDualStreaming.isMotionImplicitlyDisabled());
+    ASSERT_TRUE(reloadedDiabledDualStreaming.motion.enabled.hasValue());
+    ASSERT_TRUE(reloadedDiabledDualStreaming.motion.enabled.get());
+    ASSERT_EQ(reloadedDiabledDualStreaming.motion.stream.getBase(), State::StreamIndex::primary);
+    ASSERT_EQ(reloadedDiabledDualStreaming.effectiveMotionStream(), State::StreamIndex::primary);
+    
+    // Turn dual streaming on.
+    State enabledDualStreaming = Reducer::setDualStreamingDisabled(
+        std::move(reloadedDiabledDualStreaming), false);
+    
+    ASSERT_TRUE(enabledDualStreaming.isDualStreamingEnabled());
+    ASSERT_TRUE(enabledDualStreaming.isMotionImplicitlyDisabled());
+    ASSERT_TRUE(enabledDualStreaming.motion.enabled.hasValue());
+    ASSERT_TRUE(enabledDualStreaming.motion.enabled.get());
+    ASSERT_EQ(enabledDualStreaming.motion.stream.getBase(), State::StreamIndex::primary);
+    ASSERT_EQ(enabledDualStreaming.effectiveMotionStream(), State::StreamIndex::primary);
+
+    // Press Apply button.
+    CameraSettingsDialogStateConversionFunctions::applyStateToCameras(enabledDualStreaming, {camera});
+    State reloadedEnabledDualStreaming = Reducer::loadCameras(std::move(enabledDualStreaming), {camera});
+
+    ASSERT_TRUE(reloadedEnabledDualStreaming.isDualStreamingEnabled());
+    ASSERT_FALSE(reloadedEnabledDualStreaming.isMotionImplicitlyDisabled());
+    ASSERT_TRUE(reloadedEnabledDualStreaming.motion.enabled.hasValue());
+    ASSERT_TRUE(reloadedEnabledDualStreaming.motion.enabled.get());
+    ASSERT_EQ(reloadedEnabledDualStreaming.motion.stream.getBase(), State::StreamIndex::secondary);
+    ASSERT_EQ(reloadedEnabledDualStreaming.effectiveMotionStream(), State::StreamIndex::secondary);
 }
 
 TEST_F(CameraSettingsDialogStateReducerTest, tooHighResolutionCheck)

@@ -162,7 +162,7 @@ void setRecordingEnabled(bool value, const Cameras& cameras)
         camera->setScheduleEnabled(value);
 }
 
-void setDualStreamingDisabled(bool value, bool forceMotion, const Cameras& cameras)
+void setDualStreamingDisabled(bool value, bool forceMotion, bool switchToSecondary, const Cameras& cameras)
 {
     using Reducer = CameraSettingsDialogStateReducer;
     forceMotion = forceMotion && value; //< Force only if dual streaming is being disabled.
@@ -174,6 +174,8 @@ void setDualStreamingDisabled(bool value, bool forceMotion, const Cameras& camer
 
         if (forceMotion && Reducer::isMotionDetectionDependingOnDualStreaming(camera))
             camera->setMotionStreamIndex({StreamIndex::primary, true});
+        else if (!value && switchToSecondary)
+            camera->setMotionStreamIndex({StreamIndex::secondary, false});
 
         camera->setDisableDualStreaming(value);
     }
@@ -722,6 +724,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     {
         setDualStreamingDisabled(state.expert.dualStreamingDisabled(),
             /*need to force motion*/ !state.isSingleCamera() && state.motion.forced(),
+            /*switch to secondary*/ state.isMotionImplicitlyDisabled(),
             cameras);
     }
 
