@@ -21,7 +21,7 @@ void TimestampAdjustmentHistory::record(
 
     const auto cutoffSourceTimestamp = sourceTimestamp - m_maxSourceAge;
     if (const auto it = m_records.upper_bound(cutoffSourceTimestamp); it != m_records.begin())
-        m_records.erase(m_records.begin(), std::prev(it));
+        m_records.erase(m_records.begin(), it);
 }
 
 std::optional<std::chrono::microseconds> TimestampAdjustmentHistory::getLatestSourceTimestamp() const
