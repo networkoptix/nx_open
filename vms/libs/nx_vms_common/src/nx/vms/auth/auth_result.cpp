@@ -29,7 +29,7 @@ QString AuthResultTranslations::toErrorMessage(AuthResult value) const
 
         case Auth_WrongLogin:
         case Auth_WrongInternalLogin:
-            return tr("This user does not exist.");
+            return tr("This user does not exist or is unable to login.");
 
         case Auth_WrongDigest:
         case Auth_WrongPassword:
