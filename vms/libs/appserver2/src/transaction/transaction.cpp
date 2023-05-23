@@ -16,26 +16,30 @@ namespace ec2 {
 
 namespace ApiCommand
 {
-    QString toString(Value val)
+    QString toString(Value value)
     {
-        auto it = detail::transactionDescriptors.get<0>().find(val);
+        auto it = detail::transactionDescriptors.get<0>().find(value);
         if (it == detail::transactionDescriptors.get<0>().end())
-            return QString::number((int) val);
+            return QString::number((int) value);
         return it->get()->getName();
     }
 
-    Value fromString(const QString& val)
+    Value fromString(const QString& value)
     {
-        auto descriptor = getTransactionDescriptorByName(val);
+        auto descriptor = getTransactionDescriptorByName(value);
         return descriptor ? descriptor->getValue() : ApiCommand::NotDefined;
     }
 
-    bool isSystem(Value val) { return getTransactionDescriptorByValue(val)->isSystem; }
-    bool isRemoveOperation(Value val) { return getTransactionDescriptorByValue(val)->isRemoveOperation; }
+    bool isSystem(Value value) { return getTransactionDescriptorByValue(value)->isSystem; }
 
-    bool isPersistent(Value val)
+    bool isRemoveOperation(Value value)
     {
-        return val == CompositeSave || getTransactionDescriptorByValue(val)->isPersistent;
+        return getTransactionDescriptorByValue(value)->isRemoveOperation;
+    }
+
+    bool isPersistent(Value value)
+    {
+        return value == CompositeSave || getTransactionDescriptorByValue(value)->isPersistent;
     }
 }
 
