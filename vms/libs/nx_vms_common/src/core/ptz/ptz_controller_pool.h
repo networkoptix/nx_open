@@ -39,6 +39,8 @@ public:
     virtual void init();
     virtual void stop();
 
+    void pleaseStop();
+
 signals:
     void controllerAboutToBeChanged(const QnResourcePtr& resource);
     void controllerChanged(const QnResourcePtr& resource);
@@ -55,6 +57,7 @@ protected:
     virtual void unregisterResource(const QnResourcePtr& resource);
 
     void updateController(const QnResourcePtr& resource);
+    bool isStopping() const;
 
 private:
     friend class QnPtzControllerCreationCommand;
