@@ -5341,7 +5341,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>儲存分析與位移資料</translation>
     </message>
   </context>
   <context>
