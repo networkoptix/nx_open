@@ -2,6 +2,8 @@
 
 #include "system_context.h"
 
+#include <QtQml/QQmlEngine> //< For registering types.
+
 #include <api/media_server_statistics_manager.h>
 #include <api/runtime_info_manager.h>
 #include <camera/camera_bookmarks_manager.h>
@@ -10,6 +12,7 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
 #include <nx/branding.h>
+#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
@@ -129,6 +132,12 @@ SystemContext::~SystemContext()
 {
 }
 
+void SystemContext::registerQmlType()
+{
+    qmlRegisterUncreatableType<SystemContext>("nx.vms.client.desktop", 1, 0, "SystemContext",
+        "Cannot create instance of SystemContext.");
+}
+
 SystemContext* SystemContext::fromResource(const QnResourcePtr& resource)
 {
     if (!resource)
@@ -205,6 +214,13 @@ SystemSpecificLocalSettings* SystemContext::localSettings() const
 RestApiHelper* SystemContext::restApiHelper() const
 {
     return d->restApiHelper.get();
+}
+
+analytics::TaxonomyManager* SystemContext::taxonomyManager() const
+{
+    // TODO: #sivanov Re-implement to system-context wide storage.
+    return appContext()->qmlEngine()->singletonInstance<analytics::TaxonomyManager*>(
+        qmlTypeId("nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager"));
 }
 
 common::SessionTokenHelperPtr SystemContext::getSessionTokenHelper() const

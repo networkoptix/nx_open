@@ -32,7 +32,7 @@ Column
             return
 
         let hierarchy = []
-        for (let type = value; !!type; type = type.baseNode)
+        for (let type = value; !!type; type = type.baseObjectType)
             hierarchy.unshift(type)
 
         selectRecursively(hierarchy)
@@ -48,7 +48,7 @@ Column
         name: qsTr("Object Type")
 
         readonly property var derivedTypes: selectedObjectType
-            ? selectedObjectType.derivedNodes
+            ? selectedObjectType.derivedObjectTypes
             : []
     }
 

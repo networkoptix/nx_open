@@ -1,21 +1,25 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <memory>
+
+#include <gtest/gtest.h>
 
 #include <QtCore/QFile>
 
 #include <nx/analytics/taxonomy/state_compiler.h>
 #include <nx/reflect/instrument.h>
-#include <nx/reflect/json/serializer.h>
 #include <nx/reflect/json/deserializer.h>
+#include <nx/reflect/json/serializer.h>
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/abstract_attribute.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/abstract_state_view_filter.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/abstract_state_view.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/state_view_builder.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/attribute.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/attribute_condition_state_view_filter.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/attribute_set.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/color_set.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/enumeration.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/state_view.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/state_view_builder.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/test_support/test_resource_support_proxy.h>
 
 using nx::analytics::taxonomy::AbstractResourceSupportProxy;
@@ -33,7 +37,7 @@ NX_REFLECTION_INSTRUMENT(ExpectedColorItem, ExpectedColorItem_Fields);
 struct ExpectedAttribute
 {
     QString name;
-    AbstractAttribute::Type type;
+    Attribute::Type type;
     QString subtype;
     std::optional<float> minValue;
     std::optional<float> maxValue;
@@ -54,23 +58,23 @@ struct ExpectedAttribute
     (attributeSet)
 NX_REFLECTION_INSTRUMENT(ExpectedAttribute, ExpectedAttribute_Fields);
 
-struct ExpectedNode
+struct ExpectedObjectType
 {
     QString name;
     QString icon;
     std::set<QString> typeIds;
     std::set<QString> fullSubtreeTypeIds;
     std::vector<ExpectedAttribute> attributes;
-    std::vector<ExpectedNode> nodes;
+    std::vector<ExpectedObjectType> objectTypes;
 };
-#define ExpectedNode_Fields (name)(icon)(typeIds)(fullSubtreeTypeIds)(attributes)(nodes)
-NX_REFLECTION_INSTRUMENT(ExpectedNode, ExpectedNode_Fields);
+#define ExpectedObjectType_Fields (name)(icon)(typeIds)(fullSubtreeTypeIds)(attributes)(objectTypes)
+NX_REFLECTION_INSTRUMENT(ExpectedObjectType, ExpectedObjectType_Fields);
 
 struct ExpectedData
 {
-    std::vector<ExpectedNode> nodes;
+    std::vector<ExpectedObjectType> objectTypes;
 };
-#define ExpectedData_Fields (nodes)
+#define ExpectedData_Fields (objectTypes)
 NX_REFLECTION_INSTRUMENT(ExpectedData, ExpectedData_Fields);
 
 struct InputData
@@ -191,10 +195,10 @@ protected:
             filter = std::make_unique<AttributeConditionStateViewFilter>(
                 /*baseFilter*/ nullptr, std::move(attributes));
         }
-        const AbstractStateView* stateView = m_stateViewBuilder->stateView(filter.get());
-        std::vector<AbstractNode*> rootNodes = stateView->rootNodes();
+        const StateView* stateView = m_stateViewBuilder->stateView(filter.get());
+        std::vector<ObjectType*> objectTypes = stateView->objectTypes();
 
-        validateNodes(rootNodes, m_testCase.expected.nodes);
+        validateObjectTypes(objectTypes, m_testCase.expected.objectTypes);
     }
 
     void makeSureMultiengineStateViewIsCorrect()
@@ -212,16 +216,16 @@ protected:
             ASSERT_FALSE(itr == m_multiengineTestCase.expected.cend())
                 << engineFilter->id().toStdString();
 
-            const AbstractStateView* stateView = m_stateViewBuilder->stateView(engineFilter);
-            std::vector<AbstractNode*> rootNodes = stateView->rootNodes();
+            const StateView* stateView = m_stateViewBuilder->stateView(engineFilter);
+            std::vector<ObjectType*> objectTypes = stateView->objectTypes();
 
-            validateNodes(rootNodes, itr->second.nodes);
+            validateObjectTypes(objectTypes, itr->second.objectTypes);
         }
 
-        const AbstractStateView* stateView = m_stateViewBuilder->stateView();
-        std::vector<AbstractNode*> rootNodes = stateView->rootNodes();
+        const StateView* stateView = m_stateViewBuilder->stateView();
+        std::vector<ObjectType*> objectTypes = stateView->objectTypes();
 
-        validateNodes(rootNodes, m_multiengineTestCase.expected[QnUuid()].nodes);
+        validateObjectTypes(objectTypes, m_multiengineTestCase.expected[QnUuid()].objectTypes);
     }
 
 private:
@@ -270,71 +274,67 @@ private:
         return std::make_unique<TestResourceSupportProxy>(attributeSupportInfo);
     }
 
-    void validateNodes(
-        const std::vector<AbstractNode*>& nodes,
-        const std::vector<ExpectedNode>& expectedNodes)
+    void validateObjectTypes(
+        const std::vector<ObjectType*>& objectTypes,
+        const std::vector<ExpectedObjectType>& expectedObjectTypes)
     {
-        ASSERT_EQ(nodes.size(), expectedNodes.size());
-        for (int i = 0; i < nodes.size(); ++i)
+        ASSERT_EQ(objectTypes.size(), expectedObjectTypes.size());
+        for (int i = 0; i < objectTypes.size(); ++i)
         {
-            const AbstractNode* node = nodes[i];
-            const ExpectedNode& expectedNode = expectedNodes[i];
+            const ObjectType* objectType = objectTypes[i];
+            const ExpectedObjectType& expected = expectedObjectTypes[i];
 
-            ASSERT_EQ(node->name(), expectedNode.name);
-            ASSERT_EQ(node->icon(), expectedNode.icon);
+            ASSERT_EQ(objectType->name(), expected.name);
+            ASSERT_EQ(objectType->icon(), expected.icon);
 
-            validateTypeIds(nodes[i], expectedNodes[i]);
+            validateTypeIds(objectType, expected);
 
-            const std::vector<AbstractAttribute*> attributes = node->attributes();
-            const std::vector<ExpectedAttribute> expectedAttributes = expectedNode.attributes;
+            const std::vector<Attribute*> attributes = objectType->attributes();
+            const std::vector<ExpectedAttribute> expectedAttributes = expected.attributes;
 
             validateAttributes(attributes, expectedAttributes);
-
-            const std::vector<AbstractNode*> derivedNodes = node->derivedNodes();
-            const std::vector<ExpectedNode>& expectedDerivedNodes = expectedNode.nodes;
-
-            validateNodes(derivedNodes, expectedDerivedNodes);
+            validateObjectTypes(objectType->derivedObjectTypes(), expected.objectTypes);
         }
     }
 
-    void validateTypeIds(const AbstractNode* node, const ExpectedNode& expectedNode)
+    void validateTypeIds(const ObjectType* objectType, const ExpectedObjectType& expected)
     {
-        const std::vector<QString> actualTypeIds = node->typeIds();
+        const std::vector<QString> actualTypeIds = objectType->typeIds();
         const std::set<QString> actualTypeIdSet(actualTypeIds.begin(), actualTypeIds.end());
 
-        const std::vector<QString> actualFullSubtreeTypeIds = node->fullSubtreeTypeIds();
+        const std::vector<QString> actualFullSubtreeTypeIds = objectType->fullSubtreeTypeIds();
         const std::set<QString> actualFullSubtreeTypeIdSet(
             actualFullSubtreeTypeIds.begin(), actualFullSubtreeTypeIds.end());
 
-        ASSERT_EQ(actualTypeIdSet, expectedNode.typeIds) << expectedNode.name.toStdString();
-        ASSERT_EQ(actualFullSubtreeTypeIdSet, expectedNode.fullSubtreeTypeIds)
-            << expectedNode.name.toStdString();
+        ASSERT_EQ(actualTypeIdSet, expected.typeIds) << expected.name.toStdString();
+        ASSERT_EQ(actualFullSubtreeTypeIdSet, expected.fullSubtreeTypeIds)
+            << expected.name.toStdString();
     }
 
     void validateAttributes(
-        const std::vector<AbstractAttribute*>& attributes,
+        const std::vector<Attribute*>& attributes,
         const std::vector<ExpectedAttribute>& expectedAttributes)
     {
         ASSERT_EQ(attributes.size(), expectedAttributes.size());
         for (int i = 0; i < attributes.size(); ++i)
         {
-            const AbstractAttribute* attribute = attributes[i];
+            const Attribute* attribute = attributes[i];
             const ExpectedAttribute& expectedAttribute = expectedAttributes[i];
 
-            ASSERT_EQ(attribute->type(), expectedAttribute.type);
-            ASSERT_EQ(attribute->name(), expectedAttribute.name);
-            switch(attribute->type())
+            ASSERT_EQ(attribute->type, expectedAttribute.type);
+            ASSERT_EQ(attribute->name, expectedAttribute.name);
+            switch(attribute->type)
             {
-                case AbstractAttribute::Type::number:
+                case Attribute::Type::number:
                     validateNumericAttribute(attribute, expectedAttribute);
                     break;
-                case AbstractAttribute::Type::enumeration:
+                case Attribute::Type::enumeration:
                     validateEnumerationAttribute(attribute, expectedAttribute);
                     break;
-                case AbstractAttribute::Type::colorSet:
+                case Attribute::Type::colorSet:
                     validateColorSetAttribute(attribute, expectedAttribute);
                     break;
-                case AbstractAttribute::Type::attributeSet:
+                case Attribute::Type::attributeSet:
                     validateAttributeSetAttribute(attribute, expectedAttribute);
                     break;
             }
@@ -342,14 +342,14 @@ private:
     }
 
     void validateNumericAttribute(
-        const AbstractAttribute* attribute,
+        const Attribute* attribute,
         const ExpectedAttribute& expectedAttribute)
     {
-        const QString subtype = attribute->subtype();
+        const QString subtype = attribute->subtype;
 
         ASSERT_EQ(subtype, expectedAttribute.subtype);
-        const QVariant minValue = attribute->minValue();
-        const QVariant maxValue = attribute->maxValue();
+        const QVariant minValue = attribute->minValue;
+        const QVariant maxValue = attribute->maxValue;
 
         if (minValue.isNull())
             ASSERT_FALSE(expectedAttribute.minValue.has_value());
@@ -365,7 +365,7 @@ private:
 
         validateBounds(subtype, maxValue, expectedAttribute.maxValue);
 
-        ASSERT_EQ(attribute->unit(), expectedAttribute.unit);
+        ASSERT_EQ(attribute->unit, expectedAttribute.unit);
     }
 
     void validateBounds(
@@ -385,10 +385,10 @@ private:
     }
 
     void validateEnumerationAttribute(
-        const AbstractAttribute* attribute,
+        const Attribute* attribute,
         const ExpectedAttribute& expectedAttribute)
     {
-        const AbstractEnumeration* enumeration = attribute->enumeration();
+        const Enumeration* enumeration = attribute->enumeration;
         ASSERT_TRUE(enumeration);
 
         const std::vector<QString> items = enumeration->items();
@@ -399,10 +399,10 @@ private:
     }
 
     void validateColorSetAttribute(
-        const AbstractAttribute* attribute,
+        const Attribute* attribute,
         const ExpectedAttribute& expectedAttribute)
     {
-        const AbstractColorSet* colorSet = attribute->colorSet();
+        const ColorSet* colorSet = attribute->colorSet;
         ASSERT_TRUE(colorSet);
 
         const std::vector<QString> items = colorSet->items();
@@ -416,13 +416,13 @@ private:
     }
 
     void validateAttributeSetAttribute(
-        const AbstractAttribute* attribute,
+        const Attribute* attribute,
         const ExpectedAttribute& expectedAttribute)
     {
-        const AbstractAttributeSet* attributeSet = attribute->attributeSet();
+        const AttributeSet* attributeSet = attribute->attributeSet;
         ASSERT_TRUE(attributeSet);
 
-        const std::vector<AbstractAttribute*> attributes = attributeSet->attributes();
+        const std::vector<Attribute*> attributes = attributeSet->attributes();
         const std::vector<ExpectedAttribute> expectedAttributes = expectedAttribute.attributeSet;
 
         validateAttributes(attributes, expectedAttributes);
@@ -436,7 +436,7 @@ private:
     MultiengineTestCase m_multiengineTestCase;
     nx::vms::api::analytics::Descriptors m_descriptors;
     std::optional<std::map<QString, QString>> m_attributeValues;
-    std::unique_ptr<AbstractStateViewBuilder> m_stateViewBuilder;
+    std::unique_ptr<StateViewBuilder> m_stateViewBuilder;
     std::unique_ptr<AbstractResourceSupportProxy> m_resourceSupportProxy;
 };
 

@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "node.h"
+#include "object_type.h"
 
 #include <map>
 #include <optional>
@@ -24,43 +24,46 @@ static bool objectTypeMatchesFilter(
     return (!filter || filter->matches(objectType)) && objectType->hasEverBeenSupported();
 }
 
-struct Node::Private
+struct ObjectType::Private
 {
     const nx::analytics::taxonomy::AbstractObjectType* const mainObjectType = nullptr;
     std::map<QString, const nx::analytics::taxonomy::AbstractObjectType*> additionalObjectTypes;
     mutable std::optional<std::vector<QString>> cachedTypeIds;
     mutable std::optional<std::vector<QString>> cachedFullSubtreeTypeIds;
     mutable std::optional<QString> cachedId;
-    QPointer<AbstractNode> baseNode;
-    std::vector<AbstractNode*> derivedNodes;
-    std::vector<AbstractAttribute*> attributes;
+    QPointer<ObjectType> baseObjectType;
+    std::vector<ObjectType*> derivedObjectTypes;
+    std::vector<Attribute*> attributes;
     const AbstractStateViewFilter* filter = nullptr;
 };
 
-Node::Node(const nx::analytics::taxonomy::AbstractObjectType* mainObjectType, QObject* parent):
-    AbstractNode(parent),
+ObjectType::ObjectType(
+    const nx::analytics::taxonomy::AbstractObjectType* mainObjectType,
+    QObject* parent)
+    :
+    QObject(parent),
     d(new Private{.mainObjectType = mainObjectType})
 {
     NX_ASSERT(d->mainObjectType);
 }
 
-Node::~Node()
+ObjectType::~ObjectType()
 {
     // Required here for forward-declared scoped pointer destruction.
 }
 
-void Node::addDerivedNode(AbstractNode* node)
+void ObjectType::addDerivedObjectType(ObjectType* objectType)
 {
-    if (!NX_ASSERT(node))
+    if (!NX_ASSERT(objectType))
         return;
 
-    NX_ASSERT(node->baseNode() == nullptr);
+    NX_ASSERT(objectType->baseObjectType() == nullptr);
 
-    node->setBaseNode(this);
-    d->derivedNodes.push_back(node);
+    objectType->setBaseObjectType(this);
+    d->derivedObjectTypes.push_back(objectType);
 }
 
-void Node::addObjectType(const nx::analytics::taxonomy::AbstractObjectType* objectType)
+void ObjectType::addObjectType(const nx::analytics::taxonomy::AbstractObjectType* objectType)
 {
     if (!NX_ASSERT(objectType))
         return;
@@ -68,7 +71,7 @@ void Node::addObjectType(const nx::analytics::taxonomy::AbstractObjectType* obje
     d->additionalObjectTypes[objectType->id()] = objectType;
 }
 
-std::vector<QString> Node::typeIds() const
+std::vector<QString> ObjectType::typeIds() const
 {
     if (d->cachedTypeIds)
         return *d->cachedTypeIds;
@@ -86,21 +89,24 @@ std::vector<QString> Node::typeIds() const
     return *d->cachedTypeIds;
 }
 
-QString Node::mainTypeId() const
+QString ObjectType::mainTypeId() const
 {
     return d->mainObjectType->id();
 }
 
-std::vector<QString> Node::fullSubtreeTypeIds() const
+std::vector<QString> ObjectType::fullSubtreeTypeIds() const
 {
     if (d->cachedFullSubtreeTypeIds)
         return *d->cachedFullSubtreeTypeIds;
 
     std::set<QString> result;
-    for (const AbstractNode* derivedNode: d->derivedNodes)
+    for (const ObjectType* derivedObjectType: d->derivedObjectTypes)
     {
-        std::vector<QString> derivedNodeSubtreeTypeIds = derivedNode->fullSubtreeTypeIds();
-        result.insert(derivedNodeSubtreeTypeIds.begin(), derivedNodeSubtreeTypeIds.end());
+        const std::vector<QString> derivedObjectTypeSubtreeTypeIds =
+            derivedObjectType->fullSubtreeTypeIds();
+        result.insert(
+            derivedObjectTypeSubtreeTypeIds.begin(),
+            derivedObjectTypeSubtreeTypeIds.end());
     }
 
     std::vector<QString> ownTypeIds = this->typeIds();
@@ -110,7 +116,7 @@ std::vector<QString> Node::fullSubtreeTypeIds() const
     return *d->cachedFullSubtreeTypeIds;
 }
 
-QString Node::id() const
+QString ObjectType::id() const
 {
     if (d->cachedId)
         return *d->cachedId;
@@ -120,7 +126,7 @@ QString Node::id() const
     return *d->cachedId;
 }
 
-QString Node::name() const
+QString ObjectType::name() const
 {
     if (NX_ASSERT(d->mainObjectType))
         return d->mainObjectType->name();
@@ -128,7 +134,7 @@ QString Node::name() const
     return QString();
 }
 
-QString Node::icon() const
+QString ObjectType::icon() const
 {
     if (NX_ASSERT(d->mainObjectType))
         return d->mainObjectType->icon();
@@ -136,27 +142,27 @@ QString Node::icon() const
     return QString();
 }
 
-std::vector<AbstractAttribute*> Node::attributes() const
+std::vector<Attribute*> ObjectType::attributes() const
 {
     return d->attributes;
 }
 
-AbstractNode* Node::baseNode() const
+ObjectType* ObjectType::baseObjectType() const
 {
-    return d->baseNode;
+    return d->baseObjectType;
 }
 
-std::vector<AbstractNode*> Node::derivedNodes() const
+std::vector<ObjectType*> ObjectType::derivedObjectTypes() const
 {
-    return d->derivedNodes;
+    return d->derivedObjectTypes;
 }
 
-void Node::setFilter(const AbstractStateViewFilter* filter)
+void ObjectType::setFilter(const AbstractStateViewFilter* filter)
 {
     d->filter = filter;
 }
 
-void Node::resolveAttributes()
+void ObjectType::resolveAttributes()
 {
     std::vector<const nx::analytics::taxonomy::AbstractObjectType*> objectTypes;
 
@@ -172,14 +178,14 @@ void Node::resolveAttributes()
     d->attributes = taxonomy::resolveAttributes(objectTypes, d->filter, this);
 }
 
-QString Node::makeId(const QStringList& analyticsObjectTypeIds)
+QString ObjectType::makeId(const QStringList& analyticsObjectTypeIds)
 {
     return analyticsObjectTypeIds.join("|");
 }
 
-void Node::setBaseNode(AbstractNode* node)
+void ObjectType::setBaseObjectType(ObjectType* objectType)
 {
-    d->baseNode = node;
+    d->baseObjectType = objectType;
 }
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy

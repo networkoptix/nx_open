@@ -7,19 +7,19 @@
 #include <memory>
 
 #include <QtCore/QCollator>
+#include <QtCore/QHash>
 #include <QtCore/QJsonObject>
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
-#include <QtCore/QHash>
+#include <QtGui/QAction>
 #include <QtGui/QPalette>
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
-#include <QtGui/QAction>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialogButtonBox>
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollArea>
 
@@ -44,6 +44,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/object_type.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/item_model_menu.h>
@@ -329,8 +330,7 @@ void AnalyticsSearchWidget::Private::setupTypeSelection()
 void AnalyticsSearchWidget::Private::updateTypeButton()
 {
     const auto objectTypeIds = m_analyticsSetup->objectTypes();
-    AbstractNode* objectType =
-        m_objectTypeModel->sourceModel()->findFilterObjectType(objectTypeIds);
+    ObjectType* objectType = m_objectTypeModel->sourceModel()->findFilterObjectType(objectTypeIds);
 
     const auto engine = engineById(m_analyticsSetup->engine());
     m_objectTypeModel->setEngine(engine);

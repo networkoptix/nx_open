@@ -119,6 +119,7 @@ TableView
                                 return
 
                             headerButton.setCheckState(getCheckState(index))
+                            headerButton.text = model.headerData(index, Qt.Horizontal)
                         }
                     }
 

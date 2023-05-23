@@ -9,6 +9,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/client/desktop/analytics/analytics_filter_model.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/object_type.h>
 
 namespace nx::vms::client::desktop {
 
@@ -20,7 +21,7 @@ class DetectableObjectTypeModel::Private
 public:
     struct TypeData
     {
-        AbstractNode* parent = nullptr;
+        ObjectType* parent = nullptr;
         int indexInParent = -1;
     };
 
@@ -41,13 +42,13 @@ public:
         updateData();
     }
 
-    void updateData(const std::vector<AbstractNode*>& types)
+    void updateData(const std::vector<ObjectType*>& types)
     {
         for (int i = 0; i < types.size(); ++i)
         {
-            AbstractNode* type = types[i];
+            ObjectType* type = types[i];
             data.insert(type, TypeData{.indexInParent = i});
-            updateData(type->derivedNodes());
+            updateData(type->derivedObjectTypes());
         }
     }
 
@@ -57,15 +58,15 @@ public:
         updateData(filterModel->objectTypes());
     }
 
-    AbstractNode* type(const QModelIndex& index) const
+    ObjectType* type(const QModelIndex& index) const
     {
-        return static_cast<AbstractNode*>(index.internalPointer());
+        return static_cast<ObjectType*>(index.internalPointer());
     }
 
 public:
     DetectableObjectTypeModel* const q;
     AnalyticsFilterModel* const filterModel;
-    QMap<AbstractNode*, TypeData> data;
+    QMap<ObjectType*, TypeData> data;
 };
 
 DetectableObjectTypeModel::DetectableObjectTypeModel(
@@ -87,9 +88,9 @@ QModelIndex DetectableObjectTypeModel::index(int row, int column, const QModelIn
     if (!hasIndex(row, column, parent))
         return {};
 
-    AbstractNode* type = d->type(parent);
+    ObjectType* type = d->type(parent);
     return createIndex(
-        row, column, type ? type->derivedNodes()[row] : d->filterModel->objectTypes()[row]);
+        row, column, type ? type->derivedObjectTypes()[row] : d->filterModel->objectTypes()[row]);
 }
 
 QModelIndex DetectableObjectTypeModel::parent(const QModelIndex& index) const
@@ -97,8 +98,8 @@ QModelIndex DetectableObjectTypeModel::parent(const QModelIndex& index) const
     if (!index.isValid() || !NX_ASSERT(checkIndex(index, CheckIndexOption::DoNotUseParent)))
         return {};
 
-    AbstractNode* type = d->type(index);
-    AbstractNode* parent = type ? type->baseNode() : nullptr;
+    ObjectType* type = d->type(index);
+    ObjectType* parent = type ? type->baseObjectType() : nullptr;
     if (!parent)
         return {};
 
@@ -113,7 +114,7 @@ int DetectableObjectTypeModel::rowCount(const QModelIndex& parent) const
         return 0;
 
     return parent.isValid()
-        ? d->type(parent)->derivedNodes().size()
+        ? d->type(parent)->derivedObjectTypes().size()
         : d->filterModel->objectTypes().size(); //< Parent is the root item.
 }
 
@@ -127,7 +128,7 @@ QVariant DetectableObjectTypeModel::data(const QModelIndex& index, int role) con
     if (!index.isValid() || !NX_ASSERT(checkIndex(index)))
         return {};
 
-    AbstractNode* type = d->type(index);
+    ObjectType* type = d->type(index);
     if (!type)
         return {};
 

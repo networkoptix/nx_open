@@ -90,7 +90,7 @@ TableView
                     x: 8
                     y: 6
 
-                    text: display || qsTr("NONE")
+                    text: display || qsTr("ANY")
                     color: display ? ColorTheme.light : ColorTheme.colors.dark17
                 }
             }

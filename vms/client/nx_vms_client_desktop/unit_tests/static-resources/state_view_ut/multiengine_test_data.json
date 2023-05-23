@@ -426,7 +426,7 @@
         "expected": {
             "": {
                 "__comment": "All Engines",
-                "nodes": [
+                "objectTypes": [
                     {
                         "name": "Base Object Type 1",
                         "icon": "base.icon.1",
@@ -438,7 +438,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 1",
                                 "icon": "derived.icon.1",
@@ -468,7 +468,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 2",
                                 "icon": "derived.icon.2",
@@ -483,7 +483,7 @@
                                         "type": "string"
                                     }
                                 ],
-                                "nodes": [
+                                "objectTypes": [
                                     {
                                         "name": "Derived Object Type 6",
                                         "icon": "derived.icon.6",
@@ -516,7 +516,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 3",
                                 "icon": "derived.icon.3",
@@ -532,7 +532,7 @@
                                         "type": "string"
                                     }
                                 ],
-                                "nodes": [
+                                "objectTypes": [
                                     {
                                         "name": "Derived Object Type 4",
                                         "icon": "derived.icon.4",
@@ -577,7 +577,7 @@
             },
             "9fee3a77-8200-4e55-97fb-04fae8a78da6": {
                 "__comment": "Engine 1",
-                "nodes": [
+                "objectTypes": [
                     {
                         "name": "Base Object Type 1",
                         "icon": "base.icon.1",
@@ -592,7 +592,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 1",
                                 "icon": "derived.icon.1",
@@ -623,7 +623,7 @@
             },
             "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": {
                 "__comment": "Engine 2",
-                "nodes": [
+                "objectTypes": [
                     {
                         "name": "Base Object Type 2",
                         "icon": "base.icon.2",
@@ -638,14 +638,14 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 2",
                                 "icon": "derived.icon.2",
                                 "typeIds": [],
                                 "fullSubtreeTypeIds": ["derived.object.type.6"],
                                 "attributes": [],
-                                "nodes": [
+                                "objectTypes": [
                                     {
                                         "name": "Derived Object Type 6",
                                         "icon": "derived.icon.6",
@@ -671,7 +671,7 @@
                             "derived.object.type.5"
                         ],
                         "attributes": [],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 3",
                                 "icon": "derived.icon.3",
@@ -681,7 +681,7 @@
                                     "derived.object.type.5"
                                 ],
                                 "attributes": [],
-                                "nodes": [
+                                "objectTypes": [
                                     {
                                         "name": "Derived Object Type 4",
                                         "icon": "derived.icon.4",
@@ -726,14 +726,14 @@
             },
             "0a89f20b-9827-434d-b75c-c18866d6b993": {
                 "__comment": "Engine 3",
-                "nodes": [
+                "objectTypes": [
                     {
                         "name": "Base Object Type 2",
                         "icon": "base.icon.2",
                         "typeIds": [],
                         "fullSubtreeTypeIds": ["derived.object.type.2"],
                         "attributes": [],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 2",
                                 "icon": "derived.icon.2",
@@ -762,7 +762,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 3",
                                 "icon": "derived.icon.3",
@@ -936,7 +936,7 @@
         "expected": {
             "": {
                 "__comment": "All Engines",
-                "nodes": [
+                "objectTypes": [
                     {
                         "name": "Base Object Type 1",
                         "icon": "base.icon.1",
@@ -959,7 +959,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 1",
                                 "icon": "derived.icon.1",
@@ -997,7 +997,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 2",
                                 "icon": "derived.icon.2",
@@ -1012,7 +1012,7 @@
                                         "type": "string"
                                     }
                                 ],
-                                "nodes": [
+                                "objectTypes": [
                                     {
                                         "name": "Derived Object Type 6",
                                         "icon": "derived.icon.6",
@@ -1061,7 +1061,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 3",
                                 "icon": "derived.icon.3",
@@ -1086,7 +1086,7 @@
                                         "type": "string"
                                     }
                                 ],
-                                "nodes": [
+                                "objectTypes": [
                                     {
                                         "name": "Derived Object Type 4",
                                         "icon": "derived.icon.4",
@@ -1151,7 +1151,7 @@
             },
             "9fee3a77-8200-4e55-97fb-04fae8a78da6": {
                 "__comment": "Engine 1",
-                "nodes": [
+                "objectTypes": [
                     {
                         "name": "Base Object Type 1",
                         "icon": "base.icon.1",
@@ -1174,7 +1174,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 1",
                                 "icon": "derived.icon.1",
@@ -1198,7 +1198,7 @@
                             "hidden.derived.object.type.6"
                         ],
                         "attributes": [],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 3",
                                 "icon": "derived.icon.3",
@@ -1213,7 +1213,7 @@
                                         "type": "string"
                                     }
                                 ],
-                                "nodes": [
+                                "objectTypes": [
                                     {
                                         "name": "Derived Object Type 5",
                                         "icon": "derived.icon.5",
@@ -1246,7 +1246,7 @@
             },
             "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": {
                 "__comment": "Engine 2",
-                "nodes": [
+                "objectTypes": [
                     {
                         "name": "Base Object Type 2",
                         "icon": "base.icon.2",
@@ -1261,14 +1261,14 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 2",
                                 "icon": "derived.icon.2",
                                 "typeIds": [],
                                 "fullSubtreeTypeIds": ["derived.object.type.6"],
                                 "attributes": [],
-                                "nodes": [
+                                "objectTypes": [
                                     {
                                         "name": "Derived Object Type 6",
                                         "icon": "derived.icon.6",
@@ -1301,7 +1301,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 3",
                                 "icon": "derived.icon.3",
@@ -1317,7 +1317,7 @@
                                         "type": "string"
                                     }
                                 ],
-                                "nodes": [
+                                "objectTypes": [
                                     {
                                         "name": "Derived Object Type 4",
                                         "icon": "derived.icon.4",
@@ -1364,7 +1364,7 @@
             },
             "0a89f20b-9827-434d-b75c-c18866d6b993": {
                 "__comment": "Engine 3",
-                "nodes": [
+                "objectTypes": [
                     {
                         "name": "Base Object Type 2",
                         "icon": "base.icon.2",
@@ -1379,7 +1379,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 2",
                                 "icon": "derived.icon.2",
@@ -1416,7 +1416,7 @@
                                 "type": "string"
                             }
                         ],
-                        "nodes": [
+                        "objectTypes": [
                             {
                                 "name": "Derived Object Type 3",
                                 "icon": "derived.icon.3",

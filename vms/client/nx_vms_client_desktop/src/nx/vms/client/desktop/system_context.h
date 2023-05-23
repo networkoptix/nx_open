@@ -27,6 +27,8 @@ class VideoCache;
 class VideoWallOnlineScreensWatcher;
 class VirtualCameraManager;
 
+namespace analytics { class TaxonomyManager; }
+
 class NX_VMS_CLIENT_DESKTOP_API SystemContext: public core::SystemContext
 {
     Q_OBJECT
@@ -52,6 +54,7 @@ public:
         QObject* parent = nullptr);
     virtual ~SystemContext() override;
 
+    static void registerQmlType();
     static SystemContext* fromResource(const QnResourcePtr& resource);
 
     QnWorkbenchAccessController* accessController() const;
@@ -68,6 +71,7 @@ public:
     QnMediaServerStatisticsManager* mediaServerStatisticsManager() const;
     SystemSpecificLocalSettings* localSettings() const;
     RestApiHelper* restApiHelper() const;
+    Q_INVOKABLE nx::vms::client::desktop::analytics::TaxonomyManager* taxonomyManager() const;
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const override;
 
 protected:
@@ -79,3 +83,5 @@ private:
 };
 
 } // namespace nx::vms::client::desktop
+
+Q_DECLARE_METATYPE(nx::vms::client::desktop::SystemContext)

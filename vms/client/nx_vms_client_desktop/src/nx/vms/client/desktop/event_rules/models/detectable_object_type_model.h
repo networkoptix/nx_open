@@ -21,7 +21,6 @@ class DetectableObjectTypeModel: public ScopedModelOperations<QAbstractItemModel
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractItemModel>;
-    using TaxonomyManager = nx::vms::client::desktop::analytics::TaxonomyManager;
 
 public:
     explicit DetectableObjectTypeModel(

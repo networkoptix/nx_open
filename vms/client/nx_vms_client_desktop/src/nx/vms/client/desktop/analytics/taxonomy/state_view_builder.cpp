@@ -2,8 +2,8 @@
 
 #include "state_view_builder.h"
 
-#include "node.h"
 #include "engine_state_view_filter.h"
+#include "object_type.h"
 #include "state_view.h"
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
@@ -44,7 +44,7 @@ static bool isHidden(const nx::analytics::taxonomy::AbstractObjectType* objectTy
     return !objectType->isReachable() && objectType->hasEverBeenSupported();
 }
 
-static AbstractNode* makeFilteredNode(
+static ObjectType* makeFilteredObjectType(
     const nx::analytics::taxonomy::AbstractObjectType* objectType,
     const AbstractStateViewFilter* filter,
     QObject* parent,
@@ -53,73 +53,74 @@ static AbstractNode* makeFilteredNode(
     if (!objectType->isReachable())
         return nullptr;
 
-    std::vector<const nx::analytics::taxonomy::AbstractObjectType*> nodeObjectTypes;
-    std::vector<AbstractNode*> derivedNodes;
+    std::vector<const nx::analytics::taxonomy::AbstractObjectType*> filteredObjectTypes;
+    std::vector<ObjectType*> derivedObjectTypes;
 
     for (nx::analytics::taxonomy::AbstractObjectType* derivedObjectType:
         objectType->derivedTypes())
     {
         if (isHidden(derivedObjectType) && (!filter || filter->matches(derivedObjectType)))
         {
-            nodeObjectTypes.push_back(derivedObjectType);
+            filteredObjectTypes.push_back(derivedObjectType);
 
             if (outEngineFilters)
                 engineFiltersFromObjectType(derivedObjectType, outEngineFilters, parent);
         }
         else if (derivedObjectType->isReachable())
         {
-            if (AbstractNode* node = makeFilteredNode(derivedObjectType, filter, parent))
-                derivedNodes.push_back(node);
+            if (ObjectType* derived = makeFilteredObjectType(derivedObjectType, filter, parent))
+                derivedObjectTypes.push_back(derived);
         }
     }
 
     const bool directFilterMatch = !filter || filter->matches(objectType);
-    if (nodeObjectTypes.empty() && derivedNodes.empty() && !directFilterMatch)
+    if (filteredObjectTypes.empty() && derivedObjectTypes.empty() && !directFilterMatch)
         return nullptr;
 
     if (directFilterMatch && outEngineFilters)
         engineFiltersFromObjectType(objectType, outEngineFilters, parent);
 
-    Node* node = new Node(objectType, nullptr);
-    node->moveToThread(parent->thread());
-    node->setParent(parent);
-    node->setFilter(filter);
-    for (const nx::analytics::taxonomy::AbstractObjectType* nodeObjectType: nodeObjectTypes)
-        node->addObjectType(nodeObjectType);
+    ObjectType* result = new ObjectType(objectType, nullptr);
+    result->moveToThread(parent->thread());
+    result->setParent(parent);
+    result->setFilter(filter);
+    for (const nx::analytics::taxonomy::AbstractObjectType* baseObjectType: filteredObjectTypes)
+        result->addObjectType(baseObjectType);
 
-    for (AbstractNode* derivedNode: derivedNodes)
-        node->addDerivedNode(derivedNode);
+    for (ObjectType* derived: derivedObjectTypes)
+        result->addDerivedObjectType(derived);
 
-    node->resolveAttributes();
-    return node;
+    result->resolveAttributes();
+    return result;
 }
 
-static AbstractStateView* makeFilteredView(
+static StateView* makeFilteredView(
     const std::shared_ptr<nx::analytics::taxonomy::AbstractState>& taxonomyState,
     const AbstractStateViewFilter* filter,
-    std::map<QString, AbstractStateViewFilter*>* outEngineFilters = nullptr)
+    std::map<QString, AbstractStateViewFilter*>* outEngineFilters = nullptr,
+    QObject* parent = nullptr)
 {
     const std::vector<nx::analytics::taxonomy::AbstractObjectType*> rootObjectTypes =
         taxonomyState->rootObjectTypes();
 
-    std::vector<AbstractNode*> result;
+    std::vector<ObjectType*> result;
     for (nx::analytics::taxonomy::AbstractObjectType* objectType: rootObjectTypes)
     {
-        if (AbstractNode* node =
-            makeFilteredNode(objectType, filter, taxonomyState.get(), outEngineFilters))
+        if (ObjectType* filteredObjectType =
+            makeFilteredObjectType(objectType, filter, taxonomyState.get(), outEngineFilters))
         {
-            result.push_back(node);
+            result.push_back(filteredObjectType);
         }
     }
 
-    return new StateView(std::move(result), taxonomyState.get());
+    return new StateView(std::move(result), parent);
 }
 
 struct StateViewBuilder::Private
 {
     std::shared_ptr<nx::analytics::taxonomy::AbstractState> taxonomyState;
     std::vector<AbstractStateViewFilter*> engineFilters;
-    mutable std::map<QString, AbstractStateView*> cachedStateViews;
+    mutable std::map<QString, StateView*> cachedStateViews;
 };
 
 StateViewBuilder::StateViewBuilder(
@@ -127,7 +128,11 @@ StateViewBuilder::StateViewBuilder(
     d(new Private{std::move(taxonomyState)})
 {
     std::map<QString, AbstractStateViewFilter*> engineFilters;
-    AbstractStateView* defaultStateView = makeFilteredView(d->taxonomyState, nullptr, &engineFilters);
+    StateView* defaultStateView = makeFilteredView(
+        d->taxonomyState,
+        /*filter*/ nullptr,
+        /*outEngineFilters*/ &engineFilters,
+        /*parent*/ d->taxonomyState.get());
 
     d->cachedStateViews[QString()] = defaultStateView;
     for (const auto& [_, engineFilter]: engineFilters)
@@ -139,17 +144,25 @@ StateViewBuilder::~StateViewBuilder()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-AbstractStateView* StateViewBuilder::stateView(const AbstractStateViewFilter* filter) const
+StateView* StateViewBuilder::stateView(const AbstractStateViewFilter* filter) const
 {
     const QString filterId = filter ? filter->id() : QString();
     const auto itr = d->cachedStateViews.find(filterId);
     if (itr != d->cachedStateViews.cend())
         return itr->second;
 
-    AbstractStateView* view = makeFilteredView(d->taxonomyState, filter);
+    StateView* view = stateView(d->taxonomyState, filter, /*parent*/ d->taxonomyState.get());
     d->cachedStateViews[filterId] = view;
 
     return view;
+}
+
+StateView* StateViewBuilder::stateView(
+    std::shared_ptr<nx::analytics::taxonomy::AbstractState> taxonomyState,
+    const AbstractStateViewFilter* filter,
+    QObject* parent)
+{
+    return makeFilteredView(taxonomyState, filter, /*outEngineFilters*/ nullptr, parent);
 }
 
 std::vector<AbstractStateViewFilter*> StateViewBuilder::engineFilters() const

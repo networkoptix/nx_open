@@ -10,8 +10,9 @@
 #include <QtCore/QPointer>
 
 #include <nx/analytics/taxonomy/abstract_engine.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/abstract_node.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/state_view_builder.h>
+
+Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/taxonomy/object_type.h")
 
 namespace nx::vms::client::desktop::analytics {
 class TaxonomyManager;
@@ -30,12 +31,13 @@ class AnalyticsFilterModel: public QObject
     Q_OBJECT
 
 public:
-    Q_PROPERTY(
-        std::vector<nx::vms::client::desktop::analytics::taxonomy::AbstractNode*> objectTypes
-        READ objectTypes NOTIFY objectTypesChanged);
+    Q_PROPERTY(std::vector<nx::vms::client::desktop::analytics::taxonomy::ObjectType*> objectTypes
+        READ objectTypes
+        NOTIFY objectTypesChanged);
 
     Q_PROPERTY(std::vector<nx::analytics::taxonomy::AbstractEngine*> engines
-        READ engines NOTIFY enginesChanged);
+        READ engines
+        NOTIFY enginesChanged);
 
     Q_PROPERTY(bool active WRITE setActive READ isActive NOTIFY activeChanged);
 
@@ -45,7 +47,7 @@ public:
     /**
      * Returns filter object types structure corresponding to selected options.
      */
-    std::vector<AbstractNode*> objectTypes() const;
+    std::vector<ObjectType*> objectTypes() const;
 
     /**
      * Returns engines.
@@ -82,13 +84,13 @@ public:
     /**
      * Finds the filter object type corresponding to analytics object type ids.
      */
-    Q_INVOKABLE nx::vms::client::desktop::analytics::taxonomy::AbstractNode* findFilterObjectType(
+    Q_INVOKABLE nx::vms::client::desktop::analytics::taxonomy::ObjectType* findFilterObjectType(
         const QStringList& analyticsObjectTypeIds);
 
     /**
      * Returns analytics object type ids corresponding to the filter object type.
      */
-    Q_INVOKABLE QStringList getAnalyticsObjectTypeIds(AbstractNode* filterObjectType);
+    Q_INVOKABLE QStringList getAnalyticsObjectTypeIds(ObjectType* filterObjectType);
 
     /**
      * Returns whether the model is active: the model is updated when the taxonomy is changed.
@@ -113,8 +115,8 @@ signals:
     void activeChanged();
 
 private:
-    AbstractNode* objectTypeById(const QString& id) const;
-    void setObjectTypes(const std::vector<AbstractNode*>& objectTypes);
+    ObjectType* objectTypeById(const QString& id) const;
+    void setObjectTypes(const std::vector<ObjectType*>& objectTypes);
     void setEngines(const std::vector<nx::analytics::taxonomy::AbstractEngine*>& engines);
     void rebuild();
     void update(
@@ -134,8 +136,8 @@ private:
     QVariantMap m_attributeValues;
     bool m_liveTypesExcluded = false;
 
-    std::vector<AbstractNode*> m_objectTypes;
-    QMap<QString, AbstractNode*> m_objectTypesById;
+    std::vector<ObjectType*> m_objectTypes;
+    QMap<QString, ObjectType*> m_objectTypesById;
     bool m_isActive = true;
 };
 

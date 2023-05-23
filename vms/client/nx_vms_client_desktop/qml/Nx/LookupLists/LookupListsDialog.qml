@@ -11,16 +11,20 @@ import Nx.Controls
 import Nx.Dialogs
 
 import nx.vms.client.desktop
+import nx.vms.client.desktop.analytics as Analytics
 
 Dialog
 {
     id: control
 
-    property LookupListsDialogStore store: null
+    required property SystemContext systemContext
+    property Analytics.StateView taxonomy: systemContext.taxonomyManager().createStateView(control)
     property var currentList: listComboBox.currentValue
     property var dialog: null
+    property bool loaded: false
     property bool saving: false
     property bool closing: false
+    property bool hasChanges: false
 
     title: qsTr("Lookup Lists")
 
@@ -31,6 +35,17 @@ Dialog
     topPadding: 0
     bottomPadding: 0
 
+    ListModel
+    {
+        id: listsModel
+    }
+
+    LookupListEntriesModel
+    {
+        id: entriesModel
+        listModel: currentList ?? null
+    }
+
     function createNewList()
     {
         createNewLookupListDialog.createObject(control).openNewIn(control)
@@ -38,38 +53,52 @@ Dialog
 
     function editCurrentList()
     {
-        var dialog = editLookupListDialog.createObject(control)
-        dialog.listName = currentList.name
-        dialog.columnName = currentList.attributeNames ? currentList.attributeNames[0] : "Value"
-        dialog.openNewIn(control)
+        const properties = { "sourceModel": currentList }
+        editLookupListDialog.createObject(control, properties).openNewIn(control)
     }
 
+    // TODO: #sivanov Implement error handling.
+    // This function is to be called from the dialog to show message box (e.g. if saving failed).
     function showError(text: string)
     {
-        console.log(text)
+        console.warn(text)
     }
 
     function accept()
     {
-        saving = true
         closing = true
-        dialog.requestSave()
+        apply()
     }
 
     function apply()
     {
+        let data = []
+        for (let i = 0; i < listsModel.count; ++i)
+            data.push(listsModel.get(i).value)
         saving = true
-        dialog.requestSave()
+        hasChanges = false
+        dialog.save(data)
     }
 
     Connections
     {
-        target: store
-        function onHasChangesChanged()
+        target: dialog
+
+        function onLoadCompleted(data)
         {
-            const applyButton = buttonBox.standardButton(DialogButtonBox.Apply)
-            if (applyButton)
-                applyButton.enabled = store.hasChanges
+            listsModel.clear()
+            for (let i = 0; i < data.length; ++i)
+            {
+                const model = data[i]
+                listsModel.append({
+                    text: model.data.name,
+                    value: model
+                })
+            }
+            loaded = true
+            if (listsModel.count)
+                listComboBox.currentIndex = 0
+            hasChanges = false
         }
     }
 
@@ -79,10 +108,17 @@ Dialog
 
         EditLookupListDialog
         {
-            editMode: false
             transientParent: control.Window.window
+            taxonomy: control.taxonomy
             visible: false
-            onAccepted: store.addNewGenericList(listName, columnName)
+            onAccepted:
+            {
+                listsModel.append({
+                    text: viewModel.name,
+                    value: viewModel
+                })
+                listComboBox.currentIndex = listsModel.count - 1
+            }
         }
     }
 
@@ -92,11 +128,27 @@ Dialog
 
         EditLookupListDialog
         {
-            editMode: true
             transientParent: control.Window.window
+            taxonomy: control.taxonomy
             visible: false
-            onAccepted: store.editCurrentGenericList(listName, columnName)
-            onDeleteRequested: store.deleteCurrentList()
+            onAccepted:
+            {
+                listsModel.set(listComboBox.currentIndex, {
+                    text: viewModel.name,
+                    value: viewModel
+                })
+                hasChanges = true
+            }
+
+            onDeleteRequested:
+            {
+                const idx = listComboBox.currentIndex > 0
+                    ? listComboBox.currentIndex - 1
+                    : listsModel.count > 1 ? 0 : -1
+                listsModel.remove(listComboBox.currentIndex)
+                listComboBox.currentIndex = idx
+                hasChanges = true
+            }
         }
     }
 
@@ -107,9 +159,14 @@ Dialog
         AddLookupListEntryDialog
         {
             transientParent: control.Window.window
+            taxonomy: control.taxonomy
             visible: false
-            model: store.entryModel
-            onAccepted: store.addItem()
+            model: currentList
+            onAccepted:
+            {
+                entriesModel.addEntry(entry)
+                hasChanges = true
+            }
         }
     }
 
@@ -186,7 +243,7 @@ Dialog
             {
                 id: tableView
 
-                model: store.selectedListModel
+                model: entriesModel
 
                 anchors
                 {
@@ -206,7 +263,7 @@ Dialog
     Control
     {
         id: listControlPanel
-        enabled: !!store && store.loaded
+        enabled: loaded
         background: Rectangle
         {
             color: ColorTheme.colors.dark8
@@ -219,12 +276,10 @@ Dialog
             ComboBox
             {
                 id: listComboBox
-                model: store ? store.listsModel : null
+                model: listsModel
                 enabled: !!currentList
-                textRole: "display"
+                textRole: "text"
                 valueRole: "value"
-                currentIndex: store ? store.listIndex : -1
-                onActivated: store.selectList(currentIndex)
             }
             Button
             {
@@ -245,7 +300,7 @@ Dialog
 
     contentItem: Loader
     {
-        sourceComponent: !store || !store.loaded
+        sourceComponent: !loaded
             ? preloader
             : currentList ? mainPage : noListsPage
     }
@@ -254,5 +309,11 @@ Dialog
     {
         buttonLayout: DialogButtonBox.KdeLayout
         standardButtons: DialogButtonBox.Ok | DialogButtonBox.Apply | DialogButtonBox.Cancel
+
+        Component.onCompleted:
+        {
+            let applyButton = buttonBox.standardButton(DialogButtonBox.Apply)
+            applyButton.enabled = Qt.binding(function() { return hasChanges })
+        }
     }
 }
