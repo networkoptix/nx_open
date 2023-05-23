@@ -26,17 +26,6 @@ Item
         contentItem.anchors.margins = 0
     }
 
-    Connections
-    {
-        target: childrenItem
-        function onChildrenChanged() { updateFilled() }
-    }
-
-    function processFilledChanged()
-    {
-        updateFilled()
-    }
-
     function getItemsToCheck()
     {
         if (!childrenItem)
@@ -78,6 +67,4 @@ Item
 
         filled = false
     }
-
-    Component.onCompleted: updateFilled()
 }

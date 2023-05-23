@@ -38,7 +38,7 @@ StackLayout
         id: settingsView
 
         property string itemType: "Engine"
-        property var engineId: null
+        property string engineId: null
 
         headerItem: IntegrationPanel
         {
@@ -64,8 +64,11 @@ StackLayout
 
             function onSettingsViewStateChanged(model, initialValues)
             {
-                const restoreScrollPosition = viewModel.currentEngineId === settingsView.engineId
-                settingsView.engineId = viewModel.currentEngineId
+                const currentEngineId =
+                    viewModel.currentEngineId ? viewModel.currentEngineId.toString() : ""
+
+                const restoreScrollPosition = settingsView.engineId === currentEngineId
+                settingsView.engineId = currentEngineId
 
                 settingsView.loadModel(
                     model ?? {},
@@ -74,9 +77,9 @@ StackLayout
                     restoreScrollPosition)
             }
 
-            function onSettingsViewValuesChanged(values)
+            function onSettingsViewValuesChanged(values, isInitial)
             {
-                settingsView.setValues(values ?? {})
+                settingsView.setValues(values ?? {}, isInitial)
             }
 
             function onCurrentSettingsErrorsChanged()

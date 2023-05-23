@@ -87,7 +87,7 @@ Item
 
         impl.initialValues = initialValues
         if (initialValues)
-            setValues(initialValues)
+            setValues(initialValues, /*isInitial*/ true)
 
         if (focusState)
             Settings.setFocusState(contentItem, focusState)
@@ -98,13 +98,13 @@ Item
         return contentItem && Settings.getValues(contentItem)
     }
 
-    function setValues(values)
+    function setValues(values, isInitial)
     {
         if (!contentItem)
             return
 
         impl.valuesChangedEnabled = false
-        Settings.setValues(contentItem, values)
+        Settings.setValues(contentItem, values, isInitial)
         valuesChanged()
         impl.valuesChangedEnabled = true
     }

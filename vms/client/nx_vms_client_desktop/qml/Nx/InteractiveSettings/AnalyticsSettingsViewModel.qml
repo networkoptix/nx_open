@@ -44,7 +44,7 @@ NxObject
 
     // Settings View state grouped signals as SettingsView supports only grouped updates.
     signal settingsViewStateChanged(var model, var values)
-    signal settingsViewValuesChanged(var values)
+    signal settingsViewValuesChanged(var values, bool isInitial)
 
     NxObject
     {
@@ -69,7 +69,7 @@ NxObject
         updateModel(/*model*/ null, /*initialValues*/ null)
     }
 
-    function updateState(engines, engineId, model, initialValues, errors)
+    function updateState(engines, engineId, model, values, errors, isInitial)
     {
         if (JSON.stringify(impl.engines) !== JSON.stringify(engines))
             impl.engines = engines
@@ -83,7 +83,7 @@ NxObject
             impl.currentItemType = "Engine"
 
             if (typeof(model) !== "undefined")
-                updateModel(model, initialValues)
+                updateModel(model, values, isInitial)
 
             impl.currentSettingsErrors = errors
         }
@@ -93,12 +93,12 @@ NxObject
         }
     }
 
-    function updateModel(model, initialValues)
+    function updateModel(model, values, isInitial)
     {
         const actualModel = model ? preprocessedModel(model) : null
         if (JSON.stringify(currentEngineSettingsModel) === JSON.stringify(actualModel))
         {
-            settingsViewValuesChanged(initialValues)
+            settingsViewValuesChanged(values, isInitial)
         }
         else
         {
@@ -107,7 +107,7 @@ NxObject
             if (!(currentSectionId in sections))
                 impl.currentSectionId = null
 
-            settingsViewStateChanged(currentEngineSettingsModel, initialValues)
+            settingsViewStateChanged(currentEngineSettingsModel, values)
         }
     }
 

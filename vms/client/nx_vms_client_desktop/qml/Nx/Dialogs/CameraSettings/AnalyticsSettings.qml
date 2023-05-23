@@ -43,6 +43,7 @@ Item
                 return
 
             supportsDualStreaming = store.dualStreamingEnabled()
+            const isInitial = analyticsSettings.resourceId !== resourceId
             analyticsSettings.resourceId = resourceId
 
             const currentEngineId = store.currentAnalyticsEngineId()
@@ -52,7 +53,8 @@ Item
                 currentEngineId,
                 store.deviceAgentSettingsModel(currentEngineId),
                 store.deviceAgentSettingsValues(currentEngineId),
-                store.deviceAgentSettingsErrors(currentEngineId))
+                store.deviceAgentSettingsErrors(currentEngineId),
+                isInitial)
 
             if (currentEngineId)
             {
