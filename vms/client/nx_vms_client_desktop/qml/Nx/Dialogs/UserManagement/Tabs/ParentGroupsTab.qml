@@ -130,7 +130,7 @@ MembershipSettings
     summaryPlaceholder: [
         "image://svg/skin/user_settings/no_groups.svg",
         qsTr("No groups"),
-        qsTr("Use controls on the left to add to a group")
+        control.editable ? qsTr("Use controls on the left to add to a group") : ""
     ]
 
     summaryDelegate: Item
