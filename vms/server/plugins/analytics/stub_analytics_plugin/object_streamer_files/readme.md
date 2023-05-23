@@ -35,7 +35,8 @@ of entries like bounding boxes and best shots. The following fields are allowed 
      followed by a number, which makes a new random UUID for each such number:
     - `$<number>` Id of the Object Track is changed every time the Device Agent is recreated, chosen
         randomly.
-    - `$$<number>` Id of the Object Track is changed every stream cycle, chosen randomly.
+    - `$$<number>` Id of the Object Track is changed every stream cycle or every time the Device
+        Agent is recreated, chosen randomly.
 - `attributes` **[optional]**, **[map(string, string)]** A string or string map of Attributes. Here
     the key is the Attribute name, and the value is the Attribute value.
 - `boundingBox` **[required]**, **[object]** Object containing coordinates of the Object bounding
