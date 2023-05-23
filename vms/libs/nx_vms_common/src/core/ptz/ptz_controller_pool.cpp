@@ -113,9 +113,19 @@ void QnPtzControllerPool::init()
         registerResource(resource);
 }
 
-void QnPtzControllerPool::stop()
+void QnPtzControllerPool::pleaseStop()
 {
     d->stopped = true;
+}
+
+bool QnPtzControllerPool::isStopping() const
+{
+    return d->stopped;
+}
+
+void QnPtzControllerPool::stop()
+{
+    pleaseStop();
     while (!d->controllerByResource.isEmpty())
     {
         auto resourcePtr = d->controllerByResource.begin().key();
