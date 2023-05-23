@@ -282,7 +282,7 @@ Item
             visible: selectedGroupsListView.count === 0 && !editablePlaceholderItem.visible
 
             anchors.centerIn: parent
-            anchors.verticalCenterOffset: -100
+            anchors.verticalCenterOffset: additionalText ? -100 : 0
 
             imageSource: control.summaryPlaceholder[0]
             text: control.summaryPlaceholder[1]
