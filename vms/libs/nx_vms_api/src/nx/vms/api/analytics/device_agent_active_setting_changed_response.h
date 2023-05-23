@@ -22,11 +22,23 @@ struct NX_VMS_API DeviceAgentActiveSettingChangedResponse: DeviceAgentSettingsRe
      * If not empty, the Client will show this text to the user.
      */
     QString messageToUser;
+
+    /**%apidoc
+     * If true, the Client will use the connected server to proxy actionUrl.
+     */
+    bool useProxy = false;
+
+    /**%apidoc
+     * If true, the Client will use device authentication for actionUrl.
+     */
+    bool useDeviceCredentials = false;
 };
 #define nx_vms_api_analytics_DeviceAgentActiveSettingChangedResponse_Fields \
     nx_vms_api_analytics_DeviceAgentSettingsResponse_Fields \
     (actionUrl) \
-    (messageToUser)
+    (messageToUser) \
+    (useProxy) \
+    (useDeviceCredentials)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentActiveSettingChangedResponse, (json), NX_VMS_API)
 

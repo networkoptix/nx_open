@@ -20,12 +20,22 @@ public:
     /** Additionally, makes actionUrl() return an empty string. */
     void setMessageToUser(std::string value);
 
+    /** Sets useProxy flag. */
+    void setUseProxy(bool value);
+
+    /** Sets useDeviceCredentials flag. */
+    void setUseDeviceCredentials(bool value);
+
     virtual const char* actionUrl() const override;
     virtual const char* messageToUser() const override;
+    virtual bool useProxy() const override;
+    virtual bool useDeviceCredentials() const override;
 
 private:
     std::string m_actionUrl;
     std::string m_messageToUser;
+    bool m_useProxy = false;
+    bool m_useDeviceCredentials = false;
 };
 
 } // namespace nx::sdk

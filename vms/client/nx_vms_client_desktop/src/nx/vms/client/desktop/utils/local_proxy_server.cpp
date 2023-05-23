@@ -4,6 +4,7 @@
 
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/webpage_resource.h>
@@ -16,6 +17,7 @@
 #include <nx/utils/url.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 template<>
 nx::vms::client::desktop::LocalProxyServer*
@@ -85,6 +87,11 @@ bool VmsServerConnector::auth(const std::string& user, const std::string& passwo
     else if (resource.dynamicCast<QnNetworkResource>() || resource.dynamicCast<QnWebPageResource>())
     {
         m_exitNodeId = resource->getParentId();
+        m_resourceId = resourceId;
+    }
+    else if (resource.dynamicCast<nx::vms::common::AnalyticsEngineResource>())
+    {
+        m_exitNodeId = serverId();
         m_resourceId = resourceId;
     }
 

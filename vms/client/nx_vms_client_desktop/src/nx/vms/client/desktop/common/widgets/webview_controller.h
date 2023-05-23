@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <optional>
 
 #include <QtCore/QObject>
@@ -25,6 +26,7 @@ namespace nx::vms::client::desktop {
 
 class GraphicsQmlView;
 class WebPageIconCache;
+class AbstractWebAuthenticator;
 
 /**
  * C++ part of `WebEngineView` QML component which is used for controlling its behavior.
@@ -44,14 +46,6 @@ public:
         LoadFailedStatus
     };
 
-    enum WebEngineViewAuthAction
-    {
-        Accept,
-        Reject,
-        ShowDialog
-    };
-
-    using AuthCallback = std::function<void(const QUrl&)>;
     using CertificateValidationFunc =
         std::function<bool(const QString& certificateChain, const QUrl& url)>;
 
@@ -126,19 +120,8 @@ public:
     /** Enable/disable saving web engine profile data on disk. */
     void setOffTheRecord(bool offTheRecord);
 
-    /**
-     * When the page requires authentication (like http auth), the callback is called with the page
-     * url passed as parameter. The function auth() should be called to provide auth credentials.
-     */
-    void setAuthCallback(AuthCallback callback);
-
-    /**
-     * After AuthCallback is called, exectute one of the following actions:
-     *   Accept - use credentials for authentication,
-     *   Reject - deny authentication,
-     *   ShowDialog - request credentials from the user, showing provided credentials if any.
-     */
-    void auth(WebEngineViewAuthAction action, const QAuthenticator& credentials = {});
+    /** When the page requires authentication (like http auth), an authenticator is used. */
+    void setAuthenticator(std::shared_ptr<AbstractWebAuthenticator> authenticator);
 
     /** Execute JavaScript source code. */
     void runJavaScript(const QString& source);

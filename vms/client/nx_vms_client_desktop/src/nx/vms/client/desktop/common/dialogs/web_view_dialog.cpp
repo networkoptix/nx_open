@@ -22,6 +22,9 @@ WebViewDialog::WebViewDialog(
     const QUrl& url,
     bool enableClientApi,
     QnWorkbenchContext* context,
+    const QnResourcePtr& resource,
+    std::shared_ptr<AbstractWebAuthenticator> authenticator,
+    bool checkCertificate,
     QWidget* parent)
     :
     base_type(parent, Qt::Window)
@@ -43,7 +46,14 @@ WebViewDialog::WebViewDialog(
     // Set some resonable size to avoid completely shrinked dialog.
     resize(kBaseDialogSize);
 
-    webWidget->controller()->load(url);
+    if (!checkCertificate)
+    {
+        webWidget->controller()->setCertificateValidator(
+            [](const QString& /*certificateChain*/, const QUrl&) { return true; });
+    }
+
+    webWidget->controller()->setAuthenticator(authenticator);
+    webWidget->controller()->load(resource, url);
 
     if (enableClientApi && context)
     {
@@ -56,9 +66,14 @@ void WebViewDialog::showUrl(
     const QUrl& url,
     bool enableClientApi,
     QnWorkbenchContext* context,
+    const QnResourcePtr& resource,
+    std::shared_ptr<AbstractWebAuthenticator> authenticator,
+    bool checkCertificate,
     QWidget* parent)
 {
-    QScopedPointer<WebViewDialog> dialog(new WebViewDialog(url, enableClientApi, context, parent));
+    QScopedPointer<WebViewDialog> dialog(new WebViewDialog(
+        url, enableClientApi, context, resource, authenticator, checkCertificate, parent));
+
     dialog->exec();
 }
 

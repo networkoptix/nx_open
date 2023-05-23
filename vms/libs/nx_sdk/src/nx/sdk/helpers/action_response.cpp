@@ -16,6 +16,16 @@ void ActionResponse::setMessageToUser(std::string value)
     m_actionUrl = "";
 }
 
+void ActionResponse::setUseProxy(bool value)
+{
+    m_useProxy = value;
+}
+
+void ActionResponse::setUseDeviceCredentials(bool value)
+{
+    m_useDeviceCredentials = value;
+}
+
 const char* ActionResponse::actionUrl() const
 {
     return m_actionUrl.c_str();
@@ -24,6 +34,16 @@ const char* ActionResponse::actionUrl() const
 const char* ActionResponse::messageToUser() const
 {
     return m_messageToUser.c_str();
+}
+
+bool ActionResponse::useProxy() const
+{
+    return m_useProxy;
+}
+
+bool ActionResponse::useDeviceCredentials() const
+{
+    return m_useDeviceCredentials;
 }
 
 } // namespace nx::sdk

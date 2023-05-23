@@ -1,7 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "analytics_settings_actions_helper.h"
+#include "analytics_actions_helper.h"
 
+#include <nx/network/http/http_types.h>
+#include <nx/utils/log/log_main.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/ui/dialogs/analytics_action_settings_dialog.h>
 #include <ui/dialogs/common/message_box.h>
@@ -11,9 +13,11 @@
 
 namespace nx::vms::client::desktop {
 
-void AnalyticsSettingsActionsHelper::processResult(
+void AnalyticsActionsHelper::processResult(
     const AnalyticsActionResult& result,
     QnWorkbenchContext* context,
+    const QnResourcePtr& proxyResource,
+    std::shared_ptr<AbstractWebAuthenticator> authenticator,
     QWidget* parent)
 {
     if (!result.messageToUser.isEmpty())
@@ -31,11 +35,26 @@ void AnalyticsSettingsActionsHelper::processResult(
     }
 
     if (!result.actionUrl.isEmpty())
-        WebViewDialog::showUrl(QUrl(result.actionUrl), /*enableClientApi*/ true, context, parent);
+    {
+        if (result.useProxy && !proxyResource)
+            NX_WARNING(NX_SCOPE_TAG, "A Resource is required to proxy %1", result.actionUrl);
+
+        if (result.useDeviceCredentials && !authenticator)
+            NX_WARNING(NX_SCOPE_TAG, "Can not authenticate %1", result.actionUrl);
+
+        WebViewDialog::showUrl(
+            result.actionUrl,
+            /*enableClientApi*/ true,
+            context,
+            result.useProxy ? proxyResource : QnResourcePtr{},
+            result.useDeviceCredentials ? authenticator : nullptr,
+            /*checkCertificate*/ !result.useDeviceCredentials,
+            parent);
+    }
 }
 
-std::optional<AnalyticsSettingsActionsHelper::SettingsValuesMap>
-    AnalyticsSettingsActionsHelper::requestSettingsMap(
+std::optional<AnalyticsActionsHelper::SettingsValuesMap>
+    AnalyticsActionsHelper::requestSettingsMap(
         const QJsonObject& settingsModel,
         QWidget* parent)
 {
@@ -50,7 +69,7 @@ std::optional<AnalyticsSettingsActionsHelper::SettingsValuesMap>
     return result;
 }
 
-std::optional<QJsonObject> AnalyticsSettingsActionsHelper::requestSettingsJson(
+std::optional<QJsonObject> AnalyticsActionsHelper::requestSettingsJson(
     const QJsonObject& settingsModel,
     QWidget* parent)
 {

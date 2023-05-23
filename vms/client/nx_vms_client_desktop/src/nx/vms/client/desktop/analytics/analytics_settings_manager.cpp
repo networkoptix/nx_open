@@ -404,7 +404,9 @@ bool AnalyticsSettingsManager::activeSettingsChanged(
                 agentId,
                 AnalyticsActionResult{
                     .actionUrl = result.actionUrl,
-                    .messageToUser = result.messageToUser
+                    .messageToUser = result.messageToUser,
+                    .useProxy = result.useProxy,
+                    .useDeviceCredentials = result.useDeviceCredentials
                 });
         });
 

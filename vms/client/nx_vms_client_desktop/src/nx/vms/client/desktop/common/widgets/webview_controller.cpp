@@ -30,6 +30,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/nx_network_ini.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/common/utils/abstract_web_authenticator.h>
 #include <nx/vms/client/desktop/integrations/c2p/jsapi/external.h>
 #include <nx/vms/client/desktop/jsapi/auth.h>
 #include <nx/vms/client/desktop/jsapi/globals.h>
@@ -197,7 +198,8 @@ static constexpr auto kControllerProperty = "controller";
 
 } // namespace
 
-struct WebViewController::Private {
+struct WebViewController::Private: public QObject
+{
     using Callback = nx::utils::MoveOnlyFunc<void(QQuickItem*)>;
 
     WebViewController* const q;
@@ -208,7 +210,7 @@ struct WebViewController::Private {
     std::vector<Callback> delayedCalls;
 
     QJSValue authRequest;
-    AuthCallback authCallback;
+    std::shared_ptr<AbstractWebAuthenticator> authenticator;
 
     AttemptCounter dialodCounter;
 
@@ -371,9 +373,45 @@ struct WebViewController::Private {
 
         authRequest = {};
     }
+
+    void auth(const QAuthenticator& credentials)
+    {
+        auto requestObject = authRequest.toQObject();
+        if (!requestObject)
+            return;
+
+        const bool isPasswordRequired = credentials.password().isNull();
+
+        if (!isPasswordRequired)
+            return acceptAuth(credentials.user(), credentials.password());
+
+        QString text;
+        if (requestObject->property("type").toInt() == AuthenticationTypeProxy)
+        {
+            text = tr("The proxy %1 requires a username and password.")
+                .arg(requestObject->property("proxyHost").toString());
+        }
+        else
+        {
+            const auto url = requestObject->property("url").toUrl();
+            text = url.toString(QUrl::RemovePassword | QUrl::RemovePath);
+        }
+
+        PasswordDialog dialog(widget());
+        dialog.setText(text);
+        if (!credentials.isNull())
+            dialog.setUsername(credentials.user());
+
+        if (dialog.exec() == QDialog::Accepted)
+            acceptAuth(dialog.username(), dialog.password());
+        else
+            rejectAuth();
+    }
 };
 
-WebViewController::WebViewController(QObject* parent): base_type(parent), d(new Private(this))
+WebViewController::WebViewController(QObject* parent):
+    base_type(parent),
+    d(new Private(this))
 {
 }
 
@@ -803,9 +841,18 @@ void WebViewController::registerApiObjectWithFactory(
     d->tryEnableApiObject(name, factory);
 }
 
-void WebViewController::setAuthCallback(AuthCallback callback)
+void WebViewController::setAuthenticator(std::shared_ptr<AbstractWebAuthenticator> authenticator)
 {
-    d->authCallback = std::move(callback);
+    if (d->authenticator)
+        d->authenticator->disconnect(this);
+
+    d->authenticator = authenticator;
+
+    if (d->authenticator)
+    {
+        connect(authenticator.get(), &AbstractWebAuthenticator::authReady,
+            this->d.get(), &Private::auth);
+    }
 }
 
 QVariant WebViewController::suspend()
@@ -987,51 +1034,6 @@ void WebViewController::requestJavaScriptDialog(QObject* request)
     }
 }
 
-void WebViewController::auth(WebEngineViewAuthAction action, const QAuthenticator& credentials)
-{
-    auto requestObject = d->authRequest.toQObject();
-    if (!requestObject)
-        return;
-
-    switch (action)
-    {
-        case Accept:
-            d->acceptAuth(credentials.user(), credentials.password());
-            break;
-        case Reject:
-            d->rejectAuth();
-            break;
-        case ShowDialog:
-        {
-            QString text;
-            if (requestObject->property("type").toInt() == AuthenticationTypeProxy)
-            {
-                text = tr("The proxy %1 requires a username and password.")
-                    .arg(requestObject->property("proxyHost").toString());
-            }
-            else
-            {
-                const auto url = requestObject->property("url").toUrl();
-                text = url.toString(QUrl::RemovePassword | QUrl::RemovePath);
-            }
-
-            PasswordDialog dialog(d->widget());
-            dialog.setText(text);
-            if (!credentials.isNull())
-                dialog.setUsername(credentials.user());
-
-            if (dialog.exec() == QDialog::Accepted)
-                d->acceptAuth(dialog.username(), dialog.password());
-            else
-                d->rejectAuth();
-
-            break;
-        }
-        default:
-            break;
-    }
-}
-
 void WebViewController::requestAuthenticationDialog(QJSValue request)
 {
     NX_ASSERT(request.toQObject());
@@ -1050,10 +1052,10 @@ void WebViewController::requestAuthenticationDialog(QJSValue request)
     // Save the request object so it won't be deleted by GC.
     d->authRequest = request;
 
-    if (requestObject->property("type").toInt() == AuthenticationTypeProxy || !d->authCallback)
-        auth(ShowDialog);
+    if (requestObject->property("type").toInt() == AuthenticationTypeProxy || !d->authenticator)
+        d->auth({});
     else
-        d->authCallback(requestObject->property("url").toUrl());
+        d->authenticator->requestAuth(requestObject->property("url").toUrl());
 }
 
 void WebViewController::requestFileDialog(QObject* request)

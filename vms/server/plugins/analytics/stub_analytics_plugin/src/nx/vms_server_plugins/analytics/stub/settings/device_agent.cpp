@@ -173,7 +173,7 @@ void DeviceAgent::doGetSettingsOnActiveSettingChange(
     settingsResponse->setModel(makePtr<String>(Json(model).dump()));
 
     const nx::sdk::Ptr<nx::sdk::ActionResponse> actionResponse =
-        generateActionResponse(settingId, activeSettingChangeAction->params());
+        generateActionResponse(settingId, activeSettingChangeAction->params(), values);
 
     auto response = makePtr<ActiveSettingChangedResponse>();
     response->setSettingsResponse(settingsResponse);

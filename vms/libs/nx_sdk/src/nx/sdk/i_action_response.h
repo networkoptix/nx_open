@@ -26,6 +26,16 @@ public:
      *     actionUrl() must return a null or empty string.
      */
     virtual const char* messageToUser() const = 0;
+
+    /**
+     * @return Whether proxying through the connected server should be used for actionUrl().
+     */
+    virtual bool useProxy() const = 0;
+
+    /**
+     * @return Whether device authentication should be used for actionUrl().
+     */
+    virtual bool useDeviceCredentials() const = 0;
 };
 using IActionResponse0 = IActionResponse;
 

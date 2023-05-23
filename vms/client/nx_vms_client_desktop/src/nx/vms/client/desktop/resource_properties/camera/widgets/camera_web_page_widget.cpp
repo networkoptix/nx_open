@@ -10,17 +10,13 @@
 #include <QtWebEngineQuick/QQuickWebEngineProfile>
 #include <QtWidgets/QApplication>
 
-#include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/guarded_callback.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/common/utils/camera_web_authenticator.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/web_widget.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
-#include <ui/dialogs/common/password_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <utils/common/event_processors.h>
@@ -78,57 +74,19 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     webWidget->controller()->setMenuNavigation(true);
     webWidget->controller()->setMenuSave(true);
 
-    webWidget->controller()->setAuthCallback(
-        [this](const QUrl& url)
-        {
-            NX_ASSERT(currentlyOnUiThread());
-
-            // Camera may redirect to another path and ask for credentials,
-            // so check for host match.
-            if (lastRequestUrl.host() != url.host())
-            {
-                webWidget->controller()->auth(WebViewController::ShowDialog);
-                return;
-            }
-
-            const auto camera = qnClientCoreModule->resourcePool()
-                ->getResourceById<QnVirtualCameraResource>(lastCamera.id);
-            if (!camera || camera->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
-            {
-                webWidget->controller()->auth(WebViewController::ShowDialog);
-                return;
-            }
-
-            const auto resultCallback =
-                [this](bool success, rest::Handle /*handle*/, const QAuthenticator& result)
-                {
-                    if (success)
-                    {
-                        webWidget->controller()->auth(WebViewController::Accept, result);
-                        return;
-                    }
-
-                    // Just show user login in the dialog.
-                    QAuthenticator loginOnly;
-                    loginOnly.setUser(this->cameraLogin);
-                    webWidget->controller()->auth(WebViewController::ShowDialog, loginOnly);
-                };
-
-            core::RemoteConnectionAware connectionAccessor;
-            connectionAccessor.connectedServerApi()->getCameraCredentials(
-                lastCamera.id,
-                nx::utils::guarded(webWidget->controller(), resultCallback),
-                QThread::currentThread());
-        });
-
     // We don't have any info about cameras certificates right now.
     // Assume that we can trust them as long as they are a part of our system already.
     webWidget->controller()->setCertificateValidator(
         [](const QString& /*certificateChain*/, const QUrl&){ return true; });
 }
 
-CameraWebPageWidget::CameraWebPageWidget(CameraSettingsDialogStore* store, QWidget* parent):
+CameraWebPageWidget::CameraWebPageWidget(
+    SystemContext* systemContext,
+    CameraSettingsDialogStore* store,
+    QWidget* parent)
+    :
     base_type(parent),
+    SystemContextAware(systemContext),
     d(new Private(this))
 {
     NX_ASSERT(store);
@@ -220,8 +178,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
 
     d->cameraLogin = state.credentials.login.valueOr(QString());
     const auto cameraId = state.singleCameraProperties.id;
-    const auto camera =
-        resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
 
     if (!camera) //< Camera was just deleted.
     {
@@ -238,6 +195,14 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
 
     d->lastRequestUrl = targetUrl;
     d->lastCamera = state.singleCameraProperties;
+
+    d->webWidget->controller()->setAuthenticator(
+        std::make_shared<CameraWebAuthenticator>(
+            systemContext(),
+            camera,
+            targetUrl,
+            state.credentials.login.valueOr(QString{}),
+            state.credentials.password.valueOr(QString{})));
 
     d->webWidget->controller()->closeWindows();
 

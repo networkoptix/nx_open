@@ -4,7 +4,7 @@
 
 #include <QtQuick/QQuickItem>
 
-#include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
+#include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <utils/common/event_processors.h>
@@ -46,7 +46,7 @@ CameraAnalyticsSettingsWidget::CameraAnalyticsSettingsWidget(
 
 QVariant CameraAnalyticsSettingsWidget::requestParameters(const QJsonObject& model)
 {
-    auto result = AnalyticsSettingsActionsHelper::requestSettingsJson(model, this);
+    auto result = AnalyticsActionsHelper::requestSettingsJson(model, this);
     return result ? *result : QVariant{};
 }
 

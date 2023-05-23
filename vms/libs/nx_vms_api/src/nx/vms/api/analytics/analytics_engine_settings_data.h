@@ -52,12 +52,25 @@ struct NX_VMS_API EngineActiveSettingChangedResponse: EngineSettingsResponse
      */
     QString messageToUser;
 
+    /**%apidoc
+     * If true, the Client will use proxying through the engine parent server for actionUrl.
+     */
+    bool useProxy = false;
+
+    /**%apidoc
+     * If true, the Client will use device authentication for actionUrl.
+     */
+    bool useDeviceCredentials = false;
+
     bool operator==(const EngineActiveSettingChangedResponse& other) const = default;
 };
 #define nx_vms_api_analytics_EngineActiveSettingChangedResponse_Fields \
     nx_vms_api_analytics_EngineSettingsResponse_Fields \
     (actionUrl) \
-    (messageToUser)
+    (messageToUser) \
+    (useProxy) \
+    (useDeviceCredentials)
+
 QN_FUSION_DECLARE_FUNCTIONS(EngineActiveSettingChangedResponse, (json), NX_VMS_API)
 
 struct NX_VMS_API EngineSettingsRequest
