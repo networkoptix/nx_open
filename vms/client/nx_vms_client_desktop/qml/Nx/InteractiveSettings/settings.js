@@ -27,7 +27,7 @@ function preprocessModel(model)
     _nameSectionsRecursively(model, "")
 }
 
-function _connectSignals(parent, item)
+function _connectSignals(item)
 {
     if (item.activeValueEdited)
     {
@@ -47,20 +47,18 @@ function _connectSignals(parent, item)
 
     if (item.activated)
         item.activated.connect(() => settingsView.triggerValuesEdited(item))
-
-    if (item.filledChanged && parent.processFilledChanged)
-    {
-        item.filledChanged.connect(function() { parent.processFilledChanged(item) })
-        parent.processFilledChanged(item)
-    }
 }
 
-function getItemProperties(model)
+function getItemProperties(model, depth)
 {
     const kInternalKeys = ["type", "items", "sections"]
 
+    let properties = {}
     if (model.visible === false)
-        model.opacity = 0 //< Layouts use opacity.
+        properties.opacity = 0 //< Layouts use opacity.
+
+    if (model.type === "GroupBox")
+        properties.depth = depth
 
     return Object.keys(model)
         .filter(key => !kInternalKeys.includes(key))
@@ -69,7 +67,7 @@ function getItemProperties(model)
                 result[key] = model[key]
                 return result
             },
-            {})
+            properties)
 }
 
 function _createItemsRecursively(parent, visualParent, model, depth)
@@ -77,9 +75,6 @@ function _createItemsRecursively(parent, visualParent, model, depth)
     var type = model.type
     if (!type)
         return null
-
-    if (type === "GroupBox")
-        model.depth = depth
 
     const componentPath = "components/%1.qml".arg(type)
     const component = Qt.createComponent(componentPath)
@@ -89,11 +84,11 @@ function _createItemsRecursively(parent, visualParent, model, depth)
         return null
     }
 
-    var item = component.createObject(visualParent || null, getItemProperties(model))
+    var item = component.createObject(visualParent || null, getItemProperties(model, depth))
 
     if (item)
     {
-        _connectSignals(parent, item)
+        _connectSignals(item)
 
         if (item.childrenItem && model.items)
         {
@@ -161,21 +156,24 @@ function buildSectionPaths(model)
     return sectionPaths
 }
 
-function _processItemsRecursively(item, f)
+function _processItemsRecursively(item, func, postFunc)
 {
-    f(item)
+    func(item)
 
     if (item.childrenItem)
     {
         for (var i = 0; i < item.childrenItem.layoutItems.length; ++i)
-            _processItemsRecursively(item.childrenItem.layoutItems[i], f)
+            _processItemsRecursively(item.childrenItem.layoutItems[i], func, postFunc)
     }
 
     if (item.sectionStack)
     {
         for (var i = 1; i < item.sectionStack.children.length; ++i)
-            _processItemsRecursively(item.sectionStack.children[i], f)
+            _processItemsRecursively(item.sectionStack.children[i], func, postFunc)
     }
+
+    if (postFunc)
+        postFunc(item)
 }
 
 function getValues(rootItem)
@@ -221,8 +219,15 @@ function resetValue(item)
         setValue(item, item.hasOwnProperty("defaultValue") ? item.defaultValue : null)
 }
 
-function setValues(rootItem, values)
+function setValues(rootItem, values, isInitial)
 {
+    let updateFilled =
+        (item) =>
+        {
+            if (item.updateFilled)
+                item.updateFilled()
+        }
+
     _processItemsRecursively(rootItem,
         function(item)
         {
@@ -230,7 +235,8 @@ function setValues(rootItem, values)
                 setValue(item, values[item.name])
             else
                 resetValue(item)
-        })
+        },
+        isInitial ? updateFilled : null)
 }
 
 function resetValues(rootItem)

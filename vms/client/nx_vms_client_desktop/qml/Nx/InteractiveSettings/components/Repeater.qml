@@ -29,10 +29,10 @@ Item
 
     property bool filled: false
 
-    function processFilledChanged()
+    function updateFilled()
     {
         const lastFilled = lastFilledItemIndex()
-        visibleItemsCount = Math.max(1, visibleItemsCount, lastFilled + 1)
+        visibleItemsCount = Math.max(1, lastFilled + 1)
         filled = (lastFilled >= 0)
     }
 
@@ -41,8 +41,6 @@ Item
         id: column
         width: parent.width
         layoutControl: control
-
-        onLayoutItemsChanged: initialVisibilityUpdateTimer.restart()
     }
 
     Row
@@ -86,20 +84,10 @@ Item
         }
     }
 
-    Timer
+    onVisibleItemsCountChanged:
     {
-        // Queued update of visible items count.
-        id: initialVisibilityUpdateTimer
-        interval: 0
-        running: false
-        onTriggered:
-        {
-            visibleItemsCount = Math.max(1, lastFilledItemIndex() + 1)
-            updateVisibility()
-        }
+        updateItemsVisibility()
     }
-
-    onVisibleItemsCountChanged: updateVisibility()
 
     function lastFilledItemIndex()
     {
@@ -111,9 +99,9 @@ Item
         return -1
     }
 
-    function updateVisibility()
+    function updateItemsVisibility()
     {
         for (var i = 0; i < column.layoutItems.length; ++i)
-            column.layoutItems[i].opacity = (i < visibleItemsCount)
+            column.layoutItems[i].opacity = i < visibleItemsCount ? 1.0 : 0.0
     }
 }
