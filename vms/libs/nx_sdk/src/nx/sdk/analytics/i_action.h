@@ -59,6 +59,12 @@ public:
 
         /** If neither null nor empty, the Client will show this text to the user. */
         Ptr<IString> messageToUser;
+
+        /** If true, the Client will use the connected server to proxy actionUrl. */
+        bool useProxy = false;
+
+        /** If true, the Client will use device authentication for actionUrl. */
+        bool useDeviceCredentials = false;
     };
 };
 using IAction0 = IAction;

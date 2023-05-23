@@ -11,8 +11,10 @@ struct NX_VMS_COMMON_API AnalyticsActionResult
 {
     QString actionUrl;
     QString messageToUser;
+    bool useProxy = false;
+    bool useDeviceCredentials = false;
 };
-#define AnalyticsActionResult_Fields (actionUrl)(messageToUser)
+#define AnalyticsActionResult_Fields (actionUrl)(messageToUser)(useProxy)(useDeviceCredentials)
 
 struct NX_VMS_COMMON_API AnalyticsAction
 {

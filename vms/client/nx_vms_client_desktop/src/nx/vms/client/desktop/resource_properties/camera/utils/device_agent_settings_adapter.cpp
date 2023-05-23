@@ -5,11 +5,14 @@
 #include <client/client_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
+#include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
+#include <nx/vms/client/desktop/common/utils/camera_web_authenticator.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 
 #include "../flux/camera_settings_dialog_state.h"
@@ -84,9 +87,22 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
                 d->settingsListener.get(),
                 &AnalyticsSettingsMultiListener::actionResultReceived,
                 this,
-                [this](const QnUuid& /*engineId*/, const AnalyticsActionResult& result)
+                [this, camera](const QnUuid& engineId, const AnalyticsActionResult& result)
                 {
-                    AnalyticsSettingsActionsHelper::processResult(result, d->context, d->parent);
+                    const CameraSettingsDialogState& state = d->store->state();
+                    std::shared_ptr<CameraWebAuthenticator> authenticator = std::make_shared<CameraWebAuthenticator>(
+                        d->context->systemContext(),
+                        camera,
+                        result.actionUrl,
+                        state.credentials.login.valueOr(QString{}),
+                        state.credentials.password.valueOr(QString{}));
+
+                    AnalyticsActionsHelper::processResult(
+                        result,
+                        d->context,
+                        d->resourcePool()->getResourceById(engineId),
+                        authenticator,
+                        d->parent);
                 });
         }
         else

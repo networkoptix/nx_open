@@ -52,6 +52,10 @@ static const std::string kActiveMaxValueId = "activeMaxValue";
 
 static const std::string kShowMessageButtonId = "showMessageButton";
 static const std::string kShowUrlButtonId = "showUrlButton";
+static const std::string kUrlId = "url";
+static const std::string kUseProxyId = "useProxy";
+static const std::string kUseDeviceCredentialsId = "authDevice";
+
 static const std::string kParametersModel = /*suppress newline*/ 1 + R"json(
 {
     "type": "Settings",
@@ -225,7 +229,7 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                 },
                 {
                     "type": "Flow",
-                    "caption": "Buttons",
+                    "caption": "Parameters",
                     "items":
                     [
                         {
@@ -234,12 +238,31 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                             "caption": "Show Message...",
                             "isActive": true,
                             "parametersModel": )json" + kParametersModel + R"json(
+                        }
+                    ]
+                },
+                {
+                    "type": "Flow",
+                    "caption": "Webpage",
+                    "items":
+                    [
+                        {
+                            "type": "TextField",
+                            "name": ")json" + kUrlId + R"json(",
+                            "caption": "Url",
+                            "defaultValue": "https://example.org/"
                         },
                         {
                             "type": "Button",
                             "name": ")json" + kShowUrlButtonId + R"json(",
                             "caption": "Show Webpage...",
                             "isActive": true
+                        },
+                        {
+                            "type": "CheckBox",
+                            "name": ")json" + kUseProxyId + R"json(",
+                            "caption": "Use proxy",
+                            "defaultValue": false
                         }
                     ]
                 }
@@ -731,7 +754,7 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                 },
                 {
                     "type": "Flow",
-                    "caption": "Buttons",
+                    "caption": "Parameters",
                     "items":
                     [
                         {
@@ -740,12 +763,37 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                             "caption": "Show Message...",
                             "isActive": true,
                             "parametersModel": )json" + kParametersModel + R"json(
+                        }
+                    ]
+                },
+                {
+                    "type": "Flow",
+                    "caption": "Webpage",
+                    "items":
+                    [
+                        {
+                            "type": "TextField",
+                            "name": ")json" + kUrlId + R"json(",
+                            "caption": "Url",
+                            "defaultValue": "https://example.org/"
                         },
                         {
                             "type": "Button",
                             "name": ")json" + kShowUrlButtonId + R"json(",
                             "caption": "Show Webpage...",
                             "isActive": true
+                        },
+                        {
+                            "type": "CheckBox",
+                            "name": ")json" + kUseProxyId + R"json(",
+                            "caption": "Use proxy",
+                            "defaultValue": false
+                        },
+                        {
+                            "type": "CheckBox",
+                            "name": ")json" + kUseDeviceCredentialsId + R"json(",
+                            "caption": "Use device credentials",
+                            "defaultValue": false
                         }
                     ]
                 }

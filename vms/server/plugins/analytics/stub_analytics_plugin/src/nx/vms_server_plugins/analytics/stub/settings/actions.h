@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <map>
 #include <string>
 
 #include <nx/sdk/helpers/action_response.h>
@@ -16,7 +17,8 @@ namespace settings {
 
 nx::sdk::Ptr<nx::sdk::ActionResponse> generateActionResponse(
 	const std::string& settingId,
-	nx::sdk::Ptr<const nx::sdk::IStringMap> params);
+	nx::sdk::Ptr<const nx::sdk::IStringMap> params,
+	const std::map<std::string, std::string>& values);
 
 } // namespace settings
 } // namespace stub

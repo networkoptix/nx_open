@@ -12,8 +12,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
-#include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
@@ -100,7 +100,7 @@ QJsonObject AnalyticsSettingsWidget::Private::settingsValues(const QnUuid& engin
 
 QVariant AnalyticsSettingsWidget::Private::requestParameters(const QJsonObject& model)
 {
-    const auto values = AnalyticsSettingsActionsHelper::requestSettingsJson(model, /*parent*/ q);
+    const auto values = AnalyticsActionsHelper::requestSettingsJson(model, /*parent*/ q);
     return values ? *values : QVariant{};
 }
 
@@ -348,7 +348,7 @@ void AnalyticsSettingsWidget::Private::activeElementChanged(
         settingsValuesByEngineId[engineId].values,
         parameters,
         nx::utils::guarded(this,
-            [this, engineId](
+            [this, engine, engineId](
                 bool success,
                 rest::Handle requestId,
                 const nx::vms::api::analytics::EngineActiveSettingChangedResponse& result)
@@ -368,11 +368,15 @@ void AnalyticsSettingsWidget::Private::activeElementChanged(
                     result.settingsErrors,
                     /*changed*/ true);
 
-                AnalyticsSettingsActionsHelper::processResult(
+                AnalyticsActionsHelper::processResult(
                     AnalyticsActionResult{
                         .actionUrl = result.actionUrl,
-                        .messageToUser = result.messageToUser},
+                        .messageToUser = result.messageToUser,
+                        .useProxy = result.useProxy,
+                        .useDeviceCredentials = result.useDeviceCredentials},
                     q->context(),
+                    engine,
+                    /*authenticator*/ {},
                     /*parent*/ q);
             }),
             thread());

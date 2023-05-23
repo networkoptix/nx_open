@@ -25,6 +25,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/analytics/action_type_descriptor_manager.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
@@ -35,7 +36,7 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
+#include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -354,7 +355,7 @@ void TileInteractionHandler::executePluginAction(
     if (!actionDescriptor->parametersModel.isEmpty())
     {
         // Show dialog to enter required parameters.
-        const auto params = AnalyticsSettingsActionsHelper::requestSettingsMap(
+        const auto params = AnalyticsActionsHelper::requestSettingsMap(
             actionDescriptor->parametersModel, mainWindowWidget());
 
         if (!params)
@@ -364,7 +365,10 @@ void TileInteractionHandler::executePluginAction(
     }
 
     const auto resultCallback =
-        [this](bool success, rest::Handle /*requestId*/, nx::network::rest::JsonResult result)
+        [this, camera, engineId](
+            bool success,
+            rest::Handle /*requestId*/,
+            nx::network::rest::JsonResult result)
         {
             if (result.error != nx::network::rest::Result::NoError)
             {
@@ -377,8 +381,12 @@ void TileInteractionHandler::executePluginAction(
                 return;
 
             const auto reply = result.deserialized<AnalyticsActionResult>();
-            AnalyticsSettingsActionsHelper::processResult(
-                reply, workbench()->context(), mainWindowWidget());
+            AnalyticsActionsHelper::processResult(
+                reply,
+                workbench()->context(),
+                resourcePool()->getResourceById(engineId),
+                /*authenticator*/ {},
+                mainWindowWidget());
         };
 
     connectedServerApi()->executeAnalyticsAction(

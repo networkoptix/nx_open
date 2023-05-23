@@ -5,20 +5,23 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
 
-class CameraWebPageWidget: public QWidget, public core::CommonModuleAware
+class CameraWebPageWidget:
+    public QWidget,
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QWidget;
 
 public:
     explicit CameraWebPageWidget(
+        SystemContext* systemContext,
         CameraSettingsDialogStore* store,
         QWidget* parent = nullptr);
 
