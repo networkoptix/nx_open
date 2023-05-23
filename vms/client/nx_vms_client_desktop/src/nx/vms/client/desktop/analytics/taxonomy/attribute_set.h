@@ -2,24 +2,35 @@
 
 #pragma once
 
+#include <vector>
+
+#include <QtCore/QObject>
+
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/utils/impl_ptr.h>
 
-#include "abstract_attribute_set.h"
+Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/taxonomy/attribute.h")
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
+class Attribute;
 class AbstractStateViewFilter;
 
-class AttributeSet: public AbstractAttributeSet
+/**
+ * Special attribute type that contains other attributes. Corresponds Object attribute in the
+ * analytics taxonomy.
+ */
+class NX_VMS_CLIENT_DESKTOP_API AttributeSet: public QObject
 {
+    Q_OBJECT
+    Q_PROPERTY(std::vector<nx::vms::client::desktop::analytics::taxonomy::Attribute*>
+        attributes READ attributes CONSTANT)
 public:
     // AttributeSet doesn't own the filter. The filter should live longer than the AttributeSet.
     AttributeSet(const AbstractStateViewFilter* filter, QObject* parent);
-
     virtual ~AttributeSet() override;
 
-    std::vector<AbstractAttribute*> attributes() const override;
+    std::vector<Attribute*> attributes() const;
 
     void addObjectType(nx::analytics::taxonomy::AbstractObjectType* objectType);
 

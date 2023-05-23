@@ -12,11 +12,11 @@ struct AttributeSet::Private
 {
     const AbstractStateViewFilter* const filter;
     std::vector<const nx::analytics::taxonomy::AbstractObjectType*> objectTypes;
-    mutable std::optional<std::vector<AbstractAttribute*>> cachedAttributes;
+    mutable std::optional<std::vector<Attribute*>> cachedAttributes;
 };
 
 AttributeSet::AttributeSet(const AbstractStateViewFilter* filter, QObject* parent):
-    AbstractAttributeSet(parent),
+    QObject(parent),
     d(new Private{.filter = filter})
 {
 }
@@ -26,7 +26,7 @@ AttributeSet::~AttributeSet()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-std::vector<AbstractAttribute*> AttributeSet::attributes() const
+std::vector<Attribute*> AttributeSet::attributes() const
 {
     if (!d->cachedAttributes)
         d->cachedAttributes = resolveAttributes(d->objectTypes, d->filter, parent());

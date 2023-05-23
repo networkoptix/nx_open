@@ -15,6 +15,8 @@
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/utils/impl_ptr.h>
 
+#include "taxonomy/state_view.h"
+
 class QnCommonModule;
 
 namespace nx::vms::client::desktop {
@@ -43,6 +45,9 @@ public:
     Taxonomy* qmlCurrentTaxonomy() const;
     Q_INVOKABLE nx::vms::client::desktop::analytics::taxonomy::AnalyticsFilterModel*
         createFilterModel(QObject* parent = nullptr);
+
+    Q_INVOKABLE nx::vms::client::desktop::analytics::taxonomy::StateView*
+        createStateView(QObject* parent = nullptr) const;
 
     Q_INVOKABLE QVariant objectTypeById(const QString& objectTypeId) const;
 

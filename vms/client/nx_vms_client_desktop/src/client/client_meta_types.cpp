@@ -34,7 +34,7 @@
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_action_choice_model.h>
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_settings_model.h>
-#include <nx/vms/client/desktop/lookup_lists/lookup_lists_dialog_store.h>
+#include <nx/vms/client/desktop/lookup_lists/lookup_lists_dialog.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_status_helper.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
@@ -56,6 +56,7 @@
 #include <nx/vms/client/desktop/system_administration/models/recursive_members_model.h>
 #include <nx/vms/client/desktop/system_administration/models/server_list_model.h>
 #include <nx/vms/client/desktop/system_administration/models/time_duration_suffix_model.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/connect_tiles_proxy_model.h>
 #include <nx/vms/client/desktop/system_logon/data/systems_visibility_sort_filter_model.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
@@ -229,6 +230,7 @@ void QnClientMetaTypes::initialize()
 
 void QnClientMetaTypes::registerQmlTypes()
 {
+    SystemContext::registerQmlType();
     AccessRightsList::registerQmlTypes();
     LayoutModel::registerQmlType();
     LinearizationListModel::registerQmlType();
@@ -263,6 +265,7 @@ void QnClientMetaTypes::registerQmlTypes()
     RecursiveMembersModel::registerQmlType();
     LdapFiltersModel::registerQmlType();
     ServerListModel::registerQmlType();
+    LookupListsDialog::registerQmlTypes();
     joystick::JoystickManager::registerQmlType();
     TimeDurationSuffixModel::registerQmlType();
 
@@ -284,12 +287,6 @@ void QnClientMetaTypes::registerQmlTypes()
     qmlRegisterUncreatableType<joystick::JoystickButtonActionChoiceModel>("nx.vms.client.desktop", 1, 0,
         "JoystickButtonActionChoiceModel",
         "JoystickButtonActionChoiceModel can be created from C++ code only.");
-
-    qmlRegisterUncreatableType<LookupListsDialogStore>("nx.vms.client.desktop",
-        1,
-        0,
-        "LookupListsDialogStore",
-        "LookupListsDialogStore can be created from C++ code only.");
 
     qmlRegisterUncreatableType<AccessSubjectEditingContext>("nx.vms.client.desktop", 1, 0,
         "AccessSubjectEditingContext",

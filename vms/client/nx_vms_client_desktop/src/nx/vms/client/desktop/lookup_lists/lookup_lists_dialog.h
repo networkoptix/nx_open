@@ -2,19 +2,23 @@
 
 #pragma once
 
-#include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/lookup_list_data.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
+
+#include "lookup_list_model.h"
 
 namespace nx::vms::client::desktop {
 
-class LookupListsDialog: public QmlDialogWrapper
+class LookupListsDialog: public QmlDialogWrapper, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QmlDialogWrapper;
 
 public:
-    LookupListsDialog(QWidget* parent = nullptr);
+    static void registerQmlTypes();
+
+    LookupListsDialog(SystemContext* systemContext, QWidget* parent = nullptr);
     virtual ~LookupListsDialog() override;
 
     void setData(nx::vms::api::LookupListDataList data);
@@ -25,14 +29,11 @@ public:
     /** Notify the dialog about saving result. */
     void setSaveResult(bool success);
 
-    Q_INVOKABLE void requestSave();
+    Q_INVOKABLE void save(QList<LookupListModel*> data);
 
 signals:
+    void loadCompleted(QList<LookupListModel*> data);
     void saveRequested(nx::vms::api::LookupListDataList data);
-
-private:
-    struct Private;
-    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

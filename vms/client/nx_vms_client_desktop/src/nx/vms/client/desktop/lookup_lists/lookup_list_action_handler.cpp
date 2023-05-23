@@ -160,6 +160,7 @@ LookupListActionHandler::LookupListActionHandler(QObject* parent):
 
             appContext()->qmlEngine()->clearComponentCache();
             auto dialog = std::make_unique<LookupListsDialog>(
+                context->systemContext(),
                 context->mainWindowWidget());
             executeDelayedParented(
                 [d = dialog.get()]() { d->setData(sourceData); }, kLoadDelay, dialog.get());
@@ -189,7 +190,7 @@ LookupListActionHandler::~LookupListActionHandler()
 
 void LookupListActionHandler::openLookupListsDialog()
 {
-    d->dialog = std::make_unique<LookupListsDialog>(mainWindowWidget());
+    d->dialog = std::make_unique<LookupListsDialog>(systemContext(), mainWindowWidget());
     if (lookupListManager()->isInitialized())
     {
         d->dialog->setData(lookupListManager()->lookupLists());

@@ -2,31 +2,33 @@
 
 #include "state_view.h"
 
-#include "node.h"
+#include <nx/utils/std/algorithm.h>
 
-#include <nx/analytics/taxonomy/state.h>
+#include "object_type.h"
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
-struct StateView::Private
-{
-    std::vector<AbstractNode*> rootNodes;
-};
-
-StateView::StateView(std::vector<AbstractNode*> rootNodes, QObject* parent):
-    AbstractStateView(parent),
-    d(new Private{std::move(rootNodes)})
+StateView::StateView(std::vector<ObjectType*> objectTypes, QObject* parent):
+    QObject(parent),
+    m_objectTypes(objectTypes)
 {
 }
 
-StateView::~StateView()
+ObjectType* StateView::objectTypeById(const QString& objectTypeId) const
 {
-    // Required here for forward-declared scoped pointer destruction.
-}
+    for (auto objectType: m_objectTypes)
+    {
+        if (objectType->mainTypeId() == objectTypeId)
+            return objectType;
+    }
 
-std::vector<AbstractNode*> StateView::rootNodes() const
-{
-    return d->rootNodes;
+    for (auto objectType: m_objectTypes)
+    {
+        if (nx::utils::contains(objectType->typeIds(), objectTypeId))
+            return objectType;
+    }
+
+    return nullptr;
 }
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy

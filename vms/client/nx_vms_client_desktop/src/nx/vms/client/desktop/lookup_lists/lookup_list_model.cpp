@@ -4,22 +4,14 @@
 
 namespace nx::vms::client::desktop {
 
-namespace {
-
-static constexpr int kCheckBoxColumnIndex = 0;
-
-QString attribute(const nx::vms::api::LookupListData& list, int column)
+LookupListModel::LookupListModel(QObject* parent):
+    QObject(parent)
 {
-    if (column <= kCheckBoxColumnIndex || column > list.attributeNames.size())
-        return {};
-
-    return list.attributeNames[column - 1];
 }
 
-} // namespace
-
-LookupListModel::LookupListModel(QObject* parent):
-    base_type(parent)
+LookupListModel::LookupListModel(nx::vms::api::LookupListData data, QObject* parent):
+    QObject(parent),
+    m_data(std::move(data))
 {
 }
 
@@ -27,111 +19,20 @@ LookupListModel::~LookupListModel()
 {
 }
 
-QVariant LookupListModel::headerData(int section, Qt::Orientation orientation, int role) const
+QList<QString> LookupListModel::attributeNames() const
 {
-    if (orientation != Qt::Orientation::Horizontal)
-        return {};
-
-    switch (role)
-    {
-        case Qt::DisplayRole:
-        {
-            if (section == kCheckBoxColumnIndex)
-                return {};
-            else
-                return attribute(m_data, section);
-        }
-        case Qt::CheckStateRole:
-        {
-            if (section == kCheckBoxColumnIndex)
-                return m_tempHeaderCheckBoxState;
-            else
-                return {};
-        }
-    }
-
-    NX_ASSERT("Unexpected header role");
-    return {};
+    QList<QString> result;
+    for (const auto& v: m_data.attributeNames)
+        result.push_back(v);
+    return result;
 }
 
-bool LookupListModel::setHeaderData(
-    int section,
-    Qt::Orientation orientation,
-    const QVariant& value,
-    int role)
+void LookupListModel::setAttributeNames(QList<QString> value)
 {
-    if (section < 0
-        || section >= columnCount()
-        || orientation != Qt::Horizontal
-        || role != Qt::CheckStateRole)
-    {
-        return false;
-    }
-
-    m_tempHeaderCheckBoxState = static_cast<Qt::CheckState>(value.toInt());
-
-    return true;
-}
-
-int LookupListModel::rowCount(const QModelIndex& parent) const
-{
-    return (int) m_data.entries.size();
-}
-
-int LookupListModel::columnCount(const QModelIndex& parent) const
-{
-    return (int) m_data.attributeNames.size() + 1; //< Reserve one for checkbox column.
-}
-
-QVariant LookupListModel::data(const QModelIndex& index, int role) const
-{
-    switch (role)
-    {
-        case Qt::DisplayRole:
-        {
-            auto key = attribute(m_data, index.column());
-            if (key.isEmpty())
-                return QString();
-
-            const auto& entry = m_data.entries[index.row()];
-            const auto iter = entry.find(key);
-            if (iter != entry.cend())
-                return iter->second;
-            return QString();
-        }
-
-        case TypeRole:
-        {
-            if (index.column() == kCheckBoxColumnIndex)
-                return "checkbox";
-
-            return "text";
-        }
-    }
-
-    return {};
-}
-
-QHash<int, QByteArray> LookupListModel::roleNames() const
-{
-    auto roles = base_type::roleNames();
-    roles[TypeRole] = "type";
-    return roles;
-}
-
-void LookupListModel::resetData(nx::vms::api::LookupListData data)
-{
-    beginResetModel();
-    m_data = std::move(data);
-    endResetModel();
-}
-
-void LookupListModel::addEntry(nx::vms::api::LookupListEntry entry)
-{
-    const int count = m_data.entries.size();
-    beginInsertRows({}, count, count);
-    m_data.entries.push_back(std::move(entry));
-    endInsertRows();
+    m_data.attributeNames.clear();
+    for (const auto& v: value)
+        m_data.attributeNames.push_back(v);
+    emit attributeNamesChanged();
 }
 
 } // namespace nx::vms::client::desktop

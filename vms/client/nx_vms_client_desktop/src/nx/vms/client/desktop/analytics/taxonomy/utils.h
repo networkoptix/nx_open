@@ -6,24 +6,24 @@
 
 #include <nx/analytics/taxonomy/abstract_attribute.h>
 
-#include "abstract_attribute.h"
-#include "abstract_state_view_filter.h"
-
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
-AbstractAttribute* mergeNumericAttributes(
+class Attribute;
+class AbstractStateViewFilter;
+
+Attribute* mergeNumericAttributes(
     const std::vector<const nx::analytics::taxonomy::AbstractAttribute*>& taxonomyAttributes,
     QObject* parent);
 
-AbstractAttribute* mergeColorTypeAttributes(
+Attribute* mergeColorTypeAttributes(
     const std::vector<const nx::analytics::taxonomy::AbstractAttribute*>& taxonomyAttributes,
     QObject* parent);
 
-AbstractAttribute* mergeEnumTypeAttributes(
+Attribute* mergeEnumTypeAttributes(
     const std::vector<const nx::analytics::taxonomy::AbstractAttribute*>& taxonomyAttributes,
     QObject* parent);
 
-AbstractAttribute* mergeObjectTypeAttributes(
+Attribute* mergeObjectTypeAttributes(
     const std::vector<const nx::analytics::taxonomy::AbstractAttribute*>& taxonomyAttributes,
     const AbstractStateViewFilter* filter,
     QObject* parent);
@@ -31,19 +31,16 @@ AbstractAttribute* mergeObjectTypeAttributes(
 nx::analytics::taxonomy::AbstractAttribute::Type attributeType(
     const std::vector<const nx::analytics::taxonomy::AbstractAttribute*>& taxonomyAttributes);
 
-AbstractAttribute::Type fromTaxonomyAttributeType(
-    nx::analytics::taxonomy::AbstractAttribute::Type taxonomyAttributeType);
-
-AbstractAttribute* wrapAttribute(
+Attribute* wrapAttribute(
     const nx::analytics::taxonomy::AbstractAttribute* taxonomyAttribute,
     QObject* parent);
 
-AbstractAttribute* mergeAttributes(
+Attribute* mergeAttributes(
     const std::vector<const nx::analytics::taxonomy::AbstractAttribute*>& taxonomyAttributes,
     const AbstractStateViewFilter* filter,
     QObject* parent);
 
-std::vector<AbstractAttribute*> resolveAttributes(
+std::vector<Attribute*> resolveAttributes(
     const std::vector<const nx::analytics::taxonomy::AbstractObjectType*>& objectTypes,
     const AbstractStateViewFilter* filter,
     QObject* parent);

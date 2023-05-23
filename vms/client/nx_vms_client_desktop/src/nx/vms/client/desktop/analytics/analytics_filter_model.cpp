@@ -6,13 +6,14 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/utils/range_adapters.h>
-#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/abstract_state_view_filter.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/attribute_condition_state_view_filter.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/composite_state_view_filter.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/engine_state_view_filter.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/node.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/scope_state_view_filter.h>
+
+#include "analytics_taxonomy_manager.h"
+#include "taxonomy/abstract_state_view_filter.h"
+#include "taxonomy/attribute_condition_state_view_filter.h"
+#include "taxonomy/composite_state_view_filter.h"
+#include "taxonomy/engine_state_view_filter.h"
+#include "taxonomy/object_type.h"
+#include "taxonomy/scope_state_view_filter.h"
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
@@ -58,23 +59,23 @@ bool LiveTypeFilter::matches(const nx::analytics::taxonomy::AbstractAttribute* a
 }
 
 void mapObjectTypes(
-    const std::vector<taxonomy::AbstractNode*>& objectTypes,
-    QMap<QString, taxonomy::AbstractNode*>& outObjectTypesById)
+    const std::vector<taxonomy::ObjectType*>& objectTypes,
+    QMap<QString, taxonomy::ObjectType*>& outObjectTypesById)
 {
     if (objectTypes.empty())
         return;
 
-    for (taxonomy::AbstractNode* objectType: objectTypes)
+    for (taxonomy::ObjectType* objectType: objectTypes)
     {
         outObjectTypesById.insert(objectType->id(), objectType);
-        mapObjectTypes(objectType->derivedNodes(), outObjectTypesById);
+        mapObjectTypes(objectType->derivedObjectTypes(), outObjectTypesById);
     }
 }
 
-QMap<QString, taxonomy::AbstractNode*> objectTypesMap(
-    const std::vector<taxonomy::AbstractNode*>& objectTypes)
+QMap<QString, taxonomy::ObjectType*> objectTypesMap(
+    const std::vector<taxonomy::ObjectType*>& objectTypes)
 {
-    QMap<QString, taxonomy::AbstractNode*> result;
+    QMap<QString, taxonomy::ObjectType*> result;
     mapObjectTypes(objectTypes, result);
     return result;
 }
@@ -129,7 +130,7 @@ AnalyticsFilterModel::AnalyticsFilterModel(TaxonomyManager* taxonomyManager, QOb
     rebuild();
 }
 
-std::vector<taxonomy::AbstractNode*> AnalyticsFilterModel::objectTypes() const
+std::vector<taxonomy::ObjectType*> AnalyticsFilterModel::objectTypes() const
 {
     return m_objectTypes;
 }
@@ -139,7 +140,7 @@ std::vector<nx::analytics::taxonomy::AbstractEngine*> AnalyticsFilterModel::engi
     return m_engines;
 }
 
-void AnalyticsFilterModel::setObjectTypes(const std::vector<taxonomy::AbstractNode*>& objectTypes)
+void AnalyticsFilterModel::setObjectTypes(const std::vector<taxonomy::ObjectType*>& objectTypes)
 {
     m_objectTypes = objectTypes;
     m_objectTypesById = objectTypesMap(m_objectTypes);
@@ -187,8 +188,8 @@ void AnalyticsFilterModel::update(
             std::vector<AbstractStateViewFilter*>{liveTypeFilter, scopeFilter, conditionFilter},
             m_stateViewBuilder.get());
 
-        taxonomy::AbstractStateView* state = m_stateViewBuilder->stateView(filter);
-        setObjectTypes(state->rootNodes());
+        taxonomy::StateView* state = m_stateViewBuilder->stateView(filter);
+        setObjectTypes(state->objectTypes());
     }
 }
 
@@ -219,19 +220,19 @@ void AnalyticsFilterModel::setLiveTypesExcluded(bool value)
     update(m_engine, m_devices, m_attributeValues, value);
 }
 
-AbstractNode* AnalyticsFilterModel::objectTypeById(const QString& id) const
+ObjectType* AnalyticsFilterModel::objectTypeById(const QString& id) const
 {
     auto objectType = m_objectTypesById[id];
     QQmlEngine::setObjectOwnership(objectType, QQmlEngine::CppOwnership);
     return objectType;
 }
 
-AbstractNode* AnalyticsFilterModel::findFilterObjectType(const QStringList& analyticsObjectTypeIds)
+ObjectType* AnalyticsFilterModel::findFilterObjectType(const QStringList& analyticsObjectTypeIds)
 {
-    return objectTypeById(Node::makeId(analyticsObjectTypeIds));
+    return objectTypeById(ObjectType::makeId(analyticsObjectTypeIds));
 }
 
-QStringList AnalyticsFilterModel::getAnalyticsObjectTypeIds(AbstractNode* filterObjectType)
+QStringList AnalyticsFilterModel::getAnalyticsObjectTypeIds(ObjectType* filterObjectType)
 {
     if (!filterObjectType)
         return {};

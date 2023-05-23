@@ -5,38 +5,40 @@
 #include <QtCore/QUrl>
 
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 
-#include "lookup_lists_dialog_store.h"
+#include "lookup_list_entries_model.h"
 
 namespace nx::vms::client::desktop {
 
-struct LookupListsDialog::Private
+void LookupListsDialog::registerQmlTypes()
 {
-    LookupListsDialog* const q;
-    std::unique_ptr<LookupListsDialogStore> store = std::make_unique<LookupListsDialogStore>();
-};
+    qmlRegisterType<LookupListModel>("nx.vms.client.desktop", 1, 0, "LookupListModel");
+    qmlRegisterType<LookupListEntriesModel>("nx.vms.client.desktop", 1, 0, "LookupListEntriesModel");
+}
 
-LookupListsDialog::LookupListsDialog(QWidget* parent):
+LookupListsDialog::LookupListsDialog(SystemContext* systemContext, QWidget* parent):
     base_type(
         appContext()->qmlEngine(),
         QUrl("Nx/LookupLists/LookupListsDialog.qml"),
-        /*initialProperties*/ {},
+        /*initialProperties*/ { {"systemContext", QVariant::fromValue(systemContext)} },
         parent),
-    d(new Private{.q = this})
+    SystemContextAware(systemContext)
 {
     QmlProperty<QObject*>(rootObjectHolder(), "dialog") = this;
-    QmlProperty<QObject*>(rootObjectHolder(), "store") = d->store.get();
 }
 
 LookupListsDialog::~LookupListsDialog()
 {
     QmlProperty<QObject*>(rootObjectHolder(), "dialog") = nullptr;
-    QmlProperty<QObject*>(rootObjectHolder(), "store") = nullptr;
 }
 
 void LookupListsDialog::setData(nx::vms::api::LookupListDataList data)
 {
-    d->store->loadData(std::move(data));
+    QList<LookupListModel*> modelList;
+    for (const auto& elem: data)
+        modelList.push_back(new LookupListModel(elem, this));
+    emit loadCompleted(modelList);
 }
 
 void LookupListsDialog::showError(const QString& text)
@@ -47,20 +49,25 @@ void LookupListsDialog::showError(const QString& text)
 void LookupListsDialog::setSaveResult(bool success)
 {
     QmlProperty<bool>(window(), "saving") = false;
-
     if (success)
     {
-        d->store->hasChanges = false;
-        emit d->store->hasChangesChanged();
-
         if (QmlProperty<bool>(window(), "closing").value())
             accept();
     }
+    else
+    {
+        // Allow to run save request once more.
+        QmlProperty<bool>(window(), "hasChanges") = true;
+    }
 }
 
-void LookupListsDialog::requestSave()
+void LookupListsDialog::save(QList<LookupListModel*> data)
 {
-    emit saveRequested(d->store->data);
+    nx::vms::api::LookupListDataList result;
+    for (auto list: data)
+        result.push_back(list->rawData());
+
+    emit saveRequested(result);
 }
 
 } // namespace nx::vms::client::desktop

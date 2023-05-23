@@ -2,22 +2,24 @@
 
 #pragma once
 
-#include <nx/utils/impl_ptr.h>
+#include <QtCore/QObject>
 
-#include "abstract_enumeration.h"
+#include <nx/utils/impl_ptr.h>
 
 namespace nx::analytics::taxonomy { class AbstractEnumType; }
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
-class Enumeration: public AbstractEnumeration
+class NX_VMS_CLIENT_DESKTOP_API Enumeration: public QObject
 {
+    Q_OBJECT
+    Q_PROPERTY(std::vector<QString> items READ items CONSTANT)
+
 public:
     Enumeration(QObject* parent = nullptr);
-
     virtual ~Enumeration() override;
 
-    virtual std::vector<QString> items() const override;
+    std::vector<QString> items() const;
 
     void addEnumType(nx::analytics::taxonomy::AbstractEnumType* enumType);
 

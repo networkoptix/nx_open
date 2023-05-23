@@ -2,8 +2,8 @@
 
 #include "enumeration.h"
 
-#include <set>
 #include <optional>
+#include <set>
 
 #include <nx/analytics/taxonomy/abstract_enum_type.h>
 
@@ -18,7 +18,7 @@ struct Enumeration::Private
 };
 
 Enumeration::Enumeration(QObject* parent):
-    AbstractEnumeration(parent),
+    QObject(parent),
     d(new Private())
 {
 }

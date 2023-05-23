@@ -800,7 +800,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -950,7 +950,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -1018,7 +1018,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -1072,7 +1072,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -1161,7 +1161,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -1246,7 +1246,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -1292,7 +1292,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -1400,7 +1400,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -1609,7 +1609,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -1695,7 +1695,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -1770,7 +1770,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -1896,7 +1896,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -2005,7 +2005,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -2069,7 +2069,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -2134,7 +2134,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -2145,7 +2145,7 @@
                         "derived.object.type.2",
                         "derived.object.type.3"
                     ],
-                    "nodes": [
+                    "objectTypes": [
                         {
                             "name": "Derived Object Type 1",
                             "icon": "derived.1.icon",
@@ -2166,7 +2166,7 @@
                                 "derived.object.type.2",
                                 "derived.object.type.3"
                             ],
-                            "nodes": [
+                            "objectTypes": [
                                 {
                                     "name": "Derived Object Type 3",
                                     "icon": "derived.3.icon",
@@ -2258,7 +2258,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -2276,7 +2276,7 @@
                         "hidden.derived.object.type.9",
                         "hidden.derived.object.type.10"
                     ],
-                    "nodes": [
+                    "objectTypes": [
                         {
                             "name": "Derived Object Type 1",
                             "icon": "derived.1.icon",
@@ -2312,7 +2312,7 @@
                                 "derived.object.type.3",
                                 "hidden.derived.object.type.10"
                             ],
-                            "nodes": [
+                            "objectTypes": [
                                 {
                                     "name": "Derived Object Type 3",
                                     "icon": "derived.3.icon",
@@ -2399,7 +2399,7 @@
 
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Base Object Type 1",
                     "icon": "base.icon",
@@ -2411,7 +2411,7 @@
                         "hidden.derived.object.type.9",
                         "hidden.derived.object.type.10"
                     ],
-                    "nodes": [
+                    "objectTypes": [
                         {
                             "name": "Derived Object Type 1",
                             "icon": "derived.1.icon",
@@ -2432,7 +2432,7 @@
                                 "hidden.derived.object.type.9",
                                 "hidden.derived.object.type.10"
                             ],
-                            "nodes": [
+                            "objectTypes": [
                                 {
                                     "name": "Derived Object Type 3",
                                     "icon": "derived.3.icon",
@@ -2491,7 +2491,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Object Type with conditional Attributes",
                     "typeIds": ["object.type.with.conditional.attributes"],
@@ -2538,7 +2538,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Object Type with conditional Attributes",
                     "typeIds": ["object.type.with.conditional.attributes"],
@@ -2589,7 +2589,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Object Type with conditional Attributes",
                     "typeIds": ["object.type.with.conditional.attributes"],
@@ -2641,7 +2641,7 @@
             }
         },
         "expected": {
-            "nodes": [
+            "objectTypes": [
                 {
                     "name": "Object Type with conditional Attributes",
                     "typeIds": ["object.type.with.conditional.attributes"],

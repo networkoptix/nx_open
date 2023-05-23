@@ -14,7 +14,7 @@ struct ColorSet::Private
 };
 
 ColorSet::ColorSet(QObject* parent):
-    AbstractColorSet(parent),
+    QObject(parent),
     d(new Private())
 {
 }
