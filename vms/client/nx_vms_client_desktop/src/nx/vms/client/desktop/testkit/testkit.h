@@ -2,7 +2,9 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
+#include <thread>
 
 #include <QtCore/QObject>
 #include <QtQml/QJSValue>
@@ -102,6 +104,16 @@ public:
     Q_INVOKABLE void mouse(QJSValue object, QJSValue parameters);
 
     /**
+     * Emulates drag and drop action by performing the sequence of mouse input events. Mouse input
+     * emulation is executed asynchronously in the non-GUI thread, if any other TestKit method will
+     * be invoked while drag and drop is performed this will block the GIU thread until the
+     * sequence ends, and drag and drop wouldn't happen. Thus it's required to place at least
+     * 3 seconds delay after invoking this method in the test script to be sure that it will work
+     * correctly.
+     */
+    Q_INVOKABLE void dragAndDrop(QJSValue object, QJSValue parameters);
+
+    /**
      * Sends sequence of keyboard events to the object. If object is null the events are sent to
      * the active window. Input option may be "type", "press" or "release".
      */
@@ -132,9 +144,17 @@ private:
     /** Exposes QObject stored in QVariant to script without changing its ownership. */
     QJSValue wrapQVariant(QVariant value);
 
+    /**
+     * Blocks the current thread until the asyncronious operation, e.g drag and drop finishes its
+     * execution.
+     */
+    void ensureAsyncActionFinished();
+
     QJSValue m_eventObservers;
 
     std::unique_ptr<Highlighter> m_highlighter;
+    std::unique_ptr<std::thread> m_asyncActionThread;
+    std::atomic<bool> m_dragAndDropActive = false;
 };
 
 } // namespace nx::vms::client::desktop::testkit
