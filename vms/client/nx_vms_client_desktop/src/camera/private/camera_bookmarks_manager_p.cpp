@@ -265,6 +265,11 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
     QnGetBookmarksRequestData requestData;
     requestData.filter = filter;
     requestData.format = Qn::SerializationFormat::UbjsonFormat;
+    if (!NX_ASSERT(requestData.filter.startTimeMs.count() >= 0, "Invalid start time passed"))
+        requestData.filter.startTimeMs = {};
+    if (!NX_ASSERT(requestData.filter.endTimeMs.count() >= 0, "Invalid end time passed"))
+        requestData.filter.endTimeMs = {};
+
     return sendGetRequest("/ec2/bookmarks", requestData, makeUbjsonResponseWrapper(callback));
 }
 
