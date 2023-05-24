@@ -367,14 +367,13 @@ Button
             {
                 target: tile
                 parent: openedParent
+                x: Math.floor((openedParent.width - tile.width) / 2)
+                y: Math.floor((openedParent.height - tile.height) / 2)
             }
 
             PropertyChanges
             {
                 target: tile
-                x: Math.floor((openedParent.width - tile.width) / 2)
-                y: Math.floor((openedParent.height - tile.height) / 2)
-
                 width: MathUtils.bound(
                     tile.gridCellWidth * 1.2,
                     openedTileLoader.item.requiredWidth,
@@ -411,6 +410,11 @@ Button
                 parent: _initialParent
                 x: 0
                 y: 0
+            }
+
+            PropertyChanges
+            {
+                target: tile
                 width: gridCellWidth
                 height: gridCellHeight
             }
