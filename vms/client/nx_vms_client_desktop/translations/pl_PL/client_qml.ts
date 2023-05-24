@@ -162,15 +162,15 @@
     </message>
     <message>
       <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
+      <translation>Sprawdź ustawienia administracyjne, aby skonfigurować tę wtyczkę.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>Ta wtyczka nie ma ustawień na poziomie systemu.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Ta wtyczka nie ma ustawień dla tej kamery.</translation>
     </message>
   </context>
   <context>
@@ -1348,7 +1348,7 @@ aby aktywować PTZ</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Nie masz dostępu do %1. Sprawdź swoje połączenie internetowe.</translation>
     </message>
   </context>
 </TS>

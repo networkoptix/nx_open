@@ -667,11 +667,11 @@
     </message>
     <message>
       <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
+      <translation>Importuj z urządzenia</translation>
     </message>
     <message>
       <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
+      <translation>Importuj wideo automatycznie</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -797,7 +797,7 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>Kamera została zastąpiona</translation>
     </message>
     <message>
       <source>Name</source>
@@ -914,11 +914,11 @@
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>Eksport wideo</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>Wideo i archiwizacja na żywo</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -930,15 +930,15 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>Przeczytaj więcej na stronie pomocy</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Nie pokazuj ponownie tego okna</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Ujawnienie układu w chmurze</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -946,11 +946,11 @@
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>Wyszukiwanie zakładek, obiektów, zdarzeń</translation>
     </message>
     <message>
       <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
+      <translation>W przyszłości</translation>
     </message>
   </context>
   <context>
@@ -979,11 +979,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>Ta akcja może być ustawiona tylko dla zdarzeń natychmiastowych</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>Wybierz inne zdarzenie lub akcję</translation>
     </message>
   </context>
   <context>
@@ -1028,7 +1028,7 @@
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+      <translation>Utwórz kopię zapasową danych zarządzania systemem lub przywróć dane zarządzania systemem z istniejącej kopii zapasowej</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1040,7 +1040,7 @@
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>Otwórz folder</translation>
     </message>
   </context>
   <context>
@@ -1171,7 +1171,7 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>Zdarzenie generowane</translation>
     </message>
   </context>
   <context>
@@ -1194,23 +1194,23 @@
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>Adres URL http(s)</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>Zawartość Http(s)</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>Typ zawartości</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>Rodzaj uwierzytelniania</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>Metoda żądania</translation>
     </message>
   </context>
   <context>
@@ -1339,7 +1339,7 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>Dodaj komentarz</translation>
     </message>
     <message>
       <source>Set Schedule</source>
@@ -1347,11 +1347,11 @@
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>Testuj akcję</translation>
     </message>
     <message>
       <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
+      <translation>Dodaj komentarz</translation>
     </message>
   </context>
   <context>
@@ -1433,7 +1433,7 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>Pozwól komputerowi wejść w tryb uśpienia przy bezczynności</translation>
     </message>
   </context>
   <context>
@@ -1799,19 +1799,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>Poziom logowania</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>Podziel plik według rozmiaru</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>Podziel plik według czasu</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>Ogranicz maksymalną głośność</translation>
     </message>
   </context>
   <context>
@@ -2068,7 +2068,7 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>Ustawienia połączenia</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2084,15 +2084,15 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Adres serwera</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>Protokół zabezpieczeń</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>Ustawienia poczty e-mail</translation>
     </message>
     <message>
       <source>Support Signature</source>
@@ -2628,23 +2628,23 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>Reguły alarmu/zdarzenia</translation>
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>Nowa reguła</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <translation>Usuń regułę</translation>
     </message>
     <message>
       <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <translation>Wybierz regułę</translation>
     </message>
     <message>
       <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <translation>Zresetuj reguły domyślne</translation>
     </message>
   </context>
   <context>
@@ -2948,11 +2948,11 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Dźwięk</translation>
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Zarządzaj</translation>
     </message>
   </context>
   <context>
@@ -3017,11 +3017,11 @@
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Dane analityczne mogą zajmować dużo przestrzeni dyskowej. Zalecamy wybranie innej lokalizacji zamiast partycji systemowej.</translation>
     </message>
     <message>
       <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
+      <translation>Dane analityczne będą nadal przechowywane w wyłączonym archiwum.</translation>
     </message>
   </context>
   <context>
@@ -3157,11 +3157,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ Dodaj grupę</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Nie znaleziono grup</translation>
     </message>
   </context>
   <context>
@@ -3176,7 +3176,7 @@
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>Nie znaleziono żadnych użytkowników</translation>
     </message>
   </context>
   <context>
