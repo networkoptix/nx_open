@@ -178,7 +178,7 @@ Item
                         currentIndex = 0
                 }
 
-                Keys.onPressed: openedTileItem.handleKeyPressed(event)
+                Keys.onPressed: event => openedTileItem.handleKeyPressed(event)
             }
 
             Label
@@ -234,7 +234,7 @@ Item
                 editable: true
                 enabled: !openedTileItem.isConnecting
 
-                Keys.onPressed: openedTileItem.handleKeyPressed(event)
+                Keys.onPressed: event => openedTileItem.handleKeyPressed(event)
             }
         }
 
@@ -275,10 +275,7 @@ Item
 
                     onTextChanged: openedTileItem.errorMessage = ""
 
-                    Keys.onPressed: function(event)
-                    {
-                        openedTileItem.handleKeyPressed(event)
-                    }
+                    Keys.onPressed: event => openedTileItem.handleKeyPressed(event)
 
                     KeyNavigation.tab: savePasswordCheckbox
                 }
@@ -358,7 +355,7 @@ Item
 
                 KeyNavigation.tab: connectButton
 
-                Keys.onPressed: openedTileItem.handleKeyPressed(event)
+                Keys.onPressed: event => openedTileItem.handleKeyPressed(event)
             }
         }
 
