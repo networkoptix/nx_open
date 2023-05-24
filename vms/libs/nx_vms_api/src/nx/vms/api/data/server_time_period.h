@@ -45,8 +45,7 @@ struct NX_VMS_API ServerTimePeriod
     std::chrono::milliseconds startTimeMs{0};
 
     /**%apidoc[opt]
-     * Duration in milliseconds. In uninitialized state represents a video chunk
-     * that is being recorded at the moment.
+     * Duration in milliseconds. Not present for a video chunk that is currently being recorded.
      */
     std::optional<std::chrono::milliseconds> durationMs{0};
 
