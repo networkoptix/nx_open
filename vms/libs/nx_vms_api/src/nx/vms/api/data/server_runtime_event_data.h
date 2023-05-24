@@ -49,6 +49,7 @@ struct NX_VMS_API ServerRuntimeEventData
 #define nx_vms_api_ServerRuntimeEventData_Fields (eventType)(eventData)
 
 QN_FUSION_DECLARE_FUNCTIONS(ServerRuntimeEventData, (json)(ubjson), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(ServerRuntimeEventData, nx_vms_api_ServerRuntimeEventData_Fields)
 
 // Specific event payload -------------------------------------------------------------------------
 
@@ -63,6 +64,8 @@ struct NX_VMS_API DeviceAgentSettingsMaybeChangedData
 #define nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields (deviceId)(engineId)(settingsData)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsMaybeChangedData, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceAgentSettingsMaybeChangedData,
+    nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields)
 
 struct NX_VMS_API DeviceFootageChangedData
 {
@@ -71,6 +74,8 @@ struct NX_VMS_API DeviceFootageChangedData
 
 #define nx_vms_api_DeviceFootageChangedData_Fields (deviceIds)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageChangedData, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceFootageChangedData,
+    nx_vms_api_DeviceFootageChangedData_Fields)
 
 struct NX_VMS_API AnalyticsStorageParametersChangedData
 {
@@ -79,6 +84,8 @@ struct NX_VMS_API AnalyticsStorageParametersChangedData
 
 #define nx_vms_api_AnalyticsStorageParametersChangedData_Fields (serverId)
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsStorageParametersChangedData, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(AnalyticsStorageParametersChangedData,
+    nx_vms_api_AnalyticsStorageParametersChangedData_Fields)
 
 struct NX_VMS_API DeviceAdvancedSettingsManifestChangedData
 {
@@ -86,6 +93,8 @@ struct NX_VMS_API DeviceAdvancedSettingsManifestChangedData
 };
 #define nx_vms_api_DeviceAdvancedSettingsManifestChangedData_Fields (deviceIds)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAdvancedSettingsManifestChangedData, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceAdvancedSettingsManifestChangedData,
+    nx_vms_api_DeviceAdvancedSettingsManifestChangedData_Fields)
 
 } // namespace nx::vms::api
 
