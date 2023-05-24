@@ -29,23 +29,15 @@ using namespace nx::vms::client::desktop;
 
 namespace
 {
-    enum
-    {
-        kWindowWidthMs =  5 * 60 * 1000      // 3 minute before and after current position
-        , kLeftOffset = kWindowWidthMs / 2
-        , kRightOffset = kLeftOffset
-    };
+    // 5 minutes before and after current position
+    static constexpr auto kWindowWidthMs =  5 * 60 * 1000;
 
-    const QnCameraBookmarkSearchFilter kInitialFilter = []()
-    {
-        enum { kMaxBookmarksNearThePosition = 256 };
+    static constexpr auto kLeftOffset = kWindowWidthMs / 2;
+    static constexpr auto kRightOffset = kLeftOffset;
 
-        QnCameraBookmarkSearchFilter filter;
-        filter.limit = kMaxBookmarksNearThePosition;
-        filter.startTimeMs = milliseconds(DATETIME_INVALID);
-        filter.endTimeMs = milliseconds(DATETIME_INVALID);
-        return filter;
-    }();
+    static constexpr auto kMaxBookmarksNearThePosition = 256;
+
+    const QnCameraBookmarkSearchFilter kInitialFilter{.limit=kMaxBookmarksNearThePosition};
 
     /* Maximum number of bookmarks, allowed on the single widget. */
     const int kBookmarksDisplayLimit = 10;
