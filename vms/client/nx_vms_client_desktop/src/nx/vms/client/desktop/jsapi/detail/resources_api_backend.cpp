@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -65,6 +66,8 @@ ResourcesApiBackend::~ResourcesApiBackend()
 
 detail::Resource::List ResourcesApiBackend::resources() const
 {
+    // Only current system's resources are presented in the list of available resources, as only
+    // such items can be added on a layout.
     const auto resources = appContext()->currentSystemContext()->resourcePool()->getResources(
         [](const QnResourcePtr& resource)
         {
@@ -75,8 +78,9 @@ detail::Resource::List ResourcesApiBackend::resources() const
 
 detail::ResourceResult ResourcesApiBackend::resource(const QUuid& resourceId) const
 {
-    const auto pool = appContext()->currentSystemContext()->resourcePool();
-    const auto resource = pool->getResourceById(resourceId);
+    // Use UnifiedResourcePool to make it possible to interact with cross-system items on a layout
+    // although only items of the current system are presented in the list of available resources.
+    const auto resource = appContext()->unifiedResourcePool()->resource(resourceId);
     if (isResourceAvailable(resource))
         return detail::ResourceResult{Error::success(), detail::Resource::from(resource)};
 
