@@ -31,6 +31,8 @@ struct NX_VMS_API DeviceAgentSettingsSession
 #define nx_vms_api_analytics_DeviceAgentSettingsSession_Fields (id)(sequenceNumber)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsSession, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceAgentSettingsSession,
+    nx_vms_api_analytics_DeviceAgentSettingsSession_Fields)
 
 struct NX_VMS_API DeviceAgentSettingsResponse
 {
@@ -78,5 +80,7 @@ struct NX_VMS_API DeviceAgentSettingsResponse
     (session)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsResponse, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceAgentSettingsResponse,
+    nx_vms_api_analytics_DeviceAgentSettingsResponse_Fields)
 
 } // namespace nx::vms::api::analytics
