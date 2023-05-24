@@ -12,6 +12,7 @@
 
 #include <client_core/client_core_module.h>
 #include <nx/build_info.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 
 #include "highlighter.h"
@@ -47,6 +48,7 @@ TestKit::TestKit(QObject* parent): base_type(parent), m_highlighter(std::make_un
 
 TestKit::~TestKit()
 {
+    ensureAsyncActionFinished();
     qApp->removeEventFilter(this);
 }
 
@@ -282,6 +284,8 @@ QByteArray TestKit::screenshot(const char* format)
 
 void TestKit::post(QJSValue object, QString eventName, QJSValue /* args */)
 {
+    ensureAsyncActionFinished();
+
     auto engine = qjsEngine(this);
 
     if (eventName == "QCloseEvent")
@@ -303,11 +307,15 @@ void TestKit::post(QJSValue object, QString eventName, QJSValue /* args */)
 
 QJSValue TestKit::bounds(QJSValue object)
 {
+    ensureAsyncActionFinished();
+
     return qjsEngine(this)->toScriptValue(utils::globalRect(object.toVariant()));
 }
 
 QJSValue TestKit::find(QJSValue properties)
 {
+    ensureAsyncActionFinished();
+
     QVariantList matchingObjects = utils::findAllObjects(properties);
 
     auto result = qjsEngine(this)->newArray(matchingObjects.size());
@@ -319,6 +327,8 @@ QJSValue TestKit::find(QJSValue properties)
 
 QJSValue TestKit::wrap(QJSValue object)
 {
+    ensureAsyncActionFinished();
+
     auto engine = qjsEngine(this);
     if (auto qobject = object.toQObject())
         return engine->toScriptValue(ObjectWrapper(qobject));
@@ -330,6 +340,8 @@ QJSValue TestKit::wrap(QJSValue object)
 
 void TestKit::mouse(QJSValue object, QJSValue parameters)
 {
+    ensureAsyncActionFinished();
+
     const bool hasCoordinates =
         parameters.property("x").isNumber() && parameters.property("y").isNumber();
 
@@ -380,8 +392,95 @@ void TestKit::mouse(QJSValue object, QJSValue parameters)
         parameters.property("scrollDelta").toInt());
 }
 
+void TestKit::dragAndDrop(QJSValue object, QJSValue parameters)
+{
+    ensureAsyncActionFinished();
+
+    const auto fromValue = parameters.property("from");
+    const auto toValue = parameters.property("to");
+
+    QPoint from(fromValue.property("x").toNumber(), fromValue.property("y").toNumber());
+    QPoint to(toValue.property("x").toNumber(), toValue.property("y").toNumber());
+
+    QWindow* window = nullptr;
+
+    if (!object.isNull())
+    {
+        const auto objectRect = utils::globalRect(object.toVariant(), &window);
+        from += objectRect.topLeft();
+        to += objectRect.topLeft();
+    }
+
+    if (!window)
+    {
+        window = QGuiApplication::topLevelAt(from);
+        if (!window)
+            return;
+    }
+
+    auto doDragAndDrop =
+        [this, from, to, window]
+        {
+            static constexpr auto kMouseInputDelay = std::chrono::milliseconds(150);
+
+            QVector<QPoint> points;
+
+            QPoint moveVector(to - from);
+            for (int i = 0; i <= 10; ++i)
+                points.push_back(from + moveVector * i / 10.0);
+
+            utils::sendMouse(points.front(),
+                "move",
+                Qt::MouseButton::NoButton,
+                Qt::MouseButtons(),
+                Qt::KeyboardModifier::NoModifier,
+                window,
+                true);
+
+            std::this_thread::sleep_for(kMouseInputDelay);
+
+            utils::sendMouse(points.front(),
+                "press",
+                Qt::MouseButton::LeftButton,
+                Qt::MouseButtons(Qt::MouseButton::LeftButton),
+                Qt::KeyboardModifier::NoModifier,
+                window,
+                true);
+
+            std::this_thread::sleep_for(kMouseInputDelay);
+
+            for (const auto& point: points)
+            {
+                utils::sendMouse(point,
+                    "move",
+                    Qt::MouseButton::LeftButton,
+                    Qt::MouseButtons(Qt::MouseButton::LeftButton),
+                    Qt::KeyboardModifier::NoModifier,
+                    window,
+                    true);
+
+                std::this_thread::sleep_for(kMouseInputDelay);
+            }
+
+            utils::sendMouse(points.back(),
+                "release",
+                Qt::MouseButton::LeftButton,
+                Qt::MouseButtons(Qt::MouseButton::LeftButton),
+                Qt::KeyboardModifier::NoModifier,
+                window,
+                true);
+
+            m_dragAndDropActive = false;
+        };
+
+    m_dragAndDropActive = true;
+    m_asyncActionThread = std::make_unique<std::thread>(doDragAndDrop);
+}
+
 void TestKit::keys(QJSValue object, QString keys, QString input)
 {
+    ensureAsyncActionFinished();
+
     input = input.toUpper();
     auto option = utils::KeyType;
 
@@ -395,6 +494,8 @@ void TestKit::keys(QJSValue object, QString keys, QString input)
 
 QJSValue TestKit::dump(QJSValue object, QJSValue withChildren)
 {
+    ensureAsyncActionFinished();
+
     auto engine = qjsEngine(this);
     QModelIndex index = engine->fromScriptValue<QModelIndex>(object);
     if (index.isValid())
@@ -415,6 +516,8 @@ QJSValue TestKit::dump(QJSValue object, QJSValue withChildren)
 
 QJSValue TestKit::pick(int x, int y)
 {
+    ensureAsyncActionFinished();
+
     auto result = m_highlighter->pick({x, y}).toMap();
     if (result.isEmpty())
         return {};
@@ -448,6 +551,19 @@ void TestKit::registerAction()
             if (auto testkit = instance())
                 testkit->m_highlighter->setEnabled(!testkit->m_highlighter->isEnabled());
         });
+}
+
+void TestKit::ensureAsyncActionFinished()
+{
+    if (m_asyncActionThread)
+    {
+        // Drag and drop won't be performed if GUI thread event loop will be blocked.
+        NX_ASSERT(!m_dragAndDropActive,
+            "TestKit method invoked while drag and drop operation in progress");
+
+        m_asyncActionThread->join();
+        m_asyncActionThread.reset();
+    }
 }
 
 } // namespace nx::vms::client::desktop::testkit
