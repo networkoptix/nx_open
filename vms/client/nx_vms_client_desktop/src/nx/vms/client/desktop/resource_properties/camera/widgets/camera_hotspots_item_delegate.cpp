@@ -5,6 +5,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QPushButton>
 
 #include <client/client_globals.h>
 #include <nx/utils/log/assert.h>
@@ -172,8 +173,15 @@ QWidget* CameraHotspotsItemDelegate::createEditor(
 {
     if (index.column() == CameraHotspotsItemModel::CameraColumn)
     {
-        emit cameraEditorRequested(index);
-        return nullptr;
+        auto editorButton = new QPushButton(parent);
+        editorButton->setText(index.data(Qt::DisplayRole).toString());
+        editorButton->setStyleSheet(QString("text-align:left; padding-left:%1")
+            .arg(nx::style::Metrics::kTextButtonIconMargin));
+
+        connect(editorButton, &QPushButton::clicked, this,
+            [this, index] { emit cameraEditorRequested(index); });
+
+        return editorButton;
     }
     return base_type::createEditor(parent, option, index);
 }

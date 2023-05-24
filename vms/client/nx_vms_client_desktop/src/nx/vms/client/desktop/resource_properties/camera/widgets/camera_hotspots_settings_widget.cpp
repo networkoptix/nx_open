@@ -168,6 +168,10 @@ void CameraHotspotsSettingsWidget::Private::selectHotspotsViewRow(std::optional<
     if (row)
     {
         const auto selectionModel = ui->hotspotsItemView->selectionModel();
+
+        if (selectionModel->currentIndex().isValid())
+            ui->hotspotsItemView->closePersistentEditor(selectionModel->currentIndex());
+
         selectionModel->select(hotspotsModel->index(*row, 0),
             QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     }
