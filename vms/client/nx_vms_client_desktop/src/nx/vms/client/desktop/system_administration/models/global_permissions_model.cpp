@@ -21,7 +21,7 @@ std::vector<std::pair<api::GlobalPermission, QString>> globalPermissions()
 {
     return {
         {api::GlobalPermission::viewLogs, GlobalPermissionsModel::tr("View event log")},
-        {api::GlobalPermission::generateEvents, GlobalPermissionsModel::tr("Synthesize VMS events")},
+        {api::GlobalPermission::generateEvents, GlobalPermissionsModel::tr("Generate events")},
     };
 };
 
