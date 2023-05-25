@@ -74,6 +74,7 @@ struct PredefinedUserGroups::Private
             return GlobalPermission::administrator
                 | GlobalPermission::powerUser
                 | GlobalPermission::viewLogs
+                | GlobalPermission::generateEvents
                 | GlobalPermission::systemHealth;
         }
 

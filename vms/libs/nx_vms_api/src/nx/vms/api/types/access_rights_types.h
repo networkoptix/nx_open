@@ -62,8 +62,9 @@ enum class GlobalPermission
     /**%apidoc
      * Can access System Health Monitoring information.
      * %caption GlobalSystemHealthPermission
+     * %// This is a new flag, it shouldn't be copied to DeprecatedGlobalPermission.
      */
-     systemHealth = 0x00000020, //< New flag, shouldn't be copied to DeprecatedGlobalPermission.
+     systemHealth = 0x00000020,
 
     /* Viewer permissions. */
 
@@ -103,6 +104,13 @@ enum class GlobalPermission
      * %caption GlobalUserInputPermission
      */
     userInput = 0x00010000,
+
+    /**%apidoc
+     * Can generate VMS Events.
+     * %caption GlobalGenerateEventsPermission
+     * %// This is a new flag, it shouldn't be copied to DeprecatedGlobalPermission.
+     */
+     generateEvents = 0x00020000,
 
     /* Resources access permissions. */
 
@@ -190,6 +198,7 @@ constexpr auto nxReflectVisitAllEnumItems(GlobalPermission*, Visitor&& visitor)
         Item{GlobalPermission::viewBookmarks, "GlobalViewBookmarksPermission"},
         Item{GlobalPermission::manageBookmarks, "GlobalManageBookmarksPermission"},
         Item{GlobalPermission::userInput, "GlobalUserInputPermission"},
+        Item{GlobalPermission::generateEvents, "GlobalGenerateEventsPermission"},
         Item{GlobalPermission::accessAllMedia, "GlobalAccessAllMediaPermission"},
         Item{GlobalPermission::customUser, "GlobalCustomUserPermission"},
         // For compatibility with existing APIs we should serialize this value to
@@ -206,12 +215,14 @@ constexpr GlobalPermissions kNonDeprecatedGlobalPermissions =
     GlobalPermission::powerUser
     | GlobalPermission::administrator
     | GlobalPermission::viewLogs
+    | GlobalPermission::generateEvents
     | GlobalPermission::systemHealth
     | GlobalPermission::customUser
     | GlobalPermission::requireFreshSession;
 
 constexpr GlobalPermissions kAssignableGlobalPermissions =
     GlobalPermission::viewLogs
+    | GlobalPermission::generateEvents
     | GlobalPermission::customUser;
 
 constexpr GlobalPermissions kDeprecatedGlobalPermissions{~kNonDeprecatedGlobalPermissions};

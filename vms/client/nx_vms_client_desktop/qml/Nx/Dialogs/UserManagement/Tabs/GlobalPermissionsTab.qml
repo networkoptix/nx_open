@@ -28,7 +28,7 @@ Item
         anchors.top: parent.top
         anchors.topMargin: 16
 
-        spacing: 16
+        spacing: 0
 
         Text
         {
@@ -36,6 +36,7 @@ Item
 
             font: Qt.font({pixelSize: 14, weight: Font.Normal})
             color: ColorTheme.colors.light16
+            bottomPadding: 16 - parent.spacing
         }
 
         Repeater
