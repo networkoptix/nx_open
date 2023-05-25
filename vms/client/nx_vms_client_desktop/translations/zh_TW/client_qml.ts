@@ -152,19 +152,19 @@
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>請在攝影機設定頁面中確認並進行套件設定。</translation>
     </message>
     <message>
       <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
+      <translation>請在系統管理設定頁面中確認並進行套件設定。</translation>
     </message>
     <message>
       <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>此套件在系統中沒有任何相關可用設定。</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>此套件沒有針對此相機的相關可用設定。</translation>
     </message>
   </context>
   <context>
@@ -1069,7 +1069,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>部分欄位必須填入參數以進行此操作。</translation>
     </message>
   </context>
   <context>
@@ -1315,7 +1315,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>目前無法連線至 %1，請檢查您的網路連線。</translation>
     </message>
   </context>
 </TS>
