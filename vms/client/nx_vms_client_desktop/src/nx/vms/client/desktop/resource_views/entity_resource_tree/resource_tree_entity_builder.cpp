@@ -654,12 +654,15 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
     auto layoutsComposition = std::make_unique<CompositionEntity>();
     layoutsComposition->addSubEntity(std::move(layoutsGroupList));
 
-    auto cloudLayoutsList = makeUniqueKeyGroupList<QnResourcePtr>(
-        cloudLayoutItemCreator,
-        [this](const QnResourcePtr& layout) { return createLayoutItemListEntity(layout); },
-        layoutsOrder());
-    cloudLayoutsList->installItemSource(m_itemKeySourcePool->cloudLayoutsSource());
-    layoutsComposition->addSubEntity(std::move(cloudLayoutsList));
+    if (user() && user()->isCloud())
+    {
+        auto cloudLayoutsList = makeUniqueKeyGroupList<QnResourcePtr>(
+            cloudLayoutItemCreator,
+            [this](const QnResourcePtr& layout) { return createLayoutItemListEntity(layout); },
+            layoutsOrder());
+        cloudLayoutsList->installItemSource(m_itemKeySourcePool->cloudLayoutsSource());
+        layoutsComposition->addSubEntity(std::move(cloudLayoutsList));
+    }
 
     return makeFlatteningGroup(
         m_itemFactory->createLayoutsItem(),
