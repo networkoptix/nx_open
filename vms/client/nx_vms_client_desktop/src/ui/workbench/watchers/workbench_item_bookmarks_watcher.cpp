@@ -221,9 +221,12 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updatePos(qint64 posMs)
 
 void QnWorkbenchItemBookmarksWatcher::WidgetData::updateQueryFilter()
 {
-    const auto newWindow = (m_posMs == DATETIME_INVALID
-        ? QnTimePeriod::fromInterval(DATETIME_INVALID, DATETIME_INVALID)
-        : helpers::extendTimeWindow(m_posMs, m_posMs, kLeftOffset, kRightOffset));
+    // No need to update filter if current position is invalid (e.g. client was disconnected or
+    // camera was removed).
+    if (m_posMs == DATETIME_INVALID)
+        return;
+
+    const auto newWindow = helpers::extendTimeWindow(m_posMs, m_posMs, kLeftOffset, kRightOffset);
 
     bool nearLive = m_posMs + kRightOffset >= qnSyncTime->currentMSecsSinceEpoch();
     const auto minWindowChange = nearLive

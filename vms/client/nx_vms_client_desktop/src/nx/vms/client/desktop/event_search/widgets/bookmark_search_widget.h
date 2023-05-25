@@ -17,6 +17,8 @@ public:
     BookmarkSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
     virtual ~BookmarkSearchWidget() override;
 
+    virtual void resetFilters() override;
+
 private:
     virtual QString placeholderText(bool constrained) const override;
     virtual QString itemCounterText(int count) const override;
