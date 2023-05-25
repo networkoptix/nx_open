@@ -139,6 +139,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(ExportedLayout | Locked, loadIcon("tree/layout_exported_locked.svg"));
     m_cache.insert(ExportedEncryptedLayout, loadIcon("tree/layout_exported_encrypted.svg"));
     m_cache.insert(IntercomLayout, loadIcon("tree/layouts_intercom.svg"));
+    m_cache.insert(IntercomLayout | Locked, loadIcon("tree/layouts_intercom_locked.svg"));
     m_cache.insert(SharedLayout, loadIcon("tree/layout_shared.svg"));
     m_cache.insert(SharedLayout | Locked, loadIcon("tree/layout_shared_locked.svg"));
     m_cache.insert(CloudLayout, loadIcon("tree/layout_cloud.svg"));
