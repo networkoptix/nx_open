@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <plugins/resource/archive/syncplay_wrapper.h>
+#include <plugins/resource/archive/syncplay_archive_delegate.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
@@ -207,11 +208,20 @@ void QnWorkbenchStreamSynchronizer::handleWidget(QnMediaResourceWidget* widget)
 
     const auto resource = widget->resource()->toResource();
     const bool hasArchiveReader = widget->display()->archiveReader() != nullptr;
-    const bool hasToBeSynced =
-        hasArchiveReader && resource->hasFlags(Qn::sync) && !resource->hasFlags(Qn::fake);
+    const bool hasToBeSynced = hasArchiveReader && resource->hasFlags(Qn::sync);
     const bool isSyncedAlready = m_syncedWidgets.contains(widget);
 
+    // This safety measure is not quite architecturally correct, but should be here until code
+    // is cleaned up.
+    const bool isSyncedActually = dynamic_cast<QnSyncPlayArchiveDelegate*>(
+        widget->display()->archiveReader()->getArchiveDelegate());
+
     if (hasToBeSynced && !isSyncedAlready)
+    {
+        NX_ASSERT(!isSyncedActually, "Syncplay wrapper already handles this camera");
+    }
+
+    if (hasToBeSynced && !isSyncedAlready && !isSyncedActually)
     {
         // New or queued widget.
         QnClientVideoCamera* camera = widget->display()->camera();
@@ -228,10 +238,12 @@ void QnWorkbenchStreamSynchronizer::handleWidget(QnMediaResourceWidget* widget)
         m_syncedWidgets.insert(widget);
         m_queuedWidgets.remove(widget);
     }
-    else
+    else if (!hasToBeSynced)
     {
         if (isSyncedAlready)
         {
+            NX_ASSERT(false, "Actually we should never be here. Widget is either syncable or not");
+
             // Stop sync.
             const auto archiveReader = widget->display()->archiveReader();
             if (NX_ASSERT(archiveReader))
@@ -250,6 +262,6 @@ void QnWorkbenchStreamSynchronizer::handleWidget(QnMediaResourceWidget* widget)
     }
 
     const auto syncedWidgetsCount = m_syncedWidgets.size();
-    if(syncedWidgetsCount <= 1)
+    if (syncedWidgetsCount <= 1)
         emit effectiveChanged();
 }

@@ -182,6 +182,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
                 if (handle != m_chunkMergingProcessHandle)
                     return;
 
+                NX_VERBOSE(this, "Merging of %1 is finished with %2 chunks",
+                    timePeriodType, result.size());
                 m_mergedTimePeriods[timePeriodType] = result;
 
                 if (timePeriodType != Qn::RecordingContent && timePeriodType == selectedExtraContent())
@@ -215,9 +217,10 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         [this]
         {
             m_chunkMergingProcessHandle = qn_threadedMergeHandle.fetchAndAddAcquire(1);
+            NX_VERBOSE(this, "Updated chunk merging handle to %1", m_chunkMergingProcessHandle);
         });
 
-    connect(workbench(), &Workbench::currentLayoutItemRemoved, this, 
+    connect(workbench(), &Workbench::currentLayoutItemRemoved, this,
         &QnWorkbenchNavigator::currentLayoutItemRemoved, Qt::QueuedConnection);
 
     connect(workbench(), &Workbench::currentLayoutChanged, this,
@@ -571,7 +574,7 @@ bool QnWorkbenchNavigator::hasVmaxInSync() const
     auto isSync = syncAllowed && streamSynchronizer->isRunning();
     if (!isSync)
         return false;
-    
+
     return std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(), resourceIsVmax);
 }
 
@@ -1627,7 +1630,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     }
     m_timelineWindowIsNearLive = timelineWindowIsNearLive;
 
-    NX_VERBOSE(this, "Updating slider from reader. IsLiveSuppored: %1", isLiveSupportedInReader);
+    NX_TRACE(this, "Updating slider from reader. IsLiveSuppored: %1", isLiveSupportedInReader);
     m_timeSlider->setTimeRange(milliseconds(startTimeMSec), milliseconds(endTimeMSec));
 
     if (m_calendar)
@@ -1692,7 +1695,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             timeMSec = m_timeSlider->maximum().count() - 1;
 
         const bool isLive = (timeUSec == DATETIME_NOW);
-        NX_VERBOSE(this, "Updating slider from reader. Is playing live: %1", isLive);
+        NX_TRACE(this, "Updating slider from reader. Is playing live: %1", isLive);
         NX_ASSERT(isLiveSupported() == m_timeSlider->isLiveSupported(),
             "Navigator supports live: %1, time slider: %2",
             isLiveSupported(),
@@ -1753,7 +1756,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
 
         m_previousMediaPosition = timeMSec;
 
-        NX_VERBOSE(this, "Updating slider from reader: animated position %1", m_animatedPosition);
+        NX_TRACE(this, "Updating slider from reader: animated position %1", m_animatedPosition);
         m_timeSlider->setValue(milliseconds(m_animatedPosition), keepInWindow);
 
         if (timeUSec >= 0)
@@ -1876,6 +1879,10 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodT
         if (timePeriodType == Qn::MotionContent && !widget->options().testFlag(QnResourceWidget::DisplayMotion))
             continue; /* Ignore it. */
 
+        // Ignore cross-system cameras from offline Systems.
+        if (widget->resource()->toResourcePtr()->hasFlags(Qn::fake))
+            continue;
+
         if (auto loader = loaderByWidget(widget))
             loaders.insert(loader);
     }
@@ -1884,9 +1891,23 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodT
     for (auto loader: loaders)
         periodsList.push_back(loader->periods(timePeriodType));
 
+    NX_VERBOSE(this, "Syncing %1 periods from %2 loaders. Total count is %3.",
+        timePeriodType,
+        loaders.size(),
+        std::accumulate(periodsList.cbegin(), periodsList.cend(), 0,
+            [](int result, const QnTimePeriodList& list) { return result + list.size(); }));
+
     QnTimePeriodList syncedPeriods = m_timeSlider->timePeriods(SyncedLine, timePeriodType);
 
-    m_threadedChunksMergeTool[timePeriodType]->queueMerge(periodsList, syncedPeriods, startTimeMs, m_chunkMergingProcessHandle);
+    NX_VERBOSE(this, "Queuing merge of synced periods (%1) with loaded periods, handle %2",
+        syncedPeriods.size(),
+        m_chunkMergingProcessHandle);
+
+    m_threadedChunksMergeTool[timePeriodType]->queueMerge(
+        periodsList,
+        syncedPeriods,
+        startTimeMs,
+        m_chunkMergingProcessHandle);
 }
 
 void QnWorkbenchNavigator::updateLines()
@@ -2460,6 +2481,9 @@ void QnWorkbenchNavigator::updatePeriods(
     Qn::TimePeriodContent type,
     qint64 startTimeMs)
 {
+    NX_VERBOSE(this, "%1 periods are changed for %2 since %3",
+        type, resource, startTimeMs);
+
     const bool isCurrent = m_currentMediaWidget && m_currentMediaWidget->resource() == resource;
     const bool isSynced = m_syncedResources.contains(resource);
 
@@ -2759,13 +2783,17 @@ void QnWorkbenchNavigator::at_widget_optionsChanged(QnResourceWidget *widget)
     }
 }
 
-void QnWorkbenchNavigator::at_resource_flagsChanged(const QnResourcePtr &resource)
+void QnWorkbenchNavigator::at_resource_flagsChanged(const QnResourcePtr& resource)
 {
-    if (!resource || !m_currentWidget || m_currentWidget->resource() != resource)
-        return;
+    NX_VERBOSE(this, "Flags are changed for %1", resource);
 
-    updateCurrentWidgetFlags();
-    updateTimelineRelevancy();
+    if (m_currentWidget && m_currentWidget->resource() == resource)
+    {
+        updateCurrentWidgetFlags();
+        updateTimelineRelevancy();
+    }
+
+    updateSyncedPeriods();
 }
 
 void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed()
