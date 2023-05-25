@@ -66,6 +66,7 @@ TEST(PredefinedUserGroups, globalPermissions)
         GlobalPermission::administrator
         | GlobalPermission::powerUser
         | GlobalPermission::viewLogs
+        | GlobalPermission::generateEvents
         | GlobalPermission::systemHealth);
 
     EXPECT_EQ(PredefinedUserGroups::find(kPowerUsersGroupId)->permissions,
