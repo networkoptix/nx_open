@@ -405,7 +405,7 @@ void ConnectionBase::startConnection()
     m_startedClassId = typeid(*this).hash_code();
 
     auto headers = m_additionalRequestHeaders;
-    if (m_remotePeerUrl.path() == kWebsocketUrlPath)
+    if (m_remotePeerUrl.path().contains(kWebsocketUrlPath))
     {
         nx::network::websocket::addClientHeaders(
             &headers, kP2pProtoName, nx::network::websocket::CompressionType::perMessageDeflate);
