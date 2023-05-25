@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -198,16 +199,18 @@ rest::Handle BookmarkSearchListModel::Private::getBookmarks(
     filter.orderBy.column = nx::vms::api::BookmarkSortField::startTime;
     filter.orderBy.order = order;
     filter.limit = limit;
-    for (const auto& camera: q->cameras())
-        filter.cameras.insert(camera->getId());
+
+    if (q->cameraSet()->type() != ManagedCameraSet::Type::all)
+    {
+        for (const auto& camera: q->cameras())
+            filter.cameras.insert(camera->getId());
+    }
 
     NX_VERBOSE(q, "Requesting bookmarks:\n"
-        "    from: %1\n    to: %2\n    text filter: %3\n    sort: %4\n    limit: %5",
+        "    from: %1\n    to: %2\n    filter: %3",
         nx::utils::timestampToDebugString(period.startTimeMs),
         nx::utils::timestampToDebugString(period.endTimeMs()),
-        filter.text,
-        QVariant::fromValue(filter.orderBy.order).toString(),
-        filter.limit);
+        filter);
 
     // FIXME: #sivanov Send request to all contexts for the required cameras.
     auto systemContext = appContext()->currentSystemContext();
@@ -221,13 +224,17 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
         [this](bool success, rest::Handle requestId, const QnCameraBookmarkList& bookmarks)
         {
             if (!requestId || requestId != currentRequest().id)
+            {
+                NX_VERBOSE(this, "[%1] Request reply dropped", requestId);
                 return;
+            }
 
             QnTimePeriod actuallyFetched;
             m_prefetch = QnCameraBookmarkList();
 
             if (success)
             {
+                NX_VERBOSE(this, "[%1] Received %2 bookmarks", requestId, bookmarks.size());
                 m_prefetch = bookmarks;
                 if (!m_prefetch.empty())
                 {
@@ -237,6 +244,10 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
                 QnWorkbenchContextAware(q).context()->menu()->trigger(
                     ui::action::BookmarksPrefetchEvent,
                     ui::action::Parameters().withArgument(Qn::CameraBookmarkListRole, bookmarks));
+            }
+            else
+            {
+                NX_VERBOSE(this, "[%1] Request failed", requestId);
             }
 
             completePrefetch(actuallyFetched, success, m_prefetch.size());
