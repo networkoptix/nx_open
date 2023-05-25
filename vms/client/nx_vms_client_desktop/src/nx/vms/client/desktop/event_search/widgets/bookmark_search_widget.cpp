@@ -12,6 +12,7 @@
 #include <nx/utils/metatypes.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/event_search/models/bookmark_search_list_model.h>
+#include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -95,6 +96,7 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
     NX_CRITICAL(d->model);
 
     setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/bookmarks.svg"));
+    commonSetup()->setCameraSelection(RightPanel::CameraSelection::layout);
 
     // Track remote bookmark changes by polling.
     QPointer<QTimer> updateTimer = new QTimer(this);
@@ -127,6 +129,12 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
 BookmarkSearchWidget::~BookmarkSearchWidget()
 {
     // Required here for forward-declared scoped pointer destruction.
+}
+
+void BookmarkSearchWidget::resetFilters()
+{
+    base_type::resetFilters();
+    commonSetup()->setCameraSelection(RightPanel::CameraSelection::layout);
 }
 
 QString BookmarkSearchWidget::placeholderText(bool /*constrained*/) const
