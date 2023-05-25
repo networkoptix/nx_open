@@ -34,7 +34,10 @@ struct ReaderInfo
         minTimeUsec(0),
         maxTimeUsec(0)
     {
+        const bool syncPlayDelegate = dynamic_cast<QnSyncPlayArchiveDelegate*>(_oldDelegate);
+        NX_ASSERT(!syncPlayDelegate, "Sync play delegate cannot be used here");
     }
+
     QnAbstractArchiveStreamReader* reader;
     QnAbstractArchiveDelegate* oldDelegate;
     QnlTimeSource* cam;
