@@ -78,6 +78,38 @@ struct NX_VMS_API BookmarkFilter
     (id)(startTimeMs)(endTimeMs)(text)(limit)(order)(column)(minVisibleLengthMs)(deviceId)(creationStartTimeMs)(creationEndTimeMs)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkFilter, (json), NX_VMS_API)
 
+NX_REFLECTION_ENUM_CLASS(TailDirection,
+    /**%apidoc Tail contains bookmars with the start time less than the reference point. */
+    before,
+
+    /**%apidoc Tail contains bookmars with the start time greater than the reference point. */
+    after)
+
+/* Filter structure for the the tail bookmark request. */
+struct NX_VMS_API TailBookmarkFilter
+{
+    /**%apidoc:stringArray Device ids to get Bookmarks on. */
+    nx::vms::api::json::ValueOrArray<QString> deviceId;
+
+    /**%apidoc[opt] Text-search filter string. */
+    QString text;
+
+    /**%apidoc[opt] Time point that splits result to tail and body Bookmarks. */
+    std::chrono::milliseconds referencePointMs{0};
+
+    /**%apidoc[opt]:enum Direction of the required tail. */
+    TailDirection tailDirection = TailDirection::after;
+
+    /**%apidoc[opt] Maximum tail items count. */
+    int tailLimit = 50;
+
+    /**%apidoc[opt] Maximum body items count. */
+    int bodyLimit = 100;
+};
+#define TailBookmarkFilter_Fields \
+    (deviceId)(text)(referencePointMs)(tailDirection)(tailLimit)(bodyLimit)
+QN_FUSION_DECLARE_FUNCTIONS(TailBookmarkFilter, (json), NX_VMS_API)
+
 struct NX_VMS_API Bookmark
 {
     /**%apidoc[readonly] Id of the Bookmark. */

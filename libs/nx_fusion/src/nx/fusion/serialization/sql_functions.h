@@ -4,6 +4,7 @@
 #define QN_SERIALIZATION_SQL_FUNCTIONS_H
 
 #include <chrono>
+#include <set>
 #include <string>
 
 #include <nx/utils/uuid.h>
@@ -145,6 +146,21 @@ void deserialize_field(const QVariant &value,  std::array<std::array<T, M>, N>* 
     }
 }
 
+template<typename Key, typename Predicate, typename Allocator>
+void serialize_field(const std::set<Key, Predicate, Allocator>& a, QVariant *target)
+{
+    QList<Key> result(a.cbegin(), a.cend());
+    serialize_field(result, target);
+}
+
+template<typename Key, typename Predicate, typename Allocator>
+void deserialize_field(const QVariant &value, std::set<Key, Predicate, Allocator>* a)
+{
+    QList<Key> result;
+    deserialize_field(value, &result);
+    *a = std::set<Key, Predicate, Allocator>(result.cbegin(), result.cend());
+}
+
 /**
  * Representing system_clock::time_point in SQL as milliseconds since epoch (1970-01-01T00:00).
  */
@@ -163,7 +179,6 @@ inline void deserialize_field(const QVariant& value, std::chrono::system_clock::
     // Adding milliseconds since epoch.
     *target += std::chrono::milliseconds(millisSinceEpoch);
 }
-
 
 template<class T>
 void serialize_field(const T &value, QVariant *target, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
