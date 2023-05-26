@@ -153,6 +153,7 @@ QWidget* BookmarkTooltip::createMoreItemsLabel()
     font.setPixelSize(11);
     font.setBold(true);
     moreItemsLabel->setFont(font);
+    moreItemsLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     return moreItemsLabel;
 }
@@ -196,6 +197,7 @@ QWidget* BookmarkTooltip::createDescriptionLabel(const QString& text)
     QFont font = descriptionLabel->font();
     font.setPixelSize(12);
     descriptionLabel->setFont(font);
+    descriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     return descriptionLabel;
 }
