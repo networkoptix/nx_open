@@ -32,6 +32,16 @@ Control
     implicitWidth: 324
     implicitHeight: contentItem.implicitHeight
 
+    property date currentDate: new Date(new Date().getTime() + displayOffset)
+
+    Timer
+    {
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: currentDate = new Date(new Date().getTime() + displayOffset)
+    }
+
     background: Rectangle
     {
         color: ColorTheme.colors.dark5
@@ -206,6 +216,7 @@ Control
                 width: parent.width - 2 * x
 
                 locale: control.regionLocale
+                currentDate: control.currentDate
 
                 visibleYear: selection.start.getFullYear()
                 visibleMonth: selection.start.getMonth()
@@ -289,8 +300,7 @@ Control
             displayOffset: daysSelector.displayOffset
 
             year: visibleYear
-            currentMonth: (visibleYear === daysSelector.today.getFullYear())
-                ? daysSelector.today.getMonth() : -1
+            currentMonth: (visibleYear === currentDate.getFullYear()) ? currentDate.getMonth() : -1
 
             Binding
             {
@@ -312,11 +322,11 @@ Control
         {
             width: parent.width
             range: daysSelector.range
+            currentDate: control.currentDate
 
-            onIntervalSelected: interval =>
+            onIntervalSelected: startDate =>
             {
-                selection = NxGlobals.dateRange(
-                    new Date(range.end.getTime() - interval), range.end)
+                selection = NxGlobals.dateRange(startDate, range.end)
                 visibleYear = range.end.getFullYear()
                 visibleMonth = range.end.getMonth()
             }

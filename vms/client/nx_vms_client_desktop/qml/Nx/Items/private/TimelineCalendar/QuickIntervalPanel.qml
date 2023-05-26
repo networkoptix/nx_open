@@ -1,23 +1,24 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+
+import "date_utils.js" as DateUtils
 
 Item
 {
     height: 32
 
     property var range: NxGlobals.dateRange(
-        new Date(1970, 1, 1), DateUtils.addDays(d.today, 1))
+        new Date(1970, 1, 1), DateUtils.addDays(currentDate, 1))
+    property date currentDate: new Date()
 
-    signal intervalSelected(real milliseconds)
+    signal intervalSelected(date startDate)
 
     readonly property real kMillisecondsPerHour: 60 * 60 * 1000
-
-    readonly property real rangeLength: range.end.getTime() - range.start.getTime()
 
     Item
     {
@@ -57,9 +58,9 @@ Item
             implicitWidth: buttonText.implicitWidth + 16
             implicitHeight: buttonText.implicitHeight
 
-            enabled: interval <= rangeLength
+            enabled: getStartDate() <= range.end && getStartDate() >= range.start
 
-            function getInterval() { return interval }
+            function getStartDate() { return new Date(currentDate.getTime() - interval) }
 
             Text
             {
@@ -84,7 +85,7 @@ Item
                 anchors.fill: parent
                 hoverEnabled: true
 
-                onPressed: intervalSelected(getInterval())
+                onPressed: intervalSelected(getStartDate())
             }
         }
 
@@ -92,11 +93,9 @@ Item
         {
             text: qsTr("today")
 
-            function getInterval()
+            function getStartDate()
             {
-                const now = range.end
-                const then = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-                return now.getTime() - then.getTime()
+                return DateUtils.stripTime(currentDate)
             }
         }
         IntervalButton
