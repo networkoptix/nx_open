@@ -132,6 +132,20 @@ QnResourceData QnResourceDataPool::data(const Key& key) const
     return result;
 }
 
+void QnResourceDataPool::setData(
+    QJsonObject allData,
+    std::vector<std::pair<Key, QnResourceData>> dataByKey)
+{
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_dataByKey = std::move(dataByKey);
+        m_allData = std::move(allData);
+        m_cachedResultByKey.clear();
+    }
+
+    emit changed();
+}
+
 bool QnResourceDataPool::loadFile(const QString& fileName)
 {
     if(!QFile::exists(fileName))
@@ -176,46 +190,25 @@ bool QnResourceDataPool::loadData(const QByteArray& data)
     if(!validateDataInternal(data, map, chunks))
         return false;
 
-    // merge data with same keys to improve runtime performance
     decltype(m_dataByKey) dataByKey;
-    std::map<Key, std::size_t> indexes;
     for(const auto& chunk: std::as_const(chunks))
     {
         for(const auto& rawKey: chunk.keys)
-        {
-            auto key = Key::fromString(rawKey);
-            const auto [it, isNew] = indexes.emplace(key, indexes.size());
-            if (isNew)
-                dataByKey.emplace_back(std::move(key), chunk.data);
-            else
-                dataByKey[it->second].second.add(chunk.data);
-        }
+            dataByKey.emplace_back(Key::fromString(rawKey), chunk.data);
     }
 
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        m_dataByKey = std::move(dataByKey);
-        m_cachedResultByKey.clear();
-    }
-
-    m_allData = std::move(map);
-    emit changed();
+    setData(std::move(map), std::move(dataByKey));
     return true;
 }
 
 void QnResourceDataPool::clear()
 {
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        m_cachedResultByKey.clear();
-        m_dataByKey.clear();
-        m_allData = QJsonObject();
-    }
-    emit changed();
+    setData({}, {});
 }
 
 QJsonObject QnResourceDataPool::allData() const
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_allData;
 }
 
