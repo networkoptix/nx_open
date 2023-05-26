@@ -73,7 +73,7 @@ Item
                         ? ColorTheme.colors.light4
                         : ColorTheme.colors.light10
 
-                    enabled: control.editingEnabled
+                    enabled: control.editingEnabled && !frameSelector.dragging
 
                     GlobalToolTip.text: modelData.description
 
@@ -166,6 +166,7 @@ Item
             columnWidth: control.kColumnWidth
             rowHovered: tree.hoveredItem === this
             editingEnabled: control.editingEnabled
+            automaticDependencies: automaticDependenciesSwitch.checked
 
             accessRightsList: control.availableAccessRights
 
@@ -176,6 +177,7 @@ Item
             implicitHeight: control.kRowHeight
 
             frameSelectionActive: frameSelector.dragging
+            frameSelectionValue: frameSelector.selectionValue
 
             frameSelectionRect:
             {
@@ -239,6 +241,8 @@ Item
                 item: selectionArea
                 enabled: control.editingEnabled
 
+                property bool selectionValue: true //< Select or unselect.
+
                 onStarted:
                 {
                     selectionArea.start = Qt.point(
@@ -274,7 +278,8 @@ Item
                     const resources = indexes.map(index => NxGlobals.modelData(index, "resource"))
                         .filter(resource => !!resource)
 
-                    control.editingContext.modifyAccessRights(resources, accessRights, true)
+                    control.editingContext.modifyAccessRights(resources, accessRights,
+                        selectionValue, automaticDependenciesSwitch.checked)
                 }
             }
 
@@ -397,6 +402,30 @@ Item
         {
             GradientStop { position: 0.0; color: ColorTheme.transparent("black", 0.4) }
             GradientStop { position: 1.0; color: "transparent" }
+        }
+    }
+
+    Item
+    {
+        // Covers dialog button box.
+
+        anchors.top: parent.bottom
+
+        height: control.buttonBox.height
+        width: parent.width
+
+        Switch
+        {
+            id: automaticDependenciesSwitch
+
+            anchors.left: parent.left
+            anchors.leftMargin: 16
+            anchors.verticalCenter: parent.verticalCenter
+
+            checked: true
+            visible: control.enabled
+
+            text: qsTr("Automatically add dependent access rights")
         }
     }
 }

@@ -91,10 +91,16 @@ public:
     static nx::vms::api::AccessRights relevantAccessRights(const QnResourcePtr& resource);
 
     static void modifyAccessRights(nx::core::access::ResourceAccessMap& accessMap,
-        const QnUuid& resourceOrGroupId, nx::vms::api::AccessRights accessRightsMask, bool value);
+        const QnUuid& resourceOrGroupId, nx::vms::api::AccessRights accessRightsMask, bool value,
+        bool withDependent);
 
     Q_INVOKABLE void modifyAccessRights(const QList<QnResource*>& resources,
-        nx::vms::api::AccessRights accessRights, bool value);
+        nx::vms::api::AccessRights accessRights, bool value, bool withDependent);
+
+    static nx::vms::api::AccessRights dependentAccessRights(nx::vms::api::AccessRight dependingOn);
+    static nx::vms::api::AccessRights requiredAccessRights(nx::vms::api::AccessRight requiredFor);
+    static Q_INVOKABLE bool isDependingOn(int /*AccessRight*/ what, nx::vms::api::AccessRights on);
+    static Q_INVOKABLE bool isRequiredFor(int /*AccessRight*/ what, nx::vms::api::AccessRights for_);
 
 signals:
     void subjectChanged();

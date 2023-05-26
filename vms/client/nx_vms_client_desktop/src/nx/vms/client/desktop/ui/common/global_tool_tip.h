@@ -13,7 +13,7 @@ class GlobalToolTipAttached: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
-    Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
     Q_PROPERTY(bool showOnHover READ showOnHover WRITE setShowOnHover
         NOTIFY showOnHoverChanged)
     Q_PROPERTY(bool stickToItem READ stickToItem WRITE setStickToItem
@@ -27,8 +27,8 @@ public:
     QString text() const;
     void setText(const QString& value);
 
-    bool isVisible() const;
-    void setVisible(bool value);
+    bool isEnabled() const;
+    void setEnabled(bool value);
 
     bool showOnHover() const;
     void setShowOnHover(bool value);
@@ -44,7 +44,7 @@ public:
 
 signals:
     void textChanged();
-    void visibleChanged();
+    void enabledChanged();
     void showOnHoverChanged();
     void stickToItemChanged();
     void delayChanged();
