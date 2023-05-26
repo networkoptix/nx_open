@@ -6,10 +6,40 @@ add_custom_target(unit_tests)
 set_target_properties(unit_tests PROPERTIES FOLDER utils)
 
 set(testTempDirectory "${CMAKE_BINARY_DIR}" CACHE STRING "Temp directory for running tests.")
+set(testMetaInformationFile "${CMAKE_BINARY_DIR}/unit_tests_info.yml")
+file(WRITE ${testMetaInformationFile} "")
+nx_store_known_file(${testMetaInformationFile})
+
+function(nx_store_test_metainformation target)
+    set(oneValueArgs PROJECT COMPONENT)
+    cmake_parse_arguments(NX_TEST_INFO
+        #[[options]] ""
+        "${oneValueArgs}"
+        #[[multi_value_keywords]] ""
+        ${ARGN})
+
+    if(NOT NX_TEST_INFO_PROJECT)
+        message(FATAL_ERROR
+            "Add PROJECT parameter with a related Jira project to target ${target}")
+    endif()
+
+    if(NX_TEST_INFO_COMPONENT)
+        file(APPEND ${testMetaInformationFile}
+            "${target}: { project: ${NX_TEST_INFO_PROJECT}, component: ${NX_TEST_INFO_COMPONENT} }\n")
+    else()
+        if(NX_TEST_INFO_PROJECT STREQUAL "VMS")
+            message(FATAL_ERROR
+                "Add COMPONENT parameter with a related Jira component to target ${target}")
+        endif()
+        file(APPEND ${testMetaInformationFile}
+            "${target}: { project: ${NX_TEST_INFO_PROJECT} }\n")
+    endif()
+
+endfunction()
 
 function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
     set(options NO_GTEST NO_QT NO_NX_UTILS)
-    set(oneValueArgs FOLDER)
+    set(oneValueArgs FOLDER PROJECT COMPONENT)
     cmake_parse_arguments(NX_ADD_TEST "${options}"
         "${oneValueArgs}" #[[multi_value_keywords]] "" ${ARGN})
 
@@ -54,6 +84,11 @@ function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
 
     add_test(NAME ${target} COMMAND ${target})
 
+    # Write unit test metainformation.
+    nx_store_test_metainformation(${target}
+        PROJECT ${NX_ADD_TEST_PROJECT}
+        COMPONENT ${NX_ADD_TEST_COMPONENT})
+
     if(WINDOWS)
         # Adding ${CMAKE_MSVCIDE_RUN_PATH} to PATH for running unit tests via CTest.
         set(new_path "${CMAKE_MSVCIDE_RUN_PATH};$ENV{PATH}")
@@ -80,7 +115,9 @@ function(nx_add_server_plugin_test target) # [NO_GTEST] [NO_QT]
         ${CMAKE_BINARY_DIR}/bin/plugins_optional
     )
 
-    nx_add_test(${ARGV})
+    nx_add_test(${ARGV}
+        PROJECT VMS
+        COMPONENT Server)
 
     if(WINDOWS)
         # Include "ut_msvc.user.props" into each Visual Studio project.

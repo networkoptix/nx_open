@@ -6,5 +6,6 @@ nx_add_test(nx_network_ut
         nx_network
     PRIVATE_LIBS
         udt
+    PROJECT NXLIB
     FOLDER common/tests
 )

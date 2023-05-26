@@ -2,5 +2,7 @@
 
 nx_add_test(nx_vms_update_ut
     PUBLIC_LIBS nx_vms_update
+    PROJECT VMS
+    COMPONENT Client
     FOLDER common/tests
 )
