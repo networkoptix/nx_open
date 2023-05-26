@@ -3088,7 +3088,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
+      <translation>無法登入到系統 &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3190,7 +3190,7 @@ to %1</source>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>資料庫已成功還原，伺服器應用程式將重新啟動。</translation>
     </message>
   </context>
   <context>
@@ -4335,7 +4335,7 @@ to %1</source>
     <name>QnPopupSettingsWidget</name>
     <message>
       <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the System you are logged in to and will be removed in future versions.</translation>
+      <translation>這些設定僅套用於你目前登入的系統，且可能會在未來版本中移除。</translation>
     </message>
   </context>
   <context>
@@ -4971,7 +4971,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</translation>
+      <translation>相同位置ID且啟用備援移轉的伺服器將自動接手離線伺服器上的攝影機。</translation>
     </message>
     <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
@@ -5337,7 +5337,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>用於儲存分析與位移資料</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
@@ -5591,7 +5591,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>尚未指定分析資料的儲存裝置</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>

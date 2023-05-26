@@ -1423,7 +1423,7 @@
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
+      <translation>Wyłącz dostawców urządzenia</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
@@ -1436,7 +1436,7 @@
     <message>
       <source>Use %1 service to send emails instead of SMTP client</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Use %1 service to send emails instead of SMTP client</translation>
+      <translation>Użyj usługi %1 do wysyłania wiadomości e-mail zamiast klienta SMTP</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -1464,11 +1464,11 @@
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
+      <translation>Wymuś HTTPS (szyfrowanie przesyłu danych)</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
+      <translation>Wymuś RTSPS (szyfrowanie ruchu wideo)</translation>
     </message>
     <message>
       <source>Enable auto-discovery</source>
@@ -1476,7 +1476,7 @@
     </message>
     <message>
       <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
+      <translation>Włącz automatyczne powiadomienia</translation>
     </message>
     <message>
       <source>Enable update notifications</source>
@@ -1560,7 +1560,7 @@
     </message>
     <message>
       <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
+      <translation>Ustawienia aktualizacji klienta</translation>
     </message>
     <message>
       <source>Watermark settings</source>

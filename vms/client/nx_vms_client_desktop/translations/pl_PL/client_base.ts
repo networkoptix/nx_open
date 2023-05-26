@@ -8319,7 +8319,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>%1 Układy to &lt;b&gt;układy międzysystemowe&lt;/b&gt;, które umożliwiają pracę z urządzeniami z różnych systemów. Obecnie dostępne są tylko niektóre funkcje zwykłych układów, ale w przyszłych wersjach będziemy nadal rozszerzać możliwości %1 układów</translation>
     </message>
     <message>
       <source>Read more on the %1</source>
