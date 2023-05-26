@@ -111,6 +111,8 @@ public:
     void showDelayed(int delay, bool restart);
     void update();
 
+    bool isEffectivelyDisabled() const { return !enabled || text.isEmpty(); }
+
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 public slots:
@@ -125,7 +127,7 @@ public:
     QQuickItem* item = nullptr;
     QString text;
     QPoint hoverPos;
-    bool visible = false;
+    bool enabled = true;
     bool showOnHover = true;
     bool stickToItem = false;
     int delayMs = 500;
@@ -313,7 +315,7 @@ void GlobalToolTipAttached::Private::update()
 
 bool GlobalToolTipAttached::Private::eventFilter(QObject* watched, QEvent* event)
 {
-    if (watched != item)
+    if (watched != item || isEffectivelyDisabled())
         return false;
 
     switch (event->type())
@@ -409,25 +411,32 @@ void GlobalToolTipAttached::setText(const QString& value)
     d->text = value;
     emit textChanged();
 
-    if (auto toolTip = d->instance();
+    if (d->text.isEmpty())
+    {
+        hide();
+    }
+    else if (auto toolTip = d->instance();
         toolTip && toolTip.isVisible() && toolTip.invokerItem() == d->item)
     {
         d->update();
     }
 }
 
-bool GlobalToolTipAttached::isVisible() const
+bool GlobalToolTipAttached::isEnabled() const
 {
-    return d->visible;
+    return d->enabled;
 }
 
-void GlobalToolTipAttached::setVisible(bool value)
+void GlobalToolTipAttached::setEnabled(bool value)
 {
-    if (d->visible == value)
+    if (d->enabled == value)
         return;
 
-    d->visible = value;
-    emit visibleChanged();
+    d->enabled = value;
+    emit enabledChanged();
+
+    if (!d->enabled)
+        hide();
 }
 
 bool GlobalToolTipAttached::showOnHover() const
@@ -481,7 +490,7 @@ void GlobalToolTipAttached::setDelay(int value)
 
 void GlobalToolTipAttached::show(const QString& text, int delay)
 {
-    if (!d->item || d->text.isEmpty())
+    if (!d->item || d->text.isEmpty() || d->isEffectivelyDisabled())
         return;
 
     QQmlEngine* engine = qmlEngine(d->item);

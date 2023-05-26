@@ -79,6 +79,7 @@ public:
     enum Roles
     {
         ProviderRole = Qt::UserRole + 1,
+        TotalChildCountRole,
         CheckedChildCountRole,
         AccessRightRole,
         EditableRole
@@ -114,7 +115,7 @@ public:
     /** @returns ProvidedVia::layout, ProvidedVia::videowall or ProvidedVia::unknown. */
     static Q_INVOKABLE ResourceAccessInfo::ProvidedVia providerType(QnResource* provider);
 
-    Q_INVOKABLE void toggle(int index);
+    Q_INVOKABLE void toggle(int index, bool withDependentAccessRights);
 
     static void registerQmlTypes();
 

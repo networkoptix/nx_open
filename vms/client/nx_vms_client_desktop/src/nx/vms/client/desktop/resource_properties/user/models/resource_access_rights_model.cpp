@@ -230,6 +230,8 @@ QVariant ResourceAccessRightsModel::data(const QModelIndex& index, int role) con
     {
         case ProviderRole:
             return static_cast<int>(d->info[index.row()].providedVia);
+        case TotalChildCountRole:
+            return static_cast<int>(d->info[index.row()].totalChildCount);
         case CheckedChildCountRole:
             return static_cast<int>(d->info[index.row()].checkedChildCount);
         case AccessRightRole:
@@ -243,7 +245,7 @@ QVariant ResourceAccessRightsModel::data(const QModelIndex& index, int role) con
     }
 }
 
-void ResourceAccessRightsModel::toggle(int index)
+void ResourceAccessRightsModel::toggle(int index, bool withDependentAccessRights)
 {
     if (index >= rowCount() || index < 0 || !d->context)
         return;
@@ -252,37 +254,61 @@ void ResourceAccessRightsModel::toggle(int index)
     if (!NX_ASSERT(!id.isNull()))
         return;
 
-    auto accessMap = d->context->ownResourceAccessMap();
+    const auto toggledRight = d->accessRightList[index];
 
-    const auto accessRight = d->accessRightList[index];
+    const bool isGroup = !d->resource;
     const auto outerGroupId = AccessSubjectEditingContext::specialResourceGroupFor(d->resource);
     const bool hasOuterGroup = !outerGroupId.isNull();
-    const bool isGroup = !d->resource;
 
-    const bool outerGroupWasChecked = hasOuterGroup
-        && accessMap.value(outerGroupId).testFlag(accessRight);
+    auto accessMap = d->context->ownResourceAccessMap();
+    const auto itemAccessRights = accessMap.value(id);
 
-    const bool itemWasChecked = outerGroupWasChecked || accessMap.value(id).testFlag(accessRight);
+    const auto outerGroupAccessRights = hasOuterGroup
+        ? accessMap.value(outerGroupId)
+        : AccessRights{};
+
+    const auto& info = d->info[index];
+    const auto allChildrenWereChecked = info.totalChildCount > 0
+        && info.totalChildCount == info.checkedChildCount;
+
+    const bool outerGroupWasChecked = outerGroupAccessRights.testFlag(toggledRight);
+    const bool itemWasChecked = outerGroupWasChecked || itemAccessRights.testFlag(toggledRight);
+    const bool itemWillBeChecked = !(itemWasChecked || allChildrenWereChecked);
+
+    AccessRights toggledMask = toggledRight;
+    if (withDependentAccessRights)
+    {
+        toggledMask |= (itemWillBeChecked
+            ? AccessSubjectEditingContext::requiredAccessRights(toggledRight)
+            : AccessSubjectEditingContext::dependentAccessRights(toggledRight));
+    }
 
     if (isGroup)
     {
+        // If we're toggling a group on, we must explicitly toggle all its children off.
+        // If we're toggling a group off, we must explicitly toggle all its children on.
+
+        auto mask = itemWasChecked
+            ? (toggledMask & itemAccessRights)
+            : toggledMask;
+
         for (const auto& itemId: d->getGroupContents(id))
-            modifyAccessRights(accessMap, itemId, accessRight, itemWasChecked);
+            modifyAccessRights(accessMap, itemId, mask, itemWasChecked);
     }
 
-    if (itemWasChecked && outerGroupWasChecked)
+    if (outerGroupWasChecked)
     {
-        for (const auto& itemId: d->getGroupContents(outerGroupId))
-            modifyAccessRights(accessMap, itemId, accessRight, true);
+        // If we're toggling off an item that was implicitly toggled on by its group,
+        // we must toggle the group off, and explicitly toggle all its children on.
 
-        modifyAccessRights(accessMap, outerGroupId, accessRight, false);
+        for (const auto& itemId: d->getGroupContents(outerGroupId))
+            modifyAccessRights(accessMap, itemId, toggledMask, true);
+
+        modifyAccessRights(accessMap, outerGroupId, toggledMask, false);
     }
 
-    const auto& info = d->info[index];
-    const auto allChecked = info.totalChildCount > 0
-        && info.totalChildCount == info.checkedChildCount;
-
-    modifyAccessRights(accessMap, id, accessRight, !itemWasChecked && !allChecked);
+    // Toggle the item.
+    modifyAccessRights(accessMap, id, toggledMask, itemWillBeChecked);
     d->context->setOwnResourceAccessMap(accessMap);
 }
 
@@ -290,6 +316,7 @@ QHash<int, QByteArray> ResourceAccessRightsModel::roleNames() const
 {
     auto names = base_type::roleNames();
     names.insert(ProviderRole, "providedVia");
+    names.insert(TotalChildCountRole, "totalChildCount");
     names.insert(CheckedChildCountRole, "checkedChildCount");
     names.insert(AccessRightRole, "accessRight");
     names.insert(EditableRole, "editable");

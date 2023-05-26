@@ -30,7 +30,10 @@ Item
 
     property bool editingEnabled: true
 
+    property bool automaticDependencies: false
+
     property bool frameSelectionActive: false
+    property bool frameSelectionValue: true //< Select or unselect.
     property rect frameSelectionRect
 
     property var hoveredCell: null
@@ -74,6 +77,11 @@ Item
 
         x: mainDelegate.width
 
+        readonly property int frameAccessRights: Array.prototype.reduce.call(
+            children,
+            (total, child) => child.frameSelected ? (total | child.accessRight) : total,
+            0)
+
         Repeater
         {
             model: accessRightsModel
@@ -88,8 +96,9 @@ Item
                     height: delegateRoot.height
 
                     hoverEnabled: true
-                    acceptedButtons: cell.effectivelyToggleable ? Qt.LeftButton : Qt.NoButton
+                    acceptedButtons: cell.toggleable ? Qt.LeftButton : Qt.NoButton
 
+                    GlobalToolTip.enabled: !delegateRoot.frameSelectionActive
                     GlobalToolTip.text:
                     {
                         if (cell.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup
@@ -101,36 +110,66 @@ Item
                         return model.toolTip
                     }
 
-                    readonly property bool toggleable:
+                    readonly property int accessRight: model.accessRight
+
+                    readonly property bool relevant:
                         (accessRightsModel.resource || accessRightsModel.isResourceGroup)
                         && model.editable
 
-                    readonly property bool effectivelyToggleable:
+                    readonly property bool toggleable:
                     {
-                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
-                            return false
-
-                        return delegateRoot.editingEnabled && cell.toggleable
+                        return delegateRoot.editingEnabled && cell.relevant
+                            && model.providedVia != ResourceAccessInfo.ProvidedVia.ownResourceGroup
                     }
 
-                    readonly property int accessRight: model.accessRight
-
-                    readonly property bool frameSelected: delegateRoot.resource
+                    readonly property bool frameSelected: toggleable && delegateRoot.resource
                         && Geometry.intersects(frameSelectionRect, cellsRow.mapToItem(delegateRoot,
                             cell.x, cell.y, cell.width, cell.height))
 
                     readonly property int providedVia:
                     {
-                        return frameSelected && effectivelyToggleable
+                        return frameSelected
                             ? ResourceAccessInfo.ProvidedVia.own
                             : model.providedVia
                     }
 
-                    readonly property bool highlighted: frameSelected
-                        || (delegateRoot.enabled
-                            && (containsMouse
-                                || delegateRoot.rowHovered
-                                || delegateRoot.hoveredAccessRight == accessRight))
+                    // Highlighted to indicate that a mouse click at current mouse position
+                    // or applying current frame selection shall affect this cell.
+                    readonly property bool highlighted:
+                    {
+                        const context = delegateRoot.editingContext
+                        if (!context || !toggleable)
+                            return false
+
+                        // Highlight directly hovered or directly frame-selected cell.
+                        if ((delegateRoot.enabled && containsMouse) || frameSelected)
+                            return true
+
+                        if (!delegateRoot.automaticDependencies)
+                            return false
+
+                        const toggledOn = isToggledOn()
+
+                        // Highlight access rights dependency for current frame selection.
+                        if (frameSelectionActive && frameSelectionValue != toggledOn)
+                        {
+                            return frameSelectionValue
+                                ? context.isRequiredFor(accessRight, cellsRow.frameAccessRights)
+                                : context.isDependingOn(accessRight, cellsRow.frameAccessRights)
+                        }
+
+                        // Highlight access rights dependency from hovered other cell.
+                        const base = delegateRoot.hoveredCell
+
+                        if (base && base.toggleable && toggledOn == base.isToggledOn())
+                        {
+                            return toggledOn
+                                ? context.isDependingOn(accessRight, base.accessRight)
+                                : context.isRequiredFor(accessRight, base.accessRight)
+                        }
+
+                        return false
+                    }
 
                     readonly property color backgroundColor:
                     {
@@ -179,6 +218,17 @@ Item
                             : ColorTheme.colors.dark13
                     }
 
+                    function isToggledOn()
+                    {
+                        // A group not explicitly toggled on but having all children toggled on
+                        // is still considered toggled on, for convenience of access right
+                        // dependency tracking.
+
+                        return providedVia == ResourceAccessInfo.ProvidedVia.own
+                            || (model.checkedChildCount
+                                && model.checkedChildCount == model.totalChildCount)
+                    }
+
                     onContainsMouseChanged:
                     {
                         if (containsMouse)
@@ -189,14 +239,14 @@ Item
 
                     onClicked:
                     {
-                        accessRightsModel.toggle(index)
+                        accessRightsModel.toggle(index, delegateRoot.automaticDependencies)
                     }
 
                     Item
                     {
                         anchors.fill: cell
 
-                        visible: cell.toggleable
+                        visible: cell.relevant
 
                         Rectangle
                         {

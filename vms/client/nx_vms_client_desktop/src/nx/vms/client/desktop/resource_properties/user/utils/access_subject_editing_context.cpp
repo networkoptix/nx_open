@@ -3,6 +3,7 @@
 #include "access_subject_editing_context.h"
 
 #include <memory>
+#include <type_traits>
 
 #include <QtCore/QAbstractItemModel>
 
@@ -30,6 +31,38 @@ namespace nx::vms::client::desktop {
 using namespace nx::vms::api;
 using namespace nx::vms::common;
 using namespace nx::core::access;
+
+namespace {
+
+using AccessRightInt = std::make_unsigned_t<std::underlying_type_t<AccessRight>>;
+
+static const QHash<AccessRight, AccessRights> kRequiredAccessRights{
+    {AccessRight::viewArchive, AccessRight::view},
+    {AccessRight::exportArchive, AccessRight::view | AccessRight::viewArchive},
+    {AccessRight::viewBookmarks, AccessRight::view | AccessRight::viewArchive},
+    {AccessRight::manageBookmarks,
+        AccessRight::view | AccessRight::viewArchive | AccessRight::viewBookmarks},
+    {AccessRight::userInput, AccessRight::view},
+    {AccessRight::edit, AccessRight::view}};
+
+static const QHash<AccessRight, AccessRights> kDependentAccessRights =
+    []()
+    {
+        QHash<AccessRight, AccessRights> dependentAccessRights;
+        for (const auto [dependent, dependsOn]: kRequiredAccessRights.asKeyValueRange())
+        {
+            for (AccessRightInt flag = 1; flag; flag <<= 1)
+            {
+                const auto requirement = static_cast<AccessRight>(flag);
+                if (dependsOn.testFlag(requirement))
+                    dependentAccessRights[requirement] |= dependent;
+            }
+        }
+
+        return dependentAccessRights;
+    }();
+
+} // namespace
 
 // ------------------------------------------------------------------------------------------------
 // AccessSubjectEditingContext::Private
@@ -150,7 +183,7 @@ public:
                 return resourcePool->getResources<QnVideoWallResource>();
         }
 
-        NX_ASSERT(false, "Unhandled special resource group type");
+        NX_ASSERT(false, "Unhandled special resource group type: %1", *group);
         return {};
     }
 
@@ -243,7 +276,8 @@ bool AccessSubjectEditingContext::hasOwnAccessRight(
 void AccessSubjectEditingContext::setOwnResourceAccessMap(
     const ResourceAccessMap& resourceAccessMap)
 {
-    NX_DEBUG(this, "Setting access map to %1", resourceAccessMap);
+    NX_DEBUG(this, "Setting access map to %1",
+        toString(resourceAccessMap, d->systemContext->resourcePool()));
     d->accessRightsManager->setOwnResourceAccessMap(resourceAccessMap);
 }
 
@@ -410,8 +444,23 @@ AccessRights AccessSubjectEditingContext::relevantAccessRights(const QnResourceP
 }
 
 void AccessSubjectEditingContext::modifyAccessRights(ResourceAccessMap& accessMap,
-    const QnUuid& resourceOrGroupId, AccessRights accessRightsMask, bool value)
+    const QnUuid& resourceOrGroupId, AccessRights accessRightsMask, bool value, bool withDependent)
 {
+    if (withDependent)
+    {
+        const auto dependencies = value
+            ? kRequiredAccessRights
+            : kDependentAccessRights;
+
+        const auto sourceRights = accessRightsMask;
+        for (AccessRightInt flag = 1; flag != 0; flag <<= 1)
+        {
+            const auto accessRight = static_cast<AccessRight>(flag);
+            if (sourceRights.testFlag(accessRight))
+                accessRightsMask |= dependencies.value(accessRight);
+        }
+    }
+
     const auto accessRights = accessMap.value(resourceOrGroupId);
     const auto newAccessRights = value
         ? accessRights | accessRightsMask
@@ -427,7 +476,7 @@ void AccessSubjectEditingContext::modifyAccessRights(ResourceAccessMap& accessMa
 }
 
 void AccessSubjectEditingContext::modifyAccessRights(const QList<QnResource*>& resources,
-    AccessRights accessRights, bool value)
+    AccessRights accessRights, bool value, bool withDependent)
 {
     auto map = ownResourceAccessMap();
     for (const auto& resource: resources)
@@ -435,11 +484,40 @@ void AccessSubjectEditingContext::modifyAccessRights(const QList<QnResource*>& r
         if (!resource)
             continue;
 
-        modifyAccessRights(map, resource->getId(),
-            accessRights & relevantAccessRights(resource->toSharedPointer()), value);
+        const auto resourcePtr = resource->toSharedPointer();
+        AccessRights accessRightsMask = accessRights & relevantAccessRights(resourcePtr);
+
+        if (value)
+        {
+            // Don't grant access rights already granted by resource group access rights.
+            if (const auto groupId = specialResourceGroupFor(resourcePtr); !groupId.isNull())
+                accessRightsMask &= ~ownResourceAccessMap().value(groupId);
+        }
+
+        modifyAccessRights(map, resourcePtr->getId(), accessRightsMask, value, withDependent);
     }
 
     setOwnResourceAccessMap(map);
+}
+
+AccessRights AccessSubjectEditingContext::dependentAccessRights(AccessRight dependingOn)
+{
+    return kDependentAccessRights.value(dependingOn);
+}
+
+AccessRights AccessSubjectEditingContext::requiredAccessRights(AccessRight requiredFor)
+{
+    return kRequiredAccessRights.value(requiredFor);
+}
+
+bool AccessSubjectEditingContext::isDependingOn(int /*AccessRight*/ what, AccessRights on)
+{
+    return requiredAccessRights(static_cast<AccessRight>(what)).testAnyFlags(on);
+}
+
+bool AccessSubjectEditingContext::isRequiredFor(int /*AccessRight*/ what, AccessRights for_)
+{
+    return dependentAccessRights(static_cast<AccessRight>(what)).testAnyFlags(for_);
 }
 
 } // namespace nx::vms::client::desktop
