@@ -19,8 +19,13 @@ struct NX_VMS_API LoginUserFilter
 NX_VMS_API_DECLARE_STRUCT_EX(LoginUserFilter, (json))
 
 NX_REFLECTION_ENUM_CLASS(LoginMethod,
+    /**%apidoc HTTP Basic and digest (RFC 2617). */
     http = 1 << 0,
+
+    /**%apidoc Local sessions (API `/rest/v{1-}/login/sessions`). */
     sessions = 1 << 1,
+
+    /**%apidoc Cloud sessions by OAuth2 (Nx implementation). */
     nxOAuth2 = 1 << 2
 )
 
@@ -28,26 +33,12 @@ Q_DECLARE_FLAGS(LoginMethods, LoginMethod)
 
 struct NX_VMS_API LoginUser
 {
+    QnUuid id;
     QString username;
-
-    /**%apidoc
-     * User type, one of:
-     * * `local` - This User is managed by the Server. Session tokens must be obtained locally.
-     * * `ldap` - This User is managed by the LDAP server. Session tokens must be obtained locally.
-     * * `cloud` - This User is managed by the Cloud. Session tokens must be obtained on the cloud
-     *     side.
-     */
     UserType type = UserType::local;
-
-    /**%apidoc
-     * Supported authorization types separated by "|", one of:
-     * * `http` - HTTP Basic and digest.
-     * * `sessions` - Local sessions.
-     * * `nxOAuth2` - Cloud sessions by OAuth2 (Nx implementation).
-     */
     LoginMethods methods;
 };
-#define LoginUser_Fields (username)(type)(methods)
+#define LoginUser_Fields (id)(username)(type)(methods)
 NX_VMS_API_DECLARE_STRUCT_EX(LoginUser, (json))
 NX_REFLECTION_INSTRUMENT(LoginUser, LoginUser_Fields);
 
@@ -89,6 +80,7 @@ struct NX_VMS_API LoginSession
 {
     static constexpr std::string_view kTokenPrefix = "vms-";
 
+    QnUuid id;
     QString username;
 
     /**%apidoc The session authorization token to be used as HTTP bearer token or URL parameter. */
@@ -97,7 +89,7 @@ struct NX_VMS_API LoginSession
     std::chrono::seconds ageS{0};
     std::chrono::seconds expiresInS{0};
 };
-#define LoginSession_Fields (username)(token)(ageS)(expiresInS)
+#define LoginSession_Fields (id)(username)(token)(ageS)(expiresInS)
 NX_VMS_API_DECLARE_STRUCT_EX(LoginSession, (json))
 NX_REFLECTION_INSTRUMENT(LoginSession, LoginSession_Fields);
 
