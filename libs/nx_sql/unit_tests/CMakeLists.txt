@@ -3,5 +3,6 @@
 nx_add_test(nx_sql_ut NO_MOC
     WERROR_IF NOT WINDOWS
     PUBLIC_LIBS nx_sql GTest GMock
+    PROJECT NXLIB
     FOLDER common/tests
 )
