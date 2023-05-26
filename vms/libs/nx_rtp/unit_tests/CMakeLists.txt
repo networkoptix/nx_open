@@ -4,5 +4,7 @@ nx_add_test(nx_rtp_ut
     WERROR_IF NOT WINDOWS
     PUBLIC_LIBS
         nx_rtp
+    PROJECT VMS
+    COMPONENT Server
     FOLDER common/tests
 )

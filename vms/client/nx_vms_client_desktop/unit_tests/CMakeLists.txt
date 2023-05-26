@@ -7,5 +7,7 @@ nx_add_test(nx_vms_client_desktop_ut
         Qt6::Test
     ADDITIONAL_MOCABLES
         src/qml/qml_dialog_with_state_ut.h
+    PROJECT VMS
+    COMPONENT Client
     FOLDER client/tests
 )
