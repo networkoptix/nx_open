@@ -17,7 +17,6 @@
 
 namespace {
 
-static constexpr auto kHotspotRadius = 16;
 static constexpr auto kHotspotPointerAngle = 90.0;
 static constexpr auto kHotspotBoundsOffset = 4;
 static constexpr auto kSelectedHotspotOutlineWidth = 2.0;

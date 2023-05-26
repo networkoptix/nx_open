@@ -12,6 +12,8 @@
 namespace nx::vms::client::desktop {
 namespace camera_hotspots {
 
+static constexpr auto kHotspotRadius = 16;
+
 QPointF hotspotOrigin(const QPointF& hotspotRelativePos, const QRectF& rect);
 QPointF hotspotOrigin(const nx::vms::common::CameraHotspotData& hotspot, const QRectF& rect);
 
