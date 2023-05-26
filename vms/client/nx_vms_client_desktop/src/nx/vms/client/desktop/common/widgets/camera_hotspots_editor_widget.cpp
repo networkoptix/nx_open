@@ -25,6 +25,8 @@
 #include <ui/common/palette.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
+using Geometry = nx::vms::client::core::Geometry;
+
 namespace {
 
 QFont noDataPlaceholderFont()
@@ -39,11 +41,57 @@ QFont noDataPlaceholderFont()
     return font;
 }
 
+// Intersection points of a ray defined by origin and direction and a circle defined by the center
+// point and radius.
+QVector<QPointF> rayAndCircleIntersectionPoints(
+    const QPointF& rayOrigin,
+    const QPointF& rayDirection,
+    const QPointF& circleCenter,
+    double circleRadius)
+{
+    if (!NX_ASSERT(!qFuzzyIsNull(Geometry::length(rayDirection))))
+        return {};
+
+    if (!NX_ASSERT(circleRadius >= 0.0))
+        return {};
+
+    const auto normalizedDirection = Geometry::normalized(rayDirection);
+    QPointF deltaVector = circleCenter - rayOrigin;
+
+    double distanceToChordCenter = QPointF::dotProduct(normalizedDirection, deltaVector);
+    double halfChordLengthSquared =
+        std::pow(distanceToChordCenter, 2.0)
+        - Geometry::lengthSquared(deltaVector)
+        + std::pow(circleRadius, 2.0);
+
+    QVector<QPointF> result;
+
+    if (qFuzzyIsNull(halfChordLengthSquared)) //< Tangent.
+    {
+        if (qFuzzyIsNull(distanceToChordCenter) || distanceToChordCenter > 0)
+            result.push_back(rayOrigin + normalizedDirection * distanceToChordCenter);
+    }
+    else if (halfChordLengthSquared > 0)
+    {
+        const auto halfChordLength = std::sqrt(halfChordLengthSquared);
+
+        const auto distanceToIntersection1 = distanceToChordCenter - halfChordLength;
+        const auto distanceToIntersection2 = distanceToChordCenter + halfChordLength;
+
+        if (qFuzzyIsNull(distanceToIntersection1) || distanceToIntersection1 > 0)
+            result.push_back(rayOrigin + normalizedDirection * distanceToIntersection1);
+
+        if (qFuzzyIsNull(distanceToIntersection2) || distanceToIntersection2 > 0)
+            result.push_back(rayOrigin + normalizedDirection * distanceToIntersection2);
+    }
+
+    return result;
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
 
-using Geometry = nx::vms::client::core::Geometry;
 using CameraHotspotData = nx::vms::common::CameraHotspotData;
 using CameraHotspotDataList = nx::vms::common::CameraHotspotDataList;
 
@@ -74,6 +122,10 @@ struct CameraHotspotsEditorWidget::Private
     std::optional<int> hotspotIndexAtPos(const QPoint& pos) const;
 
     void processContextMenuRequest(const QPoint& pos);
+
+    QPoint resolveHotspotsCollision(
+        const QPoint& desiredPosition,
+        std::optional<int> modifiedHotspotIndex = std::nullopt) const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -192,6 +244,61 @@ void CameraHotspotsEditorWidget::Private::processContextMenuRequest(const QPoint
     QnHiDpiWorkarounds::showMenu(menu, QCursor::pos());
 }
 
+QPoint CameraHotspotsEditorWidget::Private::resolveHotspotsCollision(
+    const QPoint& desiredPosition,
+    std::optional<int> modifiedHotspotIndex) const
+{
+    QVector<QPointF> hotspotsOrigins;
+    for (int i = 0; i < hotspots.size(); ++i)
+    {
+        if (i == modifiedHotspotIndex)
+            continue;
+
+        hotspotsOrigins.push_back(
+            camera_hotspots::hotspotOrigin(hotspots.at(i), thumbnailRect()));
+    }
+
+    auto isAcceptablePosition =
+        [hotspotsOrigins](const QPointF& pos)
+        {
+            return std::all_of(hotspotsOrigins.begin(), hotspotsOrigins.end(),
+                [pos](const auto& origin)
+                {
+                    static constexpr auto kTolerance = 0.01;
+                    return camera_hotspots::kHotspotRadius * 2 - Geometry::length(origin - pos)
+                        < kTolerance;
+                });
+        };
+
+    if (isAcceptablePosition(desiredPosition))
+        return desiredPosition;
+
+    QVector<QPointF> possiblePositions;
+    for (int angle = 0; angle < 360; angle += 5)
+    {
+        const QPointF offsetDirection = Geometry::rotated(QPointF(0, 1), QPointF(0, 0), angle);
+        for (const auto& origin: hotspotsOrigins)
+        {
+            possiblePositions += rayAndCircleIntersectionPoints(
+                desiredPosition, offsetDirection, origin, camera_hotspots::kHotspotRadius * 2);
+        }
+    }
+
+    std::sort(possiblePositions.begin(), possiblePositions.end(),
+        [desiredPosition](const QPointF& lhs, const QPointF& rhs)
+        {
+            return Geometry::length(desiredPosition - lhs)
+                < Geometry::length(desiredPosition - rhs);
+        });
+
+    for (const auto& possiblePosition: possiblePositions)
+    {
+        if (isAcceptablePosition(possiblePosition))
+            return possiblePosition.toPoint();
+    }
+
+    return desiredPosition;
+}
 
 //-------------------------------------------------------------------------------------------------
 // CameraHotspotEditorWidget definition.
@@ -285,7 +392,16 @@ void CameraHotspotsEditorWidget::setHotspotAt(const CameraHotspotData& hotspotDa
 
 int CameraHotspotsEditorWidget::appendHotspot(const CameraHotspotData& hotspotData)
 {
-    d->hotspots.push_back(hotspotData);
+    auto fixedHotspotData = hotspotData;
+    const auto desiredHotspotOrigin =
+        camera_hotspots::hotspotOrigin(hotspotData, d->thumbnailRect());
+
+    camera_hotspots::setHotspotPositionFromPointInRect(
+        d->thumbnailRect(),
+        d->resolveHotspotsCollision(desiredHotspotOrigin.toPoint()),
+        fixedHotspotData);
+
+    d->hotspots.push_back(fixedHotspotData);
     update();
     emit hotspotsDataChanged();
     return d->hotspots.size() - 1;
@@ -390,7 +506,9 @@ void CameraHotspotsEditorWidget::mouseMoveEvent(QMouseEvent* event)
         setCursor(Qt::SizeAllCursor);
         auto& draggedHotspot = d->hotspots[d->selectedHotspotIndex.value()];
         camera_hotspots::setHotspotPositionFromPointInRect(
-            d->thumbnailRect(), event->pos(), draggedHotspot);
+            d->thumbnailRect(),
+            d->resolveHotspotsCollision(event->pos(), d->selectedHotspotIndex.value()),
+            draggedHotspot);
         d->isDragChange = true;
         update();
     }
