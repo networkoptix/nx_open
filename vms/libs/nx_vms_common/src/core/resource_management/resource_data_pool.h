@@ -76,6 +76,8 @@ private:
     bool loadInternal(const QString& fileName);
     QnResourceData data(const Key& key) const;
 
+    void setData(QJsonObject allData, std::vector<std::pair<Key, QnResourceData>> dataByKey);
+
 private:
     mutable nx::Mutex m_mutex;
     QJsonObject m_allData;
