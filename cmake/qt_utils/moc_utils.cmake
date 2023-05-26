@@ -74,6 +74,7 @@ function(nx_add_qt_mocables target)
         endif()
 
         _get_moc_file_name(moc_file ${file})
+        set(dep_file ${moc_file}.d)
         get_filename_component(path ${moc_file} PATH)
         list(APPEND moc_dirs ${path})
 
@@ -81,7 +82,9 @@ function(nx_add_qt_mocables target)
             OUTPUT ${moc_file}
             COMMAND ${QT_MOC_EXECUTABLE}
                 -o ${moc_file} ${file} @${moc_parameters_file} ${MOC_FLAGS}
+                --output-dep-file --dep-file-path ${dep_file}
             DEPENDS ${file} ${moc_parameters_file}
+            DEPFILE ${dep_file}
             VERBATIM
         )
 
