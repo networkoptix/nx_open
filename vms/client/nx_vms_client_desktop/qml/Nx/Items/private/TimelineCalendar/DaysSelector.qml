@@ -16,6 +16,7 @@ Item
     property var selection: NxGlobals.dateRange(d.today, DateUtils.addDays(d.today, 1))
 
     property alias displayOffset: calendarModel.displayOffset
+    property date currentDate: new Date(new Date().getTime() + displayOffset)
     property alias locale: calendarModel.locale
     property alias visibleYear: calendarModel.year
     property int visibleMonth: 0
@@ -23,16 +24,13 @@ Item
     property alias allCamerasPeriodStorage: calendarModel.allCamerasPeriodStorage
     property bool periodsVisible: true
 
-    readonly property alias today: d.today
-
     implicitHeight: 32 * 6
 
     QtObject
     {
         id: d
 
-        readonly property date today: DateUtils.stripTime(
-            new Date(new Date().getTime() + displayOffset))
+        readonly property date today: DateUtils.stripTime(currentDate)
 
         readonly property date rangeStartDay:
             DateUtils.stripTime(range.start)
@@ -149,7 +147,6 @@ Item
                     id: mouseArea
 
                     anchors.fill: parent
-                    enabled: model.hasArchive || model.anyCameraHasArchive
                     hoverEnabled: true
                     onPressed: function(event)
                     {
