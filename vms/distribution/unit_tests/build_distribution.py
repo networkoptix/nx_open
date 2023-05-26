@@ -14,6 +14,7 @@ import os
 import re
 import subprocess
 import sys
+import yaml
 
 import archiver
 import build_distribution_conf as conf
@@ -28,7 +29,20 @@ WINDOWS_QT_PLUGINS = [
 ]
 
 
-def get_unit_tests_list():
+def load_unit_test_metainfo():
+    path = Path(conf.METAINFO_FILE)
+    if not path.exists():
+        logging.error(f'Metainfo file {path} cannot be found')
+        sys.exit(1)
+
+    with open(path, 'r') as f:
+        return yaml.load(f, Loader=yaml.SafeLoader)
+
+    logging.error(f'Metainfo file {path} cannot be read')
+    sys.exit(1)
+
+
+def get_unit_tests_list(metainfo):
     test_regex = re.compile(r"\s+Test.+: (.+)")
 
     extension = {
@@ -52,10 +66,15 @@ def get_unit_tests_list():
             test_target_name = m.group(1)
             if limit_to_targets is not None and test_target_name not in limit_to_targets:
                 continue
-            yield m.group(1) + extension
+
+            if test_target_name not in metainfo:
+                logging.error(f"Metainfo for {test_target_name} not found!")
+                sys.exit(1)
+            yield test_target_name + extension
+
 
 # TODO: Remove this function once Go unit test dependency issue is fixed.
-def get_go_unit_tests_list(tests_directory: str):
+def get_go_unit_tests_list(tests_directory: str, metainfo):
     extension = {
         "Linux": "",
         "Windows": ".exe",
@@ -83,7 +102,12 @@ def get_go_unit_tests_list(tests_directory: str):
         test_full_name = f"{test_name}{extension}"
         if not (Path(tests_directory) / test_full_name).is_file():
             continue
+
+        if test_name not in metainfo:
+            logging.error(f"Metainfo for {test_name} not found!")
+            sys.exit(1)
         yield test_full_name
+
 
 def gatherFiles(source_dir, exclude):
     reject_name = lambda name: any([fnmatch(name, pattern) for pattern in exclude])
@@ -105,6 +129,7 @@ def gatherFiles(source_dir, exclude):
         for name in files:
             yield os.path.normpath(join(relative_root, name))
 
+
 def archiveMacOsFrameworks(archiver, target_dir, source_dir):
     for framework_dir in iglob(join(source_dir, "*.framework")):
         framework_dir_name = os.path.basename(framework_dir)
@@ -118,6 +143,7 @@ def archiveMacOsFrameworks(archiver, target_dir, source_dir):
         files = list(gatherFiles(framework_dir, exclude=["Headers", "*.prl"]))
         archiveFiles(archiver, join(target_dir, framework_dir_name), framework_dir, files,
             category=framework_dir_name)
+
 
 def archiveFiles(archiver, target_dir, source_dir, file_list, category=None) -> int:
     if category:
@@ -193,21 +219,25 @@ def main():
         "Windows": ["*.dll", "*.pdb"],
         "Darwin": ["*.dylib"]
     }[conf.CMAKE_SYSTEM_NAME]
+    metainfo = load_unit_test_metainfo()
 
     with archiver.Archiver(conf.PACKAGE_FILE, conf=conf) as a:
         src_bin_dir = join(conf.BUILD_DIR, bin_dir)
+
+        logging.info("Archiving metadata file")
+        a.add(conf.METAINFO_FILE, Path(conf.METAINFO_FILE).name)
 
         # Since the build system doesn't know on which files Go unit tests depend, always add
         # these unit tests. TODO: Fix the build system - add dependencies to Go unit test
         # generation.
         logging.info("Archiving Go unit tests")
-        archiveFiles(a, bin_dir, src_bin_dir, get_go_unit_tests_list(src_bin_dir))
+        archiveFiles(a, bin_dir, src_bin_dir, get_go_unit_tests_list(src_bin_dir, metainfo))
 
         logging.info("Archiving standalone metadata_sdk unit tests")
         archiveSdkUnitTests(a, conf, src_bin_dir)
 
         logging.info("Archiving unit test executables")
-        if not archiveFiles(a, bin_dir, src_bin_dir, get_unit_tests_list()):
+        if not archiveFiles(a, bin_dir, src_bin_dir, get_unit_tests_list(metainfo)):
             logging.info("No unit test executables found")
             return
 

@@ -6,5 +6,7 @@ nx_add_test(nx_vms_common_ut
         nx_vms_common
     PRIVATE_LIBS
         nx_vms_common_test_support
+    PROJECT VMS
+    COMPONENT Server
     FOLDER common/tests
 )

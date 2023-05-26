@@ -2,5 +2,6 @@
 
 nx_add_test(nx_preprocessor_ut NO_NX_UTILS WERROR
     PUBLIC_LIBS nx_preprocessor
+    PROJECT NXLIB
     FOLDER common/tests
 )

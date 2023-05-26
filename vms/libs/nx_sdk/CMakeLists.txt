@@ -26,4 +26,8 @@ target_include_directories(nx_sdk PRIVATE ${copied_nx_sdk_version_origin})
 
 if(withTests)
     add_subdirectory(unit_tests)
+
+    # Actually this should be in the unit_tests/CMakeLists.txt, but that file is used as a template
+    # for the auto-generated CMakeLists.txt in the sample archive.
+    nx_store_test_metainformation(nx_sdk_ut PROJECT NXLIB)
 endif()

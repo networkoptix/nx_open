@@ -6,6 +6,7 @@ nx_add_test(nx_utils_ut
         nx_reflect
         nx_utils
         Qt5::Network
+    PROJECT NXLIB
     FOLDER common/tests
 )
 
