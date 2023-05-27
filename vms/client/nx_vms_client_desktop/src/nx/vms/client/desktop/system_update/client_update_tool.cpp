@@ -419,7 +419,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             break;
         case FileInformation::Status::downloading:
             emit updateStateChanged(State::downloading,
-                fileInformation.calculateDownloadProgress(), {});
+                fileInformation.downloadProgress(), {});
             break;
         default:
             // Nothing to do here

@@ -68,9 +68,6 @@ public:
 
     std::future<RemoteStatus> requestRemoteUpdateState();
 
-    using ClientPackageStatus = std::vector<common::update::OverallClientPackageStatus>;
-    std::future<ClientPackageStatus> requestClientPackageStatus();
-
     /**
      * Tries to get status changes from the server.
      * @param status storage for remote status
@@ -156,8 +153,12 @@ public:
      */
     bool hasActiveUploadsTo(const QnUuid& id) const;
 
-    /** Start uploading local update packages to the servers. */
-    bool startUpload(const UpdateContents& contents, bool cleanExisting);
+    /**
+     * Start uploading local update packages to the servers.
+     * Note: The parameter `force` is a temporary workaround for retrying update uploads. It will
+     * be removed as soon as the Client-side logic is rewritten.
+     */
+    bool startUpload(const UpdateContents& contents, bool cleanExisting, bool force = false);
 
     /** Stops all uploads. */
     void stopAllUploads();
@@ -187,8 +188,7 @@ public:
         bool downloadingServers = false;
         /** Client is downloading files for the servers without internet. */
         bool downloadingForServers = false;
-        /** Client is uploading client update files to mediaservers. */
-        bool uploadingClientUpdates = false;
+        bool uploadingOfflinePackages = false;
         bool installingServers = false;
         bool installingClient = false;
     };
@@ -202,7 +202,6 @@ public:
     };
 
     void calculateManualDownloadProgress(ProgressInfo& progress);
-    void calculateClientUploadProgress(ProgressInfo& progress);
 
     OfflineUpdateState getUploaderState() const;
 
@@ -228,9 +227,6 @@ public:
 
     /** Checks if there are any manual downloads. */
     bool hasManualDownloads() const;
-
-    /** Checks if there are any Client package uploads to persistent storage servers. */
-    bool hasClientPackageUploads() const;
 
     /**
      * Starts uploading package to the servers.
@@ -317,10 +313,6 @@ private:
     std::unique_ptr<UploadManager> m_uploadManager;
     std::set<QString> m_activeUploads;
     std::set<QString> m_completedUploads;
-
-    // It helps to track client package uploading progress.
-    std::set<QString> m_activeClientUploads;
-    std::set<QString> m_completeClientUploads;
 
     // It helps to track downloading progress for files.
     std::map<QString, int> m_activeDownloads;

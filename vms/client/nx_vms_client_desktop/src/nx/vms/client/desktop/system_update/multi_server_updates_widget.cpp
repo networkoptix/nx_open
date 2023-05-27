@@ -757,6 +757,7 @@ void MultiServerUpdatesWidget::setUpdateTarget(
 {
     NX_VERBOSE(this, "setUpdateTarget(%1)", contents.info.version);
     m_updateInfo = contents;
+    m_updateSourceMode = contents.sourceType;
 
     m_stateTracker->clearVerificationErrors();
 
@@ -1547,18 +1548,13 @@ void MultiServerUpdatesWidget::repeatUpdateValidation()
 
 void MultiServerUpdatesWidget::atServerPackageDownloaded(const nx::vms::update::Package& package)
 {
+    NX_INFO(this, "Package download finished: \"%1\". Current state: %2",
+        package.file, m_widgetState());
+
     if (m_widgetState == WidgetUpdateState::downloading)
     {
-        NX_INFO(this, "atServerPackageDownloaded() - downloaded server package \"%1\"",
-            package.file);
-
-        auto dir = m_serverUpdateTool->getDownloadDir();
-        m_serverUpdateTool->uploadPackageToRecipients(package, dir);
-    }
-    else
-    {
-        NX_INFO(this, "atServerPackageDownloaded() - downloaded server package \"%1\" "
-            "and widget is not in downloading state", package.file);
+        m_serverUpdateTool->uploadPackageToRecipients(
+            package, m_serverUpdateTool->getDownloadDir());
     }
 }
 
@@ -1642,6 +1638,7 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
     {
         auto peersIssued = m_stateTracker->peersIssued();
         auto peersActive = m_stateTracker->peersActive();
+        auto peersDownloadingOfflineUpdates = m_stateTracker->peersWithOfflinePackages();
         // Note: we can get here right after we clicked 'download' but before
         // we got an update from /ec2/updateStatus. Most servers will be in 'idle' state.
         // We even can get a stale callback from /ec2/updateStatus, with data actual to
@@ -1697,8 +1694,18 @@ ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress
         if (m_serverUpdateTool->hasManualDownloads())
             m_serverUpdateTool->calculateManualDownloadProgress(result);
 
-        if (m_serverUpdateTool->hasClientPackageUploads())
-            m_serverUpdateTool->calculateClientUploadProgress(result);
+        result.uploadingOfflinePackages = false;
+        for (const QnUuid& serverId: peersDownloadingOfflineUpdates)
+        {
+            const UpdateItemPtr item = m_stateTracker->findItemById(serverId);
+            const auto maxOfflinePackageProgress = item->offlinePackageCount * 100;
+            result.max += maxOfflinePackageProgress;
+            result.current += item->offlinePackageProgress;
+            result.active += item->offlinePackageCount;
+
+            result.uploadingOfflinePackages |=
+                (item->offlinePackageProgress < maxOfflinePackageProgress);
+        }
 
         if (m_clientUpdateTool->hasUpdate())
             result.downloadingClient = !m_clientUpdateTool->isDownloadComplete();
@@ -1740,11 +1747,7 @@ void MultiServerUpdatesWidget::processInitialState()
         m_serverStatusCheck = m_serverUpdateTool->requestRemoteUpdateState();
 
     m_offlineUpdateCheck = m_serverUpdateTool->takeUpdateCheckFromFile();
-    if (m_offlineUpdateCheck.valid())
-    {
-        m_clientPackageStatusCheck = m_serverUpdateTool->requestClientPackageStatus();
-    }
-    else
+    if (!m_offlineUpdateCheck.valid())
     {
         NX_VERBOSE(this, "processInitialState() - there was no offline update file. State=%1",
             toString(m_serverUpdateTool->getUploaderState()));
@@ -1773,19 +1776,14 @@ void MultiServerUpdatesWidget::processInitialCheckState()
     bool offlineCheckReady = !m_offlineUpdateCheck.valid()
         || m_offlineUpdateCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready;
 
-    bool clientPackageStatusCheckReady = !m_clientPackageStatusCheck.valid()
-        || (m_clientPackageStatusCheck.wait_for(kWaitForUpdateCheckFuture)
-            == std::future_status::ready);
-
     if (mediaserverUpdateCheckReady
         && mediaserverStatusCheckReady
-        && offlineCheckReady
-        && clientPackageStatusCheckReady)
+        && offlineCheckReady)
     {
         // TODO: We should invent a method for testing this.
         auto updateInfo = m_serverUpdateCheck.get();
         auto serverStatus = m_serverStatusCheck.get();
-        bool hasClientsToUpload = false;
+        bool haveDownloadsInProgress = false;
 
         // Update info for offline update package is already verified.
         if (m_offlineUpdateCheck.valid())
@@ -1808,23 +1806,20 @@ void MultiServerUpdatesWidget::processInitialCheckState()
             NX_DEBUG(this, "processInitialCheckState() - there was no offline update check.");
         }
 
-        if (m_clientPackageStatusCheck.valid())
+        for (const auto& [id, status]: serverStatus)
         {
-            const ServerUpdateTool::ClientPackageStatus clientPackageStatusList =
-                m_clientPackageStatusCheck.get();
-
-            if (updateInfo.sourceType == UpdateSourceType::file)
+            for (const common::update::PackageDownloadStatus& packageStatus: status.downloads)
             {
-                for (const auto& packageStatus: clientPackageStatusList)
+                if (packageStatus.status
+                    != common::update::PackageDownloadStatus::Status::downloaded)
                 {
-                    using Status = common::update::OverallClientPackageStatus::Status;
-                    hasClientsToUpload |= (packageStatus.status == Status::downloading
-                        || packageStatus.status == Status::error);
-
-                    if (hasClientsToUpload)
-                        break;
+                    haveDownloadsInProgress = true;
+                    break;
                 }
             }
+
+            if (haveDownloadsInProgress)
+                break;
         }
 
         ServerUpdateTool::RemoteStatus remoteStatus;
@@ -1895,7 +1890,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
                 peersAreInstalling + serversHaveInstalled, false);
         }
         else if (!serversAreDownloading.empty() || !serversWithDownloadingError.empty()
-            || hasClientsToUpload)
+            || haveDownloadsInProgress)
         {
             auto targets = serversAreDownloading + serversWithDownloadingError;
             NX_INFO(this,
@@ -1953,6 +1948,27 @@ void MultiServerUpdatesWidget::processDownloadingState()
     auto peersFailed = m_stateTracker->peersFailed();
     auto peersComplete = m_stateTracker->peersComplete();
     auto peersIssued = m_stateTracker->peersIssued();
+    auto peersWithOfflinePackages = m_stateTracker->peersWithOfflinePackages();
+    auto completedPeersWithOfflinePackages =
+        m_stateTracker->peersCompletedOfflinePackagesDownload();
+    auto failedPeersWithOfflinePackages =
+        m_stateTracker->peersWithOfflinePackageDownloadError();
+
+    NX_VERBOSE(this,
+        "processDownloadingState(): "
+            "active: %1, unknown: %2, failed: %3, complete: %4, issued: %5, "
+            "with offline packages: %6, with offline packages completed: %7, "
+            "with offline packages failed: %8",
+        peersActive.size(),
+        peersUnknown.size(),
+        peersFailed.size(),
+        peersComplete.size(),
+        peersIssued.size(),
+        peersWithOfflinePackages.size(),
+        completedPeersWithOfflinePackages.size(),
+        failedPeersWithOfflinePackages.size());
+
+    NX_VERBOSE(this, "processDownloadingState(): issued: %1", peersIssued);
 
     // Starting uploads only when we get a proper data from /ec2/updateStatus.
     if (m_serverStatusCheck.valid()
@@ -1979,14 +1995,15 @@ void MultiServerUpdatesWidget::processDownloadingState()
     processUploaderChanges();
 
     const bool fileTransfersNotDone = peersActive.size() + peersUnknown.size() > 0
-        || m_serverUpdateTool->hasClientPackageUploads();
-    if (fileTransfersNotDone && peersFailed.empty())
+        || completedPeersWithOfflinePackages.size() < peersWithOfflinePackages.size();
+
+    if (fileTransfersNotDone && peersFailed.empty() && failedPeersWithOfflinePackages.empty())
         return;
 
     // No peers are doing anything. So we consider current state transition is complete
     NX_INFO(this) << "processDownloadingState() - download has stopped";
 
-    if (peersComplete.size() >= peersIssued.size())
+    if (peersComplete.size() >= peersIssued.size() && failedPeersWithOfflinePackages.empty())
     {
         // All servers have completed downloading process.
         auto complete = peersComplete;
@@ -2026,6 +2043,13 @@ void MultiServerUpdatesWidget::processDownloadingState()
             m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             setTargetState(WidgetUpdateState::downloading, serversToRetry);
             m_stateTracker->markStatusUnknown(serversToRetry);
+            m_stateTracker->resetOfflinePackagesInformation(failedPeersWithOfflinePackages);
+            if (!failedPeersWithOfflinePackages.isEmpty()
+                || !m_updateInfo.manualPackages.isEmpty())
+            {
+                m_serverUpdateTool->startUpload(
+                    m_updateInfo, /*cleanExisting*/ true, /*force*/ true);
+            }
         }
         else if (clicked == cancelUpdate)
         {
@@ -2547,8 +2571,8 @@ void MultiServerUpdatesWidget::syncProgress()
         caption = tr("Downloading updates...");
     else if (info.downloadingClient)
         caption = tr("Downloading client package...");
-    else if (info.uploadingClientUpdates)
-        caption = tr("Uploading client packages to Servers...");
+    else if (info.uploadingOfflinePackages)
+        caption = tr("Uploading offline update packages to Servers...");
     else if (info.installingServers)
         caption = tr("Installing updates...");
     else if (info.installingClient)

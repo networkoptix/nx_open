@@ -20,20 +20,17 @@ bool FileInformation::isValid() const
     return !name.isEmpty();
 }
 
-int FileInformation::calculateDownloadProgress() const
+int FileInformation::downloadProgress() const
 {
-    int size = downloadedChunks.size();
-    if (size <= 0)
-        return 0;
-
-    int done = downloadedChunks.count(true);
-    return 100 * done / size;
+    return 100 * downloadedBytes() / size;
 }
 
-qint64 FileInformation::calculateDownloadedBytes() const
+qint64 FileInformation::downloadedBytes() const
 {
-    int done = downloadedChunks.count(true);
-    return done * chunkSize;
+    qint64 result = downloadedChunks.count(true) * chunkSize;
+    if (downloadedChunks.testBit(downloadedChunks.size() - 1))
+        result -= (chunkSize - size % chunkSize);
+    return result;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
