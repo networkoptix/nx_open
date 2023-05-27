@@ -111,10 +111,10 @@ public:
     QString userData;
 
     /** Calculates a progress for download, [0..100]. */
-    int calculateDownloadProgress() const;
+    int downloadProgress() const;
 
     /** Calculates total number of bytes downloaded. */
-    qint64 calculateDownloadedBytes() const;
+    qint64 downloadedBytes() const;
 };
 
 #define FileInformation_Fields \

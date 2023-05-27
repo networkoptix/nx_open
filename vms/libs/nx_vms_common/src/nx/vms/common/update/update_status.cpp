@@ -7,9 +7,7 @@
 namespace nx::vms::common::update {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Status, (json), UpdateStatus_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ClientPackageStatus, (json), ClientPackageStatus_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    OverallClientPackageStatus, (json), OverallClientPackageStatus_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PackageDownloadStatus, (json), PackageDownloadStatus_Fields)
 
 Status::Status(
     const QnUuid& serverId,
