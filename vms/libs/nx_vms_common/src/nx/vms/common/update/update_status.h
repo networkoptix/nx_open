@@ -9,6 +9,23 @@
 
 namespace nx::vms::common::update {
 
+struct NX_VMS_COMMON_API PackageDownloadStatus
+{
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Status,
+        downloading,
+        downloaded,
+        corrupted
+    )
+
+    QString file;
+    Status status = Status::downloading;
+    qint64 size = 0;
+    qint64 downloadedBytes = 0;
+};
+
+#define PackageDownloadStatus_Fields (file)(status)(size)(downloadedBytes)
+QN_FUSION_DECLARE_FUNCTIONS(PackageDownloadStatus, (json), NX_VMS_COMMON_API)
+
 struct NX_VMS_COMMON_API Status
 {
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(Code,
@@ -49,6 +66,8 @@ struct NX_VMS_COMMON_API Status
     ErrorCode errorCode = ErrorCode::noError;
     QString message;
     int progress = 0;
+    std::vector<PackageDownloadStatus> downloads;
+    QString mainUpdatePackage;
 
     Status() = default;
     Status(
@@ -62,42 +81,11 @@ struct NX_VMS_COMMON_API Status
     friend NX_VMS_COMMON_API uint qHash(nx::vms::common::update::Status::ErrorCode key, uint seed);
 };
 
-#define UpdateStatus_Fields (serverId)(code)(errorCode)(progress)(message)
+#define UpdateStatus_Fields \
+    (serverId)(code)(errorCode)(progress)(message)(downloads)(mainUpdatePackage)
 
 using StatusList = std::vector<Status>;
 
 QN_FUSION_DECLARE_FUNCTIONS(Status, (json), NX_VMS_COMMON_API)
-
-struct NX_VMS_COMMON_API ClientPackageStatus
-{
-    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Status,
-        downloading,
-        downloaded,
-        error
-    )
-
-    QString file;
-    Status status = Status::downloading;
-    int progress = 0;
-};
-#define ClientPackageStatus_Fields (file)(status)(progress)
-QN_FUSION_DECLARE_FUNCTIONS(ClientPackageStatus, (json), NX_VMS_COMMON_API)
-
-struct NX_VMS_COMMON_API OverallClientPackageStatus
-{
-    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Status,
-        idle,
-        downloading,
-        downloaded,
-        error
-    )
-
-    QnUuid serverId;
-    Status status = Status::idle;
-    std::vector<ClientPackageStatus> packages;
-    int progress = 0;
-};
-#define OverallClientPackageStatus_Fields (serverId)(status)(packages)(progress)
-QN_FUSION_DECLARE_FUNCTIONS(OverallClientPackageStatus, (json), NX_VMS_COMMON_API)
 
 } // namespace nx::vms::common::update

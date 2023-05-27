@@ -394,6 +394,32 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::vms::common::up
                 changed |= compareAndSet(status.second.message, item->debugMessage);
                 changed |= compareAndSet(status.second.errorCode, item->errorCode);
 
+                changed |= compareAndSet(
+                    // -1 because we don't count an update package for the current client.
+                    (int) status.second.downloads.size() - 1, item->offlinePackageCount);
+
+                int offlinePackageProgress = 0;
+                auto haveCorruptedDownloads = false;
+                auto haveDownloadsInProgress = false;
+                for (const common::update::PackageDownloadStatus& package: status.second.downloads)
+                {
+                    if (package.file == status.second.mainUpdatePackage)
+                        continue;
+
+                    offlinePackageProgress += package.downloadedBytes * 100 / package.size;
+                    haveCorruptedDownloads |= (package.status == PackageStatusCode::corrupted);
+                    haveDownloadsInProgress |= (package.status == PackageStatusCode::downloading);
+                }
+
+                changed |= compareAndSet(offlinePackageProgress, item->offlinePackageProgress);
+
+                auto offlinePackageStatus = haveCorruptedDownloads
+                    ? PackageStatusCode::corrupted
+                    : haveDownloadsInProgress
+                        ? PackageStatusCode::downloading
+                        : PackageStatusCode::downloaded;
+                changed |= compareAndSet(offlinePackageStatus, item->offlinePackagesStatus);
+
                 if (status.second.code == StatusCode::error)
                 {
                     NX_ASSERT(status.second.errorCode != nx::vms::common::update::Status::ErrorCode::noError);
@@ -515,6 +541,27 @@ void PeerStateTracker::setPeersInstalling(const QSet<QnUuid>& targets, bool inst
                 if (item->state == StatusCode::latestUpdateInstalled)
                     continue;
                 item->installing = installing;
+                itemsChanged.append(item);
+            }
+        }
+    }
+
+    for (auto item: itemsChanged)
+        emit itemChanged(item);
+}
+
+void PeerStateTracker::resetOfflinePackagesInformation(const QSet<QnUuid>& targets)
+{
+    QList<UpdateItemPtr> itemsChanged;
+    {
+        NX_MUTEX_LOCKER locker(&m_dataLock);
+        for (const auto& id: targets)
+        {
+            if (auto item = findItemById(id))
+            {
+                item->offlinePackageProgress = 0;
+                item->offlinePackagesStatus =
+                    common::update::PackageDownloadStatus::Status::downloading;
                 itemsChanged.append(item);
             }
         }
@@ -722,6 +769,52 @@ QSet<QnUuid> PeerStateTracker::peersWithDownloaderError() const
         if (errorTypes.contains(item->errorCode))
             result.insert(item->id);
     }
+    return result;
+}
+
+QSet<QnUuid> PeerStateTracker::peersWithOfflinePackages() const
+{
+    QSet<QnUuid> result;
+    NX_MUTEX_LOCKER locker(&m_dataLock);
+    for (const auto& item: m_items)
+    {
+        if (!item->offline && !item->isClient() && item->offlinePackageCount > 0)
+            result.insert(item->id);
+    }
+
+    return result;
+}
+
+QSet<QnUuid> PeerStateTracker::peersCompletedOfflinePackagesDownload() const
+{
+    QSet<QnUuid> result;
+    NX_MUTEX_LOCKER locker(&m_dataLock);
+    for (const auto& item: m_items)
+    {
+        if (!item->offline && !item->isClient()
+            && item->offlinePackageProgress == item->offlinePackageCount * 100)
+        {
+            result.insert(item->id);
+        }
+    }
+
+    return result;
+}
+
+QSet<QnUuid> PeerStateTracker::peersWithOfflinePackageDownloadError() const
+{
+    QSet<QnUuid> result;
+    NX_MUTEX_LOCKER locker(&m_dataLock);
+    for (const auto& item: m_items)
+    {
+        if (!item->offline && !item->isClient()
+            && (item->offlinePackagesStatus
+                == common::update::PackageDownloadStatus::Status::corrupted))
+        {
+            result.insert(item->id);
+        }
+    }
+
     return result;
 }
 
