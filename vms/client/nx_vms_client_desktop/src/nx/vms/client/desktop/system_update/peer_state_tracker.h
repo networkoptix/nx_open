@@ -17,6 +17,7 @@ struct QnUpdateFreeSpaceReply;
 namespace nx::vms::client::desktop {
 
 using StatusCode = nx::vms::common::update::Status::Code;
+using PackageStatusCode = common::update::PackageDownloadStatus::Status;
 
 /**
  * This structure keeps all the information necessary to display current state of the server.
@@ -36,6 +37,10 @@ struct NX_VMS_CLIENT_DESKTOP_API UpdateItem
     QnUuid id;
     StatusCode state = StatusCode::offline;
     int progress = -1;
+
+    int offlinePackageProgress = 0;
+    int offlinePackageCount = 0;
+    PackageStatusCode offlinePackagesStatus = PackageStatusCode::downloaded;
 
     /**
      * Message generated from nx::vms::common::update::Status::message.
@@ -149,6 +154,7 @@ public:
      * 'Install update' button is clicked.
      */
     void setPeersInstalling(const QSet<QnUuid>& targets, bool installing);
+    void resetOfflinePackagesInformation(const QSet<QnUuid>& targets);
     void clearState();
 
     /** Set update check error for specified set of peers. */
@@ -192,6 +198,9 @@ public:
     QSet<QnUuid> serversWithChangedProtocol() const;
     QSet<QnUuid> peersWithUnknownStatus() const;
     QSet<QnUuid> peersWithDownloaderError() const;
+    QSet<QnUuid> peersWithOfflinePackages() const;
+    QSet<QnUuid> peersCompletedOfflinePackagesDownload() const;
+    QSet<QnUuid> peersWithOfflinePackageDownloadError() const;
 
     /**
      * Process unknown or offline states. It will change item states.

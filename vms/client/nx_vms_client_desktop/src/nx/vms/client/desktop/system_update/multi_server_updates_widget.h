@@ -188,6 +188,16 @@ public:
             return currentData;
         }
 
+        Data& operator()()
+        {
+            return currentData;
+        }
+
+        const Data& operator()() const
+        {
+            return currentData;
+        }
+
         Data* operator->()
         {
             return &currentData;
@@ -300,8 +310,7 @@ private:
      * General state for a widget.
      * It extends update state from the servers, uploader and client update.
      */
-    enum class WidgetUpdateState
-    {
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(WidgetUpdateState,
         /** We have no information about remote state right now. */
         initial,
         /**
@@ -337,8 +346,8 @@ private:
         /** Waiting server to respond to /ec2/finishUpdate */
         finishingInstall,
         /** Installation process is complete. */
-        complete,
-    };
+        complete
+    )
 
     static QString toString(UpdateSourceType mode);
     static QString toString(WidgetUpdateState state);
@@ -458,7 +467,6 @@ private:
      */
     std::future<UpdateContents> m_offlineUpdateCheck;
     std::future<ServerUpdateTool::RemoteStatus> m_serverStatusCheck;
-    std::future<ServerUpdateTool::ClientPackageStatus> m_clientPackageStatusCheck;
 
     UpdateContents m_updateInfo;
     RevisionStorage<UpdateSourceType> m_updateSourceMode = UpdateSourceType::internet;

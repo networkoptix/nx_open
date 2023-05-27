@@ -452,8 +452,40 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
     if (contents.sourceType == UpdateSourceType::file)
         return;
 
+    NX_DEBUG(this, "startManualDownloads(): Starting...");
+
     // TODO: Stop previous manual downloads
     m_manualPackages = contents.manualPackages;
+
+    bool havePersistentServerWithoutInternet = false;
+    for (const QnUuid& serverId: systemSettings()->targetPersistentUpdateStorage().servers)
+    {
+        if (const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId))
+        {
+            if (!server->hasInternetAccess())
+            {
+                havePersistentServerWithoutInternet = true;
+                break;
+            }
+        }
+    }
+
+    if (havePersistentServerWithoutInternet)
+    {
+        NX_DEBUG(this,
+            "startManualDownloads(): There are persistent storage servers without internet.");
+
+        for (auto package: contents.info.packages)
+        {
+            if (package.component == update::Component::client
+                || package.component == update::Component::customClient)
+            {
+                NX_VERBOSE(this, "startManualDownloads(): Adding %1 to manual downloads...",
+                    package.file);
+                m_manualPackages.insert(package);
+            }
+        }
+    }
 
     for (auto& package: m_manualPackages)
     {
@@ -504,11 +536,6 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
 bool ServerUpdateTool::hasManualDownloads() const
 {
     return !m_issuedDownloads.empty();
-}
-
-bool ServerUpdateTool::hasClientPackageUploads() const
-{
-    return !m_activeClientUploads.empty();
 }
 
 QSet<QnUuid> ServerUpdateTool::getTargetsForPackage(const update::Package& package) const
@@ -595,18 +622,12 @@ bool ServerUpdateTool::uploadPackageToServer(const QnUuid& serverId,
         NX_INFO(this, "uploadPackageToServer(%1) - started uploading file to server %2",
             package.file, serverId);
         m_uploadStateById[id] = config;
-        if (package.component == update::Component::client)
-            m_activeClientUploads.insert(id);
-        else
-            m_activeUploads.insert(id);
+        m_activeUploads.insert(id);
         return true;
     }
     NX_WARNING(this, "uploadPackageToServer(%1) - failed to start uploading file=%2 reason=%3",
         package.file, localFile, config.errorMessage);
-    if (package.component == update::Component::client)
-        m_completeClientUploads.insert(id);
-    else
-        m_completedUploads.insert(id);
+    m_completedUploads.insert(id);
     return false;
 }
 
@@ -648,22 +669,11 @@ void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& s
 
 void ServerUpdateTool::markUploadCompleted(const QString& uploadId)
 {
-    if (m_activeClientUploads.contains(uploadId))
-    {
-        m_activeClientUploads.erase(uploadId);
-        m_completeClientUploads.insert(uploadId);
-    }
-    else
-    {
-        m_activeUploads.erase(uploadId);
-        m_completedUploads.insert(uploadId);
-    }
+    m_activeUploads.erase(uploadId);
+    m_completedUploads.insert(uploadId);
 
-    if (m_activeUploads.empty() && !m_completedUploads.empty()
-        && m_activeClientUploads.empty() && !m_completeClientUploads.empty())
-    {
+    if (m_activeUploads.empty() && !m_completedUploads.empty())
         changeUploadState(OfflineUpdateState::done);
-    }
 }
 
 bool ServerUpdateTool::hasActiveUploadsTo(const QnUuid& id) const
@@ -675,7 +685,7 @@ bool ServerUpdateTool::hasActiveUploadsTo(const QnUuid& id) const
         });
 }
 
-bool ServerUpdateTool::startUpload(const UpdateContents& contents, bool cleanExisting)
+bool ServerUpdateTool::startUpload(const UpdateContents& contents, bool cleanExisting, bool force)
 {
     NX_VERBOSE(this, "startUpload() clean=%1", cleanExisting);
     QnMediaServerResourceList recipients = getServersForUpload();
@@ -693,13 +703,11 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents, bool cleanExi
 
         m_activeUploads.clear();
         m_completedUploads.clear();
-        m_activeClientUploads.clear();
-        m_completeClientUploads.clear();
         m_uploadStateById.clear();
     }
 
     int toUpload = 0;
-    if (contents.filesToUpload.isEmpty())
+    if (!force && contents.filesToUpload.isEmpty())
     {
         NX_WARNING(this, "startUpload(%1) - nothing to upload", contents.info.version);
     }
@@ -712,15 +720,10 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents, bool cleanExi
     if (toUpload > 0)
         NX_VERBOSE(this, "startUpload(%1) - started %2 uploads", contents.info.version, toUpload);
 
-    if (m_activeUploads.empty() && !m_completedUploads.empty()
-        && m_activeClientUploads.empty() && !m_completeClientUploads.empty())
-    {
+    if (m_activeUploads.empty() && !m_completedUploads.empty())
         changeUploadState(OfflineUpdateState::done);
-    }
     else
-    {
         changeUploadState(OfflineUpdateState::push);
-    }
 
     return true;
 }
@@ -735,8 +738,6 @@ void ServerUpdateTool::stopAllUploads()
 
     m_activeUploads.clear();
     m_completedUploads.clear();
-    m_activeClientUploads.clear();
-    m_completeClientUploads.clear();
     m_uploadStateById.clear();
     NX_VERBOSE(this) << "stopUpload()";
     changeUploadState(OfflineUpdateState::ready);
@@ -779,8 +780,6 @@ void ServerUpdateTool::stopUploadsToServer(const QnUuid &peer)
         m_uploadManager->cancelUpload(id);
         m_completedUploads.erase(id);
         m_activeUploads.erase(id);
-        m_activeClientUploads.erase(id);
-        m_completeClientUploads.erase(id);
         m_uploadStateById.erase(id);
     }
 }
@@ -820,23 +819,6 @@ void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
     progress.current += 100 * m_completeDownloads.size();
     progress.done += m_completeDownloads.size();
     progress.max += 100 * m_issuedDownloads.size();
-}
-
-void ServerUpdateTool::calculateClientUploadProgress(ProgressInfo& progress)
-{
-    progress.uploadingClientUpdates = !m_activeClientUploads.empty();
-
-    for (const QString& id: m_activeClientUploads)
-    {
-        const auto state = m_uploadManager->state(id);
-        if (state.size == 0)
-            progress.current += 100;
-        else
-            progress.current += (int) (state.uploaded * 100 / state.size);
-    }
-
-    progress.current += 100 * m_completeClientUploads.size();
-    progress.max += 100 * (m_activeClientUploads.size() + m_completeClientUploads.size());
 }
 
 bool ServerUpdateTool::hasRemoteChanges() const
@@ -1343,41 +1325,6 @@ std::future<ServerUpdateTool::RemoteStatus> ServerUpdateTool::requestRemoteUpdat
     return promise->get_future();
 }
 
-std::future<ServerUpdateTool::ClientPackageStatus> ServerUpdateTool::requestClientPackageStatus()
-{
-    auto promise = std::make_shared<std::promise<ClientPackageStatus>>();
-
-    if (auto connection = connectedServerApi())
-    {
-        connection->getRawResult("/rest/v2/update/status/clientPackages", {},
-            [this, promise, tool = QPointer<ServerUpdateTool>(this)](
-                 bool success,
-                 rest::Handle,
-                 const QByteArray& data,
-                 nx::network::http::HttpHeaders)
-            {
-                if (success)
-                {
-                    ClientPackageStatus status;
-                    if (QJson::deserialize(data, &status))
-                    {
-                        promise->set_value(status);
-                        return;
-                    }
-                }
-
-                NX_DEBUG(this, "Cannot get client packages status");
-                promise->set_value({});
-            }, thread());
-    }
-    else
-    {
-        promise->set_value({});
-    }
-
-    return promise->get_future();
-}
-
 std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
 {
     return m_stateTracker;
@@ -1452,7 +1399,7 @@ void ServerUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             emit packageDownloadFailed(*package, "Update file is corrupted");
             break;
         case FileInformation::Status::downloading:
-            it->second = fileInformation.calculateDownloadProgress();
+            it->second = fileInformation.downloadProgress();
             break;
         default:
             // Nothing to do here
