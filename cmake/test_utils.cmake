@@ -3,9 +3,7 @@
 enable_testing()
 
 add_custom_target(unit_tests)
-set_target_properties(unit_tests PROPERTIES
-    FOLDER utils
-    TESTS "")
+set_target_properties(unit_tests PROPERTIES FOLDER utils)
 
 set(testTempDirectory "${CMAKE_BINARY_DIR}" CACHE STRING "Temp directory for running tests.")
 set(testMetaInformationFile "${CMAKE_BINARY_DIR}/unit_tests_info.yml")
