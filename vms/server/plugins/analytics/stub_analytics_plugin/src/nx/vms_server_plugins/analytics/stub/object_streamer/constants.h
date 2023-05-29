@@ -26,6 +26,7 @@ extern const std::string kTimestampUsField;
 extern const std::string kEntryTypeField;
 extern const std::string kImageSourceField;
 
+extern const std::string kRegularEntryType;
 extern const std::string kBestShotEntryType;
 
 extern const std::string kDefaultManifestFile;
