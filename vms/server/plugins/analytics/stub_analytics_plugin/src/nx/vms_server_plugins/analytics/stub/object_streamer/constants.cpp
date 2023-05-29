@@ -24,6 +24,7 @@ const std::string kTimestampUsField = "timestampUs";
 const std::string kEntryTypeField = "entryType";
 const std::string kImageSourceField = "imageSource";
 
+const std::string kRegularEntryType = "regular";
 const std::string kBestShotEntryType = "bestShot";
 
 const std::string kDefaultManifestFile = "manifest.json";
