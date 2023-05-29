@@ -9,7 +9,10 @@
 #include <nx/kit/debug.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 
+#include "stub_analytics_plugin_object_streamer_ini.h"
+
 using nx::kit::Json;
+using nx::kit::jsonTypeToString;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
@@ -18,6 +21,49 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
 namespace object_streamer {
+
+/** Can be called as `return addError(...);`. */
+[[maybe_unused]] static bool addError(
+    Issues* issues, Issue issue, const std::string& context = "")
+{
+    issues->errors.insert(issue);
+    NX_PRINT << "Issue (error): " << issueToString(issue)
+        << (context.empty()? "" : (". Context: " + context));
+    return false;
+}
+
+/** Can be called as `return addWarning(...);`. */
+[[maybe_unused]] static bool addWarning(
+    Issues* issues, Issue issue, const std::string& context = "")
+{
+    issues->warnings.insert(issue);
+    NX_PRINT << "Issue (warning): " << issueToString(issue)
+        << (context.empty()? "" : (". Context: " + context));
+    return true;
+}
+
+static std::string dumpRect(const Rect& rect)
+{
+    return "Rect(x: " + std::to_string(rect.x) + ", y: " + std::to_string(rect.y)
+        + ", width: " + std::to_string(rect.width) + ", height: " + std::to_string(rect.height)
+        + ")";
+}
+
+/** Performs C-escaping to reveal control characters and other potential issues in the JSON. */
+static std::string dumpJson(const Json& json)
+{
+    static const int kMaxJsonDumpSize = 99; //< Too long JSON values will be truncated in the log.
+    std::string dump = json.dump();
+    if (dump.size() > kMaxJsonDumpSize)
+        dump = dump.substr(0, kMaxJsonDumpSize) + "...";
+    return "JSON " + jsonTypeToString(json.type()) + " " + nx::kit::utils::toString(dump);
+}
+
+/** Performs C-escaping to reveal control characters and other potential issues in the string. */
+static std::string dumpString(const std::string& s)
+{
+    return nx::kit::utils::toString(s);
+}
 
 StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* issues)
 {
@@ -28,13 +74,13 @@ StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* issues)
 
     if (!error.empty() && json.is_null())
     {
-        issues->errors.insert(Issue::objectStreamIsNotAValidJson);
+        addError(issues, Issue::objectStreamIsNotAValidJson);
         return {};
     }
 
     if (!json.is_array())
     {
-        issues->errors.insert(Issue::objectStreamIsNotAJsonArray);
+        addError(issues, Issue::objectStreamIsNotAJsonArray, dumpJson(json));
         return {};
     }
 
@@ -43,7 +89,7 @@ StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* issues)
     {
         if (!objectDescription.is_object())
         {
-            issues->errors.insert(Issue::objectItemIsNotAJsonObject);
+            addError(issues, Issue::objectItemIsNotAJsonObject, dumpJson(objectDescription));
             continue;
         }
 
@@ -74,13 +120,11 @@ bool parseTrackId(
     Object* outObject,
     Issues* issues)
 {
-    if (!objectDescription[kTrackIdField].is_string())
-    {
-        issues->errors.insert(Issue::trackIdIsNotAString);
-        return false;
-    }
+    const Json& trackId = objectDescription[kTrackIdField];
+    if (!trackId.is_string())
+        return addError(issues, Issue::trackIdIsNotAString, dumpJson(trackId));
 
-    const std::string& trackIdString = objectDescription[kTrackIdField].string_value();
+    const std::string& trackIdString = trackId.string_value();
     if (startsWith(trackIdString, kAutoTrackIdPerDeviceAgentCreationPrefix)
         || startsWith(trackIdString, kAutoTrackIdPerStreamCyclePrefix))
     {
@@ -89,12 +133,9 @@ bool parseTrackId(
         return true;
     }
 
-    outObject->trackId = UuidHelper::fromStdString(objectDescription[kTrackIdField].string_value());
+    outObject->trackId = UuidHelper::fromStdString(trackIdString);
     if (outObject->trackId.isNull())
-    {
-        issues->errors.insert(Issue::trackIdIsNotAUuid);
-        return false;
-    }
+        return addError(issues, Issue::trackIdIsNotAUuid, dumpString(trackIdString));
 
     return true;
 }
@@ -104,34 +145,30 @@ bool parseCommonFields(
     Object* outObject,
     Issues* issues)
 {
-    if (!objectDescription[kTypeIdField].is_string())
-    {
-        issues->errors.insert(Issue::typeIdIsNotAString);
-        return false;
-    }
-    outObject->typeId = objectDescription[kTypeIdField].string_value();
+    const Json& typeId = objectDescription[kTypeIdField];
+    if (!typeId.is_string())
+        return addError(issues, Issue::typeIdIsNotAString, dumpJson(typeId));
+    outObject->typeId = typeId.string_value();
 
-    if (!objectDescription[kFrameNumberField].is_number())
-    {
-        issues->errors.insert(Issue::frameNumberIsNotANumber);
-        return false;
-    }
-    outObject->frameNumberToGenerateObject = objectDescription[kFrameNumberField].int_value();
+    const Json& frameNumber = objectDescription[kFrameNumberField];
+    if (!frameNumber.is_number())
+        return addError(issues, Issue::frameNumberIsNotANumber, dumpJson(frameNumber));
+    outObject->frameNumberToGenerateObject = frameNumber.int_value();
 
     outObject->entryType = Object::EntryType::regular;
-    if (!objectDescription[kEntryTypeField].is_string())
+    const Json& entryType = objectDescription[kEntryTypeField];
+    if (entryType.is_string())
     {
-        issues->warnings.insert(Issue::objectEntryTypeIsNotAString);
-    }
-    else
-    {
-        const std::string& entryType = objectDescription[kEntryTypeField].string_value();
-        if (entryType == kBestShotEntryType)
+        const std::string& entryTypeString = entryType.string_value();
+        if (entryTypeString == kBestShotEntryType)
             outObject->entryType = Object::EntryType::bestShot;
-        else if (entryType != kRegularEntryType && !entryType.empty())
-            issues->warnings.insert(Issue::objectEntryTypeIsUnknown);
+        else if (entryTypeString != kRegularEntryType && !entryTypeString.empty())
+            addWarning(issues, Issue::objectEntryTypeIsUnknown, dumpString(entryTypeString));
     }
-
+    else if (!entryType.is_null())
+    {
+        addWarning(issues, Issue::objectEntryTypeIsNotAString, dumpJson(entryType));
+    }
     return true;
 }
 
@@ -140,47 +177,33 @@ bool parseBoundingBox(
     Rect* outBoundingBox,
     Issues* issues)
 {
-    if (!objectDescription[kBoundingBoxField].is_object())
+    const Json& boundingBox = objectDescription[kBoundingBoxField];
+    if (!boundingBox.is_object())
+        return addError(issues, Issue::boundingBoxIsNotAJsonObject, dumpJson(boundingBox));
+
+    const auto& parseParam = 
+        [&boundingBox, &issues](float* outValue, const std::string& fieldName, Issue issue) -> bool
+        {
+            const Json& value = boundingBox[fieldName];
+            if (!value.is_number())
+                return addError(issues, issue, dumpJson(value));
+            *outValue = (float) value.number_value();
+            return true;
+        };
+
+    if (!parseParam(&outBoundingBox->x, kTopLeftXField, Issue::topLeftXIsNotANumber)
+        || !parseParam(&outBoundingBox->y, kTopLeftYField, Issue::topLeftYIsNotANumber)
+        || !parseParam(&outBoundingBox->width, kWidthField, Issue::widthIsNotANumber)
+        || !parseParam(&outBoundingBox->height, kHeightField, Issue::heightIsNotANumber))
     {
-        issues->errors.insert(Issue::boundingBoxIsNotAJsonObject);
         return false;
     }
-
-    const Json boundingBox = objectDescription[kBoundingBoxField];
-    if (!boundingBox[kTopLeftXField].is_number())
-    {
-        issues->errors.insert(Issue::topLeftXIsNotANumber);
-        return false;
-    }
-
-    if (!boundingBox[kTopLeftYField].is_number())
-    {
-        issues->errors.insert(Issue::topLeftYIsNotANumber);
-        return false;
-    }
-
-    if (!boundingBox[kWidthField].is_number())
-    {
-        issues->errors.insert(Issue::widthIsNotANumber);
-        return false;
-    }
-
-    if (!boundingBox[kHeightField].is_number())
-    {
-        issues->errors.insert(Issue::heightIsNotANumber);
-        return false;
-    }
-
-    outBoundingBox->x = (float) boundingBox[kTopLeftXField].number_value();
-    outBoundingBox->y = (float) boundingBox[kTopLeftYField].number_value();
-    outBoundingBox->width = (float) boundingBox[kWidthField].number_value();
-    outBoundingBox->height = (float) boundingBox[kHeightField].number_value();
 
     if (outBoundingBox->x < 0 || outBoundingBox->y < 0
         || outBoundingBox->x + outBoundingBox->width > 1
         || outBoundingBox->y + outBoundingBox->height > 1)
     {
-        issues->warnings.insert(Issue::objectIsOutOfBounds);
+        addWarning(issues, Issue::objectIsOutOfBounds, dumpRect(*outBoundingBox));
     }
 
     return true;
@@ -191,23 +214,19 @@ bool parseAttributes(
     std::map<std::string, std::string>* outAttributes,
     Issues* issues)
 {
-    if (objectDescription[kAttributesField].is_object())
-    {
-        const Json::object attributes = objectDescription[kAttributesField].object_items();
-        for (const auto& item: attributes)
-        {
-            if (!item.second.is_string())
-            {
-                issues->warnings.insert(Issue::attributeValueIsNotAString);
-                continue;
-            }
+    const Json& attributes = objectDescription[kAttributesField];
+    if (!attributes.is_object())
+        return addWarning(issues, Issue::attributesFieldIsNotAJsonObject, dumpJson(attributes));
 
-            (*outAttributes)[item.first] = item.second.string_value();
-        }
-    }
-    else if (!objectDescription[kAttributesField].is_object())
+    for (const auto& item: attributes.object_items())
     {
-        issues->warnings.insert(Issue::attributesFieldIsNotAJsonObject);
+        if (!item.second.is_string())
+        {
+            addWarning(issues, Issue::attributeValueIsNotAString, dumpJson(item.second));
+            continue;
+        }
+
+        (*outAttributes)[item.first] = item.second.string_value();
     }
 
     return true;
@@ -218,10 +237,11 @@ bool parseTimestamp(
     int64_t* outTimestampUs,
     Issues* issues)
 {
-    if (objectDescription[kTimestampUsField].is_number())
-        *outTimestampUs = (int64_t) objectDescription[kTimestampUsField].number_value();
-    else if (!objectDescription[kTimestampUsField].is_null())
-        issues->warnings.insert(Issue::timestampIsNotANumber);
+    const Json& timestampUs = objectDescription[kTimestampUsField];
+    if (timestampUs.is_number())
+        *outTimestampUs = (int64_t) timestampUs.number_value();
+    else if (!timestampUs.is_null())
+        addWarning(issues, Issue::timestampIsNotANumber, dumpJson(timestampUs));
 
     return true;
 }
@@ -229,12 +249,14 @@ bool parseTimestamp(
 bool parseImageSource(
     const Json& objectDescription,
     std::string* outImageSource,
-    Issues*)
+    Issues* issues)
 {
-    if (!objectDescription[kEntryTypeField].is_string())
-        return true;
+    const Json& imageSource = objectDescription[kImageSourceField];
+    if (imageSource.is_string())
+        *outImageSource = objectDescription[kImageSourceField].string_value();
+    else if (!imageSource.is_null())
+        addWarning(issues, Issue::imageSourceIsNotAString);
 
-    *outImageSource = objectDescription[kImageSourceField].string_value();
     return true;
 }
 
@@ -278,6 +300,8 @@ std::string issueToString(Issue issue)
             return "Entry type of some Items in the Object stream is not a string";
         case Issue::objectEntryTypeIsUnknown:
             return "Entry type of some Items in the Object stream is invalid";
+        case Issue::imageSourceIsNotAString:
+            return "Image source of some Items in the Object stream is not a string";
         default:
             NX_KIT_ASSERT(false, "Unexpected issue");
             return {};
