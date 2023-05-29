@@ -56,6 +56,7 @@ enum class Issue
     timestampIsNotANumber,
     objectEntryTypeIsNotAString,
     objectEntryTypeIsUnknown,
+    imageSourceIsNotAString,
 };
 
 struct Issues
