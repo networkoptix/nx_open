@@ -60,3 +60,14 @@ using namespace detail::json11; //< Allow to refer to the Json11 class as nx::ki
 
 } // namespace kit
 } // namespace nx
+
+//-------------------------------------------------------------------------------------------------
+// Additional features.
+
+namespace nx {
+namespace kit {
+
+NX_KIT_API std::string jsonTypeToString(Json::Type type);
+
+} // namespace kit
+} // namespace nx
