@@ -68,37 +68,37 @@ struct StreamInfo
     std::set<std::string> objectTypeIds;
 };
 
-StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* outIssues);
+StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* issues);
 
 bool parseTrackId(
     const nx::kit::Json& objectDescription,
     Object* outObject,
-    Issues* outIssues);
+    Issues* issues);
 
 bool parseCommonFields(
     const nx::kit::Json& objectDescription,
     Object* outObject,
-    Issues* outIssues);
+    Issues* issues);
 
 bool parseBoundingBox(
     const nx::kit::Json& objectDescription,
     nx::sdk::analytics::Rect* outBoundingBox,
-    Issues* outIssues);
+    Issues* issues);
 
 bool parseAttributes(
     const nx::kit::Json& objectDescription,
     std::map<std::string, std::string>* outAttributes,
-    Issues* outIssues);
+    Issues* issues);
 
 bool parseTimestamp(
     const nx::kit::Json& objectDescription,
     int64_t* outTimestamp,
-    Issues* outIssues);
+    Issues* issues);
 
 bool parseImageSource(
     const nx::kit::Json& objectDescription,
     std::string* outImageSource,
-    Issues* outIssues);
+    Issues* issues);
 
 std::string issueToString(Issue issue);
 

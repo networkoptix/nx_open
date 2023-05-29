@@ -19,7 +19,7 @@ namespace analytics {
 namespace stub {
 namespace object_streamer {
 
-StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* outIssues)
+StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* issues)
 {
     const std::string jsonString = readFileToString(filePath);
 
@@ -28,13 +28,13 @@ StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* outIssues)
 
     if (!error.empty() && json.is_null())
     {
-        outIssues->errors.insert(Issue::objectStreamIsNotAValidJson);
+        issues->errors.insert(Issue::objectStreamIsNotAValidJson);
         return {};
     }
 
     if (!json.is_array())
     {
-        outIssues->errors.insert(Issue::objectStreamIsNotAJsonArray);
+        issues->errors.insert(Issue::objectStreamIsNotAJsonArray);
         return {};
     }
 
@@ -43,22 +43,22 @@ StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* outIssues)
     {
         if (!objectDescription.is_object())
         {
-            outIssues->errors.insert(Issue::objectItemIsNotAJsonObject);
+            issues->errors.insert(Issue::objectItemIsNotAJsonObject);
             continue;
         }
 
         Object object;
-        if (!parseTrackId(objectDescription, &object, outIssues))
+        if (!parseTrackId(objectDescription, &object, issues))
             continue;
-        if (!parseCommonFields(objectDescription, &object, outIssues))
+        if (!parseCommonFields(objectDescription, &object, issues))
             continue;
-        if (!parseBoundingBox(objectDescription, &object.boundingBox, outIssues))
+        if (!parseBoundingBox(objectDescription, &object.boundingBox, issues))
             continue;
-        if (!parseAttributes(objectDescription, &object.attributes, outIssues))
+        if (!parseAttributes(objectDescription, &object.attributes, issues))
             continue;
-        if (!parseTimestamp(objectDescription, &object.timestampUs, outIssues))
+        if (!parseTimestamp(objectDescription, &object.timestampUs, issues))
             continue;
-        if (!parseImageSource(objectDescription, &object.imageSource, outIssues))
+        if (!parseImageSource(objectDescription, &object.imageSource, issues))
             continue;
 
         result.objectTypeIds.insert(object.typeId);
@@ -69,11 +69,14 @@ StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* outIssues)
     return result;
 }
 
-bool parseTrackId(const Json& objectDescription, Object* outObject, Issues* outIssues)
+bool parseTrackId(
+    const Json& objectDescription,
+    Object* outObject,
+    Issues* issues)
 {
     if (!objectDescription[kTrackIdField].is_string())
     {
-        outIssues->errors.insert(Issue::trackIdIsNotAString);
+        issues->errors.insert(Issue::trackIdIsNotAString);
         return false;
     }
 
@@ -89,7 +92,7 @@ bool parseTrackId(const Json& objectDescription, Object* outObject, Issues* outI
     outObject->trackId = UuidHelper::fromStdString(objectDescription[kTrackIdField].string_value());
     if (outObject->trackId.isNull())
     {
-        outIssues->errors.insert(Issue::trackIdIsNotAUuid);
+        issues->errors.insert(Issue::trackIdIsNotAUuid);
         return false;
     }
 
@@ -97,13 +100,13 @@ bool parseTrackId(const Json& objectDescription, Object* outObject, Issues* outI
 }
 
 bool parseCommonFields(
-    const nx::kit::Json& objectDescription,
+    const Json& objectDescription,
     Object* outObject,
-    Issues* outIssues)
+    Issues* issues)
 {
     if (!objectDescription[kTypeIdField].is_string())
     {
-        outIssues->errors.insert(Issue::typeIdIsNotAString);
+        issues->errors.insert(Issue::typeIdIsNotAString);
         return false;
     }
 
@@ -111,7 +114,7 @@ bool parseCommonFields(
 
     if (!objectDescription[kFrameNumberField].is_number())
     {
-        outIssues->errors.insert(Issue::frameNumberIsNotANumber);
+        issues->errors.insert(Issue::frameNumberIsNotANumber);
         return false;
     }
 
@@ -130,41 +133,41 @@ bool parseCommonFields(
 bool parseBoundingBox(
     const Json& objectDescription,
     Rect* outBoundingBox,
-    Issues* outIssues)
+    Issues* issues)
 {
     if (!objectDescription[kBoundingBoxField].is_object())
     {
-        outIssues->errors.insert(Issue::boundingBoxIsNotAJsonObject);
+        issues->errors.insert(Issue::boundingBoxIsNotAJsonObject);
         return false;
     }
 
     const Json boundingBox = objectDescription[kBoundingBoxField];
     if (!boundingBox[kTopLeftXField].is_number())
     {
-        outIssues->errors.insert(Issue::topLeftXIsNotANumber);
+        issues->errors.insert(Issue::topLeftXIsNotANumber);
         return false;
     }
 
-    if (!boundingBox[kTopLeftYfield].is_number())
+    if (!boundingBox[kTopLeftYField].is_number())
     {
-        outIssues->errors.insert(Issue::topLeftYIsNotANumber);
+        issues->errors.insert(Issue::topLeftYIsNotANumber);
         return false;
     }
 
     if (!boundingBox[kWidthField].is_number())
     {
-        outIssues->errors.insert(Issue::widthIsNotANumber);
+        issues->errors.insert(Issue::widthIsNotANumber);
         return false;
     }
 
     if (!boundingBox[kHeightField].is_number())
     {
-        outIssues->errors.insert(Issue::heightIsNotANumber);
+        issues->errors.insert(Issue::heightIsNotANumber);
         return false;
     }
 
     outBoundingBox->x = (float) boundingBox[kTopLeftXField].number_value();
-    outBoundingBox->y = (float) boundingBox[kTopLeftYfield].number_value();
+    outBoundingBox->y = (float) boundingBox[kTopLeftYField].number_value();
     outBoundingBox->width = (float) boundingBox[kWidthField].number_value();
     outBoundingBox->height = (float) boundingBox[kHeightField].number_value();
 
@@ -172,7 +175,7 @@ bool parseBoundingBox(
         || outBoundingBox->x + outBoundingBox->width > 1
         || outBoundingBox->y + outBoundingBox->height > 1)
     {
-        outIssues->warnings.insert(Issue::objectIsOutOfBounds);
+        issues->warnings.insert(Issue::objectIsOutOfBounds);
     }
 
     return true;
@@ -181,7 +184,7 @@ bool parseBoundingBox(
 bool parseAttributes(
     const Json& objectDescription,
     std::map<std::string, std::string>* outAttributes,
-    Issues* outIssues)
+    Issues* issues)
 {
     if (objectDescription[kAttributesField].is_object())
     {
@@ -190,7 +193,7 @@ bool parseAttributes(
         {
             if (!item.second.is_string())
             {
-                outIssues->warnings.insert(Issue::attributeValueIsNotAString);
+                issues->warnings.insert(Issue::attributeValueIsNotAString);
                 continue;
             }
 
@@ -199,29 +202,29 @@ bool parseAttributes(
     }
     else if (!objectDescription[kAttributesField].is_object())
     {
-        outIssues->warnings.insert(Issue::attributesFieldIsNotAJsonObject);
+        issues->warnings.insert(Issue::attributesFieldIsNotAJsonObject);
     }
 
     return true;
 }
 
 bool parseTimestamp(
-    const nx::kit::Json& objectDescription,
+    const Json& objectDescription,
     int64_t* outTimestampUs,
-    Issues* outIssues)
+    Issues* issues)
 {
     if (objectDescription[kTimestampUsField].is_number())
         *outTimestampUs = (int64_t) objectDescription[kTimestampUsField].number_value();
     else if (!objectDescription[kTimestampUsField].is_null())
-        outIssues->warnings.insert(Issue::timestampIsNotANumber);
+        issues->warnings.insert(Issue::timestampIsNotANumber);
 
     return true;
 }
 
 bool parseImageSource(
-    const nx::kit::Json& objectDescription,
+    const Json& objectDescription,
     std::string* outImageSource,
-    Issues* /*outIssues*/)
+    Issues*)
 {
     if (!objectDescription[kEntryTypeField].is_string())
         return true;
