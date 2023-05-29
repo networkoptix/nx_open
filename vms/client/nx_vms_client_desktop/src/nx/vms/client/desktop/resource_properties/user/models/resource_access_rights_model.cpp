@@ -438,12 +438,7 @@ void ResourceAccessRightsModel::Private::updateInfo(bool suppressSignals)
             }
 
             const auto details = context->accessDetails(resource, accessRightList[i]);
-
-            if (details.empty())
-            {
-                newInfo.providedVia = ResourceAccessInfo::ProvidedVia::none;
-            }
-            else if (details.contains(context->currentSubjectId()))
+            if (details.contains(context->currentSubjectId()))
             {
                 const auto providers = details.value(context->currentSubjectId());
                 if (providers.contains(resource))
@@ -493,7 +488,7 @@ void ResourceAccessRightsModel::Private::updateInfo(bool suppressSignals)
                     }
                 }
             }
-            else
+            else if (!details.empty())
             {
                 newInfo.providedVia = ResourceAccessInfo::ProvidedVia::parentUserGroup;
 

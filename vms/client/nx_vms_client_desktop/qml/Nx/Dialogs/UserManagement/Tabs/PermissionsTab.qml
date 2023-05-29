@@ -204,7 +204,7 @@ Item
             x: accessRightsHeader.x - tree.x + 1
             y: 1
             width: accessRightsHeader.width
-            height: tree.height - 1
+            height: Math.max(tree.height - 1, 0)
 
             hoverEnabled: false
             propagateComposedEvents: true
@@ -248,6 +248,10 @@ Item
                     selectionArea.start = Qt.point(
                         pressPosition.x,
                         pressPosition.y - tree.contentItem.y)
+
+                    selectionValue = !(tree.hoveredCell
+                        && tree.hoveredRow.resource
+                        && tree.hoveredCell.isToggledOn())
                 }
 
                 onFinished:
@@ -304,9 +308,13 @@ Item
                 id: selectionFrame
 
                 visible: frameSelector.dragging
-                color: ColorTheme.transparent(ColorTheme.colors.brand_core, 0.2)
-                border.color: ColorTheme.colors.brand_core
                 z: 2
+
+                color: ColorTheme.transparent(border.color, 0.2)
+
+                border.color: frameSelector.selectionValue
+                    ? ColorTheme.colors.brand_core
+                    : ColorTheme.colors.light16
 
                 x: selectionArea.frameRect.left
                 y: selectionArea.frameRect.top

@@ -101,7 +101,7 @@ Item
                     GlobalToolTip.enabled: !delegateRoot.frameSelectionActive
                     GlobalToolTip.text:
                     {
-                        if (cell.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup
+                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup
                             && delegateRoot.editingEnabled)
                         {
                             return qsTr("Access granted by parent node. Deselect it to enable editing")
@@ -126,13 +126,6 @@ Item
                         && Geometry.intersects(frameSelectionRect, cellsRow.mapToItem(delegateRoot,
                             cell.x, cell.y, cell.width, cell.height))
 
-                    readonly property int providedVia:
-                    {
-                        return frameSelected
-                            ? ResourceAccessInfo.ProvidedVia.own
-                            : model.providedVia
-                    }
-
                     // Highlighted to indicate that a mouse click at current mouse position
                     // or applying current frame selection shall affect this cell.
                     readonly property bool highlighted:
@@ -141,14 +134,18 @@ Item
                         if (!context || !toggleable)
                             return false
 
-                        // Highlight directly hovered or directly frame-selected cell.
-                        if ((delegateRoot.enabled && containsMouse) || frameSelected)
+                        // Highlight directly hovered cell.
+                        if (delegateRoot.enabled && containsMouse)
+                            return true
+
+                        const toggledOn = isToggledOn()
+
+                        // Highlight frame-selected cell.
+                        if (frameSelected && frameSelectionValue != toggledOn)
                             return true
 
                         if (!delegateRoot.automaticDependencies)
                             return false
-
-                        const toggledOn = isToggledOn()
 
                         // Highlight access rights dependency for current frame selection.
                         if (frameSelectionActive && frameSelectionValue != toggledOn)
@@ -176,10 +173,10 @@ Item
                         if (!delegateRoot.editingEnabled)
                             return ColorTheme.colors.dark7
 
-                        if (cell.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
+                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
                             return ColorTheme.transparent(ColorTheme.colors.brand_core, 0.12)
 
-                        if (cell.providedVia == ResourceAccessInfo.ProvidedVia.own)
+                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.own)
                         {
                             return cell.highlighted
                                 ? ColorTheme.transparent(ColorTheme.colors.brand_core, 0.6)
@@ -195,18 +192,18 @@ Item
                     {
                         if (!delegateRoot.editingEnabled)
                         {
-                            if (cell.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
+                            if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
                                 return ColorTheme.colors.dark13
 
-                            return cell.providedVia == ResourceAccessInfo.ProvidedVia.own
+                            return model.providedVia == ResourceAccessInfo.ProvidedVia.own
                                 ? ColorTheme.colors.brand_core
                                 : ColorTheme.colors.light16
                         }
 
-                        if (cell.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
+                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
                             return ColorTheme.transparent(ColorTheme.colors.light13, 0.3)
 
-                        if (cell.providedVia == ResourceAccessInfo.ProvidedVia.own)
+                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.own)
                         {
                             return cell.highlighted
                                 ? ColorTheme.colors.light4
@@ -300,8 +297,8 @@ Item
                                 verticalAlignment: Qt.AlignVCenter
 
                                 visible: accessRightsModel.isResourceGroup
-                                    && cell.providedVia != ResourceAccessInfo.ProvidedVia.own
-                                    && cell.providedVia !=
+                                    && model.providedVia != ResourceAccessInfo.ProvidedVia.own
+                                    && model.providedVia !=
                                             ResourceAccessInfo.ProvidedVia.ownResourceGroup
                                     && model.checkedChildCount
 
