@@ -19,7 +19,7 @@ extern const std::string kFrameNumberField;
 extern const std::string kAttributesField;
 extern const std::string kBoundingBoxField;
 extern const std::string kTopLeftXField;
-extern const std::string kTopLeftYfield;
+extern const std::string kTopLeftYField;
 extern const std::string kWidthField;
 extern const std::string kHeightField;
 extern const std::string kTimestampUsField;
