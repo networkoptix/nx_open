@@ -37,7 +37,7 @@ public:
     };
     Q_ENUM(ProvidedVia);
 
-    ProvidedVia providedVia{};
+    ProvidedVia providedVia{ProvidedVia::none};
     QVector<QnUuid> providerUserGroups;
     QVector<QnResourcePtr> indirectProviders;
     int checkedChildCount = 0;
