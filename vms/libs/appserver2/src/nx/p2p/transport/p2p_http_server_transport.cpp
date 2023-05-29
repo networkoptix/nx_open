@@ -204,7 +204,7 @@ void P2PHttpServerTransport::onRead(SystemError::ErrorCode error, size_t transfe
         return;
     }
 
-    NX_VERBOSE(this, "%1: Read %2 bytes. buf: %3", __func__, transferred, m_readBuffer);
+    NX_VERBOSE(this, "%1: Read %2 bytes", __func__, transferred);
     size_t bytesProcessed = 0;
     while (true)
     {
@@ -390,7 +390,8 @@ void P2PHttpServerTransport::sendNextMessage()
         return;
     }
 
-    const auto& next = m_outgoingMessageQueue.front();
+    auto next = std::move(m_outgoingMessageQueue.front());
+    m_outgoingMessageQueue.pop();
     if (m_onGetRequestReceived || m_failed)
     {
         NX_DEBUG(this, "%1: Transport is in the failed state. Can't send anything", __func__);
@@ -422,7 +423,7 @@ void P2PHttpServerTransport::sendNextMessage()
     m_sendInProgress = true;
     m_sendSocket->sendAsync(
         &m_sendBuffer,
-        [this](SystemError::ErrorCode error, size_t transferred)
+        [this, next = std::move(next)](SystemError::ErrorCode error, size_t transferred)
         {
             NX_VERBOSE(
                 this,
@@ -433,11 +434,10 @@ void P2PHttpServerTransport::sendNextMessage()
 
             resetBuffer(&m_sendBuffer);
             utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
-            m_outgoingMessageQueue.front().handler(error, transferred);
+            next.handler(error, transferred);
             if (watcher.interrupted())
                 return;
 
-            m_outgoingMessageQueue.pop();
             m_sendInProgress = false;
             sendNextMessage();
         });
