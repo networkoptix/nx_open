@@ -15,12 +15,33 @@
 #include <limits>
 #include <sstream>
 
+#include <string>
+
 namespace nx {
 namespace kit {
+
 namespace detail {
     
 #include "../../json11/json11.cpp" //< Original Json11 .cpp.
 
 } // namespace detail
+
+//-------------------------------------------------------------------------------------------------
+// Additional features.
+
+std::string jsonTypeToString(Json::Type type)
+{
+    switch (type)
+    {
+        case Json::Type::NUL: return "NUL";
+        case Json::Type::NUMBER: return "NUMBER";
+        case Json::Type::BOOL: return "BOOL";
+        case Json::Type::STRING: return "STRING";
+        case Json::Type::ARRAY: return "ARRAY";
+        case Json::Type::OBJECT: return "OBJECT";
+        default: return "Type(" + std::to_string(type) + ")";
+    }
+}
+
 } // namespace kit
 } // namespace nx
