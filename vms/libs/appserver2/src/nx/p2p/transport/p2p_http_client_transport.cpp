@@ -219,7 +219,8 @@ void P2PHttpClientTransport::sendNextMessage()
         return;
     }
 
-    auto& next = m_outgoingMessageQueue.front();
+    auto next = std::move(m_outgoingMessageQueue.front());
+    m_outgoingMessageQueue.pop();
     if (m_failed)
     {
         NX_DEBUG(this, "%1: Transport is in the failed state. Can't send anything", __func__);
@@ -246,9 +247,8 @@ void P2PHttpClientTransport::sendNextMessage()
     m_sendInProgress = true;
     m_writeHttpClient->doPost(
         m_url,
-        [this]()
+        [this, next = std::move(next)]()
         {
-            const auto& next = m_outgoingMessageQueue.front();
             const bool isResponseValid = m_writeHttpClient->response()
                 && m_writeHttpClient->response()->statusLine.statusCode
                     == network::http::StatusCode::ok;
@@ -272,7 +272,6 @@ void P2PHttpClientTransport::sendNextMessage()
             if (watcher.interrupted())
                 return;
 
-            m_outgoingMessageQueue.pop();
             m_sendInProgress = false;
             sendNextMessage();
         });
@@ -297,8 +296,7 @@ void P2PHttpClientTransport::bindToAioThread(network::aio::AbstractAioThread* ai
 {
     BasicPollable::bindToAioThread(aioThread);
     m_readHttpClient->bindToAioThread(aioThread);
-    if (m_writeHttpClient)
-        m_writeHttpClient->bindToAioThread(aioThread);
+    m_writeHttpClient->bindToAioThread(aioThread);
     m_timer.bindToAioThread(aioThread);
 }
 
@@ -306,8 +304,7 @@ void P2PHttpClientTransport::cancelIoInAioThread(nx::network::aio::EventType eve
 {
     m_timer.cancelSync();
     m_readHttpClient->socket()->cancelIOSync(eventType);
-    if (m_writeHttpClient)
-        m_writeHttpClient->socket()->cancelIOSync(eventType);
+    m_writeHttpClient->socket()->cancelIOSync(eventType);
 }
 
 network::aio::AbstractAioThread* P2PHttpClientTransport::getAioThread() const
