@@ -109,7 +109,6 @@ bool parseCommonFields(
         issues->errors.insert(Issue::typeIdIsNotAString);
         return false;
     }
-
     outObject->typeId = objectDescription[kTypeIdField].string_value();
 
     if (!objectDescription[kFrameNumberField].is_number())
@@ -117,14 +116,20 @@ bool parseCommonFields(
         issues->errors.insert(Issue::frameNumberIsNotANumber);
         return false;
     }
-
     outObject->frameNumberToGenerateObject = objectDescription[kFrameNumberField].int_value();
 
-    if (objectDescription[kEntryTypeField].is_string())
+    outObject->entryType = Object::EntryType::regular;
+    if (!objectDescription[kEntryTypeField].is_string())
+    {
+        issues->warnings.insert(Issue::objectEntryTypeIsNotAString);
+    }
+    else
     {
         const std::string& entryType = objectDescription[kEntryTypeField].string_value();
         if (entryType == kBestShotEntryType)
             outObject->entryType = Object::EntryType::bestShot;
+        else if (entryType != kRegularEntryType && !entryType.empty())
+            issues->warnings.insert(Issue::objectEntryTypeIsUnknown);
     }
 
     return true;
@@ -242,7 +247,7 @@ std::string issueToString(Issue issue)
         case Issue::objectStreamIsNotAJsonArray:
             return "Object stream must be a valid JSON array";
         case Issue::objectItemIsNotAJsonObject:
-            return "Some of items in the Object stream are not valid JSON objects";
+            return "Some items in the Object stream are not valid JSON objects";
         case Issue::trackIdIsNotAString:
             return "Track id of some items in the Object stream is not a string";
         case Issue::trackIdIsNotAUuid:
@@ -269,6 +274,10 @@ std::string issueToString(Issue issue)
             return "Attribute values of some items in the Object stream is not a string";
         case Issue::timestampIsNotANumber:
             return "Timestamp of some items in the Object stream is not a number";
+        case Issue::objectEntryTypeIsNotAString:
+            return "Entry type of some Items in the Object stream is not a string";
+        case Issue::objectEntryTypeIsUnknown:
+            return "Entry type of some Items in the Object stream is invalid";
         default:
             NX_KIT_ASSERT(false, "Unexpected issue");
             return {};

@@ -54,6 +54,8 @@ enum class Issue
     attributesFieldIsNotAJsonObject,
     attributeValueIsNotAString,
     timestampIsNotANumber,
+    objectEntryTypeIsNotAString,
+    objectEntryTypeIsUnknown,
 };
 
 struct Issues
