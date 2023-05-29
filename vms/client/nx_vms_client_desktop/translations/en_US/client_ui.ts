@@ -1035,10 +1035,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>&lt;Message&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Open Folder</source>
         <translation></translation>
     </message>
