@@ -213,7 +213,7 @@ void QnWorkbenchStreamSynchronizer::handleWidget(QnMediaResourceWidget* widget)
 
     // This safety measure is not quite architecturally correct, but should be here until code
     // is cleaned up.
-    const bool isSyncedActually = dynamic_cast<QnSyncPlayArchiveDelegate*>(
+    const bool isSyncedActually = hasArchiveReader && dynamic_cast<QnSyncPlayArchiveDelegate*>(
         widget->display()->archiveReader()->getArchiveDelegate());
 
     if (hasToBeSynced && !isSyncedAlready)
