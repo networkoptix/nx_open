@@ -118,6 +118,19 @@ Item
 
         readonly property real scrollBarWidth: scrollBarVisible ? scrollBar.width : 0
 
+        property var currentSearchRegExp: null
+        onFilterTextChanged:
+        {
+            // Search happens in an escaped text, so also escape filter text here.
+            const escaped = tree.filterText
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+
+            tree.currentSearchRegExp = escaped
+                ? new RegExp(`(${NxGlobals.makeSearchRegExpNoAnchors(escaped)})`, 'i')
+                : ""
+        }
+
         anchors.fill: parent
         anchors.topMargin: accessRightsHeader.height - 4
         anchors.rightMargin: 8 - scrollBarWidth
@@ -170,6 +183,8 @@ Item
             automaticDependencies: automaticDependenciesSwitch.checked
 
             accessRightsList: control.availableAccessRights
+
+            highlightRegExp: tree.currentSearchRegExp
 
             implicitHeight: control.kRowHeight
 
