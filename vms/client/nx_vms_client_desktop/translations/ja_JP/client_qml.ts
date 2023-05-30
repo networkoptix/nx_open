@@ -193,6 +193,13 @@
     </message>
   </context>
   <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>各ボタンを数回押して、これらのボタンの名前を下の表に記入します。</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
@@ -533,6 +540,17 @@
     </message>
   </context>
   <context>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>ジョイスティックを選択してください。</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>デバイスは接続されていません。</translation>
+    </message>
+  </context>
+  <context>
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
@@ -557,6 +575,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>リピート切り替え</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>保存</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>前へ</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>次</translation>
     </message>
   </context>
   <context>
@@ -1017,6 +1050,21 @@ PTZを行います</translation>
     </message>
   </context>
   <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>保存するファイルを選択</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>JSONファイル (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>結果を保存するファイル:</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1314,6 +1362,27 @@ PTZを行います</translation>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
       <translation>%1 にアクセスできません。インターネット接続を確認してください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>ジョイスティックを左右に数回動かしてください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>ジョイスティックを上下に数回動かしてください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>ジョイスティックを時計回りと反時計回りに数回回転させてください。</translation>
     </message>
   </context>
 </TS>

@@ -376,6 +376,13 @@
     </message>
   </context>
   <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Kaldırılmış Kamera</translation>
+    </message>
+  </context>
+  <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
@@ -2336,13 +2343,6 @@
     <message>
       <source>Also play on source camera</source>
       <translation>Kaynak kamerada da oynat</translation>
-    </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-      <source>Removed camera</source>
-      <translation>Kaldırılmış Kamera</translation>
     </message>
   </context>
 </TS>

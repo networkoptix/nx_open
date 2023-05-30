@@ -93,10 +93,6 @@
       <translation>Certificat invalide</translation>
     </message>
     <message>
-      <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>Le certificat du serveur&amp;apos;s a été rejeté.</translation>
-    </message>
-    <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Restaurer la connexion à %1 et réessayer</translation>
@@ -211,6 +207,10 @@
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Vous pouvez activer l'authentification à deux facteurs dans votre %1.</translation>
+    </message>
+    <message>
+      <source>The server&apos;s certificate was rejected.</source>
+      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
     </message>
   </context>
   <context>

@@ -1035,10 +1035,6 @@
       <translation>キャンセル</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Message&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation>フォルダーを開く</translation>
     </message>
@@ -1665,7 +1661,7 @@
     <name>LdapUsersDialog</name>
     <message>
       <source>Fetch Users from LDAP...</source>
-      <translation>LDAPよりユーザー登録...</translation>
+      <translation>LDAPからユーザー登録...</translation>
     </message>
     <message>
       <source>Loading...</source>
@@ -1677,15 +1673,15 @@
     </message>
     <message>
       <source>Role to assign to imported users</source>
-      <translation>インポートしたユーザーに割り当てるロール</translation>
+      <translation>インポートされるユーザーに割り当てるロール</translation>
     </message>
     <message>
       <source>Disable imported users</source>
-      <translation>インポートしたユーザーを無効</translation>
+      <translation>インポートされるユーザーを無効化</translation>
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation>インポートされたユーザーのDigest認証を許可する</translation>
+      <translation>インポートされるユーザーの Digest 認証を許可する</translation>
     </message>
   </context>
   <context>
@@ -2382,7 +2378,7 @@
     </message>
     <message>
       <source>Fetch Users from LDAP...</source>
-      <translation>LDAPよりユーザー登録...</translation>
+      <translation>LDAPからユーザー登録...</translation>
     </message>
   </context>
   <context>

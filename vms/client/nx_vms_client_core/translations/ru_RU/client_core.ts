@@ -93,10 +93,6 @@
       <translation>Неверный сертификат</translation>
     </message>
     <message>
-      <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>Сертификат сервера был отклонен.</translation>
-    </message>
-    <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Восстановите соединение с %1 и повторите попытку</translation>
@@ -211,6 +207,10 @@
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Вы можете включить двухфакторную аутентификацию в вашем %1.</translation>
+    </message>
+    <message>
+      <source>The server&apos;s certificate was rejected.</source>
+      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
     </message>
   </context>
   <context>

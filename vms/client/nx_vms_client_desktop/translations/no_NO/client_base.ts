@@ -11465,6 +11465,10 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Kan ikke finne en ressurs med den angitte IDen.</translation>
     </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation type="unfinished">Cannot add resources from other Systems.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>

@@ -1035,10 +1035,6 @@
       <translation>Hủy bỏ</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Message&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation>Mở thư mục</translation>
     </message>

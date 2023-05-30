@@ -93,10 +93,6 @@
       <translation>Chứng chỉ không hợp lệ</translation>
     </message>
     <message>
-      <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>Chứng chỉ của máy chủ đã bị từ chối.</translation>
-    </message>
-    <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Khôi phục kết nối với %1 và thử lại</translation>
@@ -211,6 +207,10 @@
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Bạn có thể bật xác thực hai yếu tố tại %1.</translation>
+    </message>
+    <message>
+      <source>The server&apos;s certificate was rejected.</source>
+      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
     </message>
   </context>
   <context>

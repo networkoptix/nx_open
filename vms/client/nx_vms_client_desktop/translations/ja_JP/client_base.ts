@@ -3203,7 +3203,7 @@ to %1</source>
     </message>
     <message>
       <source>LDAP user</source>
-      <translation>LDAPサーバー</translation>
+      <translation>LDAP ユーザー</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -3712,27 +3712,27 @@ to %1</source>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
       <translation>
-        <numerusform>テスト成功 %n ユーザー検出</numerusform>
+        <numerusform>テスト正常完了: %n 名のユーザーが見つかりました。</numerusform>
       </translation>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>&quot;検索フィルター&quot; 以外のLDAP設定を変更すると、すべてのLDAPフェッチユーザーの接続が失われます。</translation>
+      <translation>&quot;検索フィルター&quot; 以外のLDAP設定を変更すると、LDAP で取得されたすべてのユーザーの接続が失われます。</translation>
     </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation>設定は無効です</translation>
+      <translation>指定された設定は無効です。</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation>テストを実行できません</translation>
+      <translation>テストを実行できませんでした。</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>タイムアウト</translation>
+      <translation>タイムアウトしました</translation>
     </message>
   </context>
   <context>
@@ -3758,31 +3758,31 @@ to %1</source>
     <name>QnLdapUsersDialog</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation>設定は無効です</translation>
+      <translation>指定された設定は無効です。</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation>テストを実行できません</translation>
+      <translation>テストを実行できませんでした。</translation>
     </message>
     <message>
       <source>Could not load users.</source>
-      <translation>ユーザーがロードできません</translation>
+      <translation>ユーザーを読み込めませんでした。</translation>
     </message>
     <message>
       <source>Error while loading users.</source>
-      <translation>ユーザーロード中にエラーが発生しました.</translation>
+      <translation>ユーザーの読み込み中にエラーが発生しました。</translation>
     </message>
     <message>
       <source>No new users found.</source>
-      <translation>新規ユーザーは検出されませんでした.</translation>
+      <translation>新しいユーザーは見つかりませんでした。</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>タイムアウト</translation>
+      <translation>タイムアウトしました</translation>
     </message>
     <message>
       <source>Import Selected</source>
-      <translation>インポートの選択</translation>
+      <translation>選択した項目をインポート</translation>
     </message>
   </context>
   <context>
@@ -10830,7 +10830,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>LDAP user</source>
-      <translation>LDAPサーバー</translation>
+      <translation>LDAP ユーザー</translation>
     </message>
     <message>
       <source>Login</source>
@@ -11308,6 +11308,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>指定されたIDのリソースが見つかりません。</translation>
+    </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation>他のシステムからリソースを追加することはできません。</translation>
     </message>
   </context>
   <context>

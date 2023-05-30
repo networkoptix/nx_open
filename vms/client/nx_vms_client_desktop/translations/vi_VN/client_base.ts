@@ -11308,6 +11308,10 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Không thể tìm thấy tài nguyên có ID chỉ định.</translation>
     </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation type="unfinished">Cannot add resources from other Systems.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>

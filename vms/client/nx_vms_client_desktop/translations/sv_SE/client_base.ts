@@ -11467,6 +11467,10 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Kan inte hitta en resurs med angivet ID.</translation>
     </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation type="unfinished">Cannot add resources from other Systems.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>

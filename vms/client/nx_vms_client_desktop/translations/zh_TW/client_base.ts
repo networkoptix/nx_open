@@ -11308,6 +11308,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Cannot find a resource with the specified ID.</source>
       <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
     </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation type="unfinished">Cannot add resources from other Systems.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>

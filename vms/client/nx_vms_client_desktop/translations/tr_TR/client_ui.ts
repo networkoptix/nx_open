@@ -1035,10 +1035,6 @@
       <translation>İptal</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Mesaj&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation>Klasör aç</translation>
     </message>

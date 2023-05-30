@@ -1035,10 +1035,6 @@
       <translation>Отмена</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation>Открыть папку</translation>
     </message>

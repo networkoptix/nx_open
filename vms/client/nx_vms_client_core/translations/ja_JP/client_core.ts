@@ -93,10 +93,6 @@
       <translation>無効な証明書</translation>
     </message>
     <message>
-      <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>サーバーの証明書が拒否されました。</translation>
-    </message>
-    <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 への接続を復旧した後、再度お試しください。</translation>
@@ -211,6 +207,10 @@
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>%1 で二要素認証を有効にできます。</translation>
+    </message>
+    <message>
+      <source>The server&apos;s certificate was rejected.</source>
+      <translation>サーバーの証明書が拒否されました。</translation>
     </message>
   </context>
   <context>
