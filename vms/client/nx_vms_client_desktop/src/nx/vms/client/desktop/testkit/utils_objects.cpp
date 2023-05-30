@@ -11,6 +11,7 @@
 
 #include "model_index_wrapper.h"
 #include "tab_item_wrapper.h"
+#include "graphics_item_wrapper.h"
 
 
 namespace nx::vms::client::desktop::testkit::utils {
@@ -90,16 +91,22 @@ QVariantList findAllTabItems(QObject* object, QJSValue parameters)
 QVariantList findAllObjectsInContainer(
     QVariant container,
     QJSValue properties,
-    QSet<QObject*>& visited)
+    QSet<VisitObject>& visited)
 {
     // Check if we are trying to find children of QModelIndex.
     if (const auto wrap = container.value<ModelIndexWrapper>(); wrap.isValid())
         return findAllIndexes(wrap.index().model(), wrap.index(), wrap.container(), properties);
 
+    bool isItemWrapper = false;
+    if (const auto wrap = container.value<GraphicsItemWrapper>(); wrap.object())
+        isItemWrapper = true;
+
     // Setup visiting children of QObject.
     QVariantList result;
 
-    auto containerObject = qvariant_cast<QObject*>(container);
+    auto containerObject = isItemWrapper
+        ? container.value<GraphicsItemWrapper>().object()
+        : qvariant_cast<QObject*>(container);
 
     // Cache some values that would be checked when visiting children objects.
     const auto itemType = properties.property("type");
@@ -113,12 +120,26 @@ QVariantList findAllObjectsInContainer(
 
     const auto selectMatchingObjects =
         [&properties, &result, &visited, containerObject, canBeIndex, textProperty, canBeTabItem]
-        (QObject* object) -> bool
+        (VisitObject visitObject) -> bool
         {
             // Remember visiting this object.
-            if (visited.contains(object))
+            if (visited.contains(visitObject))
                 return false;
-            visited.insert(object);
+            visited.insert(visitObject);
+
+            if (std::holds_alternative<QGraphicsItem*>(visitObject))
+            {
+                auto item = std::get<QGraphicsItem*>(visitObject);
+                if (graphicsItemMatches(item, properties))
+                    result << QVariant::fromValue(GraphicsItemWrapper(item));
+
+                return false;
+            }
+
+            if (!std::holds_alternative<QObject*>(visitObject))
+                return false;
+
+            auto object = std::get<QObject*>(visitObject);
 
             // Add matching object, but be sure that we don't include the container.
             if (containerObject != object && objectMatches(object, properties))
@@ -183,6 +204,11 @@ QVariantList findAllObjects(QJSValue properties)
             containers << variantWrap;
             return containers;
         }
+        else if (const auto wrap = variantWrap.value<GraphicsItemWrapper>(); wrap.isValid())
+        {
+            containers << variantWrap;
+            return containers;
+        }
     }
 
     const bool hasContainer = properties.hasOwnProperty("container");
@@ -209,7 +235,7 @@ QVariantList findAllObjects(QJSValue properties)
 
     // Search only in containers.
     QVariantList matchingObjects;
-    QSet<QObject*> visited; //< Avoid visiting the same QObject more than once.
+    QSet<VisitObject> visited; //< Avoid visiting the same QObject more than once.
 
     for (QVariant c: containers)
     {

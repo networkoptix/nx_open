@@ -11,6 +11,7 @@ class QAction;
 class QMenu;
 class QTabBar;
 class QWindow;
+class QGraphicsItem;
 
 namespace nx::vms::client::desktop::testkit::utils {
 
@@ -19,6 +20,9 @@ bool objectMatches(const QObject* object, QJSValue properties);
 
 /** Returns true if object properties match with tab item properties. */
 bool tabItemMatches(const QTabBar* tabBar, int index, QJSValue properties);
+
+/** Returns true if object properties match with graphics item properties. */
+bool graphicsItemMatches(QGraphicsItem* item, QJSValue properties);
 
 /** Returns true if text from UI element (with/without shotcuts) matches with specified text. */
 bool textMatches(QString itemText, QString text);
@@ -42,13 +46,15 @@ enum VisitOption {
 
 using VisitOptions = QFlags<VisitOption>;
 
+using VisitObject = std::variant<QObject *, QGraphicsItem *>;
+
 /**
  * Calls onVisited function for object itself and all its children.
  * If false is returned by onVisited(object) then children of that object are skipped.
  */
 void visitTree(
     QObject* object,
-    std::function<bool(QObject*)> onVisited,
+    std::function<bool(VisitObject)> onVisited,
     VisitOptions flags = NoOptions);
 
 /**
@@ -64,7 +70,7 @@ QVariantList findAllObjects(QJSValue properties);
 QVariantList findAllObjectsInContainer(
     QVariant container,
     QJSValue properties,
-    QSet<QObject*>& visited);
+    QSet<VisitObject>& visited);
 
 /**
  * Returns a screen rectangle of QWidget, QQuickItem, QGraphicsObject or QModelIndex bound with
