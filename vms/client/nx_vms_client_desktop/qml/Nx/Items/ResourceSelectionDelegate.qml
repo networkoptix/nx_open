@@ -31,6 +31,9 @@ Item
 
     readonly property real availableWidth: width - indicator.width
 
+    readonly property color highlightColor: ColorTheme.colors.yellow_d1
+    property var highlightRegExp: null
+
     implicitHeight: 20 //< Just a sensible default.
 
     implicitWidth: isSeparator
@@ -38,6 +41,18 @@ Item
         : (contentRow.implicitWidth + indicator.width + contentRow.spacing)
 
     baselineOffset: contentRow.y + name.y + name.baselineOffset
+
+    function highlightMatchingText(text)
+    {
+        const escaped = text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+
+        if (!highlightRegExp)
+            return escaped
+
+        return escaped.replace(highlightRegExp, `<font color="${highlightColor}">$1</font>`)
+    }
 
     Row
     {
@@ -108,8 +123,8 @@ Item
         {
             id: name
 
-            text: (model && model.display) || ""
-            textFormat: Text.PlainText
+            text: (model && highlightMatchingText(model.display)) || ""
+            textFormat: Text.StyledText
             font.weight: Font.DemiBold
             height: parent.height
             verticalAlignment: Text.AlignVCenter

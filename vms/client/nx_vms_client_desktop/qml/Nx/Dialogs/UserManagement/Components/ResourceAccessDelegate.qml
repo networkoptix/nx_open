@@ -21,6 +21,8 @@ Item
 
     property alias accessRightsList: accessRightsModel.accessRightsList
 
+    property alias highlightRegExp: mainDelegate.highlightRegExp
+
     required property real columnWidth
 
     required property var editingContext
