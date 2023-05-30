@@ -11,9 +11,11 @@
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickWindow>
 #include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QGraphicsWidget>
 
 #include "model_index_wrapper.h"
 #include "tab_item_wrapper.h"
+#include "graphics_item_wrapper.h"
 
 namespace nx::vms::client::desktop::testkit::utils {
 
@@ -121,6 +123,15 @@ QRect globalRect(QVariant object, QWindow** window)
             const auto topLeft = container->mapToGlobal(r.topLeft());
             const auto bottomRight = container->mapToGlobal(r.bottomRight());
             return QRect(topLeft, bottomRight);
+        }
+        else if (auto wrap = object.value<GraphicsItemWrapper>(); wrap.isValid())
+        {
+            if (auto go = qobject_cast<QGraphicsObject*>(wrap.object()))
+            {
+                const QGraphicsView* v = go->scene()->views().first();
+                *window = v->window()->windowHandle();
+            }
+            return wrap.bounds();
         }
     }
     return QRect();

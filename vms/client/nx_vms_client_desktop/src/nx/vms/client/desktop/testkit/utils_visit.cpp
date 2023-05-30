@@ -36,7 +36,7 @@ void visitModel(
     }
 }
 
-void visitTree(QObject* object, std::function<bool(QObject*)> onVisited, VisitOptions flags)
+void visitTree(QObject* object, std::function<bool(VisitObject)> onVisited, VisitOptions flags)
 {
     if (!object)
         return;
@@ -69,6 +69,8 @@ void visitTree(QObject* object, std::function<bool(QObject*)> onVisited, VisitOp
         {
             if (const auto o = dynamic_cast<QGraphicsObject*>(items.at(i)))
                 visitTree(o, onVisited, flags);
+            else
+                onVisited(items.at(i));
         }
     }
 

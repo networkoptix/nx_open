@@ -10,6 +10,7 @@
 #include <QtWidgets/QTabBar>
 #include <QtWidgets/QWidget>
 
+#include "graphics_item_wrapper.h"
 #include "model_index_wrapper.h"
 #include "tab_item_wrapper.h"
 
@@ -129,6 +130,12 @@ bool objectMatches(const QObject* object, QJSValue properties)
             matches = className.startsWith(typeString + "_QMLTYPE_") ||
                 className.startsWith("QQuick" + typeString) ||
                 className.startsWith("QQuickPre64" + typeString);
+        }
+
+        if (!matches)
+        {
+            if (auto metaType = QMetaType::fromName(typeString.toUtf8()); metaType.isValid())
+                matches = QMetaType::canView(object->metaObject()->metaType(), metaType);
         }
 
         if (!matches && className != typeString)
@@ -301,6 +308,45 @@ bool tabItemMatches(const QTabBar* tabBar, int index, QJSValue properties)
         if (!textMatches(tabBar->tabToolTip(index), properties.property("toolTip").toString()))
             return false;
     }
+    return true;
+}
+
+bool graphicsItemMatches(QGraphicsItem* item, QJSValue properties)
+{
+    const GraphicsItemWrapper wrapper(item);
+
+    if (properties.hasOwnProperty("type"))
+    {
+        const auto typeName = properties.property("type").toString();
+        if (typeName != wrapper.type() && typeName != "QGraphicsItem")
+            return false;
+    }
+
+    if (properties.hasOwnProperty("visible"))
+    {
+        if (valueIsTrue(properties.property("visible")) != item->isVisible())
+            return false;
+    }
+    if (properties.hasOwnProperty("enabled"))
+    {
+        if (valueIsTrue(properties.property("enabled")) != item->isEnabled())
+            return false;
+    }
+
+    if (properties.isString())
+        return textMatches(wrapper.text(), properties.toString());
+
+    if (properties.hasOwnProperty("text"))
+    {
+        if (!textMatches(wrapper.text(), properties.property("text").toString()))
+            return false;
+    }
+    if (properties.hasOwnProperty("toolTip"))
+    {
+        if (!textMatches(item->toolTip(), properties.property("toolTip").toString()))
+            return false;
+    }
+
     return true;
 }
 

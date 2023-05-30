@@ -117,8 +117,13 @@ QVariant Highlighter::pick(QPoint globalPos) const
     QRect minRect;
 
     auto selectContaining =
-        [&](QObject* object) -> bool
+        [&](utils::VisitObject visitObject) -> bool
         {
+            if (!std::holds_alternative<QObject*>(visitObject))
+                return false;
+
+            auto object = std::get<QObject*>(visitObject);
+
             if (visited.contains(object))
                 return false;
             visited.insert(object);
