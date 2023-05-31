@@ -148,8 +148,7 @@ possible installation procedure for Python 3.8 could look like the following:
   eval "$(pyenv init -)"
   ```
 
-Install the build and runtime dependencies specified in `readme.md` of the particular branch
-using the `brew install` command.
+Install the build and runtime dependencies specified in `readme.md` of the particular branch.
 
 NOTE: Xcode Command Line Tools package is installed automatically together with Homebrew.
 
