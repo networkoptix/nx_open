@@ -46,13 +46,14 @@ void Server::registerRequestHandlers(
     const std::string& basePath,
     http::server::rest::MessageDispatcher* messageDispatcher)
 {
-    // NOTE: #akolesnikov Api docs assume that it is registered under /placeholder/maintenance/log prefix.
-    // which is usually true but not guaranteed.
+    // NOTE: #akolesnikov The API docs assume that these functions are registered under
+    // /placeholder/maintenance/log prefix, which is usually true but not guaranteed.
 
     /**%apidoc GET /placeholder/maintenance/log/loggers
-     * %caption Get list of current loggers.
+     * Retrieves the list of the current Loggers.
+     * %caption Get Loggers
      * %ingroup Maintenance
-     * %return List of current loggers.
+     * %return List of the current Loggers.
      */
     messageDispatcher->registerRequestProcessorFunc(
         http::Method::get,
@@ -60,8 +61,9 @@ void Server::registerRequestHandlers(
         [this](auto&&... args) { serveGetLoggers(std::move(args)...); });
 
     /**%apidoc DELETE /placeholder/maintenance/log/loggers/{id}
-     * %caption Delete a logger by id.
-     * %param id Id of logger as reported by .../loggers call.
+     * Deletes the specified Logger.
+     * %caption Delete Logger
+     * %param id Id of a Logger as reported by the .../loggers call.
      * %ingroup Maintenance
      */
     messageDispatcher->registerRequestProcessorFunc(
@@ -70,7 +72,8 @@ void Server::registerRequestHandlers(
         [this](auto&&... args) { serveDeleteLogger(std::move(args)...); });
 
     /**%apidoc POST /placeholder/maintenance/log/loggers
-     * %caption Add a logger.
+     * Adds a new Logger.
+     * %caption Add Logger
      * %ingroup Maintenance
      */
     messageDispatcher->registerRequestProcessorFunc(
@@ -79,13 +82,12 @@ void Server::registerRequestHandlers(
         [this](auto&&... args) { servePostLogger(std::move(args)...); });
 
     /**%apidoc POST /placeholder/maintenance/log/stream
-     * Starts sending log messages that satisfy the given filter.
-     * Log stream is closed when the TCP connection is closed by the client.
-     * The request requires that a filter is specified.
-     * %param level Example: "level[mesasge_prefix]". E.g., "level=verbose[nx::cloud::relay]"
-     * %caption Get a log stream.
+     * Starts sending log messages that satisfy the given filter. The log stream is closed when the
+     * TCP connection is closed by the Client. The request requires that a filter is specified.
+     * %caption Get log stream
      * %ingroup Maintenance
-     * %return Stream of log messages with text/plain format.
+     * %param level Example: "level[message_prefix]". E.g., "level=verbose[nx::cloud::relay]"
+     * %return Stream with the log messages in the text/plain format.
      */
     messageDispatcher->registerRequestProcessorFunc(
         http::Method::get,
