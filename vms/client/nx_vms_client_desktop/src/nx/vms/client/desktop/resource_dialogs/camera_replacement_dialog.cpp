@@ -26,6 +26,8 @@
 #include <nx/vms/common/html/html.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/help/help_handler.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/camera/camera_replacement.h>
 
@@ -275,6 +277,8 @@ CameraReplacementDialog::CameraReplacementDialog(
                 treeEntityCreationFunction(d->cameraToBeReplaced, showServersInTree(context())));
             d->resourceSelectionWidget->resourceViewWidget()->makeRequiredItemsVisible();
         });
+
+    setHelpTopic(this, Qn::CameraReplacementDialog_Help);
 }
 
 CameraReplacementDialog::~CameraReplacementDialog()

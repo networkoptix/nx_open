@@ -22,6 +22,8 @@
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
 #include <nx/vms/common/system_settings.h>
+#include <ui/help/help_handler.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -302,6 +304,8 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
     connect(rootObjectHolder()->object(), SIGNAL(resetToDefault()),
         this, SIGNAL(resetToDefault()));
     connect(this, &JoystickSettingsDialog::resetToDefault, handleReset);
+
+    setHelpTopic(this, Qn::HelpTopic::UsingJoystick_Help);
 }
 
 JoystickSettingsDialog::~JoystickSettingsDialog()
