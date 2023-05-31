@@ -132,7 +132,6 @@ QDateTime ServerTimeWatcher::serverTime(
         if (!timezoneId.isEmpty() && isTzAvailable && tz.isValid())
         {
             QDateTime result;
-            result.setTimeSpec(Qt::TimeZone);
             result.setTimeZone(tz);
             result.setMSecsSinceEpoch(msecsSinceEpoch);
             NX_VERBOSE(NX_SCOPE_TAG, "Actual time is %1", result);
