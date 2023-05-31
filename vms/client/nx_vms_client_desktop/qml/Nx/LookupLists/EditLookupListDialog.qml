@@ -102,6 +102,7 @@ ModalDialog
         data.id: sourceModel ? sourceModel.data.id : NxGlobals.generateUuid()
         data.name: sourceModel ? sourceModel.data.name : qsTr("New List")
         data.objectTypeId: sourceModel ? sourceModel.data.objectTypeId : ""
+        data.entries: sourceModel ? sourceModel.data.entries : []
         attributeNames: sourceModel ? sourceModel.attributeNames : ["Value"]
 
         property alias name: model.data.name
