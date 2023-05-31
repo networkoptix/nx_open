@@ -543,7 +543,7 @@
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>選擇搖桿</translation>
     </message>
     <message>
       <source>No devices connected.</source>
@@ -581,7 +581,7 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>儲存</translation>
     </message>
     <message>
       <source>Previous</source>
@@ -1055,11 +1055,11 @@ to activate PTZ</source>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>選擇要儲存的檔案</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>JSON檔 (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
