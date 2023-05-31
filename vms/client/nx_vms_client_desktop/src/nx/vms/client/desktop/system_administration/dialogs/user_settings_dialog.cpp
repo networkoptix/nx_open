@@ -157,16 +157,16 @@ UserSettingsDialog::UserSettingsDialog(
             }
         });
 
-    const auto resetAccessibleResourcesFilter =
+    const auto resetEditingContext =
         [this]()
         {
             if (d->editingContext)
-                d->editingContext.value()->resetAccessibleResourcesFilter();
+                d->editingContext.value()->revert();
         };
 
-    connect(this, &QmlDialogWrapper::applied, this, resetAccessibleResourcesFilter);
-    connect(this, &QmlDialogWrapper::accepted, this, resetAccessibleResourcesFilter);
-    connect(this, &QmlDialogWrapper::rejected, this, resetAccessibleResourcesFilter);
+    connect(this, &QmlDialogWrapper::applied, this, resetEditingContext);
+    connect(this, &QmlDialogWrapper::accepted, this, resetEditingContext);
+    connect(this, &QmlDialogWrapper::rejected, this, resetEditingContext);
 }
 
 UserSettingsDialog::~UserSettingsDialog()
