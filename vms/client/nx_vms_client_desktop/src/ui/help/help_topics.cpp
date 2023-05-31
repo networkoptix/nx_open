@@ -37,7 +37,7 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
         case Qn::HelpTopic::CameraList_Help:
             return "viewing_full_cameras_list.html";
         case Qn::HelpTopic::CameraReplacementDialog_Help:
-            return "replacing-a-сamera.html";
+            return "replacing-a-camera.html";
         case Qn::HelpTopic::CameraSettingsExpertPage_Help:
             return "working_around_device_issues_e.html";
         case Qn::HelpTopic::CameraSettingsRecordingPage_Help:
@@ -55,7 +55,7 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
         case Qn::HelpTopic::CameraSettings_Expert_SettingsControl_Help:
             return "preventing_vms_from_c.html";
         case Qn::HelpTopic::CameraSettings_Expert_AutomaticExport_Help:
-            return "Disabling-Automatic-Export-SD.html";
+            return "disabling-automatic-export-sd.html";
         case Qn::HelpTopic::CameraSettings_Help:
             return "setting_up_cameras_and_devices.html";
         case Qn::HelpTopic::CameraSettings_Motion_Help:
@@ -141,7 +141,7 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
         case Qn::HelpTopic::EventsActions_ShowOnAlarmLayout_Help:
             return "showing_cameras_on_alarm_layou.html";
         case Qn::HelpTopic::EventsActions_ShowIntercomInformer_Help:
-            return "Working-With-Intercoms.html";
+            return "working-with-intercoms.html";
         case Qn::HelpTopic::EventsActions_ShowTextOverlay_Help:
             return "display_text_on_cameras.html";
         case Qn::HelpTopic::EventsActions_SoftTrigger_Help:
@@ -285,7 +285,7 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
         case Qn::HelpTopic::SaveLayout_Help:
             return "saving_layouts_(admin_only).html";
         case Qn::HelpTopic::SecureConnection_Help:
-            return "configuring_secure_connection.html";
+            return "configuring-secure-connections.html";
         case Qn::HelpTopic::ServerSettings_ArchiveRestoring_Help:
             return "restoring_broken_archive.html";
         case Qn::HelpTopic::ServerSettings_Failover_Help:
