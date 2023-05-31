@@ -12,6 +12,8 @@
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/text/time_strings.h>
+#include <ui/help/help_handler.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx::vms::client::desktop {
@@ -187,6 +189,8 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
     updateTimeControls();
 
     init({});
+
+    setHelpTopic(this, Qn::HelpTopic::CollectingLogs_Help);
 }
 
 LogSettingsDialog::~LogSettingsDialog()
