@@ -15,6 +15,7 @@
 #include <nx/vms/common/html/html.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_handler.h>
+#include <ui/help/help_topic_accessor.h>
 
 namespace nx::vms::client::desktop {
 
@@ -50,6 +51,7 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
         .arg(common::html::localLink(tr("help page"))));
     connect(ui->helpLabel, &QLabel::linkActivated,
         [](){ QnHelpHandler::openHelpTopic(Qn::HelpTopic::CloudLayoutsIntroduction_help); });
+    setHelpTopic(this, Qn::HelpTopic::CloudLayoutsIntroductionAssign_Help);
 
     QColor captionTextColor = colorTheme()->color("light1");
     setPaletteColor(ui->captionLabel, QPalette::WindowText, captionTextColor);
