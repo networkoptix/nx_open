@@ -8,7 +8,7 @@
 This document provides the most actual instructions how to set up the prerequisites, explanation of
 the build system internals, and recommendations for using the build and development tools. This
 information supplements the brief information about the build process and its prerequisites from
-`open/readme.md` specific to the particular branch of the repository.
+`readme.md` specific to the particular branch of the repository.
 
 ATTENTION: Use this document only from the `master` branch of the `nx_open` repository - it is
 kept up-to-date and applicable for building all currently supported branches of the VMS -
@@ -23,7 +23,7 @@ is likely that a policy for contributions will be developed and offered in the f
 ---------------------------------------------------------------------------------------------------
 ## Build environment
 
-The list of supported and tested platforms and architectures is given in the `open/readme.md` of
+The list of supported and tested platforms and architectures is given in the `readme.md` of
 the particular branch of the repository. Building on other OS versions/flavors, or using other
 versions of the build tools may work, but may require some adaptation, and the support team will
 not be able to provide asistance.
@@ -125,7 +125,7 @@ Alternatively to using `pip` with `requirements.txt`, you may install CMake and 
 python -m pip install pyaml conan==1.46.2
 ```
 
-Install the build and runtime dependencies specified in `open/readme.md` of the particular branch
+Install the build and runtime dependencies specified in `readme.md` of the particular branch
 using the `sudo apt install` command.
 
 NOTE: The C++ compiler is downloaded as a Conan artifact during the CMake Generation stage - the
@@ -148,7 +148,7 @@ possible installation procedure for Python 3.8 could look like the following:
   eval "$(pyenv init -)"
   ```
 
-Install the build and runtime dependencies specified in `open/readme.md` of the particular branch
+Install the build and runtime dependencies specified in `readme.md` of the particular branch
 using the `brew install` command.
 
 NOTE: Xcode Command Line Tools package is installed automatically together with Homebrew.
@@ -243,11 +243,6 @@ Right after opening the directory, Visual Studio will start the CMake generation
 default build configuration - `Debug (minimal)`. If you need another build configuration, select it
 in the Visual Studio main toolbar - the CMake generation stage will be started immediately, and the
 build directory from the previously selected build configuration can be deleted manually.
-
-When performing the Generation for the first time, it will fail because the required CMake argument
-`-DcustomizationPackageFile=...` will not be passed. After the error, open
-"Manage Configurations..." in the configuration drop-down box in the Visual Studio toolbar, and add
-this argument to the "CMake command arguments:" field in the "Command arguments" section.
 
 If you don't need advanced debugging features, you may choose one of the Release configurations -
 the basics of visual debugging like breakpoints and step-by-step execution will work anyway in most
