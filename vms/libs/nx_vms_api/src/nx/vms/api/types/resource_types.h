@@ -28,24 +28,27 @@ enum class ResourceStatus
      */
     online = 2,
 
-    /**%apidoc Applies only to Cameras. The Camera is online and recording video stream.
+    /**%apidoc Applies only to Cameras. The Camera is online and recording the video stream.
      */
     recording = 3,
 
-    /**%apidoc The Device status is unknown. It may show up while Servers synchronize status
-     * information. If this status persists, it indicates an internal system problem.
+    /**%apidoc
+     * The Device status is unknown. It may show up while Servers synchronize status information.
+     * If this status persists, it indicates an internal System problem.
      */
     undefined = 4,
 
-    /**%apidoc Applies only to Servers. The Server is incompatible only when it has System name
-     * different from the current or it has incompatible protocol version.
+    /**%apidoc
+     * Applies only to Servers. The Server is incompatible only when it has the System name
+     * different from the current one, or it has an incompatible protocol version.
      */
     incompatible = 5,
 
-    /**%apidoc Applies only to Servers. Server is in this state if its DB certificate doesn't
-     * match with the certificate provided during SSL handshake on Server to Server connection.
-     * This may happen in case of the man-in-the-middle attack or in case of certificate lost
-     * on the target server.
+    /**%apidoc
+     * Applies only to Servers. Server is in this state if its DB certificate doesn't match the
+     * certificate provided during the SSL handshake on a Server-to-Server connection. This may
+     * happen in the case of a man-in-the-middle attack, or in the case of a certificate loss on
+     * the target Server.
      */
     mismatchedCertificate = 6,
 };

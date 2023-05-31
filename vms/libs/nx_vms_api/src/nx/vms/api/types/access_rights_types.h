@@ -15,11 +15,11 @@ namespace nx::vms::api {
  */
 enum class GlobalPermission
 {
-    // Will be superseded by AccessRight::view.
-    // Description should be changed to "No global permissions" then.
     /**%apidoc
      * Only live video access.
      * %caption NoGlobalPermissions
+     * %// Will be superseded by AccessRight::view. The description should be changed to "No global
+     *     permissions" then.
      */
     none = 0,
 
@@ -39,17 +39,17 @@ enum class GlobalPermission
 
     /* Manager permissions. */
 
-    // Will be superseded by AccessRight::edit.
     /**%apidoc
      * Can edit Device settings of available devices.
      * %caption GlobalEditCamerasPermission
+     * %// Will be superseded by AccessRight::edit.
      */
     editCameras = 0x00000002,
 
-    // Will be superseded by AccessRight::view for particular videowall resources.
     /**%apidoc
      * Can control all video-walls in the system.
      * %caption GlobalControlVideoWallPermission
+     * %// Will be superseded by AccessRight::view for particular videowall resources.
      */
     controlVideowall = 0x00000004,
 
@@ -68,40 +68,40 @@ enum class GlobalPermission
 
     /* Viewer permissions. */
 
-    // Will be superseded by AccessRight::viewArchive.
     /**%apidoc
      * Can view archives of the available cameras.
      * %caption GlobalViewArchivePermission
+     * %// Will be superseded by AccessRight::viewArchive.
      */
     viewArchive = 0x00000100,
 
-    // Will be superseded by AccessRight::exportArchive.
     /**%apidoc
      * Can export archives of the available cameras.
      * %caption GlobalExportPermission
+     * %// Will be superseded by AccessRight::exportArchive.
      */
     exportArchive = 0x00000200,
 
-    // Will be superseded by AccessRight::viewBookmarks.
     /**%apidoc
      * Can view Bookmarks on the available cameras.
      * %caption GlobalViewBookmarksPermission
+     * %// Will be superseded by AccessRight::viewBookmarks.
      */
     viewBookmarks = 0x00000400,
 
-    // Will be superseded by AccessRight::manageBookmarks.
     /**%apidoc
      * Can modify Bookmarks on the available cameras.
      * %caption GlobalManageBookmarksPermission
+     * %// Will be superseded by AccessRight::manageBookmarks.
      */
     manageBookmarks = 0x00000800,
 
     /* Input permissions. */
 
-    // Will be superseded by AccessRight::userInput.
     /**%apidoc
      * Can change the camera PTZ state, use 2-way audio and I/O buttons.
      * %caption GlobalUserInputPermission
+     * %// Will be superseded by AccessRight::userInput.
      */
     userInput = 0x00010000,
 
@@ -114,10 +114,11 @@ enum class GlobalPermission
 
     /* Resources access permissions. */
 
-    // Will be superseded by AccessRight::view for kAllDevicesGroupId, kAllWebPagesGroupId and kAllServersGroupId.
     /**%apidoc
      * Has access to all media Resources (cameras and web pages).
      * %caption GlobalAccessAllMediaPermission
+     * %// Will be superseded by AccessRight::view for kAllDevicesGroupId, kAllWebPagesGroupId and
+     *     kAllServersGroupId.
      */
     accessAllMedia = 0x01000000,
 
@@ -140,41 +141,41 @@ enum class GlobalPermission
 
     /* Combinations. */
 
-    // Will be deprecated with new user groups.
     /**%apidoc[unused]
      * A Live Viewer has access to all Devices and global Layouts by default.
+     * %// Will be deprecated with the new User Groups.
      */
     liveViewerPermissions = accessAllMedia,
 
-    // Will be deprecated with new user groups.
     /**%apidoc[unused]
      * A Viewer can additionally view archive and Bookmarks, and export video.
+     * %// Will be deprecated with the new User Groups.
      */
     viewerPermissions = liveViewerPermissions | viewArchive | exportArchive | viewBookmarks,
 
-    // Will be deprecated with new user groups.
     /**%apidoc[unused]
      * An Advanced Viewer can manage Bookmarks and use various input methods.
+     * %// Will be deprecated with the new User Groups.
      */
     advancedViewerPermissions = viewerPermissions | manageBookmarks | userInput | viewLogs,
 
-    // Will be deprecated with new user groups.
     /**%apidoc[unused]
      * An Admin can do everything.
+     * %// Will be deprecated with the new User Groups.
      */
     powerUserPermissions = powerUser | advancedViewerPermissions | controlVideowall | editCameras,
 
-    // Will be deprecated with new user groups.
     /**%apidoc[unused]
      * Has access to all media. Can view archive and Bookmarks, change the camera PTZ
      * state, use 2-way audio and I/O buttons, and control video-walls.
+     * %// Will be deprecated with the new User Groups.
      */
     videowallModePermissions = liveViewerPermissions | viewArchive | userInput
         | controlVideowall | viewBookmarks, /* PTZ here is intended - for SpaceX, see VMS-2208 */
 
-    // Will be deprecated with new user groups.
     /**%apidoc[unused]
      * The actions in the ACS mode are limited.
+     * %// Will be deprecated with the new User Groups.
      */
     acsModePermissions = viewerPermissions | userInput,
 };
@@ -227,45 +228,31 @@ constexpr GlobalPermissions kAssignableGlobalPermissions =
 
 constexpr GlobalPermissions kDeprecatedGlobalPermissions{~kNonDeprecatedGlobalPermissions};
 
-// Stored in the database. QFlags uses int internally, so we are limited to 32 bits.
 /**%apidoc
  * Flags describing User access rights towards particular Resources.
+ * %// Stored in the database. QFlags uses int internally, so we are limited to 32 bits.
  */
 NX_REFLECTION_ENUM_CLASS(AccessRight,
 
-    /**%apidoc
-     * Can see a resource. Can access live footage from a media resource.
-     */
+    /**%apidoc Can see a resource. Can access live footage from a media resource. */
     view = 0x0001,
 
-    /**%apidoc
-     * Can view archive.
-     */
+    /**%apidoc Can view archive. */
     viewArchive = 0x0004,
 
-    /**%apidoc
-     * Can export archive.
-     */
+    /**%apidoc Can export archive. */
     exportArchive = 0x0008,
 
-    /**%apidoc
-     * Can view Bookmarks.
-     */
+    /**%apidoc Can view Bookmarks. */
     viewBookmarks = 0x0010,
 
-    /**%apidoc
-     * Can modify Bookmarks.
-     */
+    /**%apidoc Can modify Bookmarks. */
     manageBookmarks = 0x0020,
 
-    /**%apidoc
-     * Can change the camera PTZ state, use 2-way audio and I/O buttons.
-     */
+    /**%apidoc Can change the camera PTZ state, use 2-way audio and I/O buttons. */
     userInput = 0x0080,
 
-    /**%apidoc
-     * Can edit Device settings.
-     */
+    /**%apidoc Can edit Device settings. */
     edit = 0x0200
 )
 
