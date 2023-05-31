@@ -7,6 +7,7 @@
 #include <QtCore/QPointer>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::client::desktop {
 
@@ -33,8 +34,16 @@ ProxyAccessRightsManager::ProxyAccessRightsManager(
     connect(d->sourceManager, &AbstractAccessRightsManager::ownAccessRightsChanged, this,
         [this](QSet<QnUuid> subjectIds)
         {
+            NX_VERBOSE(this, "Access rights changed remotely for subject %1", subjectIds);
+
             if (d->accessMapOverride && NX_ASSERT(!d->currentSubjectId.isNull()))
             {
+                if (subjectIds.contains(d->currentSubjectId))
+                {
+                    NX_VERBOSE(this, "Current subject %2 is changed locally, remote changes will "
+                        "be ignored", d->currentSubjectId);
+                }
+
                 // Ignore edited subject changes.
                 subjectIds.remove(d->currentSubjectId);
                 if (subjectIds.empty())
@@ -47,6 +56,7 @@ ProxyAccessRightsManager::ProxyAccessRightsManager(
     connect(d->sourceManager, &AbstractAccessRightsManager::accessRightsReset, this,
         [this]()
         {
+            NX_VERBOSE(this, "Access rights reset");
             emit accessRightsReset();
         });
 }
@@ -94,6 +104,8 @@ void ProxyAccessRightsManager::setOwnResourceAccessMap(const ResourceAccessMap& 
     if (value == ownResourceAccessMap(d->currentSubjectId))
         return;
 
+    NX_VERBOSE(this, "Access rights changed locally for %1", d->currentSubjectId);
+
     d->accessMapOverride = value;
     emit ownAccessRightsChanged({d->currentSubjectId});
 }
@@ -102,6 +114,8 @@ void ProxyAccessRightsManager::resetOwnResourceAccessMap()
 {
     if (!NX_ASSERT(!d->currentSubjectId.isNull()) || !d->accessMapOverride)
         return;
+
+    NX_VERBOSE(this, "Local access rights changes are cancelled for %1", d->currentSubjectId);
 
     d->accessMapOverride = {};
     emit ownAccessRightsChanged({d->currentSubjectId});
