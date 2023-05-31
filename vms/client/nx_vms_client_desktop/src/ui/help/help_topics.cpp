@@ -36,6 +36,8 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "diagnosing_offline_cameras.html";
         case Qn::HelpTopic::CameraList_Help:
             return "viewing_full_cameras_list.html";
+        case Qn::HelpTopic::CameraReplacementDialog_Help:
+            return "replacing-a-сamera.html";
         case Qn::HelpTopic::CameraSettingsExpertPage_Help:
             return "working_around_device_issues_e.html";
         case Qn::HelpTopic::CameraSettingsRecordingPage_Help:
@@ -68,8 +70,10 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "dual_streaming.html";
         case Qn::HelpTopic::CertificateValidation_Help:
             return "certificate-validation.html";
-        case Qn::CloudLayoutsIntroduction_help:
+        case Qn::HelpTopic::CloudLayoutsIntroduction_help:
             return "cloud-layouts.html";
+        case Qn::HelpTopic::CloudLayoutsIntroductionAssign_Help:
+            return "assigning-layout-to-users-and-.html";
         case Qn::HelpTopic::ConnectToCamerasOverOnlyHttps_Help:
             return "to-connect-to-cameras-over-onl.html";
         case Qn::HelpTopic::EnableArchiveEncryption_Help:
@@ -84,6 +88,8 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "create_bookmark.html";
         case Qn::HelpTopic::EventsActions_CameraDisconnected_Help:
             return "camera_disconnection_malfuncti.html";
+        case Qn::HelpTopic::CollectingLogs_Help:
+            return "collecting_logs.html";
         case Qn::HelpTopic::EventsActions_CameraInput_Help:
             return "input_signal_on_camera.html";
         case Qn::HelpTopic::EventsActions_CameraIpConflict_Help:
@@ -342,6 +348,8 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "introducing_user_roles.html";
         case Qn::HelpTopic::UserWatermark_Help:
             return "user_watermark_on_exports.html";
+        case Qn::HelpTopic::UsingJoystick_Help:
+            return "using-joysticks.html";
         case Qn::HelpTopic::VersionMismatch_Help:
             return "launching_product_name_in_comp.html";
         case Qn::HelpTopic::Videowall_Attach_Help:
@@ -353,7 +361,7 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
         case Qn::HelpTopic::Videowall_Management_Help:
             return "video_wall_management.html";
         case Qn::HelpTopic::VirtualCamera_Help:
-            return "wearable_camera.html";
+            return "virtual_camera.html";
         case Qn::HelpTopic::Watermark_Help:
             return "viewing_and_checking_the_validity_of_exported_vide.html";
 
