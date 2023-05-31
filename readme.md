@@ -1,217 +1,74 @@
-# Nx Meta Platform Open Source Components
+# Nx Meta Platform open-source components
 
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 ---------------------------------------------------------------------------------------------------
 ## Introduction
 
-This repository `nx_open` contains **Network Optix Meta Platform open source components** - the
+This repository `nx_open` contains **Network Optix Meta Platform open-source components** - the
 source code and specifications which are used to build all Powered-by-Nx products including Nx
 Witness Video Management System (VMS).
 
 Currently, the main VMS component which can be built from this repository is the Desktop Client.
-Other notable Components which are parts of the Desktop Client, but can be useful independently,
+Other notable components which are parts of the Desktop Client, but can be useful independently,
 include the Nx Kit library (`artifacts/nx_kit/`) - see its `readme.md` for details.
 
 Most of the source code and other files are licensed under the terms of Mozilla Public License 2.0
 (unless specified otherwise in the files) which can be found in the `license_mpl2.md` file in the
 `licenses/` directory in the root directory of the repository.
 
-### Contribution policy
+ATTENTION: This document provides only brief information about the build process and its
+prerequisites, specific to the current branch. For the most actual instructions how to set up the
+prerequisites, explanation of the build system internals, and recommendations for using the build
+and development tools, refer to the following document in the `master` branch of this repository:
+[build.md](https://github.com/networkoptix/nx_open/blob/master/build.md)
 
-At this moment, Network Optix is not able to process any pull/merge requests to this repository. It
-is likely that a policy for contributions will be developed and offered in the future.
+---------------------------------------------------------------------------------------------------
+## Free and open-source software notices
+
+The "Network Optix Meta Platform open-source components" software incorporates, depends upon,
+interacts with, or was developed using a number of free and open-source software components. The
+full list of such components can be found at [OPEN SOURCE SOFTWARE DISCLOSURE](https://meta.nxvms.com/content/libraries/).
+Please see the linked component websites for additional licensing, dependency, and use information,
+as well as the component source code.
 
 ---------------------------------------------------------------------------------------------------
 ## Build environment
 
-Currently the following target platforms and architectures are supported by this repository:
-- Windows x64 (Microsoft Visual Studio).
-- Linux x64 (GCC or Clang).
-- Linux 64-bit ARM (cross-compiling on Linux x64, GCC or Clang).
-- Linux 32-bit ARM (cross-compiling on Linux x64, GCC or Clang).
-- MacOS (Xcode with Clang).
+Supported target platforms and architectures:
+- Windows 10 x64 (Microsoft Visual Studio).
+- Linux Ubuntu 18.04 and 20.04 (GCC or Clang) x64, ARM64, ARM32 (cross-compiling on Linux x64).
+- MacOS Monterey 12.6.3 (Xcode with Clang) x64, ARM M1/M2.
 
-NOTE: Certain components in this repository can be built using more platforms and compilers, e.g.
-the Nx Kit library (`artifacts/nx_kit/`).
-
-**Windows** host: this guide implies Windows 10 x64 - other versions may require some adaptation.
-The build can be triggered from the command line of `cmd`, MinGW (Git Bash), or **Cygwin**.
-
-**Linux** host: this guide implies Ubuntu 18.04 or 20.04 - other flavors/versions may require some
-adaptation.
-
-**MacOS** host: the build is tested on **macOS Monterey** version 12.6.3 and Xcode Command
-Line Tools 14.2 - older versions may work but may require some adaptation.
-
-Pre-requisites needed to build all of the Components (the details on installing are given below):
-- Python 3.8 (newer versions may work but may require some adaptation).
-- CMake 3.20+.
-- Ninja.
-- Conan 1.46.x.
-- **Linux:** Certain packages for the build dependencies.
-- **Windows:** Microsoft Visual Studio 2022, Community Edition.
-    - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branches
-        `vms_5.0`, `vms_5.0_patch` and `vms_5.1`, but its support may be dropped in further
-        branches like `vms_5.1_patch` and `master`.
-- **MacOS**: Xcode Command Line Tools 14.2+, Homebrew 3.6.20+.
-
-### Python
-
-Python 3.8+ should be installed and available on `PATH` as `python`, and for macOS and Ubuntu also
-as `python3`. A possible installation procedure is described below.
-
-- **Windows**:
-    - Disable the Python alias that opens Microsoft Store: go to "Start" ->
-        "Manage app execution aliases" and disable all python-related aliases for App Installer
-        (`python.exe` and `python3.exe`).
-    - Download the Python installer from
-        [python-3.8.10](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe).
-    - In the installer, select "Add Python 3.8 to PATH". Note that the component "tcl/tk and IDLE"
-        is not required.
-    - It is recommended to activate "Disable path length limit" option at the end of the installer.
-
-- **Linux**:
-    - **Ubuntu 18**: The default version of Python in the Ubuntu 18 distribution is `python3.6`
-        (Ubuntu 18.04.5 LTS), so it is necessary to upgrade it - some tricks are required. Perform
-        the following steps to install the required Python version and configure it:
-        ```
-        sudo apt update
-        sudo apt install python3.8 python3-pip -y
-        sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 100
-        sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 100
-        sudo python -m pip install pip --upgrade
-        find /usr/lib/python3/dist-packages -name "*apt_*.cpython-3?m*" -exec sh -c \
-            "new_name=\$(echo {} | cut -d. -f1); sudo ln -s {} \${new_name}.so" \;
-        ```
-
-    - **Ubuntu 20**: Make `python` command equivalent to `python3`:
-        ```
-        sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 100
-        ```
-
-    - If you have Python 2 installed on your machine and you need it for some reason, you can run
-        `sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 10` and then
-        switch between Python 3 and Python 2 by running `sudo update-alternatives --config python`
-        and selecting the appropriate version of Python. Same for the older version of Python3 -
-        you can add it using
-        `sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python<your_old_version> 10`.
-
-- **MacOS**:
-    - Install Homebrew:
-      ```
-      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      ```
-    - Install and configure Python 3 using `pyenv`:
-      ```
-      brew install pyenv
-      pyenv install 3.8
-      pyenv global 3.8
-      echo 'eval "$(pyenv init -)"' >>~/.zshrc
-      eval "$(pyenv init -)"
-      ```
-
-### CMake, Ninja, and Conan
-
-The file **`requirements.txt`** in the root directory of this repository lists all the Python
-packages that are necessary for the build, including pre-packaged CMake, Ninja and Conan. To
-install them, check out the **`master` branch** (its `requirements.txt` is guaranteed to list the
-proper packages to build any currently supported repository branches), and run the command:
-```
-pip install -r requirements.txt
-```
-Here are the hints for the correct installation on different platforms:
-- **Windows**:
-    - For the correct installation, **`pip`** must be run with **Administrator privileges**: find
-      the Command Prompt in the Start menu, right-click it and choose "Run as administrator" from
-      the menu.
-    - ATTENTION: If you use **Cygwin**, make sure the Cygwin's **`cmake` is not on `PATH`**.
-- **Linux**:
-    - `pip` installs the binaries to `~/.local/bin/`, so make sure this directory is on `PATH`.
-
-Alternatively to using `requirements.txt`, you may install CMake and Ninja manually (just make sure
-they appear on `PATH`) and install the `pyaml` and `conan` Python packages:
-```
-python -m pip install pyaml conan==1.46.2
-```
-On **macOS** you also need `dmgbuild` package:
-```
-python -m install dmgbuild==1.3.2
-```
-
-On **Windows**, CMake and Ninja which come with Microsoft Visual Studio are suitable.
-
-### Conan cache
-
-The VMS build system is configured in such a way that Conan stores the downloaded artifacts in the
-`.conan/` directory in the build directory. To avoid re-downloading all the artifacts from the
-internet for every clean build, set the environment variable `NX_CONAN_DOWNLOAD_CACHE` to the full
-path of a directory that will be used as a transparent download cache; for example, create the
-directory `conan_cache/` next to the repository root and the build directories.
-
-### Build tools
-
-- **Windows**:
-    Install [Visual Studio, Community Edition](https://visualstudio.microsoft.com/downloads/) and
-    make sure that the following components are selected:
-    - "The Workload" -> "Desktop development with C++"
-    - "Individual components" -> "C++ CMake tools for Windows"
-
-- **Linux**:
+Build prerequisites:
+- **Python 3.8+** - should be available on `PATH` as `python`, and for macOS and Ubuntu also as
+    `python3`.
+- **CMake 3.20+, Ninja 1.10.2+, Conan 1.46.x** - recommended to be installed via **`pip`**:
+    ```
+    git checkout master # The master branch contains a universal requirements.txt.
+    pip install -r requirements.txt
+    ```
+    On Windows, run `pip` as an Administrator; on Linux - relogin to make ~/.local/bin/ appear on
+    PATH.
+- **Linux:** Build and runtime dependencies:
+    ```
+    sudo apt install -y \
+        chrpath libtinfo5 zlib1g-dev libopenal-dev mesa-common-dev libgl1-mesa-dev libtool \
+        libglu1-mesa-dev libldap2-dev libxfixes-dev libxss-dev libgstreamer1.0-0 p7zip-full \
+        libgstreamer-plugins-base1.0-0 libxslt1.1 pkg-config autoconf libxcb-xinerama0 \
+        libfreetype6-dev libfontconfig1-dev
+    ```
     - NOTE: The compiler is downloaded as a Conan artifact during the CMake Generation stage -
         compilers installed in the Linux system (if any) are not used.
-    - Install the following build and runtime dependencies:
-        ```
-        sudo apt install -y \
-            chrpath libtinfo5 zlib1g-dev libopenal-dev mesa-common-dev libgl1-mesa-dev libtool \
-            libglu1-mesa-dev libldap2-dev libxfixes-dev libxss-dev libgstreamer1.0-0 p7zip-full \
-            libgstreamer-plugins-base1.0-0 libxslt1.1 pkg-config autoconf libxcb-xinerama0 \
-            libfreetype6-dev libfontconfig1-dev
-        ```
-
-- **MacOS**:
-    - Install Homebrew if it is not installed yet (see the description in [Python](#Python)
-        section).
-    - Install the following build and runtime dependencies:
-      ```
-      brew install zlib-ng openal-soft mesa mesa-glu mesalib-glw openldap libxfixes \
+- **Windows:** Microsoft Visual Studio 2022,
+    [Community Edition](https://visualstudio.microsoft.com/downloads/); select the components:
+    - "The Workload" -> "Desktop development with C++"
+    - "Individual components" -> "C++ CMake tools for Windows"
+- **MacOS**: Xcode Command Line Tools 14.2+, Homebrew 3.6.20+, build and runtime dependencies:
+    ```
+    brew install zlib-ng openal-soft mesa mesa-glu mesalib-glw openldap libxfixes \
         libxscrnsaver gstreamer gst-plugins-base libxslt pkgconf
-      ```
-    - NOTE: Xcode Command Line Tools package is installed automatically together with Homebrew.
-
----------------------------------------------------------------------------------------------------
-## Using CMake
-
-We recommend doing out-of-source builds with CMake – the source code folder (VCS folder) remains
-intact, and all build results go into a dedicated folder. E.g. sources are in `nx_open/`, the build
-goes to `nx_open-build/`.
-
-With CMake, building is done in two stages:
-- Generation stage: performed by cmake.
-- Build stage: performed by a build tool chosen at the Generation stage - we use `ninja` for both
-    Linux and Windows platforms. Can be also invoked via the CMake executable.
-
-After the generation is performed once, further building attempts are performed invoking the chosen
-build tool - no need to manually invoke the Generation stage again, because the generated rules for
-the build tool include calling CMake Generation stage when necessary, e.g. when the CMake or source
-files change. Thus, generally, invoking the Generation stage should be done only once - after the
-initial cloning of the repository.
-
-### Under the hood
-
-During the Build stage the following things happen:
-1. Pre-build actions are executed. The script `ninja_tool.py` reads the file `pre_build.ninja_tool`
-    in the build directory and executes the commands from this file. The exact command list depends
-    on the build platform and generation options and can include:
-    - Cleaning the build directory from the files which are no longer built.
-    - Patching build.ninja file (changing dependencies, adding new commands, etc.).
-    - Scanning for third-party package changes and fetching the new versions of the packages.
-    - Other preliminary actions.
-2. The build itself. Ninja reads its configuration files (`build.ninja` and `rules.ninja`) which
-    can be patched by `ninja_tool.py`, and builds the project. In some cases (new source files,
-    package updates, etc.) for the correct build the project needs to be re-generated. If such need
-    arises, `ninja` will run `cmake` to perform the Generation stage and then return to the Build
-    stage again.
+    ```
 
 ---------------------------------------------------------------------------------------------------
 ## Building VMS Desktop Client
@@ -232,13 +89,6 @@ your favorite C++ development workflow instead.
 The scripts create/use the build directory as a sibling to the repository root directory, having
 added the `-build` suffix. Here we assume the repository root is `nx_open/`, so the build directory
 will be `nx_open-build/`.
-
-When running the scripts with the build directory absent, they create it, perform the CMake
-Generation stage (which creates `CMakeCache.txt` in the build directory), and then perform the
-Build stage. The same takes place when the build directory exists but `CMakeCache.txt` in it is
-absent. When running the scripts with `CMakeCache.txt` in the build directory present, they only
-perform the Build stage, and the script arguments are ignored (they are intended to be passed only
-to the Generation stage).
 
 ATTENTION: If the generation fails for any reason, remove `CMakeCache.txt` manually before the next
 attempt of running the build script.
@@ -275,13 +125,6 @@ for Windows.
         source files or altering the build system files, because `ninja_tool.py` properly
         handles such cases - the generation stage will be called automatically when needed.
 
-ATTENTION: On **Windows**, you can use a regular `cmd` console, because `build.bat` calls the
-`vcvars64.bat` which comes with the Visual Studio and properly sets PATH and other environment
-variables to enable using the 64-bit compiler and linker. If you don't use `build.bat`, you may
-call `vcvars64.bat` from your console, or use the console available from the Start menu as `VS2022
-x64 Native Tools Command Prompt`. Do not use the Visual Studio Command Prompt available from the
-Visual Studio main menu, because it sets up the environment for the 32-bit compiler and linker.
-
 For **cross-compiling** on Linux or MacOS, set the CMake variable `<targetDevice>`: add the
 argument `-DtargetDevice=<value>`, where <value> is one of the following:
 - `linux_x64`
@@ -289,6 +132,14 @@ argument `-DtargetDevice=<value>`, where <value> is one of the following:
 - `linux_arm32`
 - `macos_x64`
 - `macos_arm64`
+
+Building and debugging in Visual Studio IDE is also supported: run the generation stage from the
+command line, it will create `CMakeSettings.json` and `launch.vs.json`, then open the project.
+
+It is recommended to set the environment variable `NX_CONAN_DOWNLOAD_CACHE` to the full path of a
+directory that will be used to avoid re-downloading all the artifacts from the internet for every
+clean build; for example, create the directory `conan_cache/` next to the repository root and the
+build directories.
 
 ---------------------------------------------------------------------------------------------------
 ## Signing executable files
@@ -313,7 +164,7 @@ argument `-DtargetDevice=<value>`, where <value> is one of the following:
             time-stamped.
 
         The example of a configuration file can be found in
-        `open/build_utils/signtool/config/config.yaml`.
+        `build_utils/signtool/config/config.yaml`.
     - Add a CMake argument `-DsigntoolConfig=<configuration_file_path>` to the generation stage. If
     this argument is missing, no signing will be performed.
 
@@ -321,7 +172,7 @@ argument `-DtargetDevice=<value>`, where <value> is one of the following:
     `python build_utils/signtool/signtool.py --config <configuration_file> --file <unsigned_file> --output <signed_file>`
 
     To test the signing procedure, you can use a self-signed certificate. To generate such
-    certificate, you can use the file `open/build_utils/signtool/genkey/genkey_signtool.bat`. When
+    certificate, you can use the file `build_utils/signtool/genkey/genkey_signtool.bat`. When
     run, it creates the `certificate.p12` file and a couple of auxillary `*.pem` files in the same
     directory where it is run. We recommend to move these files outside of the source directory to
     maintain the out-of-source build concept.
@@ -399,67 +250,5 @@ custom Update server, and prepare the update packages and meta-information accor
 standard, so that the automatic updates will work with a custom VMS built from open source. In the
 future, instructions and/or tools for this will likely be provided.
 
----------------------------------------------------------------------------------------------------
-## Building and debugging in Visual Studio
 
-On Windows, besides the command-line way described above, you can use the Visual Studio IDE to
-build and debug the Client.
 
-The build configurations (Debug, Release and the like) used by the IDE are defined in the file
-`CMakeSettings.json` in the repository root directory. If absent, this file is created during the
-Generation stage. It defines a build directory name for each build configuration, and a path to
-`cmake.exe` - if you installed CMake manually, write its path to the `cmakeExecutable` parameter.
-
-Open Visual Studio, select "Open a local folder" and choose the repository root folder.
-Alternatively, run `devenv.exe` (Visual Studio IDE executable) supplying the repository root
-directory as an argument.
-
-Right after opening the directory, Visual Studio will start the CMake generation stage using the
-default build configuration - `Debug (minimal)`. If you need another build configuration, select it
-in the Visual Studio main toolbar - the CMake generation stage will be started immediately, and the
-build directory from the previously selected build configuration can be deleted manually.
-
-When performing the Generation for the first time, it will fail because the required CMake argument
-`-DcustomizationPackageFile=...` will not be passed. After the error, open
-"Manage Configurations..." in the configuration drop-down box in the Visual Studio toolbar, and add
-this argument to the "CMake command arguments:" field in the "Command arguments" section.
-
-If you don't need advanced debugging features, you may choose one of the Release configurations -
-the basics of visual debugging like breakpoints and step-by-step execution will work anyway in most
-cases, and the build time and disk usage will be noticeably lower than with a Debug configuration.
-
-After successfully finishing the CMake Generation stage, open the "Solution Explorer" side window,
-click the "Switch between solutions and available views" toolbar button at the top of this side
-window (looking like a document icon with a Visual Studio logo on it), and in the tree below
-double-click the "CMake Targets View". The CMake Generation stage will be run again, and when
-finished, the tree of CMake targets will appear - watch the "Output" window for the Generation
-stage progress.
-
-To build the solution, right-click on "vms Project" in "Solution Explorer" and select "Build All".
-Alternatively, build only the required project of the solution, for example, right-click on
-"desktop_client" and select "Build".
-
-### Running/debugging
-
-To be able to run and debug the built Desktop Client from the IDE, the file `launch.vs.json` must
-be created in the `.vs/` directory which Visual Studio creates in the source (repository root)
-directory. The first run of the CMake Generation stage checks if `.vs/` directory already exists
-and creates `launch.vs.json` file if it is not the case.
-
-Also it is necessary to specify the actual path to the Qt library binaries in the file
-`CMakeSettings.json` in the repository root directory. This is also done automatically by CMake
-during the Generation stage.
-
-If all the above steps are performed correctly, you can right-click the required executable, e.g.
-"desktop_client", in the "CMake Targets View" of the "Solution Explorer" side window, and select
-either "Debug" to run it immediately, or "Set As Startup Item" to allow running it using the green
-triangle ("play") icon in the toolbar at the top of the main Visual Studio window.
-
----------------------------------------------------------------------------------------------------
-## Free and Open-Source Software Notices
-
-The Network Optix VMS Open Source Components software incorporates, depends upon, interacts with,
-or was developed using a number of free and open-source software components. The full list of such
-components can be found at [OPEN SOURCE SOFTWARE DISCLOSURE](https://meta.nxvms.com/content/libraries/).
-Please see the linked component websites for additional licensing, dependency, and use information,
-as well as the component source code.
