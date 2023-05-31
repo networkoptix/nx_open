@@ -69,6 +69,7 @@
 #include <nx/vms/client/desktop/videowall/workbench_videowall_shortcut_helper.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -1294,6 +1295,8 @@ void ConnectActionsHandler::clearConnection()
     systemContext()->licensePool()->reset();
 
     resourceAccessManager()->endUpdate();
+
+    systemContext()->lookupListManager()->deinitialize();
 }
 
 void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptions options)
