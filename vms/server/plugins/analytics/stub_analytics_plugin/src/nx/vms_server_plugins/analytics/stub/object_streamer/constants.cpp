@@ -27,8 +27,8 @@ const std::string kImageSourceField = "imageSource";
 const std::string kRegularEntryType = "regular";
 const std::string kBestShotEntryType = "bestShot";
 
-const std::string kDefaultManifestFile = "manifest.json";
-const std::string kDefaultStreamFile = "stream.json";
+const std::string kDefaultManifestFile = "object_streamer/manifest.json";
+const std::string kDefaultStreamFile = "object_streamer/stream.json";
 
 const std::string kManifestFileSetting = "manifestFile";
 const std::string kStreamFileSetting = "streamFile";
