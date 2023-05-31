@@ -172,7 +172,9 @@ void CameraHotspotsSettingsWidget::Private::selectHotspotsViewRow(std::optional<
         if (selectionModel->currentIndex().isValid())
             ui->hotspotsItemView->closePersistentEditor(selectionModel->currentIndex());
 
-        selectionModel->select(hotspotsModel->index(*row, 0),
+        const auto index = hotspotsModel->index(*row, 0);
+        ui->hotspotsItemView->scrollTo(index);
+        selectionModel->select(index,
             QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     }
     else
