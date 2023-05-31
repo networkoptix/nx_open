@@ -37,8 +37,8 @@ as well as the component source code.
 
 Supported target platforms and architectures:
 - Windows 10 x64 (Microsoft Visual Studio).
-- Linux Ubuntu 18.04 and 20.04 (GCC or Clang) x64, ARM64, ARM32 (cross-compiling on Linux x64).
-- MacOS Monterey 12.6.3 (Xcode with Clang) x64, ARM M1/M2.
+- Linux Ubuntu 18.04 and 20.04 (GCC or Clang) x64, ARM 32/64 (cross-compiling on Linux x64).
+- MacOS Monterey 12.6.3 (Xcode with Clang) x64, Apple M1/M2.
 
 Build prerequisites:
 - **Python 3.8+** - should be available on `PATH` as `python`, and for macOS and Ubuntu also as
@@ -48,7 +48,7 @@ Build prerequisites:
     git checkout master # The master branch contains a universal requirements.txt.
     pip install -r requirements.txt
     ```
-    On Windows, run `pip` as an Administrator; on Linux - relogin to make ~/.local/bin/ appear on
+    On Windows, run `pip` as an Administrator; on Linux - re-login to make ~/.local/bin/ appear on
     PATH.
 - **Linux:** Build and runtime dependencies:
     ```
@@ -121,9 +121,9 @@ for Windows.
     Nx-Meta-branded Customization Packages (their `<customization_id>` is `metavms`).
 
 - To perform an incremental build after some changes, run the `<build>` script without arguments.
-    - Note that there is no need to explicitly call the generation stage after adding/deleting
+    - Note that there is no need to explicitly call the Generation stage after adding/deleting
         source files or altering the build system files, because `ninja_tool.py` properly
-        handles such cases - the generation stage will be called automatically when needed.
+        handles such cases - the Generation stage will be called automatically when needed.
 
 For **cross-compiling** on Linux or MacOS, set the CMake variable `<targetDevice>`: add the
 argument `-DtargetDevice=<value>`, where <value> is one of the following:
@@ -133,7 +133,7 @@ argument `-DtargetDevice=<value>`, where <value> is one of the following:
 - `macos_x64`
 - `macos_arm64`
 
-Building and debugging in Visual Studio IDE is also supported: run the generation stage from the
+Building and debugging in Visual Studio IDE is also supported: run the Generation stage from the
 command line, it will create `CMakeSettings.json` and `launch.vs.json`, then open the project.
 
 It is recommended to set the environment variable `NX_CONAN_DOWNLOAD_CACHE` to the full path of a
@@ -165,7 +165,7 @@ build directories.
 
         The example of a configuration file can be found in
         `build_utils/signtool/config/config.yaml`.
-    - Add a CMake argument `-DsigntoolConfig=<configuration_file_path>` to the generation stage. If
+    - Add a CMake argument `-DsigntoolConfig=<configuration_file_path>` to the Generation stage. If
     this argument is missing, no signing will be performed.
 
     Also you can sign any file manually by calling `signtool.py` directly:
@@ -249,6 +249,3 @@ Technically it is possible to specify a custom Update server in the VMS Server s
 custom Update server, and prepare the update packages and meta-information according to the VMS
 standard, so that the automatic updates will work with a custom VMS built from open source. In the
 future, instructions and/or tools for this will likely be provided.
-
-
-
