@@ -13,37 +13,22 @@
 
 namespace nx::vms::client::core {
 
-namespace {
-
-QnUserResourcePtr findUser(const QString& userName, const QnResourceList& resources)
-{
-    for (const auto& resource: resources)
-    {
-        if (auto user = resource.dynamicCast<QnUserResource>())
-        {
-            if (userName.compare(user->getName(), Qt::CaseInsensitive) == 0)
-                return user;
-        }
-    }
-    return {};
-}
-
-} // namespace
-
 UserWatcher::UserWatcher(SystemContext* systemContext, QObject* parent):
     QObject(parent),
     SystemContextAware(systemContext)
 {
     connect(resourcePool(), &QnResourcePool::resourcesAdded,
         this,
-        [this](const QnResourceList& resources)
+        [this](const QnResourceList&)
         {
             const auto username = QString::fromStdString(
                 this->systemContext()->connectionCredentials().username);
 
             if (!m_user && !username.isEmpty())
             {
-                if (const auto user = findUser(username, resources))
+                // Here we use the same method as server in order to select the correct user when
+                // there are multiple users with the same name.
+                if (const auto user = resourcePool()->userByName(username))
                     setUser(user);
             }
         }

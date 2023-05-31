@@ -193,13 +193,9 @@ void ContextCurrentUserWatcher::setReconnectOnPasswordChange(bool value)
 
 QnUserResourcePtr ContextCurrentUserWatcher::calculateCurrentUser() const
 {
-    for (const auto& user: resourcePool()->getResources<QnUserResource>())
-    {
-        if (user->getName().toLower() != m_userName.toLower())
-            continue;
-        return user;
-    }
-    return QnUserResourcePtr();
+    // Here we use the same method as server in order to select the correct user when there are
+    // multiple users with the same name.
+    return resourcePool()->userByName(m_userName);
 }
 
 void ContextCurrentUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
