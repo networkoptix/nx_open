@@ -21,6 +21,7 @@
 #include <nx/vms/client/desktop/showreel/showreel_state_manager.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
+#include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
@@ -59,6 +60,7 @@ struct SystemContext::Private
     std::unique_ptr<QnMediaServerStatisticsManager> mediaServerStatisticsManager;
     std::unique_ptr<SystemSpecificLocalSettings> localSettings;
     std::unique_ptr<RestApiHelper> restApiHelper;
+    std::unique_ptr<DelayedDataLoader> delayedDataLoader;
 
     void initLocalRuntimeInfo()
     {
@@ -108,6 +110,7 @@ SystemContext::SystemContext(
                 this);
             d->localSettings = std::make_unique<SystemSpecificLocalSettings>(this);
             d->restApiHelper = std::make_unique<RestApiHelper>(this);
+            d->delayedDataLoader = std::make_unique<DelayedDataLoader>(this);
             break;
 
         case Mode::crossSystem:

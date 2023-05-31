@@ -181,6 +181,13 @@ LookupListActionHandler::LookupListActionHandler(QObject* parent):
 
     connect(action(ui::action::OpenLookupListsDialogAction), &QAction::triggered, this,
         &LookupListActionHandler::openLookupListsDialog);
+
+    connect(lookupListManager(), &common::LookupListManager::initialized, this,
+        [this]()
+        {
+            if (d->dialog)
+                d->dialog->setData(lookupListManager()->lookupLists());
+        });
 }
 
 LookupListActionHandler::~LookupListActionHandler()
@@ -190,49 +197,13 @@ LookupListActionHandler::~LookupListActionHandler()
 
 void LookupListActionHandler::openLookupListsDialog()
 {
+    if (appContext()->qmlEngine()->baseUrl().isLocalFile())
+        appContext()->qmlEngine()->clearComponentCache();
+
     d->dialog = std::make_unique<LookupListsDialog>(systemContext(), mainWindowWidget());
     if (lookupListManager()->isInitialized())
     {
         d->dialog->setData(lookupListManager()->lookupLists());
-    }
-    else
-    {
-        d->cancelRequest();
-
-        auto callback = nx::utils::guarded(
-            this,
-            [this](
-                bool /*success*/,
-                rest::Handle requestId,
-                const rest::ErrorOrData<LookupListDataList>& result)
-            {
-                if (d->requestId != requestId)
-                    return;
-
-                d->requestId = std::nullopt;
-
-                if (std::holds_alternative<network::rest::Result>(result))
-                {
-                    auto restResult = std::get<network::rest::Result>(result);
-                    NX_WARNING(
-                        this,
-                        "Lookup Lists request %1 failed: %2",
-                        requestId, restResult.errorString);
-
-                    d->handleError(tr("Network request failed"));
-                    return;
-                }
-
-                auto lookupLists = std::get<LookupListDataList>(result);
-                NX_VERBOSE(this, "Received %1 Lookup Lists entries", lookupLists.size());
-
-                lookupListManager()->initialize(std::move(lookupLists));
-                if (d->dialog)
-                    d->dialog->setData(lookupListManager()->lookupLists());
-            });
-
-        d->requestId = connectedServerApi()->getLookupLists(std::move(callback), thread());
-        NX_VERBOSE(this, "Send get lookup lists request (%1)", *d->requestId);
     }
 
     connect(d->dialog.get(), &LookupListsDialog::saveRequested, this,
