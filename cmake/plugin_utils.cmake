@@ -11,7 +11,8 @@ set_property(GLOBAL PROPERTY nx_server_plugins_optional_list)
 set(nx_add_plugin_to_distribution_if NOT targetDevice STREQUAL "edge1") #< The default condition.
 
 function(nx_add_server_plugin target)
-    cmake_parse_arguments(PLUGIN "OPTIONAL;DEDICATED_DIR" "" "ADD_TO_DISTRIBUTION_IF;EXTRA_FILES" ${ARGN})
+    cmake_parse_arguments(PLUGIN "OPTIONAL;DEDICATED_DIR" "EXTRA_FILES_SUBDIR"
+        "ADD_TO_DISTRIBUTION_IF;EXTRA_FILES" ${ARGN})
 
     if(PLUGIN_OPTIONAL)
         set(optionalPostfix "_optional")
@@ -48,7 +49,12 @@ function(nx_add_server_plugin target)
     endif()
 
     foreach(extra_file ${PLUGIN_EXTRA_FILES})
-        nx_copy("${extra_file}" DESTINATION "${CMAKE_BINARY_DIR}/${outputDirectory}" IF_DIFFERENT)
+        if(PLUGIN_EXTRA_FILES_SUBDIR STREQUAL "")
+            set(destination "${CMAKE_BINARY_DIR}/${outputDirectory}")
+        else()
+            set(destination "${CMAKE_BINARY_DIR}/${outputDirectory}/${PLUGIN_EXTRA_FILES_SUBDIR}")
+        endif()
+        nx_copy("${extra_file}" DESTINATION "${destination}" IF_DIFFERENT)
     endforeach()
 
     add_dependencies(server_plugins ${target})
