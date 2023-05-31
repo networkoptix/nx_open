@@ -24,7 +24,8 @@ void Server::registerRequestHandlers(
     http::server::rest::MessageDispatcher* messageDispatcher)
 {
     /**%apidoc GET /placeholder/maintenance/malloc_info
-     * %caption Get statistics from the libc allocator. Supported on Unix only.
+     * Retrieves the statistics from the libc memory allocator. Supported on Linux only.
+     * %caption Get memory allocator stats
      * %ingroup Maintenance
      * %return malloc_info(3) output. See https://man7.org/linux/man-pages/man3/malloc_info.3.html
      * for details.
@@ -34,17 +35,19 @@ void Server::registerRequestHandlers(
         http::Method::get);
 
     /**%apidoc GET /placeholder/maintenance/debug/counters
-     * This result format is not stable and can be changed at any moment.
-     * %caption Get list of various debug counters.
+     * Retrieves the list of various debug counters.
+     * %caption Get debug counters
      * %ingroup Maintenance
-     * %return The list of counters.
+     * %return The list of counters. The result format is not stable and can be changed at any
+     *     moment.
      */
     messageDispatcher->registerRequestProcessor<GetDebugCounters>(
         url::joinPath(m_maintenancePath, kDebugCounters),
         http::Method::get);
 
     /**%apidoc GET /placeholder/maintenance/version
-     * %caption Get version of the module.
+     * Reports the component version.
+     * %caption Get component version
      * %ingroup Maintenance
      * %return Version information.
      *     %struct Version
@@ -55,7 +58,8 @@ void Server::registerRequestHandlers(
         http::Method::get);
 
     /**%apidoc GET /placeholder/maintenance/health
-     * %caption Get module health information.
+     * Reports the component health information.
+     * %caption Get Module health
      * %ingroup Maintenance
      * %return Application-specific health information.
      */
