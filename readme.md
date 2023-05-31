@@ -69,6 +69,10 @@ Build prerequisites:
     brew install zlib-ng openal-soft mesa mesa-glu mesalib-glw openldap libxfixes \
         libxscrnsaver gstreamer gst-plugins-base libxslt pkgconf
     ```
+    - For Apple M1/M2, install Rosetta 2:
+    ```
+    /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+    ```
 
 ---------------------------------------------------------------------------------------------------
 ## Building VMS Desktop Client
