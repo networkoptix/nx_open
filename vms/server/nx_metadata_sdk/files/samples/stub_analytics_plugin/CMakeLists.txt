@@ -77,3 +77,8 @@ target_compile_definitions(stub_analytics_plugin
 if(NOT WIN32)
     target_link_libraries(stub_analytics_plugin PRIVATE pthread)
 endif()
+
+#--------------------------------------------------------------------------------------------------
+# Copy object_streamer files.
+
+file(COPY "object_streamer_files/" DESTINATION "object_streamer/" FILES_MATCHING PATTERN "*")
