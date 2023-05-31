@@ -26,7 +26,7 @@ is likely that a policy for contributions will be developed and offered in the f
 The list of supported and tested platforms and architectures is given in the `readme.md` of
 the particular branch of the repository. Building on other OS versions/flavors, or using other
 versions of the build tools may work, but may require some adaptation, and the support team will
-not be able to provide asistance.
+not be able to provide assistance.
 
 Note that certain components in this repository can be built using more platforms and compilers,
 e.g. the Nx Kit library (`artifacts/nx_kit/`) - see its `readme.md`.
@@ -239,9 +239,9 @@ Open Visual Studio, select "Open a local folder" and choose the repository root 
 Alternatively, run `devenv.exe` (Visual Studio IDE executable) supplying the repository root
 directory as an argument.
 
-Right after opening the directory, Visual Studio will start the CMake generation stage using the
+Right after opening the directory, Visual Studio will start the CMake Generation stage using the
 default build configuration - `Debug (minimal)`. If you need another build configuration, select it
-in the Visual Studio main toolbar - the CMake generation stage will be started immediately, and the
+in the Visual Studio main toolbar - the CMake Generation stage will be started immediately, and the
 build directory from the previously selected build configuration can be deleted manually.
 
 If you don't need advanced debugging features, you may choose one of the Release configurations -
