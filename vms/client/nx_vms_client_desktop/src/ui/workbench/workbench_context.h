@@ -21,9 +21,10 @@ class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchLayoutWatcher;
 
+namespace nx::vms::client::core { class UserWatcher; }
+
 namespace nx::vms::client::desktop {
 
-class ContextCurrentUserWatcher;
 class MainWindow;
 class ResourceTreeSettings;
 class IntercomManager;
@@ -115,7 +116,7 @@ private:
 
     QPointer<nx::vms::client::desktop::MainWindow> m_mainWindow;
 
-    nx::vms::client::desktop::ContextCurrentUserWatcher* m_userWatcher = nullptr;
+    nx::vms::client::core::UserWatcher* m_userWatcher = nullptr;
     QnWorkbenchLayoutWatcher *m_layoutWatcher = nullptr;
 
     bool m_closingDown = false;
