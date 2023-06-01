@@ -54,8 +54,6 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "setting_up_camera_transport_pr.html";
         case Qn::HelpTopic::CameraSettings_Expert_SettingsControl_Help:
             return "preventing_vms_from_c.html";
-        case Qn::HelpTopic::CameraSettings_Expert_AutomaticExport_Help:
-            return "disabling-automatic-export-sd.html";
         case Qn::HelpTopic::CameraSettings_Help:
             return "setting_up_cameras_and_devices.html";
         case Qn::HelpTopic::CameraSettings_Motion_Help:
@@ -68,10 +66,12 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "setting_camera_orientation.html";
         case Qn::HelpTopic::CameraSettings_SecondStream_Help:
             return "dual_streaming.html";
+        case Qn::HelpTopic::CameraSettings_Onvif_Help:
+            return "using-the-specific-onvif-profi.html";
         case Qn::HelpTopic::CertificateValidation_Help:
             return "certificate-validation.html";
         case Qn::HelpTopic::CloudLayoutsIntroduction_help:
-            return "cloud-layouts.html";
+            return "adding-items-to-layout.html";
         case Qn::HelpTopic::CloudLayoutsIntroductionAssign_Help:
             return "assigning-layout-to-users-and-.html";
         case Qn::HelpTopic::ConnectToCamerasOverOnlyHttps_Help:
@@ -227,7 +227,7 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
         case Qn::HelpTopic::MainWindow_Scene_EMapping_Help:
             return "e-mapping.html";
         case Qn::HelpTopic::MainWindow_Scene_Help:
-            return "vms_user_interface_overview.html";
+            return "index.html";
         case Qn::HelpTopic::MainWindow_Scene_PreviewSearch_Help:
             return "thumbnail_search.html";
         case Qn::HelpTopic::MainWindow_Scene_TourInProgress_Help:
