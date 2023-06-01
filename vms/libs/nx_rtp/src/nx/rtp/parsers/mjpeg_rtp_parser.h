@@ -64,6 +64,12 @@ private:
     std::vector<quint8> m_extendedJpegHeader;
     bool m_sofFound = false;
     CodecParametersConstPtr m_codecParameters;
+    struct Chunk
+    {
+        int offset;
+        int size;
+    };
+    std::vector<Chunk> m_chunks;
 };
 
 } // namespace nx::rtp

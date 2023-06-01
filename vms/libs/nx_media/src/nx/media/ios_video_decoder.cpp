@@ -347,9 +347,7 @@ int IOSVideoDecoder::decode(
     Q_D(IOSVideoDecoder);
 
     auto compressedVideoData = videoData;
-    if (videoData
-        && (videoData->compressionType == AV_CODEC_ID_H264 || videoData->compressionType == AV_CODEC_ID_H265)
-        && !nx::media::isMp4Format(videoData.get()))
+    if (videoData && nx::media::isAnnexb(videoData.get()))
     {
         compressedVideoData = d->m_annexbToMp4.process(videoData.get());
         if (!compressedVideoData)

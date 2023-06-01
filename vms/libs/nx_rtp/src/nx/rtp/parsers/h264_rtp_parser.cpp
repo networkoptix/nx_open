@@ -8,7 +8,6 @@
 
 namespace nx::rtp {
 
-static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const int kMinIdrCountToDetectIFrameByIdr = 2;
 
 H264Parser::H264Parser():
@@ -21,7 +20,6 @@ H264Parser::H264Parser():
         m_frameExists(false),
         m_firstSeqNum(0),
         m_packetPerNal(0),
-        m_videoFrameSize(0),
         m_lastRtpTime(0)
 {
     StreamParser::setFrequency(90'000);
@@ -45,37 +43,26 @@ void H264Parser::setSdpInfo(const Sdp::Media& sdp)
                     QByteArray nal = QByteArray::fromBase64(nalStr.toUtf8());
                     // Some cameras sends extra start code in SPSPSS sdp string.
                     nal = NALUnit::dropBorderedStartCodes(nal);
-                    if( nal.size() > 0 && NALUnit::decodeType(nal[0]) == nuSPS )
-                        decodeSpsInfo( nal );
+                    if (nal.size() > 0 && NALUnit::decodeType(nal[0]) == nuSPS)
+                        decodeSpsInfo((uint8_t*)nal.data(), nal.size());
 
-                    m_sdpSpsPps << QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX)).append(nal);
+                    m_sdpSpsPps.insert(m_sdpSpsPps.end(),
+                        NALUnit::kStartCodeLong,
+                        NALUnit::kStartCodeLong + sizeof(NALUnit::kStartCodeLong));
+                    m_sdpSpsPps.insert(m_sdpSpsPps.end(),
+                        (uint8_t*)nal.data(),
+                        (uint8_t*)nal.data() + nal.size());
                 }
             }
         }
     }
 }
 
-int H264Parser::getSpsPpsSize() const
-{
-    int result = 0;
-    for (int i = 0; i < m_sdpSpsPps.size(); ++i)
-        result += m_sdpSpsPps[i].size();
-    return result;
-}
-
-void H264Parser::serializeSpsPps(nx::utils::ByteArray& dst)
-{
-    for (int i = 0; i < m_sdpSpsPps.size(); ++i)
-        dst.uncheckedWrite(m_sdpSpsPps[i].data(), m_sdpSpsPps[i].size());
-}
-
-void H264Parser::decodeSpsInfo(const QByteArray& data)
+void H264Parser::decodeSpsInfo(const uint8_t* data, int size)
 {
     try
     {
-        m_sps.decodeBuffer(
-            (const quint8*) data.constData(),
-            (const quint8*) data.constData() + data.size());
+        m_sps.decodeBuffer(data, data + size);
         m_sps.deserialize();
         m_spsInitialized = true;
 
@@ -90,66 +77,23 @@ bool H264Parser::isBufferOverflow() const
 {
     int addHeaderSize = 0;
     if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
-        addHeaderSize = getSpsPpsSize();
+        addHeaderSize = m_sdpSpsPps.size();
 
-    int totalSize = m_videoFrameSize + addHeaderSize;
+    int totalSize = m_chunks.size() + addHeaderSize;
     return totalSize > MAX_ALLOWED_FRAME_SIZE;
 }
 
 QnCompressedVideoDataPtr H264Parser::createVideoData(const quint8* rtpBuffer, quint32 rtpTime)
 {
-    int addHeaderSize = 0;
+    QnWritableCompressedVideoDataPtr result;
     if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
-        addHeaderSize = getSpsPpsSize();
+        result = m_chunks.buildFrame(rtpBuffer, m_sdpSpsPps.data(), m_sdpSpsPps.size());
+    else
+        result = m_chunks.buildFrame(rtpBuffer, nullptr, 0);
 
-    int totalSize = m_videoFrameSize + addHeaderSize;
-
-    QnWritableCompressedVideoDataPtr result =
-        QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(totalSize));
     result->compressionType = AV_CODEC_ID_H264;
-
     if (m_keyDataExists)
-    {
         result->flags = QnAbstractMediaData::MediaFlags_AVKey;
-        if (!m_builtinSpsFound || !m_builtinPpsFound)
-            serializeSpsPps(result->m_data);
-    }
-
-    size_t spsNaluStartOffset = (size_t) -1;
-    size_t spsNaluSize = 0;
-    for (size_t i = 0; i < m_chunks.size(); ++i)
-    {
-        auto buffer = m_chunks[i].bufferStart ? m_chunks[i].bufferStart : rtpBuffer;
-        if (m_chunks[i].nalStart)
-        {
-            // Close previous SPS.
-            if ((spsNaluStartOffset != (size_t)-1) && (spsNaluSize == 0))
-                spsNaluSize = result->m_data.size() - spsNaluStartOffset;
-
-            result->m_data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-
-            const auto nalType = NALUnit::decodeType(*(buffer + m_chunks[i].bufferOffset));
-            if ((m_chunks[i].len > 0) && (nalType == nuSPS))
-            {
-                // More than one SPS is not supported, currently we analyze only the last one.
-                spsNaluStartOffset = result->m_data.size();
-                spsNaluSize = 0;
-            }
-        }
-
-        result->m_data.uncheckedWrite(
-            (const char*) buffer + m_chunks[i].bufferOffset, m_chunks[i].len);
-    }
-
-    if (spsNaluStartOffset != (size_t) -1)
-    {
-        if (spsNaluSize == 0)
-            spsNaluSize = result->m_data.size() - spsNaluStartOffset;
-
-        // Decoding sps to detect stream resolution change.
-        decodeSpsInfo(QByteArray::fromRawData(
-            result->m_data.constData() + spsNaluStartOffset, (int) spsNaluSize));
-    }
 
     auto codecParameters = QnFfmpegHelper::createVideoCodecParameters(result.get());
     if (codecParameters && (!m_codecParameters || !m_codecParameters->isEqual(*codecParameters)))
@@ -166,7 +110,6 @@ QnCompressedVideoDataPtr H264Parser::createVideoData(const quint8* rtpBuffer, qu
 void H264Parser::clear()
 {
     m_chunks.clear();
-    m_videoFrameSize = 0;
     m_keyDataExists = false;
     m_builtinPpsFound = false;
     m_builtinSpsFound = false;
@@ -207,7 +150,10 @@ void H264Parser::updateNalFlags(const quint8* data, int dataLen)
         const auto nalUnitType = NALUnit::decodeType(*data);
 
         if (nalUnitType == nuSPS)
+        {
             m_builtinSpsFound = true;
+            decodeSpsInfo(data, dataLen);
+        }
         else if (nalUnitType == nuPPS)
             m_builtinPpsFound = true;
         else if (NALUnit::isSliceNal(nalUnitType))
@@ -305,7 +251,7 @@ Result H264Parser::processData(
     const quint8* bufferEnd = rtpBuffer + bytesRead;
     quint16 sequenceNum = rtpHeader.getSequence();
 
-    if (m_videoFrameSize > MAX_ALLOWED_FRAME_SIZE)
+    if (m_chunks.size() > MAX_ALLOWED_FRAME_SIZE)
     {
         clear();
         return {false, "Too large RTP/H.264 frame. Truncate video buffer"};
@@ -355,8 +301,7 @@ Result H264Parser::processData(
                 }
 
                 nalUnitType = NALUnit::decodeType(*curPtr);
-                m_chunks.emplace_back((int) (curPtr - rtpBufferBase), nalUnitLen, true);
-                m_videoFrameSize += nalUnitLen + 4;
+                m_chunks.addChunk((int) (curPtr - rtpBufferBase), nalUnitLen, true);
                 updateNalFlags(curPtr, bufferEnd - curPtr);
                 curPtr += nalUnitLen;
             }
@@ -407,11 +352,10 @@ Result H264Parser::processData(
                 --curPtr;
                 *curPtr = nalUnitType;
             }
-            m_chunks.emplace_back(
+            m_chunks.addChunk(
                 (int) (curPtr - rtpBufferBase),
                 (quint16) (bufferEnd - curPtr),
                 m_packetPerNal == 0);
-            m_videoFrameSize += bufferEnd - curPtr + (m_packetPerNal == 0 ? 4 : 0);
             break;
         }
         case MTAP16_PACKET:
@@ -425,9 +369,8 @@ Result H264Parser::processData(
         {
             curPtr--;
             nalUnitType = NALUnit::decodeType(*curPtr);
-            m_chunks.emplace_back(
+            m_chunks.addChunk(
                 (int) (curPtr - rtpBufferBase), (quint16) (bufferEnd - curPtr), true);
-            m_videoFrameSize += bufferEnd - curPtr + 4;
             updateNalFlags(curPtr, bufferEnd - curPtr);
             break; // ignore unknown data
         }
@@ -441,7 +384,7 @@ Result H264Parser::processData(
 
     if (gotData)
     {
-        backupCurrentData(rtpBufferBase);
+        m_chunks.backupCurrentData(rtpBufferBase);
     }
     else if (isBufferOverflow())
     {

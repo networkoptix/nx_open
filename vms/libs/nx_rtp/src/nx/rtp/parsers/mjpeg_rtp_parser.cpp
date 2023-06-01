@@ -593,7 +593,7 @@ Result MjpegParser::processData(
         m_frameSize = 0;
         return {false, "RTP MJPEG parser buffer overflow"};
     }
-    m_chunks.push_back(Chunk(curPtr - rtpBufferBase, bytesLeft));
+    m_chunks.emplace_back(Chunk{int(curPtr - rtpBufferBase), bytesLeft});
     m_frameSize += bytesLeft;
 
     bool lastPacketReceived = rtpHeader.marker;
@@ -613,7 +613,7 @@ Result MjpegParser::processData(
         for (uint i = 0; i < m_chunks.size(); ++i)
         {
             videoData->m_data.uncheckedWrite(
-                (const char*)rtpBufferBase + m_chunks[i].bufferOffset, m_chunks[i].len);
+                (const char*)(rtpBufferBase + m_chunks[i].offset), m_chunks[i].size);
         }
         if (needAddMarker)
             videoData->m_data.uncheckedWrite((const char*)jpeg_end, sizeof(jpeg_end));

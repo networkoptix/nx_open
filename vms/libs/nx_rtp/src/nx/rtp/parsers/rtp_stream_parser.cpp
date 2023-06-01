@@ -4,17 +4,6 @@
 
 namespace nx::rtp {
 
-namespace {
-
-static const int kDefaultChunkContainerSize = 1024;
-
-} // namespace
-
-VideoStreamParser::VideoStreamParser()
-{
-    m_chunks.reserve(kDefaultChunkContainerSize);
-}
-
 QnAbstractMediaDataPtr VideoStreamParser::nextData()
 {
     if (m_mediaData)
@@ -29,24 +18,6 @@ QnAbstractMediaDataPtr VideoStreamParser::nextData()
     }
 }
 
-void VideoStreamParser::backupCurrentData(const quint8* currentBufferBase)
-{
-    size_t chunksLength = 0;
-    for (const auto& chunk: m_chunks)
-        chunksLength += chunk.len;
-
-    m_nextFrameChunksBuffer.resize(chunksLength);
-
-    size_t offset = 0;
-    quint8* nextFrameBufRaw = m_nextFrameChunksBuffer.data();
-    for (auto& chunk: m_chunks)
-    {
-        memcpy(nextFrameBufRaw + offset, currentBufferBase + chunk.bufferOffset, chunk.len);
-        chunk.bufferStart = nextFrameBufRaw;
-        chunk.bufferOffset = (int)offset;
-        offset += chunk.len;
-    }
-}
 
 QnAbstractMediaDataPtr AudioStreamParser::nextData()
 {
