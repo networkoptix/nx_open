@@ -14,8 +14,8 @@ ToolTip
     font.pixelSize: 13
     leftPadding: 8
     rightPadding: 8
-    topPadding: 2
-    bottomPadding: 5
+    topPadding: 4
+    bottomPadding: 4
     margins: 0
 
     delay: 500
