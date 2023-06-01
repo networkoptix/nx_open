@@ -117,7 +117,7 @@ SystemContext::SystemContext(
     d->analyticsDescriptorContainer = std::make_unique<taxonomy::DescriptorContainer>(this);
     d->analyticsTaxonomyStateWatcher = std::make_unique<taxonomy::StateWatcher>(
         d->analyticsDescriptorContainer.get(),
-        d->resourcePool.get());
+        this);
 
     d->metrics = std::make_shared<nx::metrics::Storage>();
     switch (mode)
