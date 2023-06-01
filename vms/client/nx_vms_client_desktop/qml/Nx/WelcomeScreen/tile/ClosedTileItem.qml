@@ -33,6 +33,7 @@ Item
         width: parent.width - x - 32
         height: 14
 
+        textFormat: Text.PlainText
         elide: Text.ElideRight
         font.pixelSize: 12
         color: closedTileItem.tile.connectable ? ColorTheme.colors.light16 : ColorTheme.colors.dark14
