@@ -7,12 +7,14 @@
 
 class QnResourcePool;
 
+namespace nx::vms::common { class SystemContext; }
+
 namespace nx::analytics::taxonomy {
 
 class NX_VMS_COMMON_API ResourceSupportProxy: public AbstractResourceSupportProxy
 {
 public:
-    ResourceSupportProxy(QnResourcePool* resourcePool);
+    ResourceSupportProxy(nx::vms::common::SystemContext* systemContext);
 
     ~ResourceSupportProxy();
 
