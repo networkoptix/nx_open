@@ -7,6 +7,7 @@
 #include <client/client_globals.h>
 #include <core/resource/layout_resource.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <recording/time_period.h>
 
 #include "resource_fwd.h"
@@ -56,6 +57,9 @@ public:
      * @return New layout (not added to any system context).
      */
     LayoutResourcePtr clone(ItemsRemapHash* remapHash = nullptr) const;
+
+    nx::vms::api::LayoutData snapshot() const;
+    void storeSnapshot();
 
     /** Allowed time period range. Can be applied e.g for exported layout or for audit trail. */
     QnTimePeriod localRange() const;
@@ -127,6 +131,9 @@ private:
     QnTimePeriod m_localRange;
     DataHash m_data;
     QHash<QnUuid, DataHash> m_itemData;
+
+    /** Saved state of the layout, which can be used to rollback unapplied changes. */
+    nx::vms::api::LayoutData m_snapshot;
 
     bool m_isIntercomLayout = false;
 

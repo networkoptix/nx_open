@@ -748,7 +748,7 @@ LayoutsHandler::LayoutChange LayoutsHandler::calculateLayoutChange(
     result.layout = layout;
 
     /* Share added resources. */
-    const auto& snapshot = systemContext->layoutSnapshotManager()->snapshot(layout);
+    const auto& snapshot = layout->snapshot();
 
     // Check only Resources from the same System Context as the Layout. Cross-system Resources
     // cannot be available through Shared Layouts.
