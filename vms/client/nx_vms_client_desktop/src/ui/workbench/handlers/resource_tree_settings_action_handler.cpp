@@ -30,6 +30,14 @@ ResourceTreeSettingsActionHandler::ResourceTreeSettingsActionHandler(QObject* pa
 
     connect(action(action::HideServersInTreeAction), &QAction::triggered,
         this, &ResourceTreeSettingsActionHandler::hideServersInResourceTree);
+
+    const ResourceTreeSettings* settings = context()->resourceTreeSettings();
+
+    connect(action(action::ToggleProxiedResources), &QAction::triggered,
+        settings, &ResourceTreeSettings::setShowProxiedResourcesInServerTree);
+
+    connect(settings, &ResourceTreeSettings::showProxiedResourcesInServerTreeChanged,
+        action(ui::action::ToggleProxiedResources), &QAction::setChecked);
 }
 
 void ResourceTreeSettingsActionHandler::showServersInResourceTree()

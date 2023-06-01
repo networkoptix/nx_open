@@ -512,6 +512,14 @@ enum IDType
      */
     HideServersInTreeAction,
 
+    /**
+     * Toggles representation and behavior of proxied resources in the Resource Tree. By default,
+     * all proxied resources are displayed only under the corresponding nodes. When enabled,
+     * proxied resources are displayed also under the corresponding server node, it is possible to
+     * group them with other server resources and change proxying settings using drag'n'drop.
+     */
+    ToggleProxiedResources,
+
     /* Tab bar actions. */
 
     /**

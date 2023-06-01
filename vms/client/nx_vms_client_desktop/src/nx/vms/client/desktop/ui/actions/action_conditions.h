@@ -554,6 +554,14 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
+class ToggleProxiedResourcesCondition: public Condition
+{
+public:
+    virtual ActionVisibility check(
+        const Parameters& parameters,
+        QnWorkbenchContext* context) override;
+};
+
 /**
  * Calculates visual state of "Replace Camera..." context menu action.
  * @return <tt>Enabled</tt> if parameters have camera, camera is offline, it's not a virtual

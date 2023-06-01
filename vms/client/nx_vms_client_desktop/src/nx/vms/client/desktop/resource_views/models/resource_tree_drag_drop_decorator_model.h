@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QIdentityProxyModel>
+#include <QtCore/QPointer>
 
 #include <core/resource/shared_resource_pointer_list.h>
 
@@ -13,6 +14,8 @@ namespace nx::vms::client::desktop {
 
 namespace ui::action { class Manager; }
 namespace ui::workbench { class ActionHandler; }
+
+class ResourceTreeSettings;
 
 /**
  * Decorator model which implements Resource Tree drag & drop behavior. Logic has been extracted
@@ -30,7 +33,8 @@ public:
     ResourceTreeDragDropDecoratorModel(
         QnResourcePool* resourcePool,
         ui::action::Manager* actionManager,
-        ui::workbench::ActionHandler* actionHandler);
+        ui::workbench::ActionHandler* actionHandler,
+        ResourceTreeSettings* resourceTreeSettings);
 
     virtual ~ResourceTreeDragDropDecoratorModel() override;
 
@@ -44,6 +48,8 @@ public:
         int row, int column, const QModelIndex& parent) override;
 
     virtual Qt::DropActions supportedDropActions() const override;
+
+    bool isWebPageDragDropEnabled() const;
 
 private:
     QModelIndex targetDropIndex(const QModelIndex& dropIndex) const;
@@ -60,6 +66,7 @@ private:
     QnResourcePool* m_resourcePool = nullptr;
     ui::action::Manager* m_actionManager = nullptr;
     ui::workbench::ActionHandler* m_actionHandler = nullptr;
+    QPointer<ResourceTreeSettings> m_resourceTreeSettings;
 };
 
 } // namespace nx::vms::client::desktop

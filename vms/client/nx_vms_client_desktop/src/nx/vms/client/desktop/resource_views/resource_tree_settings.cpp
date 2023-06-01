@@ -7,12 +7,14 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 
 namespace
 {
 
 const QString kResourceTreeSettingsDelegateId = "resourceTreeSettings";
 const QString kShowServersInTreeKey = "showServersInTree";
+const QString kShowProxiedResourcesInServerTreeKey = "showProxiedResourcesInServerTree";
 
 } // namespace
 
@@ -40,18 +42,16 @@ public:
         if (!flags.testFlag(ClientStateDelegate::Substate::systemSpecificParameters))
             return false;
 
-        bool result = true;
-
         m_resourceTreeSettings->clear();
+        m_resourceTreeSettings->setShowServersInTree(state[kShowServersInTreeKey].toBool());
 
-        const auto showServersInTreeValue = state.value(kShowServersInTreeKey);
+        if (ini().webPagesAndIntegrations)
+        {
+            m_resourceTreeSettings->setShowProxiedResourcesInServerTree(
+                state[kShowProxiedResourcesInServerTreeKey].toBool());
+        }
 
-        if (showServersInTreeValue.isBool())
-            m_resourceTreeSettings->setShowServersInTree(showServersInTreeValue.toBool());
-        else
-            result = false;
-
-        return result;
+        return true;
     }
 
     virtual void saveState(DelegateState* state, SubstateFlags flags) override
@@ -63,6 +63,12 @@ public:
             return;
 
         state->insert(kShowServersInTreeKey, m_resourceTreeSettings->showServersInTree());
+
+        if (ini().webPagesAndIntegrations)
+        {
+            state->insert(kShowProxiedResourcesInServerTreeKey,
+                m_resourceTreeSettings->showProxiedResourcesInServerTree());
+        }
     }
 
     virtual void createInheritedState(
@@ -77,12 +83,15 @@ public:
             return;
 
         state->insert(kShowServersInTreeKey, m_resourceTreeSettings->showServersInTree());
+        state->insert(kShowProxiedResourcesInServerTreeKey,
+                m_resourceTreeSettings->showProxiedResourcesInServerTree());
     }
 
     virtual DelegateState defaultState() const override
     {
         DelegateState result;
         result.insert(kShowServersInTreeKey, true);
+        result.insert(kShowProxiedResourcesInServerTreeKey, false);
         return result;
     }
 
@@ -120,9 +129,24 @@ void ResourceTreeSettings::setShowServersInTree(bool show)
     emit showServersInTreeChanged();
 }
 
+bool ResourceTreeSettings::showProxiedResourcesInServerTree() const
+{
+    return m_showProxiedResourcesInServerTree;
+}
+
+void ResourceTreeSettings::setShowProxiedResourcesInServerTree(bool show)
+{
+    if (m_showProxiedResourcesInServerTree == show)
+        return;
+
+    m_showProxiedResourcesInServerTree = show;
+    emit showProxiedResourcesInServerTreeChanged(show);
+}
+
 void ResourceTreeSettings::clear()
 {
-    m_showServersInResourceTree = true;
+    setShowServersInTree(true);
+    setShowProxiedResourcesInServerTree(false);
 }
 
 } // namespace nx::vms::client::desktop

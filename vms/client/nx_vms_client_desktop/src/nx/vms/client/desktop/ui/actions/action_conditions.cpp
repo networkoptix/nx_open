@@ -1839,6 +1839,40 @@ ActionVisibility HideServersInTreeCondition::check(
     return InvisibleAction;
 }
 
+ActionVisibility ToggleProxiedResourcesCondition::check(
+    const Parameters& parameters,
+    QnWorkbenchContext* context)
+{
+    const bool isLoggedIn = !context->accessController()->user().isNull();
+    if (!isLoggedIn)
+        return InvisibleAction;
+
+    if (!parameters.hasArgument(Qn::NodeTypeRole))
+        return InvisibleAction;
+
+    const auto nodeType = parameters.argument(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    if (nodeType == ResourceTree::NodeType::servers
+        || nodeType == ResourceTree::NodeType::camerasAndDevices)
+    {
+        return EnabledAction;
+    }
+
+    const auto server = parameters.size() > 0
+        ? parameters.resource().dynamicCast<QnMediaServerResource>()
+        : QnMediaServerResourcePtr{};
+
+    if (!server || server->hasFlags(Qn::fake))
+        return InvisibleAction;
+
+    const auto parentNodeType =
+        parameters.argument(Qn::ParentNodeTypeRole).value<ResourceTree::NodeType>();
+
+    if (parentNodeType == ResourceTree::NodeType::root)
+        return EnabledAction;
+
+    return InvisibleAction;
+}
+
 ActionVisibility ReplaceCameraCondition::check(const Parameters& parameters, QnWorkbenchContext*)
 {
     using namespace nx::vms::common::utils;

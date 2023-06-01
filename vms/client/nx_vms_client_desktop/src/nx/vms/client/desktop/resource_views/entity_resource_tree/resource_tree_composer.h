@@ -76,7 +76,7 @@ private:
     };
 
     void onWorkbenchUserChanged(const QnUserResourcePtr& user);
-    void onShowServersInTreeChanged();
+    void onTreeSettingsChanged();
     entity_item_model::AbstractEntityPtr createDevicesEntity() const;
     void rebuildEntity();
     entity_item_model::AbstractEntity* entityForCurrentFilterMode() const;
