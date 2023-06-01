@@ -338,10 +338,10 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     setHelpTopic(ui->secondStreamDisableCheckBox, Qn::CameraSettings_SecondStream_Help);
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
     setHelpTopic(ui->keepCameraTimeSettingsCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
-    setHelpTopic(ui->remoteArchiveAutoImportCheckBox, Qn::CameraSettings_Expert_AutomaticExport_Help);
     setHelpTopic(ui->checkBoxPrimaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->checkBoxSecondaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->groupBoxRTP, Qn::CameraSettings_Expert_Rtp_Help);
+    setHelpTopic(ui->useMedia2ToFetchProfilesGroupBox, Qn::CameraSettings_Onvif_Help);
 
     ui->settingsDisableControlCheckBox->setHint(tr("Server will not change any cameras settings, "
         "it will receive and use camera stream as-is."));
