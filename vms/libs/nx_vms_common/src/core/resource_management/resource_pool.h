@@ -223,6 +223,11 @@ public:
     /** Find an online server with actual internet access. */
     QnMediaServerResourcePtr serverWithInternetAccess() const;
 
+    /**
+     * Find online Server that has connection to Cloud and chosen as the one to sync data with it.
+     */
+    QnMediaServerResourcePtr masterCloudSyncServer() const;
+
     QnResourceList getResourcesByParentId(const QnUuid& parentId) const;
 
     // Returns list of resources with such flag.

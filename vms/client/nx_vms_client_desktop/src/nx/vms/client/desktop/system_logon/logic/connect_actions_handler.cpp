@@ -1111,7 +1111,7 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
         .userType = currentConnection->userType(),
         .expectedServerId = serverId};
 
-    if (isConnectionToCloud(logonData) && server->hasInternetAccess())
+    if (isConnectionToCloud(logonData))
     {
         logonData.address.address = nx::vms::client::core::helpers::serverCloudHost(
             systemId, serverId);

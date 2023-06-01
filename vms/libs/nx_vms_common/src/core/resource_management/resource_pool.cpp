@@ -401,6 +401,17 @@ QnMediaServerResourcePtr QnResourcePool::serverWithInternetAccess() const
     return {}; //< No internet access found.
 }
 
+QnMediaServerResourcePtr QnResourcePool::masterCloudSyncServer() const
+{
+    NX_READ_LOCKER lock(&m_resourcesMutex);
+    for (const auto& server: std::as_const(d->mediaServers))
+    {
+        if (server->isMasterCloudSync())
+            return server;
+    }
+    return {};
+}
+
 QnMediaServerResourceList QnResourcePool::servers() const
 {
     NX_READ_LOCKER lock(&m_resourcesMutex);
