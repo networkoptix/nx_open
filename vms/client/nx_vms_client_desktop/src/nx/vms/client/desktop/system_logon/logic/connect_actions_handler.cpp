@@ -51,6 +51,7 @@
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -253,8 +254,8 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     if (connectTimeout > 0)
         setupConnectTimeoutTimer(milliseconds(connectTimeout));
 
-    auto userWatcher = context()->instance<ContextCurrentUserWatcher>();
-    connect(userWatcher, &ContextCurrentUserWatcher::userChanged, this,
+    auto userWatcher = systemContext()->userWatcher();
+    connect(userWatcher, &core::UserWatcher::userChanged, this,
         [this](const QnUserResourcePtr &user)
         {
             QnPeerRuntimeInfo localInfo = systemContext()->runtimeInfoManager()->localInfo();
@@ -621,10 +622,6 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     const auto welcomeScreen = mainWindow()->welcomeScreen();
     if (welcomeScreen) // Welcome Screen exists in the desktop mode only.
         welcomeScreen->connectionToSystemEstablished(systemId);
-
-    const QString userName = QString::fromStdString(connection->credentials().username);
-
-    context()->setUserName(userName);
 
     // TODO: #sivanov Implement separate address and credentials handling.
     appContext()->clientStateHandler()->clientConnected(
@@ -1255,7 +1252,6 @@ void ConnectActionsHandler::clearConnection()
     qnClientCoreModule->networkModule()->setSession({});
     appContext()->currentSystemContext()->setSession({});
 
-    context()->setUserName(QString());
     context()->instance<QnWorkbenchStateManager>()->tryClose(/*force*/ true);
 
     // Get ready for the next connection.

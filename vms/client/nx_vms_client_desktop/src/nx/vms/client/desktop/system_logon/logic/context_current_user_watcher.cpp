@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <utils/common/checked_cast.h>
@@ -20,13 +21,22 @@ namespace nx::vms::client::desktop {
 
 ContextCurrentUserWatcher::ContextCurrentUserWatcher(QObject *parent):
     base_type(parent),
-    QnSessionAwareDelegate(parent)
+    QnWorkbenchContextAware(parent)
 {
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
-        &ContextCurrentUserWatcher::forcedUpdate);
+    connect(systemContext()->userWatcher(), &core::UserWatcher::userChanged, this,
+        [this](const QnUserResourcePtr& user)
+        {
+            if (user)
+            {
+                setCurrentUser(user);
+                return;
+            }
 
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        &ContextCurrentUserWatcher::at_resourcePool_resourceRemoved);
+            setCurrentUser({});
+
+            if (this->connection())
+                menu()->triggerForced(ui::action::DisconnectAction, {Qn::ForceRole, true});
+        });
 
     connect(systemContext()->globalPermissionsWatcher(),
         &nx::core::access::GlobalPermissionsWatcher::ownGlobalPermissionsChanged,
@@ -113,18 +123,6 @@ size_t ContextCurrentUserWatcher::combinedAccessRightsHash() const
     return qHash(accessMap);
 }
 
-bool ContextCurrentUserWatcher::tryClose(bool force)
-{
-    if (force)
-        setUserName(QString());
-    return true;
-}
-
-void ContextCurrentUserWatcher::forcedUpdate()
-{
-    setCurrentUser(calculateCurrentUser());
-}
-
 void ContextCurrentUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
 {
     if (m_user == user)
@@ -148,21 +146,6 @@ void ContextCurrentUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
     }
 
     m_accessRightsHash = combinedAccessRightsHash();
-
-    emit userChanged(user);
-}
-
-void ContextCurrentUserWatcher::setUserName(const QString &name)
-{
-    if (m_userName == name)
-        return;
-    m_userName = name;
-    setCurrentUser(calculateCurrentUser());
-}
-
-const QString & ContextCurrentUserWatcher::userName() const
-{
-    return m_userName;
 }
 
 void ContextCurrentUserWatcher::setUserPassword(const QString &password)
@@ -179,37 +162,11 @@ const QString & ContextCurrentUserWatcher::userPassword() const
     return m_userPassword;
 }
 
-const QnUserResourcePtr & ContextCurrentUserWatcher::user() const
-{
-    return m_user;
-}
-
 void ContextCurrentUserWatcher::setReconnectOnPasswordChange(bool value)
 {
     m_reconnectOnPasswordChange = value;
     if (value && m_user && isReconnectRequired(m_user))
         reconnect();
-}
-
-QnUserResourcePtr ContextCurrentUserWatcher::calculateCurrentUser() const
-{
-    // Here we use the same method as server in order to select the correct user when there are
-    // multiple users with the same name.
-    return resourcePool()->userByName(m_userName);
-}
-
-void ContextCurrentUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
-{
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if (!user || user != m_user)
-        return;
-
-    setCurrentUser({});
-
-    if (this->connection())
-    {
-        menu()->triggerForced(ui::action::DisconnectAction, {Qn::ForceRole, true});
-    }
 }
 
 bool ContextCurrentUserWatcher::isReconnectRequired(const QnUserResourcePtr &user)

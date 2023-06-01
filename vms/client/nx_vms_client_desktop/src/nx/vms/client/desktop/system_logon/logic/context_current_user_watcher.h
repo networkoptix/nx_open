@@ -21,7 +21,7 @@ namespace nx::vms::client::desktop {
  * Implements logic for automatic reconnect on user password change.
  * Automatic reconnect can be prevented by setReconnectOnPasswordChange(false) call.
  */
-class ContextCurrentUserWatcher: public QObject, public QnSessionAwareDelegate
+class ContextCurrentUserWatcher: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -30,35 +30,18 @@ public:
     ContextCurrentUserWatcher(QObject* parent = nullptr);
     virtual ~ContextCurrentUserWatcher() override;
 
-    /** Handle disconnect from server. */
-    virtual bool tryClose(bool force) override;
-
-    virtual void forcedUpdate() override;
-
-    void setUserName(const QString &name);
-    const QString &userName() const;
-
     void setUserPassword(const QString &password);
     const QString &userPassword() const;
 
-    const QnUserResourcePtr &user() const;
-
     void setReconnectOnPasswordChange(bool reconnect);
 
-signals:
-    void userChanged(const QnUserResourcePtr &user);
-
 private:
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-
     void at_user_resourceChanged(const QnResourcePtr &resource);
 
 private:
     void setCurrentUser(const QnUserResourcePtr &currentUser);
     bool isReconnectRequired(const QnUserResourcePtr &user);
     void reconnect();
-
-    QnUserResourcePtr calculateCurrentUser() const;
 
     size_t combinedAccessRightsHash() const;
     bool updateCombinedAccessRights();

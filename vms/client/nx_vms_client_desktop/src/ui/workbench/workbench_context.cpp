@@ -23,7 +23,6 @@
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
-#include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
 #include <nx/vms/client/desktop/system_update/server_update_tool.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
@@ -64,13 +63,13 @@ QnWorkbenchContext::QnWorkbenchContext(SystemContext* systemContext, QObject* pa
 
     m_workbench.reset(new Workbench(this));
 
-    m_userWatcher = instance<ContextCurrentUserWatcher>();
+    m_userWatcher = systemContext->userWatcher();
 
     // Desktop camera must work in the normal mode only.
     if (qnRuntime->isDesktopMode())
         instance<QnWorkbenchDesktopCameraWatcher>();
 
-    connect(m_userWatcher, &ContextCurrentUserWatcher::userChanged, this,
+    connect(m_userWatcher, &nx::vms::client::core::UserWatcher::userChanged, this,
         [this](const QnUserResourcePtr& user)
         {
             accessController()->setUser(user);
@@ -209,11 +208,6 @@ QString QnWorkbenchContext::userId() const
 {
     const auto userPtr = user();
     return userPtr ? userPtr->getId().toString() : "";
-}
-
-void QnWorkbenchContext::setUserName(const QString &userName) {
-    if(m_userWatcher)
-        m_userWatcher->setUserName(userName);
 }
 
 bool QnWorkbenchContext::closingDown() const
