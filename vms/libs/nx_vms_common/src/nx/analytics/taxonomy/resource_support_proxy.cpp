@@ -6,11 +6,17 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/common/system_context_aware.h>
+#include <nx/vms/common/system_context.h>
+#include <nx/utils/safe_direct_connection.h>
 
 using nx::vms::api::analytics::DeviceAgentManifest;
+using nx::vms::common::SystemContext;
+using nx::vms::common::SystemContextAware;
 
 namespace nx::analytics::taxonomy {
 
@@ -57,11 +63,40 @@ SupportInfo supportInfoFromDeviceAgentManifest(const DeviceAgentManifest& device
     return result;
 }
 
-struct ResourceSupportProxy::Private
+struct ResourceSupportProxy::Private:
+    public QObject,
+    public Qn::EnableSafeDirectConnection,
+    public SystemContextAware
 {
-    QnResourcePool* resourcePool = nullptr;
     mutable std::map<QnUuid, std::map<QnUuid, SupportInfo>> supportInfoCache;
     mutable nx::Mutex mutex;
+
+    Private(SystemContext* systemContext):
+        SystemContextAware(systemContext)
+    {
+        directConnect(this->systemContext()->resourcePropertyDictionary(),
+            &QnResourcePropertyDictionary::propertyChanged,
+            this,
+            &ResourceSupportProxy::Private::manifestsMaybeUpdated);
+        directConnect(this->systemContext()->resourcePropertyDictionary(),
+            &QnResourcePropertyDictionary::propertyRemoved,
+            this,
+            &ResourceSupportProxy::Private::manifestsMaybeUpdated);
+    }
+
+    ~Private()
+    {
+        directDisconnectAll();
+    }
+
+    void manifestsMaybeUpdated(const QnUuid& resourceId, const QString& key)
+    {
+        NX_MUTEX_LOCKER lock(&mutex);
+        if (key != QnVirtualCameraResource::kDeviceAgentManifestsProperty)
+            return;
+
+        supportInfoCache.erase(resourceId);
+    }
 
     void fillCacheIfNeeded(QnUuid deviceId) const
     {
@@ -69,7 +104,7 @@ struct ResourceSupportProxy::Private
             return;
 
         const QnVirtualCameraResourcePtr device =
-            resourcePool->getResourceById<QnVirtualCameraResource>(deviceId);
+            systemContext()->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
 
         if (!device)
             return;
@@ -169,10 +204,9 @@ struct ResourceSupportProxy::Private
     }
 };
 
-ResourceSupportProxy::ResourceSupportProxy(QnResourcePool* resourcePool):
-    d(new Private{.resourcePool = resourcePool})
+ResourceSupportProxy::ResourceSupportProxy(SystemContext* systemContext):
+    d(new Private(systemContext))
 {
-    NX_ASSERT(d->resourcePool);
 }
 
 ResourceSupportProxy::~ResourceSupportProxy()

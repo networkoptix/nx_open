@@ -133,7 +133,7 @@ SystemContext::SystemContext(
     d->analyticsDescriptorContainer = std::make_unique<taxonomy::DescriptorContainer>(this);
     d->analyticsTaxonomyStateWatcher = std::make_unique<taxonomy::StateWatcher>(
         d->analyticsDescriptorContainer.get(),
-        d->resourcePool.get());
+        this);
 
     switch (mode)
     {
