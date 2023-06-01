@@ -73,7 +73,7 @@ Result HevcParser::processData(
     gotData = m_gotData; // Got data can be set in handlePayload
     if (gotData)
     {
-        backupCurrentData(rtpBufferBase);
+        m_chunks.backupCurrentData(rtpBufferBase);
     }
     else if (rtpHeader.marker && m_frameStartFound && m_trustMarkerBit)
     {
@@ -84,7 +84,7 @@ Result HevcParser::processData(
     }
 
     // Check buffer overflow
-    if (!gotData && m_videoFrameSize > MAX_ALLOWED_FRAME_SIZE)
+    if (!gotData && m_chunks.size() > MAX_ALLOWED_FRAME_SIZE)
     {
         reset();
         NX_WARNING(this, "RTP parser buffer overflow.");
@@ -128,7 +128,7 @@ void HevcParser::parseFmtp(const QStringList& fmtpParams)
         else if (param.startsWith(kSdpSpsPrefix))
         {
             m_context.spropSps = parameterSet;
-            extractPictureDimensionsFromSps(parameterSet);
+            extractPictureDimensionsFromSps((uint8_t*)parameterSet.data(), parameterSet.size());
         }
         else if (param.startsWith(kSdpPpsPrefix))
         {
@@ -227,10 +227,7 @@ void HevcParser::addChunk(
         m_gotData = true;
     }
 
-    m_chunks.emplace_back(bufferOffset, payloadLength, hasStartCode);
-    m_videoFrameSize += payloadLength;
-    if (hasStartCode)
-        ++m_numberOfNalUnits;
+    m_chunks.addChunk(bufferOffset, payloadLength, hasStartCode);
 }
 
 Result HevcParser::handleSingleNalUnitPacket(
@@ -409,38 +406,19 @@ void HevcParser::updateNalFlags(
 
 QnCompressedVideoDataPtr HevcParser::createVideoData(const uint8_t* rtpBuffer, uint32_t rtpTime)
 {
-    int totalSize = m_videoFrameSize + additionalBufferSize();
+    nx::utils::ByteArray header;
+    if (m_context.keyDataFound)
+        header = buildParameterSetsIfNeeded();
 
-    QnWritableCompressedVideoDataPtr result =
-        QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(totalSize));
+    QnWritableCompressedVideoDataPtr result;
+    if (header.size() != 0)
+        result = m_chunks.buildFrame(rtpBuffer, (uint8_t*)header.data(), header.size());
+    else
+        result = m_chunks.buildFrame(rtpBuffer, nullptr, 0);
 
     result->compressionType = AV_CODEC_ID_H265;
     result->width = m_context.width;
     result->height = m_context.height;
-
-    if (m_context.keyDataFound)
-    {
-        result->flags = QnAbstractMediaData::MediaFlags_AVKey;
-        addSdpParameterSetsIfNeeded(result->m_data);
-    }
-
-    for (size_t i = 0; i < m_chunks.size(); ++i)
-    {
-        if (m_chunks[i].nalStart)
-        {
-            result->m_data.uncheckedWrite(
-                (const char*)NALUnit::kStartCodeLong,
-                sizeof(NALUnit::kStartCodeLong));
-        }
-
-        const auto chunkBufferStart = m_chunks[i].bufferStart
-            ? (const char*) m_chunks[i].bufferStart
-            : (const char*) rtpBuffer;
-
-        result->m_data.uncheckedWrite(
-            chunkBufferStart + m_chunks[i].bufferOffset,
-            m_chunks[i].len);
-    }
 
     // Check all nal units for key frame slice
     if (isKeyFrame((const uint8_t*)result->data(), result->dataSize()))
@@ -462,7 +440,6 @@ void HevcParser::clear()
 
 void HevcParser::reset(bool softReset)
 {
-    m_videoFrameSize = 0;
     if (m_context.keyDataFound || !softReset)
     {
         m_context.inStreamVpsFound = false;
@@ -473,19 +450,7 @@ void HevcParser::reset(bool softReset)
         m_frameStartFound = false;
 
     m_context.keyDataFound = false;
-
-    m_numberOfNalUnits = 0;
     m_chunks.clear();
-}
-
-bool HevcParser::extractPictureDimensionsFromSps(const QByteArray& buffer)
-{
-    return extractPictureDimensionsFromSps((const uint8_t*)buffer.data(), buffer.size());
-}
-
-bool HevcParser::extractPictureDimensionsFromSps(const nx::Buffer& buffer)
-{
-    return extractPictureDimensionsFromSps((const uint8_t*)buffer.data(), buffer.size());
 }
 
 bool HevcParser::extractPictureDimensionsFromSps(const uint8_t* buffer, int bufferLength)
@@ -512,26 +477,9 @@ void HevcParser::insertPayloadHeader(
     (*payloadStart)[1] = tid;
 }
 
-int HevcParser::additionalBufferSize() const
+nx::utils::ByteArray HevcParser::buildParameterSetsIfNeeded()
 {
-    int additionalBufferSize = 0;
-
-    // Space for parameter sets with NAL prefixes
-    if (!m_context.inStreamVpsFound && m_context.spropVps)
-        additionalBufferSize += sizeof(NALUnit::kStartCodeLong) + m_context.spropVps->size();
-    if (!m_context.inStreamSpsFound && m_context.spropSps)
-        additionalBufferSize += sizeof(NALUnit::kStartCodeLong) + m_context.spropSps->size();
-    if (!m_context.inStreamPpsFound && m_context.spropPps)
-        additionalBufferSize += sizeof(NALUnit::kStartCodeLong) + m_context.spropPps->size();
-
-    // Space for NAL prefixes
-    additionalBufferSize += m_numberOfNalUnits * sizeof(NALUnit::kStartCodeLong);
-
-    return additionalBufferSize;
-}
-
-void HevcParser::addSdpParameterSetsIfNeeded(nx::utils::ByteArray& buffer)
-{
+    nx::utils::ByteArray buffer;
     if (!m_context.inStreamVpsFound && m_context.spropVps)
     {
         buffer.uncheckedWrite(
@@ -560,6 +508,7 @@ void HevcParser::addSdpParameterSetsIfNeeded(nx::utils::ByteArray& buffer)
             m_context.spropPps->data(),
             m_context.spropPps->size());
     }
+    return buffer;
 }
 
 } // namespace nx::rtp

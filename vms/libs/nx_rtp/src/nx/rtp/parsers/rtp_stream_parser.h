@@ -47,37 +47,11 @@ using StreamParserPtr = std::unique_ptr<nx::rtp::StreamParser>;
 
 class NX_RTP_API VideoStreamParser: public StreamParser
 {
-
 public:
-    VideoStreamParser();
-    virtual ~VideoStreamParser() = default;
     virtual QnAbstractMediaDataPtr nextData() override;
 
 protected:
-    struct Chunk
-    {
-        Chunk() = default;
-        Chunk(int bufferOffset, quint16 len, quint8 nalStart = false):
-            bufferStart(nullptr),
-            bufferOffset(bufferOffset),
-            len(len),
-            nalStart(nalStart)
-        {
-        }
-
-        quint8* bufferStart = nullptr;
-        int bufferOffset = 0;
-        quint16 len = 0;
-        bool nalStart = false;
-    };
-
-protected:
-    void backupCurrentData(const quint8* currentBufferBase);
-
-protected:
     QnAbstractMediaDataPtr m_mediaData;
-    std::vector<Chunk> m_chunks;
-    std::vector<quint8> m_nextFrameChunksBuffer;
 };
 
 class NX_RTP_API AudioStreamParser: public StreamParser

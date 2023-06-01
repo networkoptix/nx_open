@@ -7,6 +7,7 @@
 
 #include <nx/codec/nal_units.h>
 #include <nx/media/video_data_packet.h>
+#include <nx/rtp/parsers/rtp_chunk_buffer.h>
 #include <nx/rtp/parsers/rtp_stream_parser.h>
 
 namespace nx::rtp {
@@ -27,8 +28,9 @@ public:
     virtual void clear() override;
 
 private:
+    RtpChunkBuffer m_chunks;
     QMap <int, QByteArray> m_allNonSliceNal;
-    QList<QByteArray> m_sdpSpsPps;
+    std::vector<uint8_t> m_sdpSpsPps;
     SPSUnit m_sps;
     bool m_spsInitialized;
     bool m_builtinSpsFound;
@@ -38,15 +40,11 @@ private:
     bool m_frameExists;
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
-
-    //nx::utils::ByteArray m_videoBuffer;
-    int m_videoFrameSize;
     quint32 m_lastRtpTime;
     CodecParametersConstPtr m_codecParameters;
 
 private:
-    void serializeSpsPps(nx::utils::ByteArray& dst);
-    void decodeSpsInfo(const QByteArray& data);
+    void decodeSpsInfo(const uint8_t* data, int size);
     bool isFirstSliceNal(const quint8 nalType, const quint8* data, int dataLen) const;
     bool isPacketStartsNewFrame(const quint8* curPtr, const quint8* bufferEnd) const;
 
@@ -54,7 +52,6 @@ private:
     bool isBufferOverflow() const;
 
     void updateNalFlags(const quint8* data, int dataLen);
-    int getSpsPpsSize() const;
 };
 
 } // namespace nx::rtp

@@ -6,6 +6,7 @@
 
 #include <nx/codec/hevc/hevc_common.h>
 #include <nx/media/video_data_packet.h>
+#include <nx/rtp/parsers/rtp_chunk_buffer.h>
 #include <nx/rtp/parsers/rtp_stream_parser.h>
 #include <nx/rtp/rtp.h>
 #include <nx/utils/buffer.h>
@@ -98,11 +99,9 @@ private:
         uint8_t tid);
 
     int additionalBufferSize() const;
-    void addSdpParameterSetsIfNeeded(nx::utils::ByteArray& buffer);
+    nx::utils::ByteArray buildParameterSetsIfNeeded();
     QnCompressedVideoDataPtr createVideoData(const uint8_t* rtpBuffer, uint32_t rtpTime);
     void parseFmtp(const QStringList& fmtp);
-    bool extractPictureDimensionsFromSps(const QByteArray& rawSps);
-    bool extractPictureDimensionsFromSps(const nx::Buffer& rawSps);
     bool extractPictureDimensionsFromSps(const uint8_t* buffer, int bufferLength);
     void reset(bool softReset = false); //< Always returns false
     void addChunk(nx::media::hevc::NalUnitType, int bufferOffset, int payloadLength, bool hasStartCode);
@@ -113,10 +112,8 @@ private:
         int payloadLength);
 
 private:
+    RtpChunkBuffer m_chunks;
     HevcContext m_context;
-
-    int m_numberOfNalUnits = 0;
-    int m_videoFrameSize = 0;
 
     uint32_t m_lastRtpTimestamp = 0;
     const uint8_t* m_rtpBufferBase;
