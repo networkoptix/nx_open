@@ -65,9 +65,11 @@ bool ConnectToCloudTool::start()
         return false;
     }
 
-    if (!resourcePool()->serverWithInternetAccess())
+    if (!resourcePool()->masterCloudSyncServer())
     {
-        showFailure(tr("None of your Servers is connected to the Internet."));
+        showFailure(tr("None of your Servers has connection to %1.",
+            "%1 is the short cloud name (like Cloud)")
+            .arg(nx::branding::shortCloudName()));
         return false;
     }
 
@@ -290,21 +292,13 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
             showFailure(errorMessage);
         });
 
-    std::optional<QnUuid> proxyServerId;
-    if (!NX_ASSERT(currentServer()) || !currentServer()->hasInternetAccess())
-    {
-        if (auto serverWithInternetAccess = resourcePool()->serverWithInternetAccess())
-            proxyServerId = serverWithInternetAccess->getId();
-    }
-
     connectedServerApi()->bindSystemToCloud(
         QString::fromStdString(m_systemData.id),
         QString::fromStdString(m_systemData.authKey),
         QString::fromStdString(m_cloudAuthData.credentials.username),
         localToken.value,
         std::move(handleReply),
-        m_parent->thread(),
-        proxyServerId);
+        m_parent->thread());
 }
 
 } // namespace nx::vms::client::desktop

@@ -278,6 +278,14 @@ bool QnMediaServerResource::hasInternetAccess() const
         && getStatus() == nx::vms::api::ResourceStatus::online;
 }
 
+bool QnMediaServerResource::isMasterCloudSync() const
+{
+    const auto flags = systemContext()->runtimeInfoManager()->item(getId()).data.flags;
+    return flags.testFlag(nx::vms::api::RuntimeFlag::masterCloudSync)
+        && !hasFlags(Qn::fake)
+        && getStatus() == nx::vms::api::ResourceStatus::online;
+}
+
 rest::ServerConnectionPtr QnMediaServerResource::restConnection() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
