@@ -256,8 +256,7 @@ public:
         const QString& cloudAccountName,
         const std::string& ownerSessionToken,
         Result<ErrorOrEmpty>::type callback,
-        QThread* targetThread = nullptr,
-        std::optional<QnUuid> proxyToServer = {});
+        QThread* targetThread = nullptr);
 
     /**
      * Unbind the System from the Cloud and reset local admin password (optionally).

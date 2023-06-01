@@ -523,8 +523,7 @@ Handle ServerConnection::bindSystemToCloud(
     const QString& cloudAccountName,
     const std::string& ownerSessionToken,
     Result<ErrorOrEmpty>::type callback,
-    QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    QThread* targetThread)
 {
     nx::vms::api::CloudSystemAuth data;
     data.systemId = cloudSystemId;
@@ -538,9 +537,6 @@ Handle ServerConnection::bindSystemToCloud(
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(data));
     request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
-
-    if (proxyToServer)
-        proxyRequestUsingServer(request, *proxyToServer);
 
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
