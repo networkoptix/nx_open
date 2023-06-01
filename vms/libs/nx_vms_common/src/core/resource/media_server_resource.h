@@ -72,6 +72,12 @@ public:
     /** Online server with actual internet access. */
     bool hasInternetAccess() const;
 
+    /**
+     * Whether this Server is online and has connection to Cloud and chosen as the one to sync data
+     * with it.
+     */
+    bool isMasterCloudSync() const;
+
     /** New Server Rest connection. */
     rest::ServerConnectionPtr restConnection() const;
 
