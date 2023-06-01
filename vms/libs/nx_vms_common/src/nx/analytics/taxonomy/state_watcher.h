@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx::analytics::taxonomy {
@@ -10,12 +11,12 @@ namespace nx::analytics::taxonomy {
 class State;
 class DescriptorContainer;
 
-class StateWatcher: public AbstractStateWatcher
+class StateWatcher: public AbstractStateWatcher, public nx::vms::common::SystemContextAware
 {
 public:
     StateWatcher(
         DescriptorContainer* taxonomyDescriptorContainer,
-        QnResourcePool* resourcePool,
+        nx::vms::common::SystemContext* systemContext,
         QObject* parent = nullptr);
 
     virtual std::shared_ptr<AbstractState> state() const override;
@@ -27,7 +28,6 @@ private:
 
 private:
     DescriptorContainer* const m_taxonomyDescriptorContainer;
-    QnResourcePool* const m_resourcePool;
     mutable nx::Mutex m_mutex;
     mutable std::shared_ptr<AbstractState> m_state;
 };
