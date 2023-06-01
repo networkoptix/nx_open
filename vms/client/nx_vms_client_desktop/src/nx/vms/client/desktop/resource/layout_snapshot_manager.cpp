@@ -21,14 +21,11 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_synchronizer.h>
 
-#include "layout_snapshot_storage.h"
-
 namespace nx::vms::client::desktop {
 
 LayoutSnapshotManager::LayoutSnapshotManager(SystemContext* systemContext, QObject* parent):
     base_type(parent),
-    SystemContextAware(systemContext),
-    m_storage(new LayoutSnapshotStorage())
+    SystemContextAware(systemContext)
 {
     // Start listening to changes.
     connect(resourcePool(), &QnResourcePool::resourcesAdded, this,
@@ -156,27 +153,13 @@ bool LayoutSnapshotManager::save(
     return success;
 }
 
-bool LayoutSnapshotManager::hasSnapshot(const LayoutResourcePtr& layout) const
-{
-    return m_storage->hasSnapshot(layout);
-}
-
-const nx::vms::api::LayoutData LayoutSnapshotManager::snapshot(
-    const LayoutResourcePtr& layout) const
-{
-    return m_storage->snapshot(layout);
-}
-
 void LayoutSnapshotManager::store(const LayoutResourcePtr &resource)
 {
     if (!NX_ASSERT(resource))
         return;
 
-    /* We don't want to get queued layout change signals that are not yet delivered,
-     * so there are no options but to disconnect. */
-    disconnectFrom(resource);
-    m_storage->storeSnapshot(resource);
-    connectTo(resource);
+    resource->storeSnapshot();
+
     markChanged(resource->getId(), false);
 }
 
@@ -189,7 +172,7 @@ void LayoutSnapshotManager::restore(const LayoutResourcePtr &resource)
      * so there are no options but to disconnect before making them. */
     disconnectFrom(resource);
     {
-        const auto snapshot = m_storage->snapshot(resource);
+        const auto snapshot = resource->snapshot();
         QnLayoutResourcePtr restored(new LayoutResource());
         ec2::fromApiToResource(snapshot, restored);
 
@@ -262,9 +245,6 @@ void LayoutSnapshotManager::onResourcesAdded(const QnResourceList& resources)
 {
     for (const auto& layout: resources.filtered<LayoutResource>())
     {
-        /* Consider it saved by default. */
-        m_storage->storeSnapshot(layout);
-
         clean(layout->getId()); //< Not changed, not being saved.
 
         /* Subscribe to changes to track changed status. */
@@ -276,7 +256,6 @@ void LayoutSnapshotManager::onResourcesRemoved(const QnResourceList& resources)
 {
     for (const auto& layout: resources.filtered<LayoutResource>())
     {
-        m_storage->removeSnapshot(layout);
         clean(layout->getId());
         disconnectFrom(layout);
     }

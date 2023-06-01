@@ -7,6 +7,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/common/intercom/utils.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 namespace nx::vms::client::desktop {
 
@@ -86,6 +87,16 @@ LayoutResourcePtr LayoutResource::clone(ItemsRemapHash* remapHash) const
     LayoutResourcePtr result = create();
     cloneTo(result, remapHash);
     return result;
+}
+
+nx::vms::api::LayoutData LayoutResource::snapshot() const
+{
+    return m_snapshot;
+}
+
+void LayoutResource::storeSnapshot()
+{
+    ec2::fromResourceToApi(toSharedPointer(this), m_snapshot);
 }
 
 QnTimePeriod LayoutResource::localRange() const
@@ -248,6 +259,8 @@ void LayoutResource::setSystemContext(nx::vms::common::SystemContext* systemCont
                 }
             }
         }));
+
+    storeSnapshot();
 }
 
 void LayoutResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)

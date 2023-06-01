@@ -15,8 +15,6 @@ namespace nx::vms::api { struct LayoutData; }
 
 namespace nx::vms::client::desktop {
 
-class LayoutSnapshotStorage;
-
 /**
  * This class maintains a storage of layout snapshots and tracks the state of
  * each layout.
@@ -37,9 +35,6 @@ public:
     typedef std::function<void(bool, const LayoutResourcePtr&)> SaveLayoutResultFunction;
     bool save(const LayoutResourcePtr& resource,
         SaveLayoutResultFunction callback = SaveLayoutResultFunction());
-
-    bool hasSnapshot(const LayoutResourcePtr& layout) const;
-    const nx::vms::api::LayoutData snapshot(const LayoutResourcePtr& layout) const;
 
     void store(const LayoutResourcePtr& resource);
     void restore(const LayoutResourcePtr& resource);
@@ -66,10 +61,6 @@ private:
     void onResourcesRemoved(const QnResourceList& resources);
     void at_layout_changed(const QnLayoutResourcePtr& resource);
     void at_resource_changed(const QnResourcePtr& resource);
-
-private:
-    /** Layout state storage that this object manages. */
-    std::unique_ptr<LayoutSnapshotStorage> m_storage;
 };
 
 } // namespace nx::vms::client::desktop
