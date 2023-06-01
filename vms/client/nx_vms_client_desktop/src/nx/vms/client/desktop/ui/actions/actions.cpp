@@ -388,6 +388,14 @@ void initialize(Manager* manager, Action* root)
         .checked(true) //< This action will be kept in checked state.
         .condition(new HideServersInTreeCondition());
 
+    factory(ToggleProxiedResources)
+        .flags(Tree | NoTarget | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Show Proxied Resources"))
+        .checkable()
+        .checked(false) //< The actual state is set in ResourceTreeSettingsActionHandler.
+        .condition(condition::isTrue(ini().webPagesAndIntegrations)
+            && ConditionWrapper(new ToggleProxiedResourcesCondition));
+
     factory().separator()
         .flags(Tree);
 

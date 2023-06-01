@@ -16,7 +16,14 @@ namespace nx::vms::client::desktop {
 class NX_VMS_CLIENT_DESKTOP_API ResourceTreeSettings: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool showServersInTree READ showServersInTree WRITE setShowServersInTree NOTIFY showServersInTreeChanged)
+
+    Q_PROPERTY(bool showServersInTree
+        READ showServersInTree WRITE setShowServersInTree NOTIFY showServersInTreeChanged)
+
+    Q_PROPERTY(bool showProxiedResourcesInServerTree
+        READ showProxiedResourcesInServerTree WRITE setShowProxiedResourcesInServerTree
+        NOTIFY showProxiedResourcesInServerTreeChanged)
+
     using base_type = QObject;
     class StateDelegate;
 
@@ -34,14 +41,19 @@ public:
     bool showServersInTree() const;
     void setShowServersInTree(bool show);
 
+    bool showProxiedResourcesInServerTree() const;
+    void setShowProxiedResourcesInServerTree(bool show);
+
 signals:
     void showServersInTreeChanged();
+    void showProxiedResourcesInServerTreeChanged(bool value);
 
 private:
     void clear();
 
 private:
     bool m_showServersInResourceTree = true;
+    bool m_showProxiedResourcesInServerTree = false;
 };
 
 } // namespace nx::vms::client::desktop

@@ -39,7 +39,13 @@ ResourceTreeComposer::ResourceTreeComposer(
     if (m_resourceTreeSettings)
     {
         connect(m_resourceTreeSettings, &ResourceTreeSettings::showServersInTreeChanged,
-            this, &ResourceTreeComposer::onShowServersInTreeChanged);
+            this, &ResourceTreeComposer::onTreeSettingsChanged);
+
+        connect(
+            m_resourceTreeSettings,
+            &ResourceTreeSettings::showProxiedResourcesInServerTreeChanged,
+            this,
+            &ResourceTreeComposer::onTreeSettingsChanged);
     }
 
     onWorkbenchUserChanged(systemContext->accessController()->user());
@@ -57,7 +63,7 @@ void ResourceTreeComposer::onWorkbenchUserChanged(const QnUserResourcePtr& user)
     rebuildEntity();
 }
 
-void ResourceTreeComposer::onShowServersInTreeChanged()
+void ResourceTreeComposer::onTreeSettingsChanged()
 {
     auto composition = static_cast<UniqueKeyCompositionEntity<int>*>(
         m_entityByFilter.at(FilterMode::noFilter).get());
@@ -70,7 +76,7 @@ void ResourceTreeComposer::onShowServersInTreeChanged()
 AbstractEntityPtr ResourceTreeComposer::createDevicesEntity() const
 {
     if (!m_resourceTreeSettings)
-        return m_entityBuilder->createServersGroupEntity();
+        return m_entityBuilder->createServersGroupEntity(/*showProxiedResources*/ false);
 
     const bool userCanSeeServers =
         accessController()->hasPowerUserPermissions()
@@ -79,9 +85,11 @@ AbstractEntityPtr ResourceTreeComposer::createDevicesEntity() const
     const bool showServers = userCanSeeServers
         && m_resourceTreeSettings->showServersInTree();
 
+    const bool showProxiedResources = m_resourceTreeSettings->showProxiedResourcesInServerTree();
+
     return showServers
-        ? m_entityBuilder->createServersGroupEntity()
-        : m_entityBuilder->createCamerasAndDevicesGroupEntity();
+        ? m_entityBuilder->createServersGroupEntity(showProxiedResources)
+        : m_entityBuilder->createCamerasAndDevicesGroupEntity(showProxiedResources);
 }
 
 void ResourceTreeComposer::rebuildEntity()

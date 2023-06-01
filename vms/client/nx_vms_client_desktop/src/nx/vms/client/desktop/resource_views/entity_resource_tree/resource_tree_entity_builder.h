@@ -45,8 +45,8 @@ public:
     AbstractEntityPtr createSpacerEntity() const;
     AbstractEntityPtr createSeparatorEntity() const;
 
-    AbstractEntityPtr createServersGroupEntity() const;
-    AbstractEntityPtr createCamerasAndDevicesGroupEntity() const;
+    AbstractEntityPtr createServersGroupEntity(bool showProxiedResources) const;
+    AbstractEntityPtr createCamerasAndDevicesGroupEntity(bool showProxiedResources) const;
     AbstractEntityPtr createLayoutsGroupEntity() const;
 
     AbstractEntityPtr createShowreelsGroupEntity() const;
@@ -79,7 +79,10 @@ public:
 
     AbstractEntityPtr createFlatCamerasListEntity() const;
 
-    AbstractEntityPtr createServerCamerasEntity(const QnMediaServerResourcePtr& server) const;
+    AbstractEntityPtr createServerCamerasEntity(
+        const QnMediaServerResourcePtr& server,
+        bool showProxiedResources) const;
+
     AbstractEntityPtr createVideowallsEntity() const;
     AbstractEntityPtr createLayoutItemListEntity(const QnResourcePtr& layoutResource) const;
 

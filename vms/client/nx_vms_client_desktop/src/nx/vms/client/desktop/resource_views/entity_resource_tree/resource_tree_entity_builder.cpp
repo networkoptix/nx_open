@@ -99,15 +99,27 @@ ResourceItemCreator simpleResourceItemCreator(ResourceTreeItemFactory* factory)
         [factory](const QnResourcePtr& resource) { return factory->createResourceItem(resource); };
 }
 
+AbstractItemPtr createDecoratedResourceItem(
+    ResourceTreeItemFactory* factory,
+    const QnResourcePtr& resource,
+    bool hasPowerUserPermissions)
+{
+    return resource->hasFlags(Qn::web_page)
+        ? std::make_unique<WebPageDecorator>(
+            factory->createResourceItem(resource), hasPowerUserPermissions)
+        : factory->createResourceItem(resource);
+}
+
 ResourceItemCreator resourceItemCreator(
     ResourceTreeItemFactory* factory,
-    const QnUserResourcePtr& user)
+    const QnUserResourcePtr& user,
+    bool hasPowerUserPermissions = false)
 {
     return
-        [factory, user](const QnResourcePtr& resource)
+        [=](const QnResourcePtr& resource)
         {
             return std::make_unique<MainTreeResourceItemDecorator>(
-                factory->createResourceItem(resource),
+                createDecoratedResourceItem(factory, resource, hasPowerUserPermissions),
                 permissionsSummary(user, resource),
                 NodeType::resource);
         };
@@ -148,10 +160,11 @@ ResourceItemCreator subjectLayoutItemCreator(
 LayoutItemCreator layoutItemCreator(
     ResourceTreeItemFactory* factory,
     const QnUserResourcePtr& user,
-    const QnLayoutResourcePtr& layout)
+    const QnLayoutResourcePtr& layout,
+    bool hasPowerUserPermissions)
 {
     return
-        [factory, user, layout](const QnUuid& itemId) -> AbstractItemPtr
+        [=](const QnUuid& itemId) -> AbstractItemPtr
         {
             const auto itemData = layout->getItem(itemId);
 
@@ -160,9 +173,7 @@ LayoutItemCreator layoutItemCreator(
                 return {};
 
             return std::make_unique<MainTreeResourceItemDecorator>(
-                itemResource->hasFlags(Qn::web_page)
-                    ? std::make_unique<WebPageDecorator>(factory->createResourceItem(itemResource))
-                    : factory->createResourceItem(itemResource),
+                createDecoratedResourceItem(factory, itemResource, hasPowerUserPermissions),
                 permissionsSummary(user, itemResource),
                 NodeType::layoutItem,
                 itemData.uuid);
@@ -332,14 +343,17 @@ bool ResourceTreeEntityBuilder::hasPowerUserPermissions() const
         : false;
 }
 
-AbstractEntityPtr ResourceTreeEntityBuilder::createServersGroupEntity() const
+AbstractEntityPtr ResourceTreeEntityBuilder::createServersGroupEntity(
+    bool showProxiedResources) const
 {
     auto serverExpander =
-        [this](const QnResourcePtr& resource)
+        [this, showProxiedResources](const QnResourcePtr& resource)
         {
             if (!resource->hasFlags(Qn::server))
                 return AbstractEntityPtr();
-            return createServerCamerasEntity(resource.staticCast<QnMediaServerResource>());
+
+            return createServerCamerasEntity(
+                resource.staticCast<QnMediaServerResource>(), showProxiedResources);
         };
 
     auto serversGroupList = makeUniqueKeyGroupList<QnResourcePtr>(
@@ -356,7 +370,8 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServersGroupEntity() const
         FlatteningGroupEntity::AutoFlatteningPolicy::singleChildPolicy);
 }
 
-AbstractEntityPtr ResourceTreeEntityBuilder::createCamerasAndDevicesGroupEntity() const
+AbstractEntityPtr ResourceTreeEntityBuilder::createCamerasAndDevicesGroupEntity(
+    bool showProxiedResources) const
 {
     Qt::ItemFlags camerasAndDevicesitemFlags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
     if (hasPowerUserPermissions())
@@ -364,7 +379,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCamerasAndDevicesGroupEntity(
 
     return makeFlatteningGroup(
         m_itemFactory->createCamerasAndDevicesItem(camerasAndDevicesitemFlags),
-        createServerCamerasEntity(QnMediaServerResourcePtr()),
+        createServerCamerasEntity(QnMediaServerResourcePtr(), showProxiedResources),
         FlatteningGroupEntity::AutoFlatteningPolicy::noPolicy);
 }
 
@@ -622,7 +637,8 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createFlatCamerasListEntity() const
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createServerCamerasEntity(
-    const QnMediaServerResourcePtr& server) const
+    const QnMediaServerResourcePtr& server,
+    bool showProxiedResources) const
 {
     using GroupingRule = GroupingRule<QString, QnResourcePtr>;
     using GroupingRuleStack = GroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
@@ -650,12 +666,12 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServerCamerasEntity(
     groupingRuleStack.push_back(recordersGroupingRule);
 
     auto camerasGroupingEntity = std::make_unique<GroupingEntity<QString, QnResourcePtr>>(
-        resourceItemCreator(m_itemFactory.get(), user()),
+        resourceItemCreator(m_itemFactory.get(), user(), hasPowerUserPermissions()),
         Qn::ResourceRole,
         serverResourcesOrder(),
         groupingRuleStack);
 
-    if (ini().webPagesAndIntegrations)
+    if (ini().webPagesAndIntegrations && !showProxiedResources)
     {
         camerasGroupingEntity->installItemSource(
             m_itemKeySourcePool->devicesSource(user(), server, /*resourceFilter*/ {}));
@@ -701,7 +717,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutItemListEntity(
     const auto layout = layoutResource.staticCast<QnLayoutResource>();
 
     return std::make_unique<LayoutItemListEntity>(layout,
-        layoutItemCreator(m_itemFactory.get(), user(), layout));
+        layoutItemCreator(m_itemFactory.get(), user(), layout, hasPowerUserPermissions()));
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
@@ -776,7 +792,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
 {
     ResourceItemCreator itemCreator = ini().webPagesAndIntegrations
         ? webPageItemCreator(m_itemFactory.get(), hasPowerUserPermissions())
-        : resourceItemCreator(m_itemFactory.get(), user());
+        : resourceItemCreator(m_itemFactory.get(), user(), hasPowerUserPermissions());
 
     auto webPagesList = makeKeyList<QnResourcePtr>(itemCreator, numericOrder());
 

@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
+#include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
@@ -75,12 +76,14 @@ namespace nx::vms::client::desktop {
 ResourceTreeDragDropDecoratorModel::ResourceTreeDragDropDecoratorModel(
     QnResourcePool* resourcePool,
     ui::action::Manager* actionManager,
-    ui::workbench::ActionHandler* actionHandler)
+    ui::workbench::ActionHandler* actionHandler,
+    ResourceTreeSettings* resourceTreeSettings)
     :
     base_type(nullptr),
     m_resourcePool(resourcePool),
     m_actionManager(actionManager),
-    m_actionHandler(actionHandler)
+    m_actionHandler(actionHandler),
+    m_resourceTreeSettings(resourceTreeSettings)
 {
     NX_ASSERT(resourcePool && actionManager);
 }
@@ -278,7 +281,8 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         return true;
     }
 
-    else if (hasNodeType(index, NodeType::webPages) && !ini().webPagesAndIntegrations)
+    else if (hasNodeType(index, NodeType::webPages)
+        && (!ini().webPagesAndIntegrations || isWebPageDragDropEnabled()))
     {
         // Setting empty parent ID for web pages forces them not to be proxied.
         const auto webPages = data.resources().filtered<QnWebPageResource>();
@@ -301,7 +305,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         QnResourceList sourceResources;
         std::copy(cameras.cbegin(), cameras.cend(), std::back_inserter(sourceResources));
 
-        if (!ini().webPagesAndIntegrations)
+        if (!ini().webPagesAndIntegrations || isWebPageDragDropEnabled())
         {
             const auto webPages = data.resources().filtered<QnWebPageResource>();
             std::copy(webPages.cbegin(), webPages.cend(), std::back_inserter(sourceResources));
@@ -339,7 +343,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         QnResourceList sourceResources;
         std::copy(cameras.cbegin(), cameras.cend(), std::back_inserter(sourceResources));
 
-        if (!ini().webPagesAndIntegrations)
+        if (!ini().webPagesAndIntegrations || isWebPageDragDropEnabled())
         {
             const auto webPages = data.resources().filtered<QnWebPageResource>();
             std::copy(webPages.cbegin(), webPages.cend(), std::back_inserter(sourceResources));
@@ -406,7 +410,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         QnResourceList sourceResources;
         std::copy(cameras.begin(), cameras.end(), std::back_inserter(sourceResources));
 
-        if (!ini().webPagesAndIntegrations)
+        if (!ini().webPagesAndIntegrations || isWebPageDragDropEnabled())
         {
             // Setting parent server ID for web pages forces them to be proxied through that
             // server.
@@ -474,6 +478,14 @@ void ResourceTreeDragDropDecoratorModel::moveCustomGroup(
 Qt::DropActions ResourceTreeDragDropDecoratorModel::supportedDropActions() const
 {
     return Qt::CopyAction | Qt::MoveAction;
+}
+
+bool ResourceTreeDragDropDecoratorModel::isWebPageDragDropEnabled() const
+{
+    if (!NX_ASSERT(m_resourceTreeSettings))
+        return false;
+
+    return m_resourceTreeSettings->showProxiedResourcesInServerTree();
 }
 
 QModelIndex ResourceTreeDragDropDecoratorModel::targetDropIndex(const QModelIndex& dropIndex) const
