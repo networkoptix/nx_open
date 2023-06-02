@@ -22,6 +22,17 @@ bool hasSourceCamera(const vms::rules::ItemDescriptor& eventDescriptor)
         });
 }
 
+bool hasSourceServer(const vms::rules::ItemDescriptor& eventDescriptor)
+{
+    return std::any_of(
+        eventDescriptor.fields.begin(),
+        eventDescriptor.fields.end(),
+        [](const vms::rules::FieldDescriptor& fieldDescriptor)
+        {
+            return fieldDescriptor.fieldName == vms::rules::utils::kServerIdFieldName;
+        });
+}
+
 bool isLoggingAllowed(const Engine* engine, const EventPtr& event)
 {
     const auto descriptor = engine->eventDescriptor(event->type());

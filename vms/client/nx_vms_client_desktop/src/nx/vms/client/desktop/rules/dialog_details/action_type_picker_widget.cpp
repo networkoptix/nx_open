@@ -30,7 +30,7 @@ ActionTypePickerWidget::~ActionTypePickerWidget()
 {
 }
 
-void ActionTypePickerWidget::init(nx::vms::rules::Engine* engine)
+void ActionTypePickerWidget::init(const nx::vms::rules::Engine* engine)
 {
     ui->actionTypeComboBox->clear();
     for (const auto& actionType: engine->actions())

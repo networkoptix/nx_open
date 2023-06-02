@@ -75,6 +75,7 @@
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/dialogs/cloud_layouts_intro_dialog.h>
+#include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/profile_g/import_from_device_dialog.h>
@@ -94,7 +95,6 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
-#include <nx/vms/client/desktop/rules/rules_dialog.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
@@ -282,7 +282,6 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::OpenAuditLogAction), SIGNAL(triggered()), this, SLOT(at_openAuditLogAction_triggered()));
     connect(action(action::CameraListAction), SIGNAL(triggered()), this, SLOT(at_cameraListAction_triggered()));
     connect(action(action::CameraListByServerAction), SIGNAL(triggered()), this, SLOT(at_cameraListAction_triggered()));
-    connect(action(action::OpenEventRulesDialogAction), &QAction::triggered, this, &ActionHandler::openVmsRulesDialog);
 
     connect(action(action::WebClientAction), &QAction::triggered, this,
         &ActionHandler::at_webClientAction_triggered);
@@ -1710,13 +1709,6 @@ void ActionHandler::at_openBusinessRulesAction_triggered()
             filter.append(camera->getId().toSimpleString());
     }
     businessRulesDialog()->setFilter(filter.join(' '));
-}
-
-void ActionHandler::openVmsRulesDialog()
-{
-    QnNonModalDialogConstructor<rules::RulesDialog> dialogConstructor(
-        m_rulesDialog,
-        mainWindowWidget());
 }
 
 void ActionHandler::at_webClientAction_triggered()

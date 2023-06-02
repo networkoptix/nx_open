@@ -29,6 +29,8 @@ public:
     ~Rule();
 
     QnUuid id() const;
+    void setId(QnUuid id);
+
     const Engine* engine() const;
 
     // Takes ownership.
@@ -87,5 +89,7 @@ private:
 
     bool m_updateInProgress = false;
 };
+
+NX_VMS_RULES_API bool operator==(const Rule& left, const Rule& right);
 
 } // namespace nx::vms::rules

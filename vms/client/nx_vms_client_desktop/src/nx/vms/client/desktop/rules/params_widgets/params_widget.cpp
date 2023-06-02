@@ -5,6 +5,7 @@
 #include <QtWidgets/QLineEdit>
 
 #include <nx/vms/client/desktop/rules/picker_widgets/picker_widget.h>
+#include <nx/vms/rules/engine.h>
 #include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop::rules {
@@ -34,30 +35,48 @@ const vms::rules::ItemDescriptor& ParamsWidget::descriptor() const
     return m_itemDescriptor;
 }
 
-void ParamsWidget::setRule(const std::shared_ptr<SimplifiedRule>& rule)
+void ParamsWidget::setRule(const std::shared_ptr<vms::rules::Rule>& rule)
 {
     m_rule = rule;
     updateUi();
+
+    // A queued connection is used below, because field value validation occurs while the field is
+    // displayed. It may lead to the field value changing, which in turn tends to emit the
+    // signal again before the field display function ends, which may lead to troubles.
+
+    connect(
+        m_rule->eventFilters().first(),
+        &vms::rules::EventFilter::changed,
+        this,
+        &ParamsWidget::updateUi,
+        Qt::QueuedConnection);
+
+    connect(
+        m_rule->actionBuilders().first(),
+        &vms::rules::ActionBuilder::changed,
+        this,
+        &ParamsWidget::updateUi,
+        Qt::QueuedConnection);
 }
 
 std::optional<vms::rules::ItemDescriptor> ParamsWidget::actionDescriptor() const
 {
-    return m_rule->actionDescriptor();
+    return m_rule->engine()->actionDescriptor(m_rule->actionBuilders().first()->actionType());
 }
 
 vms::rules::ActionBuilder* ParamsWidget::actionBuilder() const
 {
-    return m_rule->actionBuilder();
+    return m_rule->actionBuilders().first();
 }
 
 std::optional<vms::rules::ItemDescriptor> ParamsWidget::eventDescriptor() const
 {
-    return m_rule->eventDescriptor();
+    return m_rule->engine()->eventDescriptor(m_rule->eventFilters().first()->eventType());
 }
 
 vms::rules::EventFilter* ParamsWidget::eventFilter() const
 {
-    return m_rule->eventFilter();
+    return m_rule->eventFilters().first();
 }
 
 void ParamsWidget::setReadOnly(bool value)

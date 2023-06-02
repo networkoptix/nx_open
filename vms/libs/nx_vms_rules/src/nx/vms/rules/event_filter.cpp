@@ -11,6 +11,7 @@
 #include <QtCore/QVariant>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/qobject.h>
 #include <utils/common/synctime.h>
 
 #include "basic_event.h"
@@ -109,7 +110,11 @@ bool EventFilter::updateFlatData(const std::map<QString, QVariant>& data)
 
 void EventFilter::addField(const QString& name, std::unique_ptr<EventFilterField> field)
 {
-    // TODO: assert?
+    nx::utils::watchOnPropertyChanges(
+        field.get(),
+        this,
+        QMetaMethod::fromSignal(&EventFilter::changed));
+
     m_fields[name] = std::move(field);
     updateState();
 }

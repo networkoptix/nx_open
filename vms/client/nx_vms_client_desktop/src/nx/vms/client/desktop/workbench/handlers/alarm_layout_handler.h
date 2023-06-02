@@ -42,7 +42,8 @@ private:
         QnWorkbenchItem* item,
         qint64 positionUs);
 
-    void onNotificationActionReceived(const QSharedPointer<rules::NotificationActionBase>& action);
+    void onNotificationActionReceived(
+        const QSharedPointer<vms::rules::NotificationActionBase>& action);
 
     /**
      *  Check if current client instance is the main one.

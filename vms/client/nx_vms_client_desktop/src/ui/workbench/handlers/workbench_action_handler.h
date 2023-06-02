@@ -174,7 +174,6 @@ protected slots:
     void at_openBusinessLogAction_triggered();
     void at_openAuditLogAction_triggered();
     void at_cameraListAction_triggered();
-    void openVmsRulesDialog();
 
     void at_webAdminAction_triggered();
     void at_webClientAction_triggered();

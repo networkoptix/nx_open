@@ -18,7 +18,7 @@ const ItemDescriptor& BuzzerAction::manifest()
         .displayName = tr("Buzzer"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<TargetServerField>("serverIds", tr("Servers")),
+            makeFieldDescriptor<TargetServerField>(utils::kServerIdsFieldName, tr("Servers")),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,

@@ -47,6 +47,8 @@
 #include <nx/vms/client/desktop/resource_properties/user/utils/parent_groups_provider.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/item_view_drag_and_drop_scroll_assist.h>
+#include <nx/vms/client/desktop/rules/model_view/rules_sort_filter_proxy_model.h>
+#include <nx/vms/client/desktop/rules/model_view/rules_table_model.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_settings_global.h>
 #include <nx/vms/client/desktop/system_administration/models/custom_access_summary_model.h>
@@ -332,4 +334,6 @@ void QnClientMetaTypes::registerQmlTypes()
     utils::WebEngineProfileManager::registerQmlType();
     analytics::TaxonomyManager::registerQmlTypes();
     workbench::timeline::registerQmlType();
+    rules::RulesTableModel::registerQmlType();
+    rules::RulesSortFilterProxyModel::registerQmlType();
 }

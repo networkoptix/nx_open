@@ -346,6 +346,11 @@ void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionBuilderF
             setAggregationInterval(optionalTimeField->value());
     }
 
+    nx::utils::watchOnPropertyChanges(
+        field.get(),
+        this,
+        QMetaMethod::fromSignal(&ActionBuilder::changed));
+
     m_fields[name] = std::move(field);
 
     updateState();

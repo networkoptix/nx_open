@@ -31,4 +31,49 @@ bool isLoggingAllowed(const Engine* engine, const ActionPtr& action)
     return utils::isLoggingAllowed(descriptor.value(), action);
 }
 
+bool hasTargetCamera(const vms::rules::ItemDescriptor& actionDescriptor)
+{
+    return std::any_of(
+        actionDescriptor.fields.begin(),
+        actionDescriptor.fields.end(),
+        [](const vms::rules::FieldDescriptor& fieldDescriptor)
+        {
+            return fieldDescriptor.fieldName == vms::rules::utils::kDeviceIdsFieldName
+                || fieldDescriptor.fieldName == vms::rules::utils::kCameraIdFieldName;
+        });
+}
+
+bool hasTargetLayout(const vms::rules::ItemDescriptor& actionDescriptor)
+{
+    return std::any_of(
+        actionDescriptor.fields.begin(),
+        actionDescriptor.fields.end(),
+        [](const vms::rules::FieldDescriptor& fieldDescriptor)
+        {
+            return fieldDescriptor.fieldName == vms::rules::utils::kLayoutIdsFieldName;
+        });
+}
+
+bool hasTargetUser(const vms::rules::ItemDescriptor& actionDescriptor)
+{
+    return std::any_of(
+        actionDescriptor.fields.begin(),
+        actionDescriptor.fields.end(),
+        [](const vms::rules::FieldDescriptor& fieldDescriptor)
+        {
+            return fieldDescriptor.fieldName == vms::rules::utils::kUsersFieldName;
+        });
+}
+
+bool hasTargetServer(const vms::rules::ItemDescriptor& actionDescriptor)
+{
+    return std::any_of(
+        actionDescriptor.fields.begin(),
+        actionDescriptor.fields.end(),
+        [](const vms::rules::FieldDescriptor& fieldDescriptor)
+        {
+            return fieldDescriptor.fieldName == vms::rules::utils::kServerIdsFieldName;
+        });
+}
+
 } // namespace nx::vms::rules

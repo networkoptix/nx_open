@@ -36,6 +36,7 @@
 #include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
 #include <nx/vms/client/desktop/radass/radass_action_handler.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/rules/vms_rules_action_handler.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/showreel/showreel_actions_handler.h>
@@ -292,6 +293,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<StartupActionsHandler>();
     context->instance<ui::workbench::ResourceGroupingActionHandler>();
     context->instance<ui::workbench::ResourceTreeSettingsActionHandler>();
+    context->instance<rules::VmsRulesActionHandler>();
 
     context->instance<QnWorkbenchPtzDialogWatcher>();
 

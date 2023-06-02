@@ -37,7 +37,8 @@ template<class Base = QObject>
 inline QSet<QByteArray> propertyNames(
     const QObject* object,
     PropertyAccessFlags propertyAccessFlags = PropertyAccess::anyAccess,
-    bool includeBaseProperties = false)
+    bool includeBaseProperties = false,
+    bool hasNotifySignal = false)
 {
     static_assert(std::is_base_of<QObject, Base>());
 
@@ -65,6 +66,9 @@ inline QSet<QByteArray> propertyNames(
         if (propertyAccessFlags.testFlag(PropertyAccess::writable) && !property.isWritable())
             continue;
 
+        if (hasNotifySignal && !property.hasNotifySignal())
+            continue;
+
         result << metaObject->property(i).name();
     }
 
@@ -73,5 +77,12 @@ inline QSet<QByteArray> propertyNames(
 
     return result;
 }
+
+
+/** Connects all the sender properties notify signals with the receiver meta method. */
+void NX_UTILS_API watchOnPropertyChanges(
+    QObject* sender,
+    QObject* receiver,
+    const QMetaMethod& receiverMetaMethod);
 
 } // namespace nx::utils

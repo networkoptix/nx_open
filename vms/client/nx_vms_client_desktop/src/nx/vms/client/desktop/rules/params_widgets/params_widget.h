@@ -8,9 +8,8 @@
 
 #include <nx/vms/rules/field.h>
 #include <nx/vms/rules/manifest.h>
+#include <nx/vms/rules/rule.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-#include "../model_view/rules_table_model.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -30,7 +29,7 @@ public:
 
     const vms::rules::ItemDescriptor& descriptor() const;
 
-    void setRule(const std::shared_ptr<SimplifiedRule>& rule);
+    void setRule(const std::shared_ptr<vms::rules::Rule>& rule);
 
     std::optional<vms::rules::ItemDescriptor> actionDescriptor() const;
     vms::rules::ActionBuilder* actionBuilder() const;
@@ -58,7 +57,7 @@ private:
     void setupLineEditsPlaceholderColor();
 
     vms::rules::ItemDescriptor m_itemDescriptor;
-    std::shared_ptr<SimplifiedRule> m_rule;
+    std::shared_ptr<vms::rules::Rule> m_rule;
     vms::rules::ActionBuilder* m_actionBuilder{nullptr};
     vms::rules::EventFilter* m_eventFilter{nullptr};
 };

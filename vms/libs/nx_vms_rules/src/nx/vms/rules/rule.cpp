@@ -25,6 +25,11 @@ QnUuid Rule::id() const
     return m_id;
 }
 
+void Rule::setId(QnUuid id)
+{
+    m_id = id;
+}
+
 const Engine* Rule::engine() const
 {
     return m_engine;
@@ -184,6 +189,48 @@ void Rule::updateState()
 
     QScopedValueRollback<bool> guard(m_updateInProgress, true);
     emit stateChanged();
+}
+
+bool operator==(const Rule& left, const Rule& right)
+{
+    if (left.comment() != right.comment())
+        return false;
+
+    if (left.enabled() != right.enabled())
+        return false;
+
+    if (left.schedule() != right.schedule())
+        return false;
+
+    auto lEventFilters = left.eventFilters();
+    auto rEventFilters = right.eventFilters();
+    if (lEventFilters.size() != rEventFilters.size())
+        return false;
+
+    for (int i = 0; i < lEventFilters.size(); ++i)
+    {
+        if (lEventFilters[i]->eventType() != rEventFilters[i]->eventType())
+            return false;
+
+        if (lEventFilters[i]->flatData() != rEventFilters[i]->flatData())
+            return false;
+    }
+
+    auto lActionBuilders = left.actionBuilders();
+    auto rActionBuilders = right.actionBuilders();
+    if (lActionBuilders.size() != rActionBuilders.size())
+        return false;
+
+    for (int i = 0; i < lActionBuilders.size(); ++i)
+    {
+        if (lActionBuilders[i]->actionType() != rActionBuilders[i]->actionType())
+            return false;
+
+        if (lActionBuilders[i]->flatData() != rActionBuilders[i]->flatData())
+            return false;
+    }
+
+    return true;
 }
 
 } // namespace nx::vms::rules
