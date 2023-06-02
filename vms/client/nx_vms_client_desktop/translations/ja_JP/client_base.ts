@@ -2746,7 +2746,7 @@ License Key: %2</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>%1 の録画やモーション検知は無効です</translation>
+      <translation>%1 の録画またはモーション検知が無効です</translation>
     </message>
   </context>
   <context>
