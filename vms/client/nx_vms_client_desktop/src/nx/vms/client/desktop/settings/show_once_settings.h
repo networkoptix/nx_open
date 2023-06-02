@@ -72,6 +72,12 @@ public:
     /** Warning which is displayed when a User Group is removed from the System. */
     Property<bool> deleteUserGroups{this, "deleteUserGroups"};
 
+    /** Warning which is displayed when a rule is removed from the System. */
+    Property<bool> deleteRule{this, "deleteRule"};
+
+    /** Warning which is displayed when the rules are reset to defaults. */
+    Property<bool> resetRules{this, "resetRules"};
+
 private:
     /** Flag whether settings were successfully migrated from the 5.1 settings format. */
     Property<bool> migrationDone{this, "migrationDone"};

@@ -94,8 +94,24 @@ public:
         return fieldByNameImpl<T>(name);
     }
 
+    template<class T>
+    const T* fieldByType() const
+    {
+        return fieldByTypeImpl<T>();
+    }
+
+    template<class T>
+    T* fieldByType()
+    {
+        return fieldByTypeImpl<T>();
+    }
+
 signals:
     void stateChanged();
+
+    /** Emitted whenever any field property is changed. */
+    void changed();
+
     void action(const ActionPtr& action);
 
 protected:
@@ -131,6 +147,19 @@ private:
     {
         const auto it = m_fields.find(name);
         return (it == m_fields.end()) ? nullptr : dynamic_cast<T*>(it->second.get());
+    }
+
+    /** Returns first field with the given type T. */
+    template<class T>
+    T* fieldByTypeImpl() const
+    {
+        for (const auto& [_, field]: m_fields)
+        {
+            if (auto targetField = dynamic_cast<T*>(field.get()))
+                return targetField;
+        }
+
+        return {};
     }
 };
 

@@ -19,7 +19,7 @@ public:
     ActionTypePickerWidget(QWidget* parent = nullptr);
     virtual ~ActionTypePickerWidget() override;
 
-    void init(nx::vms::rules::Engine* engine);
+    void init(const nx::vms::rules::Engine* engine);
 
     QString actionType() const;
     void setActionType(const QString& actionType);

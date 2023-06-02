@@ -2,411 +2,112 @@
 
 #include "rules_table_model.h"
 
+#include <QtQml/QtQml>
+
 #include <client_core/client_core_module.h>
-#include <nx/utils/qobject.h>
-#include <nx/vms/api/rules/rule.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/rules/action_builder.h>
-#include <nx/vms/rules/action_builder_field.h>
-#include <nx/vms/rules/actions/show_notification_action.h>
+#include <nx/vms/rules/action_builder_fields/target_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_layout_field.h>
+#include <nx/vms/rules/action_builder_fields/target_server_field.h>
+#include <nx/vms/rules/action_builder_fields/target_single_device_field.h>
+#include <nx/vms/rules/action_builder_fields/target_user_field.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
-#include <nx/vms/rules/event_filter_field.h>
-#include <nx/vms/rules/events/generic_event.h>
-#include <nx/vms/rules/ini.h>
+#include <nx/vms/rules/event_filter_fields/source_camera_field.h>
+#include <nx/vms/rules/event_filter_fields/source_server_field.h>
 #include <nx/vms/rules/rule.h>
-#include <nx/vms/rules/utils/api.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_vms_rules_manager.h>
+#include <nx/vms/rules/utils/action.h>
+#include <nx/vms/rules/utils/event.h>
+#include <nx/vms/rules/utils/field.h>
 
 namespace nx::vms::client::desktop::rules {
 
-using Engine = vms::rules::Engine;
-using Field = vms::rules::Field;
-using Rule = vms::rules::Rule;
-using ItemDescriptor = vms::rules::ItemDescriptor;
-
 namespace {
 
-bool operator==(const Rule& left, const Rule& right)
+QString iconPath(QnResourceIconCache::Key iconKey)
 {
-    if (left.comment() != right.comment())
-        return false;
-
-    if (left.enabled() != right.enabled())
-        return false;
-
-    if (left.schedule() != right.schedule())
-        return false;
-
-    auto lEventFilters = left.eventFilters();
-    auto rEventFilters = right.eventFilters();
-    if (lEventFilters.size() != rEventFilters.size())
-        return false;
-
-    for (int i = 0; i < lEventFilters.size(); ++i)
-    {
-        if (lEventFilters[i]->eventType() != rEventFilters[i]->eventType())
-            return false;
-
-        if (lEventFilters[i]->flatData() != rEventFilters[i]->flatData())
-            return false;
-    }
-
-    auto lActionBuilders = left.actionBuilders();
-    auto rActionBuilders = right.actionBuilders();
-    if (lActionBuilders.size() != rActionBuilders.size())
-        return false;
-
-    for (int i = 0; i < lActionBuilders.size(); ++i)
-    {
-        if (lActionBuilders[i]->actionType() != rActionBuilders[i]->actionType())
-            return false;
-
-        if (lActionBuilders[i]->flatData() != rActionBuilders[i]->flatData())
-            return false;
-    }
-
-    return true;
+    return "image://resource/" + QString::number(iconKey);
 }
 
 } // namespace
 
-SimplifiedRule::SimplifiedRule(Engine* engine, std::shared_ptr<vms::rules::Rule>&& rule):
-    m_engine{engine},
-    m_rule{std::move(rule)}
-{
-    NX_ASSERT(m_engine);
-    NX_ASSERT(m_rule);
-
-    startWatchOnRule();
-}
-
-SimplifiedRule::~SimplifiedRule()
-{
-    // Required here for forward-declared scoped pointer destruction.
-}
-
-void SimplifiedRule::setRule(std::shared_ptr<vms::rules::Rule>&& rule)
-{
-    stopWatchOnRule();
-
-    // As users of the class use raw pointers to the fields owned by the rule and got by
-    // users with eventFields() and actionFields() methods it is required to prolong lifetime of
-    // the fields and delete them only after users is notified about changes.
-    m_rule.swap(rule);
-
-    if (!NX_ASSERT(m_rule))
-        return;
-
-    startWatchOnRule();
-
-    update({Qt::DisplayRole, Qt::CheckStateRole, RulesTableModel::FieldRole});
-}
-
-const vms::rules::Rule* SimplifiedRule::rule() const
-{
-    return m_rule.get();
-}
-
-void SimplifiedRule::setModelIndex(const QPersistentModelIndex& modelIndex)
-{
-    NX_ASSERT(modelIndex.isValid());
-    m_index = modelIndex;
-}
-
-QPersistentModelIndex SimplifiedRule::modelIndex() const
-{
-    return m_index;
-}
-
-void SimplifiedRule::update()
-{
-    update({Qt::CheckStateRole});
-}
-
-QnUuid SimplifiedRule::id() const
-{
-    return m_rule->id();
-}
-
-bool SimplifiedRule::isSystem() const
-{
-    return m_rule->isSystem();
-}
-
-QString SimplifiedRule::eventType() const
-{
-    if (NX_ASSERT(!m_rule->eventFilters().empty()))
-        return m_rule->eventFilters().constFirst()->eventType();
-
-    return "";
-}
-
-vms::rules::EventFilter* SimplifiedRule::eventFilter() const
-{
-    return m_rule->eventFilters().constFirst();
-}
-
-void SimplifiedRule::setEventType(const QString& eventType)
-{
-    if (NX_ASSERT(!m_rule->eventFilters().empty()))
-    {
-        stopWatchOnEventFilter();
-        m_rule->takeEventFilter(0);
-    }
-
-    m_rule->addEventFilter(m_engine->buildEventFilter(eventType));
-    startWatchOnEventFilter();
-    update({Qt::DisplayRole, Qt::CheckStateRole, RulesTableModel::FieldRole});
-}
-
-QHash<QString, Field*> SimplifiedRule::eventFields() const
-{
-    if (!NX_ASSERT(!m_rule->eventFilters().empty()))
-        return {};
-
-    auto fields = m_rule->eventFilters().constFirst()->fields();
-    return QHash<QString, Field*>{fields.cbegin(), fields.cend()};
-}
-
-std::optional<ItemDescriptor> SimplifiedRule::eventDescriptor() const
-{
-    return m_engine->eventDescriptor(eventType());
-}
-
-QString SimplifiedRule::actionType() const
-{
-    if (NX_ASSERT(!m_rule->actionBuilders().empty()))
-        return m_rule->actionBuilders().constFirst()->actionType();
-
-    return "";
-}
-
-vms::rules::ActionBuilder* SimplifiedRule::actionBuilder() const
-{
-    return m_rule->actionBuilders().constFirst();
-}
-
-void SimplifiedRule::setActionType(const QString& actionType)
-{
-    if (NX_ASSERT(!m_rule->actionBuilders().empty()))
-    {
-        stopWatchOnActionBuilder();
-        m_rule->takeActionBuilder(0);
-    }
-
-    m_rule->addActionBuilder(m_engine->buildActionBuilder(actionType));
-    startWatchOnActionBuilder();
-    update({Qt::DisplayRole, Qt::CheckStateRole, RulesTableModel::FieldRole});
-}
-
-QHash<QString, Field*> SimplifiedRule::actionFields() const
-{
-    if (!NX_ASSERT(!m_rule->actionBuilders().empty()))
-        return {};
-
-    auto fields = m_rule->actionBuilders().constFirst()->fields();
-    return QHash<QString, Field*>{fields.cbegin(), fields.cend()};
-}
-
-std::optional<ItemDescriptor> SimplifiedRule::actionDescriptor() const
-{
-    return m_engine->actionDescriptor(actionType());
-}
-
-QString SimplifiedRule::comment() const
-{
-    return m_rule->comment();
-}
-
-void SimplifiedRule::setComment(const QString& comment)
-{
-    m_rule->setComment(comment);
-    update({Qt::CheckStateRole});
-}
-
-bool SimplifiedRule::enabled() const
-{
-    return m_rule->enabled();
-}
-
-void SimplifiedRule::setEnabled(bool value)
-{
-    m_rule->setEnabled(value);
-    update({Qt::CheckStateRole});
-}
-
-QByteArray SimplifiedRule::schedule() const
-{
-    return m_rule->schedule();
-}
-
-void SimplifiedRule::setSchedule(const QByteArray& schedule)
-{
-    m_rule->setSchedule(schedule);
-    update({Qt::CheckStateRole});
-}
-
-void SimplifiedRule::update(const QVector<int>& roles)
-{
-    if (NX_ASSERT(m_index.isValid()))
-    {
-        auto model = dynamic_cast<const RulesTableModel*>(m_index.model());
-        if (!model)
-            return;
-
-        // It is save cast case updateRule() method doesn't invalidate index.
-        const_cast<RulesTableModel*>(model)->updateRule(m_index, roles);
-    }
-}
-
-void SimplifiedRule::startWatchOnRule() const
-{
-    startWatchOnEventFilter();
-    startWatchOnActionBuilder();
-}
-
-void SimplifiedRule::startWatchOnEventFilter() const
-{
-    for (const auto& eventField: eventFields())
-        watchOn(eventField);
-}
-
-void SimplifiedRule::startWatchOnActionBuilder() const
-{
-    for (const auto& actionField: actionFields())
-        watchOn(actionField);
-}
-
-void SimplifiedRule::stopWatchOnRule() const
-{
-    if (m_rule)
-        return;
-
-    stopWatchOnEventFilter();
-    stopWatchOnActionBuilder();
-}
-
-void SimplifiedRule::stopWatchOnEventFilter() const
-{
-    for(const auto eventField: eventFields())
-        eventField->disconnect(this);
-}
-
-void SimplifiedRule::stopWatchOnActionBuilder() const
-{
-    for(const auto actionField: actionFields())
-        actionField->disconnect(this);
-}
-
-void SimplifiedRule::watchOn(QObject* object) const
-{
-    if (!NX_ASSERT(object))
-        return;
-
-    constexpr auto kUpdateMethodSignature = "update()"; //< Invokable SimplifiedRule::update().
-    const auto simplifiedRuleMetaObject = this->metaObject();
-    const auto updateMetaMethod = simplifiedRuleMetaObject->method(
-        simplifiedRuleMetaObject->indexOfMethod(kUpdateMethodSignature));
-
-    if(!NX_ASSERT(updateMetaMethod.isValid()))
-        return;
-
-    const auto propertyNames = nx::utils::propertyNames(object);
-    const auto metaObject = object->metaObject();
-    for (const auto& propertyName: propertyNames)
-    {
-        const auto metaProperty =
-            metaObject->property(metaObject->indexOfProperty(propertyName));
-
-        if (!metaProperty.hasNotifySignal())
-            continue;
-
-        // A queued connection is used because field value validation occurs while the field is
-        // displayed. It may lead to the field value changing, which in turn tends to emit the
-        // signal again before the field display function ends, which may lead to troubles.
-        // TODO: #mmalofeev consider more convenient way to validate fields.
-        connect(object, metaProperty.notifySignal(), this, updateMetaMethod, Qt::QueuedConnection);
-    }
-}
-
-RulesTableModel::RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent):
+RulesTableModel::RulesTableModel(QObject* parent):
     QAbstractTableModel(parent),
-    m_engine(engine)
+    m_engine(appContext()->currentSystemContext()->vmsRulesEngine())
 {
     initialise();
 
-    connect(engine, &vms::rules::Engine::ruleAddedOrUpdated,
-        this, &RulesTableModel::onRuleAddedOrUpdated);
-
-    connect(engine, &vms::rules::Engine::ruleRemoved, this,
-        [this](QnUuid ruleId)
-        {
-            NX_VERBOSE(this, "Rule %1 is removed", ruleId);
-
-            m_removedRules.erase(ruleId);
-
-            auto simplifiedRule = rule(ruleId).lock();
-            if (!simplifiedRule)
-                return;
-
-            const int row = simplifiedRule->modelIndex().row();
-            if (!NX_ASSERT(row >= 0 && row < static_cast<int>(m_simplifiedRules.size())))
-                return;
-
-            beginRemoveRows({}, row, row);
-
-            m_simplifiedRules.erase(m_simplifiedRules.begin() + row);
-
-            endRemoveRows();
-
-            emit stateChanged();
-        });
-
-    connect(engine, &vms::rules::Engine::rulesReset, this,
-        [this]
-        {
-            NX_VERBOSE(this, "Rules were reset");
-            rejectChanges();
-
-            emit stateChanged();
-        });
+    connect(
+        m_engine,
+        &vms::rules::Engine::ruleAddedOrUpdated,
+        this,
+        &RulesTableModel::onRuleAddedOrUpdated);
+    connect(m_engine, &vms::rules::Engine::ruleRemoved, this, &RulesTableModel::onRuleRemoved);
+    connect(m_engine, &vms::rules::Engine::rulesReset, this, &RulesTableModel::onRulesReset);
 }
 
 void RulesTableModel::onRuleAddedOrUpdated(QnUuid ruleId, bool added)
 {
     NX_VERBOSE(this, "Rule %1 is %2", ruleId, (added ? "added" : "updated"));
 
-    // If the current user has an intention to remove a rule with such id, it's changes
-    // should be ignored.
-    if (m_removedRules.contains(ruleId))
-        return;
-
     if (added)
-        m_addedRules.erase(ruleId);
-    else
-        m_modifiedRules.erase(ruleId);
-
-    if (auto simplifiedRule = rule(ruleId).lock())
     {
-        simplifiedRule->setRule(this->m_engine->cloneRule(ruleId));
-        return;
+        beginInsertRows({}, m_ruleIds.size(), m_ruleIds.size());
+        m_ruleIds.push_back(ruleId);
+        endInsertRows();
     }
+    else
+    {
+        const auto ruleIt = std::find(m_ruleIds.cbegin(), m_ruleIds.cend(), ruleId);
+        if (ruleIt == m_ruleIds.cend())
+            return;
 
-    beginInsertRows({}, m_simplifiedRules.size(), m_simplifiedRules.size());
-
-    m_simplifiedRules.emplace_back(
-        new SimplifiedRule(this->m_engine, this->m_engine->cloneRule(ruleId)));
-    m_simplifiedRules.back()->setModelIndex(index(m_simplifiedRules.size() - 1, IdColumn));
-
-    endInsertRows();
-
-    emit stateChanged();
+        const auto distance = std::distance(m_ruleIds.cbegin(), ruleIt);
+        emit dataChanged(index(distance, StateColumn), index(distance, CommentColumn));
+    }
 };
+
+void RulesTableModel::onRuleRemoved(QnUuid ruleId)
+{
+    NX_VERBOSE(this, "Rule %1 is removed", ruleId);
+
+    const auto ruleIt = std::find(m_ruleIds.cbegin(), m_ruleIds.cend(), ruleId);
+    if (ruleIt == m_ruleIds.cend())
+        return;
+
+    const auto distance = std::distance(m_ruleIds.cbegin(), ruleIt);
+    beginRemoveRows({}, distance, distance);
+
+    m_ruleIds.erase(ruleIt);
+
+    endRemoveRows();
+}
+
+void RulesTableModel::onRulesReset()
+{
+    NX_VERBOSE(this, "Rules were reset");
+
+    beginResetModel();
+    initialise();
+    endResetModel();
+}
 
 int RulesTableModel::rowCount(const QModelIndex& /*parent*/) const
 {
-    return m_simplifiedRules.size();
+    return m_ruleIds.size();
 }
 
 int RulesTableModel::columnCount(const QModelIndex& /*parent*/) const
@@ -419,367 +120,489 @@ QVariant RulesTableModel::data(const QModelIndex& index, int role) const
     if (!isIndexValid(index))
         return {};
 
+    const auto rule = m_engine->rule(m_ruleIds[index.row()]);
+    if (!isRuleValid(rule))
+        return {};
+
+    if (role == IsSystemRuleRole)
+        return rule->isSystem();
+
+    if (role == RuleIdRole)
+        return QVariant::fromValue(rule->id());
+
     switch (index.column())
     {
-        case IdColumn:
-            return idColumnData(index, role);
+        case StateColumn:
+            return stateColumnData(rule, role);
         case EventColumn:
-            return eventColumnData(index, role);
+            return eventColumnData(rule, role);
+        case SourceColumn:
+            return sourceColumnData(rule, role);
         case ActionColumn:
-            return actionColumnData(index, role);
-        case EditedStateColumn:
-            return editedStateColumnData(index, role);
-        case EnabledStateColumn:
-            return enabledStateColumnData(index, role);
+            return actionColumnData(rule, role);
+        case TargetColumn:
+            return targetColumnData(rule, role);
         case CommentColumn:
-            return commentColumnData(index, role);
+            return commentColumnData(rule, role);
     }
 
     return {};
 }
 
-bool RulesTableModel::setData(const QModelIndex& index, const QVariant& value, int role)
-{
-    if (!isIndexValid(index))
-        return false;
-
-    switch (index.column())
-    {
-        case EnabledStateColumn:
-            return setEnabledStateColumnData(index, value, role);
-    }
-
-    return false;
-}
-
 Qt::ItemFlags RulesTableModel::flags(const QModelIndex& index) const
 {
-    auto flags = QAbstractTableModel::flags(index);
-
-    if (index.column() == EnabledStateColumn)
-        flags |= Qt::ItemIsEditable;
-
-    return flags;
+    return QAbstractTableModel::flags(index) | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
 QVariant RulesTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
     {
-        if (section == EventColumn)
-            return tr("Event");
-
-        if (section == ActionColumn)
-            return tr("Action");
-
-        return {};
+        switch (section)
+        {
+            case StateColumn:
+                return "";
+            case EventColumn:
+                return tr("Event");
+            case SourceColumn:
+                return tr("Source");
+            case ActionColumn:
+                return tr("Action");
+            case TargetColumn:
+                return tr("Target");
+            case CommentColumn:
+                return tr("Comment");
+            default:
+                return {};
+        }
     }
 
     return QAbstractTableModel::headerData(section, orientation, role);
 }
 
-QModelIndex RulesTableModel::addRule(const QString& eventId, const QString& actionId)
+QHash<int, QByteArray> RulesTableModel::roleNames() const
 {
-    auto newRuleId = QnUuid::createUuid();
-    auto newRule = std::make_unique<Rule>(newRuleId, m_engine);
+    auto roles = QAbstractTableModel::roleNames();
 
-    auto eventFilter = m_engine->buildEventFilter(eventId);
-    auto actionBuilder = m_engine->buildActionBuilder(actionId);
+    roles[RuleIdRole] = "ruleId";
 
-    if (!eventFilter || !actionBuilder)
-        return {};
-
-    newRule->addEventFilter(std::move(eventFilter));
-    newRule->addActionBuilder(std::move(actionBuilder));
-
-    beginInsertRows({}, m_simplifiedRules.size(), m_simplifiedRules.size());
-
-    m_addedRules.insert(newRule->id());
-
-    m_simplifiedRules.emplace_back(new SimplifiedRule(m_engine, std::move(newRule)));
-    m_simplifiedRules.back()->setModelIndex(index(m_simplifiedRules.size() - 1, IdColumn));
-
-    endInsertRows();
-
-    return index(m_simplifiedRules.size() - 1, IdColumn);
-}
-
-bool RulesTableModel::removeRule(const QModelIndex& ruleIndex)
-{
-    if (!isIndexValid(ruleIndex))
-        return false;
-
-    const int row = ruleIndex.row();
-    const auto ruleId = m_simplifiedRules[row]->id();
-
-    beginRemoveRows({}, row, row);
-
-    if (m_addedRules.contains(ruleId))
-        m_addedRules.erase(ruleId);
-    else
-        m_removedRules.insert(ruleId);
-
-    m_simplifiedRules.erase(m_simplifiedRules.begin() + row);
-
-    endRemoveRows();
-
-    return true;
-}
-
-bool RulesTableModel::removeRule(const QnUuid& id)
-{
-    if (auto simplifiedRule = rule(id).lock())
-        return removeRule(simplifiedRule->modelIndex());
-
-    return false;
-}
-
-std::weak_ptr<SimplifiedRule> RulesTableModel::rule(const QModelIndex& ruleIndex) const
-{
-    if (!isIndexValid(ruleIndex))
-        return {};
-
-    return {m_simplifiedRules[ruleIndex.row()]};
-}
-
-std::weak_ptr<SimplifiedRule> RulesTableModel::rule(const QnUuid& id) const
-{
-    auto simplifiedRuleIt = std::find_if(
-        m_simplifiedRules.cbegin(),
-        m_simplifiedRules.cend(),
-        [&id](const std::shared_ptr<SimplifiedRule>& r)
-        {
-            return r->id() == id;
-        });
-
-    if (simplifiedRuleIt == m_simplifiedRules.cend())
-        return {};
-
-    return {*simplifiedRuleIt};
-}
-
-void RulesTableModel::updateRule(const QModelIndex& ruleIndex, const QVector<int>& roles)
-{
-    if (!isIndexValid(ruleIndex))
-        return;
-
-    const int row = ruleIndex.row();
-    const auto ruleId = m_simplifiedRules.at(row)->id();
-
-    if (!m_addedRules.contains(ruleId))
-    {
-        if (isRuleModified(m_simplifiedRules.at(row).get()))
-            m_modifiedRules.insert(ruleId);
-        else
-            m_modifiedRules.erase(ruleId);
-    }
-
-    auto eventIndex = index(row, EventColumn);
-    auto editedIndex = index(row, EditedStateColumn);
-    emit dataChanged(eventIndex, editedIndex, roles);
-}
-
-void RulesTableModel::applyChanges(std::function<void(const QString&)> errorHandler)
-{
-    auto connection = messageBusConnection();
-    if (!connection)
-        return;
-
-    auto rulesManager = connection->getVmsRulesManager(Qn::kSystemAccess);
-
-    std::set<QnUuid> addedAndModifiedRules;
-    addedAndModifiedRules.insert(m_addedRules.cbegin(), m_addedRules.cend());
-    addedAndModifiedRules.insert(m_modifiedRules.cbegin(), m_modifiedRules.cend());
-
-    // Send save rule transactions.
-    for (const auto& id: addedAndModifiedRules)
-    {
-        auto simplifiedRule = rule(id).lock();
-        if (!simplifiedRule)
-            continue;
-
-        auto serializedRule = serialize(simplifiedRule->rule());
-        rulesManager->save(
-            serializedRule,
-            [this, errorHandler, id](int /*requestId*/, ec2::ErrorCode errorCode)
-            {
-                if (!m_addedRules.contains(id) && !m_modifiedRules.contains(id))
-                    return;
-
-                if (errorCode == ec2::ErrorCode::ok)
-                    return;
-
-                if (errorHandler)
-                    errorHandler(ec2::toString(errorCode));
-            },
-            this
-        );
-    }
-
-    // Send remove rule transactions.
-    for (const auto& id: m_removedRules)
-    {
-        rulesManager->deleteRule(
-            id,
-            [this, id, errorHandler](int /*requestId*/, ec2::ErrorCode errorCode)
-            {
-                if (!m_removedRules.contains(id))
-                    return;
-
-                if (errorCode == ec2::ErrorCode::ok)
-                    return;
-
-                if (errorHandler)
-                    errorHandler(ec2::toString(errorCode));
-            },
-            this
-        );
-    }
-}
-
-void RulesTableModel::rejectChanges()
-{
-    beginResetModel();
-
-    m_addedRules.clear();
-    m_modifiedRules.clear();
-    m_removedRules.clear();
-    m_simplifiedRules.clear();
-
-    endResetModel();
-
-    initialise();
-}
-
-void RulesTableModel::resetToDefaults(std::function<void(const QString&)> errorHandler)
-{
-    if (auto connection = messageBusConnection())
-    {
-        connection->getVmsRulesManager(Qn::kSystemAccess)->resetVmsRules(
-            [errorHandler](int /*requestId*/, ec2::ErrorCode errorCode)
-            {
-                if (errorCode == ec2::ErrorCode::ok)
-                    return;
-
-                if (errorHandler)
-                    errorHandler(ec2::toString(errorCode));
-            },
-            this);
-    }
-}
-
-bool RulesTableModel::hasChanges() const
-{
-    return !m_addedRules.empty() || !m_modifiedRules.empty() || !m_removedRules.empty();
+    return roles;
 }
 
 void RulesTableModel::initialise()
 {
-    auto clonedRules = m_engine->cloneRules();
-    m_simplifiedRules.reserve(clonedRules.size());
+    const auto rules = m_engine->rules();
 
-    for (auto& [id, rule]: clonedRules)
-    {
-        auto eventDescriptor =
-            m_engine->eventDescriptor(rule->eventFilters().constFirst()->eventType());
-        auto actionDescriptor =
-            m_engine->actionDescriptor(rule->actionBuilders().constFirst()->actionType());
-        if (!eventDescriptor || !actionDescriptor)
-            continue;
+    m_ruleIds.clear();
+    m_ruleIds.reserve(rules.size());
 
-        m_simplifiedRules.emplace_back(new SimplifiedRule(m_engine, std::move(rule)));
-        m_simplifiedRules.back()->setModelIndex(index(m_simplifiedRules.size() - 1, IdColumn));
-    }
+    for (const auto& rule: rules)
+        m_ruleIds.push_back(rule.first);
 }
 
 bool RulesTableModel::isIndexValid(const QModelIndex& index) const
 {
-    return index.isValid() && index.model()->hasIndex(index.row(), index.column(), index.parent());
+    return index.isValid() && index.row() < m_ruleIds.size();
 }
 
-bool RulesTableModel::isRuleModified(const SimplifiedRule* rule) const
+bool RulesTableModel::isRuleValid(const ConstRulePtr& rule) const
 {
-    auto sourceRuleSet = m_engine->rules();
+    if (!rule)
+        return false;
 
-    if (!sourceRuleSet.contains(rule->id()))
-        return true; //< It is a new rule.
+    if (rule->eventFilters().empty() || rule->actionBuilders().empty())
+        return false;
 
-    const auto currentRulePtr = rule->rule();
-    const auto sourceRulePtr = sourceRuleSet.at(rule->id());
+    if (!m_engine->eventDescriptor(rule->eventFilters().first()->eventType()).has_value())
+        return false;
 
-    return *currentRulePtr != *sourceRulePtr;
+    if (!m_engine->actionDescriptor(rule->actionBuilders().first()->actionType()).has_value())
+        return false;
+
+    return true;
 }
 
-QVariant RulesTableModel::idColumnData(const QModelIndex& index, int role) const
+QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) const
 {
-    switch (role)
+    if (role == Qt::DecorationRole)
     {
-        case Qt::DisplayRole:
-            return m_simplifiedRules[index.row()]->id().toString();
-        case FilterRole:
-            return QString("%1 %2")
-                .arg(eventColumnData(index, Qt::DisplayRole).toString())
-                .arg(actionColumnData(index, Qt::DisplayRole).toString());
-        case IsSystemRuleRole:
-            return m_simplifiedRules[index.row()]->isSystem();
+        // TODO: #mmalofeev check if the rule has warning.
+
+        if (!rule->enabled())
+            return "qrc:///skin/slider/navigation/pause.png";
     }
 
     return {};
 }
 
-QVariant RulesTableModel::eventColumnData(const QModelIndex& index, int role) const
+QVariant RulesTableModel::eventColumnData(const ConstRulePtr& rule, int role) const
 {
     if (role == Qt::DisplayRole)
-        return m_simplifiedRules[index.row()]->eventDescriptor()->displayName;
+        return m_engine->eventDescriptor(rule->eventFilters().first()->eventType())->displayName;
 
     return {};
 }
 
-QVariant RulesTableModel::actionColumnData(const QModelIndex& index, int role) const
+QVariant RulesTableModel::sourceColumnData(const ConstRulePtr& rule, int role) const
 {
-    switch (role)
+    const auto eventFilter = rule->eventFilters().first();
+    const auto eventDescriptor = m_engine->eventDescriptor(eventFilter->eventType());
+
+    QVariant result;
+    if (vms::rules::hasSourceCamera(eventDescriptor.value()))
+        result = sourceCameraData(eventFilter, role);
+
+    if (result.isNull() && vms::rules::hasSourceServer(eventDescriptor.value()))
+        result = sourceServerData(eventFilter, role);
+
+    if (result.isNull())
+        result = systemData(role);
+
+    return result;
+}
+
+QVariant RulesTableModel::sourceCameraData(const vms::rules::EventFilter* eventFilter, int role) const
+{
+    auto sourceCameraField = eventFilter->fieldByType<vms::rules::SourceCameraField>();
+    if (sourceCameraField == nullptr)
+        return {};
+
+    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
+    const auto resources = sourceCameraField->acceptAll()
+        ? resourcePool->getResources<QnVirtualCameraResource>()
+        : resourcePool->getResourcesByIds<QnVirtualCameraResource>(sourceCameraField->ids());
+
+    if (role == Qt::DisplayRole)
     {
-        case Qt::DisplayRole:
-            return m_simplifiedRules[index.row()]->actionDescriptor()->displayName;
+        if (sourceCameraField->acceptAll())
+        {
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool,
+                tr("All Devices"),
+                tr("All Cameras"));
+        }
+
+        if (resources.empty())
+            return tr("No source");
+
+        if (resources.size() == 1)
+        {
+            return QnResourceDisplayInfo(resources.first()).toString(
+                appContext()->localSettings()->resourceInfoLevel());
+        }
+
+        return QnDeviceDependentStrings::getNumericName(resourcePool, resources);
+    }
+
+    if (role == Qt::DecorationRole)
+    {
+        if (sourceCameraField->acceptAll() || resources.size() > 1)
+            return iconPath(QnResourceIconCache::Cameras);
+
+        if (resources.empty())
+            iconPath(QnResourceIconCache::Camera);
+
+        if (resources.size() == 1)
+            return iconPath(qnResIconCache->key(resources.first()));
+
+        return iconPath(QnResourceIconCache::Camera);
     }
 
     return {};
 }
 
-QVariant RulesTableModel::editedStateColumnData(const QModelIndex& index, int role) const
+QVariant RulesTableModel::sourceServerData(const vms::rules::EventFilter* eventFilter, int role) const
 {
-    if (role == Qt::CheckStateRole)
-        return isRuleModified(m_simplifiedRules[index.row()].get()) ? Qt::Checked : Qt::Unchecked;
+    auto sourceServerField = eventFilter->fieldByName<vms::rules::SourceServerField>(
+        vms::rules::utils::kCameraIdFieldName);
+    if (sourceServerField == nullptr)
+        return {};
 
-    return {};
-}
+    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
+    const auto resources = sourceServerField->acceptAll()
+        ? resourcePool->getResources<QnMediaServerResource>()
+        : resourcePool->getResourcesByIds<QnMediaServerResource>(sourceServerField->ids());
 
-QVariant RulesTableModel::enabledStateColumnData(const QModelIndex& index, int role) const
-{
-    if (role == Qt::CheckStateRole)
-        return m_simplifiedRules[index.row()]->enabled() ? Qt::Checked : Qt::Unchecked;
-
-    return {};
-}
-
-bool RulesTableModel::setEnabledStateColumnData(
-    const QModelIndex& index, const QVariant& value, int role)
-{
-    if (role == Qt::CheckStateRole)
+    if (role == Qt::DisplayRole)
     {
-        m_simplifiedRules[index.row()]->setEnabled(value.toInt() == Qt::Checked ? true : false);
-        return true;
+        if (sourceServerField->acceptAll())
+            return tr("All Servers");
+
+        if (resources.empty())
+            return tr("No source");
+
+        if (resources.size() == 1)
+        {
+            return QnResourceDisplayInfo(resources.first()).toString(
+                    appContext()->localSettings()->resourceInfoLevel());
+        }
+
+        return tr("%n Servers", "", resources.size());
     }
 
-    return false;
+    if (role == Qt::DecorationRole)
+    {
+        if (sourceServerField->acceptAll() || resources.size() > 1)
+            return iconPath(QnResourceIconCache::Servers);
+
+        if (resources.empty())
+            iconPath(QnResourceIconCache::Server);
+
+        if (resources.size() == 1)
+            return iconPath(qnResIconCache->key(resources.first()));
+
+        return iconPath(QnResourceIconCache::Server);
+    }
+
+    return {};
 }
 
-QVariant RulesTableModel::commentColumnData(const QModelIndex& index, int role) const
+QVariant RulesTableModel::actionColumnData(const ConstRulePtr& rule, int role) const
 {
     if (role == Qt::DisplayRole)
-        return m_simplifiedRules[index.row()]->comment();
+        return m_engine->actionDescriptor(rule->actionBuilders().first()->actionType())->displayName;
 
     return {};
+}
+
+QVariant RulesTableModel::targetColumnData(const ConstRulePtr& rule, int role) const
+{
+    const auto actionBuilder = rule->actionBuilders().first();
+    const auto actionDescriptor = m_engine->actionDescriptor(actionBuilder->actionType());
+
+    QVariant result;
+    if (vms::rules::hasTargetCamera(actionDescriptor.value()))
+        result = targetCameraData(actionBuilder, role);
+
+    if (result.isNull() && vms::rules::hasTargetLayout(actionDescriptor.value()))
+        result = targetLayoutData(actionBuilder, role);
+
+    if (result.isNull() && vms::rules::hasTargetUser(actionDescriptor.value()))
+        result = targetUserData(actionBuilder, role);
+
+    if (result.isNull() && vms::rules::hasTargetServer(actionDescriptor.value()))
+        result = targetServerData(actionBuilder, role);
+
+    if (result.isNull())
+        result = systemData(role);
+
+    return result;
+}
+
+QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* actionBuilder, int role) const
+{
+    QnVirtualCameraResourceList resources;
+    bool useSource{false};
+    bool acceptAll{false};
+    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
+
+    if (const auto targetDeviceField = actionBuilder->fieldByType<vms::rules::TargetDeviceField>())
+    {
+        useSource = targetDeviceField->useSource();
+        if (targetDeviceField->acceptAll())
+        {
+            acceptAll = true;
+            resources = resourcePool->getResources<QnVirtualCameraResource>();
+        }
+        else
+        {
+            resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(
+                targetDeviceField->ids());
+        }
+    }
+    else if (const auto targetSingleDeviceField = actionBuilder->fieldByType<vms::rules::TargetSingleDeviceField>())
+    {
+        useSource = targetSingleDeviceField->useSource();
+        resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(QnUuidSet{targetSingleDeviceField->id()});
+    }
+    else
+    {
+        return {};
+    }
+
+    if (role == Qt::DisplayRole)
+    {
+        if (useSource)
+        {
+            return resources.empty()
+                ? tr("Source camera")
+                : tr("Source and %n more Cameras", "", resources.size());
+        }
+
+        if (resources.empty())
+            return tr("No target");
+
+        if (resources.size() == 1)
+        {
+            return QnResourceDisplayInfo(resources.first()).toString(
+                appContext()->localSettings()->resourceInfoLevel());
+        }
+
+        return QnDeviceDependentStrings::getNumericName(resourcePool, resources);
+    }
+
+    if (role == Qt::DecorationRole)
+    {
+        const auto targetCamerasCount = resources.size() + (useSource ? 1 : 0);
+        return (acceptAll || targetCamerasCount > 1)
+            ? iconPath(QnResourceIconCache::Cameras)
+            : iconPath(QnResourceIconCache::Camera);
+    }
+
+    return {};
+}
+
+QVariant RulesTableModel::targetLayoutData(const vms::rules::ActionBuilder* actionBuilder, int role) const
+{
+    if (const auto targetLayoutField = actionBuilder->fieldByType<vms::rules::TargetLayoutField>())
+    {
+        const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
+        const auto layouts =
+            resourcePool->getResourcesByIds<QnLayoutResource>(targetLayoutField->value());
+
+        if (role == Qt::DisplayRole)
+        {
+            if (layouts.size() == 1)
+                return layouts.first()->getName();
+
+            if (layouts.empty())
+                return tr("No target");
+
+            return tr("%n layouts", "", layouts.size());
+        }
+
+        if (role == Qt::DecorationRole)
+        {
+            return layouts.size() > 1
+                ? iconPath(QnResourceIconCache::Layouts)
+                : iconPath(QnResourceIconCache::Layout);
+        }
+    }
+
+    return {};
+}
+
+QVariant RulesTableModel::targetUserData(const vms::rules::ActionBuilder* actionBuilder, int role) const
+{
+    if (const auto targetUserField = actionBuilder->fieldByType<vms::rules::TargetUserField>())
+    {
+        QnUserResourceList users;
+        nx::vms::api::UserGroupDataList groups;
+        nx::vms::common::getUsersAndGroups(
+            appContext()->currentSystemContext(),
+            targetUserField->ids(),
+            users,
+            groups);
+        users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
+        std::set<QnUuid> groupIds;
+        for (const auto& group: groups)
+            groupIds.insert(group.id);
+
+        if (role == Qt::DisplayRole)
+        {
+            if (targetUserField->acceptAll())
+                return tr("All Users");
+
+            if (users.size() == 1 && groups.empty())
+                return users.front()->getName();
+
+            if (users.empty() && groups.size() == 1)
+            {
+                return QString{"%1 %2 %3"}
+                    .arg(tr("Group"))
+                    .arg(QChar(0x2013)) //< En-dash.
+                    .arg(groups.front().name);
+            }
+
+            if (groups.empty())
+                return tr("%n Users", "", users.size());
+
+            if (!users.empty())
+            {
+                return QString{"%1, %2"}
+                    .arg(tr("%n Groups", "", groups.size()))
+                    .arg(tr("%n Users", "", users.size()));
+            }
+
+            if (groupIds == api::kAllPowerUserGroupIds)
+                return tr("All Power Users");
+
+            return tr("%n Groups", "", groups.size());
+        }
+
+        if (role == Qt::DecorationRole)
+        {
+            return (targetUserField->acceptAll() || users.size() > 1 || !groupIds.empty())
+                ? iconPath(QnResourceIconCache::Users)
+                : iconPath(QnResourceIconCache::User);
+        }
+    }
+
+    return {};
+}
+
+QVariant RulesTableModel::targetServerData(
+    const vms::rules::ActionBuilder* actionBuilder,
+    int role) const
+{
+    if (const auto targetServerField = actionBuilder->fieldByType<vms::rules::TargetServerField>())
+    {
+        const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
+        const QnMediaServerResourceList targetServers =
+            resourcePool->getResourcesByIds<QnMediaServerResource>(targetServerField->ids());
+
+        if (role == Qt::DisplayRole)
+        {
+            if (targetServerField->acceptAll())
+                return tr("All Server");
+
+            if (targetServers.isEmpty())
+                return tr("No target");
+
+            const auto targetServersString = targetServers.size() > 1
+                ? tr("%n Servers", "", targetServers.size())
+                : targetServers.first()->getName();
+
+            return targetServerField->useSource()
+                ? tr("Source Server and %1").arg(targetServersString)
+                : targetServersString;
+        }
+
+        if (role == Qt::DecorationRole)
+        {
+            const auto targetServerCount =
+                    targetServers.size() + (targetServerField->useSource() ? 1 : 0);
+            return targetServerField->acceptAll() || targetServerCount > 1
+                ? iconPath(QnResourceIconCache::Servers)
+                : iconPath(QnResourceIconCache::Server);
+        }
+    }
+
+    return {};
+}
+
+QVariant RulesTableModel::systemData(int role) const
+{
+    if (role == Qt::DisplayRole)
+        return tr("System");
+
+    if (role == Qt::DecorationRole)
+        return iconPath(QnResourceIconCache::CurrentSystem);
+
+    return {};
+}
+
+QVariant RulesTableModel::commentColumnData(const ConstRulePtr& rule, int role) const
+{
+    if (role == Qt::DisplayRole)
+        return rule->comment();
+
+    return {};
+}
+
+void RulesTableModel::registerQmlType()
+{
+    qmlRegisterType<rules::RulesTableModel>("nx.vms.client.desktop", 1, 0, "RulesTableModel");
 }
 
 } // namespace nx::vms::client::desktop::rules
