@@ -307,13 +307,15 @@ void Settings::migrateWelcomeScreenSettingsFrom_v51(Settings* oldSettings)
 {
     using namespace utils::property_storage;
 
+    const QString kClientCorePrefix = "client_core/";
+
     AbstractBackend* oldBackend = oldSettings->backend();
     auto oldQSettings = static_cast<QSettingsBackend*>(oldBackend)->qSettings();
 
     if (!forgottenSystems.exists())
     {
         const auto oldForgottenSystems =
-            oldQSettings->value(forgottenSystems.name).value<QSet<QString>>();
+            oldQSettings->value(kClientCorePrefix + forgottenSystems.name).value<QSet<QString>>();
         forgottenSystems = {oldForgottenSystems.begin(), oldForgottenSystems.end()};
     }
 
@@ -322,8 +324,8 @@ void Settings::migrateWelcomeScreenSettingsFrom_v51(Settings* oldSettings)
     if (!recentLocalConnections.exists())
     {
         QHash<QnUuid, LocalConnectionData> value;
-        if (QJson::deserialize(
-            oldQSettings->value(recentLocalConnections.name).toString(), &value))
+        if (QJson::deserialize(oldQSettings->value(
+            kClientCorePrefix + recentLocalConnections.name).toString(), &value))
         {
             recentLocalConnections = value;
         }
@@ -332,8 +334,8 @@ void Settings::migrateWelcomeScreenSettingsFrom_v51(Settings* oldSettings)
     if (!searchAddresses.exists())
     {
         SystemSearchAddressesHash oldSearchAddresses;
-        if (QJson::deserialize(
-            oldQSettings->value(searchAddresses.name).toString(), &oldSearchAddresses))
+        if (QJson::deserialize(oldQSettings->value(
+            kClientCorePrefix + searchAddresses.name).toString(), &oldSearchAddresses))
         {
             searchAddresses = oldSearchAddresses;
         }
@@ -342,8 +344,11 @@ void Settings::migrateWelcomeScreenSettingsFrom_v51(Settings* oldSettings)
     if (!tileScopeInfo.exists())
     {
         SystemVisibilityScopeInfoHash oldScopeInfo;
-        if (QJson::deserialize(oldQSettings->value(tileScopeInfo.name).toString(), &oldScopeInfo))
+        if (QJson::deserialize(oldQSettings->value(
+            kClientCorePrefix + tileScopeInfo.name).toString(), &oldScopeInfo))
+        {
             tileScopeInfo = oldScopeInfo;
+        }
     }
 }
 
