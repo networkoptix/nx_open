@@ -4461,7 +4461,7 @@ to %1</source>
     </message>
     <message>
       <source>Normal</source>
-      <translation>ノーマル</translation>
+      <translation>中</translation>
     </message>
     <message>
       <source>High</source>
@@ -4481,11 +4481,11 @@ to %1</source>
     </message>
     <message>
       <source>Stay Time</source>
-      <translation>稼働時間</translation>
+      <translation>待機時間</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation>スピード</translation>
+      <translation>移動速度</translation>
     </message>
     <message>
       <source>Invalid</source>

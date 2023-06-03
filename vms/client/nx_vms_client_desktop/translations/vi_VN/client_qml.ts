@@ -196,7 +196,7 @@
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>Nhấn từng nút nhiều lần và viết tên của các nút này vào bảng bên dưới.</translation>
     </message>
   </context>
   <context>
@@ -543,11 +543,11 @@
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>Chọn cần điều khiển.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Không có thiết bị nào được kết nối.</translation>
     </message>
   </context>
   <context>
@@ -581,11 +581,11 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Lưu</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Trước</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1055,15 +1055,15 @@ to activate PTZ</source>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>Chọn tệp để lưu</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>Tệp JSON (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>File lưu kết quả:</translation>
     </message>
   </context>
   <context>
@@ -1370,21 +1370,21 @@ to activate PTZ</source>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Di chuyển cần điều khiển sang trái và phải nhiều lần.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Di chuyển cần điều khiển lên xuống nhiều lần.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Xoay cần điều khiển theo chiều kim đồng hồ và ngược chiều kim đồng hồ nhiều lần.</translation>
     </message>
   </context>
 </TS>

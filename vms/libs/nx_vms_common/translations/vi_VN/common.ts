@@ -1118,7 +1118,7 @@
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Yêu cầu xác thực phiên.</translation>
     </message>
   </context>
   <context>
@@ -2272,19 +2272,19 @@
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Cũng cài đặt trên camera nguồn</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Cũng kích hoạt trên camera nguồn</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Cũng ghi camera nguồn</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>Cũng hiển thị trên camera nguồn</translation>
     </message>
   </context>
 </TS>

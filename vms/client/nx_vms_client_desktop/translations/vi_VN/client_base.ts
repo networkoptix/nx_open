@@ -11310,7 +11310,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Cannot add resources from other Systems.</source>
-      <translation type="unfinished">Cannot add resources from other Systems.</translation>
+      <translation>Không thể thêm tài nguyên từ Hệ thống khác.</translation>
     </message>
   </context>
   <context>
