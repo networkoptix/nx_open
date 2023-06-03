@@ -11,6 +11,7 @@
 
 #include <rapidjson/document.h>
 
+#include <nx/reflect/enum_string_conversion.h>
 #include <nx/reflect/from_string.h>
 #include <nx/reflect/generic_visitor.h>
 #include <nx/reflect/instrument.h>
@@ -342,6 +343,25 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
         return {
             false,
             "Either a number or a string is expected for an integral value",
+            getStringRepresentation(ctx.value)};
+    }
+    else if constexpr (IsInstrumentedEnumV<T>)
+    {
+        *data = T();
+        if (ctx.value.IsString())
+        {
+            bool ok = enumeration::fromString<T>(
+                std::string(ctx.value.GetString(), ctx.value.GetStringLength()), data);
+            return DeserializationResult(ok);
+        }
+        if (ctx.value.IsNumber())
+        {
+            *data = static_cast<T>(ctx.value.GetInt64());
+            return DeserializationResult(enumeration::isValidEnumValue<T>(*data));
+        }
+        return {
+            false,
+            "Either a number or a string is expected for an enum value",
             getStringRepresentation(ctx.value)};
     }
     else if constexpr (IsDeserializableV<T>)
