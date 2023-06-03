@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <limits>
 #include <optional>
 #include <string>
 #include <vector>
@@ -602,6 +603,34 @@ struct MediaPacketData
     int channelNumber = -1;
     bool isKeyFrame = false;
     std::vector<uint8_t> encryptionData;
+};
+
+struct CloudDeviceReportEntry
+{
+    CloudDeviceReportEntry() = default;
+    CloudDeviceReportEntry(const char* jsonData);
+    CloudDeviceReportEntry(const nx::kit::Json& json);
+
+    std::string id;
+    int32_t megapixels = std::numeric_limits<int32_t>::max();
+
+    bool operator==(const CloudDeviceReportEntry& other) const;
+    nx::kit::Json to_json() const;
+};
+
+using CloudDeviceEntryList = std::vector<CloudDeviceReportEntry>;
+
+struct CloudDeviceReport
+{
+    CloudDeviceReport() = default;
+    CloudDeviceReport(const char* jsonData);
+    CloudDeviceReport(const nx::kit::Json& json);
+
+    std::string cloudSystemId;
+    CloudDeviceEntryList devices;
+
+    bool operator==(const CloudDeviceReport& other) const;
+    nx::kit::Json to_json() const;
 };
 
 } // nx::sdk::namespace cloud_storage

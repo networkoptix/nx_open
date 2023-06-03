@@ -11,7 +11,7 @@
 #include "algorithm.h"
 
 namespace nx::sdk::cloud_storage {
-    
+
 using namespace std::chrono;
 
 namespace {
@@ -1369,6 +1369,50 @@ MediaPacketData::MediaPacketData(
         encryptionData.assign((const uint8_t*) mediaPacket->encryptionData(),
             (const uint8_t*) mediaPacket->encryptionData() + mediaPacket->encryptionDataSize());
     }
+}
+
+CloudDeviceReportEntry::CloudDeviceReportEntry(const char* jsonData): CloudDeviceReportEntry(parseJson(jsonData))
+{}
+
+CloudDeviceReportEntry::CloudDeviceReportEntry(const nx::kit::Json& json)
+{
+    id = getStringValue(json, "id");
+    megapixels = getIntValue(json, "megapixels");
+}
+
+nx::kit::Json CloudDeviceReportEntry::to_json() const
+{
+    return nx::kit::Json::object({
+        {"id", id},
+        {"megapixels", megapixels},
+    });
+}
+
+bool CloudDeviceReportEntry::operator==(const CloudDeviceReportEntry& other) const
+{
+    return id == other.id && megapixels == other.megapixels;
+}
+
+CloudDeviceReport::CloudDeviceReport(const char* jsonData): CloudDeviceReport(parseJson(jsonData))
+{}
+
+CloudDeviceReport::CloudDeviceReport(const nx::kit::Json& json)
+{
+    cloudSystemId = getStringValue(json, "cloudSystemId");
+    devices = getObjectListValue<CloudDeviceReportEntry>(json, "devices");
+}
+
+nx::kit::Json CloudDeviceReport::to_json() const
+{
+    return nx::kit::Json::object({
+        {"cloudSystemId", cloudSystemId},
+        {"devices", devices},
+    });
+}
+
+bool CloudDeviceReport::operator==(const CloudDeviceReport& other) const
+{
+    return cloudSystemId == other.cloudSystemId && devices == other.devices;
 }
 
 } // namespace nx::sdk::cloud_storage
