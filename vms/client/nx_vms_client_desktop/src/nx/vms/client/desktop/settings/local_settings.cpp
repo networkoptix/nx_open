@@ -70,10 +70,14 @@ void migratePopupSystemHealthFrom5_1(LocalSettings* settings, QSettings* oldSett
             {
                 // These were skipped in 3.0.
                 case MessageType::cloudPromo:
-
                 case MessageType::archiveFastScanFinished:
+
                 // TODO: Remove in VMS-7724.
+                case MessageType::remoteArchiveSyncFinished:
+                case MessageType::remoteArchiveSyncProgress:
                 case MessageType::remoteArchiveSyncError:
+                case MessageType::remoteArchiveSyncStopSchedule:
+                case MessageType::remoteArchiveSyncStopAutoMode:
                     return true;
 
                 default:
