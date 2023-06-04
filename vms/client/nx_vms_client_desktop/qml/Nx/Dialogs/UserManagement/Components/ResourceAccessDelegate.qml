@@ -25,9 +25,6 @@ Item
 
     required property var editingContext
 
-    required property bool rowHovered
-    required property int hoveredAccessRight
-
     property bool editingEnabled: true
 
     property bool automaticDependencies: false
@@ -55,7 +52,7 @@ Item
 
         highlighted: delegateRoot.enabled
             && !delegateRoot.frameSelectionActive
-            && (delegateRoot.rowHovered || delegateRoot.hoveredCell)
+            && delegateRoot.hoveredCell
 
         customSelectionIndicator: true
         wholeRowToggleable: false
@@ -135,7 +132,7 @@ Item
                             return false
 
                         // Highlight directly hovered cell.
-                        if (delegateRoot.enabled && containsMouse)
+                        if (delegateRoot.enabled && delegateRoot.hoveredCell === cell)
                             return true
 
                         const toggledOn = isToggledOn()

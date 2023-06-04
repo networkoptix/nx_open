@@ -166,15 +166,10 @@ Item
             selectionMode: tree.selectionMode
             showResourceStatus: tree.showResourceStatus
             columnWidth: control.kColumnWidth
-            rowHovered: tree.hoveredItem === this
             editingEnabled: control.editingEnabled
             automaticDependencies: automaticDependenciesSwitch.checked
 
             accessRightsList: control.availableAccessRights
-
-            hoveredAccessRight: accessRightsHeader.hoveredHeader
-                ? accessRightsHeader.hoveredAccessRight
-                : 0
 
             implicitHeight: control.kRowHeight
 
@@ -196,6 +191,12 @@ Item
                     tree.hoveredRow = rowAccess
                 else if (tree.hoveredRow == rowAccess)
                     tree.hoveredRow = null
+            }
+
+            Connections
+            {
+                target: frameSelector
+                function onCanceled() { rowAccess.hoveredCell = null }
             }
         }
 
@@ -287,6 +288,9 @@ Item
                     control.editingContext.modifyAccessRights(resources, accessRights,
                         selectionValue, automaticDependenciesSwitch.checked)
                 }
+
+                onCanceled:
+                    tree.hoveredRow = null
             }
 
             Binding
@@ -443,6 +447,17 @@ Item
     {
         sequence: "Ctrl+Shift+A"
         enabled: !control.automaticDependenciesSwitchVisible
-        onActivated: control.automaticDependenciesSwitchVisible = true
+
+        onActivated:
+            control.automaticDependenciesSwitchVisible = true
+    }
+
+    Shortcut
+    {
+        sequence: "Esc"
+        enabled: frameSelector.dragging
+
+        onActivated:
+            frameSelector.cancel()
     }
 }
