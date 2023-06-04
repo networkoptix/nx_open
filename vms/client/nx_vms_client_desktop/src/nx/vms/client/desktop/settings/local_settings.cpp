@@ -217,10 +217,18 @@ void migrateLastUsedConnectionFrom4_2(LocalSettings* settings, QSettings* oldSet
     settings->lastUsedConnection = data;
 }
 
-void migrateLogSettingsFrom5_0(LocalSettings* settings, QSettings* oldSettings)
+void migrateLogSettings(LocalSettings* settings, QSettings* oldSettings)
 {
-    nx::utils::property_storage::migrateValue(oldSettings,
-        settings->maxLogFileSizeB, "maxLogFileSize");
+    using nx::utils::property_storage::migrateValue;
+
+    // Migrate from 5.1.
+    migrateValue(oldSettings, settings->maxLogFileSizeB);
+    migrateValue(oldSettings, settings->maxLogVolumeSizeB);
+    migrateValue(oldSettings, settings->logArchivingEnabled);
+    migrateValue(oldSettings, settings->maxLogFileTimePeriodS);
+
+    // Migrate from 5.0 in a case if 5.1 version was skipped.
+    migrateValue(oldSettings, settings->maxLogFileSizeB, "maxLogFileSize");
 
     if (oldSettings->contains("logArchiveSize") && !settings->maxLogVolumeSizeB.exists())
     {
@@ -277,7 +285,7 @@ void LocalSettings::migrateOldSettings()
     migrateSettingsFrom5_1(this, oldSettings.get());
     migrateLastUsedConnectionFrom4_2(this, oldSettings.get());
     migrateMediaFoldersFrom4_3(this, oldSettings.get());
-    migrateLogSettingsFrom5_0(this, oldSettings.get());
+    migrateLogSettings(this, oldSettings.get());
 }
 
 void LocalSettings::setDefaults()
