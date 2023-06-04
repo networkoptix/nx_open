@@ -1529,11 +1529,11 @@ License Key: %2</source>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Route via %1</translation>
+      <translation>透過 %1 發送</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation type="unfinished">Route via SMTP server</translation>
+      <translation>透過SMTP伺服器發送</translation>
     </message>
     <message>
       <source>Success</source>
@@ -5122,7 +5122,7 @@ to %1</source>
     </message>
     <message>
       <source>Provide</source>
-      <translation type="unfinished">Provide</translation>
+      <translation>提供</translation>
     </message>
     <message>
       <source>ACCESS DENIED</source>
@@ -5587,7 +5587,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote archive synchronization has been stopped</source>
-      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
+      <translation>遠端錄影同步已停止</translation>
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
@@ -5603,11 +5603,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote archive synchronization is available</source>
-      <translation type="unfinished">Remote archive synchronization is available</translation>
+      <translation>有可用的遠端錄影資料</translation>
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>建議選擇另一個非系統分割磁區的儲存位置。</translation>
     </message>
   </context>
   <context>
@@ -6115,7 +6115,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>無法開啟檔案 &quot;%1&quot;，請檢查資料夾的路徑位置以及使用者的存取權限。</translation>
     </message>
   </context>
   <context>
@@ -6673,7 +6673,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>SourcePickerWidgetStrings</name>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>請選擇至少一個伺服器</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -6689,7 +6689,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one I/O module</source>
-      <translation type="unfinished">Select at least one I/O module</translation>
+      <translation>請選擇至少一個I/O裝置</translation>
     </message>
   </context>
   <context>
@@ -6951,7 +6951,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>日誌管理</translation>
     </message>
   </context>
   <context>
@@ -7490,11 +7490,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>更換攝影機失敗</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
-      <translation type="unfinished">Abort camera replacement?</translation>
+      <translation>是否停止相機更換?</translation>
     </message>
     <message>
       <source>Will be transferred partially:</source>
@@ -7526,20 +7526,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation type="unfinished">Checking if the old camera&apos;s data can be transferred to the new camera.</translation>
+      <translation>請確認是否要將舊攝影機的資料轉移至新攝影機。</translation>
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
-      <translation type="unfinished">Some data and settings may not be compatible with the new camera</translation>
+      <translation>某些資料和設定可能無法相容於新攝影機</translation>
     </message>
     <message>
       <source>%1 will be removed from the System and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
+      <translation>攝影機%1 將更換為選定的攝影機，並從系統中移除。</translation>
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the Server is unavailable.</translation>
+      <translation>因伺服器目前無法連線，因此無法更換攝影機。</translation>
     </message>
   </context>
   <context>
@@ -7836,7 +7836,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
-      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+      <translation>須由你確認後才能提供token</translation>
     </message>
     <message>
       <source>Allow</source>
@@ -8891,7 +8891,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Pending download...</source>
-      <translation type="unfinished">Pending download...</translation>
+      <translation>等待下載...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -8909,7 +8909,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled on the Client</source>
-      <translation type="unfinished">Debug logging is enabled on the Client</translation>
+      <translation>在客戶端上已啟用除錯日誌設定</translation>
     </message>
     <message>
       <source>Debug logging is enabled, resulting in degraded system performance.</source>
@@ -9468,7 +9468,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Uploading client packages to Servers...</source>
-      <translation type="unfinished">Uploading client packages to Servers...</translation>
+      <translation>正在將客戶端更新檔上傳到服務器...</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
@@ -9507,7 +9507,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Current System</source>
-      <translation type="unfinished">Current System</translation>
+      <translation>目前系統</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -10538,11 +10538,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
-      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+      <translation>攝影機%1已被更換為 %2。</translation>
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+      <translation>點擊 &quot;取消更換&quot; 按鈕以同時使用兩個裝置。</translation>
     </message>
     <message>
       <source>Undo Replace</source>
@@ -10782,15 +10782,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>LDAP群組</translation>
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>內建群組</translation>
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>自定群組</translation>
     </message>
     <message>
       <source>Name</source>
@@ -10802,7 +10802,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Member of</source>
-      <translation type="unfinished">Member of</translation>
+      <translation>隸屬於</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -10845,7 +10845,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>群組</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -10887,11 +10887,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>群組</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>
@@ -11306,11 +11306,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
-      <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
+      <translation>無法找到特定ID的資源項目</translation>
     </message>
     <message>
       <source>Cannot add resources from other Systems.</source>
-      <translation type="unfinished">Cannot add resources from other Systems.</translation>
+      <translation>無法從其他系統添加資源。</translation>
     </message>
   </context>
   <context>
@@ -11336,7 +11336,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
     <message>
       <source>Not saved</source>
-      <translation type="unfinished">Not saved</translation>
+      <translation>未儲存</translation>
     </message>
   </context>
   <context>
@@ -11355,11 +11355,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to restore rules.</source>
-      <translation type="unfinished">Failed to restore rules.</translation>
+      <translation>恢復規則失敗。</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>退出前是否套用變更?</translation>
     </message>
   </context>
   <context>
@@ -11789,7 +11789,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation type="unfinished">Undo replacement completed successfully!</translation>
+      <translation>更換攝影機完成！</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
@@ -11797,15 +11797,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Confirm undo replacement?</source>
-      <translation type="unfinished">Confirm undo replacement?</translation>
+      <translation>請確認是否取消更換攝影機?</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>選擇資料夾...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
+      <translation>伺服器中找不到可以更換的攝影機</translation>
     </message>
   </context>
   <context>
@@ -11876,7 +11876,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>將佈局儲存至Cloud</translation>
     </message>
   </context>
   <context>
@@ -11994,7 +11994,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
-      <translation type="unfinished">Rewind is not available for VMAX</translation>
+      <translation>倒帶不適用於 VMAX</translation>
     </message>
   </context>
   <context>
@@ -12056,7 +12056,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Cannot check Client update availability. Check your internet connection and try again.</translation>
+      <translation>目前無法檢查客戶端更新，請查看您的網路連線並重試。</translation>
     </message>
   </context>
 </TS>

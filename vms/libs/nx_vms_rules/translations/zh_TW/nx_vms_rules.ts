@@ -37,7 +37,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;敘述</translation>
+      <translation>敘述</translation>
     </message>
   </context>
   <context>
@@ -76,18 +76,18 @@
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>備份完成</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>未知的事件</translation>
     </message>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>發生%1 事件</translation>
     </message>
   </context>
   <context>
@@ -102,7 +102,7 @@
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>攝影機上的 DI</translation>
     </message>
     <message>
       <source>State</source>
@@ -121,7 +121,7 @@
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>除錯事件</translation>
     </message>
     <message>
       <source>Action</source>
@@ -129,7 +129,7 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>數值</translation>
     </message>
   </context>
   <context>
@@ -160,18 +160,18 @@
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
+      <translation>
+        <numerusform>裝置已斷線。</numerusform>
       </translation>
     </message>
     <message>
       <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
+      <translation>裝置ID</translation>
     </message>
     <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
+      <translation>
+        <numerusform>攝影機已中斷連線</numerusform>
       </translation>
     </message>
   </context>
@@ -183,7 +183,7 @@
     </message>
     <message>
       <source>MAC #%1: %2</source>
-      <translation>MAC #%1: %2 {1:?} {2?}</translation>
+      <translation>MAC #%1: %2 </translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -193,12 +193,12 @@
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>%1的攝影機IP衝突</translation>
+      <translation>%1上的的攝影機IP衝突</translation>
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
       <translation>
-        <numerusform>設備 IP 衝突</numerusform>
+        <numerusform>裝置 IP 衝突</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -231,7 +231,7 @@
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation>通用事件 %1</translation>
+      <translation>於%1的通用事件</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -258,7 +258,7 @@
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>動作間隔:</translation>
     </message>
     <message>
       <source>Login</source>
@@ -270,23 +270,23 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>發送一則HTTP(S)請求</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) 網址</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S) 內容</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>內容類型</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>請求方法</translation>
     </message>
   </context>
   <context>
@@ -301,15 +301,15 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>沒有足夠的授權數量，以下裝置的錄影已被停用:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>沒有足夠的授權數量，以下攝影機的錄影已被停用:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>沒有足夠的授權數量，以下I/O模組的錄影已被停用:</translation>
     </message>
   </context>
   <context>
@@ -399,14 +399,14 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <translation>無法強制使用攝影機時間，因其延遲過久，將改採用系統時間。</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
+      <translation>顯示通知</translation>
     </message>
     <message>
       <source>To</source>
@@ -414,11 +414,11 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>動作間隔</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>強制確認</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -430,7 +430,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>工具提示</translation>
     </message>
   </context>
   <context>
@@ -500,15 +500,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>動作間隔</translation>
     </message>
     <message>
       <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
+      <translation>其他收件人</translation>
     </message>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>電子郵件訊息</translation>
     </message>
   </context>
   <context>
@@ -628,7 +628,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>動作間隔</translation>
     </message>
     <message>
       <source>Speak to users</source>
@@ -683,15 +683,15 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>分析儲存裝置 &quot;%1&quot; DB錯誤：掛載點權限不足。</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>寫入時無法初始化 AES 加密。故錄影資料以未加密狀態寫入。</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID錯誤: %1。</translation>
     </message>
   </context>
   <context>
@@ -706,11 +706,11 @@
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation>同時顯示來源攝影機</translation>
+      <translation>同時顯示於來源攝影機</translation>
     </message>
     <message>
       <source>Display text for</source>
-      <translation>顯示字幕</translation>
+      <translation>顯示文字</translation>
     </message>
     <message>
       <source>Text</source>
@@ -753,13 +753,13 @@
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>第一次出現: %1 在 %2 (共 %n 次)</numerusform>
+        <numerusform>第一次出現: %2 %1 (共 %n 次)</numerusform>
       </translation>
     </message>
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>時間：%1 在 %2</translation>
+      <translation>時間：%2 %1 </translation>
     </message>
   </context>
 </TS>

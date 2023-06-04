@@ -210,7 +210,7 @@
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
+      <translation>此伺服器的憑證遭拒。</translation>
     </message>
   </context>
   <context>
