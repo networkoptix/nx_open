@@ -30,6 +30,8 @@ Item
 
     property var buttonBox
 
+    property bool automaticDependenciesSwitchVisible: false
+
     readonly property bool editingEnabled: enabled
 
     readonly property var availableAccessRightDescriptors:
@@ -431,9 +433,16 @@ Item
             anchors.verticalCenter: parent.verticalCenter
 
             checked: true
-            visible: control.enabled
+            visible: control.enabled && control.automaticDependenciesSwitchVisible
 
             text: qsTr("Automatically add dependent access rights")
         }
+    }
+
+    Shortcut
+    {
+        sequence: "Ctrl+Shift+A"
+        enabled: !control.automaticDependenciesSwitchVisible
+        onActivated: control.automaticDependenciesSwitchVisible = true
     }
 }
