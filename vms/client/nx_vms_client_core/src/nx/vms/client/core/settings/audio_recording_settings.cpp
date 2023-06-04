@@ -92,6 +92,7 @@ AudioRecordingSettings::AudioRecordingSettings():
             + "/settings/screen_recording")),
     m_devices(fetchDevicesList())
 {
+    load();
 }
 
 QList<AudioDeviceInfo> AudioRecordingSettings::availableDevices() const

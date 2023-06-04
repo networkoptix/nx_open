@@ -53,12 +53,13 @@ void ScreenRecordingSettings::migrateFrom_v51()
 {
     using namespace nx::utils::property_storage;
 
+    const QString kPrefix = "videoRecording/";
+
     auto oldSettings = std::make_unique<QSettings>();
 
-    migrateValue(oldSettings.get(), primaryAudioDeviceName,
-        "videoRecording/" + primaryAudioDeviceName.name);
+    migrateValue(oldSettings.get(), primaryAudioDeviceName, kPrefix + primaryAudioDeviceName.name);
     migrateValue(oldSettings.get(), secondaryAudioDeviceName,
-        "videoRecording/" + secondaryAudioDeviceName.name);
+        kPrefix + secondaryAudioDeviceName.name);
 
     // Video recording settings were stored in the General group.
     migrateValue(oldSettings.get(), captureCursor);
@@ -69,7 +70,7 @@ void ScreenRecordingSettings::migrateFrom_v51()
     migrateEnumValue(oldSettings.get(), resolution);
     migrateValue(oldSettings.get(), screenProperty);
     migrateValue(oldSettings.get(), screenGeometry, "screenResolution");
-    migrateValue(oldSettings.get(), recordingFolder);
+    migrateValue(oldSettings.get(), recordingFolder, kPrefix + recordingFolder.name);
 }
 
 ScreenRecordingSettings* screenRecordingSettings()
