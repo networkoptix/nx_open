@@ -13,7 +13,7 @@ class ScreenRecordingSettings: public core::AudioRecordingSettings
 public:
     ScreenRecordingSettings();
 
-    Property<bool> captureCursor{this, "captureCursor"};
+    Property<bool> captureCursor{this, "captureCursor", true};
     Property<screen_recording::CaptureMode> captureMode{this, "captureMode"};
     Property<screen_recording::Quality> quality{
         this, "quality", screen_recording::Quality::balanced};
