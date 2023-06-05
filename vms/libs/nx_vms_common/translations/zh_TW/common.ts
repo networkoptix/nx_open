@@ -1060,21 +1060,21 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>缺少必要的參數：%1。</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>處理請求失敗。</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Forbidden</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Conflict</translation>
     </message>
     <message>
       <source>Bad request.</source>
@@ -1084,7 +1084,7 @@
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Not implemented</translation>
     </message>
     <message>
       <source>Not found.</source>
@@ -1097,11 +1097,11 @@
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>不支援的媒體類型。</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>服務無法使用。</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
@@ -1109,16 +1109,16 @@
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>連線已逾時。</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2.</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+      <translation>無效的參數 "%1": %2。</translation>
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>請先驗證連線。</translation>
     </message>
   </context>
   <context>
@@ -1152,7 +1152,7 @@
     </message>
     <message>
       <source>Email support link</source>
-      <translation type="unfinished">Email support link</translation>
+      <translation>電子郵件支援</translation>
     </message>
     <message>
       <source>SMTP connection type</source>
@@ -1164,11 +1164,11 @@
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
-      <translation type="unfinished">SMTP timeout (seconds)</translation>
+      <translation>SMTP逾時(秒)</translation>
     </message>
     <message>
       <source>SMTP name</source>
-      <translation type="unfinished">SMTP name</translation>
+      <translation>SMTP名稱</translation>
     </message>
     <message>
       <source>LDAP URI</source>
@@ -1176,11 +1176,11 @@
     </message>
     <message>
       <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
+      <translation>LDAP 管理者 DN</translation>
     </message>
     <message>
       <source>LDAP Admin password</source>
-      <translation type="unfinished">LDAP Admin password</translation>
+      <translation>LDAP 管理者密碼</translation>
     </message>
     <message>
       <source>LDAP search base</source>
@@ -1192,23 +1192,23 @@
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
-      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
+      <translation>LDAP 密碼逾期時間(毫秒)</translation>
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
-      <translation type="unfinished">LDAP search timeout (seconds)</translation>
+      <translation>LDAP搜尋逾時時間(秒)</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
+      <translation>允許匿名統計報告</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
+      <translation>前次匿名統計報告</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
+      <translation>最新的匿名統計報告版本</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
@@ -1268,11 +1268,11 @@
     </message>
     <message>
       <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
+      <translation>Cloud系統 ID</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
+      <translation>Cloud認證金鑰</translation>
     </message>
     <message>
       <source>System name</source>
@@ -1357,11 +1357,11 @@
     </message>
     <message>
       <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
+      <translation>備份設定</translation>
     </message>
     <message>
       <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
+      <translation>Cloud 主機覆蓋</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
@@ -1429,7 +1429,7 @@
     </message>
     <message>
       <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
+      <translation>客戶端更新設定</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1457,11 +1457,11 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation>將影片編碼器還原預設值</translation>
+      <translation>將影像編碼還原為預設值</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
+      <translation>匯出影像的預設串流編碼</translation>
     </message>
     <message>
       <source>Low quality screen video codec</source>
@@ -1509,15 +1509,15 @@
     </message>
     <message>
       <source>Current storage encryption key</source>
-      <translation type="unfinished">Current storage encryption key</translation>
+      <translation>目前儲存裝置的加密金鑰</translation>
     </message>
     <message>
       <source>HTTP header: Origin</source>
-      <translation type="unfinished">HTTP header: Origin</translation>
+      <translation>HTTP header: Origin</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
+      <translation>HTTP header: X-Frame-Options</translation>
     </message>
     <message>
       <source>Show mouse timeline preview</source>
@@ -1529,7 +1529,7 @@
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
+      <translation>媒體緩衝區大小（KB, 10KB-4MB）</translation>
     </message>
     <message>
       <source>Enable cross-domain policy</source>
@@ -1537,7 +1537,7 @@
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
-      <translation type="unfinished">Enable WebSocket for P2P</translation>
+      <translation>對P2P啟用 WebSocket</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins</source>
@@ -1545,7 +1545,7 @@
     </message>
     <message>
       <source>Use only HTTPS for cameras</source>
-      <translation type="unfinished">Use only HTTPS for cameras</translation>
+      <translation>僅使用HTTPS與攝影機連線</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (unsecure)</source>
@@ -1570,7 +1570,7 @@
     </message>
     <message>
       <source>Enable 2FA for the System</source>
-      <translation type="unfinished">Enable 2FA for the System</translation>
+      <translation>啟用此系統的二階段驗證</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
@@ -1598,7 +1598,7 @@
     </message>
     <message>
       <source>Update releases.json file URL</source>
-      <translation type="unfinished">Update releases.json file URL</translation>
+      <translation>更新 releases.json檔案的URL位置</translation>
     </message>
   </context>
   <context>
@@ -2212,11 +2212,11 @@
     </message>
     <message>
       <source>Show Intercom Informer</source>
-      <translation type="unfinished">Show Intercom Informer</translation>
+      <translation>顯示對講機通知</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>發送一則HTTP(S)請求</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -2276,15 +2276,15 @@
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>同時在來源攝影機上觸發</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>同時錄製來源攝影機</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>同時於來源攝影機播放</translation>
     </message>
   </context>
 </TS>
