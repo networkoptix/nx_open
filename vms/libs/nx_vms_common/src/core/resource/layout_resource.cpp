@@ -174,7 +174,7 @@ void QnLayoutResource::updateItem(const LayoutItemData &item)
 
 /********* Properties getters and setters **********/
 
-/********* Cell aspect ratio propert **********/
+/********* Cell aspect ratio property **********/
 float QnLayoutResource::cellAspectRatio() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);

@@ -230,7 +230,7 @@ namespace nxcip
         //!Get model names, reserved by the plugin
         /*!
             For example, let camera support ONVIF, and plugin uses native API. In this case, plugin MUST implement this function and reserve model name,
-            provided by onvif implementation. Also, CameraDiscoveryManager::getVendorName MUST be same as ONVIF vendor anem
+            provided by onvif implementation. Also, CameraDiscoveryManager::getVendorName MUST be same as ONVIF vendor name
 
             \param[out] modelList        Array of \a char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
             \param[in, out] count        A pointer to a variable that specifies the size of array pointed to by the \a modelList parameter.
@@ -559,7 +559,7 @@ namespace nxcip
         /*!
             \param[out] info
             \return 0 on success, otherwise - error code
-            \note This method can set some parameters that were navailable during discovery
+            \note This method can set some parameters that were available during discovery
         */
         virtual int getCameraInfo( CameraInfo* info ) const = 0;
 
@@ -706,7 +706,7 @@ namespace nxcip
                 If \a motionMask is NULL, then whole picture is of interest
             \note Can be NULL
             \note Motion mask is OPTIONAL. It is used only if \a BaseCameraManager2::searchByMotionMaskCapability capability is set
-                If plugin does not support \a BaseCameraManager2::searchByMotionMaskCapability capabilitym it MUST ignore this value
+                If plugin does not support \a BaseCameraManager2::searchByMotionMaskCapability capability it MUST ignore this value
         */
         Picture* motionMask;
         //!Min data timestamp that is of interest

@@ -24,7 +24,7 @@ public:
     /*
      * Function MUST write encoded data packet to sendBuffer. sendBuffer may contain some data
      * before function call (TCP RTSP header). So, function MUST add data only without clearing
-     * buffer return true if some data are writed or false if no more data.
+     * buffer return true if some data are written or false if no more data.
      */
     virtual bool getNextPacket(nx::utils::ByteArray& sendBuffer) = 0;
 

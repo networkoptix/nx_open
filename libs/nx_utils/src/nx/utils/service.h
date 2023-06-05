@@ -66,7 +66,7 @@ public:
 protected:
     virtual std::unique_ptr<AbstractServiceSettings> createSettings() = 0;
     /**
-     * NOTE: Implemention MUST call Service::runMainLoop if all custom initialization succeeded.
+     * NOTE: Implementation MUST call Service::runMainLoop if all custom initialization succeeded.
      */
     virtual int serviceMain(const AbstractServiceSettings& settings) = 0;
 

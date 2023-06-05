@@ -69,7 +69,7 @@ std::string encodeOrThrow(
     const std::string& salt,
     const Options& options)
 {
-    NX_TRACE(NX_SCOPE_TAG, "Calculating scrypt");
+    NX_TRACE(NX_SCOPE_TAG, "Calculating SCrypt");
 
     const auto context = makeContext(options);
 

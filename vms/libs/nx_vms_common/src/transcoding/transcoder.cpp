@@ -226,7 +226,8 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
 
             if (quality <= Qn::StreamQuality::normal)
             {
-                params.insert("profile", 1); //< [0..3] Bigger numbers mean less posibilities for encoder.
+                // [0..3] Bigger numbers mean less possibilities for encoder.
+                params.insert("profile", 1);
                 staticThreshold = 1000;
             }
 
@@ -379,7 +380,6 @@ int QnTranscoder::openAndTranscodeDelayedData()
     }
     return 0;
 }
-
 
 int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, nx::utils::ByteArray* const result)
 {

@@ -709,7 +709,6 @@ struct RemoveResourceAccess
                 storage->getId().toSimpleString()));
         }
 
-
         if (const auto user = target.dynamicCast<QnUserResource>();
             user && user->attributes().testFlag(nx::vms::api::UserAttribute::readonly))
         {
@@ -1737,7 +1736,7 @@ struct ModifyListAccess
         if (paramContainer.size() != tmpContainer.size())
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                "Modiying of %1 entries out of %2 is not allowed for %3.", /*comment*/ "%3 is a C++ type name"),
+                "Modifying of %1 entries out of %2 is not allowed for %3.", /*comment*/ "%3 is a C++ type name"),
                 paramContainer.size() - tmpContainer.size(),
                 paramContainer.size(),
                 typeid(ParamContainer)));

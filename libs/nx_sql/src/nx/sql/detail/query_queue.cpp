@@ -84,7 +84,7 @@ std::optional<QueryQueue::value_type> QueryQueue::pop(
 
         NX_MUTEX_LOCKER lock(&m_mainQueueMutex);
 
-        // Enqueing tasks.
+        // Enqueuing tasks.
         for (auto& task: lightQueue)
         {
             const auto priority = getPriority(*task.value);

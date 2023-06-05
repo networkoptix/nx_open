@@ -192,7 +192,6 @@ protected:
     qint64 m_topIFrameTime;
     qint64 m_bottomIFrameTime;
 
-
     int m_primaryVideoIdx;
     int m_audioStreamIndex;
 
@@ -210,7 +209,7 @@ private:
     void setSpeedInternal(double speed, qint64 currentTimeHint = AV_NOPTS_VALUE);
     bool isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const;
     virtual bool needKeyData(int channel) const override;
-    void emitJumpOccured(qint64 jumpTime, bool usePreciseSeek, int sequence);
+    void emitJumpOccurred(qint64 jumpTime, bool usePreciseSeek, int sequence);
 
 private:
     unsigned m_selectedAudioChannel;

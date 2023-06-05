@@ -93,7 +93,7 @@ bool MetadataLogParser::parseRectLine(
 }
 
 /**
- * Parsees the text in form `metadataTimestampMs #, ...; objects: #:`, where `#` is the respective
+ * Parses the text in form `metadataTimestampMs #, ...; objects: #:`, where `#` is the respective
  * number, and the trailing `:` can be missing.
  */
 bool MetadataLogParser::parsePacketLine(

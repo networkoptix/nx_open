@@ -241,7 +241,7 @@ void FileTranscoder::run()
             const qint64 bytesWritten = m_dest->write( outPacket.constData() + curPos, outPacket.size() - curPos );
             if( bytesWritten < 0 )
             {
-                //write error occured. Interrupting transcoding
+                //write error occurred. Interrupting transcoding
                 m_resultCode = bytesWritten;
                 m_state = sReady;
                 prevSrcPacketTimestamp = -1;

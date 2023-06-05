@@ -18,7 +18,7 @@ namespace aio {
  * 1. Reads data from another channel.
  * 2. Detects protocol using pre-configured rules.
  * 3. When detected some protocol, instantiates proper channel type
- *    and delegates already-received data and all futher I/O operations to the new channel.
+ *    and delegates already-received data and all further I/O operations to the new channel.
  */
 template<typename Base, typename AsyncChannelInterface>
 // requires AsyncChannel<Base> && AsyncChannel<AsyncChannelInterface>
@@ -62,7 +62,7 @@ public:
 
 protected:
     /**
-     * NOTE: setDataSource call MUST follow this initilizer.
+     * NOTE: setDataSource() call MUST follow this initializer.
      */
     template<typename ... BaseInitializeArgs>
     BaseProtocolDetectingAsyncChannel(

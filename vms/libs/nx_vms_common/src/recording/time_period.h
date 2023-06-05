@@ -126,7 +126,7 @@ struct NX_VMS_COMMON_API QnTimePeriod
     };
 
     /**
-     * \returns distance from the nearest period edge to the time in ms. Returns zerro if timeMs inside period
+     * \returns distance from the nearest period edge to the time in ms. Returns zero if timeMs inside period
      */
     qint64 distanceToTime(qint64 timeMs) const;
 

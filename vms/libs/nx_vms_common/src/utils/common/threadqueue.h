@@ -131,7 +131,6 @@ public:
         return RandomAccess<>(this);
     }
 
-
     bool isEmpty() const
     {
         return m_bufferLen == 0;
@@ -347,8 +346,8 @@ public:
         if ((uint)m_bufferLen == m_buffer.size())
             reallocateBuffer(qMax(m_bufferLen + 1, m_bufferLen + m_bufferLen/4));
 
-        // we can have 2 threads independetlly put data at the same queue; so we need to put data any way. client is responsible for max size of the quue
-        //if ( m_queue.size()>=m_maxSize )    return false; <- wrong aproach
+        // we can have 2 threads independently put data at the same queue; so we need to put data any way. client is responsible for max size of the quue
+        //if ( m_queue.size()>=m_maxSize )    return false; <- wrong approach
 
         //m_queue.enqueue(val);
         int index = (m_headIndex + m_bufferLen) % m_buffer.size();
@@ -374,7 +373,6 @@ public:
         int index = m_headIndex + m_bufferLen - 1;
         return m_buffer[index % m_buffer.size()];
     }
-
 
     bool pop(T& val)
     {

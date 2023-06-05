@@ -30,7 +30,7 @@ public:
     virtual void stopWhileInAioThread() override;
 
     /**
-     * NOTE: handler reports bandwidth result in Kilobits per second iff there is no error.
+     * NOTE: The handler reports the bandwidth result in kilobits per second if there is no error.
      */
     void doBandwidthTest(BandwidthCompletionHandler handler);
 

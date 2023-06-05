@@ -134,7 +134,7 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
                             {
                                 // Zlib does not consume any input data and does not write anything
                                 // to output.
-                                d->state = Private::State::failed; //< To avoid inifinite loop.
+                                d->state = Private::State::failed; //< To avoid infinite loop.
                             }
                             continue;
                         }

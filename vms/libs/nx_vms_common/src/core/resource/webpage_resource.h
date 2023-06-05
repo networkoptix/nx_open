@@ -70,7 +70,7 @@ public:
 
     /** Get proxy server id, null id means no proxy. */
     QnUuid getProxyId() const { return getParentId(); }
-    /** Set server id throught which the page should be proxied, null id means no proxy. */
+    /** Set server id through which the page should be proxied, null id means no proxy. */
     void setProxyId(const QnUuid& proxyServerId) { setParentId(proxyServerId); }
 
     /** SSL certificate check flag. Default is true. */

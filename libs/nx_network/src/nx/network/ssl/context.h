@@ -90,7 +90,7 @@ public:
      * "tls"|"ssl" [v] major_version "_" minor_version.
      * Example: sslv3|tls1_1|tls1_2.
      * By default, TLS 1.1+ are enabled.
-     * @return true if protocol versions have been aplied. false if versions is not valid.
+     * @return true if protocol versions have been applied. false if versions is not valid.
      */
     bool setAllowedServerVersions(const std::string& versions);
 
@@ -98,7 +98,7 @@ public:
      * Set allowed cipher list for TLSv1.2 and below.
      * @param ciphers Passed directly to SSL_CTX_set_cipher_list function.
      * For the format description see SSL_CTX_set_cipher_list docs.
-     * @return true if protocol ciphers have been aplied. false if not valid.
+     * @return true if protocol ciphers have been applied. false if not valid.
      */
     bool setAllowedServerCiphers(const std::string& ciphers);
 

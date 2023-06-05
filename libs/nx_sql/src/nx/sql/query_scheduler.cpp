@@ -25,7 +25,7 @@ void QueryScheduler::start(
     std::chrono::milliseconds periodicDelay,
     std::chrono::milliseconds firstRunDelay)
 {
-    NX_VERBOSE(this, "Starting query sceduler with periodic delay %1 and initial delay %2",
+    NX_VERBOSE(this, "Starting query scheduler with periodic delay %1 and initial delay %2",
         periodicDelay, firstRunDelay);
 
     m_stopped = false;

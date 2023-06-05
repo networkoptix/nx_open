@@ -8,14 +8,14 @@ namespace nx::crypt {
 
 /**
  * Class that is a concept base for encryptable entities. Default realization is private.
- * Methods can be overriden partially.
+ * Methods can be overridden partially.
  */
 class Encryptable
 {
 public:
     virtual ~Encryptable() = default;
 
-protected: //< These functions do nothing and should be overwritten as public, at least partually.
+protected: //< These functions do nothing and should be overwritten as public, at least partially.
     /** Returns true if the entity is actually encrypted. */
     virtual bool isEncrypted() const { return false; }
     /** Returns true if the entity is encrypted and no valid password is provided. */

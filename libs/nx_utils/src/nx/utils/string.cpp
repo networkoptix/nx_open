@@ -126,7 +126,6 @@ QString xorDecrypt(const QString &crypted, const QString &key)
     return QString::fromUtf8(array);
 }
 
-
 QString extractFileExtension(const QString &string)
 {
     auto pos = string.lastIndexOf('.');
@@ -144,7 +143,6 @@ QString extractFileExtension(const QString &string)
 
     return result;
 }
-
 
 QString generateUniqueString(
     const QStringList& usedStrings,
@@ -193,8 +191,6 @@ QString generateUniqueString(
 
     return templateString.arg(number);
 }
-
-
 
 // -------------------------------------------------------------------------- //
 // String comparison
@@ -370,7 +366,7 @@ int naturalStringCompare(
         }
         else
         {
-            // completely arebitrary that a number comes before a string
+            // completely arbitrary that a number comes before a string
             retVal = lhsNumber ? -1 : 1;
         }
     }

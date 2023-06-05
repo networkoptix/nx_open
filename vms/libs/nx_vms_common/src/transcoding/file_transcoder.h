@@ -24,7 +24,7 @@ class QnAviArchiveDelegate;
 //!Helper class to transcoder file to other file
 /*!
     Transcoding is done in a separate thread.
-    Modifying transcoding parameters after transcoding start can cause undefined behavour
+    Modifying transcoding parameters after transcoding start can cause undefined behavior
     \note Object belongs to the thread, it has been created in (not internal thread)
     \note Class methods are not thread-safe
 */
@@ -44,7 +44,7 @@ public:
     */
     bool setSourceFile( const QString& filePath );
     /*!
-        If file \a filePath does not exist, it is created. Existing file will be overwitten
+        If file \a filePath does not exist, it is created. Existing file will be overwritten
         \return false on file access error
     */
     bool setDestFile( const QString& filePath );

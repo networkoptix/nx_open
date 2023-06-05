@@ -13,7 +13,7 @@ public:
 
     /**
      * @return metadata in motion archive for specified time.
-     * If next call got same metadata or no metada is found return null.
+     * If next call got same metadata or no metadata is found return null.
      */
     virtual QnAbstractCompressedMetadataPtr getMotionData(qint64 timeUsec) = 0;
 };

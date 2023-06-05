@@ -234,7 +234,7 @@ void ModuleConnector::InformationReader::readUntilError()
 
         nx::vms::api::ModuleInformationWithAddresses moduleInformation;
         if (!QJson::deserialize(restResult.reply, &moduleInformation))
-            return nx::utils::swapAndCall(m_handler, std::nullopt, "Deserializiation has failed");
+            return nx::utils::swapAndCall(m_handler, std::nullopt, "Deserialization has failed");
 
         if (moduleInformation.id.isNull())
             return nx::utils::swapAndCall(m_handler, std::nullopt, "Module id is null");
@@ -450,14 +450,14 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     {
         if (m_forbiddenEndpoints.count(endpoint.toString()))
         {
-            NX_VERBOSE(this, "Enpoint %1 is forbidden", endpoint);
+            NX_VERBOSE(this, "Endpoint %1 is forbidden", endpoint);
             continue;
         }
 
         // TODO: Remove as soon as IPv6 is finally supported.
         if (endpoint.address.isPureIpV6())
         {
-            NX_VERBOSE(this, "Enpoint %1 is omited, IPv6 is not fully supported yet", endpoint);
+            NX_VERBOSE(this, "Endpoint %1 is omitted, IPv6 is not fully supported yet", endpoint);
             continue;
         }
 

@@ -14,8 +14,8 @@ namespace nx::utils::algorithm {
 /**
  * Merge sorted lists using priority queue concept implemented via STL heap.
  *
- * @param sortedLists List of source sorted lists. Its type should be random access iteratable.
- *   Each list should be sequentially iteratable and have value_type type
+ * @param sortedLists List of source sorted lists. Its type should be random access iterable.
+ *   Each list should be sequentially iterable and have value_type type
  *   and size, push_back and erase(first, last) methods.
  * @param lessItem Item comparison functor taking two values of sorted list's value_type
  *   and returning a boolean. Must be consistent with source lists sort order.
@@ -127,8 +127,8 @@ auto merge_sorted_lists(
 /**
  * Merge sorted lists using priority queue concept implemented via STL heap.
  *
- * @param sortedLists List of source sorted lists. Its type should be random access iteratable.
- *   Each list should be sequentially iteratable and have value_type type
+ * @param sortedLists List of source sorted lists. Its type should be random access iterable.
+ *   Each list should be sequentially iterable and have value_type type
  *   and size, push_back and erase(first, last) methods.
  * @param sortFieldGetter A functor taking value_type of a sorted list and returning a value
  *   of type that can be compared with operator <.
@@ -158,8 +158,8 @@ auto merge_sorted_lists(
 /**
  * Merge sorted lists using priority queue concept implemented via STL heap.
  *
- * @param sortedLists List of source sorted lists. Its type should be random access iteratable.
- *   Each list should be sequentially iteratable and have value_type type
+ * @param sortedLists List of source sorted lists. Its type should be random access iterable.
+ *   Each list should be sequentially iterable and have value_type type
  *   and size, push_back and erase(first, last) methods.
  *   Values should be comparable with operator<
  * @param sortOrder How source sorted lists are sorted.

@@ -83,7 +83,7 @@ public:
     virtual api::OauthManager* oauthManager() = 0;
     virtual api::TwoFactorAuthManager* twoFactorAuthManager() = 0;
 
-    /** Pings cloud_db with current creentials. */
+    /** Pings cloud_db with current credentials. */
     virtual void ping(std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) = 0;
 };
 
@@ -144,7 +144,7 @@ public:
     virtual std::string toString(api::ResultCode resultCode) const = 0;
 
     /**
-     * Explicitely specify endpoint of cloud module. If this method not called, endpoint is detected automatically.
+     * Explicitly specify endpoint of cloud module. If this method not called, endpoint is detected automatically.
      * NOTE: Call this method only if you are sure about what you are doing.
      */
     virtual void setCloudUrl(const std::string& url) = 0;

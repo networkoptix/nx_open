@@ -133,7 +133,7 @@ void StorageRecordingContext::allocateFfmpegObjects(
                 if (m_container == "matroska")
                 {
                     if (!convertExtraDataToMp4(videoData.get(), codecParams))
-                        throw ErrorEx(Error::Code::incompatibleCodec, "Failed to convert codecpar");
+                        throw ErrorEx(Error::Code::incompatibleCodec, "Failed to convert codec parameters");
                 }
                 auto avCodecParams = codecParams->getAvCodecParameters();
                 if (!avCodecParams)

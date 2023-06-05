@@ -77,7 +77,7 @@ public:
 };
 
 /**
- * This is convinient method for simplify transition from QHttp.
+ * This is convenient method for simplify transition from QHttp.
  * @return Value of header headerName (if found), empty string otherwise.
 */
 NX_NETWORK_API std::string getHeaderValue(

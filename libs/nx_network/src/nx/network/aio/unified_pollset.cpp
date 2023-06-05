@@ -92,7 +92,6 @@ public:
     }
 };
 
-
 /*********************************
 UnifiedPollSet::const_iterator
 **********************************/
@@ -239,7 +238,6 @@ bool UnifiedPollSet::const_iterator::operator!=(
 {
     return !(*this == right);
 }
-
 
 /*********************************
 UnifiedPollSet
@@ -438,8 +436,10 @@ bool UnifiedPollSet::removeSocket(
         return true;
     }
 
-    //ignoring error since for udt sockets it fails if unrecoverable error happended to socket
-        //TODO #akolesnikov But, this is, of course, not correct. MUST fix! Most likely, it will required AioThread modifications
+    // Ignoring the error since for EDT sockets it fails if an unrecoverable error happens to the
+    // socket.
+    // TODO: #akolesnikov But this is, of course, not correct. Must be fixed. Most likely, it
+    // will require AioThread modifications.
     addToPollSet(m_epollFd, handle, &newEventMask);
     //if (addToPollSet(m_epollFd, handle, &newEventMask) != 0)
     //{

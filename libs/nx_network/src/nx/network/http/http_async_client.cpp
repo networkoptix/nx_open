@@ -202,7 +202,6 @@ void AsyncClient::doHead(
     doHead(url);
 }
 
-
 void AsyncClient::doPost(const nx::utils::Url& url)
 {
     doRequest(nx::network::http::Method::post, url);
@@ -1279,7 +1278,7 @@ void AsyncClient::addBodyToRequest()
 bool AsyncClient::isIgnoringCurrentMessage() const
 {
     return
-        // Awaiting the next message already. Just skippng the current one.
+        // Awaiting the next message already. Just skipping the current one.
         m_awaitedMessageNumber > m_messageReceivedThroughTheCurrentConnectionCount ||
         // Have already invoked "request completed" handler.
         m_lastReportedMessageNumber >= m_messageReceivedThroughTheCurrentConnectionCount;

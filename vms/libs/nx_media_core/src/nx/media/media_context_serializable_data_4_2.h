@@ -11,7 +11,7 @@ extern "C" {
 #include <QtCore/QByteArray>
 
 /**
- * Copy of Media context struct from vms_4.2 for backward compatiblity.
+ * Copy of Media context struct from vms_4.2 for backward compatibility.
  * Contains fields of AVCodecParameters (and respectively of CodecParameters) which
  * are transferred from Server to Client with a media stream.
  *
@@ -38,7 +38,7 @@ struct NX_MEDIA_CORE_API QnMediaContextSerializableData_4_2
 
     AVCodecID codecId = AV_CODEC_ID_NONE;
     AVMediaType codecType = AVMEDIA_TYPE_UNKNOWN;
-    QByteArray rcEq_deprecated; ///< Deprecated fields are needed for backward comptibility for mobile client
+    QByteArray rcEq_deprecated; ///< Deprecated fields are needed for backward compatibility for mobile client
     QByteArray extradata;
 
     /// Length is 0 or QnAvCodecHelper::kMatrixLength.

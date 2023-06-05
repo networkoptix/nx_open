@@ -7,7 +7,7 @@
 #include <QtCore/QString>
 
 /** Time value for 'now'. */
-// TODO: #lbusygin change it to kLivePosition, it will help to avoid convertion problem ms -> usec
+// TODO: #lbusygin change it to kLivePosition, it will help to avoid conversion problem ms -> usec
 static const qint64 DATETIME_NOW = std::numeric_limits<qint64>::max();
 
 /** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE.

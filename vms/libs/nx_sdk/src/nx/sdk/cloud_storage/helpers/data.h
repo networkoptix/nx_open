@@ -228,7 +228,7 @@ struct Motion
     // This mask covers the frame as a 44x32 cells grid. Every non zero bit in the mask means
     // that motion was detected in that cell. So, the bit mask size is 44*32=1408 bits = 176 bytes
     // before encoding to base64. The mask is rotated by 90 degree. The very first bit of the mask
-    // is the top-left corner bit. The next bit is for 1-sth column, 2-nd row e.t.c.
+    // is the top-left corner bit. The next bit is for 1-st column, 2-nd row e.t.c.
     std::string dataBase64;
 
     nx::kit::Json to_json() const;
@@ -605,4 +605,3 @@ struct MediaPacketData
 };
 
 } // nx::sdk::namespace cloud_storage
-

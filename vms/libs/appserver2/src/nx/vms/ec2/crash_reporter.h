@@ -31,8 +31,8 @@ public:
         const QString& settingsDir);
     ~CrashReporter();
 
-    /** Scans for local reports and sends them to the statistics server asynchronously
-     *  \param admin is used to configure the process (bt system settings)
+    /** Scans for local reports and sends them to the statistic server asynchronously
+     *  \param admin is used to configure the process (by system settings)
      *
      *  \note Might be used on the start up in  every binary which generates crash dumps by
      *        \class win32_exception or \class linux_exception

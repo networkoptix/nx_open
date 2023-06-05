@@ -82,7 +82,7 @@ void tuple_for_each(const std::tuple<Args...>& tuple, Func func)
 
 /**
  * Invokes func with each argument of Args pack separately.
- * NOTE: Args packs elements are interated forward.
+ * NOTE: Args packs elements are iterated forward.
  */
 template<typename Func, typename... Args>
 inline void apply_each(Func&& func, Args&&... args)

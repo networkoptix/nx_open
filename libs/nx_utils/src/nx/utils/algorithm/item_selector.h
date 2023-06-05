@@ -17,7 +17,7 @@ namespace nx::utils::algorithm {
  * Helps choosing an element from a set based on priorities that can be changed dynamically.
  *
  * Example: let us have a set of network connection methods. Different methods have different
- * implications. So, some are more preferrable than others. At the same time, not every connection
+ * implications. So, some are more preferable than others. At the same time, not every connection
  * method works at all times. And the set of working connection methods may change in time.
  * <pre><code>
  * const auto popupRate = std::chrono::seconds(1);

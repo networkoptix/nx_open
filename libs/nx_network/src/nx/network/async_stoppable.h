@@ -18,7 +18,7 @@ public:
     virtual ~QnStoppableAsync() = default;
 
     /**
-     * Ask object to interrupt all asynchoronous operations.
+     * Ask object to interrupt all asynchronous operations.
      * Caller MUST ensure that no asynchronous operations are started after this call
      * @param completionHandler Executed when asynchronous operation is interrupted.
      *   For example, in case with async socket operations,
@@ -32,7 +32,7 @@ public:
     /**
      * Stops object's asynchronous operations and waits for completion.
      * Default implementation Cannot be called in aio thread.
-     * Also, it is not recommended to call default implemntation with mutex locked.
+     * Also, it is not recommended to call default implementation with mutex locked.
      * It is a potential deadlock.
      */
     virtual void pleaseStopSync();

@@ -15,10 +15,9 @@ QByteArray NX_UTILS_API generateSalt(int length);
  */
 QByteArray NX_UTILS_API linuxCryptSha512(const QByteArray& password, const QByteArray& salt);
 
-
 /**
  * Currently implemented on linux only. Modifies /etc/shadow. digest MUST be suitable for a shadow file
- * NOTE: on linux process MUST have root priviledge to be able to modify /etc/shadow
+ * NOTE: on linux process MUST have root privilege to be able to modify /etc/shadow
  */
 bool NX_UTILS_API setRootPasswordDigest(const QByteArray& userName, const QByteArray& digest);
 

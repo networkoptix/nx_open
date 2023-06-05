@@ -198,7 +198,7 @@ bool isRelativePathSafe(const QString& path)
     if (path.startsWith('\\'))
         return false; //< Windows SMB drive.
 
-    // TODO: It makes sense to add some more security cheks e.g. symlinks, etc.
+    // TODO: It makes sense to add some more security checks e.g. symlinks, etc.
     return true;
 }
 

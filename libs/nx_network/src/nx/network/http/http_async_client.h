@@ -87,7 +87,7 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     /**
-     * @return true if no response has been recevied due to transport error.
+     * @return true if no response has been received due to transport error.
      */
     bool failed() const;
     SystemError::ErrorCode lastSysErrorCode() const;

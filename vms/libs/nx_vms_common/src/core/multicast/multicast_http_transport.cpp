@@ -43,7 +43,6 @@ static char EMPTY_DATA_FILLER = '\x0';
 
 static const int INTERFACE_LIST_CHECK_INTERVAL = 1000 * 15;
 
-
 namespace SystemError
 {
 #ifdef _WIN32
@@ -68,7 +67,6 @@ namespace SystemError
 #endif
     }
 }
-
 
 // --------- UDP / Multicast routines -----------------
 
@@ -189,7 +187,6 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
     return result;
 }
 
-
 // ----------------- Transport -----------------
 
 Transport::Transport(const QUuid& localGuid):
@@ -210,7 +207,7 @@ void Transport::initSockets(const QSet<QString>& addrList)
 {
     if (m_recvSocket)
     {
-        // unsabscribe socket from old multicast list
+        // unsubscribe socket from old multicast list
         for (const QString& ipv4Addr: m_localAddressList)
             leaveMulticastGroup(m_recvSocket->socketDescriptor(), MULTICAST_GROUP.toString(), ipv4Addr);
     }

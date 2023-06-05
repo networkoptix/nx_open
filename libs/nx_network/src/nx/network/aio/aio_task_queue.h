@@ -186,8 +186,8 @@ public:
      * This method introduced for optimization: if we fast call startMonitoring then removeSocket
      * (socket has not been added to pollset yet), then removeSocket can just cancel
      * "add socket to pollset" task. And vice versa.
-     * @return true if reverse task has been cancelled and socket
-     *   is already in desired state, no futher processing is needed.
+     * @return True if the reverse task has been canceled, and socket is already in the desired
+     *     state, so no further processing is needed.
      */
     bool removeReverseTask(
         Pollable* const sock,
@@ -288,9 +288,9 @@ private:
         TaskType taskType) const;
 
     /**
-     * @return tuple<true if reverse task has been cancelled and socket
-     *   is already in desired state and no futher processing is needed,
-     *   tasks taken out from the queue>.
+     * @return tuple<true, ...> if the reverse task has been canceled, and the socket is already in
+     *     the desired state, so no further processing is needed, the tasks are taken out of the
+     *     queue.
      */
     std::tuple<bool, std::deque<SocketAddRemoveTask>> takeReverseTasksToRemove(
         const nx::Locker<nx::Mutex>&,

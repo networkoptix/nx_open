@@ -145,7 +145,7 @@ void WebSocket::onRead(SystemError::ErrorCode error, size_t transferred)
     {
         NX_DEBUG(
             this,
-            nx::format("Incoming message queue breached %1 messages treshold. Reading ceased")
+            nx::format("Incoming message queue breached %1 messages threshold. Reading ceased")
                 .args(kMaxIncomingMessageQueueSize));
         m_readingCeased = true;
         return;

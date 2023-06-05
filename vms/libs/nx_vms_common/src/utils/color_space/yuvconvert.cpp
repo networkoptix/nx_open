@@ -265,7 +265,6 @@ void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
             dst2[2] =_mm_unpacklo_epi16(bg1, ra1); /* SSE2. */
             dst2[3] =_mm_unpackhi_epi16(bg1, ra1); /* SSE2. */
 
-
             curPu += 8;
             curPv += 8;
             dstIntr += 4;
@@ -339,7 +338,7 @@ void bgra_to_yv12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* 
             yData = _mm_add_epi16(_mm_mulhi_epi16(rgbaB1, y_b_coeff), _mm_add_epi16(_mm_mulhi_epi16(rgbaG1, y_g_coeff), _mm_mulhi_epi16(rgbaR1, y_r_coeff))); /* SSE2. */
             yData = _mm_srli_epi16(_mm_add_epi16(yData, sse_00a0), 5); /* SSE2. */
             _mm_storel_epi64((__m128i*) (dstY+yStride), _mm_packus_epi16(yData, yData));
-            // calc avarage for UV
+            // calc average for UV
             __m128i bAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaB0, rgbaB1), sse_01); /* SSE2. */ // use madd instead of "horizontal add" to prevent SSSE3 requirement
             __m128i gAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaG0, rgbaG1), sse_01); /* SSE2. */
             __m128i rAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaR0, rgbaR1), sse_01); /* SSE2. */
@@ -404,7 +403,7 @@ void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int wid
             quint8 y4 = rgba2[4]*0.098 + rgba2[5]*0.504 + rgba2[6]*0.257 + 16.5f;
             *yptr2++ = y4;
 
-            // calculate avarage RGB values for UV pixels
+            // calculate average RGB values for UV pixels
             quint8 avgB = (rgba[0]+rgba[4]+rgba2[0]+rgba2[4]+2) >> 2;
             quint8 avgG = (rgba[1]+rgba[5]+rgba2[1]+rgba2[5]+2) >> 2;
             quint8 avgR = (rgba[2]+rgba[6]+rgba2[2]+rgba2[6]+2) >> 2;

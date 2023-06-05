@@ -9,8 +9,8 @@ namespace nx::vms::rules {
 /**
  * Abstract base class for storing configuration values for event filters.
  * Derived classes should provide Q_PROPERTY's for for all values used for
- * configuration of corespongind event field as well as match procedure
- * used to check values of incomming events in filter.
+ * configuration of corresponding event field as well as match procedure
+ * used to check values of incoming events in filter.
  */
 class NX_VMS_RULES_API EventFilterField: public Field
 {

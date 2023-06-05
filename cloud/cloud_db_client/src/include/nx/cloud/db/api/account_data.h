@@ -20,7 +20,7 @@ enum class AccountStatus
 
 struct AccountRegistrationSecuritySettings
 {
-    /**%apidoc Enable/disable HTTP Digest authentication. The HTTP Digest requres storing
+    /**%apidoc Enable/disable HTTP Digest authentication. The HTTP Digest requires storing
      * of MD5(email:realm:password).
      */
     std::optional<bool> httpDigestAuthEnabled;
@@ -138,7 +138,7 @@ struct AccountUpdateData
      */
     std::optional<std::string> totp;
 
-    /**%apidoc One-time password from the authenicator app or any other source. */
+    /**%apidoc One-time password from the authenticator app or any other source. */
     std::optional<std::string> mfaCode;
 };
 
@@ -227,7 +227,7 @@ struct AccountSecuritySettings
      */
     std::optional<std::string> totp;
 
-    /**%apidoc One-time password from the authenicator app.
+    /**%apidoc One-time password from the authenticator app.
      * Required and MUST be valid if account2faEnabled is specified.
      */
     std::optional<std::string> mfaCode;

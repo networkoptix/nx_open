@@ -27,8 +27,8 @@ public:
         std::function<void(Value abnormalValue, Value currentAverage, AuxReportArgs...)>;
 
     /**
-     * @param multipler Some value is considered abnormal if it is greater (if multipler >= 1)
-     * or smaller (if multipler < 1) than an average value.
+     * @param multiplier Some value is considered abnormal if it is greater (if multiplier >= 1)
+     * or smaller (if multiplier < 1) than an average value.
      * The average is taken for the last period.
      */
     AbnormalValueDetector(
@@ -44,7 +44,7 @@ public:
     }
 
     /**
-     * NOTE: Anomality detection really starts after accumulating data for the period
+     * NOTE: Anomaly detection really starts after accumulating data for the period
      * specified in the constructor.
      */
     template<typename... AuxArgs>

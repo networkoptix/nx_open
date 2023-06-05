@@ -48,7 +48,7 @@ std::string::size_type KmpSearcher::process(const std::string_view& textPart)
     return std::string::npos;
 }
 
-std::size_t KmpSearcher::potentialOccurenceLag() const
+std::size_t KmpSearcher::potentialOccurrenceLag() const
 {
     return m_matchedPrefixLength;
 }
@@ -102,7 +102,7 @@ std::string KmpReplacer::process(std::string textPart)
     {
         const auto posFound = m_searcher.process(textPart);
 
-        if (posFound == std::string::npos && m_searcher.potentialOccurenceLag() == 0)
+        if (posFound == std::string::npos && m_searcher.potentialOccurrenceLag() == 0)
         {
             return std::move(textToReturn) +
                 std::exchange(m_cache, std::string()) +
@@ -112,7 +112,7 @@ std::string KmpReplacer::process(std::string textPart)
         if (posFound == std::string::npos)
         {
             m_cache += std::move(textPart);
-            const auto pos = m_cache.size() - m_searcher.potentialOccurenceLag();
+            const auto pos = m_cache.size() - m_searcher.potentialOccurrenceLag();
             textToReturn += m_cache.substr(0, pos);
             m_cache = m_cache.substr(pos);
             return textToReturn;

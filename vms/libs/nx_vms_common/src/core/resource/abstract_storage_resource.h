@@ -102,7 +102,7 @@ public:
     virtual bool removeDir(const QString& url) = 0;
 
     /**
-     * This function is used when server restarts. Unfinished files re-readed, writed again (under a new name), then renamed.
+     * This function is used when server restarts. Unfinished files are re-read, written again (under a new name), then renamed.
      *
      * \param oldName
      * \param newName

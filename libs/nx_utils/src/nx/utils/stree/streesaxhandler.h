@@ -36,7 +36,7 @@ enum class MatchType
     greater,
 
     /**
-     * Numberic comparison. Child node with minimal value greater than that of the tested
+     * Numeric comparison. Child node with minimal value greater than that of the tested
      * attribute is selected.
      */
     intGreater,
@@ -48,7 +48,7 @@ enum class MatchType
     less,
 
     /**
-     * Numberic comparison. Child node with max value less than that of the
+     * Numeric comparison. Child node with max value less than that of the
      * tested attribute is selected.
      */
     intLess,
@@ -62,7 +62,7 @@ enum class MatchType
     wildcard,
 
     /**
-     * If specified attribite is present in the input set, then child node with value "true"
+     * If specified attribute is present in the input set, then child node with value "true"
      * is selected. Otherwise, node with value "false" is chosen.
      */
     presence,

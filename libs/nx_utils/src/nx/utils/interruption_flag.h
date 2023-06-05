@@ -51,7 +51,7 @@ public:
 
     /**
      * After this call no Watcher will use InterruptionFlag.
-     * So, InterruptionFlag instance can be sefely freed.
+     * So, InterruptionFlag instance can be safely freed.
      */
     void interrupt();
 

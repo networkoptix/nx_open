@@ -74,7 +74,7 @@ public:
 
     /**
      * @return Map of supported Event types indexed by the Event type id for a set of devices.
-     *     Calculated as an interseection of maps of supported Event types of particular devices
+     *     Calculated as an intersection of maps of supported Event types of particular devices
      *     from the set.
      */
     std::map<QString, AbstractEventType*> supportedEventTypeIntersection(
@@ -116,7 +116,7 @@ public:
 
     /**
      * @return Map of compatible Event types indexed by the Event type id for a set of devices.
-     *     Calculated as an interseection of maps of compatible Event types of particular devices
+     *     Calculated as an intersection of maps of compatible Event types of particular devices
      *     from the set.
      */
     std::map<QString, AbstractEventType*> compatibleEventTypeIntersection(
@@ -158,7 +158,7 @@ public:
 
     /**
      * @return Map of supported Object types indexed by the Object type id for a set of devices.
-     *     Calculated as an interseection of maps of supported Object types of particular devices
+     *     Calculated as an intersection of maps of supported Object types of particular devices
      *     from the set.
      */
     std::map<QString, AbstractObjectType*> supportedObjectTypeIntersection(
@@ -200,7 +200,7 @@ public:
 
     /**
      * @return Map of compatible Object types indexed by the Object type id for a set of devices.
-     *     Calculated as an interseection of maps of compatible Object types of particular devices
+     *     Calculated as an intersection of maps of compatible Object types of particular devices
      *     from the set.
      */
     std::map<QString, AbstractObjectType*> compatibleObjectTypeIntersection(

@@ -123,7 +123,7 @@ public:
     GlobalPermissions getRawPermissions() const;
     void setRawPermissions(GlobalPermissions permissions);
 
-    /** Administrator has maxumum permissions. Can be a local or Cloud user. */
+    /** Administrator has maximum permissions. Can be a local or Cloud user. */
     bool isAdministrator() const;
 
     /**

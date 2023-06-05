@@ -28,7 +28,7 @@ enum class TestTransmissionMode
 {
     spam, // sends random data as fast as possible, receive always
     ping, // sends random data and verifies if it comes back
-    pong, // reads 4K buffer, sends same buffer back, waits for futher data...
+    pong, // reads 4K buffer, sends same buffer back, waits for further data...
     receiveOnly,
 };
 
@@ -160,7 +160,7 @@ NX_NETWORK_API bool operator==(
 NX_NETWORK_API bool operator!=(
     const ConnectionTestStatistics& left,
     const ConnectionTestStatistics& right);
-/** Substracts field by field */
+/** Subtracts field by field */
 NX_NETWORK_API ConnectionTestStatistics operator-(
     const ConnectionTestStatistics& left,
     const ConnectionTestStatistics& right);
@@ -176,7 +176,7 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Server that listenes randome tcp-port, accepts connections,
+ * Server that listens random tcp-port, accepts connections,
  * reads every connection and sends specified bytes number through every connection.
  * NOTE: This class is not thread-safe.
  */

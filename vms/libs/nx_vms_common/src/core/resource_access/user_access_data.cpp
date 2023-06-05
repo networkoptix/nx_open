@@ -30,7 +30,7 @@ UserAccessData::UserAccessData(
 
 // TODO: In future versions all sessions should have normal timestamps, but for legacy auth we're
 // going to use this really big value.
-// TODO: Chage to std::chrono::days when MSVC supports it.
+// TODO: Change to std::chrono::days when MSVC supports it.
 constexpr const UserAccessData::Duration kDefaultDuration = std::chrono::hours(24) * 100;
 
 UserAccessData::Duration UserAccessData::age(TimePoint now) const

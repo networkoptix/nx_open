@@ -128,7 +128,7 @@ AVPixelFormat parsePixelFormatFromSof(const quint8* data, size_t size)
     if (numberComponents == 1)
         return bits <= 8 ? AV_PIX_FMT_GRAY8 : AV_PIX_FMT_GRAY16;
 
-    if (numberComponents != 3) // not impelemented
+    if (numberComponents != 3) // not implemented
         return AV_PIX_FMT_NONE;
 
     // below obfuscated code from ffmpeg, need to be simplified

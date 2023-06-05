@@ -188,7 +188,7 @@ void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(const QnAbstra
             else if (m_lastMediaTime[channel] != AV_NOPTS_VALUE)
             {
                 qint64 timeDiff = media->timestamp - m_lastMediaTime[channel];
-                // if timeDiff < -N it may be time correction or dayling time change
+                // if timeDiff < -N it may be time correction or daylight time change
                 if (timeDiff >= -TIME_RESYNC_THRESHOLD && timeDiff < kMinFrameDurationUsec)
                 {
                     // Most likely, timestamps reported by the camera are not so good.

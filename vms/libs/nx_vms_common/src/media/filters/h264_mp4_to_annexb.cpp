@@ -41,7 +41,7 @@ std::vector<uint8_t> readH264SeqHeaderFromExtraData(const uint8_t* extraData, in
     int lengthSizeMinusOne = (extraData[4] & 0x03);
     if (lengthSizeMinusOne != 3)
     {
-        NX_WARNING(NX_SCOPE_TAG, "Unsupported NAL lenght size: %1, TODO impl this",
+        NX_WARNING(NX_SCOPE_TAG, "Unsupported NAL length size: %1, TODO impl this",
             lengthSizeMinusOne + 1);
         return result;
     }
@@ -91,7 +91,7 @@ std::vector<uint8_t> readH265SeqHeaderFromExtraData(const uint8_t* extraData, in
     }
     if (hvcc.lengthSizeMinusOne != 3)
     {
-        NX_WARNING(NX_SCOPE_TAG, "Unsupported NAL lenght size: %1, TODO impl this",
+        NX_WARNING(NX_SCOPE_TAG, "Unsupported NAL length size: %1, TODO impl this",
             hvcc.lengthSizeMinusOne + 1);
         return result;
     }

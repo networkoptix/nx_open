@@ -108,7 +108,7 @@ void TemporaryKeyKeeper<Value>::setOptions(TemporaryKeyOptions options)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     if (NX_ASSERT(m_options.lifeTime > std::chrono::milliseconds::zero()))
-        m_options = std::move(options); //< No need to update timers, they do so automaticly.
+        m_options = std::move(options); //< No need to update timers, they do so automatically.
 }
 
 template<typename Value>
@@ -149,7 +149,7 @@ bool TemporaryKeyKeeper<Value>::update(
 
     if (!binding.empty() && context.binding != binding)
     {
-        // May be a sign of hucker attack attempt.
+        // May be a sign of a security attack attempt.
         NX_WARNING(this, nx::format("Binding %1 does not match for %2").args(binding, contextString(it)));
         return false;
     }
@@ -173,7 +173,7 @@ std::optional<Value> TemporaryKeyKeeper<Value>::get(const Key& key, const Bindin
 
     if (!binding.empty() && context.binding != binding)
     {
-        // May be a sign of hucker attack attempt.
+        // May be a sign of a security attack attempt.
         NX_WARNING(this, nx::format("Binding %1 does not match for %2").args(binding, contextString(it)));
         return std::nullopt;
     }

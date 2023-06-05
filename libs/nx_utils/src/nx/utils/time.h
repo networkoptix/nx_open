@@ -55,7 +55,7 @@ NX_UTILS_API QStringList getSupportedTimeZoneIds();
 NX_UTILS_API QString getCurrentTimeZoneId();
 
 /**
- * On Linux, set system date and time. On other plaforms, do nothing, return true.
+ * On Linux, set system date and time. On other platforms, do nothing, return true.
  * @return false on error or unsupported platform, true on success.
  */
 NX_UTILS_API bool setDateTime(qint64 millisecondsSinceEpoch);

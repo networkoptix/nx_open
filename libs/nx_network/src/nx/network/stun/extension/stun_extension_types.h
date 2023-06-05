@@ -56,7 +56,7 @@ enum Value
      */
     reserved,
 
-    /** Veifies current peer state from mediator's perspective (e.g. is listening). */
+    /** Verifies current peer state from mediator's perspective (e.g. is listening). */
     getConnectionState,
 };
 
@@ -145,7 +145,6 @@ enum AttributeType
 
 NX_NETWORK_API const char* toString(AttributeType val);
 
-
 /** Base class for string attributes */
 struct NX_NETWORK_API BaseStringAttribute : stun::attrs::Unknown
 {
@@ -229,7 +228,6 @@ struct NX_NETWORK_API SystemErrorCodeAttr: stun::attrs::IntAttribute
     SystemErrorCodeAttr(int value)
         : stun::attrs::IntAttribute(TYPE, value) {}
 };
-
 
 struct NX_NETWORK_API Endpoint: BaseStringAttribute
 {

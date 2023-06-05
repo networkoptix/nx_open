@@ -33,7 +33,7 @@ public:
     virtual bool auth(const std::string& user, const std::string& password) = 0;
 
     /**
-     * Server calls this method when connection to specified destionation is requested.
+     * Server calls this method when connection to specified destination is requested.
      *
      * @param address destination host and port
      * @param onDone function to call when connection is succeeded or failed, pass connected socket

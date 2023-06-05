@@ -24,10 +24,13 @@ static constexpr size_t kReadBufferCapacity = 16 * 1024;
 /**
  * Contains common logic for server-side connection created by StreamSocketServer.
  *
- * NOTE: This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to.
- *     In other case, it is caller's responsibility to synchronize access to the connection object.
- * NOTE: Despite absence of thread-safety simultaneous read/write operations are allowed in different threads
- * NOTE: This class instance can be safely freed in any event handler (i.e., in internal socket's aio thread)
+ * NOTE: This class is not thread-safe. All methods are expected to be executed in the aio thread
+ * the underlying socket is bound to. In other case, it is a caller's responsibility to synchronize
+ * the access to the connection object.
+ * NOTE: Despite absence of thread-safety simultaneous read/write operations are allowed in
+ * different threads
+ * NOTE: This class instance can be safely freed in any event handler (i.e., in internal socket's
+ * aio thread)
  * NOTE: It is allowed to free instance within event handler
  */
 class NX_NETWORK_API BaseServerConnection:

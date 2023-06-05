@@ -17,7 +17,7 @@
 #include "layout_storage_filestream.h"
 
 namespace {
-    /* Max future nov-file version that should be opened by the current client version. */
+    /* Max future nov file version that should be opened by the current client version. */
     const qint32 kMaxVersion = 1024;
 
     /* Protocol for items on the exported layouts. */
@@ -272,7 +272,7 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
         QString storageUrl = storage->getUrl();
         if (storageUrl == newName || storageUrl == oldName)
         {
-            storage->setUrl(newName); // update binary offsetvalue
+            storage->setUrl(newName); // update binary offset value
             storage->unlockOpenings();
             storage->restoreOpenedFiles();
         }

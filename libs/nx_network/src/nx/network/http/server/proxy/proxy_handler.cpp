@@ -251,7 +251,7 @@ void AbstractProxyHandler::establishSecureConnectionToTheTarget(
         (m_sslHandshakeTimeout && !m_encryptedConnection->setSendTimeout(*m_sslHandshakeTimeout)))
     {
         NX_WARNING(this,
-            "Error intializing SSL connection to %1(%2, full name %3, path %4) from %5. %6",
+            "Error initializing SSL connection to %1(%2, full name %3, path %4) from %5. %6",
             m_targetHost.target, connectionForeignAddress, connectionForeignHostName,
                 m_request.requestLine.url, connectionLocalAddress,
                 SystemError::getLastOSErrorCode());

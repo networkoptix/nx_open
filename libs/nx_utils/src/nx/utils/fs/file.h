@@ -62,7 +62,7 @@ namespace nx::utils::fs {
  * A file implementation.
  * Internally uses either QnFile (when working with regular files) or
  * QFile (for Qt resource files).
- * NOTE: Asynchronous functions are not effecient and should not be used where
+ * NOTE: Asynchronous functions are not efficient and should not be used where
  * performance is a concern.
  * Asynchronous calls may be scheduled without waiting for the last one to complete.
  * They will be queued and processed in the order.

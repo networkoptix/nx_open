@@ -147,7 +147,7 @@ NX_UTILS_API QString escapeMnemonics(QString text);
     one, two, "three, four"
     \endcode
 
-    will be splitted to
+    will be split to
     \code
     one
     two
@@ -184,8 +184,8 @@ NX_UTILS_API QString trimAndUnquote(const QString& v);
 static const size_t BufferNpos = size_t(-1);
 
 /**
- * Searches first occurence of any element of \0-terminated string toSearch in count elements of str,
- *   starting with element offset.
+ * Searches the first occurrence of any element of \0-terminated string toSearch in count elements
+ *   of str, starting with element offset.
  * @param toSearch \0-terminated string.
  * @param count number of characters of str to check,
  *   NOT a length of searchable characters string (toSearch).

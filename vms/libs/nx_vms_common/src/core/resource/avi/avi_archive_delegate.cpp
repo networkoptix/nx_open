@@ -673,7 +673,7 @@ void QnAviArchiveDelegate::initLayoutStreams()
 
             // Ffmpeg has a bug when mux AAC into mkv, see
             // https://github.com/HandBrake/HandBrake/issues/2809.
-            // So force video channles count from resource video layout.
+            // So force video channels count from resource video layout.
             if (m_forceVideoChannelsCount.has_value() && m_forceVideoChannelsCount <= videoStreams.size())
                 continue;
             videoStreams.insert(i);

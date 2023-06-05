@@ -7,7 +7,7 @@
 namespace nx::vms::utils::metrics {
 
 /**
- * Controlls resources of a single type.
+ * Controls resources of a single type.
  */
 class NX_VMS_UTILS_API ResourceController
 {

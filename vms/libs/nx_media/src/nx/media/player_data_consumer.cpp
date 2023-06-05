@@ -58,7 +58,7 @@ PlayerDataConsumer::PlayerDataConsumer(
 {
     Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump);
-    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured,
+    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::jumpOccurred,
         this, &PlayerDataConsumer::onJumpOccurred);
 }
 
@@ -202,7 +202,6 @@ bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& constData)
 {
     if (m_archiveReader->isJumpProcessing())
         return true; //< ignore EOF due to we are going set new position
-
 
     QnEmptyMediaDataPtr data = constData;
 

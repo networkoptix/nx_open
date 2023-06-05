@@ -13,7 +13,7 @@
 namespace nx::sdk::cloud_storage {
 
 /**
- * The main inferface of a Cloud Storage Plugin instance.
+ * The main interface of a Cloud Storage Plugin instance.
  */
 class IPlugin: public Interface<IPlugin, nx::sdk::IPlugin>
 {
