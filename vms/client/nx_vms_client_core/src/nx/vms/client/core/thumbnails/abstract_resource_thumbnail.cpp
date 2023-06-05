@@ -2,8 +2,8 @@
 
 #include "abstract_resource_thumbnail.h"
 
-#include <cmath>
 #include <chrono>
+#include <cmath>
 #include <memory>
 
 #include <QtCore/QMetaEnum>
@@ -13,14 +13,13 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_media_layout.h>
-#include <utils/common/synctime.h>
-
 #include <nx/utils/enum_utils.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/core/thumbnails/generic_image_store.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
+#include <utils/common/synctime.h>
 
 #include "async_image_result.h"
 
@@ -187,6 +186,15 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
 
         connect(d->resource.get(), &QnResource::parentIdChanged, this,
             [this]() { d->updateIsArmServer(); });
+
+        // Safety measure. Actually this shall be done by the owner class, who calls setResource.
+        // It should listen for resourcesRemoved instead.
+        connect(d->resource.get(), &QnResource::flagsChanged, this,
+            [this]()
+            {
+                if (NX_ASSERT(d->resource) && d->resource->hasFlags(Qn::removed))
+                    setResource({});
+            });
     }
 
     emit resourceChanged();
