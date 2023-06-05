@@ -131,7 +131,8 @@ bool checkForKeywords(const QString& value, const QString& keywords)
 
     for (const auto& keyword: nx::utils::smartSplit(keywords, ' ', Qt::SkipEmptyParts))
     {
-        if (value.contains(nx::utils::trimAndUnquote(keyword)))
+        const auto pure = nx::utils::trimAndUnquote(keyword);
+        if (!pure.isEmpty() && value.contains(pure))
             return true;
     }
 
