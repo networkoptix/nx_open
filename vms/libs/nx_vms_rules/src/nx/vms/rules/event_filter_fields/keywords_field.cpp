@@ -4,25 +4,13 @@
 
 #include <QtCore/QVariant>
 
-#include <nx/utils/string.h>
+#include <nx/vms/event/helpers.h>
 
 namespace nx::vms::rules {
 
 bool KeywordsField::match(const QVariant& value) const
 {
-    if (m_list.empty())
-        return true;
-
-    const auto& string = value.toString();
-
-    if (string.isEmpty())
-        return false;
-
-    return std::any_of(m_list.cbegin(), m_list.cend(),
-        [&string](const auto& word)
-        {
-            return string.contains(word);
-        });
+    return m_list.empty() || nx::vms::event::checkForKeywords(value.toString(), m_list);
 }
 
 QString KeywordsField::string() const
@@ -35,14 +23,7 @@ void KeywordsField::setString(const QString& string)
     if (m_string != string)
     {
         m_string = string;
-        m_list.clear();
-        for (const auto& keyword: nx::utils::smartSplit(m_string, ' ', Qt::SkipEmptyParts))
-        {
-            auto trimmed = nx::utils::trimAndUnquote(keyword);
-            if (!trimmed.isEmpty())
-                m_list.append(std::move(trimmed));
-        }
-
+        m_list = nx::vms::event::splitOnPureKeywords(m_string);
         emit stringChanged();
     }
 }

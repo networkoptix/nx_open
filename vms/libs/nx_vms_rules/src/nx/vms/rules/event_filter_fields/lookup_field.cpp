@@ -6,9 +6,9 @@
 
 #include <analytics/common/object_metadata.h>
 #include <api/common_message_processor.h>
-#include <nx/utils/string.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/event/helpers.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_lookup_list_manager.h>
 
@@ -23,12 +23,8 @@ vms::api::LookupListData makeLookupList(const QString& keywords)
     vms::api::LookupListData lookupList;
     lookupList.attributeNames.emplace_back(kKeywordAttributeName);
 
-    for (const auto& keyword: nx::utils::smartSplit(keywords, ' ', Qt::SkipEmptyParts))
-    {
-        const auto trimmed = nx::utils::trimAndUnquote(keyword);
-        if (!trimmed.isEmpty())
-            lookupList.entries.push_back({{kKeywordAttributeName, trimmed}});
-    }
+    for (const auto& keyword: nx::vms::event::splitOnPureKeywords(keywords))
+        lookupList.entries.push_back({{kKeywordAttributeName, keyword}});
 
     if (lookupList.entries.empty()) //< Keywords absence means any value match.
         lookupList.entries.push_back({{kKeywordAttributeName, ""}});
