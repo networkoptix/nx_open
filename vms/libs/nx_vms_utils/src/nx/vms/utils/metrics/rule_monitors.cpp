@@ -468,10 +468,10 @@ std::optional<api::metrics::Alarm> AlarmMonitor::alarm()
     }
     catch (const std::exception& e)
     {
-        NX_ASSERT(false, "Unexpected general error when checkin alarm %1: %2", this, e);
+        NX_ASSERT(false, "Unexpected general error when check-in alarm %1: %2", this, e);
     }
 
-    // TODO: Should we return error to the user if it occures?
+    // TODO: Should we return error to the user if it occurs?
     return std::nullopt;
 }
 

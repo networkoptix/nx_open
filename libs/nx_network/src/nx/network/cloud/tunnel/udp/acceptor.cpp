@@ -144,7 +144,7 @@ void TunnelAcceptor::startUdtConnection(
     const SocketAddress& target)
 {
     NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
-    NX_VERBOSE(this, nx::format("Initiate rendevous UDT connection from %1 to %2, "
+    NX_VERBOSE(this, nx::format("Initiate rendezvous UDT connection from %1 to %2, "
         "connectionId=%3, remotePeerId=%4")
         .arg((*socketIt)->getLocalAddress()).arg(target)
         .arg(m_connectionId).arg(m_remotePeerId));

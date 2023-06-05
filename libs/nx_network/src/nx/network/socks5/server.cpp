@@ -69,7 +69,7 @@ private:
 
     void abortConnection()
     {
-        // Avoid direct call from AIO thread to prevent use-after-free errors when accesing `this`.
+        // Avoid direct call from AIO thread to prevent use-after-free errors when accessing `this`.
         post([this] { closeConnection(SystemError::connectionAbort); });
     }
 

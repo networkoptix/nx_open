@@ -19,7 +19,8 @@ public:
         QThread::sleep(secs);
     }
 
-    static void usleep ( unsigned long usecs ) //  does not work fine with windows ? delay is always ruound to 1 ms
+    // does not work fine with windows ? delay is always rounded to 1 ms
+    static void usleep ( unsigned long usecs )
     {
         QThread::usleep(usecs);
     }

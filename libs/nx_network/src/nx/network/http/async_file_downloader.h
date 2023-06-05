@@ -69,7 +69,7 @@ public:
      */
     bool hasRequestSucceeded() const;
     /**
-     * @return true if no response has been recevied due to transport error or data failed to be
+     * @return true if no response has been received due to transport error or data failed to be
      * written due to filesystem error.
      */
     bool failed() const;

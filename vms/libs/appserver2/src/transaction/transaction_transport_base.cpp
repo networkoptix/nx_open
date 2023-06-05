@@ -1,6 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "transaction_transport_base.h"
 
 #include <atomic>
@@ -291,7 +290,7 @@ QnTransactionTransportBase::~QnTransactionTransportBase()
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         m_state = Closed;
-        m_cond.wakeAll();   //signalling waiters that connection is being closed
+        m_cond.wakeAll();   //signaling waiters that connection is being closed
         //waiting for waiters to quit
         while (m_waiterCount > 0)
             m_cond.wait(lk.mutex());
@@ -402,7 +401,7 @@ void QnTransactionTransportBase::addDataToTheSendQueue(nx::Buffer data)
         const uint32_t dataSize = htonl(data.size());
         nx::Buffer dataWithSize;
         dataWithSize.resize(sizeof(dataSize) + data.size());
-        // TODO #akolesnikov too many memcopy here. Should use stream base64 encoder to write directly
+        // TODO #akolesnikov too many memcpy here. Should use stream base64 encoder to write directly
         // to the output buffer.
         memcpy(dataWithSize.data(), &dataSize, sizeof(dataSize));
         memcpy(
@@ -740,7 +739,7 @@ void QnTransactionTransportBase::onSomeBytesRead(
         NX_VERBOSE(this, nx::format("There are already %1 transactions posted. "
             "Suspending receiving new transactions until pending transactions are processed")
             .args(m_postedTranCount));
-        return; //not reading futher while that much transactions are not processed yet
+        return; //not reading further while that much transactions are not processed yet
     }
 
     m_readBuffer.reserve(m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE);
@@ -794,7 +793,7 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
 
         default:
             NX_WARNING(this,
-                "Received unkown format from peer %1. Disconnecting...",
+                "Received unknown format from peer %1. Disconnecting...",
                 m_remotePeer.id.toString());
             setStateNoLock(State::Error);
             return;
@@ -871,8 +870,8 @@ void QnTransactionTransportBase::transactionProcessed()
 
             --m_postedTranCount;
             if (m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME)
-                m_cond.wakeAll();   //signalling waiters that we are ready for new transactions once again
-            if (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME ||     //not reading futher while that much transactions are not processed yet
+                m_cond.wakeAll();   //signaling waiters that we are ready for new transactions once again
+            if (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME ||     //not reading further while that much transactions are not processed yet
                 m_asyncReadScheduled ||      //async read is ongoing already, overlapping reads are not supported by sockets api
                 m_state > ReadyForStreaming)
             {
@@ -926,7 +925,7 @@ void QnTransactionTransportBase::unlock()
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     --m_waiterCount;
-    m_cond.wakeAll();    //signalling that we are not waiting anymore
+    m_cond.wakeAll();    //signaling that we are not waiting anymore
 }
 
 void QnTransactionTransportBase::waitForNewTransactionsReady()

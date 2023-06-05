@@ -112,7 +112,7 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam
     * Check it after some delay to avoid call 'invalidateCameraHistory' several times in a row.
     * It could be because client video camera sends extra 'statusChanged' signal when camera is moved.
     * Also, online->recording may occurs on the server side before history information updated.
-    * Excact delay isn't important, at worse scenario we just do extra work. So, do it delayed.
+    * Exact delay isn't important, at worse scenario we just do extra work. So, do it delayed.
     */
 
     if (cam->getStatus() != nx::vms::api::ResourceStatus::recording)

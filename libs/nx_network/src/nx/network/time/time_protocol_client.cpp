@@ -159,7 +159,7 @@ void TimeProtocolClient::onSomeBytesRead(
         NX_DEBUG(this, nx::format("rfc868 time_sync. Read %1 from time server %2").
             arg(nx::utils::toHex(m_timeStr)).arg(m_timeServerEndpoint));
 
-        // Max data size has been read, ignoring futher data.
+        // Max data size has been read, ignoring further data.
         reportResult(
             *rfc868TimestampToTimeToUtcMillis((std::string_view) m_timeStr),
             SystemError::noError,
@@ -167,7 +167,7 @@ void TimeProtocolClient::onSomeBytesRead(
         return;
     }
 
-    // Reading futher data.
+    // Reading further data.
     m_tcpSock->readSomeAsync(
         &m_timeStr,
         std::bind(&TimeProtocolClient::onSomeBytesRead, this, _1, _2));

@@ -192,7 +192,7 @@ AbstractPeerManager::RequestContextPtr<FileInformation> ResourcePoolPeerManager:
         const auto server = resourcePool()->getResourceById<QnMediaServerResource>(peerId);
 
         // If there is no corresponding server in the resources pool, then it is a direct connection
-        // to the incompatible server (which is not updated yed, for example). We cannot know for
+        // to the incompatible server (which is not updated yet, for example). We cannot know for
         // sure if it has internet or no, so trying to use it anyway.
         const bool hasInternet = !server || server->hasInternetAccess();
 

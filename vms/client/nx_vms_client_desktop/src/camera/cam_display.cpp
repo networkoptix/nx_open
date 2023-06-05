@@ -948,7 +948,7 @@ void QnCamDisplay::onBeforeJump(qint64 time)
     m_gotKeyDataInfo.clear();
 }
 
-void QnCamDisplay::onJumpOccured(qint64 time)
+void QnCamDisplay::onJumpOccurred(qint64 time)
 {
     //if (m_extTimeSrc)
     //    m_extTimeSrc->onBufferingStarted(this, time);
@@ -1013,7 +1013,7 @@ void QnCamDisplay::onReaderResumed()
     setSingleShotMode(false);
 }
 
-void QnCamDisplay::onPrevFrameOccured()
+void QnCamDisplay::onPrevFrameOccurred()
 {
     if (getDisplayedTime() != DATETIME_NOW)
         m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
@@ -1021,7 +1021,7 @@ void QnCamDisplay::onPrevFrameOccured()
     m_audioDisplay->clearDeviceBuffer();
 }
 
-void QnCamDisplay::onNextFrameOccured()
+void QnCamDisplay::onNextFrameOccurred()
 {
     m_singleShotQuantProcessed = false;
     NX_MUTEX_LOCKER lock( &m_audioChangeMutex );

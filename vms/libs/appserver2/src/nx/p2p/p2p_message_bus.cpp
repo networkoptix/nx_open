@@ -336,7 +336,7 @@ void MessageBus::createOutgoingConnections(
             }
 
             {
-                // This check is redundant (can be ommited). But it reduce network race condition time.
+                // This check is redundant (can be omitted). But it reduce network race condition time.
                 // So, it reduce frequency of in/out conflict and network traffic a bit.
                 if (m_connectionGuardSharedState.contains(remoteConnection.peerId))
                     continue; //< incoming connection in progress
@@ -1676,7 +1676,6 @@ template void MessageBus::sendTransactionImpl(const P2pConnectionPtr&, \
 
 #include <transaction_types.h>
 BOOST_PP_SEQ_FOR_EACH(INSTANTIATE, _, TransactionDataTypes (UserDataEx))
-
 
 } // namespace p2p
 } // namespace nx

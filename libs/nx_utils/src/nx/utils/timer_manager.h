@@ -138,7 +138,7 @@ public:
     void deleteTimer(const TimerId& timerId);
     /**
      * Delete timer and wait for handler execution (if its is being executed).
-     * Garantees that timer handler of timerId is not being executed after return of this method.
+     * Guarantees that timer handler of timerId is not being executed after return of this method.
      * It is recommended to use previous method, if appropriate, since this method is a bit more heavier.
      * @param timerId Id of timer, created by addTimer call. If no such timer, nothing is done.
      * NOTE: If this method is called from TimerEventHandler::onTimer to delete timer being executed, nothing is done

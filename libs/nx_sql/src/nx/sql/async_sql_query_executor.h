@@ -162,7 +162,7 @@ public:
     // Synchronous operations.
 
     /**
-     * @param script Contain mutiple SQL statements separated with semicolon.
+     * @param script Contain multiple SQL statements separated with semicolon.
      */
     virtual DBResult execSqlScript(
         nx::sql::QueryContext* const queryContext,

@@ -18,8 +18,8 @@
 namespace nx::network::server {
 
 /**
- * Connection of stream-orientied protocol of type request/respose.
- * It is not tied to underlying transport (tcp, udp, etc...).
+ * Connection of the stream-oriented protocol of type "request/response". It is not tied to the
+ * underlying transport (tcp, udp, etc.).
  *
  * CustomConnection MUST implement following methods:
  * <pre><code>
@@ -159,7 +159,7 @@ protected:
 
         if (m_serializerState == SerializerState::done)
         {
-            // Message is sent, triggerring completion handler.
+            // The message is sent, triggering the completion handler.
             if (!completeCurrentSendTask())
                 return;
             processAnotherSendTaskIfAny();
@@ -357,7 +357,7 @@ private:
     }
 
     /**
-     * @return false If was interrupted. All futher processing should be stopped until the next event.
+     * @return False if it was interrupted. All further processing should be stopped until the next event.
      */
     bool completeCurrentSendTask()
     {

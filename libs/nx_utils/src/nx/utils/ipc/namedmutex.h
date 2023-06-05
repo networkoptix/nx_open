@@ -9,7 +9,7 @@ namespace nx::utils {
 class NamedMutexImpl;
 
 /**
- * Mutex that can be used by multiple proceses (QSystemSemaphore does not work well on
+ * Mutex that can be used by multiple processes (QSystemSemaphore does not work well on
  * win32 since it does not release lock on process termination)
  * On win32 it is implemented as Mutex, on Unix - as QSystemSemaphore,
  * since unix provides ability to rollback semaphore state on process termination (SEM_UNDO).

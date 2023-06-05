@@ -73,7 +73,7 @@ public:
     /**
      * Removes resource access subject and all associated resource permissions. If subject was
      * also stored as resource, i.e subject was user resource, it will be removed as resource
-     * either. Subsequent call of the removeResource() method method won't make any further
+     * either. Subsequent call of the removeResource() method won't make any further
      * changes to the storage. Method has O(|Res|+|Subj|) complexity in the worst case, but
      * single call may be considered as instant operation regardless of storage size due
      * actually low overhead.

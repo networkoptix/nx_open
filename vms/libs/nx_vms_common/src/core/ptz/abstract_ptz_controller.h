@@ -154,7 +154,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>Ptz::ViewportPtzCapability</tt>.
      *
      * @param aspectRatio Actual aspect ratio of the current viewport.
-     * @param viewpor New viewport position.
+     * @param viewport New viewport position.
      * @param speed Movement speed, in range [0, 1].
      * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.

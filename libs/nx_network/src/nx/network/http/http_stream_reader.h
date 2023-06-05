@@ -137,7 +137,7 @@ private:
     /**
      * Reads message body parameters from message headers and initializes required data.
      * Sets members m_contentLength, m_isChunkedTransfer, a m_contentDecoder.
-     * @return true If message body could be read or no message body is delared in message.
+     * @return true If message body could be read or no message body is declared in message.
      *   false if cannot read message body (e.g., unsupported content encoding)
      */
     bool prepareToReadMessageBody();

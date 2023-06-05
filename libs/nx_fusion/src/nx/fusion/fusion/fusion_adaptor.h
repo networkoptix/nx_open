@@ -118,7 +118,6 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     return QnFusionBinding<CLASS>::visit_members(value, std::forward<Visitor>(visitor)); \
 }
 
-
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_I(R, GLOBAL_SEQ, INDEX, PROPERTY_SEQ) \
     QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, GLOBAL_SEQ PROPERTY_SEQ)
 
@@ -160,17 +159,15 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     if(!QnFusionDetail::dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), QnFusion::AccessAdaptor<at_c<INDEX>::type>())) \
         return false;
 
-
 /**
  * \see QN_FUSION_ADAPT_CLASS
  */
 #define QN_FUSION_ADAPT_CLASS_SHORT(CLASS, KEYS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
     QN_FUSION_ADAPT_CLASS(CLASS, QN_FUSION_UNROLL_SHORTCUT_SEQ(KEYS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
 
-
 /**
  * A shortcut for <tt>QN_FUSION_ADAPT_CLASS</tt>. Each property sequence of the
- * proveded member sequence is expected to start with a tuple of size 3 consisting
+ * provided member sequence is expected to start with a tuple of size 3 consisting
  * of values for fusion keys <tt>getter</tt>, <tt>setter</tt> and <tt>name</tt>.
  *
  * Note that <tt>GSN</tt> in the macro name stands for GetterSetterName.
@@ -209,7 +206,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * \code
  * struct Point { int x, y, z; }
  *
- * QN_FUSION_ADAPT_STRUCT(Point, (x)(y)(z), (optinal, true))
+ * QN_FUSION_ADAPT_STRUCT(Point, (x)(y)(z), (optional, true))
  * \endcode
  *
  * This code defines three members for class <tt>Point</tt>, all of them optional.
@@ -252,7 +249,6 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, BOOST_PP_VARIADIC_ELEM(0, ##__VA_ARGS__,,)) \
     QN_FUSION_DEFINE_FUNCTIONS(STRUCT, FUNCTION_SEQ, BOOST_PP_VARIADIC_ELEM(1, ##__VA_ARGS__,,))
 
-
 /**
  * \internal
  *
@@ -266,7 +262,6 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 #define QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ_STEP_I(R, STRUCT, FIELD)              \
     ((getter, &STRUCT::FIELD)(setter, &STRUCT::FIELD)(name, BOOST_PP_STRINGIZE(FIELD)))
-
 
 /**
  * \internal
@@ -305,7 +300,6 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(KEYS_TUPLE, VALUES_TUPLE, INDEX) \
     (BOOST_PP_TUPLE_ELEM(INDEX, KEYS_TUPLE), BOOST_PP_TUPLE_ELEM(INDEX, VALUES_TUPLE))
 
-
 /**
  * \internal
  *
@@ -320,7 +314,6 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QN_FUSION_EXTEND_MEMBER_SEQ_STEP_I(R, DATA, PROPERTY_SEQ)               \
     (QN_FUSION_EXTEND_PROPERTY_SEQ(PROPERTY_SEQ))
 
-
 /**
  * \internal
  *
@@ -334,7 +327,6 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 #define QN_FUSION_EXTEND_PROPERTY_SEQ_STEP_I(R, DATA, PROPERTY_TUPLE)           \
     QN_FUSION_PROPERTY_EXTENSION PROPERTY_TUPLE
-
 
 /**
  * \internal
@@ -370,7 +362,6 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QN_FUSION_PROPERTY_TYPE_I_1(KEY, VALUE) decltype(VALUE)
 #define QN_FUSION_PROPERTY_TYPE_I_2(KEY, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_TYPE_FOR_, KEY)
 
-
 /**
  * \internal
  *
@@ -399,7 +390,5 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 #define QN_FUSION_PROPERTY_EXTENSION_I_1(KEY, VALUE) (KEY, VALUE)
 #define QN_FUSION_PROPERTY_EXTENSION_I_2(KEY, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_EXTENSION_FOR_, KEY)(KEY, VALUE)
-
-
 
 #endif // QN_FUSION_ADAPTOR_H

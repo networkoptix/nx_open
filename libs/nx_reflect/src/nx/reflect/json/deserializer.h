@@ -468,7 +468,7 @@ DeserializationResult deserialize(const DeserializationContext& ctx, T* data)
  * @param data Can be any instrumented type or a container with instrumented types.
  * @return true if deserialized successfully.
  * NOTE: All JSON fields are considered optional. So, missing field in the JSON text is not an error.
- * Member-fields that are not of intstrumented types and not of built-in (int, double, std::string) types
+ * Member-fields that are not of instrumented types and not of built-in (int, double, std::string) types
  * must be ConvertibleFromString for the deserialization to work.
  * ConvertibleFromString type supports at least one of the following methods:
  * - static T T::fromStdString(const std::string&)

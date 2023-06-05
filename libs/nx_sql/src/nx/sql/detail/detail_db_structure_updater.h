@@ -18,7 +18,7 @@ namespace nx::sql::detail {
 
 /**
  * Updates specified DB scheme.
- * Multiple objects can be used to update mutiple schemes
+ * Multiple objects can be used to update multiple schemes
  * (e.g., db_version_data table and application scheme).
  */
 class NX_SQL_API DbStructureUpdater

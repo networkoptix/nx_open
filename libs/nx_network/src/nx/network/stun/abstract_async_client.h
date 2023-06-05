@@ -70,7 +70,7 @@ public:
     /**
      * Subscribes for the event of successful reconnect.
      *
-     * @param handler is called on every successfull reconnect.
+     * @param handler is called on every successful reconnect.
      * @param client Can be used to cancel subscription.
      */
     virtual void addOnReconnectedHandler(
@@ -82,7 +82,7 @@ public:
     /** Sends message asynchronously
      *
      * @param requestHandler Triggered after response has been received or error
-     *     has occured. Message attribute is valid only if first attribute value
+     *     has occurred. Message attribute is valid only if first attribute value
      *     is SystemError::noError.
      * @param client Can be used to cancel subscription.
      * @return false, if could not start asynchronous operation.
@@ -94,7 +94,7 @@ public:
         Message request, RequestHandler handler, void* client = 0) = 0;
 
     /**
-     * Schedules repetable timer until disconnect.
+     * Schedules repeatable timer until disconnect.
      * @return false if timer has not been scheduled (e.g., no connection is established at the moment).
      */
     virtual bool addConnectionTimer(

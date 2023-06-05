@@ -41,7 +41,6 @@ Yunhong Gu, last updated 09/28/2010
 #ifndef __UDT_API_H__
 #define __UDT_API_H__
 
-
 #include <condition_variable>
 #include <map>
 #include <mutex>
@@ -211,7 +210,7 @@ public:
     void setError(Error e);
 
     /**
-     * @return The last error occured in the current thread.
+     * @return The last error occurred in the current thread.
      */
     const Error& getError() const;
 

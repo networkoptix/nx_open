@@ -104,8 +104,8 @@ bool ConnectionParameters::parseAttributes(const nx::network::stun::Message& mes
         &tunnelInactivityTimeout,
         std::chrono::duration_cast<std::chrono::seconds>(kDefaultTunnelInactivityTimeout));
 
-    // TODO: make real support for unsigned int(s) in STUN,
-    //  curently unsigned int(s) are represented like simple ints
+    // TODO: Make real support for unsigned int(s) in STUN, currently unsigned int(s) are
+    // represented like signed ints.
     readAttributeValue(
         message, stun::extension::attrs::tcpReverseRetryMaxCount,
         (int*)&tcpReverseRetryPolicy.maxRetryCount,

@@ -145,7 +145,7 @@ PreloadedTranslationReference TranslationManager::preloadTranslation(
 
             if (!translation)
             {
-                // Write to log, return an empty referece.
+                // Write to log, return an empty reference.
                 NX_WARNING(this, "Could not load translation for locale '%1'", locale);
                 return PreloadedTranslationReference(this, {});
             }
@@ -158,7 +158,6 @@ PreloadedTranslationReference TranslationManager::preloadTranslation(
 
     return PreloadedTranslationReference(this, locale);
 }
-
 
 std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
     const PreloadedTranslationReference& locale,
@@ -306,4 +305,3 @@ void TranslationManager::removePreloadedTranslationReference(const QString& loca
 }
 
 } // namespace nx::vms::utils
-

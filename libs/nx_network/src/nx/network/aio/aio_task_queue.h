@@ -186,8 +186,8 @@ public:
      * This method introduced for optimization: if we fast call startMonitoring then removeSocket
      * (socket has not been added to pollset yet), then removeSocket can just cancel
      * "add socket to pollset" task. And vice versa.
-     * @return true if reverse task has been cancelled and socket
-     *   is already in desired state, no futher processing is needed.
+     * @return True if the reverse task has been canceled, and socket is already in the desired
+     *     state, so no further processing is needed.
      */
     bool removeReverseTask(
         Pollable* const sock,

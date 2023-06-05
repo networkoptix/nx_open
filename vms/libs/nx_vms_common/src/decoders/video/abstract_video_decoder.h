@@ -54,7 +54,7 @@ public:
 
     virtual void setLightCpuMode( DecodeMode val ) = 0;
 
-    //!Use ulti-threaded decoding (if supported by implementation)
+    //!Use multi-threaded decoding (if supported by implementation)
     virtual void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy) = 0;
 
     //!Returns output picture size in pixels (after scaling if it is present)

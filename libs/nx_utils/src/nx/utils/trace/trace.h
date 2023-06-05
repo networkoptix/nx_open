@@ -88,7 +88,7 @@ private:
     std::unique_ptr<QJsonObject> m_args;
 };
 
-// Helper class for convenient tracking of execution time of some scope (eg. function).
+// Helper class for convenient tracking of execution time of some scope (e.g. function).
 class NX_UTILS_API Scope
 {
     using ArgsType = std::unique_ptr<QJsonObject>;

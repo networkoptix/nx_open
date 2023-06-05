@@ -270,7 +270,7 @@ QString Formatter::toString(const QDateTime& value, Format format) const
             return d->getLocalizedHours(value.time());
         case Format::a:
             return d->getHoursTimeFormatMark(value.time());
-        default: //< Other formats are handled by usuall way.
+        default: //< Other formats are handled by usual way.
             return d->locale.toString(value, d->formatStrings[format]);
     }
 }

@@ -1079,7 +1079,7 @@ void QnRtspClientArchiveDelegate::beforeChangeSpeed(double speed)
 void QnRtspClientArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64 frameStep)
 {
     NX_VERBOSE(this,
-        "Set range %1 - %2, framestep %3 us",
+        "Set range %1 - %2, framestamp %3 us",
         nx::utils::timestampToDebugString(startTime),
         nx::utils::timestampToDebugString(endTime),
         frameStep);

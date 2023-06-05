@@ -48,7 +48,6 @@ struct ReaderInfo
     qint64 maxTimeUsec;
 };
 
-
 class QnArchiveSyncPlayWrapperPrivate
 {
 public:
@@ -64,7 +63,6 @@ public:
         cachedTime = 0;
         gotCacheTimer.invalidate();
     }
-
 
     QnArchiveSyncPlayWrapperPrivate():
       timeMutex(nx::Mutex::Recursive)
@@ -254,7 +252,6 @@ void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
     }
 }
 
-
 // -------------------------- end of navigation ----------------------------
 
 void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* reader, QnlTimeSource* cam)
@@ -289,8 +286,8 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* r
 
     connect(reader, &QnAbstractArchiveStreamReader::beforeJump, this,
         &QnArchiveSyncPlayWrapper::onBeforeJump, Qt::DirectConnection);
-    connect(reader, &QnAbstractArchiveStreamReader::jumpOccured, this,
-        &QnArchiveSyncPlayWrapper::onJumpOccured, Qt::DirectConnection);
+    connect(reader, &QnAbstractArchiveStreamReader::jumpOccurred, this,
+        &QnArchiveSyncPlayWrapper::onJumpOccurred, Qt::DirectConnection);
 
     if (d->enabled)
     {
@@ -440,7 +437,7 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 /*mksec*/)
     NX_MUTEX_LOCKER lock( &d->timeMutex );
 }
 
-void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
+void QnArchiveSyncPlayWrapper::onJumpOccurred(qint64 mksec)
 {
     Q_UNUSED(mksec)
 
@@ -576,7 +573,7 @@ void QnArchiveSyncPlayWrapper::reinitTimeIfBufferingIsFinishedUnsafe()
             return;
     }
 
-    // reinit time to real position. If reinit time to requested position (it differs if rought jump), redAss can switch item to LQ
+    // reinit time to real position. If reinit time to requested position (it differs if rough jump), redAss can switch item to LQ
     d->bufferingTime = AV_NOPTS_VALUE;
     reinitTime(getDisplayedTime());
 }
@@ -611,12 +608,12 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
                 if (callSync)
                     jumpTo(DATETIME_NOW, 0);
                 else
-                    QMetaObject::invokeMethod(this, "jumpToLive", Qt::QueuedConnection); // all items at EOF position. This call may occured from non GUI thread!
+                    QMetaObject::invokeMethod(this, "jumpToLive", Qt::QueuedConnection); // all items at EOF position. This call may occurred from non GUI thread!
             }
         }
         else {
             if (reader)
-                reader->jumpTo(DATETIME_NOW, 0); // if sync disabled and items go to archive EOF, jump to live immediatly (without waiting other items)
+                reader->jumpTo(DATETIME_NOW, 0); // if sync disabled and items go to archive EOF, jump to live immediately (without waiting other items)
         }
     }
 }
@@ -665,7 +662,6 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     return d->cachedTime;
 }
 
-
 double sign(double value) { return value >= 0 ? 1 : -1; }
 
 qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
@@ -678,7 +674,6 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
     str.flush();
     NX_INFO(this, s);
     */
-
 
     qint64 expectTime = expectedTime();
     qint64 nextTime = getNextTime();

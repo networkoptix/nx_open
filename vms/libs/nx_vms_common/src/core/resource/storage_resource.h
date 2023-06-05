@@ -56,7 +56,7 @@ public:
     void releaseBitrate(QnAbstractMediaStreamDataProvider* provider);
 
     /*
-     * Short and uniq storage ID. It is addition related ID field, and used for memory usage optimization
+     * Short and unique storage ID. It is addition related ID field, and used for memory usage optimization
      */
     virtual void setUrl(const QString& value) override;
 

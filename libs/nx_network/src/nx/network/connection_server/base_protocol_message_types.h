@@ -55,7 +55,7 @@ public:
      *   - source data depleted
      * @param bytesProcessed Number of bytes from buf which were read and parsed is stored here.
      * NOTE: *buf MAY NOT contain whole message, but any part of it (it can be as little as 1 byte).
-     * NOTE: Reads whole message even if parse error occured.
+     * NOTE: Reads whole message even if parse error occurred.
      */
     virtual ParserState parse(const nx::ConstBufferRefType& /*buf*/, size_t* /*bytesProcessed*/) = 0;
 

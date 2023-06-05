@@ -18,9 +18,9 @@ public:
     const std::string& str() const;
 
     /**
-     * @return Distance from the end of the last processed character to the occurence found.
+     * @return Distance from the end of the last processed character to the occurrence found.
      * std::string::npos if nothing found.
-     * NOTE: Processing is stopped with any occurence. So, KmpSearcher::process has to be invoked
+     * NOTE: Processing is stopped with any occurrence. So, KmpSearcher::process has to be invoked
      * again with unprocessed text (textPart.substr(textPart.size() + str.size() - result)).
      */
     std::string::size_type process(const std::string_view& textPart);
@@ -29,7 +29,7 @@ public:
      * @return E.g., if string to find is "bcd" and text "198nrabc" has been provided, then 2 is
      * returned. It means that string can potentially be found 2 positions prior to the last position.
      */
-    std::size_t potentialOccurenceLag() const;
+    std::size_t potentialOccurrenceLag() const;
 
 private:
     const std::string m_str;

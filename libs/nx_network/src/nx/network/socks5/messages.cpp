@@ -37,7 +37,7 @@ uint16_t readPortAt(const nx::Buffer& buffer, size_t offset)
     return ((uint16_t) portHigh << 8) | portLow;
 }
 
-// Read lenght-byte string starting at offset.
+// Read length-byte string starting at offset.
 std::string readStringAt(const nx::Buffer& buffer, size_t offset, uint8_t length)
 {
     NX_ASSERT(buffer.size() >= offset + length);

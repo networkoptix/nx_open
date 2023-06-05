@@ -135,7 +135,6 @@ bool LockGraphEdgeData::TwoMutexLockData::operator!=(const TwoMutexLockData& rhs
     return !(*this == rhs);
 }
 
-
 LockGraphEdgeData::LockGraphEdgeData()
 {
 }
@@ -315,7 +314,7 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
 
     std::list<MutexDelegate*> existingPath;
     std::list<LockGraphEdgeData> edgesTravelled;
-    //travelling edges containing any thread different from current
+    //traveling edges containing any thread different from current
     //    This is needed to avoid reporting deadlock in case of loop in the same thread.
     //    Consider following: m1->m2, m2->m1. But both locks happen in the same thread only,
     //    so deadlock is not possible.

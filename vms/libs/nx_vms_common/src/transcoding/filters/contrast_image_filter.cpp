@@ -16,7 +16,7 @@ QnContrastImageFilter::QnContrastImageFilter(const nx::vms::api::ImageCorrection
 
 bool QnContrastImageFilter::isFormatSupported(CLVideoDecoderOutput* frame) const
 {
-    return frame->data[1]; // if several video planes are present, format is supprted
+    return frame->data[1]; //< if several video planes are present, format is supported
 }
 
 #if defined(NX_SSE2_SUPPORTED)
@@ -106,7 +106,6 @@ CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderO
                         (m_gammaCorrection[tmp.b[13]] << 8) +
                         (m_gammaCorrection[tmp.b[14]] << 16) +
                         (m_gammaCorrection[tmp.b[15]] << 24);
-
 
                     *srcY++ = tmp.v;
                 }

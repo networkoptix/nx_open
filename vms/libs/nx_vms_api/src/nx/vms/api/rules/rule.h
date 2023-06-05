@@ -30,7 +30,7 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(Rule)
 // A dummy struct used in ec2 transactions.
 struct NX_VMS_API ResetRules
 {
-    bool none = false; //< A dummy field that is necessary for nxfusion serialization.
+    bool none = false; //< A dummy field that is necessary for nx fusion serialization.
 };
 #define nx_vms_api_rules_ResetRules_Fields (none)
 NX_VMS_API_DECLARE_STRUCT(ResetRules)

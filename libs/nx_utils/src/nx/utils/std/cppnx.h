@@ -11,7 +11,7 @@
 namespace nx::utils {
 
 /**
- * Containers like vector of non-copyble types cannot be initialized by the initializer list (it
+ * Containers like vector of non-copyable types cannot be initialized by the initializer list (it
  * requires a copy constructor), but can be initialized by the following method:
  * ```
  *     auto vector = make_container<std::vector<std::unique_ptr<Data>>>(

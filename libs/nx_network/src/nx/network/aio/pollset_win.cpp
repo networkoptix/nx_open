@@ -37,7 +37,7 @@ static void freeFDSet(my_fd_set* fdSet)
 }
 
 /**
- * Reallocs fdSet to be of size newSize while preseving existing data.
+ * Reallocs fdSet to be of size newSize while preserving existing data.
  * In case of allocation error *fdSet is freed and set to NULL.
  */
 static void reallocFDSet(my_fd_set** fdSet, size_t newSize)
@@ -431,7 +431,9 @@ bool PollSet::add(
 void PollSet::remove(Pollable* const sock, aio::EventType eventType)
 {
 #ifdef _DEBUG
-    sock->handle(); //checking that socket object is still alive, since linux and mac implementation use socket in PollSet::remove
+    //checking that the socket object is still alive, since Linux and Mac implementations use
+    //the socket in PollSet::remove().
+    sock->handle();
 #endif
 
     auto sockIter = m_impl->sockets.find(sock->handle());
@@ -444,7 +446,7 @@ void PollSet::remove(Pollable* const sock, aio::EventType eventType)
         return;
     }
 
-    //removing socket from already occured events list
+    //removing the socket from the list of already occurred events
     if (eventType == aio::etRead)
     {
         std::replace(

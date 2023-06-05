@@ -118,7 +118,7 @@ struct Storage: ParameterSet
     NX_METRICS_ADD(std::atomic_int, transcoders,
         "Amount of video transcoding threads (same as amount of encoders)");
     NX_METRICS_ADD(std::atomic_int, progressiveDownloadingTranscoders,
-        "Amount of opened progressive downloading connections with trancoding");
+        "Amount of opened progressive downloading connections with transcoding");
     NX_METRICS_ADD(std::atomic_int, decoders, "Amount of video decoders");
     NX_METRICS_ADD(std::atomic<qint64>, encodedPixels, "Amount of encoded video pixels");
     NX_METRICS_ADD(std::atomic<qint64>, decodedPixels, "Amount of decoded video pixels");

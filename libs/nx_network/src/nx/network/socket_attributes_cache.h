@@ -217,7 +217,7 @@ public:
         if (!m_delegate)
         {
             NX_CRITICAL(m_socketAttributes.aioThread,
-                "Notfully supported while delegate is not set");
+                "Not fully supported while delegate is not set");
 
             return *m_socketAttributes.aioThread;
         }

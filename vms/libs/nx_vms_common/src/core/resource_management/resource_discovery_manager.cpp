@@ -436,8 +436,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             // Existing camera resource could has empty url in case of Undo camera replacement. At this case allow
             // to find new camera and change 'manual' flag from true to false.
             const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>(existingRes.data());
-            if( existingCamRes && existingCamRes->isManuallyAdded() 
-                && !existingCamRes->getUrl().isEmpty() 
+            if( existingCamRes && existingCamRes->isManuallyAdded()
+                && !existingCamRes->getUrl().isEmpty()
                 && camRes->getHostAddress() == existingCamRes->getHostAddress())
             {
                 NX_VERBOSE(this, "Ignore auto discovered camera %1 because it is added manually", camRes);
@@ -569,7 +569,7 @@ QSet<QString> QnResourceDiscoveryManager::registerManualCameras(
             if (!camera.resType || !searcher->isResourceTypeSupported(camera.resType->getId()))
                 continue;
 
-            NX_DEBUG(this, nx::format("Manual camera %1 is registred for %2 on %3")
+            NX_DEBUG(this, nx::format("Manual camera %1 is registered for %2 on %3")
                 .args(camera.physicalId, typeid(*searcher), camera.url));
 
             QnManualCameraInfo updatedManualCameraInfo = camera;

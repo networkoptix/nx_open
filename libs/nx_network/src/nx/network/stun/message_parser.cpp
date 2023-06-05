@@ -347,7 +347,7 @@ int MessageParser::parseHeaderLength(MessageParserBuffer& buffer)
     if ((m_header.length & kLengthMask) != 0)
     {
         // We don't understand such header since the last 2 bits of the length
-        // is not zero zero. This is another way to tell if a packet is STUN or not
+        // is not zero. This is another way to tell if a packet is STUN or not
         return FAILED;
     }
     m_legacyState = LegacyState::HEADER_MAGIC_ID;
@@ -654,7 +654,7 @@ bool MessageParser::validateCachedData()
 {
     if (m_state == State::header)
     {
-        // The most significant 2 bits of every STUN message MUST be zeroes.
+        // The most significant 2 bits of every STUN message MUST be zeros.
         if (!m_cache.empty() && (m_cache[0] & 0xC0) != 0)
             return false;
 

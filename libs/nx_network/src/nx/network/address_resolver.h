@@ -60,7 +60,7 @@ public:
 
     /**
      * Resolves hostName like DNS server does.
-     * Handler is called with complete address list includung:
+     * Handler is called with complete address list including:
      * - Addresses reported by AddressResolver::addFixedAddress.
      * - Resolve result from DnsResolver.
      * - Resolve result from MediatorAddressResolver.
@@ -68,7 +68,7 @@ public:
      * @param natTraversalSupport defines if mediator should be used for address resolution.
      *
      * NOTE: Handler might be called within this function in case if
-     *     values are avaliable from cache.
+     *     values are available from cache.
      */
     void resolveAsync(
         const HostAddress& hostName,
@@ -85,7 +85,7 @@ public:
     /**
      * Cancels request.
      * If handler not provided the method will block until actual
-     *   cancelation is done.
+     *   cancellation is done.
      */
     void cancel(
         void* requestId,

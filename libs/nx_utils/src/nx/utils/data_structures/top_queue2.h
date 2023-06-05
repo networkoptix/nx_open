@@ -8,7 +8,7 @@
 namespace nx::utils {
 
 /**
- * Queue that can return "top" element with O(1) time compexity.
+ * Queue that can return "top" element with O(1) time complexity.
  * Top element here is, for example, the largest element (it is defined by Comp functor).
  */
 template <typename T, const T& (*Comp)(const T&, const T&)>

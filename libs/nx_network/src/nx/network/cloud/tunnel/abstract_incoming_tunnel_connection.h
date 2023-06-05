@@ -11,7 +11,7 @@ namespace nx::network::cloud {
 // TODO: #akolesnikov Inherit aio::BasicPollable.
 
 /**
- * Represents incomming tunnel connection established using one of a nat traversal methods.
+ * Represents the incoming tunnel connection established using one of the NAT traversal methods.
  */
 class NX_NETWORK_API AbstractIncomingTunnelConnection:
     public aio::BasicPollable
@@ -25,7 +25,7 @@ public:
      *  Accepts new connection from peer (like socket)
      *
      *  NOTE: Not all of the AbstractTunnelConnection can really accept
-     *      connections so that they just return it's prmary connection
+     *      connections, so that they just return it's primary connection.
      *  NOTE: If handler returns some error, this connection can not be reused
      *      and shell be deleted.
      */

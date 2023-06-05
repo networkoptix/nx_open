@@ -56,7 +56,7 @@ public:
      * @return If the file does not exist at time of subscription, SystemError::fileNotFound is
      * returned. It should not be treated as an error; the user is still subscribed in this case.
      * If something went wrong while checking the file, SystemError::getLastOsErrorCode is
-     * returned. Otherwise, no errors occured and SystemError::noError is returned.
+     * returned. Otherwise, no errors occurred and SystemError::noError is returned.
      */
     SystemError::ErrorCode subscribe(
         const std::string& filePath,

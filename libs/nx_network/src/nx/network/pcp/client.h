@@ -22,13 +22,13 @@ struct NX_NETWORK_API Mapping
         : internal(_internal), external(_external) {}
 };
 
-/** PCP Client to work with multiplie network interfaces */
+/** PCP Client to work with multiple network interfaces */
 class NX_NETWORK_API Client
 {
 public:
     static Client& instance();
 
-    /** Mapps @param port on @param address to the same port on NAT async */
+    /** Maps @param port on @param address to the same port on NAT async */
     nx::utils::Guard mapPort(const SocketAddress& address);
 
     /** Subscribes for port mapping events */

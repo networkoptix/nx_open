@@ -108,7 +108,7 @@ private:
         if (m_sendQueue.size() == 1)
             sendNextBuffer();
 
-        // TODO: #akolesnikov Put a mimit on send queue size.
+        // TODO: #akolesnikov Put a limit on send queue size.
         scheduleRead();
     }
 

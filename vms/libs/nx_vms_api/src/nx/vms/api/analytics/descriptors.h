@@ -50,7 +50,6 @@ struct DescriptorScope
     (hasTypeEverBeenSupportedInThisScope)
 NX_REFLECTION_INSTRUMENT(DescriptorScope, nx_vms_api_analytics_DescriptorScope_Fields);
 
-
 template<typename T, typename = void>
 struct hasGroupId: std::false_type {};
 
@@ -263,7 +262,7 @@ struct ObjectTypeDescriptor: public ExtendedScopedDescriptor
 
     /**
      * Some Object Types aren't visible anywhere in the GUI (hidden), but behave like mixins for
-     * its base Types (mimicing them). E.g its attrributes become a part of the base Object Type
+     * its base Types (mimicking them). E.g its attributes become a part of the base Object Type
      * attribute set.
      */
     bool isSupposedToMimicBaseType() const

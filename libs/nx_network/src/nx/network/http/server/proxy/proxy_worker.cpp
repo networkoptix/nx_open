@@ -28,7 +28,7 @@ ProxyWorker::ProxyWorker(
 {
     replaceTargetHostWithFullCloudNameIfAppropriate(connectionToTheTargetPeer.get());
 
-    NX_VERBOSE(this, "Proxy %1. Starting proxing to %2(%3) (path %4) from %5",
+    NX_VERBOSE(this, "Proxy %1. Starting proxying to %2(%3) (path %4) from %5",
         m_proxyingId, m_targetHostName, connectionToTheTargetPeer->getForeignAddress(),
         translatedRequest.requestLine.url, connectionToTheTargetPeer->getLocalAddress());
 

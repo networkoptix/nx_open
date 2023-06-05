@@ -61,7 +61,7 @@ public:
      * occur, for example, when one copy of nx::kit library is linked to the executable itself, and
      * another one is linked to the shared library. If ensureOutputRedirection() is called once
      * (in the executable) this works perfectly well, because the linker leaves static
-     * initilization in the executable and optimizes it away from the shared library. Otherwise
+     * initialization in the executable and optimizes it away from the shared library. Otherwise
      * (ensureOutputRedirection() is called both in the executable and in the shared library) it
      * can result in multiple initialization of the Redirector, and some output can be lost.
      */
@@ -69,8 +69,8 @@ public:
 
 protected: //< Intended for unit tests.
     OutputRedirector(const char* overridingLogFilesDir = nullptr);
-    
-private:    
+
+private:
     bool m_isStdoutRedirected = false;
     bool m_isStderrRedirected = false;
 };

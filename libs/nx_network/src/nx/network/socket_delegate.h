@@ -258,7 +258,7 @@ public:
     }
 
     /*
-     * Warning! Buffer should live at least till asynchronous send occurres, so
+     * Warning! Buffer should live at least till asynchronous send occurs, so
      * do not use buffers with local scope here.
      */
     virtual void sendAsync(

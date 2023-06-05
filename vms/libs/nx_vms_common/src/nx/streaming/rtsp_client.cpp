@@ -475,7 +475,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
 
     result = sendDescribe();
     if (result)
-        NX_DEBUG(this, "Sucessfully opened RTSP stream %1", m_url);
+        NX_DEBUG(this, "Successfully opened RTSP stream %1", m_url);
 
     return result;
 }
@@ -807,7 +807,7 @@ bool QnRtspClient::sendSetup()
         request.requestLine.method = kSetupCommand;
         if( setupUrl.isRelative() )
         {
-            // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
+            // SETUP postfix should be written after url query params. It's invalid url, but it's required according to RTSP standard
             request.requestLine.url = m_contentBase
                     + ((m_contentBase.endsWith(lit("/")) || setupUrl.isEmpty()) ? lit("") : lit("/"))
                     + setupUrl.toString();
@@ -1550,7 +1550,7 @@ void QnRtspClient::setCredentials(const nx::network::http::Credentials& credenti
             m_defaultAuthScheme = nx::network::http::header::AuthScheme::bearer;
             return;
     }
-    NX_ASSERT(false, NX_FMT("Uknown AuthTokenType %1", (int) credentials.authToken.type));
+    NX_ASSERT(false, NX_FMT("Unknown AuthTokenType %1", (int) credentials.authToken.type));
 }
 
 const nx::network::http::Credentials& QnRtspClient::getCredentials() const
@@ -1649,7 +1649,7 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
     if (!m_tcpSock)
         return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_url.host(), port);
 
-    for (int i = 0; i < 3; ++i) //< Avoid infinite loop in case of incorrect server behavour.
+    for (int i = 0; i < 3; ++i) //< Avoid infinite loop in case of incorrect server behavior.
     {
         fillRequestAuthorization(&request);
 
@@ -1724,7 +1724,7 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
             if (!authenticate.parse(authenticateHeaderValue))
             {
                 NX_DEBUG(this,
-                    "Authentification to %1 failed with wrong %2 header value \"%3\" in response.",
+                    "Authentication to %1 failed with wrong %2 header value \"%3\" in response.",
                     m_url, authenticateHeaderName, authenticateHeaderValue);
                 return CameraDiagnostics::NotAuthorisedResult(m_url);
             }

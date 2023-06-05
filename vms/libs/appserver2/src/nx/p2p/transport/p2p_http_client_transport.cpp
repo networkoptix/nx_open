@@ -213,7 +213,7 @@ void P2PHttpClientTransport::sendNextMessage()
     if (m_sendInProgress || m_outgoingMessageQueue.empty())
     {
         NX_VERBOSE(
-            this, "%1: Can't intiate send. in progress: %2, message queue size: %3",
+            this, "%1: Can't initiate send. in progress: %2, message queue size: %3",
             __func__, m_sendInProgress, m_outgoingMessageQueue.size());
 
         return;

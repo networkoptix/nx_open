@@ -18,7 +18,7 @@ NX_REFLECTION_ENUM_CLASS(PublicationType,
     /** Private patch for a single setup. */
     private_patch,
 
-    /** Regular monthy patch. */
+    /** Regular monthly patch. */
     patch,
 
     /** Public beta version. */

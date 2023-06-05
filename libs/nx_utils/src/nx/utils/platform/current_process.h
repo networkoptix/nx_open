@@ -19,7 +19,7 @@ public:
     static bool changeUser( const uint userId );
 
 private:
-    CurrentProcess(); // not constructable
+    CurrentProcess(); // not constructible
 };
 
 } // namespace utils

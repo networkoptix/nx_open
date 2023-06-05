@@ -128,7 +128,7 @@ private:
     };
 
     /**
-     * If there is at least m_bytesToCache bytes in the cache or the input buffer then refrence
+     * If there is at least m_bytesToCache bytes in the cache or the input buffer then reference
      * to either input data or cache is returned.
      * If there is not enough data, then input data is copied to the cache and
      * server::ParserState::readingMessage is returned.

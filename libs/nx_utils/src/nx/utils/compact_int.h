@@ -49,7 +49,7 @@ QByteArray serialized(const T& value)
 
 /**
  * *begin is shifted by the number of bytes read.
- * @return false is data is maformed.
+ * @return false is data is malformed.
  */
 NX_UTILS_API bool deserialize(const char** begin, const char* end, long long* value);
 

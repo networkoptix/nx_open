@@ -119,7 +119,7 @@ void QnArchiveStreamReader::nextFrame()
         m_navDelegate->nextFrame();
         return;
     }
-    emit nextFrameOccured();
+    emit nextFrameOccurred();
     NX_MUTEX_LOCKER lock( &m_jumpMtx );
     m_singleQuantProcessed = false;
     m_singleShowWaitCond.wakeAll();
@@ -139,7 +139,7 @@ void QnArchiveStreamReader::previousFrame(qint64 mksec)
         m_navDelegate->previousFrame(mksec);
         return;
     }
-    emit prevFrameOccured();
+    emit prevFrameOccurred();
     jumpToPreviousFrame(mksec);
 }
 
@@ -308,7 +308,7 @@ bool QnArchiveStreamReader::init()
     bool opened = m_delegate->open(m_resource, m_archiveIntegrityWatcher);
 
     if (jumpTime != qint64(AV_NOPTS_VALUE))
-        emitJumpOccured(jumpTime, usePreciseSeek, m_delegate->getSequence());
+        emitJumpOccurred(jumpTime, usePreciseSeek, m_delegate->getSequence());
 
     if (!opened)
         return false;
@@ -542,7 +542,7 @@ begin_label:
                 if (displayTime != DATETIME_NOW)
                     setSkipFramesToTime(displayTime, false);
 
-                emitJumpOccured(displayTime, usePreciseSeek, m_delegate->getSequence());
+                emitJumpOccurred(displayTime, usePreciseSeek, m_delegate->getSequence());
                 m_BOF = true;
             }
         }
@@ -567,7 +567,7 @@ begin_label:
         if (!exactJumpToSpecifiedFrame && channelCount > 1)
             setNeedKeyData();
         internalJumpTo(jumpTime);
-        emitJumpOccured(jumpTime, usePreciseSeek, m_delegate->getSequence());
+        emitJumpOccurred(jumpTime, usePreciseSeek, m_delegate->getSequence());
         m_BOF = true;
     }
 
@@ -622,7 +622,7 @@ begin_label:
         m_BOF = true;
         m_afterBOFCounter = 0;
         if (jumpTime != qint64(AV_NOPTS_VALUE))
-            emitJumpOccured(displayTime, usePreciseSeek, m_delegate->getSequence());
+            emitJumpOccurred(displayTime, usePreciseSeek, m_delegate->getSequence());
     }
     else if (speed != m_prevSpeed)
     {
@@ -695,7 +695,7 @@ begin_label:
         {
             // I have found example where AV_PKT_FLAG_KEY detected very bad.
             // Same frame sometimes Key sometimes not. It is VC1 codec.
-            // Manual detection for it stream better, but has artefacts too. I thinks some data lost in stream after jump
+            // Manual detection for it stream better, but has artifacts too. I thinks some data lost in stream after jump
             // (after sequence header always P-frame, not I-Frame. But I returns I, because no I frames at all in other case)
 
             bool isKeyFrame = false;
@@ -723,7 +723,7 @@ begin_label:
 
             if (m_eof || (m_currentTime == 0 && m_bottomIFrameTime > 0 && m_topIFrameTime >= m_bottomIFrameTime))
             {
-                // seek from EOF to BOF occured
+                // seek from EOF to BOF occurred
                 //NX_ASSERT(m_topIFrameTime != DATETIME_NOW);
                 setCurrentTime(m_topIFrameTime);
                 m_eof = false;
@@ -734,7 +734,7 @@ begin_label:
             {
                 if (m_afterBOFCounter == 0 && m_currentTime == std::numeric_limits<qint64>::max())
                 {
-                    // no any packet yet readed from archive and eof reached. So, current time still unknown
+                    // no any packet yet read from archive and eof reached. So, current time still unknown
                     QnSleep::msleep(10);
                     internalJumpTo(qnSyncTime->currentUSecsSinceEpoch() - BACKWARD_SEEK_STEP);
                     m_afterBOFCounter = 0;
@@ -1541,7 +1541,7 @@ bool QnArchiveStreamReader::isJumpProcessing() const
     return m_requiredJumpTime != AV_NOPTS_VALUE;
 }
 
-void QnArchiveStreamReader::emitJumpOccured(qint64 jumpTime, bool usePreciseSeek, int sequence)
+void QnArchiveStreamReader::emitJumpOccurred(qint64 jumpTime, bool usePreciseSeek, int sequence)
 {
     {
         NX_MUTEX_LOCKER mutex(&m_jumpMtx);
@@ -1551,5 +1551,5 @@ void QnArchiveStreamReader::emitJumpOccured(qint64 jumpTime, bool usePreciseSeek
             m_requiredJumpTime = AV_NOPTS_VALUE;
         }
     }
-    emit jumpOccured(jumpTime, sequence);
+    emit jumpOccurred(jumpTime, sequence);
 }

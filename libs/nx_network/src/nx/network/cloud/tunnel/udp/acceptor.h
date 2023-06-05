@@ -14,7 +14,7 @@ namespace nx::network::cloud::udp {
 
 /**
  * Sends connectionAck to mediator over UDT, then creates IncomingControlConnection to return it
- * wrapped into IncomingTunnelConnection. In case if control connection can not be estabilished
+ * wrapped into IncomingTunnelConnection. In case if control connection can not be established
  * the error is returned.
  */
 class NX_NETWORK_API TunnelAcceptor:

@@ -16,12 +16,11 @@ static const float NORM_RANGE_RANGE = 256.0 - NORM_RANGE_START*2.0;
 
 float ImageCorrectionResult::calcGamma(int leftPos, int rightPos, int pixels) const
 {
-    // 1. calc hystogram middle point
+    // 1. calc histogram middle point
     int sum = 0;
     int median = leftPos;
     for (; median <= rightPos && sum < pixels/2; ++median)
         sum += hystogram[median];
-
 
     // 2. calc gamma
     qreal curValue = (median - leftPos) / qreal(rightPos-leftPos+1);
@@ -52,7 +51,7 @@ void ImageCorrectionResult::analyseImage(
 
     int xSteps = (right-left) / 4;
 
-    // prepare hystogram
+    // prepare histogram
     memset(hystogram, 0, sizeof(hystogram));
     for (int y = top; y < bottom; ++y)
     {
@@ -75,7 +74,7 @@ void ImageCorrectionResult::analyseImage(
         }
     }
 
-    // get hystogram range
+    // get histogram range
     int pixels = (right-left) * (bottom-top);
     int leftThreshold = data.blackLevel * pixels + 0.5;
     int rightThreshold = data.whiteLevel * pixels + 0.5;

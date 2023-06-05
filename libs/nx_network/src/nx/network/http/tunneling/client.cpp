@@ -214,7 +214,7 @@ void Client::handleTunnelValidationResult(ClientContext* ctx, ResultCode resultC
 
     if (resultCode != ResultCode::ok)
     {
-        // Resetting previously saved result since it is cancelled by the validation faiure.
+        // Resetting previously saved result since it is cancelled by the validation failure.
         ctx->result = OpenTunnelResult();
         ctx->result.resultCode = resultCode;
     }

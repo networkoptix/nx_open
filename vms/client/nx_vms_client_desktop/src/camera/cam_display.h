@@ -79,7 +79,6 @@ public:
 
     virtual void pleaseStop() override;
 
-
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
     bool doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed);
@@ -157,13 +156,13 @@ public:
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
-    void onJumpOccured(qint64 time);
+    void onJumpOccurred(qint64 time);
     void onRealTimeStreamHint(bool value);
     void onSlowSourceHint();
     void onReaderPaused();
     void onReaderResumed();
-    void onPrevFrameOccured();
-    void onNextFrameOccured();
+    void onPrevFrameOccurred();
+    void onNextFrameOccurred();
 
 signals:
     void liveMode(bool value);

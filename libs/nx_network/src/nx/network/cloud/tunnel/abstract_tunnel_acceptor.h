@@ -33,7 +33,7 @@ public:
     std::string remotePeerId() const;
 
     /**
-     * Shall be called only once to estabilish incomming tunnel connection.
+     * Shall be called only once to establish the incoming tunnel connection.
      */
     virtual void accept(AcceptHandler handler) = 0;
 

@@ -74,7 +74,7 @@ api::metrics::Value ValueMonitor::handleValueErrors(
     {
         NX_ASSERT(false, "Unexpected general error when calculating metric %1: %2", this, e);
     }
-    // TODO: Should we return error to the user if it occures?
+    // TODO: Should we return error to the user if it occurs?
     return {};
 }
 
