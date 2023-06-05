@@ -56,7 +56,7 @@ struct NX_CODEC_API AdtsHeader
 class NX_CODEC_API AACCodec
 {
 public:
-    // convert AAC prifle to mpeg 4 object type.
+    // convert AAC prifle to mpeg4 object type.
     //static const int object_type[9];
     const static int OBJECT_AAC_MAIN = 1;
     const static int OBJECT_AAC_LC = 2;

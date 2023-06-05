@@ -317,13 +317,13 @@ void CryptedFileStream::writeHeader()
 {
     m_file.seek(m_enclosure.position);
     m_file.write((char *)&m_header, sizeof(m_header));
-    // Fill rest with zeroes.
+    // Fill rest with zeros.
     static char zeroes[kHeaderSize - sizeof(m_header)];
     memset(zeroes, 0, kHeaderSize - sizeof(m_header));
     m_file.write(zeroes, kHeaderSize - sizeof(m_header));
 }
 
-// Actual encrypring & decrypting.
+// Actual encrypting & decrypting.
 void CryptedFileStream::cryptBlock()
 {
     // Create IV from block index.

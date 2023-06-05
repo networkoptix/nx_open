@@ -1922,7 +1922,7 @@ inline bool operator!=(const std::string_view& left, const QString& right)
 
 //-------------------------------------------------------------------------------------------------
 // std::string_view vs const char*. Needed since previous introducing "QString == std::string_view"
-// makes "std::string_view == const char*" ambigious.
+// makes "std::string_view == const char*" ambiguous.
 
 inline bool operator==(const std::string_view& left, const char* right)
 { return left == std::string_view(right); }

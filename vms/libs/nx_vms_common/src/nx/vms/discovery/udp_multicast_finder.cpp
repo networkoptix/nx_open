@@ -199,7 +199,7 @@ void UdpMulticastFinder::receiveModuleInformation()
         {
             if (code != SystemError::noError)
             {
-                NX_WARNING(this, "Failed to read reciever: %1", SystemError::toString(code));
+                NX_WARNING(this, "Failed to read receiver: %1", SystemError::toString(code));
 
                 m_receiver.reset();
                 return;

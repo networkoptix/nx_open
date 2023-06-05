@@ -268,7 +268,7 @@ void StreamTransformingAsyncChannel::issueIoOperationsScheduledByConverter()
     if (m_asyncReadPostponed)
         readRawChannelAsync();
 
-    // Scheduling I/O operations that have been added during the converter invokation.
+    // Scheduling I/O operations that have been added during the converter invocation.
     if (m_rawWriteQueue.size() == 1 && !m_rawWriteQueue.back().inProgress)
     {
         m_rawWriteQueue.back().inProgress = true;

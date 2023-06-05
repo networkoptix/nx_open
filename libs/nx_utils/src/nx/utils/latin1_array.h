@@ -27,5 +27,4 @@ template<> struct IsQByteArrayAlike<QnLatin1Array, std::void_t<>>: public std::f
 
 } // namespace nx::reflect::detail
 
-
 #endif // QN_LATIN1_ARRAY_H

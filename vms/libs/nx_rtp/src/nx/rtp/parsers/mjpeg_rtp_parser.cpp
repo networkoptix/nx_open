@@ -302,7 +302,7 @@ int MjpegParser::makeHeaders(
     *p++ = 0x11; //< huffman table 1
     *p++ = 0; //< first DCT coeff
     *p++ = 63; //< last DCT coeff
-    *p++ = 0; //< sucessive approx.
+    *p++ = 0; //< successive approx.
 
     return p - start;
 }
@@ -421,7 +421,6 @@ void MjpegParser::fixResolution(int* width, int* height)
 
     if (*height == 0)
         *height += 256;
-
 
     if (m_configuredWidth == *width * 8 + 2048)
         *width = m_configuredWidth / 8;

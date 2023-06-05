@@ -231,7 +231,7 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubje
     }
 
     const auto result = calculatePermissions(subject, targetResource);
-    NX_VERBOSE(this, "Calculated permissions for %1 ower %2 is %3", subject,
+    NX_VERBOSE(this, "Calculated permissions for %1 over %2 is %3", subject,
         targetResource, result);
     return result;
 }
@@ -250,7 +250,7 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubje
     }
 
     const auto result = calculatePermissionsInternal(subject, targetGroup);
-    NX_VERBOSE(this, "Calculated permissions for %1 ower %2 is %3", subject, targetGroup, result);
+    NX_VERBOSE(this, "Calculated permissions for %1 over %2 is %3", subject, targetGroup, result);
     return result;
 }
 

@@ -94,26 +94,30 @@ public:
     void interrupt();
 
     /**
-     * Add socket to set.
-     * @param userData This value is associated with pair (socket, eventType)
-     * @return true, if socket added to set
-     * NOTE: This method does not check, whether socket is already in pollset.
-     * NOTE: Ivalidates all iterators.
+     * Adds the socket to the set.
+     *
+     * NOTE: This method does not check whether the socket is already in the pollset.
+     * NOTE: Invalidates all iterators.
+     *
+     * @param userData This value is associated with the pair (socket, eventType).
+     * @return True if the socket was added to the set.
      */
     bool add(Pollable* const sock, EventType eventType, void* userData = NULL);
     /**
-     * NOTE: Ivalidates all iterators to the left of removed element.
+     * NOTE: Invalidates all iterators to the left of removed element.
      * So, it is ok to iterate signalled sockets and remove current element.
      * Subsequent iterator increment operation will perform safely.
      */
     void remove(Pollable* const sock, EventType eventType);
     size_t size() const;
     /**
-     * @param millisToWait if 0, method returns immediatly (useful to test socket state).
-     * @return -1 on error, 0 if timeout has expired, > 0 - number of socket whose state has been changed
-     * NOTE: If multiple event occured on same socket each event
-     * will be present as a single element when iterating.
+     * NOTE: If a multiple event occurs on the same socket, each event will be present as a single
+     *     element when iterating.
      * NOTE: Invalidates iterators.
+     *
+     * @param millisToWait If 0, the method returns immediately (useful to test the socket state).
+     * @return -1 on error, 0 if a timeout has expired, > 0 is the number of the socket whose state
+     *     has been changed.
      */
     int poll(int millisToWait = kInfiniteTimeout);
     int poll(std::chrono::milliseconds timeout) { return poll(timeout.count()); }

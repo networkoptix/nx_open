@@ -66,7 +66,7 @@ public:
         return *this;
     }
 
-    // NOTE: Deleted to make nx::String assignment to std::string() unambigious.
+    // NOTE: Deleted to make nx::String assignment to std::string() unambiguous.
     operator const char*() const = delete;
 
     bool empty() const { return isEmpty(); };

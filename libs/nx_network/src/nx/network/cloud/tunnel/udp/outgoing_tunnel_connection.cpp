@@ -119,7 +119,7 @@ void OutgoingTunnelConnection::establishNewConnection(
         return;
     }
 
-    //temporariliy binding new socket to the same aio thread to simplify code here
+    // Temporarily binding the new socket to the same aio thread to simplify the code here.
     newConnection->bindToAioThread(getAioThread());
 
     NX_MUTEX_LOCKER lk(&m_mutex);

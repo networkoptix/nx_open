@@ -68,7 +68,7 @@ public:
     //!Transcode coded picture of input stream to output format
     /*!
         Transcoder is allowed to return NULL coded picture for non-NULL input and return coded output pictures with some delay from input.
-        To empty transcoder'a coded picture buffer one should provide NULL as input until receiving NULL at output.
+        To empty transcoder's coded picture buffer one should provide NULL as input until receiving NULL at output.
         \param media Coded picture of the input stream. May be NULL
         \param result Coded picture of the output stream. If NULL, only decoding is done
         \return return Return error code or 0 if no error
@@ -95,7 +95,6 @@ public:
     QnVideoTranscoder(AVCodecID codecId);
     virtual bool open(const QnConstCompressedVideoDataPtr& video) = 0;
 };
-
 
 //!Base class for all audio transcoders
 class QnAudioTranscoder: public QnCodecTranscoder
@@ -170,7 +169,7 @@ public:
     * @return Returns OperationResult::Success if no error or error code otherwise
     */
     int finalize(nx::utils::ByteArray* const result);
-    //!Adds tag to the file. Maximum langth of tags and allowed names are format dependent
+    //!Adds tag to the file. Maximum length of tags and allowed names are format dependent
     /*!
         This implementation always returns \a false
         \return true on success
@@ -182,7 +181,7 @@ public:
      */
     QString getLastErrorMessage() const;
 
-    // for internal use only. move to protectd!
+    // For internal use only, move to protected!
     int writeBuffer(const char* data, int size);
     void setPacketizedMode(bool value);
     const QVector<int>& getPacketsSize();
@@ -216,8 +215,8 @@ public:
 
 protected:
     /*
-    *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
-    * Destionation codecs MUST be used from source data codecs. If 'direct stream copy' is false, video or audio may be empty
+    * Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
+    * Destination codecs MUST be used from source data codecs. If 'direct stream copy' is false, video or audio may be empty
     * @return Returns OperationResult::Success if no error or error code otherwise
     */
     virtual int open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio) = 0;
@@ -240,7 +239,7 @@ protected:
 
 protected:
     bool m_initialized;
-    //! Make sure to correctly fill these member variables in overriden open() function.
+    //! Make sure to correctly fill these member variables in overridden open() function.
     bool m_initializedAudio;    // Incoming audio packets will be ignored.
     bool m_initializedVideo;    // Incoming video packets will be ignored.
     nx::metrics::Storage* m_metrics = nullptr;

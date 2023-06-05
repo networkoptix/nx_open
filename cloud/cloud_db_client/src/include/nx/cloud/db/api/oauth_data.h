@@ -8,7 +8,7 @@
 
 namespace nx::cloud::db::api {
 
-// Code style violated in fields names to match RFC 
+// Code style violated in fields names to match RFC
 // and support correct API documentation generation
 enum class GrantType
 {
@@ -112,7 +112,7 @@ struct ValidateTokenResponse : public TokenInfo
     std::optional<std::string> vms_user_id;
 
     /**%apidoc Seconds. Time that passed since this token was confirmed with a password entry
-     * (explicitely or implicitely).<br/>
+     * (explicitly or implicitly).<br/>
      * E.g., if an access token was issued with <pre>grant_type=refresh_token</pre>, then
      * its time_since_password will be the time passed since corresponding refresh token was issued
      * with `grant_type=password`. If, in turn the refresh token was issued with `grant_type=code`,

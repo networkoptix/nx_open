@@ -24,7 +24,7 @@
 
 namespace {
 
-// Retuns updates function if resource exists and requires an update.
+// Returns updates function if resource exists and requires an update.
 template<class T>
 std::function<void()> insertOrUpdateResource(const T& resource, QHash<QnUuid, T>* const resourcePool)
 {
@@ -191,7 +191,6 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
             else
                 removedOtherResources.push_back(resource);
         };
-
 
     QnResourceList removedResources;
     for (const QnResourcePtr& resource: std::as_const(resources))

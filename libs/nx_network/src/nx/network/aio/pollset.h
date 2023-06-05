@@ -16,7 +16,7 @@ namespace aio {
 class PollSetImpl;
 class ConstIteratorImplOld;
 
-/** NOTE: Do not wait more than a second for posted calls in case of interupt failure. */
+/** NOTE: Do not wait more than a second for posted calls in case of interrupt failure. */
 static const int INFINITE_TIMEOUT = -1;
 
 /**

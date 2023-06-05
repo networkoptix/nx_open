@@ -726,7 +726,6 @@ Pem& Pem::operator=(const Pem& pem)
     return *this;
 }
 
-
 bool Pem::parse(const std::string& str, std::string* errorMessage)
 {
     return m_certificate.parsePem(str, /*maxChainLength*/ std::nullopt, errorMessage)

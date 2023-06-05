@@ -14,7 +14,7 @@ class AbstractArchiveIntegrityWatcher
 {
 public:
     /**
-     * @brief fileRequested - call to report that file has been queyried for reading
+     * @brief fileRequested - call to report that file has been queried for reading
      * @param metadata
      * @param fileName
      * @return - whether file integrity is confirmed. If not - further reading this file should be

@@ -317,7 +317,7 @@ void BitStreamWriter::putBytes(const uint8_t* data, uint32_t size)
         --size;
     }
 
-    int copySize = size & ~3; //< flor to 4
+    int copySize = size & ~3; //< floor to 4
     if (copySize > 0)
     {
         memcpy(m_buffer, data, copySize);

@@ -166,7 +166,7 @@ SocketGlobals::~SocketGlobals()
     // Keeping m_impl pointer accessible while SocketGlobalsImpl is being destroyed
     // so that its members are still able to access each other until they are destroyed.
     // TODO: #akolesnikov Decouple life-time of the holder of everything that currently resides in
-    // SocketGlobalsImpl and the members of SocketGlobalsImpl so that noone accesses
+    // SocketGlobalsImpl and the members of SocketGlobalsImpl so that no one accesses
     // SocketGlobalsImpl when the control is in its destructor.
     m_impl = nullptr;
 

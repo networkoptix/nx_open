@@ -167,7 +167,7 @@ std::optional<Mpeg12AudioHeader> Mpeg12AudioHeaderParser::parse(
         const uint32_t frameSyncSequence = reader.getBits(kFrameSyncBits);
         if (frameSyncSequence != kFrameSyncSequenceValue)
         {
-            NX_VERBOSE(NX_SCOPE_TAG, "Wrong frame syncronization sequence: %1, expected %2",
+            NX_VERBOSE(NX_SCOPE_TAG, "Wrong frame synchronization sequence: %1, expected %2",
                 frameSyncSequence, kFrameSyncSequenceValue);
             return std::nullopt;
         }

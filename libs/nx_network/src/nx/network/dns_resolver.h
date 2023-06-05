@@ -52,7 +52,7 @@ public:
      * @param handler MUST not block
      * @param requestId Used to cancel request. Multiple requests can be started using same request id.
      * @return false if failed to start asynchronous resolve operation
-     * NOTE: It is garanteed that reqID is set before completionHandler is called.
+     * NOTE: It is guaranteed that reqID is set before completionHandler is called.
      */
     void resolveAsync(const std::string& hostname, Handler handler, int ipVersion, RequestId requestId);
 

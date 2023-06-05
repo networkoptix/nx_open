@@ -114,7 +114,7 @@ public:
      * Find nearest period for specified time.
      *
      * \param[in] timeMs                Time to find at usec
-     * \param[in] searchForward         Rount time to the future if true or to the past if false
+     * \param[in] searchForward         Round time to the future if true or to the past if false
      * \returns                         Time moved to nearest chunk at usec
      */
     qint64 roundTimeToPeriodUSec(qint64 timeUsec, bool searchForward) const;
@@ -282,6 +282,5 @@ typedef std::vector<MultiServerPeriodData> MultiServerPeriodDataList;
 QN_FUSION_DECLARE_FUNCTIONS(MultiServerPeriodData,
     (json)(ubjson)(xml)(csv_record)(compressed_time),
     NX_VMS_COMMON_API);
-
 
 #endif // QN_TIME_PERIOD_LIST_H

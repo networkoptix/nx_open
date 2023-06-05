@@ -21,7 +21,7 @@ struct NX_VMS_API UserDataDeprecated: ResourceData
     void fillId();
 
     /**
-     * Converts this legacy user data into the new one assiging default values to new fields.
+     * Converts this legacy user data into the new one assigning default values to new fields.
      */
     std::tuple<UserData, AccessRightsData> toUserData() const;
 
@@ -61,4 +61,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserDataDeprecated)
 NX_REFLECTION_INSTRUMENT(UserDataDeprecated, UserDataDeprecated_Fields)
 
 } // namespace nx::vms::api
-

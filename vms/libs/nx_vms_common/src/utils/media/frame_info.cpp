@@ -95,7 +95,7 @@ void CLVideoDecoderOutput::clean()
     if (!m_useExternalData && data[0])
     {
         if (buf[0])
-            av_frame_unref(this); //< Refcounted frame.
+            av_frame_unref(this); //< Ref-counted frame.
         else
             av_free(data[0]); //< Manually allocated frame.
     }

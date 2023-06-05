@@ -250,7 +250,7 @@ public:
     /**
      * Split host:port string to host and port. Port is optional.
      * host may be a domain name or a IPv4/IPv6 address.
-     * Ipv6 address MUST be enclosed in squeare brackets if port is specified.
+     * Ipv6 address MUST be enclosed in square brackets if port is specified.
      * E.g., [ipv6]:port.
      * @return pair<host, port (if present)>.
      */
@@ -309,7 +309,6 @@ struct NX_NETWORK_API KeepAliveOptions
 NX_NETWORK_API void PrintTo(const KeepAliveOptions& val, ::std::ostream* os);
 
 } // namespace nx::network
-
 
 namespace std {
 

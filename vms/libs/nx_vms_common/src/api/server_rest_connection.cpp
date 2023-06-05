@@ -2341,7 +2341,7 @@ Callback<ResultType> ServerConnection::makeSessionAwareCallback(
                             const auto originalHandle = handle;
 
                             // Make an auxiliary callback that will pass the original request
-                            // handle to the caller instead of an unknown-to-the-caller resended
+                            // handle to the caller instead of an unknown-to-the-caller resent
                             // request handle.
                             Callback<ResultType> fixedCallback =
                                 [self, callback=std::move(callback), originalHandle](
@@ -2351,7 +2351,7 @@ Callback<ResultType> ServerConnection::makeSessionAwareCallback(
                                         self
                                             ? self->d->logTag
                                             : NX_SCOPE_TAG,
-                                        "Received responce for <%1>, which is a re-send of <%2>",
+                                        "Received response for <%1>, which is a re-send of <%2>",
                                         handle, originalHandle);
 
                                     if (self)
@@ -2456,7 +2456,7 @@ ServerConnectionBase::Result<QByteArray>::type ServerConnection::makeSessionAwar
                             const auto originalHandle = handle;
 
                             // Make an auxiliary callback that will pass the original request
-                            // handle to the caller instead of an unknown-to-the-caller resended
+                            // handle to the caller instead of an unknown-to-the-caller resent
                             // request handle.
                             ServerConnectionBase::Result<QByteArray>::type fixedCallback =
                                 [this, callback = std::move(callback), originalHandle](
@@ -2464,7 +2464,7 @@ ServerConnectionBase::Result<QByteArray>::type ServerConnection::makeSessionAwar
                                     const nx::network::http::HttpHeaders& headers)
                                 {
                                     NX_VERBOSE(d->logTag,
-                                        "Received responce for <%1>, which is a re-send of <%2>",
+                                        "Received response for <%1>, which is a re-send of <%2>",
                                         handle,
                                         originalHandle);
 
@@ -2544,7 +2544,7 @@ Handle ServerConnection::executeRequest(
                 bool success = false;
                 const auto format = Qn::serializationFormatFromHttpContentType(context->response.contentType);
 
-                // All parsing fuctions can handle incorrect format.
+                // All parsing functions can handle incorrect format.
                 auto resultPtr = std::make_shared<ResultType>(
                     parseMessageBody<ResultType>(
                         format,
@@ -2606,7 +2606,7 @@ Handle ServerConnection::executeRequest(
             const auto format =
                 Qn::serializationFormatFromHttpContentType(context->response.contentType);
 
-            // All parsing fuctions can handle incorrect format.
+            // All parsing functions can handle incorrect format.
             auto resultPtr = std::make_shared<ResultType>(parseMessageBody<ResultType>(
                 format, context->response.messageBody, context->getStatusCode(), &success));
 

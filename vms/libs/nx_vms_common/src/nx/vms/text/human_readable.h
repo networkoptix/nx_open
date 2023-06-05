@@ -82,7 +82,7 @@ public:
 
     /**
      * Get human representation of digital size in bytes using provided units. Maximum 2 units are
-     * used, e.g. 1315333734400 bytes may be decribed as 1 TB 201 GB.
+     * used, e.g. 1315333734400 bytes may be described as 1 TB 201 GB.
      */
     static QString digitalSize(qint64 bytes,
         DigitalSizeFormat format = FileSize,
@@ -93,7 +93,7 @@ public:
 
     /**
     * Get human representation of digital size in bytes using provided units. Floating point is
-    * used, e.g. 1315333734400 bytes may be decribed as 1.2 TB.
+    * used, e.g. 1315333734400 bytes may be described as 1.2 TB.
     */
     static QString digitalSizePrecise(qint64 bytes,
         DigitalSizeFormat format = FileSize,

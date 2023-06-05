@@ -231,7 +231,7 @@ QString toString(
     const QString& suffix = " )",
     const QString& delimiter = ": ")
 {
-    // QString::operator+= works much faster than template subsitution.
+    // QString::operator+= works much faster than template substitution.
     QString result = prefix;
     result += nx::toString(pair.first);
     result += delimiter;

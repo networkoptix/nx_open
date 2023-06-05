@@ -166,7 +166,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
             metadata && metadata->metadataType == MetadataType::MediaStreamEvent)
         {
             // Not enough licenses, archive is encrypted, etc.
-            NX_VERBOSE(this, "Finish: media stream event has occured.");
+            NX_VERBOSE(this, "Finish: media stream event has occurred.");
             needToStop = true;
         }
         else if (result->dataType == QnAbstractMediaData::VIDEO &&

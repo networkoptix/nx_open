@@ -83,7 +83,7 @@ struct NX_VMS_API PluginInfo
         unsupportedVersion = 5,
 
         /**%apidoc
-         * Some internal error has occured which made the proper PluginInfo structure unavailable.
+         * Some internal error has occurred which made the proper PluginInfo structure unavailable.
          * In this case the error message is stored in statusMessage field.
          */
         internalError = 6

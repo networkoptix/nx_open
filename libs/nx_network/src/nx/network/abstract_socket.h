@@ -82,7 +82,7 @@ public:
     bool bind(const std::string& localAddress, unsigned short localPort);
 
     /**
-     * If socket was not bound to some address explicitely, then the binding may be done on late as
+     * If socket was not bound to some address explicitly, then the binding may be done on late as
      * the first socket usage (this is OS-dependent).
      * @return The local address the socket is bound to.
      */
@@ -113,7 +113,7 @@ public:
     virtual bool shutdown() = 0;
 
     /**
-     * Allows mutiple sockets to bind to same address and port EXCEPT
+     * Allows multiple sockets to bind to same address and port EXCEPT
      * multiple active listening sockets on the same.
      * @return false on error.
      * NOTE: Same as SO_REUSEADDR option on linux.
@@ -122,7 +122,7 @@ public:
     virtual bool getReuseAddrFlag(bool* value) const = 0;
 
     /**
-     * Allows mutiple listening sockets on the same address and port.
+     * Allows multiple listening sockets on the same address and port.
      * @return false on error.
      * NOTE: Same as SO_REUSEPORT option on linux.
      * NOTE: Due to lack of support in win32 API on mswin this option actually does nothing.
@@ -183,7 +183,7 @@ public:
 
     /**
      * Get socket's receive timeout (in millis).
-     * @param millis In case of error value is udefined.
+     * @param millis In case of error value is undefined.
      * @return false on error.
      */
     virtual bool getRecvTimeout(unsigned int* millis) const = 0;
@@ -199,7 +199,7 @@ public:
 
     /**
      * Get socket's send timeout (in millis).
-     * @param millis In case of error value is udefined.
+     * @param millis In case of error value is undefined.
      * @return false on error.
      */
     virtual bool getSendTimeout(unsigned int* millis) const = 0;
@@ -220,7 +220,7 @@ public:
      * @param protocol One of values from Protocol namespace.
      * Note that additional protocol support can be added.
      * @return false if protocol is not defined yet.
-     * An impementation is allowed to choose actual protocol after socket creation.
+     * An implementation is allowed to choose actual protocol after socket creation.
      */
     virtual bool getProtocol(int* protocol) const = 0;
 
@@ -265,7 +265,7 @@ public:
      * Binds current socket to specified AioThread.
      * Cannot be used to re-bind socket to a different AIO thread if asynchronous I/O has already
      * been scheduled on the socket.
-     * Cancel all asynchoronous I/O first.
+     * Cancel all asynchronous I/O first.
      */
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) = 0;
 
@@ -375,7 +375,7 @@ public:
         IoCompletionHandler handler);
 
     /**
-     * Asynchnouosly writes all bytes from input buffer.
+     * Asynchronously writes all bytes from input buffer.
      * @param buf Calling party MUST guarantee that this object is alive until send completion
      * @param handler functor with following parameters:
      * @code{.cpp}
@@ -453,7 +453,7 @@ struct NX_NETWORK_API StreamSocketInfo
 };
 
 /**
- * Interface for connection-orientied sockets.
+ * Interface for connection-oriented sockets.
  */
 class NX_NETWORK_API AbstractStreamSocket:
     public AbstractCommunicatingSocket
@@ -475,7 +475,7 @@ public:
 
     /**
      * Enable collection of socket statistics.
-     * @param val true - enable, false - diable.
+     * @param val true - enable, false - disable.
      * NOTE: This method MUST be called only after establishing connection.
      *   After reconnecting socket, it MUST be called again!
      * NOTE: On win32 only process with admin rights can enable statistics collection,
@@ -631,7 +631,7 @@ public:
      * @param foreignAddress address (IP address or name) to send to
      * @param foreignPort port number to send to
      * @return true if whole data has been sent
-     * NOTE: Remebers new destination address
+     * NOTE: Remembers new destination address
      *   (as if AbstractDatagramSocket::setDestAddr(foreignAddress, foreignPort) has been called).
      */
     bool sendTo(

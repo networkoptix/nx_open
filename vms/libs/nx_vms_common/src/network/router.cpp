@@ -82,7 +82,7 @@ QnRoute routeTo(
 
     if (routeVia == result.id)
     {
-        // peer accesible directly, but no address avaliable (bc of NAT),
+        // peer accessible directly, but no address available (bc of NAT),
         // so we need backwards connection
         result.reverseConnect = true;
         return result;

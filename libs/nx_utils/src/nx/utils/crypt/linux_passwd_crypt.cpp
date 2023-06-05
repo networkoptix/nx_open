@@ -45,7 +45,7 @@ namespace
     //!Performs inplace bitshift of array data
     void shiftArrayRight( unsigned char* data, size_t dataSize, size_t bitsCount )
     {
-        //TODO #akolesnikov moving by number of bytes and modifing bitsCount
+        //TODO #akolesnikov moving by number of bytes and modifying bitsCount
         NX_ASSERT( bitsCount < 8 );
 
         if( bitsCount == 0 )
@@ -153,7 +153,7 @@ bool setRootPasswordDigest( const QByteArray& userName, [[maybe_unused]] const Q
         //checking that we have found complete word
         if( userPos != 0 && (isalnum(shadowFileContents[userPos-1]) || shadowFileContents[userPos - 1] == '_') )
         {
-            //searching futher
+            //searching further
             ++userPos;
             continue;
         }

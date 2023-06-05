@@ -39,7 +39,7 @@ public:
     /** Sets moduleInformation to multicast, starts multicast process if not running yet. */
     void multicastInformation(const api::ModuleInformationWithAddresses& information);
 
-    /** Listens to module information multicasts, executes handler on each message recieved. */
+    /** Listens to module information multicasts, executes handler on each message received. */
     void listen(ModuleHandler handler);
 
     virtual void stopWhileInAioThread() override;

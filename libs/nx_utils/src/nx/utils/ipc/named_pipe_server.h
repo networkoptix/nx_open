@@ -20,7 +20,7 @@ public:
     virtual ~NamedPipeServer();
 
     /**
-     * Openes pipeName and listenes it for connections.
+     * Opens pipeName and listens it for connections.
      * This method returns immediately.
      */
     SystemError::ErrorCode listen(const std::string& pipeName);

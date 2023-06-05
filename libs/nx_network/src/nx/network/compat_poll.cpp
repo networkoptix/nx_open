@@ -16,7 +16,7 @@ static const size_t USEC_PER_MS = 1000;
  *   Zero - return immediately. Less than zero - wait indefinitely.
  * @return
  * - Zero - no sockets were in the queried state before the timer expired
- * - Greater than zero - the number of elements in fdarray for which an revents member of the POLLFD structure is nonzero
+ * - Greater than zero - the number of elements in fdarray for which an events member of the POLLFD structure is nonzero
  * - SOCKET_ERROR - an error occurred. Call the WSAGetLastError function to retrieve the extended error code
  * NOTE: Implementation is very inefficient! (same as select, actually)
  */
@@ -90,7 +90,6 @@ int WINAPI pollOverSelectWin32(
 
     return pollResult;
 }
-
 
 PollFuncType getPollFuncAddress()
 {

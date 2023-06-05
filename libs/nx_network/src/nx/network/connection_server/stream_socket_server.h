@@ -148,7 +148,7 @@ public:
                 [conn = std::exchange(connection.second, nullptr)]() mutable
                 {
                     // Someone else may have strong refs to the connection, so invoking
-                    // pleaseStopSync explicitely since reset() may not destroy the connection.
+                    // pleaseStopSync() explicitly since reset() may not destroy the connection.
                     conn->pleaseStopSync();
                     conn.reset();
                 });

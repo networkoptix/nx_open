@@ -303,7 +303,6 @@ bool QnTCPConnectionProcessor::sendBufferThreadSafe(
     return true;
 }
 
-
 QString QnTCPConnectionProcessor::extractPath() const
 {
     Q_D(const QnTCPConnectionProcessor);
@@ -701,7 +700,7 @@ int QnTCPConnectionProcessor::redirectTo(
 {
     // Moved Permanently for get and head only because of incompatibility of many clients:
     //     https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301
-    // Use Temporary Redirect instead of Permanent Redirect because permament is experimental:
+    // Use Temporary Redirect instead of Permanent Redirect because permanent is experimental:
     //     https://datatracker.ietf.org/doc/html/rfc7238
     const auto code =
         (method == nx::network::http::Method::get || method == nx::network::http::Method::head)

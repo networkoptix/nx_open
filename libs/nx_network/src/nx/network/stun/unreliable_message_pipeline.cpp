@@ -115,7 +115,7 @@ void DatagramPipeline::onBytesRead(
         return;
     }
 
-    if (bytesRead > 0)  //zero-sized UDP datagramm is OK
+    if (bytesRead > 0)  //zero-sized UDP datagram is OK
     {
         nx::utils::InterruptionFlag::Watcher watcher(&m_terminationFlag);
         datagramReceived(sourceAddress, m_readBuffer);

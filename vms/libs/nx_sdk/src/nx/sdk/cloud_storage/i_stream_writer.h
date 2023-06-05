@@ -17,7 +17,7 @@ namespace nx::sdk::cloud_storage {
  * When Mediaserver is finished with the current stream ~IStreamWriter() will be called.
  * Implementation might do some finalization at this point.
  * Server will create a StreamWriter object for each chunk of media data. So the media stream,
- * being continuos is still cut on the small chunks of data each of which has its timestamp
+ * being continuous is still cut on the small chunks of data each of which has its timestamp
  * and duration. Each of those chunks are recorded using Stream Writer and subsequently
  * requested back using a corresponding StreamReader object.
  */

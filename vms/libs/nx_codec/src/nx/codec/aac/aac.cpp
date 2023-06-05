@@ -5,7 +5,7 @@
 #include <nx/utils/bit_stream.h>
 #include <nx/utils/math/math.h>
 
-// convert AAC prifle to mpeg 4 object type.
+// convert AAC prifle to mpeg4 object type.
 
 /*
 const int AACCodec::object_type[9] = {1, // 'AAC_MAIN' -> AAC Main
@@ -159,7 +159,7 @@ bool AACCodec::decodeFrame(quint8* buffer, quint8* end)
         bits.skipBit();          /* copyright_identification_start */
         // -- 32 bit getted
         int frameSize = bits.getBits(13) >> 2; /* aac_frame_length */
-        //LTRACE(LT_DEBUG, 0, "decodec frame size: " << m_size);
+        //LTRACE(LT_DEBUG, 0, "decoded frame size: " << m_size);
         int adts_buffer_fullness = bits.getBits(11);       /* adts_buffer_fullness */
         (void) adts_buffer_fullness;
 

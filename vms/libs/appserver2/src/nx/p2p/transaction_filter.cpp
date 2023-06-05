@@ -68,7 +68,7 @@ TransactionFilter::MatchResult TransactionFilter::matchSpecificContents(
 //-------------------------------------------------------------------------------------------------
 
 /**
- * This filter repressents Cloud filter as of now.
+ * This filter represents Cloud filter as of now.
  * 10200: saveSystemMergeHistoryRecord
  * 502: removeUser
  * 501: saveUserDeprecated

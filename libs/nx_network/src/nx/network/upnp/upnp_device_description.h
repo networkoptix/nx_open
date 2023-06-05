@@ -35,7 +35,7 @@ struct NX_NETWORK_API DeviceInfo
     std::list<Service> serviceList;
 };
 
-//!Partial parser for SSDP descrition xml (UPnP Device Architecture 1.1, 2.3)
+//!Partial parser for SSDP description xml (UPnP Device Architecture 1.1, 2.3)
 class NX_NETWORK_API DeviceDescriptionHandler
 {
 public:

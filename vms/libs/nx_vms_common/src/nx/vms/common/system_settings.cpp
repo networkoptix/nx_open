@@ -691,7 +691,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         []
         {
             return nx::format(tr(
-                "Enable deprecated API functions curently used by %1 software (unsecure)",
+                "Enable deprecated API functions currently used by %1 software (unsecure)",
                 "%1 is a company name"),
                 nx::branding::company());
         });

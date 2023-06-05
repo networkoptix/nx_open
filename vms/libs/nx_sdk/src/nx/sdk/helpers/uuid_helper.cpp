@@ -123,7 +123,7 @@ private:
     uint64_t getSeed()
     {
         #if defined(__arm__) || defined(__aarch64__)
-            // Is is known that on certain ARM platforms std::random_device has issues.
+            // It is known that on certain ARM platforms std::random_device has issues.
             const auto time = std::chrono::high_resolution_clock::now().time_since_epoch();
             return time.count() ^ (uintptr_t) this;
         #else

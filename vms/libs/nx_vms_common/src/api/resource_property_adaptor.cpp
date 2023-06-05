@@ -6,7 +6,7 @@
 
 // TODO: #vkutin #sivanov This class seems too complicated now.
 // 1. Is dynamic resource switching via setResource really needed?
-// 2. Since we moved DB sync out of this class, queueing changes seems no longer needed.
+// 2. Since we moved DB sync out of this class, queuing changes seems no longer needed.
 
 // -------------------------------------------------------------------------- //
 // QnAbstractResourcePropertyAdaptor

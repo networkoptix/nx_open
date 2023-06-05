@@ -90,7 +90,7 @@ public:
     {
     }
 
-    /** Implementaion of nxpl::PluginInterface::addRef(). */
+    /** Implementation of nxpl::PluginInterface::addRef(). */
     int addRef() const
     {
         return m_refCountingDelegate
@@ -99,7 +99,7 @@ public:
     }
 
     /**
-     * Implementaion of nxpl::PluginInterface::releaseRef(). Deletes the monitored object if the
+     * Implementation of nxpl::PluginInterface::releaseRef(). Deletes the monitored object if the
      * reference counter drops to zero.
      */
     int releaseRef() const

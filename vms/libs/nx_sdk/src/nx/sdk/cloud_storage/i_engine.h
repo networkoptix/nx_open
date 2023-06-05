@@ -130,7 +130,7 @@ public:
     public: virtual ErrorCode saveBestShotImage(const char* data) = 0;
 
     /**
-     * Fetch a best shot image assiciated with the givem objectTrackId. Result string should
+     * Fetch a best shot image associated with the given objectTrackId. Result string should
      * contain the JSON representation of the nx::sdk::cloud_storage::Image struct.
      */
     public: Result<IString*> fetchBestShotImage(const char* objectTrackId) const

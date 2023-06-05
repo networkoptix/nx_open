@@ -191,7 +191,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     qRegisterMetaType<QnConstAbstractDataPacketPtr>();
 
-    // Required for queueing arguments of type 'QnArchiveStreamReader*' in QObject::connect.
+    // Required for queuing arguments of type 'QnArchiveStreamReader*' in QObject::connect.
     qRegisterMetaType<QnArchiveStreamReader>();
 
     qRegisterMetaType<QnStorageSpaceReply>();

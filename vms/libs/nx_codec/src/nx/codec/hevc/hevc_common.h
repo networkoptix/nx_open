@@ -96,6 +96,6 @@ bool isLeadingPicture(NalUnitType unitType);
 bool isTrailingPicture(NalUnitType unitType);
 bool isParameterSet(NalUnitType unitType);
 NX_CODEC_API bool isSlice(NalUnitType unitType);
-NX_CODEC_API bool isNewAccessUnit(NalUnitType unitType); //< check is new AU, exlcuding slices
+NX_CODEC_API bool isNewAccessUnit(NalUnitType unitType); //< check is new AU, excluding slices
 
 } // namespace nx::media::hevc

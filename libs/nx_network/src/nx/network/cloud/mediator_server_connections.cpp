@@ -15,9 +15,9 @@ MediatorServerTcpConnection::MediatorServerTcpConnection(
 
 MediatorServerTcpConnection::~MediatorServerTcpConnection()
 {
-    // Need to stop ancestor class aio::Timer before destuction of this class to stop any timer
-    // callbacks from accessing this object after it destruction
-    // (or any parents between here and aio::Timer).
+    // We need to stop the ancestor class aio::Timer before the destruction of this class to stop
+    // any timer callbacks from accessing this object after its destruction (or any parents between
+    // this place and aio::Timer).
     pleaseStopSync();
 }
 

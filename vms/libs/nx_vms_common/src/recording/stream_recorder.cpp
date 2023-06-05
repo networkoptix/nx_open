@@ -312,7 +312,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 
     if (dataHoleDetected(md))
     {
-        NX_VERBOSE(this, "Closing file %1 because data hole has been dectected", startTimeUs());
+        NX_VERBOSE(this, "Closing file %1 because data hole has been detected", startTimeUs());
         close();
     }
 

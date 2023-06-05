@@ -31,7 +31,7 @@ public:
     /**
      * Add child node. Takes ownership of child in case of success.
      * Implementation is allowed to reject adding child. In this case it must return false.
-     * If noded added, true is returned and ownership of child object is taken.
+     * If node added, true is returned and ownership of child object is taken.
      */
     virtual bool addChild(const std::string_view& value, std::unique_ptr<AbstractNode> child) = 0;
 };
@@ -153,7 +153,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Checks presense of specified attribute in input container.
+ * Checks presence of specified attribute in input container.
  * Allows only 2 children: false and true.
  */
 class NX_UTILS_API AttrPresenceNode:

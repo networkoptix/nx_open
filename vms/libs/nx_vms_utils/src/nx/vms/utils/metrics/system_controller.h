@@ -7,7 +7,7 @@
 namespace nx::vms::utils::metrics {
 
 /**
- * Controlls all of the resources in the system.
+ * Controls all of the resources in the system.
  */
 class NX_VMS_UTILS_API SystemController
 {

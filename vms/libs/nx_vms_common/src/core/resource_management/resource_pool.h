@@ -275,7 +275,7 @@ public:
     QnSecurityCamResourceList getResourcesBySharedId(const QString& sharedId) const;
 
     /**
-     * Returns resource list by logicalId. logicaId is a some camera tag used for intergration
+     * Returns resource list by logicalId. logicaId is a some camera tag used for integration
      * with external systems.
      */
     QnResourceList getResourcesByLogicalId(int value) const;
@@ -288,7 +288,6 @@ public:
 
     QnNetworkResourcePtr getNetworkResourceByPhysicalId(const QString& physicalId) const;
     QnNetworkResourcePtr getResourceByMacAddress(const QString& mac) const;
-
 
     QnMediaServerResourcePtr getIncompatibleServerById(
         const QnUuid& id,

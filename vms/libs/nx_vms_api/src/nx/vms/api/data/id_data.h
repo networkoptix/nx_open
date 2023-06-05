@@ -31,7 +31,7 @@ struct NX_VMS_API IdData
      * via sfinae, if this method is defined, hence it is non-virtual, and any serializable
      * class which is not inherited from IdData can also define such method together with
      * defining getIdForMerging() (otherwise, this method will not be called).
-     * Used for generating ommitted id in POST requests which create new objects. Can set id to
+     * Used for generating omitted id in POST requests which create new objects. Can set id to
      * a null guid if generating is not possible.
      */
     void fillId() { id = QnUuid::createUuid(); }
@@ -47,4 +47,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(IdData)
 NX_REFLECTION_INSTRUMENT(IdData, IdData_Fields)
 
 } // namespace nx::vms::api
-

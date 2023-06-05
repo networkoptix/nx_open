@@ -13,7 +13,7 @@
 namespace nx::network::http {
 
 /**
- * Reponsible for modifying HTTP request.
+ * Responsible for modifying HTTP request.
  */
 class NX_NETWORK_API HttpModManager
 {

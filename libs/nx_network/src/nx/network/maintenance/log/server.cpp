@@ -144,7 +144,7 @@ void Server::servePostLogger(
     auto newLogger = LoggerBuilder::buildLogger(
         logSettings,
         "", //< TODO: #nw get the application name
-        "", //< TODO: #nw get the appliation binary path
+        "", //< TODO: #nw get the application binary path
         utils::toFilters(newLoggerInfo.filters),
         nullptr);
     if (!newLogger)
@@ -195,7 +195,7 @@ void Server::serveGetStreamingLogger(
     auto newLogger = LoggerBuilder::buildLogger(
         logSettings,
         "", //< TODO: #nw get the application name
-        "", //< TODO: #nw get the appliation binary path
+        "", //< TODO: #nw get the application binary path
         utils::toFilters(loggerSettings.level.filters),
         std::move(logWriter));
     if (!newLogger)

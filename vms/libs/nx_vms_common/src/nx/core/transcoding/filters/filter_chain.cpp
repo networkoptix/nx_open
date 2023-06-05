@@ -62,7 +62,6 @@ void FilterChain::prepare(const QSize& srcFrameResolution, const QSize& resoluti
     m_ready = true;
 }
 
-
 void FilterChain::prepareForImage(const QSize& fullImageResolution, const QSize& resolutionLimit)
 {
     NX_ASSERT(!isReady(), "Double initialization");
@@ -321,7 +320,7 @@ void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,
 
         // Adjusting scale filter.
         // Due to size ceiled, some more iteration can be needed.
-        // TODO refact this -> use floor instead ceil or select new one by subtracting of alignment
+        // TODO refactor this -> use floor instead ceil or select new one by subtracting of alignment
         // value?
         const auto resizeToSize = QnCodecTranscoder::roundSize(
             QSize(srcFrameResolution.width() * resizeRatio,

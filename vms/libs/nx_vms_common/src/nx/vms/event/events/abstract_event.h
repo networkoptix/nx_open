@@ -149,7 +149,7 @@ private:
     const QnResourcePtr m_resource;
 
     /**
-     * @brief m_toggleState     State on/off for togglable events.
+     * @brief m_toggleState     State on/off for toggleable events.
      */
     const EventState m_toggleState;
 };

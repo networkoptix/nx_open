@@ -47,7 +47,7 @@ private:
 };
 
 /**
- * Message body source that sends data upon availibility.
+ * Message body source that sends data upon availability.
  * To make body data available, call WritableMessageBody::writeBodyData.
  * Another way is to use WritableMessageBody::writer().
  * This allows to make life-times or writer and WritableMessageBody itself

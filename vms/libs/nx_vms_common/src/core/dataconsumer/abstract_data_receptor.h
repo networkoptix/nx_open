@@ -18,7 +18,7 @@ public:
 
     /**
      * @return true, if subsequent QnAbstractDataReceptor::putData
-     *   call is garanteed to accept input data.
+     *   call is guaranteed to accept input data.
      */
     virtual bool canAcceptData() const = 0;
 

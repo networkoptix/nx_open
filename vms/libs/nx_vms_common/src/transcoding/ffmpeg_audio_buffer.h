@@ -9,7 +9,7 @@ extern "C" {
 #include <vector>
 
 /**
- * Audio sample buffer, that help to implement non copy audio resampling
+ * Audio sample buffer, that help to implement non copy audio resampling.
  */
 class NX_VMS_COMMON_API FfmpegAudioBuffer
 {

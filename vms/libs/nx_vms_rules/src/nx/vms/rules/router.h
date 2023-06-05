@@ -15,7 +15,7 @@ namespace nx::vms::rules {
  * Abstract class that provides interface for event router.
  * This router exists in a single copy as a part of every Engine instance
  * and is responsible for event delivery between different Engine instances,
- * hovever it was split out into a separate class for testing purposes.
+ * however it was split out into a separate class for testing purposes.
  */
 class NX_VMS_RULES_API Router: public QObject
 {

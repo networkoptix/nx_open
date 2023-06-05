@@ -58,7 +58,7 @@ public:
     virtual std::vector<AbstractAttribute*> baseAttributes() const = 0;
 
     /**
-     * @return A list of Attributes that are declared by the Type directly, including overriden
+     * @return A list of Attributes that are declared by the Type directly, including overridden
      *     base Attributes.
      */
     virtual std::vector<AbstractAttribute*> ownAttributes() const = 0;

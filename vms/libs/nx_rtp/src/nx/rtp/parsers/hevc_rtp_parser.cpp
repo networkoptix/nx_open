@@ -327,7 +327,7 @@ Result HevcParser::handleFragmentationPacket(
     if (fuHeader.startFlag)
     {
         insertPayloadHeader(
-            const_cast<uint8_t**>(&payload),  //< Dirty dirty practice.
+            const_cast<uint8_t**>(&payload),  //< Dirty-dirty practice.
             &payloadLength,
             fuHeader.unitType,
             header->tid);

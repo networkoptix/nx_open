@@ -32,7 +32,7 @@ public:
     AuthInfoCache();
 
     /**
-     * Complexity: ammortized O(log(N)).
+     * Complexity: amortized O(log(N)).
      */
     std::optional<header::WWWAuthenticate> getServerResponse(
         const SocketAddress& serverEndpoint,

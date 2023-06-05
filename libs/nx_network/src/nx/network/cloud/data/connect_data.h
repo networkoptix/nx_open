@@ -41,7 +41,7 @@ struct NX_NETWORK_API ConnectRequest:
 
     ConnectionMethods connectionMethods = 0;
 
-    /**%apidoc UDP endpoits of the client which should be used by the peer for UDP hole punching. */
+    /**%apidoc UDP endpoints of the client which should be used by the peer for UDP hole punching. */
     std::vector<network::SocketAddress> udpEndpointList;
 
     /**%apidoc if true, mediator does not report Connect request source address to the server peer.

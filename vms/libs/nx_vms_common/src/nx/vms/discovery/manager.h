@@ -96,7 +96,7 @@ public:
      * @param endpoint Socket address to search for module information on.
      * @param expectedId If the specified address is added to module's address list and the module
      *     is already found on a different address, then this address will not be used until the
-     *     address in use is disconnected. If expectedId is not scpecified, the endpoint will be
+     *     address in use is disconnected. If expectedId is not specified, the endpoint will be
      *     pinged just once.
      */
     void checkEndpoint(nx::network::SocketAddress endpoint, QnUuid expectedId = QnUuid());

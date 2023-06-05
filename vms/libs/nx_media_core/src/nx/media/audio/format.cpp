@@ -9,7 +9,7 @@ namespace {
 
 static constexpr auto kMicrosecondsInSecond = 1000000LL;
 
-} // namepspace
+} // namespace
 
 using namespace std::chrono;
 

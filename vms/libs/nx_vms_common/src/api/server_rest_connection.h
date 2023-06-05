@@ -729,7 +729,7 @@ public:
         QThread* targetThread = nullptr);
 
     /**
-     * Modifies existing settings with provided non-empty settings and allows to clear exising LDAP
+     * Modifies existing settings with provided non-empty settings and allows to clear existing LDAP
      * users/groups.
      */
     Handle modifyLdapSettingsAsync(

@@ -10,10 +10,10 @@ namespace nx::network::http::futures {
 
 /**
  * A simple wrapper for nx::network::http::AsyncClient with future-based API.
- * 
+ *
  * If the request is failed(), std::system_error is thrown with lastSysErrorCode() through the
  * returned future.
- * If request is canceled, std::system_error with std::ercc::operation_canceled is thrown
+ * If request is canceled, std::system_error with std::errc::operation_canceled is thrown
  * through the returned future.
  * On success the entire response is returned, including Response::messageBody containing the
  * result of fetchMessageBodyBuffer() (meaning only the last part of the body if you've been

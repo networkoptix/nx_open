@@ -1636,7 +1636,7 @@ UDPSocket::UDPSocket(int ipVersion):
     }
 
     // Made with an assumption that SO_LINGER may cause ::close system call to block
-    // on win32 with some network drivers when network inteface fails.
+    // on win32 with some network drivers when network interface fails.
     struct linger lingerOptions;
     memset(&lingerOptions, 0, sizeof(lingerOptions));
     if (setsockopt(
@@ -1991,7 +1991,7 @@ bool UDPSocket::hasData() const
     {
         case 0:             // timeout expired
             return false;
-        case SOCKET_ERROR:  // error occured
+        case SOCKET_ERROR:  // error occurred
             return false;
     }
     return true;

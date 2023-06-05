@@ -53,7 +53,7 @@ std::string toString(ErrorCode errorCode)
     return QString::fromWCharArray(msgBuf).toStdString();
 #else
     if (errorCode == dnsServerFailure)
-        return "DNS server falure";
+        return "DNS server failure";
 
     return QString::fromLocal8Bit(strerror(errorCode)).toStdString();
 #endif

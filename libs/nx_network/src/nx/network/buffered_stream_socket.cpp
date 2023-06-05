@@ -86,7 +86,7 @@ void BufferedStreamSocket::readSomeAsync(
     std::memcpy(buf->data() + oldSize, m_internalRecvBuffer.data(), recvSize);
     m_internalRecvBuffer = m_internalRecvBuffer.substr(recvSize);
 
-    // Post handler like it the event just happend on the real socket
+    // Post handler like it the event just happened on the real socket
     m_socket->post(
         [this, recvSize, handler = std::move(handler)]()
         {

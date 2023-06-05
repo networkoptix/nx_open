@@ -12,7 +12,7 @@ class NX_UTILS_API TestWithTemporaryDirectory
 public:
     /**
      * Temporary directory path can be passed explicitly. In this case, folder contents will be
-     * automatically cleared. Aternatively, global temporary path variable
+     * automatically cleared. Alternatively, global temporary path variable
      * (TestOptions::temporaryDirectoryPath) will be used.
      * If it is empty, home folder will be used. In these cases TestOptions::moduleName()
      * is used as a distinction subfolder.

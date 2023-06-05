@@ -126,7 +126,7 @@ public:
     void enableRouting(nx::vms::discovery::Manager* moduleDiscoveryManager);
 
     /**
-     * Whether Module Disovery Manager is set to the context.
+     * Whether Module Discovery Manager is set to the context.
      */
     bool isRoutingEnabled() const;
 

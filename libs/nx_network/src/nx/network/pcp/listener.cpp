@@ -59,7 +59,7 @@ void Listener::readHandler(SystemError::ErrorCode /*result*/, size_t /*size*/)
             break;
     }
 
-    readAsync(); // initiase next read
+    readAsync(); // initiate next read
 }
 
 } // namespace nx::network::pcp

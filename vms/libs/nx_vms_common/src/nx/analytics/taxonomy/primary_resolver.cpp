@@ -56,7 +56,7 @@ std::optional<ProcessingError> validateFlags(const Descriptor& descriptor)
             (!descriptor.base || descriptor.base->isEmpty()))
         {
             return ProcessingError{nx::format(
-                "%1: \"hiddenDerivedType\" flag is availbale only for derived types. The \"base\" "
+                "%1: \"hiddenDerivedType\" flag is available only for derived types. The \"base\" "
                 "field must be filled.", descriptor.id)};
         }
     }

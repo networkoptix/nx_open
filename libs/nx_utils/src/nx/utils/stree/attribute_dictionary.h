@@ -151,7 +151,7 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Interface of an attribites dictionary that allows iterating.
+ * Interface of an attributes dictionary that allows iterating.
  * Usage sample:
  * AbstractIteratableContainer* cont = ...;
  * for (auto it = cont->begin(); !it->atEnd(); it->next())

@@ -9,7 +9,7 @@
 namespace nx::sdk::cloud_storage {
 
 /**
- * Abstract representaion of parameters corresponding to the substream of
+ * Abstract representation of parameters corresponding to the substream of
  * media data.
  */
 class ICodecInfo: public Interface<ICodecInfo>

@@ -29,7 +29,7 @@ public:
         std::function<void(api::ResultCode, api::AccountEmail)> completionHandler) = 0;
 
     /**
-     * Fetches account info if credentails are account credentials.
+     * Fetches account info if credentials are account credentials.
      * @note Required access role: account.
      */
     virtual void getAccount(

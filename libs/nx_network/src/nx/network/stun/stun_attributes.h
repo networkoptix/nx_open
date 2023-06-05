@@ -63,7 +63,7 @@ enum Type
     iceControlling = 0x802A,
     thirdPartyAuthorization = 0x802E,
 
-    // Starting value for custom NX attributes in the middle of unasigned range 0xC003-0xFFFF:
+    // Starting value for custom NX attributes in the middle of unassigned range 0xC003-0xFFFF:
     // https://www.iana.org/assignments/stun-parameters/stun-parameters.txt
     userDefined = 0xE000,
 };
@@ -196,7 +196,6 @@ struct NX_NETWORK_API XorRelayedAddress: XorMappedAddress
     virtual int getType() const override { return TYPE; }
 };
 
-
 struct NX_NETWORK_API BufferedValue
 {
     BufferedValue(nx::Buffer buffer_ = nx::Buffer());
@@ -244,7 +243,6 @@ struct NX_NETWORK_API FingerPrint: Attribute
 private:
     uint32_t crc32;
 };
-
 
 struct NX_NETWORK_API MessageIntegrity: Attribute, BufferedValue
 {
@@ -298,7 +296,6 @@ struct NX_NETWORK_API Lifetime: IntAttribute
     virtual int getType() const override { return TYPE; }
 };
 
-
 struct NX_NETWORK_API UseCandidate: Unknown
 {
     static const int TYPE = useCandidate;
@@ -330,7 +327,6 @@ struct NX_NETWORK_API Realm: Unknown
     Realm(nx::Buffer value_ = nx::Buffer()): Unknown(TYPE, value_) {}
     virtual int getType() const override { return TYPE; }
 };
-
 
 struct NX_NETWORK_API ThirdPartyAuthorization: Unknown
 {

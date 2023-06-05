@@ -431,7 +431,7 @@ private:
         {
             NX_ASSERT(static_cast<Pollable*>(this->m_socket) == sock);
 
-            // NOTE: aio garantees that all events on socket are handled in same aio thread,
+            // NOTE: Aio guarantees that all events on the socket are handled in the same aio thread,
             // so no synchronization is required.
 
             if (eventType & aio::etRead)
@@ -800,7 +800,7 @@ public:
     ~AsyncServerSocketHelper()
     {
         // NOTE: Removing socket not from completion handler while completion handler is running
-        // in another thread is undefined behavour anyway, so no synchronization here.
+        // in another thread is undefined behavior anyway, so no synchronization here.
     }
 
     virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() override
@@ -872,8 +872,8 @@ public:
             [this]()
             {
                 ++m_acceptAsyncCallCount;
-                // TODO: #akolesnikov Usually, acceptAsync is called repeatedly.
-                // SHOULD avoid unneccessary startMonitoring and stopMonitoring calls.
+                // TODO: #akolesnikov Usually, acceptAsync() is called repeatedly. We should avoid
+                // unnecessary startMonitoring() and stopMonitoring() calls.
                 return this->m_socket->impl()->aioThread->load()->startMonitoring(
                     this->m_socket, aio::etRead, this);
             });

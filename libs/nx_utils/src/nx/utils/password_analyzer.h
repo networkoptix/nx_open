@@ -21,7 +21,7 @@ struct NX_UTILS_API PasswordLimitations
     /** Maximum length of a consecutive characters sequence. */
     static constexpr int kConsecutiveCharactersLimit = 4;
 
-    /** Maximum number of repating characters. */
+    /** Maximum number of repeating characters. */
     static constexpr int kRepeatingCharactersLimit = 4;
 
     /** Minimum acceptable number of character categories. */

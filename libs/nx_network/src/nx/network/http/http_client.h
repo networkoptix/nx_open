@@ -100,7 +100,7 @@ public:
      */
     nx::Buffer fetchMessageBodyBuffer();
 
-    /** Blocks until entire message body is avaliable or timeout expired if it is specified. */
+    /** Blocks until entire message body is available or timeout expired if it is specified. */
     std::optional<nx::Buffer> fetchEntireMessageBody(
         std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 

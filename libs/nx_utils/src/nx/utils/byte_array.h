@@ -16,7 +16,7 @@ public:
     /**
      * @param alignment Alignment of the array data.
      * @param capacity Initial array capacity.
-     * @param padding Additional data beyond the array capacity, which will be filled with zeroes.
+     * @param padding Additional data beyond the array capacity, which will be filled with zeros.
      *     Used to prevent overread and segfault for damaged MPEG bitstreams.
      */
     explicit ByteArray(
