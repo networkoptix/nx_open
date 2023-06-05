@@ -162,6 +162,12 @@ struct CloudCrossSystemContext::Private
 
     ~Private()
     {
+        // Emit signals about all resources removing. This is a temporary measure: more accurate
+        // solution would be to listen `systemContextRemoved` in all appropriate places, but it
+        // is way more complex.
+        const auto resources = systemContext->resourcePool()->getResources();
+        systemContext->resourcePool()->removeResources(resources);
+
         appContext()->removeSystemContext(systemContext.get());
     }
 
