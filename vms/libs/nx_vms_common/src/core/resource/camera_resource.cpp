@@ -396,8 +396,12 @@ AnalyticsEntitiesByEngine QnVirtualCameraResource::supportedObjectTypes(
 
 QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines() const
 {
-    return QJson::deserialized<QSet<QnUuid>>(
-        getProperty(kUserEnabledAnalyticsEnginesProperty).toUtf8());
+    return calculateUserEnabledAnalyticsEngines(getProperty(kUserEnabledAnalyticsEnginesProperty));
+}
+
+QSet<QnUuid> QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines(const QString& value)
+{
+    return QJson::deserialized<QSet<QnUuid>>(value.toUtf8());
 }
 
 QSet<QnUuid> QnVirtualCameraResource::calculateCompatibleAnalyticsEngines() const

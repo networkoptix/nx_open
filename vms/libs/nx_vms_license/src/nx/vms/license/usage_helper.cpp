@@ -80,6 +80,16 @@ const nx::utils::Url LicenseServer::cloudLicensesUrl(common::SystemContext* cont
     return baseUrl(context) + "/api/v2/license/cloud/licenses";
 }
 
+const nx::utils::Url LicenseServer::saasServicesUrl(common::SystemContext* context, const QString& systemId)
+{
+    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/services/", systemId);
+}
+
+const nx::utils::Url LicenseServer::saasDataUrl(common::SystemContext* context, const QString& systemId)
+{
+    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/saas_report/", systemId);
+}
+
 const nx::utils::Url LicenseServer::inspectUrl(common::SystemContext* context)
 {
     return baseUrl(context) + "/api/v2/license/inspect/";

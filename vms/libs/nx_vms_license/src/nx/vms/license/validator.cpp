@@ -53,10 +53,8 @@ QnLicenseErrorCode Validator::validate(const QnLicensePtr& license, ValidationMo
 
     if (license->type() == Qn::LC_Cloud)
     {
-        // Check cloud license expiration time using tmpExpirationDate.
-        const auto data = license->cloudData();
-        const auto expirationTime = data.toDateTime(data.security.tmpExpirationDate);
-        if (!expirationTime.isNull() && qnSyncTime->currentDateTime() > expirationTime)
+        const auto date = license->tmpExpirationDate();
+        if (date.isValid() && date.toMSecsSinceEpoch() < qnSyncTime->currentMSecsSinceEpoch())
             return QnLicenseErrorCode::TemporaryExpired;
         info = manager->items()->getItem(currentServerId);
     }

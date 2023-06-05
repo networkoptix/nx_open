@@ -43,6 +43,8 @@ class VideoWallLicenseUsageWatcher;
 class SystemSettings;
 class UserGroupManager;
 
+namespace saas { class ServiceManager; }
+
 /**
  * Storage for the application Resource Context classes. One Resource Context corresponds to one
  * client-server connection. Also there can be separate Resource Context for the local files in the
@@ -161,6 +163,8 @@ public:
      * List of all licenses, installed in the System.
      */
     QnLicensePool* licensePool() const;
+
+    saas::ServiceManager* saasServiceManager() const;
 
     /** Watches and notifies when Device license usage is changed in the System. */
     DeviceLicenseUsageWatcher* deviceLicenseUsageWatcher() const;

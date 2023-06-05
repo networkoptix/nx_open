@@ -16,7 +16,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/api/data/cloud_license_data.h>
+#include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <utils/common/id.h>
@@ -39,6 +39,12 @@ class NX_VMS_COMMON_API QnLicense
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 
 public:
+
+    static const QString kLocalRecordingServiceName;
+    static const QString kcloudStorageServiceName;
+    static const QString kAnalyticIntegrationServiceName;
+
+
     struct NX_VMS_COMMON_API RegionalSupport
     {
         /**
@@ -109,6 +115,9 @@ public:
     /** How much times this license can still be deactivated. */
     int deactivationsCountLeft() const;
 
+    QDateTime tmpExpirationDate() const;
+    void setTmpExpirationDate(const QDateTime& value);
+
     virtual Qn::LicenseType type() const;
 
     bool isInfoMode() const;
@@ -137,7 +146,9 @@ public:
     static LicenseTypeInfo licenseTypeInfo(Qn::LicenseType licenseType);
     LicenseTypeInfo licenseTypeInfo() const;
 
-    const nx::vms::api::CloudLicenseData& cloudData() const;
+    /** Fill license v1 fields from license v2 fields. */
+    static QnLicensePtr createSaasLocalRecordingLicense();
+
 protected:
     void setClass(const QString& xclass);
 
@@ -149,12 +160,8 @@ private:
 
     void verify(const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock);
 
-    /** Fill license v1 fields from license v2 fields */
-    void fillCompatibleFields();
-
 private:
     QByteArray m_rawLicense;
-    nx::vms::api::CloudLicenseData m_cloudData;
 
     QString m_name;
     QByteArray m_key;
@@ -179,6 +186,9 @@ private:
 
     // Is full license valid (signature2 is used)
     bool m_isValid2 = false;
+
+    // Used for licenses created from Saas service.
+    QDateTime m_tmpExpirationDate;
 };
 
 /**

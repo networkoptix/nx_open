@@ -54,4 +54,9 @@ void serialize(QnJsonContext* ctx, const ResolutionData& value, QJsonValue* targ
     *target = QString::number(value.size.height()) + "p";
 }
 
+int ResolutionData::megaPixels() const
+{
+    return (size.width() * size.height() + 500'000) / 1'000'000;
+}
+
 } // namespace nx::vms::api

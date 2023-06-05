@@ -119,6 +119,10 @@ static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
 //-------------------------------------------------------------------------------------------------
 // QnLicense
 
+const QString QnLicense::kLocalRecordingServiceName("localRecording");
+const QString QnLicense::kcloudStorageServiceName("cloudStorage");
+const QString QnLicense::kAnalyticIntegrationServiceName("analyticIntegration");
+
 bool QnLicense::RegionalSupport::isValid() const
 {
     return !company.isEmpty();
@@ -139,6 +143,16 @@ int QnLicense::deactivationsCount() const
 int QnLicense::deactivationsCountLeft() const
 {
     return std::max(0, kMaximumDeactivationsCount - m_deactivationsCount);
+}
+
+QDateTime QnLicense::tmpExpirationDate() const
+{
+    return m_tmpExpirationDate;
+}
+
+void QnLicense::setTmpExpirationDate(const QDateTime& value)
+{
+    m_tmpExpirationDate = value;
 }
 
 QnLicense::QnLicense(const QByteArray& licenseBlock):
@@ -532,17 +546,17 @@ Qn::LicenseType QnLicense::type() const
 }
 
 
-void QnLicense::fillCompatibleFields()
+QnLicensePtr QnLicense::createSaasLocalRecordingLicense()
 {
-    m_class = m_name = ::licenseTypeInfo[Qn::LC_Cloud].className;
-    m_key = m_cloudData.params.orderParams.licenseKey.toUtf8();
-    auto value = m_cloudData.params.services["localRecording"]["totalChannelNumber"];
-    m_cameraCount = value.toInt();
-    m_version = m_cloudData.version.toString();
-    m_brand = m_cloudData.params.orderParams.brand;
-    m_expiration = m_cloudData.state.expirationDate;
-    m_deactivationsCount = m_cloudData.state.deactivationsRemaining;
-    m_signature = m_cloudData.signature.toUtf8();
+    static const QByteArray kSaasLocalRecordingKey("saasLocalRecording");
+    QnLicensePtr result(new QnLicense);
+
+    result->m_class = result->m_name = ::licenseTypeInfo[Qn::LC_Cloud].className;
+    result->m_key = kSaasLocalRecordingKey;
+    result->m_version = "2.0";
+    result->m_brand = nx::branding::vmsName();
+
+    return result;
 }
 
 void QnLicense::parseLicenseBlock(
@@ -553,15 +567,6 @@ void QnLicense::parseLicenseBlock(
     int n = 0;
     m_orderType.clear();
 
-    if (licenseBlock.startsWith("{"))
-    {
-        // Cloud license.
-        nx::reflect::json::deserialize(
-            std::string_view(licenseBlock.data(), licenseBlock.size()),
-            &m_cloudData);
-        fillCompatibleFields();
-        return;
-    }
 
     for (QByteArray line: licenseBlock.split('\n'))
     {
@@ -623,10 +628,7 @@ void QnLicense::verify(const QByteArray& v1LicenseBlock, const QByteArray& v2Lic
 {
     if (type() == Qn::LC_Cloud)
     {
-        auto rawData = m_rawLicense;
-        rawData.replace(m_cloudData.signature.toUtf8(), "");
-        m_isValid1 = isSignatureMatch(rawData.data(),
-            QByteArray::fromBase64(m_signature), nxRSAPublicKey3);
+        m_isValid1 = true;
     }
     else if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey3)
         || isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey2)
@@ -664,10 +666,6 @@ bool QnLicense::isSaas() const
     return orderType() == "saas";
 }
 
-const nx::vms::api::CloudLicenseData& QnLicense::cloudData() const
-{
-    return m_cloudData;
-}
 
 //-------------------------------------------------------------------------------------------------
 // QnLicensePool

@@ -24,6 +24,7 @@
 #include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -44,6 +45,7 @@ struct SystemContext::Private
     QnCommonMessageProcessor* messageProcessor = nullptr;
 
     std::unique_ptr<QnLicensePool> licensePool;
+    std::unique_ptr<saas::ServiceManager> saasServiceManager;
     std::unique_ptr<QnResourcePool> resourcePool;
     std::unique_ptr<QnResourceDataPool> resourceDataPool;
     std::unique_ptr<QnResourceStatusDictionary> resourceStatusDictionary;
@@ -91,6 +93,7 @@ SystemContext::SystemContext(
     d->resourceDataPool = std::make_unique<QnResourceDataPool>();
     d->resourceStatusDictionary = std::make_unique<QnResourceStatusDictionary>();
     d->resourcePropertyDictionary = std::make_unique<QnResourcePropertyDictionary>(this);
+    d->saasServiceManager = std::make_unique<saas::ServiceManager>(this);
     d->cameraHistoryPool = std::make_unique<QnCameraHistoryPool>(this);
     d->serverAdditionalAddressesDictionary =
         std::make_unique<QnServerAdditionalAddressesDictionary>();
@@ -216,6 +219,11 @@ void SystemContext::deleteMessageProcessor()
 QnLicensePool* SystemContext::licensePool() const
 {
     return d->licensePool.get();
+}
+
+saas::ServiceManager* SystemContext::saasServiceManager() const
+{
+    return d->saasServiceManager.get();
 }
 
 DeviceLicenseUsageWatcher* SystemContext::deviceLicenseUsageWatcher() const
