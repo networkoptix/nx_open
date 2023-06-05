@@ -479,32 +479,33 @@ void HevcParser::insertPayloadHeader(
 
 nx::utils::ByteArray HevcParser::buildParameterSetsIfNeeded()
 {
-    nx::utils::ByteArray buffer;
+    constexpr int kHeaderReservedSize = 64;
+    nx::utils::ByteArray buffer(/*aligment*/ 0, kHeaderReservedSize, /*padding*/ 0);
     if (!m_context.inStreamVpsFound && m_context.spropVps)
     {
-        buffer.uncheckedWrite(
+        buffer.write(
             (char*)NALUnit::kStartCodeLong,
             sizeof(NALUnit::kStartCodeLong));
 
-        buffer.uncheckedWrite(
+        buffer.write(
             m_context.spropVps->data(),
             m_context.spropVps->size());
     }
     if (!m_context.inStreamSpsFound && m_context.spropSps)
     {
-        buffer.uncheckedWrite(
+        buffer.write(
             (char*)NALUnit::kStartCodeLong,
             sizeof(NALUnit::kStartCodeLong));
-        buffer.uncheckedWrite(
+        buffer.write(
             m_context.spropSps->data(),
             m_context.spropSps->size());
     }
     if (!m_context.inStreamPpsFound && m_context.spropPps)
     {
-        buffer.uncheckedWrite(
+        buffer.write(
             (char*)NALUnit::kStartCodeLong,
             sizeof(NALUnit::kStartCodeLong));
-        buffer.uncheckedWrite(
+        buffer.write(
             m_context.spropPps->data(),
             m_context.spropPps->size());
     }
