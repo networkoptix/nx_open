@@ -24,10 +24,15 @@ public: //< Required for Qt MOC run.
     QString version;
     QString vendor;
     QJsonObject engineSettingsModel;
+
+    /**%apidoc
+     * Whether an integaration requires license to use.
+     */
+    bool isLicenseRequired = false;
 };
 
 #define nx_vms_api_analytics_PluginManifest_Fields \
-    (id)(name)(description)(version)(vendor)(engineSettingsModel)
+    (id)(name)(description)(version)(vendor)(engineSettingsModel)(isLicenseRequired)
 
 QN_FUSION_DECLARE_FUNCTIONS(PluginManifest, (json), NX_VMS_API)
 

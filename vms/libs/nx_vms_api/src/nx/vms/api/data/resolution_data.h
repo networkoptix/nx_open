@@ -22,12 +22,14 @@ struct NX_VMS_API ResolutionData
 
     operator QSize() const { return size; }
     operator QSize&() { return size; }
+    
+    int megaPixels() const;
 
     /**%apidoc[unused] */
     QSize size;
 };
 
-bool deserialize(QnJsonContext* ctx, const QJsonValue& value, ResolutionData* target);
-void serialize(QnJsonContext* ctx, const ResolutionData& value, QJsonValue* target);
+bool NX_VMS_API deserialize(QnJsonContext* ctx, const QJsonValue& value, ResolutionData* target);
+void NX_VMS_API serialize(QnJsonContext* ctx, const ResolutionData& value, QJsonValue* target);
 
 } // namespace nx::vms::api

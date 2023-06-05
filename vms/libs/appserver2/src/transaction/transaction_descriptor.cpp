@@ -27,6 +27,7 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/ec2/ec_connection_notification_manager.h>
+#include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/data/api_fwd.h>
@@ -1034,6 +1035,71 @@ struct ModifyResourceParamAccess
 
     ModifyResourceParamAccess(bool isRemove): isRemove(isRemove) {}
 
+    Result checkAnalyticsIntegrationAccess(
+        SystemContext* systemContext,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::ResourceParamWithRefData& param)
+    {
+        const auto resPool = systemContext->resourcePool();
+        const auto camera = resPool->getResourceById<QnVirtualCameraResource>(param.resourceId);
+        if (!NX_ASSERT(camera))
+        {
+            return Result(ErrorCode::serverError, nx::format(ServerApiErrors::tr(
+                "Camera %1 does not exist."), param.resourceId));
+        }
+
+        QSet<QnUuid> newEngines = camera->calculateUserEnabledAnalyticsEngines(param.value);
+        nx::vms::common::saas::IntegrationServiceUsageHelper helper(systemContext);
+        helper.proposeChange(param.resourceId, newEngines);
+        if (helper.isOverflow())
+        {
+            return Result(ErrorCode::serverError, nx::format(ServerApiErrors::tr(
+                "Not enough integration licenses for camera %1."), param.resourceId));
+        }
+
+        return Result();
+    }
+
+    Result checkMetadataStorageAccess(
+        SystemContext* systemContext,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::ResourceParamWithRefData& param)
+    {
+        const auto resPool = systemContext->resourcePool();
+
+        if (param.resourceId != systemContext->peerId())
+        {
+            return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                "Setting analytics Storage for a different Server is forbidden."));
+        }
+
+        const auto metadataStorageId = QnUuid::fromStringSafe(param.value);
+        const auto ownServer = resPool->getResourceById<QnMediaServerResource>(param.resourceId);
+        if (!NX_ASSERT(ownServer))
+        {
+            return Result(ErrorCode::serverError, nx::format(ServerApiErrors::tr(
+                "Server %1 does not exist."), param.resourceId));
+        }
+
+        const auto ownStorages = ownServer->getStorages();
+        const auto storage = nx::utils::find_if(ownStorages,
+            [&metadataStorageId](const auto& s) { return s->getId() == metadataStorageId; });
+
+        if (!storage)
+        {
+            return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+                "Storage %1 does not belong to this Server."), param.value));
+        }
+
+        if (!(*storage)->canStoreAnalytics())
+        {
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "Storage %1 can not store analytics."), param.value));
+        }
+
+        return Result();
+    }
+
     Result operator()(
         SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
@@ -1082,37 +1148,15 @@ struct ModifyResourceParamAccess
         const auto resPool = systemContext->resourcePool();
         const auto target = resPool->getResourceById(param.resourceId);
 
-        if (!isRemove && param.name == ResourcePropertyKey::Server::kMetadataStorageIdKey)
+        if (!isRemove)
         {
-            if (param.resourceId != systemContext->peerId())
-            {
-                return Result(ErrorCode::forbidden, ServerApiErrors::tr(
-                    "Setting analytics Storage for a different Server is forbidden."));
-            }
-
-            const auto metadataStorageId = QnUuid::fromStringSafe(param.value);
-            const auto ownServer = resPool->getResourceById<QnMediaServerResource>(param.resourceId);
-            if (!NX_ASSERT(ownServer))
-            {
-                return Result(ErrorCode::serverError, nx::format(ServerApiErrors::tr(
-                    "Own Server %1 does not exist."), param.resourceId));
-            }
-
-            const auto ownStorages = ownServer->getStorages();
-            const auto storage = nx::utils::find_if(ownStorages,
-                [&metadataStorageId](const auto& s) { return s->getId() == metadataStorageId; });
-
-            if (!storage)
-            {
-                return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
-                    "Storage %1 does not belong to this Server."), param.value));
-            }
-
-            if (!(*storage)->canStoreAnalytics())
-            {
-                return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                    "Storage %1 can not store analytics."), param.value));
-            }
+            Result result;
+            if (param.name == ResourcePropertyKey::Server::kMetadataStorageIdKey)
+                result = checkMetadataStorageAccess(systemContext, accessData, param);
+            if (param.name == QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty)
+                result = checkAnalyticsIntegrationAccess(systemContext, accessData, param);
+            if (result.error != ErrorCode::ok)
+                return result;
         }
 
         if (isNewApiCompoundTransaction && hasPowerUserPermissions)

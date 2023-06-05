@@ -3,10 +3,12 @@
 #pragma once
 
 #include <QtCore/QMap>
+#include <QtCore/QSize>
 
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/vms/api/data/resolution_data.h>
 
 namespace nx {
 namespace media {
@@ -26,14 +28,16 @@ struct NX_VMS_COMMON_API CameraStreamCapability
 #define CameraStreamCapability_Fields (minBitrateKbps)(maxBitrateKbps)(defaultBitrateKbps)(defaultFps)(maxFps)
 QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json), NX_VMS_COMMON_API)
 
-struct CameraMediaCapability
+struct NX_VMS_COMMON_API CameraMediaCapability
 {
     QMap<nx::vms::api::StreamIndex, CameraStreamCapability> streamCapabilities;
     bool hasDualStreaming = false;
     bool hasAudio = false;
+    nx::vms::api::ResolutionData maxResolution;
+
     // TODO: move more fields to here like io port settings e.t.c
 };
-#define CameraMediaCapability_Fields (streamCapabilities)(hasDualStreaming)(hasAudio)
+#define CameraMediaCapability_Fields (streamCapabilities)(hasDualStreaming)(hasAudio)(maxResolution)
 QN_FUSION_DECLARE_FUNCTIONS(CameraMediaCapability, (json), NX_VMS_COMMON_API)
 
 NX_REFLECTION_ENUM_CLASS(CameraTraitType,

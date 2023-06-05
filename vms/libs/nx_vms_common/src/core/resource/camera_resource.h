@@ -238,6 +238,8 @@ public:
      */
     QString forcedProfile(nx::vms::api::StreamIndex index) const;
 
+    static QSet<QnUuid> calculateUserEnabledAnalyticsEngines(const QString& value);
+
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
     void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);

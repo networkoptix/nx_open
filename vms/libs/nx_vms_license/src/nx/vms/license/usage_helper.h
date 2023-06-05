@@ -25,6 +25,8 @@ struct LicenseServer
     static const nx::utils::Url validateUrl(common::SystemContext* context);
     static const nx::utils::Url reportUrl(common::SystemContext* context);
     static const nx::utils::Url cloudLicensesUrl(common::SystemContext* context);
+    static const nx::utils::Url saasServicesUrl(common::SystemContext* context, const QString& systemId);
+    static const nx::utils::Url saasDataUrl(common::SystemContext* context, const QString& systemId);
     static const nx::utils::Url inspectUrl(common::SystemContext* context);
 private:
     static const QString baseUrl(common::SystemContext* context);
