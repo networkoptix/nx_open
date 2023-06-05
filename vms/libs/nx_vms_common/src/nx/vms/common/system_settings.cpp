@@ -132,7 +132,8 @@ SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
         [] { return tr("SMTP connection type"); });
 
     m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        "smtpPort", 0, this, [] { return tr("SMTP port"); });
+        "smtpPort", QnEmailSettings::defaultPort(m_connectionTypeAdaptor->value()), this,
+        [] { return tr("SMTP port"); });
 
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "smtpTimeout", QnEmailSettings::defaultTimeoutSec(), this, [] { return tr("SMTP timeout (seconds)"); });

@@ -17,6 +17,12 @@
 
 namespace nx::vms::api {
 
+static constexpr int kTlsPort = 587;
+static constexpr int kSslPort = 465;
+static constexpr int kUnsecurePort = 25;
+static constexpr int kAutoPort = 0;
+static constexpr int kDefaultSmtpTimeout = 300;
+
 struct SystemSettings
 {
     QString cloudAccountName;
@@ -50,8 +56,8 @@ struct SystemSettings
     QString emailSignature;
     QString emailSupportEmail;
     ConnectionType smtpConnectionType = ConnectionType::unsecure;
-    int smtpPort = 0;
-    int smtpTimeout = 300;
+    int smtpPort = kUnsecurePort;
+    int smtpTimeout = kDefaultSmtpTimeout;
     QString smtpName;
     bool useCloudServiceToSendEmail = false;
 
@@ -80,6 +86,8 @@ NX_REFLECTION_INSTRUMENT(SystemSettings, (cloudAccountName)(cloudSystemID)(defau
     (smtpPassword)(emailSignature)(emailSupportEmail)(smtpConnectionType)(smtpPort)(smtpTimeout)
     (smtpName)(useCloudServiceToSendEmail)(timeSynchronizationEnabled)(primaryTimeServer)
     (customReleaseListUrl)(clientUpdateSettings)(backupSettings)(metadataStorageChangePolicy));
+
+NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeChronoDurationAsNumber)
 
 } // namespace nx::vms::api
 
