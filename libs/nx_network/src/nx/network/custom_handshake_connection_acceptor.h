@@ -290,7 +290,7 @@ private:
         else if (socket && socket->setNonBlockingMode(true))
         {
             // NOTE: connection is bound to unknown AIO thread here.
-            // Leaving it so so that multiple AIO threads are loaded by this object.
+            // Leaving it so that multiple AIO threads are loaded by this object.
 
             const auto seq = ++m_connectionSequence;
 

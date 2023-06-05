@@ -47,7 +47,6 @@ namespace ConnectionType
     Type fromString( const std::string_view& str );
 }
 
-
 class QnTransactionTransportBase:
     public QnAbstractTransactionTransport,
     public nx::network::aio::BasicPollable
@@ -128,7 +127,7 @@ public:
     /**
      * @param value If true then it is expected that transactionProcessed() is called after
      * processing each transactions received by this object.
-     * New transactions receival is suspended while there are >= 16 received transactions pending.
+     * New transactions receive is suspended while there are >= 16 received transactions pending.
      * true by default.
      */
     void setReceivedTransactionsQueueControlEnabled(bool value);

@@ -116,7 +116,7 @@ nx::network::rest::Params QnThumbnailRequestData::toParams() const
 std::optional<QString> QnThumbnailRequestData::getError() const
 {
     if (!request.camera)
-        return lit("No camera avaliable");
+        return lit("No camera available");
 
     // Check invalid time.
     if (request.timestampUs.count() < 0

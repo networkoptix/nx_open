@@ -200,7 +200,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAviArchiveMetadata, (json), QnAviArchiveMetad
 
 QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* context)
 {
-    // Prevent standart tag name parsing in 'avi' format.
+    // Prevent standard tag name parsing in 'avi' format.
     const QString format = QString::fromLatin1(context->iformat->name).split(QLatin1Char(','))[0];
 
     const auto metadata = tagValueRaw(context, CustomTag, format);

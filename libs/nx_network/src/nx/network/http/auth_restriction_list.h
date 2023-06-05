@@ -44,9 +44,9 @@ enum Value
     urlQuerySessionToken = 1 << 9,
 
     /**
-     * Normally all GET requests do not requres SCRF token, but we could not allow that, because of
+     * Normally all GET requests do not requires SCRF token, but we could not allow that, because of
      * poorly designed requests changing information (including passwords).
-     * TODO: Remove this propery as soon as all these requests are terminated.
+     * TODO: Remove this property as soon as all these requests are terminated.
      */
     allowWithoutCsrf = 1 << 30,
     urlQueryDigestWithoutCsrf = urlQueryDigest | allowWithoutCsrf,
@@ -61,7 +61,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Values);
 
 /**
  * NOTE: By default, AuthMethod::http, AuthMethod::cookie and AuthMethod::videowall
- * authorization methods are allowed fo every url.
+ * authorization methods are allowed for every url.
  */
 class NX_NETWORK_API AuthMethodRestrictionList
 {

@@ -5,7 +5,7 @@
 namespace nx::utils {
 
 // TODO: #akolesnikov Get rid of QByteArray in base64 functions. It will save 2 allocations.
-// TODO: #akolesnikov Introduce inplace conversion. That will allow implementing fromBase64(String&&)
+// TODO: #akolesnikov Introduce in-place conversion. That will allow implementing fromBase64(String&&)
 // without allocations at all.
 // TODO: #akolesnikov Provide single implementation.
 

@@ -403,11 +403,11 @@ bool PdhMonitor::checkCountersExist(const QString& query) const
 {
     DWORD countersNumber = 0;
     const auto status = PdhExpandWildCardPathW(
-        NULL, // Do not use log file.
+        /* Do not use log file */ NULL,
         reinterpret_cast<LPCWSTR>(query.utf16()),
-        NULL, // Result counter paths.
-        &countersNumber, // Get couter path number.
-        0); // Expand all wildcards.
+        /* Result counter paths */ NULL,
+        &countersNumber,
+        /* Expand all wildcards */ 0);
 
     if (status != ERROR_SUCCESS)
     {

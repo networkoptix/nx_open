@@ -21,25 +21,25 @@ public:
     Connection(
         network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
 
-    //!Implemetation of api::Connection::getAccountManager
+    /** Implementation of api::Connection::getAccountManager(). */
     virtual api::AccountManager* accountManager() override;
-    //!Implemetation of api::Connection::getAccountManager
+    /** Implementation of api::Connection::getAccountManager(). */
     virtual api::SystemManager* systemManager() override;
-    //!Implemetation of api::Connection::authProvider
+    /** Implementation of api::Connection::authProvider(). */
     virtual api::AuthProvider* authProvider() override;
-    //!Implemetation of api::Connection::maintenanceManager
+    /** Implementation of api::Connection::maintenanceManager(). */
     virtual api::MaintenanceManager* maintenanceManager() override;
-    //! Implemetation of api::Connection::OauthManager
+    /** Implementation of api::Connection::OauthManager(). */
     virtual api::OauthManager* oauthManager() override;
-    //! Implemetation of api::Connection::TwoFactorAuthManager
+    /** Implementation of api::Connection::TwoFactorAuthManager(). */
     virtual api::TwoFactorAuthManager* twoFactorAuthManager() override;
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
-    //!Implemetation of api::Connection::setCredentials
+    /** Implementation of api::Connection::setCredentials(). */
     virtual void setCredentials(nx::network::http::Credentials credentials) override;
 
-    //!Implemetation of api::Connection::setProxyVia
+    /** Implementation of api::Connection::setProxyVia(). */
     virtual void setProxyVia(
         const std::string& proxyHost,
         std::uint16_t proxyPort,
@@ -49,7 +49,7 @@ public:
     virtual void setRequestTimeout(std::chrono::milliseconds) override;
     virtual std::chrono::milliseconds requestTimeout() const override;
 
-    //!Implemetation of api::Connection::ping
+    //** Implementation of api::Connection::ping(). */
     virtual void ping(
         std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) override;
 

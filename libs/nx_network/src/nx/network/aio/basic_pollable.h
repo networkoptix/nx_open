@@ -70,7 +70,7 @@ class AIOService;
  * See BasicPollable::pleaseStopSync() comment for more details.
  *
  * Successor to this class MUST support safe object deletion while in object's aio thread
- * (usually, it is acheived automatically).
+ * (usually, it is achieved automatically).
  * QnStoppableAsync::pleaseStop and BasicPollable::stopWhileInAioThread are not called in this case.
  *
  * TODO #akolesnikov Name conflicts with Pollable. Consider renaming Pollable, AbstractPollable, BasicPollable.
@@ -133,7 +133,7 @@ public:
     /**
      * If called within AIO thread (same as returned by getAioThread()) then func is executed
      * right in this call and dispatch returns after that.
-     * Otherwse, invokes BasicPollable::post.
+     * Otherwise, invokes BasicPollable::post.
      */
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
 

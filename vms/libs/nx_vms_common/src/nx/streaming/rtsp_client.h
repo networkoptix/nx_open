@@ -70,7 +70,6 @@ public:
     void setHostAddress(const nx::network::HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
 
-
     void bindToMulticastAddress(const QHostAddress& address, const nx::String& interfaceAddress);
     void sendDummy();
 
@@ -160,7 +159,6 @@ public:
 
     ~QnRtspClient();
 
-
     /**
      * Shutdown TCP socket and terminate current IO operation. Can be called from the other thread.
      * Thread safe.
@@ -190,7 +188,7 @@ public:
     CameraDiagnostics::Result open(const nx::utils::Url& url, qint64 startTime = AV_NOPTS_VALUE);
 
     /*
-    * Start playing RTSP sessopn.
+    * Start playing RTSP session.
     * @param positionStart start position at mksec
     * @param positionEnd end position at mksec
     * @param scale playback speed
@@ -272,18 +270,18 @@ public:
     bool isMediaTypeEnabled(nx::streaming::Sdp::MediaType mediaType) const;
 
     /*
-    * Demuxe RTSP binary data
+    * Demux RTSP binary data
     * @param data Buffer to write demuxed data. 4 byte RTSP header keep in buffer
     * @param maxDataSize maximum buffer size
-    * @return amount of readed bytes
+    * @return amount of read bytes
     */
     int readBinaryResponse(quint8 *data, int maxDataSize);
 
     /*
-    * Demuxe RTSP binary data.
+    * Demux RTSP binary data.
     * @param demuxedData vector of buffers where stored demuxed data. Buffer number determined by RTSP channel number. 4 byte RTSP header are not stored in buffer
     * @param channelNumber buffer number
-    * @return amount of readed bytes
+    * @return amount of read bytes
     */
     int readBinaryResponse(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
@@ -309,7 +307,6 @@ public:
     bool parseSetupResponse(const QString& response, SDPTrackInfo* outTrack, int trackIndex);
     std::chrono::milliseconds keepAliveTimeOut() const { return m_keepAliveTimeOut; }
     QString sessionId() const { return m_SessionId; }
-
 
     /*
     * Some cameras declare qop support in digest authentication, but actually don't support it.

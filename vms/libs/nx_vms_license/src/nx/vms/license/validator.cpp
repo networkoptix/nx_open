@@ -35,7 +35,7 @@ bool Validator::overrideMissingRuntimeInfo(const QnLicensePtr&, QnPeerRuntimeInf
 QnLicenseErrorCode Validator::validate(const QnLicensePtr& license, ValidationMode mode) const
 {
     /**
-     * >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
+     * >= v1.5, should have hwid1, hwid2 or hwid3, and have brand
      * v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
      * We just allow empty brand for all, because we believe license is correct.
      */

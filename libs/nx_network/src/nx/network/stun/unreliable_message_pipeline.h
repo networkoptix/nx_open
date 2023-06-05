@@ -117,7 +117,7 @@ public:
 
 /**
  * Pipeline for transferring messages over unreliable transport (datagram socket).
- * This is a helper class for implementing UDP server/client of message-orientied protocol.
+ * This is a helper class for implementing UDP server/client of message-oriented protocol.
  * Received messages are delivered to UnreliableMessagePipelineEventHandler<MessageType> instance.
  * NOTE: All events are delivered within internal socket's aio thread
  * NOTE: UnreliableMessagePipeline object can be safely freed within any event handler

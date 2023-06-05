@@ -19,7 +19,7 @@ namespace nx::utils::math {
  * Period as small as 1 millisecond is normal since internally resolution of 1 microsecond is used.
  * So, to limit rps rate in a high-loaded system to 1000 rps it may be best to use period of
  * 1 millisecond and allowed amount of 1 in comparison to period of 1 second and amount of 1000.
- * Note: it uses nx::utils::math::SumPerPeriod internally. So, there is some error when calcuating
+ * Note: it uses nx::utils::math::SumPerPeriod internally. So, there is some error when calculating
  * number of requests per current period. See nx::utils::math::SumPerPeriod for more details.
  */
 class NX_UTILS_API RateLimiter

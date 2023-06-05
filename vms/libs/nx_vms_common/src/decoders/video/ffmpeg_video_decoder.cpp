@@ -127,7 +127,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
 
     if (m_context->codec_id == AV_CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
     {
-        // ignoring deblocking filter type 1 for better perfomace between H264 slices.
+        // ignoring deblocking filter type 1 for better performance between H264 slices.
         m_context->flags2 |= AV_CODEC_FLAG2_FAST;
     }
     m_checkH264ResolutionChange =
@@ -336,7 +336,7 @@ bool QnFfmpegVideoDecoder::decode(
             const quint8* dataEnd = avpkt.data + avpkt.size;
             const quint8* curPtr = avpkt.data;
             // New version scan whole data to find SPS unit.
-            // It is slower but some cameras do not put SPS the begining of a data.
+            // It is slower but some cameras do not put SPS the beginning of a data.
             while (curPtr < dataEnd - 2)
             {
                 const int nalLen = curPtr[2] == 0x01 ? 3 : 4;

@@ -17,8 +17,8 @@ namespace utils {
 namespace random {
 
 /**
- * Simple implementaion of std::uniform_int_distribution.
- * NOTE: Currenty this distribution is not uniform, because of overflow bug.
+ * Simple implementation of std::uniform_int_distribution.
+ * NOTE: Currently this distribution is not uniform, because of overflow bug.
  *     Do not use it without a dare need.
  */
 template<typename Type = int>
@@ -34,7 +34,7 @@ public:
     template<typename Device>
     Type operator()(Device& device) const
     {
-        // NOTE: uint64_t is used becauce it is likely biggest type avalible.
+        // NOTE: uint64_t is used because it is likely biggest type available.
         static const uint64_t deviceRange = (uint64_t) (Device::max() - Device::min());
         const auto makeNumber = [&device]() { return (Type) (device() - Device::min()); };
 
@@ -51,7 +51,7 @@ public:
         }
 
         if (std::numeric_limits<Type>::max() == m_range)
-            return m_min + number; //< Awoid range owerflow.
+            return m_min + number; //< Avoid range overflow.
 
         return m_min + (number % (m_range + 1));
     }
@@ -64,7 +64,7 @@ private:
 template<>
 class UniformIntDistribution<char>
 {
-    // Char specialization is not defined by standart, as it is not even clear if it is signed.
+    // Char specialization is not defined by standard, as it is not even clear if it is signed.
 };
 
 template<typename StringType>
@@ -74,7 +74,7 @@ StringType generate(int count)
     auto& device = *QRandomGenerator::global();
 
     // NOTE: Direct device access with simple cast works significantly faster than
-    //     uniform_int_distribution on a number of platforms (STL implemenations).
+    //     uniform_int_distribution on a number of platforms (STL implementations).
     //     Found on iOS by profiler.
 
     StringType data(count, 0);

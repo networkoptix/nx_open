@@ -234,7 +234,7 @@ inline void setLevelReducerEnabled(bool value)
         NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
         NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_MESSAGE, \
         NX_UTILS_LOG_STREAM, /*< Chosen when called with TAG arg only (without a message). */ \
-        args_required /*< Chosed when called without arguments; leads to an error. */ \
+        args_required /*< Chosen when called without arguments; leads to an error. */ \
     )(__VA_ARGS__))
 
 #define NX_ERROR(...) NX_UTILS_LOG(nx::utils::log::Level::error, __VA_ARGS__)

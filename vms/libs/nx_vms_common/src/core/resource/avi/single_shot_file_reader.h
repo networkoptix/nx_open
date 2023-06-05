@@ -4,7 +4,7 @@
 
 #include "nx/streaming/abstract_media_stream_data_provider.h"
 
-// difference between this class and pull reader is that run function does not have infinit loop
+// difference between this class and pull reader is that run function does not have infinite loop
 // it quits after first getData
 // such reader can be used for photo
 

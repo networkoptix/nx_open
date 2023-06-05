@@ -17,7 +17,7 @@ struct ResourceDescriptor
     QnUuid id;
 
     /**
-     * Custom resource path. Contains diffferent values depending on resource types:
+     * Custom resource path. Contains different values depending on resource types:
      * - Path to the file for the local media resources.
      * - Url for web pages.
      * - Url of the special form `cloud://{NULL UUID}.{id}` for the cloud layouts.

@@ -53,7 +53,7 @@ public:
      * NOTE: There may already be a test in progress when this handler is invoked. In that case,
      * aboutToStart will be false, otherwise true.
      * NOTE: handler is invoked before each attempt to run the speed test.
-     * It is not discarded after invokation.
+     * It is not discarded after invocation.
      */
     void setAboutToRunSpeedTestHandler(
         nx::utils::MoveOnlyFunc<void(bool)> handler);

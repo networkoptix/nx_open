@@ -62,7 +62,7 @@ public:
      * Temporary change the Qt-specific locale in the current thread, so all translatable strings
      * will use it. When this object is destroyed, the original locale is restored.
      * This method could wait up to maxWaitTime if the translation hasn't been installed yet,
-     * however preloaded translation usage assumes that it shoudn't be necessary.
+     * however preloaded translation usage assumes that it shouldn't be necessary.
      * @return Scoped guard object.
      */
     [[nodiscard]]
@@ -113,7 +113,7 @@ public:
 
     /**
      * When assert on failure is enabled, TranslationManager will report an error (assert) if
-     * installScopedLocale() call was not executed within the given timelimit. Such behaviour could
+     * installScopedLocale() call was not executed within the given timelimit. Such behavior could
      * be helpful to detect unwanted locks of the main app thread. By default, assert is disabled
      * since some integration tests could lock the main thread until the testing action is done.
      */

@@ -113,7 +113,7 @@ public:
      * Find nearest period for specified time.
      *
      * \param[in] timeMs                Time to find at usec
-     * \param[in] searchForward         Rount time to the future if true or to the past if false
+     * \param[in] searchForward         Round time to the future if true or to the past if false
      * \returns                         Time moved to nearest chunk at usec
      */
     qint64 roundTimeToPeriodUSec(qint64 timeUsec, bool searchForward) const;

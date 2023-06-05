@@ -207,7 +207,7 @@ bool NX_NETWORK_API calcDigestResponse(
     int nonceCount = 1);
 
 /**
- * To be used by server to validate recevied Authorization against known credentials.
+ * To be used by server to validate received Authorization against known credentials.
  */
 NX_NETWORK_API bool validateAuthorization(
     const Method& method,

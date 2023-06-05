@@ -38,7 +38,7 @@ struct SystemAttributesUpdate
     /**%apidoc Vms-specific data. Transparently stored and returned. */
     std::optional<std::string> opaque = std::nullopt;
 
-    /**%apidoc If set to true, then cloud users wil be asked to enter 2FA code when logging
+    /**%apidoc If set to true, then cloud users will be asked to enter 2FA code when logging
      * into this system.
      */
     std::optional<bool> system2faEnabled = std::nullopt;
@@ -49,7 +49,7 @@ struct SystemAttributesUpdate
      */
     std::optional<std::string> totp = std::nullopt;;
 
-    /**%apidoc One-time password from the authenicator app.
+    /**%apidoc One-time password from the authenticator app.
      * Required and MUST be valid if changing system2faEnabled setting.
      */
     std::optional<std::string> mfaCode = std::nullopt;
@@ -124,7 +124,6 @@ struct SystemDataList
     /**%apidoc Systems attributes. */
     std::vector<SystemData> systems;
 };
-
 
 ////////////////////////////////////////////////////////////
 //// system sharing data
@@ -297,8 +296,9 @@ struct SystemDataEx: SystemData
 
     SystemHealth stateOfHealth = SystemHealth::offline;
 
-    /**%apidoc This number shows how often user, performing request,
-     * uses this system in comparision to other systems.
+    /**%apidoc
+     * This number shows how often the User performing the request uses this System in comparison
+     * to other Systems.
      */
     float usageFrequency = 0;
 
@@ -354,17 +354,17 @@ struct UserSessionDescriptor
 
 struct MergeRequest
 {
-    /**%apidoc The system to merge to another system. This is the system that disappears
+    /**%apidoc The system to merge to another system. This is the System that disappears
      * during the merge. */
     std::string systemId;
 
-    /**%apidoc OAUTH access token valid for authenticating requests to the system that stays
+    /**%apidoc OAUTH access token valid for authenticating requests to the System that stays
      * after the merge.
      * Required when merging 5.0+ systems.
      */
     std::optional<std::string> masterSystemAccessToken;
 
-     /**%apidoc OAUTH access token valid for authenticating requests to the system that disappers
+     /**%apidoc OAUTH access token valid for authenticating requests to the System that disappears
       * during the merge.
       * Required when merging 5.0+ systems.
       */

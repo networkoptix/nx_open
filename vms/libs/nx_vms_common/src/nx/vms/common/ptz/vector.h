@@ -61,7 +61,7 @@ public:
 
     Vector operator-(const Vector& other) const;
 
-    // Multiplies the corresponding components of two vectors (Hadamar product).
+    // Multiplies the corresponding components of two vectors (Hadamard product).
     // Is not the same as cross product.
     Vector operator*(const Vector& other) const;
 

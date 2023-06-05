@@ -291,7 +291,8 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
             [&]() { handlingData->eventHandler->eventTriggered(socket, sockEventType); },
             "socket event");
 
-        //updating socket's periodic task (it's garanteed that there is a periodic task for socket)
+        // Updating the socket periodic task (it's guaranteed that there is a periodic task for the
+        // socket).
         if (handlingData->timeout > std::chrono::milliseconds::zero())
             handlingData->updatedPeriodicTaskClock = curClock + handlingData->timeout.count();
 

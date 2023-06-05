@@ -49,7 +49,6 @@ inline constexpr bool HasHasherV = HasHasher<Args...>::value;
 
 } // namespace detail
 
-
 /**
  * A simplified replacement for AssociativeContainer concept (until we have c++20 concepts).
  */
@@ -68,7 +67,7 @@ struct IsAssociativeContainer<
     std::void_t<std::enable_if_t<IsContainerV<T>>>,
     std::void_t<typename T::key_type>,
     std::void_t<typename T::key_compare>,
-    // NOTE: It is wierd, but msvc v141 defines key_compare and value_compare in
+    // NOTE: It is weird, but msvc v141 defines key_compare and value_compare in
     // unordered containers. So, taking this into account.
     std::void_t<std::enable_if_t<!detail::HasHasherV<T>>>
 >: std::true_type {};

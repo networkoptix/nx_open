@@ -189,7 +189,7 @@ bool setDateTime([[maybe_unused]] qint64 millisecondsSinceEpoch)
         }
 
         // On NX1, we have to execute "hwclock -w" to save the time, and this command sometimes
-        // failes, hence several attempts.
+        // fails, hence several attempts.
         for (int i = 0; i < 3; ++i)
         {
             if (QProcess::execute("hwclock", {"-w"}) == 0)

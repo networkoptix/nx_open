@@ -324,14 +324,14 @@ void TestConnection::startEchoTestIO()
                     // if all ok start all over again
                     if (m_readBuffer == m_outData)
                     {
-                        NX_VERBOSE(this, nx::format("Echo virified bytes: %1")
+                        NX_VERBOSE(this, nx::format("Echo verified bytes: %1")
                             .arg(m_readBuffer.size()));
 
                         m_readBuffer.resize(0);
                         return startEchoTestIO();
                     }
 
-                    NX_ERROR(this, nx::format("Recieved data does not match sent"));
+                    NX_ERROR(this, nx::format("Received data does not match sent"));
 
                     reportFinish( SystemError::invalidData );
                 });
@@ -499,7 +499,6 @@ void TestConnection::verifyDataReceived(const nx::Buffer& buf, size_t bytesRead)
     m_curStreamPos += bytesRead;
 }
 
-
 ////////////////////////////////////////////////////////////
 //// class ConnectionTestStatistics
 ////////////////////////////////////////////////////////////
@@ -540,7 +539,6 @@ ConnectionTestStatistics operator-(
         left.totalConnections - right.totalConnections,
         left.onlineConnections - right.onlineConnections};
 }
-
 
 ////////////////////////////////////////////////////////////
 //// class RandomDataTcpServer
@@ -709,8 +707,6 @@ void RandomDataTcpServer::onConnectionDone(
     if (it != m_aliveConnections.end())
         m_aliveConnections.erase(it);
 }
-
-
 
 ////////////////////////////////////////////////////////////
 //// class ConnectionsGenerator

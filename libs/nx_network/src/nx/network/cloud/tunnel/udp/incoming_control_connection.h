@@ -32,12 +32,12 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     /**
-     * This handler is called when error accures (so object is not usefull any more).
+     * This handler is called when an error occurs (so the object is not useful any more).
      */
     void setErrorHandler(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
     /**
-     * Starts reading socket and prosesses events.
+     * Starts reading the socket and processes events.
      * @param selectedHandler is called when this connection is selected by client.
      */
     void start(utils::MoveOnlyFunc<void()> selectedHandler);

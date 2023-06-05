@@ -33,7 +33,7 @@ struct NotDefinedApiData
 };
 
 /**
- * This table describes all possible transactions and defines various access righs check for them.
+ * This table describes all possible transactions and defines various access rights check for them.
  *
  * Couple of examples:
  *
@@ -44,24 +44,24 @@ struct NotDefinedApiData
  * false,                   -- transaction is not persistent (does not save anything to database)
  * false,                   -- transaction is not system (handled common way)
  * InvalidGetHashHelper(),  -- Calculates hash for persistent transaction.
- *                             MUST yield the same result for corresponing setXXX and removeXXX
+ *                             MUST yield the same result for corresponding setXXX and removeXXX
  *                             transactions. Actual for persistent transactions only.
  * InvalidTriggerNotificationHelper(),
  *                          -- actual mostly for persistent transactions. This callable SHOULD
  *                             implement second stage of transaction processing "in memory, non db"
  *                             logic (work with resource pool for example). It's quite possible
- *                             that non persistent transaction tiriggers some notifications (for
+ *                             that non persistent transaction triggers some notifications (for
  *                             example dumpDataBase).
  * InvalidAccess(),         -- actual only for persistent transactions with one element.
- *                             Warning below MUST be fullfilled.
+ *                             Warning below MUST be fulfilled.
  * InvalidAccess(),         -- actual only for read transactions for one element.
- *                             Warning below MUST be fullfilled.
+ *                             Warning below MUST be fulfilled.
  * InvalidFilterFunc(),     -- actual only for persistent transactions with element list.
- *                             Warning below MUST be fullfilled.
+ *                             Warning below MUST be fulfilled.
  * FilterListByAccess<LayoutTourAccess>(), -- filtering requested list by the passed checker.
- *                             Warning below MUST be fullfilled.
+ *                             Warning below MUST be fulfilled.
  * AllowForAllAccessOut(),  -- Actual only for persistent transactions
- *                             Desides if remote peer has enough rights to receive this transaction
+ *                             Decides if remote peer has enough rights to receive this transaction
  *                             while the proxy transaction stage.
  * RegularTransactionType() -- transaction is common, regular, without any magic
  * )
@@ -1648,7 +1648,7 @@ namespace ApiCommand
     Value fromString(const QString& val);
 
     /**
-     * Check if transaction can be sent independently of current syncronisation state. These
+     * Check if transaction can be sent independently of current synchronization state. These
      * transactions are rather commands then data transfers.
      */
     bool isSystem(Value val);

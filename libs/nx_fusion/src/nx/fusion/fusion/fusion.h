@@ -39,7 +39,7 @@ namespace QnFusion {
      * that iteration should be stopped, and in this case this function will
      * return false.
      *
-     * Visitor can also optionally define <tt>operator()</tt> with additinal
+     * Visitor can also optionally define <tt>operator()</tt> with additional
      * parameter <tt>QnFusion::start_tag</tt> (or <tt>QnFusion::end_tag</tt>).
      * This operator will then be invoked before (or after) the iteration takes place.
      * If this operator returns false, then iteration will stop and this
@@ -53,7 +53,6 @@ namespace QnFusion {
     bool visit_members(T &&value, Visitor &&visitor) {
         return QnFusionDetail::visit_members_internal(std::forward<T>(value), std::forward<Visitor>(visitor));
     }
-
 
     /**
      * \fn invoke
@@ -130,7 +129,7 @@ namespace QnFusion {
     };
 
     /**
-     * This metafuction returns the type of the field specified by the given
+     * This metafunction returns the type of the field specified by the given
      * access type.
      *
      * \param Access                    Access type.
@@ -156,8 +155,8 @@ namespace QnFusion {
             typename Access::template at<setter_type, void>::type::result_type,
             typename access_member_type<Access>::type
         >
-    {};
-
+    {
+    };
 
     /**
      * This class defines the access interface, which is an external interface
@@ -192,7 +191,6 @@ namespace QnFusion {
         }
     };
 
-
     /**
      * This metafunction returns whether the given type is fusion-adapted.
      *
@@ -205,7 +203,6 @@ namespace QnFusion {
 
 } // namespace QnFusion
 
-
 namespace QnFusionDetail {
 
     template<class Access>
@@ -215,7 +212,6 @@ namespace QnFusionDetail {
     }
 
 } // namespace QnFusionDetail
-
 
 /**
  * This macro generates several functions for the given fusion-adapted type.

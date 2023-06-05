@@ -30,7 +30,6 @@ private:
     const QnPropertyStorage *m_storage;
 };
 
-
 // -------------------------------------------------------------------------- //
 // QnPropertyStorage
 // -------------------------------------------------------------------------- //
@@ -54,7 +53,7 @@ QVariant QnPropertyStorage::valueLocked(int id) const {
 
 bool QnPropertyStorage::setValueLocked(int id, const QVariant &value) {
     if(!isWritableLocked(id)) {
-        NX_ASSERT(false, "Property '%1' is not writeable.", name(id));
+        NX_ASSERT(false, "Property '%1' is not writable.", name(id));
         return false;
     }
 

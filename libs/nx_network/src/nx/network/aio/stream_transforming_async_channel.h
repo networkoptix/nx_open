@@ -158,7 +158,7 @@ private:
     template<typename Range> std::deque<RawSendContext> takeRawSendTasks(Range range);
 
     /**
-     * @return false if was interrupted. All futher processing should be stopped until the next event.
+     * @return False if was interrupted. All further processing should be stopped until the next event.
      */
     bool completeRawSendTasks(
         std::deque<RawSendContext> completedRawSendTasks,

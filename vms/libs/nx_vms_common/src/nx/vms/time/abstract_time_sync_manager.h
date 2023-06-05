@@ -20,7 +20,7 @@ public:
     virtual std::chrono::milliseconds getSyncTime(
         bool* outIsTimeTakenFromInternet = nullptr) const = 0;
 
-    /** Forced re-syncronization. */
+    /** Forced re-synchronization. */
     virtual void resync() = 0;
 
 signals:

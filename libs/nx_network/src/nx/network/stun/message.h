@@ -69,7 +69,7 @@ enum MethodType
     dataMethod = 7,
     createPermissionMethod = 8,
 
-    // Starting value for custom NX methods in the middle of unasigned range 0x00D-0x0FF:
+    // Starting value for custom NX methods in the middle of unassigned range 0x00D-0x0FF:
     // https://www.iana.org/assignments/stun-parameters/stun-parameters.txt
     userMethod = 0x050,
 

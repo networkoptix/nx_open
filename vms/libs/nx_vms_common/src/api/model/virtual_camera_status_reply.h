@@ -9,13 +9,13 @@
 
 struct QnVirtualCameraStatusReply
 {
-    /**%apidoc Whether API command was successible. */
+    /**%apidoc Whether API command was successive. */
     bool success = false;
 
     /**%apidoc Whether lock was acquired. */
     bool locked = false;
 
-    /**%apidoc Wether this virtual camera is currently consuming virtual footage. */
+    /**%apidoc Whether this virtual camera is currently consuming virtual footage. */
     bool consuming = false;
 
     /**%apidoc User who has the lock, if any. */
@@ -30,4 +30,3 @@ struct QnVirtualCameraStatusReply
 #define QnVirtualCameraStatusReply_Fields (success)(locked)(consuming)(userId)(token)(progress)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraStatusReply, (json)(ubjson)(metatype), NX_VMS_COMMON_API)
-

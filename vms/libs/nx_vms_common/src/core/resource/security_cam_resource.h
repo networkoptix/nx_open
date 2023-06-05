@@ -252,7 +252,7 @@ public:
      * - audio enabled in client
      * - audio forced
      * - audio mapped to another device
-     * this getter should be used by data providers to decide whether to retrive audio from source
+     * this getter should be used by data providers to decide whether to retrieve audio from source
      * or not
      */
     bool isAudioRequired() const;
@@ -596,7 +596,6 @@ signals:
 
 protected slots:
     virtual void at_motionRegionChanged();
-
 
 protected:
     virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;

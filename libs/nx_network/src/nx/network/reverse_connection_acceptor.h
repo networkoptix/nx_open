@@ -53,7 +53,7 @@ public:
 
     /**
      * Invoked on connect completion.
-     * Note: number of invokations of this functor may be greater than number of
+     * Note: number of invocations of this functor may be greater than number of
      * AbstractReverseConnector::connectAsync calls. But, not less.
      */
     virtual void setOnConnect(ConnectHandler handler) = 0;

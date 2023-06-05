@@ -59,7 +59,7 @@ MutexImplementations::Value mutexImplementation()
             if (parsed != MutexImplementations::undefined)
                 return parsed;
 
-            NX_ASSERT(false, nx::format("Unknown mutex implementaiton in ini: %1").args(value));
+            NX_ASSERT(false, nx::format("Unknown mutex implementation in ini: %1").args(value));
             return MutexImplementations::parse(utils::Ini::kDefaultMutexImplementation);
         }();
 
@@ -115,4 +115,3 @@ std::unique_ptr<WaitConditionDelegate> makeWaitConditionDelegate()
 }
 
 } // namespace nx
-

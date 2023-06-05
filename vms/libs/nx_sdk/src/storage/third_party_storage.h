@@ -16,7 +16,6 @@ namespace nx_spl
 {
     const uint64_t unknown_size = 0xffffffffffffffff;
 
-
     //!File IO flags.
     namespace io
     {
@@ -291,7 +290,7 @@ namespace nx_spl
 
         /**
         *   \return English name of the Storage type. This name can be shown to the user, but is
-        *       not used programatically, so it can be any human-readable name, like "local",
+        *       not used programmatically, so it can be any human-readable name, like "local",
         *       "network", "smb", "ftp", "tape", etc.
         */
         virtual const char* STORAGE_METHOD_CALL storageType() const = 0;

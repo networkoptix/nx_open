@@ -87,7 +87,7 @@ NX_BRANDING_API QString freeLicenseKey();
  */
 NX_BRANDING_API QString minilauncherBinaryName();
 
-/** Name of the new applauncher binary in the filesystem (applaucher-bin, applauncher.exe). */
+/** Name of the new applauncher binary in the filesystem (applauncher-bin, applauncher.exe). */
 NX_BRANDING_API QString applauncherBinaryName();
 
 /** Internal name, used as a key in settings storage, data folder, etc. */

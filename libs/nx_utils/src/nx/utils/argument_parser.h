@@ -15,7 +15,7 @@ namespace utils {
 
 /**
  * Stand-alone & simple function for parsing arguments.
- * Supports both "-a value" and "--arg=value" syntax. "-" and "--" are ommitted.
+ * Supports both "-a value" and "--arg=value" syntax. "-" and "--" are omitted.
  */
 class NX_UTILS_API ArgumentParser
 {

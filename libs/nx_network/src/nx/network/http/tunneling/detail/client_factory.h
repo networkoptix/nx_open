@@ -23,7 +23,7 @@ using ClientFactoryFunction =
 
 /**
  * Always instantiates client type with the highest priority.
- * Tunnel type priorioty is lowered with each tunnel failure.
+ * Tunnel type priority is lowered with each tunnel failure.
  * Tunnel failure can be caused by some random short-term problems
  * (e.g., TCP connection broken or cloud service restart).
  * So, tunnel type can still be used. But, we do not know that.

@@ -51,14 +51,14 @@ public:
     /**
      * If set to true then established connection (provided by Client::openTunnel),
      * that did not receive a single byte of data from remote host, is reported as
-     * tunnelling method failure and causes tunnel type switching.
+     * tunneling method failure and causes tunnel type switching.
      * See detail::ClientFactory for more information on tunnel types.
      * false by default.
      */
     void setConsiderSilentConnectionAsTunnelFailure(bool value);
 
     /**
-     * If true, then the client may try to estabish multiple tunnels of different types
+     * If true, then the client may try to establish multiple tunnels of different types
      * simultaneously to find a working tunnel type faster.
      * By default, true.
      */
@@ -77,7 +77,7 @@ public:
     void setCustomHeaders(HttpHeaders headers);
 
     /**
-     * Initiate tunnel setup process. Starts HTTP message exchange with the tunnelling server.
+     * Initiate tunnel setup process. Starts HTTP message exchange with the tunneling server.
      */
     void openTunnel(OpenTunnelCompletionHandler completionHandler);
 

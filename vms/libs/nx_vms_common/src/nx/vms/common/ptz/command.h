@@ -57,7 +57,7 @@ inline uint qHash(const Command& command, uint seed)
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(Command*, Visitor&& visitor)
 {
-    // ATTENTION: Assigning backwards-compatible misspelled values with `Auxilary` in them.
+    // ATTENTION: Assigning backwards-compatible misspelled values with `Auxiliary` in them.
     // Such values should go before the correct ones, so both versions are supported on input,
     // and only deprecated misspelled version is supported on output.
     using Item = nx::reflect::enumeration::Item<Command>;

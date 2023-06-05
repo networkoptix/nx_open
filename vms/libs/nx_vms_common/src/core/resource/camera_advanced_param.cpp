@@ -408,7 +408,7 @@ static void mergeGroups(
 
 void QnCameraAdvancedParams::merge(QnCameraAdvancedParams params)
 {
-    // These fields are never used in code, but could still be usefull for debug.
+    // These fields are never used in code, but could still be useful for debug.
     name += lit(", ") + params.name;
     version += lit(", ") + params.version;
     pluginUniqueId += lit(", ") + params.pluginUniqueId;

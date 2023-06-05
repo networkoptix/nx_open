@@ -9,7 +9,7 @@ class QnLicensePool;
 class QnUuid;
 
 /*
- * Class helper that build new version of signature that process audio frames separatelly, due to
+ * Class helper that build new version of signature that process audio frames separately, due to
  * some media containers(#: ismv) can change audio/video packets order.
  */
 

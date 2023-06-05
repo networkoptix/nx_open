@@ -39,7 +39,7 @@ namespace nx::network::http::tunneling::detail {
  * After receiving POST request, server uses TCP connection as a binary tunnel.
  * The client is expected to use it as a tunnel after receiving response to GET and sending POST.
  *
- * The tunnelling logic itself is implemented in GetPostTunnelServerWorker class.
+ * The tunneling logic itself is implemented in GetPostTunnelServerWorker class.
  * This class keeps a worker instance for each AIO thread and delegates work to a worker
  * depending on AIO thread the "establish tunnel" HTTP request was received in.
  */

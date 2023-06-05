@@ -91,7 +91,7 @@ public:
     static nx::utils::SoftwareVersion minimalVersion(Purpose purpose = Purpose::connect);
 
     /**
-     * Check customization compatiblity. Servers and desktop client customization must be equal,
+     * Check customization compatibility. Servers and desktop client customization must be equal,
      * mobile client supports own customization and a special compatibility list.
      */
     static bool isCompatibleCustomization(const QString& remoteCustomization);

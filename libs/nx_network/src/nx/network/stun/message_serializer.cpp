@@ -108,7 +108,7 @@ server::SerializerState MessageSerializer::serializeAttributeTypeAndLength(
     if (buffer->WriteUint16(static_cast<std::uint16_t>(attrType)) == NULL)
         return server::SerializerState::needMoreBufferSpace;
 
-    // NOTE: actual attribute lenght gets rewrited in /fn serializeAttributes
+    // NOTE: actual attribute length gets rewritten in /fn serializeAttributes
     // TODO: refactor to get rig of this dummy place holder
     *lenPtr = reinterpret_cast<std::uint16_t*>(buffer->WriteUint16(0));
     if (*lenPtr == NULL)
@@ -370,7 +370,7 @@ server::SerializerState MessageSerializer::serialize(
     if (user_buffer->capacity() == 0)
         user_buffer->reserve(kDefaultMessageBufferSize);
 
-    for (int i = 0; ; ++i) //TODO #akolesnikov ensure loop is not inifinite
+    for (int i = 0; ; ++i) //TODO #akolesnikov ensure loop is not infinite
     {
         if (i > 0)
         {

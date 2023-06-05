@@ -113,7 +113,7 @@ void AsyncClientUser::disconnectFromClient()
         [guard = std::move(guard)]() mutable
         {
             // Guard shall be kept here up to the end of cancellation to prevent reuse of the
-            // same address (new subscriptions might be accidently removed).
+            // same address (new subscriptions might be accidentally removed).
             guard.reset();
         });
 

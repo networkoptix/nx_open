@@ -31,7 +31,7 @@ T maxUnit()
 template<typename T>
 T prevUnit(T value)
 {
-    NX_ASSERT(value > minUnit<T>(), "Mimimal unit already");
+    NX_ASSERT(value > minUnit<T>(), "Minimal unit already");
     return static_cast<T>(value >> 1);
 }
 
@@ -147,7 +147,6 @@ bool partition(qint64 value, std::vector<PartDescriptor<Unit, Count>>& units)
 
     return hasNonEmptyPart;
 }
-
 
 using TimeSpanUnitDescriptor = PartDescriptor<HumanReadable::TimeSpanUnit, qint64>;
 std::vector<TimeSpanUnitDescriptor> timeSpanUnits(HumanReadable::TimeSpanFormat format)
@@ -280,7 +279,6 @@ QString calculateValueInternal(qint64 sourceValue,
 }
 
 } // namespace
-
 
 QString HumanReadable::timeSpan(std::chrono::milliseconds ms,
     TimeSpanFormat format,

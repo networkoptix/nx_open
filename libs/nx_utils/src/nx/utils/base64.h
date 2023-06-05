@@ -19,7 +19,7 @@ NX_UTILS_API int toBase64(
     char* outBuf, int outBufCapacity);
 
 /**
- * Base64 with URL-safe alfabet.
+ * Base64 with URL-safe alphabet.
  * @return If outBuf != NULL, number of bytes written to outBuf is returned.
  * If output buffer size is insufficient, then -1 is returned.
  * If outBuf == NULL, returns number of bytes required to store base64 representation of data.
@@ -39,7 +39,7 @@ NX_UTILS_API int fromBase64(
     void* outBuf, int outBufCapacity);
 
 /**
- * Base64 with URL-safe alfabet.
+ * Base64 with URL-safe alphabet.
  * @return If outBuf != NULL, number of bytes written to outBuf is returned.
  * If output buffer size is insufficient, then -1 is returned.
  * If outBuf == NULL, returns number of bytes required to store decoded representation of data.

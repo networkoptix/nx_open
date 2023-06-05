@@ -203,7 +203,7 @@ bool TimerManager::modifyTimerDelay(
     m_taskToTime.erase(taskIter);
     m_timeToTask.erase(handlerIter);
 
-    NX_VERBOSE(this, nx::format("Modifyed timer %1, new delay %2 ms")
+    NX_VERBOSE(this, nx::format("Modified timer %1, new delay %2 ms")
         .arg(timerId).arg(newDelay.count()));
 
     addTaskNonSafe(
@@ -236,7 +236,7 @@ void TimerManager::joinAndDeleteTimer(const TimerId& timerId)
         return;
 
     NX_MUTEX_LOCKER lk(&m_mutex);
-    //having locked m_mutex we garantee, that execution of timer timerId will not start
+    //having locked m_mutex we guarantee, that execution of timer timerId will not start
 
     if (QThread::currentThread() != this)
     {

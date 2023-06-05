@@ -65,7 +65,7 @@ RegisterSystemUriProtocolHandlerResult registerSystemUriProtocolHandler(
     registryEditor.endGroup();
     registryEditor.sync();
 
-    /* After sync() we get real value; empty if save was not successfull. */
+    /* After sync() we get real value; empty if save was not successful. */
     SoftwareVersion writtenVersion(registryEditor.value(kVersionKey).toString());
     result.success = (writtenVersion == version);
 
@@ -111,7 +111,6 @@ bool runAsAdministratorOnWindows(const QString& applicationBinaryPath,
     }
     return false;
 }
-
 
 } // namespace utils
 } // namespace vms
