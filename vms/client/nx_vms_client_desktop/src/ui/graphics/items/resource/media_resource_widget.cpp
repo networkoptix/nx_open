@@ -50,6 +50,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/trace/trace.h>
+#include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h> //< TODO: #sivanov Remove this dependency.
@@ -1072,7 +1073,18 @@ void QnMediaResourceWidget::updatePtzController()
     if (d->camera)
     {
         auto ptzPool = systemContext()->ptzControllerPool();
-        if (QnPtzControllerPtr serverController = ptzPool->controller(d->camera))
+        QnPtzControllerPtr serverController = ptzPool->controller(d->camera);
+
+        // Camera is opened for the first time, initialize controller.
+        if (d->camera->hasFlags(Qn::cross_system) && !serverController)
+        {
+            auto crossSystemControllerPool =
+                dynamic_cast<nx::vms::client::core::CrossSystemPtzControllerPool*>(ptzPool);
+            if (NX_ASSERT(crossSystemControllerPool))
+                serverController = crossSystemControllerPool->ensureControllerExists(d->camera);
+        }
+
+        if (serverController)
         {
             serverController.reset(new QnActivityPtzController(
                 QnActivityPtzController::Client,
