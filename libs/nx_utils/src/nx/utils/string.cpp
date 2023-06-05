@@ -584,8 +584,14 @@ static QList<T> smartSplitInternal(
             lastPos = i + 1;
         }
     }
-    rez << data.mid(lastPos, data.size() - lastPos);
-
+    int end = data.size();
+    if (!keepEmptyParts && quoted)
+    {
+        while (end > lastPos && data[end - 1] == delimiter)
+            --end;
+    }
+    if (keepEmptyParts || end > lastPos)
+        rez << data.mid(lastPos, end - lastPos);
     return rez;
 }
 

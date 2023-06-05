@@ -9,6 +9,8 @@
 #include <nx/reflect/json.h>
 #include <utils/common/id.h>
 
+#include "helpers.h"
+
 namespace nx {
 namespace vms {
 namespace event {
@@ -126,16 +128,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 bool checkForKeywords(const QString& value, const QString& keywords)
 {
-    if (keywords.trimmed().isEmpty())
-        return true;
-
-    for (const auto& keyword: nx::utils::smartSplit(keywords, ' ', Qt::SkipEmptyParts))
-    {
-        if (value.contains(nx::utils::trimAndUnquote(keyword)))
-            return true;
-    }
-
-    return false;
+    return checkForKeywords(value, splitOnPureKeywords(keywords));
 }
 
 } // namespace event

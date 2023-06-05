@@ -1,7 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <nx/utils/string.h>
-
 #include <gtest/gtest.h>
 
 #include <QtCore/QDateTime>
@@ -9,6 +7,8 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/string.h>
+#include <nx/utils/string.h>
+#include <nx/vms/event/helpers.h>
 
 TEST( parseDateTime, general )
 {
@@ -30,6 +30,59 @@ TEST(removeMnemonics, general)
     static const auto changed = nx::utils::removeMnemonics(source);
     static const auto target = lit("& && a &&a &&& bb a a& a&");
     ASSERT_EQ(changed, target);
+}
+
+TEST(splitOnPureKeywords, fixture)
+{
+    struct Test
+    {
+        QString value;
+        QStringList withEmptyParts;
+        QStringList pure;
+    };
+    std::vector<Test> tests = {
+        {"", {}, {}},
+        {" ", {"", ""}, {}},
+        {" a", {"", "a"}, {"a"}},
+
+        {"\"\"", {"\"\""}, {}},
+        {" \"\" ", {"", "\"\"", ""}, {}},
+        {"\" \"", {"\" \""}, {" "}},
+        {" \" \" ", {"", "\" \"", ""}, {" "}},
+        {"\"\"a", {"\"\"a"}, {"\"\"a"}},
+        {"\"a\"", {"\"a\""}, {"a"}},
+        {"\"a\" ", {"\"a\"", ""}, {"a"}},
+
+        {"\"", {"\""}, {"\""}},
+        {" \" ", {"", "\" "}, {"\""}},
+        {" \" a", {"", "\" a"}, {"\" a"}},
+
+        {"a b c", {"a", "b", "c"}, {"a", "b", "c"}},
+        {" a  b  c ", {"", "a", "", "b", "", "c", ""}, {"a", "b", "c"}},
+        {"a \"b c\"", {"a", "\"b c\""}, {"a", "b c"}},
+        {"a  \" b  c \"", {"a", "", "\" b  c \""}, {"a", " b  c "}},
+
+        {"\"\" a b c", {"\"\"", "a", "b", "c"}, {"a", "b", "c"}},
+    };
+    for (const auto& t : tests)
+    {
+        ASSERT_EQ(nx::utils::smartSplit(t.value, ' '), t.withEmptyParts) << nx::String(t.value);
+        ASSERT_EQ(nx::vms::event::splitOnPureKeywords(t.value), t.pure) << nx::String(t.value);
+    }
+}
+
+TEST(checkForKeywords, fixture)
+{
+    using namespace nx::vms::event;
+
+    ASSERT_TRUE(checkForKeywords("", splitOnPureKeywords("")));
+    ASSERT_TRUE(checkForKeywords("a", splitOnPureKeywords("")));
+
+    ASSERT_TRUE(checkForKeywords("a", splitOnPureKeywords("a b")));
+    ASSERT_TRUE(checkForKeywords("b", splitOnPureKeywords("a b")));
+
+    ASSERT_FALSE(checkForKeywords("", splitOnPureKeywords("a b")));
+    ASSERT_FALSE(checkForKeywords("c", splitOnPureKeywords("a b")));
 }
 
 namespace nx::test {
