@@ -27,6 +27,7 @@ H264Parser::H264Parser():
 
 void H264Parser::setSdpInfo(const Sdp::Media& sdp)
 {
+    constexpr int kHeaderReservedSize = 64;
     if (sdp.rtpmap.clockRate > 0)
         StreamParser::setFrequency(sdp.rtpmap.clockRate);
     for (const QString& param: sdp.fmtp.params)
@@ -38,6 +39,7 @@ void H264Parser::setSdpInfo(const Sdp::Media& sdp)
             {
                 QString h264SpsPps = param.mid(pos+1);
                 QStringList nalUnits = h264SpsPps.split(',');
+                m_sdpSpsPps.reserve(kHeaderReservedSize);
                 for (QString nalStr: nalUnits)
                 {
                     QByteArray nal = QByteArray::fromBase64(nalStr.toUtf8());
