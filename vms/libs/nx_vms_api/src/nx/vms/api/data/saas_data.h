@@ -36,35 +36,13 @@ NX_REFLECTION_ENUM_CLASS(SaasServiceState,
     obsolete
 );
 
-/**%apidoc Saas partner type. */
-NX_REFLECTION_ENUM_CLASS(SaasPartnerType,
-
-    /**%apidoc Unknown. */
-    undefined,
-
-    /**%apidoc Channel partner. */
-    channelPartner,
-    
-    /**%apidoc Brand owner. */
-    brandOwner
-);
-
-/**%apidoc Partner Id. Deprecated. Will be replaced to Uuid soon. */
-struct NX_VMS_API SaasPartnerId
-{
-    int64_t id = 0;
-    SaasPartnerType type = SaasPartnerType::undefined;
-};
-#define SaasPartnerId_fields (id)(type)
-NX_REFLECTION_INSTRUMENT(SaasPartnerId, SaasPartnerId_fields)
-
 using SaasServiceParameters = std::map<std::string, std::variant<std::string, int>>;
 
 /**%apidoc Saas service parameters for 'localRecording' service type */
 struct NX_VMS_API SaasLocalRecordingParameters
 {
     /**%apidoc Amount of channels */
-    int totalChannelNumber = 0;
+    int totalChannelNumber = 1;
 
     static SaasLocalRecordingParameters fromParams(const SaasServiceParameters& parameters);
 };
@@ -125,24 +103,24 @@ struct NX_VMS_API SaasService
     QString description;
 
     /**%apidoc Identifier of Brand owner or Channel partner issuing the service. */
-    int64_t createdById;
+    QnUuid createdByChannelPartner;
 
     /**%apidoc Configurable service parameters.  Different block for each service type. */
     SaasServiceParameters parameters;
 };
-#define SaasService_fields (id)(type)(state)(createdById)(displayName)(description)(parameters)
+#define SaasService_fields (id)(type)(state)(displayName)(description)(createdByChannelPartner)(parameters)
 NX_REFLECTION_INSTRUMENT(SaasService, SaasService_fields)
 
 /**%apidoc SaasState */
 NX_REFLECTION_ENUM_CLASS(SaasState,
     /**%apidoc Saas services is active */
-    Active,
+    active,
 
     /**%apidoc Saas services are suspended manually */
-    Suspend,
+    suspend,
 
     /**%apidoc Saas services are suspended automatically */
-    Shutdown
+    shutdown
 );
 
 /**%apidoc SaasPurshase */
@@ -188,7 +166,7 @@ struct NX_VMS_API SaasData
     QnUuid cloudSystemId;
 
     /**%apidoc Saas state */
-    SaasState state = SaasState::Active;
+    SaasState state = SaasState::active;
 
     /**%apidoc The list of purchased services */
     std::map<QnUuid, SaasPurshase> services;

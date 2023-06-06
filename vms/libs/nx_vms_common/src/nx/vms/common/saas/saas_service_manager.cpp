@@ -89,7 +89,7 @@ QnLicensePtr ServiceManager::localRecordingLicenseV1()  const
     using namespace nx::vms::api;
 
     QnLicensePtr license = QnLicense::createSaasLocalRecordingLicense();
-    if (m_data.state != SaasState::Active)
+    if (m_data.state != SaasState::active)
         return license;
 
     int counter = 0;
