@@ -107,7 +107,10 @@ else()
 endif()
 
 if(targetDevice STREQUAL "windows_x64")
-    set(compilingOptions "-Tv141") #< Use MSVC 2017 compiler.
+    if(NOT openSourceBuild)
+        # Use MSVC 2017 compiler for non-open-source builds only.
+        set(compilingOptions "-Tv141")
+    endif()
 else()
     if(targetDevice STREQUAL "linux_arm32"
         OR targetDevice STREQUAL "edge1"
