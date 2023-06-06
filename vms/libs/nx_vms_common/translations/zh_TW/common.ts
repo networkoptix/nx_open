@@ -1152,7 +1152,7 @@
     </message>
     <message>
       <source>Email support link</source>
-      <translation>電子郵件支援</translation>
+      <translation>Email support link</translation>
     </message>
     <message>
       <source>SMTP connection type</source>
@@ -1168,7 +1168,7 @@
     </message>
     <message>
       <source>SMTP name</source>
-      <translation>SMTP名稱</translation>
+      <translation>SMTP name</translation>
     </message>
     <message>
       <source>LDAP URI</source>
@@ -1192,7 +1192,7 @@
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
-      <translation>LDAP 密碼逾期時間(毫秒)</translation>
+      <translation>LDAP 密碼逾時 (毫秒)</translation>
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
@@ -1204,19 +1204,19 @@
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation>前次匿名統計報告</translation>
+      <translation>匿名統計報告 - 前次紀錄</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation>最新的匿名統計報告版本</translation>
+      <translation>匿名統計報告 - 最新版本</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
+      <translation>匿名統計報告 - 最後一個數值</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
+      <translation>匿名統計報告 - 間隔</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
@@ -1236,7 +1236,7 @@
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
+      <translation>代理連接逾時 (秒, 1秒~1小時)</translation>
     </message>
     <message>
       <source>Time synchronization enabled</source>
@@ -1248,7 +1248,7 @@
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+      <translation>本機伺服器與原伺服器校時 - 允許最大秒差 (毫秒)</translation>
     </message>
     <message>
       <source>OS time change check period</source>

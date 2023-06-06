@@ -679,7 +679,7 @@
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation type="unfinished">Web Page Port</translation>
+      <translation>網頁埠號</translation>
     </message>
   </context>
   <context>
@@ -797,7 +797,7 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>攝影機更換</translation>
     </message>
     <message>
       <source>Name</source>
@@ -906,19 +906,19 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>測試版</translation>
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>可使用的操作</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>影像匯出</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>即時串流與錄影資料</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -983,7 +983,7 @@
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>選擇另一個事件或動作</translation>
     </message>
   </context>
   <context>
@@ -1028,7 +1028,7 @@
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+      <translation>建立系統資料庫的備份，或者從已備份的資料庫還原系統。</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1036,7 +1036,7 @@
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>開啟資料夾</translation>
     </message>
   </context>
   <context>
@@ -1167,7 +1167,7 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>通用事件</translation>
     </message>
   </context>
   <context>
@@ -1190,23 +1190,23 @@
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) 網址</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S) 內容</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>內容類型</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>驗證類型</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>請求方法</translation>
     </message>
   </context>
   <context>
@@ -1335,7 +1335,7 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>新增評論</translation>
     </message>
     <message>
       <source>Set Schedule</source>
@@ -1343,11 +1343,11 @@
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>測試動作</translation>
     </message>
     <message>
       <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
+      <translation>新增評論</translation>
     </message>
   </context>
   <context>
@@ -1429,7 +1429,7 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>允許電腦在閒置時進入睡眠模式</translation>
     </message>
   </context>
   <context>
@@ -1795,19 +1795,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>日誌級別</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>依大小拆分</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>依時間拆分</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>最大音量限制</translation>
     </message>
   </context>
   <context>
@@ -1861,15 +1861,15 @@
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>下載已完成！</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>無法將日誌保存至所選資料夾</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>開啟檔案資料夾</translation>
     </message>
   </context>
   <context>
@@ -1998,11 +1998,11 @@
     </message>
     <message>
       <source>Get Update File</source>
-      <translation type="unfinished">Get Update File</translation>
+      <translation>取得更新檔案</translation>
     </message>
     <message>
       <source>Check Again</source>
-      <translation type="unfinished">Check Again</translation>
+      <translation>再次檢查</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -2064,7 +2064,7 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>連線設定</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2080,15 +2080,15 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>伺服器位址</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>安全協定</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>電子郵件設定</translation>
     </message>
     <message>
       <source>Support Signature</source>
@@ -2628,19 +2628,19 @@
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>新規則</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <translation>刪除規則</translation>
     </message>
     <message>
       <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <translation>選擇規則</translation>
     </message>
     <message>
       <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <translation>將規則重置為預設值</translation>
     </message>
   </context>
   <context>
@@ -2948,7 +2948,7 @@
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>管理</translation>
     </message>
   </context>
   <context>
@@ -3013,11 +3013,11 @@
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>分析資料可能會佔用大量硬碟空間。建議選擇其他位置，不要存放於系統磁區。</translation>
     </message>
     <message>
       <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
+      <translation>分析與位移資料將持續儲存於已停用的儲存裝置上。</translation>
     </message>
   </context>
   <context>
@@ -3085,7 +3085,7 @@
     </message>
     <message>
       <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
+      <translation>自訂手機推播通知的語言</translation>
     </message>
   </context>
   <context>
@@ -3153,11 +3153,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ 新增群組</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>找不到任何群組</translation>
     </message>
   </context>
   <context>
@@ -3172,7 +3172,7 @@
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>未找到此使用者</translation>
     </message>
   </context>
   <context>
