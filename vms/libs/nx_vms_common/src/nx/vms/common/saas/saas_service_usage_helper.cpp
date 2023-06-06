@@ -61,7 +61,7 @@ void IntegrationServiceUsageHelper::updateCacheUnsafe()
     {
         auto& cacheData = (*m_cache)[integrationId];
         cacheData.total += integration.totalChannelNumber;
-        if (saasData.state == SaasState::Active)
+        if (saasData.state == SaasState::active)
             cacheData.available += integration.totalChannelNumber;
     }
 
@@ -170,7 +170,7 @@ void CloudStorageServiceUsageHelper::updateCacheUnsafe()
     {
         auto& cacheData = cache[parameters.maxResolution];
         cacheData.total += parameters.totalChannelNumber;
-        if (saasData.state == SaasState::Active)
+        if (saasData.state == SaasState::active)
             cacheData.available += parameters.totalChannelNumber;
     }
 
