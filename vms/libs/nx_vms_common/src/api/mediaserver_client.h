@@ -64,9 +64,13 @@ public:
         nx::network::http::StatusCode::Value,
         nx::vms::api::MergeStatusReply)>;
 
+    using UpdateCloudStorageHandler = std::function<void(SystemError::ErrorCode,
+        nx::network::http::StatusCode::Value)>;
+
     void mergeSystems(
-        const nx::vms::api::SystemMergeData& request,
-        MergeSystemsHandler completionHandler);
+        const nx::vms::api::SystemMergeData& request, MergeSystemsHandler completionHandler);
+
+    void updateCloudStorage(UpdateCloudStorageHandler completionHandler);
 
     /**
      * Authentication through query param.
@@ -212,6 +216,37 @@ protected:
                     httpMethod,
                     std::move(fusionClient),
                     std::move(completionHandler));
+            });
+    }
+
+
+    void performRestApiRequest(nx::network::http::Method httpMethod,
+        const std::string& requestPath,
+        std::function<void(SystemError::ErrorCode,
+            nx::network::http::StatusCode::Value statusCode)> completionHandler)
+    {
+        const nx::utils::Url requestUrl = nx::network::url::Builder(m_baseRequestUrl)
+                                              .appendPath("/")
+                                              .appendPath(requestPath)
+                                              .toUrl();
+        nx::network::http::Credentials credentials;
+        if (NX_ASSERT(m_credentials))
+            credentials = *m_credentials;
+
+        auto fusionClient = std::make_unique<
+            nx::network::http::FusionDataHttpClient<void, void, SerializationImpl>>(
+            requestUrl, std::move(credentials), m_adapterFunc);
+        if (m_requestTimeout)
+            fusionClient->setRequestTimeout(*m_requestTimeout);
+
+        post(
+            [this,
+                httpMethod,
+                fusionClient = std::move(fusionClient),
+                completionHandler = std::move(completionHandler)]() mutable
+            {
+                executeRequest<decltype(fusionClient), decltype(completionHandler)>(
+                    httpMethod, std::move(fusionClient), std::move(completionHandler));
             });
     }
 

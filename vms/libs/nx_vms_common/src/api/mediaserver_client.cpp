@@ -80,6 +80,12 @@ void MediaServerClient::mergeSystems(
         std::move(completionHandler));
 }
 
+void MediaServerClient::updateCloudStorage(UpdateCloudStorageHandler completionHandler)
+{
+    performRestApiRequest(
+        Method::post, "rest/v3/system/cloud/updateStorages", std::move(completionHandler));
+}
+
 void MediaServerClient::setAuthenticationKey(const QString& key)
 {
     m_authenticationKey = key;
