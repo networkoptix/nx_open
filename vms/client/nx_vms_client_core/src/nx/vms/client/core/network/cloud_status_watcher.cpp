@@ -202,7 +202,6 @@ CloudStatusWatcher::CloudStatusWatcher(QObject* parent):
 
 CloudStatusWatcher::~CloudStatusWatcher()
 {
-    d->saveCredentials();
 }
 
 nx::network::http::Credentials CloudStatusWatcher::credentials() const
