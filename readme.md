@@ -43,6 +43,8 @@ Supported target platforms and architectures:
 Build prerequisites:
 - **Python 3.8+** - should be available on `PATH` as `python`, and for macOS and Ubuntu also as
     `python3`.
+- **Pip** - should be available on `PATH` as `pip` and be installed for the Python interpreter used
+    by the build.
 - **CMake 3.20+, Ninja 1.10.2+, Conan 1.46.x** - recommended to be installed via **`pip`**:
     ```
     git checkout master # The master branch contains a universal requirements.txt.
