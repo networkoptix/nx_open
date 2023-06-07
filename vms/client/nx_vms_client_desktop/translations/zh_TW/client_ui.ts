@@ -934,11 +934,11 @@
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>不要再顯示此視窗</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Cloud佈局功能介紹</translation>
     </message>
     <message>
       <source>Motion Search</source>

@@ -198,7 +198,7 @@
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>Appuyez plusieurs fois sur chaque bouton et écrivez les noms de ces boutons dans le tableau ci-dessous.</translation>
     </message>
   </context>
   <context>
@@ -547,11 +547,11 @@
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>Sélectionnez le joystick.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Aucun appareil connecté.</translation>
     </message>
   </context>
   <context>
@@ -585,11 +585,11 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Enregistrer</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Précédent</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1064,15 +1064,15 @@ pour activer le PTZ</translation>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>Choisir le fichier à enregistrer</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>Fichiers JSON (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>Fichier pour enregistrer les résultats :</translation>
     </message>
   </context>
   <context>
@@ -1381,21 +1381,21 @@ pour activer le PTZ</translation>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Déplacez le joystick à gauche et à droite plusieurs fois.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Déplacez le joystick de haut en bas plusieurs fois.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Faites pivoter le joystick dans le sens horaire et dans le sens inverse des aiguilles d'une montre plusieurs fois.</translation>
     </message>
   </context>
 </TS>

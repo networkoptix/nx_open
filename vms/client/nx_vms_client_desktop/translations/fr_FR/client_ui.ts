@@ -134,7 +134,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Ouvrir le dossier des fichiers</translation>
     </message>
   </context>
   <context>
@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
+      <translation>Utiliser la caméra source de l'événement</translation>
     </message>
   </context>
   <context>
@@ -651,27 +651,27 @@
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>Ne pas enregistrer le flux principal</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>Ne pas enregistrer le flux secondaire</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>Profil de flux secondaire</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>Profil de Flux Primaire</translation>
     </message>
     <message>
       <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
+      <translation>Importer depuis l'appareil</translation>
     </message>
     <message>
       <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
+      <translation>Importer automatiquement la vidéo</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -679,7 +679,7 @@
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation type="unfinished">Web Page Port</translation>
+      <translation>Port de la page Web</translation>
     </message>
   </context>
   <context>
@@ -817,7 +817,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>Nouvel appareil</translation>
     </message>
   </context>
   <context>
@@ -910,15 +910,15 @@
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>Actions disponibles</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>Exportation vidéo</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>Vidéo en direct et archives</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -930,15 +930,15 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>En savoir plus sur la page d'aide</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Ne plus afficher cette fenêtre</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Présentation des mises en page Cloud</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -946,11 +946,11 @@
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>Recherche de signets, objets, événements</translation>
     </message>
     <message>
       <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
+      <translation>Dans le futur</translation>
     </message>
   </context>
   <context>
@@ -1028,7 +1028,7 @@
     </message>
     <message>
       <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
+      <translation>Créer une sauvegarde des données de gestion du système ou restaurer les données de gestion du système à partir d'une sauvegarde existante</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1036,7 +1036,7 @@
     </message>
     <message>
       <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <translation>Ouvrir le dossier</translation>
     </message>
   </context>
   <context>
@@ -1202,7 +1202,7 @@
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>Type d'authentification</translation>
     </message>
     <message>
       <source>Request Method</source>
@@ -1347,7 +1347,7 @@
     </message>
     <message>
       <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
+      <translation>Ajouter un commentaire</translation>
     </message>
   </context>
   <context>
@@ -1429,7 +1429,7 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>Autoriser l'ordinateur à entrer en mode veille en mode inactif</translation>
     </message>
   </context>
   <context>
@@ -1795,19 +1795,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>Niveau de journalisation</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>Diviser le fichier par taille</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>Diviser le fichier par heure</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>Limite de volume maximum</translation>
     </message>
   </context>
   <context>
@@ -1861,15 +1861,15 @@
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Téléchargement terminé !</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Impossible d'enregistrer les logs dans le dossier sélectionné</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Ouvrir le dossier des fichiers</translation>
     </message>
   </context>
   <context>
@@ -1998,11 +1998,11 @@
     </message>
     <message>
       <source>Get Update File</source>
-      <translation type="unfinished">Get Update File</translation>
+      <translation>Obtenir le fichier de mise à jour</translation>
     </message>
     <message>
       <source>Check Again</source>
-      <translation type="unfinished">Check Again</translation>
+      <translation>Vérifier à nouveau</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -2636,11 +2636,11 @@
     </message>
     <message>
       <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <translation>Sélectionnez une règle</translation>
     </message>
     <message>
       <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <translation>Réinitialiser les règles par défaut</translation>
     </message>
   </context>
   <context>
@@ -3013,11 +3013,11 @@
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Les données d'analyse peuvent prendre une grande quantité d'espace. Nous vous recommandons de choisir un autre emplacement à la place de la partition système.</translation>
     </message>
     <message>
       <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
+      <translation>Les données d'analyse et de mouvement continueront d'être stockées sur le stockage désactivé.</translation>
     </message>
   </context>
   <context>

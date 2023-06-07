@@ -547,7 +547,7 @@
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>沒有任何連線裝置。</translation>
     </message>
   </context>
   <context>
