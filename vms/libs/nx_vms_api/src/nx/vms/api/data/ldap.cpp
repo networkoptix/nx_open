@@ -9,8 +9,7 @@ namespace nx::vms::api {
 bool LdapSettingsBase::isValid(bool checkPassword) const
 {
     return !uri.isEmpty()
-        && !adminDn.isEmpty()
-        && !(checkPassword && adminPassword.value_or("").isEmpty());
+        && (!checkPassword || !(adminDn.isEmpty() ^ adminPassword.value_or(QString()).isEmpty()));
 }
 
 int LdapSettingsBase::defaultPort(bool useSsl)
