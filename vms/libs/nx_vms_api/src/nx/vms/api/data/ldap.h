@@ -26,6 +26,8 @@ struct NX_VMS_API LdapSettingsBase
     nx::utils::Url uri;
 
     /**%apidoc
+     * Empty adminDn and empty adminPassword means using anonymous LDAP server bind for all
+     * interactions with it.
      * %example cn=admin,dc=la
      */
     QString adminDn;

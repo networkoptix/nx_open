@@ -604,7 +604,7 @@ void LdapSettingsWidget::testConnection(
     nx::vms::api::LdapSettings settings;
     settings.uri = nx::utils::Url::fromUserInput(url);
     settings.adminDn = adminDn;
-    settings.adminPassword = password;
+    settings.adminPassword = password.isEmpty() ? std::nullopt : std::make_optional(password);
 
     if (d->currentHandle)
         connectedServerApi()->cancelRequest(d->currentHandle);
