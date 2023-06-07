@@ -4,23 +4,15 @@
 
 #include <chrono>
 
-#include <QtCore/QRectF>
 #include <QtCore/QSize>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/resolution_data.h>
 
+#include "rect_as_string.h"
+
 namespace nx::vms::api {
-
-class ThumbnailCrop: public QRectF
-{
-public:
-    ThumbnailCrop() = default;
-    ThumbnailCrop(const QRectF& crop): QRectF(crop) {}
-};
-
-bool deserialize(QnJsonContext* ctx, const QJsonValue& value, ThumbnailCrop* target);
 
 struct NX_VMS_API ThumbnailFilter
 {
@@ -132,7 +124,7 @@ struct NX_VMS_API ThumbnailFilter
     bool tolerant = false;
 
     /**%apidoc[opt]:string Crop image, format `{x},{y},{width}x{height}` with values in range [0..1] */
-    ThumbnailCrop crop;
+    RectAsString crop;
 
     /**%apidoc[opt] Stream choice. */
     StreamSelectionMode streamSelectionMode = StreamSelectionMode::auto_;

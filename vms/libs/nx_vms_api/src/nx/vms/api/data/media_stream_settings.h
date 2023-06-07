@@ -6,14 +6,12 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/uuid.h>
-#include <nx/vms/api/data/resolution_data.h>
-#include <nx/vms/api/types/motion_types.h>
-#include <nx/vms/api/types/resource_types.h>
+
+#include "media_settings.h"
 
 namespace nx::vms::api {
 
-struct NX_VMS_API MediaStreamSettings
+struct NX_VMS_API MediaStreamSettings: public MediaSettings
 {
     static const QString kMpjpegBoundary;
     static constexpr int kDefaultMaxCachedFrames = 1;
@@ -30,47 +28,17 @@ struct NX_VMS_API MediaStreamSettings
         f4v
     );
 
-    /**%apidoc
-     * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     * /rest/v{1-}/devices) or MAC address (not supported for certain Devices).
-     */
-    QnUuid id;
-
     /**%apidoc[opt] Stream format. */
     Format format = Format::mkv;
 
     /**%apidoc[opt] Video quality. */
     StreamQuality quality = StreamQuality::normal;
 
-    /**%apidoc[opt]:string
-     * Turn on video transcoding to the specified resolution. Resolution string either may contain
-     * width and height (for instance, 320x240) or height only (for instance, 240p). By default,
-     * 640x480 is used.
-     */
-    std::optional<ResolutionData> resolution = std::nullopt;
-
-    /**%apidoc[opt]
-     * If present, specifies the Archive stream start position. Otherwise, the Live stream is
-     * provided.
-     */
-    std::optional<std::chrono::microseconds> positionUs = std::nullopt;
-
     /**%apidoc[opt]
      * If present, specifies the Archive stream end position. It is used only if the `positionUs`
      * parameter is present.
      */
     std::optional<std::chrono::microseconds> endPositionUs = std::nullopt;
-
-    /**%apidoc[opt]
-     * Item rotation, in degrees. If the parameter is absent, the video will be rotated to the
-     * default value defined in the Device Settings dialog.
-     *
-     * %value 0
-     * %value 90
-     * %value 180
-     * %value 270
-     */
-    std::optional<int> rotation = std::nullopt;
 
     /**%apidoc[opt] Drop Late Frames. */
     std::optional<int> dropLateFrames = std::nullopt;
@@ -97,12 +65,6 @@ struct NX_VMS_API MediaStreamSettings
      */
     bool accurateSeek = false;
 
-    /**%apidoc[opt]
-     * %value undefined The Server auto-detects the preferred stream index based on the destination
-     * resolution.
-     */
-    StreamIndex stream = nx::vms::api::StreamIndex::undefined;
-
     /**%apidoc[opt] Fragment length in seconds. Can be used for both live and archive streams -
      * for archive streams effectively it's another way to specify `endPositionUs`.
      */
@@ -128,9 +90,9 @@ struct NX_VMS_API MediaStreamSettings
 
     static QByteArray getMimeType(const QString& format);
 };
-#define MediaStreamSettings_Fields (id)(format)(quality)(resolution)(positionUs)(endPositionUs)\
-    (rotation)(dropLateFrames)(standFrameDuration)(realTimeOptimization)(audioOnly)(accurateSeek)\
-    (stream)(durationS)(signature)(utcTimestamps)(continuousTimestamps)(download)
+#define MediaStreamSettings_Fields MediaSettings_Fields(format)(quality)(endPositionUs)\
+    (dropLateFrames)(standFrameDuration)(realTimeOptimization)(audioOnly)(accurateSeek)\
+    (durationS)(signature)(utcTimestamps)(continuousTimestamps)(download)
 QN_FUSION_DECLARE_FUNCTIONS(MediaStreamSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MediaStreamSettings, MediaStreamSettings_Fields)
 
