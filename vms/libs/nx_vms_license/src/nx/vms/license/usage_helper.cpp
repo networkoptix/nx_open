@@ -45,6 +45,7 @@ namespace nx::vms::license {
 const QString LicenseServer::baseUrl(common::SystemContext* context)
 {
     auto result = context->globalSettings()->licenseServerUrl();
+    result = result.trimmed();
     while (result.endsWith('/'))
         result.chop(1);
     return result + "/nxlicensed";
