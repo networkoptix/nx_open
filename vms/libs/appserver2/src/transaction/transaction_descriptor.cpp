@@ -962,34 +962,22 @@ struct ModifyResourceParamAccess
         auto target = resPool->getResourceById(param.resourceId);
         if (!isRemove && param.name == ResourcePropertyKey::Server::kMetadataStorageIdKey)
         {
-            if (param.resourceId != commonModule->peerId())
-            {
-                return Result(ErrorCode::forbidden,
-                    NX_FMT("Setting analytics storage for different server is forbidden"));
-            }
-
             const auto metadataStorageId = QnUuid::fromStringSafe(param.value);
-            const auto ownServer = resPool->getResourceById<QnMediaServerResource>(param.resourceId);
-            if (!NX_ASSERT(ownServer))
+            const auto server = resPool->getResourceById<QnMediaServerResource>(param.resourceId);
+            if (!NX_ASSERT(server))
             {
                 return Result(ErrorCode::serverError,
-                    NX_FMT("Own server %1 does not exist", param.resourceId));
+                    NX_FMT("Server %1 does not exist", param.resourceId));
             }
 
-            const auto ownStorages = ownServer->getStorages();
-            const auto storage = nx::utils::find_if(ownStorages,
+            const auto storages = server->getStorages();
+            const auto storage = nx::utils::find_if(storages,
                 [&metadataStorageId](const auto& s) { return s->getId() == metadataStorageId; });
 
             if (!storage)
             {
                 return Result(ErrorCode::badRequest,
                     NX_FMT("Storage %1 does not belong to the server", param.value));
-            }
-
-            if (!(*storage)->canStoreAnalytics())
-            {
-                return Result(ErrorCode::forbidden,
-                    NX_FMT("Storage %1 can not store analytics", param.value));
             }
         }
 
