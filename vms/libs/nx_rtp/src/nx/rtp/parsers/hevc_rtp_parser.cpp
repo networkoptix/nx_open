@@ -480,7 +480,7 @@ void HevcParser::insertPayloadHeader(
 nx::utils::ByteArray HevcParser::buildParameterSetsIfNeeded()
 {
     constexpr int kHeaderReservedSize = 64;
-    nx::utils::ByteArray buffer(/*aligment*/ 0, kHeaderReservedSize, /*padding*/ 0);
+    nx::utils::ByteArray buffer(/*aligment*/ 1, kHeaderReservedSize, /*padding*/ 0);
     if (!m_context.inStreamVpsFound && m_context.spropVps)
     {
         buffer.write(
