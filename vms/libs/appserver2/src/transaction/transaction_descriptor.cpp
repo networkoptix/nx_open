@@ -1066,34 +1066,23 @@ struct ModifyResourceParamAccess
     {
         const auto resPool = systemContext->resourcePool();
 
-        if (param.resourceId != systemContext->peerId())
-        {
-            return Result(ErrorCode::forbidden, ServerApiErrors::tr(
-                "Setting analytics Storage for a different Server is forbidden."));
-        }
 
         const auto metadataStorageId = QnUuid::fromStringSafe(param.value);
-        const auto ownServer = resPool->getResourceById<QnMediaServerResource>(param.resourceId);
-        if (!NX_ASSERT(ownServer))
+        const auto server = resPool->getResourceById<QnMediaServerResource>(param.resourceId);
+        if (!NX_ASSERT(server))
         {
             return Result(ErrorCode::serverError, nx::format(ServerApiErrors::tr(
                 "Server %1 does not exist."), param.resourceId));
         }
 
-        const auto ownStorages = ownServer->getStorages();
-        const auto storage = nx::utils::find_if(ownStorages,
+        const auto storages = server->getStorages();
+        const auto storage = nx::utils::find_if(storages,
             [&metadataStorageId](const auto& s) { return s->getId() == metadataStorageId; });
 
         if (!storage)
         {
             return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
                 "Storage %1 does not belong to this Server."), param.value));
-        }
-
-        if (!(*storage)->canStoreAnalytics())
-        {
-            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                "Storage %1 can not store analytics."), param.value));
         }
 
         return Result();
