@@ -3,11 +3,11 @@
 #include "filter_helper.h"
 
 #include <core/resource/media_resource.h>
-#include <nx/core/transcoding/filters/text_image_filter.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include <nx/core/transcoding/filters/text_image_filter.h>
+#include <nx/vms/time/formatter.h>
 #include <utils/common/util.h>
 #include <utils/media/frame_info.h>
-#include <nx/vms/time/formatter.h>
 
 namespace {
 
@@ -69,9 +69,15 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
     settings.enhancement = legacy.contrastParams;
     settings.zoomWindow = legacy.zoomWindow;
     settings.watermark = legacy.watermark;
+    auto dewarpingMedia = legacy.resource->getDewarpingParams();
+    if (legacy.forceDewarping)
+    {
+        dewarpingMedia.enabled = true;
+        settings.dewarping.enabled = true;
+    }
 
     nx::core::transcoding::FilterChain result(
-        settings, legacy.resource->getDewarpingParams(), legacy.resource->getVideoLayout());
+        settings, dewarpingMedia, legacy.resource->getVideoLayout());
 
     using nx::core::transcoding::TextImageFilter;
     TextImageFilter::Factor factor(1, 1);

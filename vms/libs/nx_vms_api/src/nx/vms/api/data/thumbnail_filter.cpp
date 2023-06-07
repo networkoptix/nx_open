@@ -8,9 +8,4 @@ namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ThumbnailFilter, (json), ThumbnailFilter_Fields)
 
-bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, ThumbnailCrop* target)
-{
-    return value.isString() && QnLexical::deserialize<QRectF>(value.toString(), target);
-}
-
 } // namespace nx::vms::api
