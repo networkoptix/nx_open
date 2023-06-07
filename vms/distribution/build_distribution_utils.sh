@@ -9,11 +9,11 @@
 #--------------------------------------------------------------------------------------------------
 # private
 
-# [in] PLATFORM
+# [in] PLATFORM_NEW
 #
 distrib_librarySuffix()
 {
-    if [[ "${PLATFORM}" =~ ^macos_.*$ ]]; then
+    if [[ "${PLATFORM_NEW}" =~ ^macos_.*$ ]]; then
         echo "dylib"
     else
         echo "so"
