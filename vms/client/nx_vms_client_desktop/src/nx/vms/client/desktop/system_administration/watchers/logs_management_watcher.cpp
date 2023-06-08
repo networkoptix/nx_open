@@ -199,6 +199,8 @@ void ClientLogCollector::run()
             }
 
             static constexpr int kBufferSize = 64 * 1024;
+            uint64_t currentSize = 0;
+            uint64_t fileSize = 0;
             if (rotation && extension == File::Extension::zip)
             {
                 QuaZip rotatedArchive(path);
@@ -245,11 +247,13 @@ void ClientLogCollector::run()
                     return;
                 }
 
+                fileSize = fileName.size();
                 while (!m_cancelled
                     && deflatedLog.pos() < deflatedLog.size()
                     && deflatedLog.getZipError() == 0 && zip.getZipError() == 0)
                 {
                     const auto buf = deflatedLog.read(kBufferSize);
+                    emit progressChanged((currentSize += kBufferSize) * 100.0 / fileSize);
                     if (!buf.isEmpty())
                         zip.write(buf);
                 }
@@ -289,10 +293,12 @@ void ClientLogCollector::run()
                     return;
                 }
 
+                fileSize = textLog.size();
                 while (!m_cancelled && !textLog.atEnd()
                     && textLog.error() == QFileDevice::NoError && zip.getZipError() == 0)
                 {
                     const auto buf = textLog.read(kBufferSize);
+                    emit progressChanged((currentSize += kBufferSize) * 100.0 / fileSize);
                     if (!buf.isEmpty())
                         zip.write(buf);
                 }
