@@ -930,7 +930,7 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>在幫助頁面上了解更多詳細資訊</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
@@ -946,11 +946,11 @@
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>搜索書籤、物件、事件</translation>
     </message>
     <message>
       <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
+      <translation>未來</translation>
     </message>
   </context>
   <context>
@@ -979,7 +979,7 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>此操作僅能套用於即時事件</translation>
     </message>
     <message>
       <source>Select another event or action</source>
@@ -2624,7 +2624,7 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>警告與事件規則</translation>
     </message>
     <message>
       <source>New Rule</source>
@@ -2944,7 +2944,7 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>聲音</translation>
     </message>
     <message>
       <source>Manage</source>

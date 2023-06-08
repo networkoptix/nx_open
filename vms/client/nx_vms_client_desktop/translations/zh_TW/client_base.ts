@@ -5595,7 +5595,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>系統碟已用於儲存分析資料</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -6628,7 +6628,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Only some of the selected devices can be moved to %1</source>
-      <translation type="unfinished">Only some of the selected devices can be moved to %1</translation>
+      <translation>僅能將部分選定裝置移動到 %1</translation>
     </message>
     <message>
       <source>Move Partially</source>
@@ -7953,7 +7953,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Introducing %1 Layouts</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Introducing %1 Layouts</translation>
+      <translation>%1佈局功能介紹</translation>
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
@@ -10534,7 +10534,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation type="unfinished">Replaced camera discovered</translation>
+      <translation>已找到用來更換的攝影機</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
@@ -10876,7 +10876,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Users with Digest Authentication</source>
-      <translation type="unfinished">Users with Digest Authentication</translation>
+      <translation>支援Digest驗證的使用者</translation>
     </message>
   </context>
   <context>
@@ -11302,7 +11302,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Cannot find an item with the specified ID</source>
-      <translation type="unfinished">Cannot find an item with the specified ID</translation>
+      <translation>無法找到與指定ID相關的項目</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
