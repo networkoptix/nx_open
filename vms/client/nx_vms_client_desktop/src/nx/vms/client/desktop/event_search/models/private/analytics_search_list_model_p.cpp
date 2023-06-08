@@ -699,7 +699,7 @@ rest::Handle AnalyticsSearchListModel::Private::lookupObjectTracksCached(
     }
     else
     {
-        const auto responseHandler =
+        const auto responseHandler = nx::utils::guarded(this,
             [this](bool success, rest::Handle handle, nx::analytics::db::LookupResult&& result)
             {
                 const auto contextIt = std::find_if(cachedRequests.begin(), cachedRequests.end(),
@@ -728,13 +728,17 @@ rest::Handle AnalyticsSearchListModel::Private::lookupObjectTracksCached(
 
                 NX_VERBOSE(q, "Removed handle=%1 from cache, %2 requests are still cached",
                     handle, cachedRequests.size());
-        };
+        });
 
         LookupContext context;
         context.filter = request;
         context.callbacks[(intptr_t) this] = std::move(callback);
 
-        context.handle = connectedServerApi()->lookupObjectTracks(
+        const auto api = connectedServerApi();
+        if (!api)
+            return {};
+
+        context.handle = api->lookupObjectTracks(
             request, /*isLocal*/ false, responseHandler, thread());
 
         NX_VERBOSE(q, "Created a new request, handle=%1", context.handle);
