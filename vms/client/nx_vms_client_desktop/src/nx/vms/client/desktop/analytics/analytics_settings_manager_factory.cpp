@@ -8,6 +8,7 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/server_runtime_event_data.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
@@ -127,9 +128,12 @@ AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
         {
             if (eventData.eventType == ServerRuntimeEventType::deviceAgentSettingsMaybeChanged)
             {
-                const auto payload =
-                    QJson::deserialized<DeviceAgentSettingsMaybeChangedData>(
-                        eventData.eventData);
+                const auto [payload, success] =
+                    nx::reflect::json::deserialize<DeviceAgentSettingsMaybeChangedData>(
+                        eventData.eventData.toStdString());
+
+                if (!NX_ASSERT(success, "Could not deserialize event data"))
+                    return;
 
                 managerPtr->storeSettings(
                     {payload.deviceId, payload.engineId},
