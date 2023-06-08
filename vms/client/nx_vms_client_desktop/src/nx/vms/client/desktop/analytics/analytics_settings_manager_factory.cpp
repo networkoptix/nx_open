@@ -38,11 +38,16 @@ public:
         if (!NX_ASSERT(device) || !NX_ASSERT(engine) || !NX_ASSERT(m_owner))
             return {};
 
-        return connectedServerApi()->getDeviceAnalyticsSettings(
-            device,
-            engine,
-            nx::utils::guarded(m_owner, callback),
-            m_owner->thread());
+        if (const auto api = connectedServerApi())
+        {
+            return api->getDeviceAnalyticsSettings(
+                device,
+                engine,
+                nx::utils::guarded(m_owner, callback),
+                m_owner->thread());
+        }
+
+        return {};
     }
 
     virtual rest::Handle applySettings(
@@ -55,13 +60,18 @@ public:
         if (!NX_ASSERT(device) || !NX_ASSERT(engine) || !NX_ASSERT(m_owner))
             return {};
 
-        return connectedServerApi()->setDeviceAnalyticsSettings(
-            device,
-            engine,
-            settings,
-            settingsModelId,
-            nx::utils::guarded(m_owner, callback),
-            m_owner->thread());
+        if (const auto api = connectedServerApi())
+        {
+            return api->setDeviceAnalyticsSettings(
+                device,
+                engine,
+                settings,
+                settingsModelId,
+                nx::utils::guarded(m_owner, callback),
+                m_owner->thread());
+        }
+
+        return {};
     }
 
     virtual rest::Handle activeSettingsChanged(
@@ -76,15 +86,20 @@ public:
         if (!NX_ASSERT(device) || !NX_ASSERT(engine) || !NX_ASSERT(m_owner))
             return {};
 
-        return connectedServerApi()->deviceAnalyticsActiveSettingsChanged(
-            device,
-            engine,
-            activeElement,
-            settingsModel,
-            settingsValues,
-            paramValues,
-            nx::utils::guarded(m_owner, callback),
-            m_owner->thread());
+        if (const auto api = connectedServerApi())
+        {
+            return api->deviceAnalyticsActiveSettingsChanged(
+                device,
+                engine,
+                activeElement,
+                settingsModel,
+                settingsValues,
+                paramValues,
+                nx::utils::guarded(m_owner, callback),
+                m_owner->thread());
+        }
+
+        return {};
     }
 
 private:
