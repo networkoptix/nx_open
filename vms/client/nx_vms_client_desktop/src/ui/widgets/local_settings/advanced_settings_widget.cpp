@@ -159,6 +159,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     connect(ui->downloadLogsButton, &QPushButton::clicked, this,
         [this]
         {
+            d->finished = d->success = false;
             QString dir = QFileDialog::getExistingDirectory(
                 this,
                 tr("Select Folder..."),
@@ -186,6 +187,11 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
                     d->success = false;
                     updateLogsManagementWidgetsState();
                 });
+            connect(d->logsCollector.get(), &ClientLogCollector::progressChanged, this,
+                [this](double value)
+                {
+                    ui->logsDownloadProgressBar->setValue(value);
+                });
             d->logsCollector->start();
 
             updateLogsManagementWidgetsState();
@@ -212,7 +218,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
         [this]
         {
             if (!d->path.isEmpty())
-                QDesktopServices::openUrl(d->path);
+                QDesktopServices::openUrl(QUrl::fromLocalFile(d->path));
         });
     auto resetLogsDownloadState =
         [this]
