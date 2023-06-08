@@ -59,8 +59,6 @@ public:
 
 private:
     int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
-    QSharedPointer<CLVideoDecoderOutput> processFilterChain(
-        const QSharedPointer<CLVideoDecoderOutput>& decodedFrame);
     bool prepareFilters(AVCodecID dstCodec, const QnConstCompressedVideoDataPtr& video);
     std::pair<uint32_t, QnFfmpegVideoDecoder*> getDecoder(
         const QnConstCompressedVideoDataPtr& video);

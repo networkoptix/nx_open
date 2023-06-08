@@ -337,7 +337,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         }
     }
 
-    decodedFrame = processFilterChain(decodedFrame);
+    decodedFrame = m_filters.apply(decodedFrame);
     if (!decodedFrame)
     {
         NX_ERROR(this, "Failed to process filter chain for video frame");
@@ -442,21 +442,6 @@ void QnFfmpegVideoTranscoder::setUseMultiThreadDecode(bool value)
 QSize QnFfmpegVideoTranscoder::getOutputResolution() const
 {
     return m_targetResolution;
-}
-
-CLVideoDecoderOutputPtr QnFfmpegVideoTranscoder::processFilterChain(
-    const CLVideoDecoderOutputPtr& decodedFrame)
-{
-    if (m_filters.isEmpty())
-        return decodedFrame;
-    CLVideoDecoderOutputPtr result = decodedFrame;
-    for (QnAbstractImageFilterPtr filter: m_filters)
-    {
-        result = filter->updateImage(result);
-        if (!result)
-            break;
-    }
-    return result;
 }
 
 void QnFfmpegVideoTranscoder::setFilterChain(const nx::core::transcoding::FilterChain& filters)
