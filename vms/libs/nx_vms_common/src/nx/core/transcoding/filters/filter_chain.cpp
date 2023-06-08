@@ -154,9 +154,17 @@ QSize FilterChain::apply(const QSize& resolution) const
 
 CLVideoDecoderOutputPtr FilterChain::apply(const CLVideoDecoderOutputPtr& source) const
 {
-    auto result = source;
+    if (empty() || !source)
+        return source;
+
+    // Make a deep copy of the source frame since modifying a frame received from a decoder can
+    // affect further decoding process.
+    CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput());
+    result->copyFrom(source.get());
+
     for (auto filter: *this)
         result = filter->updateImage(result);
+
     return result;
 }
 
