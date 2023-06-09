@@ -54,6 +54,9 @@ void P2PHttpServerTransport::start(
         std::chrono::seconds(10),
         [this]()
         {
+            if (m_failed)
+                return;
+
             if (m_onGetRequestReceived)
                 m_onGetRequestReceived(SystemError::connectionAbort);
             else
@@ -61,9 +64,12 @@ void P2PHttpServerTransport::start(
         });
 
     m_sendSocket->readSomeAsync(
-        &m_sendBuffer,
+        &m_sendChannelReadBuffer,
         [this](SystemError::ErrorCode error, size_t transferred)
         {
+            if (m_failed)
+                return;
+
             utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
             m_onGetRequestReceived(
                 error != SystemError::noError || transferred == 0
@@ -108,11 +114,17 @@ void P2PHttpServerTransport::initiatePingPong()
         *pingTimeout(),
         [this]()
         {
+            if (m_failed)
+                return;
+
             sendPingOrPong(Headers::ping);
             m_timer.start(
                 *pingTimeout() / 2,
                 [this]()
                 {
+                    if (m_failed)
+                        return;
+
                     NX_DEBUG(this, "Closing connection because there was no answer to ping");
                     setFailedState(SystemError::connectionAbort);
                 });
@@ -124,6 +136,9 @@ void P2PHttpServerTransport::sendPingOrPong(Headers type)
     post(
         [this, type]()
         {
+            if (m_failed)
+                return;
+
             auto handler =
                 [this, type](SystemError::ErrorCode code, size_t transferred)
                 {
@@ -183,6 +198,9 @@ void P2PHttpServerTransport::onReadFromSendSocket(
             &m_sendChannelReadBuffer,
             [this](SystemError::ErrorCode error, size_t transferred)
             {
+                if (m_failed)
+                    return;
+
                 onReadFromSendSocket(error, transferred);
             });
     }
@@ -248,6 +266,9 @@ void P2PHttpServerTransport::onRead(SystemError::ErrorCode error, size_t transfe
         &m_readBuffer,
         [this](auto error, auto transferred)
         {
+            if (m_failed)
+                return;
+
             onRead(error, transferred);
         });
 }
@@ -259,6 +280,9 @@ void P2PHttpServerTransport::gotPostConnection(
     post(
         [this, socket = std::move(socket), request = std::move(request)]() mutable
         {
+            if (m_failed)
+                return;
+
             m_readSocket = std::move(socket);
             m_readSocket->setNonBlockingMode(true);
             m_readSocket->bindToAioThread(getAioThread());
@@ -270,6 +294,9 @@ void P2PHttpServerTransport::gotPostConnection(
                 &m_readBuffer,
                 [this](auto error, auto transferred)
                 {
+                    if (m_failed)
+                        return;
+
                     onRead(error, transferred);
                 });
         });
@@ -282,7 +309,10 @@ void P2PHttpServerTransport::readSomeAsync(
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            if (m_onGetRequestReceived || m_failed)
+            if (m_failed)
+                return;
+
+            if (m_onGetRequestReceived)
                 return handler(SystemError::connectionAbort, 0);
 
             NX_ASSERT(!m_userReadHandlerPair);
@@ -310,8 +340,12 @@ void P2PHttpServerTransport::onIncomingPost(nx::network::http::Request request)
     if (!pingOrPong)
     {
         sendPostResponse(
-            [this, request = std::move(request)](SystemError::ErrorCode error, size_t transferred)
+            [this, request = std::move(request)]
+            (SystemError::ErrorCode error, size_t transferred)
             {
+                if (m_failed)
+                    return;
+
                 if (error != SystemError::noError || transferred <= 0)
                 {
                     NX_VERBOSE(this, "Response to POST failed");
@@ -372,8 +406,12 @@ void P2PHttpServerTransport::sendPostResponse(network::IoCompletionHandler handl
 
     m_readSocket->sendAsync(
         &m_responseBuffer,
-        [this, handler = std::move(handler)](SystemError::ErrorCode error, size_t transferred)
+        [this, handler = std::move(handler)]
+        (SystemError::ErrorCode error, size_t transferred)
         {
+            if (m_failed)
+                return;
+
             m_responseBuffer.clear();
             handler(error, transferred);
         });
@@ -425,6 +463,9 @@ void P2PHttpServerTransport::sendNextMessage()
         &m_sendBuffer,
         [this, next = std::move(next)](SystemError::ErrorCode error, size_t transferred)
         {
+            if (m_failed)
+                return;
+
             NX_VERBOSE(
                 this,
                 nx::format("Send completed. error: %1, transferred: %2").args(error, transferred));
@@ -455,6 +496,9 @@ void P2PHttpServerTransport::sendAsync(
     post(
         [this, encodedBuffer = std::move(encodedBuffer), handler = std::move(handler)]() mutable
         {
+            if (m_failed)
+                return;
+
             m_outgoingMessageQueue.push(OutgoingData{
                 encodedBuffer, std::move(handler), Headers::contentType});
 
