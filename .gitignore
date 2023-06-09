@@ -29,6 +29,9 @@ __pycache__
 *.qmlc
 
 # Build folders in the repository root.
+cmake-build-debug
+cmake-build-release
+cmake-build-relwithdebinfo
 /build/
 /build-*/
 /*-build/
