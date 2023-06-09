@@ -90,6 +90,9 @@ void P2PHttpClientTransport::sendPingOrPong(const std::string& name)
     post(
         [this, name]() mutable
         {
+            if (m_failed)
+                return;
+
             NX_VERBOSE(this, "Sending %1", name);
             m_outgoingMessageQueue.push(OutgoingData{
                 std::nullopt,
@@ -113,6 +116,7 @@ void P2PHttpClientTransport::sendPingOrPong(const std::string& name)
 
 void P2PHttpClientTransport::setFailedState()
 {
+    NX_DEBUG(this, "%1: Going to failed state", __func__);
     m_failed = true;
     if (m_userReadHandlerPair)
         m_userReadHandlerPair->second(SystemError::timedOut, 0);
@@ -137,11 +141,17 @@ void P2PHttpClientTransport::initiatePingPong()
         *pingTimeout(),
         [this]()
         {
+            if (m_failed)
+                return;
+
             sendPingOrPong("ping");
             m_timer.start(
                 *pingTimeout() / 2,
                 [this]()
                 {
+                    if (m_failed)
+                        return;
+
                     NX_DEBUG(this, "Closing connection because there was no answer to ping");
                     setFailedState();
                 });
@@ -167,6 +177,9 @@ void P2PHttpClientTransport::readSomeAsync(
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
+            if (m_failed)
+                return;
+
             NX_ASSERT(
                 !m_userReadHandlerPair,
                 "Don't call readSomeAsync() again, before the previous handler has been invoked.");
@@ -249,6 +262,9 @@ void P2PHttpClientTransport::sendNextMessage()
         m_url,
         [this, next = std::move(next)]()
         {
+            if (m_failed)
+                return;
+
             const bool isResponseValid = m_writeHttpClient->response()
                 && m_writeHttpClient->response()->statusLine.statusCode
                     == network::http::StatusCode::ok;
@@ -285,6 +301,9 @@ void P2PHttpClientTransport::sendAsync(
         [this, buffer = *buffer, bufferSize = buffer->size(),
             handler = std::move(handler)]() mutable
         {
+            if (m_failed)
+                return;
+
             m_outgoingMessageQueue.push(OutgoingData{
                 buffer, std::move(handler), network::http::HttpHeaders{}});
 
@@ -340,6 +359,9 @@ void P2PHttpClientTransport::startReading()
     m_readHttpClient->setOnResponseReceived(
         [this]()
         {
+            if (m_failed)
+                return;
+
             auto nextFilter = nx::utils::bstream::makeCustomOutputStream(
                 [this](const nx::ConstBufferRefType& data)
                 {
@@ -407,12 +429,12 @@ void P2PHttpClientTransport::startReading()
                 {
                     NX_WARNING(
                         this, "startReading: Expected a multipart response from '%1'. It is not.", m_url);
-                    m_failed = true;
+                    setFailedState();
                 }
             }
             else
             {
-                m_failed = true;
+                setFailedState();
             }
 
             if (m_onStartHandler)
@@ -436,46 +458,22 @@ void P2PHttpClientTransport::startReading()
         [this]()
         {
             if (!m_multipartContentParser.processData(m_readHttpClient->fetchMessageBodyBuffer()))
-                m_failed = true;
+                setFailedState();
         });
 
     m_readHttpClient->setOnDone(
         [this]()
         {
+            if (m_failed)
+                return;
+
             NX_VERBOSE(
                 this,
                 "The read (GET) http client emitted 'onDone'. Moving to a failed state.");
 
-            m_failed = true;
-            if (m_userReadHandlerPair)
-            {
-                nx::Buffer outBuffer;
-                SystemError::ErrorCode errorCode = SystemError::noError;
-
-                if (!m_incomingMessageQueue.empty())
-                {
-                    outBuffer = m_incomingMessageQueue.front();
-                    m_incomingMessageQueue.pop();
-                    m_userReadHandlerPair->first->append(
-                        m_messageType == network::websocket::FrameType::binary
-                        ? nx::utils::fromBase64(outBuffer) : outBuffer);
-
-                }
-                else
-                {
-                    errorCode = SystemError::connectionAbort;
-                }
-
-                utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
-                m_userReadHandlerPair->second(errorCode, outBuffer.size());
-                if (watcher.interrupted())
-                    return;
-
-                m_userReadHandlerPair.reset();
-            }
-
-        if (m_onStartHandler)
-            nx::utils::swapAndCall(m_onStartHandler, SystemError::connectionAbort);
+            setFailedState();
+            if (m_onStartHandler)
+                nx::utils::swapAndCall(m_onStartHandler, SystemError::connectionAbort);
         });
 
     NX_VERBOSE(this, "startReading: Sending initial GET request to '%1'", m_url);
