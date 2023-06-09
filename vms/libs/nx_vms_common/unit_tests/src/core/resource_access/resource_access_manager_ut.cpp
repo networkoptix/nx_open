@@ -7,6 +7,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
@@ -179,9 +180,8 @@ protected:
     QnUserResourcePtr m_currentUser;
 };
 
-/************************************************************************/
-/* Checking layouts as Power User                                       */
-/************************************************************************/
+// ------------------------------------------------------------------------------------------------
+// Checking layouts as Power User
 
 /** Check permissions for common layout when the user is logged in as Power User. */
 TEST_F(ResourceAccessManagerTest, checkLayoutAsPowerUser)
@@ -215,9 +215,8 @@ TEST_F(ResourceAccessManagerTest, checkLockedLayoutAsPowerUser)
     checkPermissions(layout, desired, forbidden);
 }
 
-/************************************************************************/
-/* Checking own layouts as viewer                                       */
-/************************************************************************/
+// ------------------------------------------------------------------------------------------------
+// Checking own layouts as viewer
 
 /** Check permissions for common layout when the user is logged in as viewer. */
 TEST_F(ResourceAccessManagerTest, checkLayoutAsViewer)
@@ -262,9 +261,9 @@ TEST_F(ResourceAccessManagerTest, checkLockedChanged)
     ASSERT_FALSE(hasPermission(user, layout, Qn::AddRemoveItemsPermission));
 }
 
-/************************************************************************/
-/* Checking non-own remote layouts                                      */
-/************************************************************************/
+// ------------------------------------------------------------------------------------------------
+// Checking non-own remote layouts
+
 /** Check permissions for another viewer's layout when the user is logged in as viewer. */
 TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsViewer)
 {
@@ -279,7 +278,10 @@ TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsViewer)
     checkPermissions(layout, desired, forbidden);
 }
 
-/** Check permissions for another viewer's layout when the user is logged in as Power User. */
+/**
+ * Check permissions for another viewer's layout when the user is logged in as Power User.
+ * Since 5.2 Power Users no longer have access to other users' layouts.
+ */
 TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsPowerUser)
 {
     loginAs(kPowerUsersGroupId);
@@ -288,12 +290,15 @@ TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsPowerUser)
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     resourcePool()->addResource(layout);
 
-    Qn::Permissions desired = Qn::FullLayoutPermissions;
-    Qn::Permissions forbidden = Qn::NoPermissions;
+    Qn::Permissions desired = Qn::NoPermissions;
+    Qn::Permissions forbidden = Qn::FullLayoutPermissions;
     checkPermissions(layout, desired, forbidden);
 }
 
-/** Check permissions for another Power User's layout when the user is logged in as Power User. */
+/**
+ * Check permissions for another Power User's layout when the user is logged in as Power User.
+ * Since 5.2 Power Users no longer have access to other users' layouts.
+ */
 TEST_F(ResourceAccessManagerTest, checkNonOwnPowerUsersLayoutAsPowerUser)
 {
     loginAs(kPowerUsersGroupId);
@@ -302,10 +307,21 @@ TEST_F(ResourceAccessManagerTest, checkNonOwnPowerUsersLayoutAsPowerUser)
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     resourcePool()->addResource(layout);
 
-    Qn::Permissions desired = Qn::ModifyLayoutPermission;
+    Qn::Permissions desired = Qn::NoPermissions;
     Qn::Permissions forbidden = Qn::FullLayoutPermissions;
-    forbidden &= ~desired;
+    checkPermissions(layout, desired, forbidden);
+}
 
+/** Check permissions for unknown user's layout when the user is logged in as Power User. */
+TEST_F(ResourceAccessManagerTest, checkUnknownUsersLayoutAsPowerUser)
+{
+    loginAs(kPowerUsersGroupId);
+
+    auto layout = createLayout(Qn::remote, false, QnUuid::createUuid());
+    resourcePool()->addResource(layout);
+
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = Qn::NoPermissions;
     checkPermissions(layout, desired, forbidden);
 }
 
@@ -323,9 +339,9 @@ TEST_F(ResourceAccessManagerTest, checkNonOwnPowerUsersLayoutAsAdministrator)
     checkPermissions(layout, desired, forbidden);
 }
 
-/************************************************************************/
-/* Checking shared layouts                                              */
-/************************************************************************/
+// ------------------------------------------------------------------------------------------------
+// Checking shared layouts
+
 /** Check permissions for shared layout when the user is logged in as viewer. */
 TEST_F(ResourceAccessManagerTest, checkSharedLayoutAsViewer)
 {
@@ -371,8 +387,9 @@ TEST_F(ResourceAccessManagerTest, checkNewSharedLayoutAsPowerUser)
     resourcePool()->addResource(layout);
 
     /* PowerUser cannot modify administrator's layout. */
-    Qn::Permissions desired = Qn::ModifyLayoutPermission;
-    Qn::Permissions forbidden = Qn::WriteNamePermission | Qn::SavePermission;
+    Qn::Permissions desired = Qn::NoPermissions;
+    Qn::Permissions forbidden =
+        Qn::ModifyLayoutPermission | Qn::WriteNamePermission | Qn::SavePermission;
     checkPermissions(layout, desired, forbidden);
 
     layout->setParentId(QnUuid());
@@ -1569,9 +1586,8 @@ TEST_F(ResourceAccessManagerTest, checkDefaultAuthCameraNonChangeable)
     ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
 }
 
-/************************************************************************/
-/* Checking servers access rights                                       */
-/************************************************************************/
+// ------------------------------------------------------------------------------------------------
+// Checking servers access rights
 
 /* PowerUser must have full permissions for servers. */
 TEST_F(ResourceAccessManagerTest, checkServerAsPowerUser)
@@ -1613,9 +1629,8 @@ TEST_F(ResourceAccessManagerTest, checkServerAsLiveViewer)
     checkPermissions(server, desired, forbidden);
 }
 
-/************************************************************************/
-/* Checking storages access rights                                       */
-/************************************************************************/
+// ------------------------------------------------------------------------------------------------
+// Checking storages access rights
 
 /* PowerUser must have full permissions for storages. */
 TEST_F(ResourceAccessManagerTest, checkStoragesAsPowerUser)
@@ -1661,14 +1676,13 @@ TEST_F(ResourceAccessManagerTest, checkStoragesAsLiveViewer)
     checkPermissions(storage, desired, forbidden);
 }
 
-/************************************************************************/
-/* Checking videowall access rights                                     */
-/************************************************************************/
+// ------------------------------------------------------------------------------------------------
+// Checking videowall access rights
 
 /* PowerUser must have full permissions for videowalls. */
 TEST_F(ResourceAccessManagerTest, checkVideowallAsPowerUser)
 {
-    loginAsAdministrator();
+    loginAs(kPowerUsersGroupId);
 
     auto videowall = addVideoWall();
 
@@ -1703,6 +1717,52 @@ TEST_F(ResourceAccessManagerTest, checkVideowallAsViewer)
     Qn::Permissions forbidden = Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
 
     checkPermissions(videowall, desired, forbidden);
+}
+
+// ------------------------------------------------------------------------------------------------
+// Checking web page access rights
+
+// PowerUser must have full permissions for web pages.
+TEST_F(ResourceAccessManagerTest, checkWebPageAsPowerUser)
+{
+    loginAs(kPowerUsersGroupId);
+
+    const auto webPage = addWebPage();
+
+    checkPermissions(webPage,
+        /*desired*/ Qn::FullWebPagePermissions, /*forbidden*/ Qn::NoPermissions);
+}
+
+// Web page is read-only for viewers.
+TEST_F(ResourceAccessManagerTest, checkWebPageAsViewer)
+{
+    loginAs(kViewersGroupId);
+
+    const auto webPage = addWebPage();
+
+    const Qn::Permissions desired = Qn::ReadPermission | Qn::ViewContentPermission;
+    const Qn::Permissions forbidden = Qn::GenericEditPermissions | Qn::RemovePermission;
+    checkPermissions(webPage, desired, forbidden);
+}
+
+// Web page is accessible to custom users only if explicitly shared.
+TEST_F(ResourceAccessManagerTest, checkWebPageAsCustom)
+{
+    loginAsCustom();
+
+    const auto webPage = addWebPage();
+    checkPermissions(webPage, /*desired*/ Qn::NoPermissions, /*forbidden*/ Qn::AllPermissions);
+
+    const Qn::Permissions desired = Qn::ReadPermission | Qn::ViewContentPermission;
+    const Qn::Permissions forbidden = Qn::GenericEditPermissions | Qn::RemovePermission;
+
+    // Share explicitly.
+    setOwnAccessRights(m_currentUser->getId(), {{webPage->getId(), AccessRight::view}});
+    checkPermissions(webPage, desired, forbidden);
+
+    // Share via all web pages virtual group.
+    setOwnAccessRights(m_currentUser->getId(), {{kAllWebPagesGroupId, AccessRight::view}});
+    checkPermissions(webPage, desired, forbidden);
 }
 
 // ------------------------------------------------------------------------------------------------

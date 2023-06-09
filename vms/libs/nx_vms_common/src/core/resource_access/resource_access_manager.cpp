@@ -534,6 +534,9 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnWebPageResourcePtr& webPage) const
 {
+    if (hasPowerUserPermissions(subject))
+        return Qn::FullWebPagePermissions;
+
     const auto accessRights = this->accessRights(subject, webPage);
     if (!accessRights)
         return Qn::NoPermissions;
@@ -544,7 +547,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         result |= Qn::ViewContentPermission;
 
     if (accessRights.testFlag(AccessRight::edit))
-        result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+        result |= Qn::GenericEditPermissions | Qn::RemovePermission;
 
     return result;
 }
@@ -652,15 +655,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                             ? Qn::FullLayoutPermissions
                             : Qn::NoPermissions;
                     }
-
-                    // We can modify layout for user if we can modify this user.
-                    Qn::Permissions userPermissions = permissions(subject, owner);
-                    if (userPermissions.testFlag(Qn::SavePermission))
-                        return Qn::FullLayoutPermissions;
-
-                    // We can see layouts for another users if we are able to see these users.
-                    if (userPermissions.testFlag(Qn::ReadPermission))
-                        return Qn::ModifyLayoutPermission;
 
                     return Qn::NoPermissions;
                 }

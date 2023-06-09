@@ -157,6 +157,9 @@ ResourceAccessDetails LayoutItemAccessResolver::accessDetails(
     ResourceAccessDetails details = d->baseResolver->accessDetails(
         subjectId, resource, accessRight);
 
+    if (hasFullAccessRights(subjectId) && !resource->hasFlags(Qn::desktop_camera))
+        return details;
+
     NX_MUTEX_LOCKER lk(&d->mutex);
     const auto resourceLayouts = d->sharedLayoutItemsWatcher.resourceLayouts(resource->getId());
     lk.unlock();

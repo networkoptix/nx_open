@@ -98,46 +98,45 @@ TEST_F(OwnResourceAccessResolverTest, notificationSignals)
     NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
 }
 
-TEST_F(OwnResourceAccessResolverTest, adminAccessToCamera)
+TEST_F(OwnResourceAccessResolverTest, powerUserAccessToCamera)
 {
     const auto camera = addCamera();
     ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, camera), kFullAccessRights);
 }
 
-TEST_F(OwnResourceAccessResolverTest, noAdminAccessToDesktopCamera)
+TEST_F(OwnResourceAccessResolverTest, noPowerUserAccessToDesktopCamera)
 {
     const auto other = addUser(NoGroup);
     const auto camera = addDesktopCamera(other);
     ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, camera), AccessRights());
 }
 
-TEST_F(OwnResourceAccessResolverTest, adminAccessToWebPage)
+TEST_F(OwnResourceAccessResolverTest, powerUserAccessToWebPage)
 {
     const auto webPage = addWebPage();
-    ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, webPage), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, webPage), kViewAccessRights);
 }
 
-TEST_F(OwnResourceAccessResolverTest, adminAccessToVideowall)
+TEST_F(OwnResourceAccessResolverTest, powerUserAccessToVideowall)
 {
     const auto videowall = addVideoWall();
-    ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, videowall), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, videowall), AccessRight::edit);
 }
 
-TEST_F(OwnResourceAccessResolverTest, adminAccessToSharedLayout)
+TEST_F(OwnResourceAccessResolverTest, powerUserAccessToSharedLayout)
 {
     const auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
     ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, layout), kFullAccessRights);
 }
 
-// TODO: Fix resource assess for group-inherited permissions.
-TEST_F(OwnResourceAccessResolverTest, adminAccessToPrivateLayout)
+TEST_F(OwnResourceAccessResolverTest, adminHasNoAccessToPrivateLayout_5_2)
 {
     const auto user = addUser(NoGroup);
     const auto layout = addLayout();
     layout->setParentId(user->getId());
     ASSERT_FALSE(layout->isShared());
-    ASSERT_EQ(resolver->accessRights(kPowerUsersGroupId, layout), kFullAccessRights);
+    ASSERT_EQ(resolver->accessRights(kAdministratorsGroupId, layout), AccessRights());
 }
 
 } // namespace test

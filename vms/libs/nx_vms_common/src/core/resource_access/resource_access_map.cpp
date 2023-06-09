@@ -17,7 +17,7 @@ ResourceAccessMap kFullResourceAccessMap{
     {kAllDevicesGroupId, kFullAccessRights},
     {kAllWebPagesGroupId, kViewAccessRights},
     {kAllServersGroupId, kViewAccessRights},
-    {kAllVideoWallsGroupId, kFullAccessRights}};
+    {kAllVideoWallsGroupId, AccessRight::edit}};
 
 ResourceAccessMap& operator+=(ResourceAccessMap& destination, const ResourceAccessMap& source)
 {
