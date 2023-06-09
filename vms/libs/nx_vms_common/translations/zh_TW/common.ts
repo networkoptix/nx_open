@@ -1541,7 +1541,7 @@
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+      <translation>允許非管理者亦能於資源樹列表看到伺服器的顯示</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras</source>
@@ -2244,19 +2244,19 @@
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID錯誤: %1。</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>沒有足夠的授權數量，以下裝置的錄影已被停用:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>沒有足夠的授權數量，以下攝影機的錄影已被停用:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>沒有足夠的授權數量，以下I/O模組的錄影已被停用:</translation>
     </message>
     <message>
       <source>Also show source camera</source>

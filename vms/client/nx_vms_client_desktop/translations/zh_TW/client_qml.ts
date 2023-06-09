@@ -1063,7 +1063,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>保存結果到文件</translation>
     </message>
   </context>
   <context>
@@ -1370,21 +1370,21 @@ to activate PTZ</source>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>左右移動操縱桿數次。</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>上下移動操縱桿數次。</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>順時針和逆時針旋轉操縱桿數次。</translation>
     </message>
   </context>
 </TS>
