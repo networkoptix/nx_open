@@ -90,7 +90,7 @@ public:
             lines << nx::format("%1: %2", name(id), nx::reflect::toString(accessRights));
 
         lines.sort();
-        return lines.join("\n");
+        return lines.join(", ");
     }
 
     QString detailsToString(const ResourceAccessDetails& details) const
@@ -107,7 +107,7 @@ public:
         }
 
         lines.sort();
-        return lines.join("\n");
+        return lines.join(", ");
     }
 
     std::unique_ptr<TestSubjectHierarchy> subjects;

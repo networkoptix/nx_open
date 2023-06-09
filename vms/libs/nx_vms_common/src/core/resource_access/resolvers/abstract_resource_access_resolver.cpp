@@ -47,14 +47,16 @@ AccessRights AbstractResourceAccessResolver::accessRights(
     if (!NX_ASSERT(resource) || !resource->resourcePool() || resource->hasFlags(Qn::removed))
         return {};
 
-    const bool isDesktopCamera = resource->hasFlags(Qn::desktop_camera);
-
-    if (hasFullAccessRights(subjectId) && !isDesktopCamera)
-        return kFullAccessRights;
+    if (hasFullAccessRights(subjectId))
+    {
+        const auto layout = resource.objectCast<QnLayoutResource>();
+        if (layout && layout->isShared())
+            return kFullAccessRights;
+    }
 
     const auto accessMap = resourceAccessMap(subjectId);
 
-    if (isDesktopCamera)
+    if (resource->hasFlags(Qn::desktop_camera))
         return accessMap.value(resource->getId());
 
     if (const auto camera = resource.objectCast<QnSecurityCamResource>())

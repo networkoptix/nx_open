@@ -5,6 +5,7 @@
 #include <QtCore/QPointer>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/abstract_access_rights_manager.h>
 #include <core/resource_access/abstract_global_permissions_watcher.h>
 #include <nx/utils/log/assert.h>
@@ -67,6 +68,10 @@ AccessRights OwnResourceAccessResolver::accessRights(const QnUuid& subjectId,
 
 GlobalPermissions OwnResourceAccessResolver::globalPermissions(const QnUuid& subjectId) const
 {
+    // A workaround for the built-in local admin having own permissions duplicating inherited ones.
+    if (subjectId == QnUserResource::kAdminGuid)
+        return {};
+
     return NX_ASSERT(d->globalPermissionsWatcher)
         ? d->globalPermissionsWatcher->ownGlobalPermissions(subjectId)
         : GlobalPermissions{};

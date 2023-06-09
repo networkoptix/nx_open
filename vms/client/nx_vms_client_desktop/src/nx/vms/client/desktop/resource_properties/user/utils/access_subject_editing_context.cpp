@@ -255,6 +255,12 @@ void AccessSubjectEditingContext::setCurrentSubjectId(const QnUuid& value)
 
     emit subjectChanged();
     emit resourceAccessChanged();
+
+    if (!d->currentSubjectId.isNull())
+    {
+        NX_DEBUG(this, "Current subject's access map is %1",
+            toString(ownResourceAccessMap(), d->systemContext->resourcePool()));
+    }
 }
 
 ResourceAccessMap AccessSubjectEditingContext::ownResourceAccessMap() const

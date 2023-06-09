@@ -410,17 +410,6 @@ void ResourceAccessRightsModel::Private::updateInfo(bool suppressSignals)
         for (int i = 0; i < count; ++i)
         {
             auto& newInfo = newResourceAccessInfo[i];
-
-            // Visual sugar to not display full access rights as own if they come from inherited
-            // global permissions.
-            const auto powerParents = context->globalPermissionSource(GlobalPermission::powerUser);
-            if (!powerParents.empty())
-            {
-                newInfo.providedVia = ResourceAccessInfo::ProvidedVia::parentUserGroup;
-                newInfo.providerUserGroups = {powerParents.begin(), powerParents.end()};
-                continue;
-            }
-
             if (isResourceGroup)
             {
                 if (context->hasOwnAccessRight(groupId, accessRightList[i]))

@@ -1496,7 +1496,7 @@ struct VideoWallControlAccess
         const nx::vms::api::VideowallControlMessageData& data)
     {
         return userHasAccess(systemContext, accessData, data.videowallGuid,
-            nx::vms::api::AccessRight::view);
+            nx::vms::api::AccessRight::edit);
     }
 };
 

@@ -460,19 +460,15 @@ namespace Qn {
         //-----------------------------------------------------------------------------------------
         // Webpage-specific permissions.
 
-        // Permission to view web page.
-        ViewWebPagePermission = ViewContentPermission,
+        FullWebPagePermissions = FullGenericPermissions | ViewContentPermission,
 
         //-----------------------------------------------------------------------------------------
 
         //-----------------------------------------------------------------------------------------
         // Server-specific permissions.
 
-        // Permission to view health monitoring.
-        ViewHealthMonitorPermission = ViewContentPermission,
-
         // Full set of permissions which can be available for the server resource.
-        FullServerPermissions = FullGenericPermissions | ViewHealthMonitorPermission,
+        FullServerPermissions = FullGenericPermissions | ViewContentPermission,
 
         //-----------------------------------------------------------------------------------------
 
