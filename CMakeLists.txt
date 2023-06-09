@@ -2,6 +2,9 @@
 
 cmake_minimum_required(VERSION 3.20.0 FATAL_ERROR) #< This version is bundled with MSVC 2019.
 
+add_definitions(-DBOOST_NO_CXX98_FUNCTION_BASE)
+add_definitions(-Wno-enum-constexpr-conversion)
+
 set(open_source_root "${CMAKE_SOURCE_DIR}")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
