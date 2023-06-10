@@ -60,15 +60,15 @@ struct SystemSettingsManager::Private
 
                 NX_VERBOSE(this, "System settings received");
 
-                if (*systemSettings == result)
-                    return;
-
-                *systemSettings = result;
+                auto hasChange = *systemSettings != result;
+                if (hasChange)
+                    *systemSettings = result;
 
                 if (callback)
                     callback();
-
-                emit q->systemSettingsChanged();
+                    
+                if (hasChange)
+                    emit q->systemSettingsChanged();
             }
         );
 
