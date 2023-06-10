@@ -196,7 +196,7 @@
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>請按下每個按鈕數次，並將這些按鈕的名稱寫在下表中。</translation>
     </message>
   </context>
   <context>
@@ -585,7 +585,7 @@
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>上一個</translation>
     </message>
     <message>
       <source>Next</source>

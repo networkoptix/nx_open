@@ -7957,7 +7957,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>%1 為跨系統佈局，允許你加入不同系統的裝置。目前雖僅支援部分功能，但Nx會持續優化並加入新功能。</translation>
     </message>
     <message>
       <source>Read more on the %1</source>
@@ -8817,14 +8817,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>The selected Logging Level may not be collecting enough information.
 The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
-      <translation type="unfinished">The selected Logging Level may not be collecting enough information.
-The Logging Level &quot;%1&quot; will provide you with more granular information.</translation>
+      <translation>目前所選的日誌級別可能無法收集足夠的資訊。
+設定日誌級別為 &quot;%1&quot; 時，伺服器將收集更詳細的日誌內容。</translation>
     </message>
     <message>
       <source>The selected Logging Level may degrade your system&apos;s performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade your system&apos;s performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>目前所選的日誌級別可能會降低系統效能。
+在完成日誌收集後，建議將日誌級別改回為預設值。</translation>
     </message>
   </context>
   <context>
@@ -9564,7 +9564,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>This tab will be available in future versions</source>
-      <translation type="unfinished">This tab will be available in future versions</translation>
+      <translation>此頁面功能將在未來版本中支援</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -10600,15 +10600,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Not imported archive found on camera %1</source>
-      <translation type="unfinished">Not imported archive found on camera %1</translation>
+      <translation>在攝影機%1上發現尚未匯入的錄影檔案</translation>
     </message>
     <message>
       <source>The archive stream settings have been changed by the user</source>
-      <translation type="unfinished">The archive stream settings have been changed by the user</translation>
+      <translation>錄影資料上的串流設定已被使用者更改</translation>
     </message>
     <message>
       <source>The recording settings have been changed by the user</source>
-      <translation type="unfinished">The recording settings have been changed by the user</translation>
+      <translation>錄影設定已被使用者更改</translation>
     </message>
   </context>
   <context>
@@ -10675,7 +10675,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>This action is not supported for notifications from other Systems</source>
-      <translation type="unfinished">This action is not supported for notifications from other Systems</translation>
+      <translation>此操作不支援來自其他系統的通知</translation>
     </message>
   </context>
   <context>

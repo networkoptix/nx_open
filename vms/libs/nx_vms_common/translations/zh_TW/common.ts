@@ -1296,7 +1296,7 @@
     </message>
     <message>
       <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
+      <translation>攝影機設定優化</translation>
     </message>
     <message>
       <source>Thumbnails auto-update</source>
@@ -1333,27 +1333,27 @@
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
+      <translation>強制使用 HTTPS連線(通訊加密)</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
+      <translation>強制使用RTSPS連線(串流傳輸加密)</translation>
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>啟用裝置自動搜尋</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
+      <translation>啟用自動更新通知</translation>
     </message>
     <message>
       <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
+      <translation>啟用更新通知</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
+      <translation>啟用 UPNP 連接埠對應</translation>
     </message>
     <message>
       <source>Backup settings</source>
@@ -1365,7 +1365,7 @@
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
+      <translation>使用RTSP協定於Arecont 攝影機 </translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
@@ -1389,7 +1389,7 @@
     </message>
     <message>
       <source>RTP retry count</source>
-      <translation type="unfinished">RTP retry count</translation>
+      <translation>RTP連線重試次數</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
@@ -1525,7 +1525,7 @@
     </message>
     <message>
       <source>Language for Cloud notifications</source>
-      <translation type="unfinished">Language for Cloud notifications</translation>
+      <translation>自訂手機推播通知的語言</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB)</source>
