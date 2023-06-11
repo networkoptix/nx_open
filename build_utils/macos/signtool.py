@@ -45,8 +45,10 @@ def import_certificate(certificate_file, certificate_password, keychain=None, ig
         return
 
     logging.info(f"Importing keys from {certificate}")
+    if certificate_password is None:
+        certificate_password = ""
     certificate_password_args = \
-        ["-P", certificate_password] if certificate_password else []
+        ["-P", certificate_password] if certificate_file.endswith(".p12") else []
     keychain_args = ["-k", keychain] if keychain else []
     process = run_and_log_command(
         ["security",
