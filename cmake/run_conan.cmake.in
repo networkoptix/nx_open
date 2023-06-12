@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.20)
 
 set(ENV{CONAN_USER_HOME} "@CONAN_USER_HOME@")
 set(CONAN_EXECUTABLE "@CONAN_EXECUTABLE@")
-set(CMAKE_SOURCE_DIR "@CMAKE_SOURCE_DIR@")
+set(CMAKE_SOURCE_DIR "@open_source_root@")
 set(CMAKE_BINARY_DIR "@CMAKE_BINARY_DIR@")
 
 set(developerBuild @developerBuild@)

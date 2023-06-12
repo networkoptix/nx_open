@@ -52,7 +52,7 @@ endif()
 
 nx_run_conan(
     BUILD_TYPE ${build_type}
-    PROFILE ${CMAKE_SOURCE_DIR}/conan_profiles/${conan_profile}.profile
+    PROFILE ${open_source_root}/conan_profiles/${conan_profile}.profile
     FLAGS ${_additional_conan_parameters}
 )
 
