@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <compare>
 #include <deque>
 
 #include <gtest/gtest.h>
@@ -8,10 +9,82 @@
 #include <nx/utils/random.h>
 
 #include <nx/utils/byte_stream/custom_output_stream.h>
+#include <nx/utils/std/cpp20.h>
 
 namespace nx::network::http::test {
 
-TEST(HttpMultipartContentParser, genericTest)
+class HttpMultipartContentParser:
+    public ::testing::Test
+{
+public:
+    HttpMultipartContentParser():
+        m_boundary("fbdr")
+    {
+    }
+
+protected:
+    struct Frame
+    {
+        std::string data;
+        HttpHeaders headers;
+
+        auto operator<=>(const Frame&) const = default;
+    };
+
+    void givenFrames(const std::vector<Frame>& frames)
+    {
+        for (const auto& frame: frames)
+        {
+            m_bufferToParse += "\r\n--" + m_boundary;
+            m_bufferToParse += "\r\n";
+            for (const auto& header: frame.headers)
+                m_bufferToParse += header.first + ": " + header.second + "\r\n";
+            m_bufferToParse += "\r\n";
+            m_bufferToParse += frame.data;
+        }
+    }
+
+    void whenParse()
+    {
+        constexpr int dataStep = 100;
+
+        nx::network::http::MultipartContentParser parser;
+        parser.setContentType("multipart/x-mixed-replace;boundary=" + m_boundary);
+
+        auto decodedFramesProcessor = [this, &parser](const ConstBufferRefType& data)
+        {
+            m_parsedFrames.push_back(Frame{
+                .data = std::string(data),
+                .headers = parser.prevFrameHeaders()
+            });
+        };
+
+        parser.setNextFilter(
+            std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(decodedFramesProcessor)>>(
+                decodedFramesProcessor));
+
+        for (std::size_t pos = 0; pos < m_bufferToParse.size(); pos += dataStep)
+        {
+            parser.processData(ConstBufferRefType(
+                m_bufferToParse.data() + pos,
+                std::min<std::size_t>(dataStep, m_bufferToParse.size() - pos)));
+        }
+
+        parser.flush();
+    }
+
+    void thenFramesWereReported(const std::vector<Frame>& expected)
+    {
+        ASSERT_EQ(expected, m_parsedFrames);
+    }
+
+private:
+    std::string m_boundary;
+    std::string m_bufferToParse;
+    std::vector<Frame> m_parsedFrames;
+};
+
+TEST_F(HttpMultipartContentParser, genericTest)
 {
     const nx::Buffer frame1 =
         "1xxxxxxxxxxxxxxx\rxxxxxxxx\nxxxxxxxxxx"
@@ -106,7 +179,7 @@ TEST(HttpMultipartContentParser, genericTest)
     }
 }
 
-TEST(HttpMultipartContentParser, onlySizedData)
+TEST_F(HttpMultipartContentParser, onlySizedData)
 {
     const nx::Buffer frame1 =
         "1xxxxxxxxxxxxxxx\rxxxxxxxx\nxxxxxxxxxx"
@@ -194,7 +267,7 @@ TEST(HttpMultipartContentParser, onlySizedData)
     //TODO #akolesnikov test with Content-Length specified
 }
 
-TEST(HttpMultipartContentParser, unSizedDataSimple)
+TEST_F(HttpMultipartContentParser, unSizedDataSimple)
 {
     const nx::Buffer frame1 =
         "a\rb";
@@ -243,7 +316,7 @@ TEST(HttpMultipartContentParser, unSizedDataSimple)
     }
 }
 
-TEST(HttpMultipartContentParser, unSizedData)
+TEST_F(HttpMultipartContentParser, unSizedData)
 {
     static const size_t FRAMES_COUNT = nx::utils::random::number<size_t>(3, 7);
     static const size_t FRAME_SIZE_MIN = 1024;
@@ -308,7 +381,7 @@ TEST(HttpMultipartContentParser, unSizedData)
     }
 }
 
-TEST(HttpMultipartContentParser, epilogueOnly)
+TEST_F(HttpMultipartContentParser, epilogueOnly)
 {
     nx::Buffer testData = "\r\n--fbdr--"; //terminating multipart body
 
@@ -332,6 +405,29 @@ TEST(HttpMultipartContentParser, epilogueOnly)
         ASSERT_EQ(1U, frames.size());
         ASSERT_TRUE(frames[0].empty());
     }
+}
+
+TEST_F(HttpMultipartContentParser, empty_frame_is_reported)
+{
+    const std::vector<Frame> frames({
+        Frame{.data = "", .headers = {{"Content-Type", "image/jpeg"}, {"Content-Length", "0"}}},
+        Frame{.data = "test", .headers = {{"Content-Type", "image/jpeg"}, {"Content-Length", "4"}}}
+    });
+
+    givenFrames(frames);
+    whenParse();
+    thenFramesWereReported(frames);
+}
+
+TEST_F(HttpMultipartContentParser, empty_frame_is_reported_timely)
+{
+    const std::vector<Frame> frames({
+        Frame{.data = "", .headers = {{"Content-Type", "image/jpeg"}, {"Content-Length", "0"}}}
+    });
+
+    givenFrames(frames);
+    whenParse();
+    thenFramesWereReported(frames);
 }
 
 } // namespace nx::network::http::test

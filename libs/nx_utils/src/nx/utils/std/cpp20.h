@@ -244,6 +244,16 @@ constexpr detail::synth3way_t<pair<const Key, Tp>> operator<=>(
         detail::synth3way);
 }
 
+template<typename Key, typename Tp, typename Compare, typename Alloc>
+constexpr detail::synth3way_t<pair<const Key, Tp>> operator<=>(
+    const std::multimap<Key, Tp, Compare, Alloc>& x, const std::multimap<Key, Tp, Compare, Alloc>& y)
+{
+    return std::lexicographical_compare_three_way(
+        x.begin(), x.end(),
+        y.begin(), y.end(),
+        detail::synth3way);
+}
+
 template<typename Tp, typename Alloc>
 inline detail::synth3way_t<Tp> operator<=>(
     const vector<Tp, Alloc>& x,
