@@ -1505,7 +1505,7 @@
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation type="unfinished">Storage encryption enabled</translation>
+      <translation>啟用錄影資料加密</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
@@ -1521,7 +1521,7 @@
     </message>
     <message>
       <source>Show mouse timeline preview</source>
-      <translation type="unfinished">Show mouse timeline preview</translation>
+      <translation>於時間軸上啟用鼠標查看縮圖功能</translation>
     </message>
     <message>
       <source>Language for Cloud notifications</source>
@@ -2240,7 +2240,7 @@
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>寫入時無法初始化 AES 加密。故錄影資料以未加密狀態寫入。</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>

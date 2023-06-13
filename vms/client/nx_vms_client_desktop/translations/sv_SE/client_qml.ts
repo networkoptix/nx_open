@@ -198,7 +198,7 @@
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>Tryck på varje knapp flera gånger och skriv namnen på dessa knappar i tabellen nedan.</translation>
     </message>
   </context>
   <context>
@@ -547,11 +547,11 @@
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>Välj joystick.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Inga enheter anslutna.</translation>
     </message>
   </context>
   <context>
@@ -585,11 +585,11 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Spara</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Föregående</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1064,15 +1064,15 @@ att aktivera PTZ</translation>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>Välj fil att spara</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>JSON-filer (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>Fil för att spara resultaten:</translation>
     </message>
   </context>
   <context>
@@ -1381,21 +1381,21 @@ att aktivera PTZ</translation>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Flytta joysticken åt vänster och höger flera gånger.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Flytta joysticken upp och ner flera gånger.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Rotera joysticken medurs och moturs flera gånger.</translation>
     </message>
   </context>
 </TS>

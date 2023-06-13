@@ -11469,7 +11469,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Cannot add resources from other Systems.</source>
-      <translation type="unfinished">Cannot add resources from other Systems.</translation>
+      <translation>Kan inte lägga till resurser från andra system.</translation>
     </message>
   </context>
   <context>
