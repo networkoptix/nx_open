@@ -318,6 +318,8 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
         m_keyFrameFound[data->channelNumber] = true;
     }
     data->encryptionData = m_metadata.encryptionData;
+    if (m_metadata.metadataStreamVersion <= QnAviArchiveMetadata::kMetadataStreamVersion_2)
+        data->flags |= QnAbstractMediaData::MediaFlags_BomDecoding;
     return data;
 }
 
