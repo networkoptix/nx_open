@@ -48,7 +48,7 @@ TabControl
             leftPadding: 0
             rightPadding: 0
             focusFrameEnabled: false
-            icon.source: "qrc:/skin/events/tabs/motion.png"
+            icon.source: "qrc:/skin/events/tabs/motion.svg"
             text: qsTr("Motion")
         }
 
