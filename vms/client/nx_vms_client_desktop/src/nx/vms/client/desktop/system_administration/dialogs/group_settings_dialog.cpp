@@ -162,6 +162,16 @@ GroupSettingsDialog::GroupSettingsDialog(
 
     connect(this, &QmlDialogWrapper::rejected, [this] { setGroup({}); });
 
+    connect(
+        systemContext->accessRightsManager(),
+        &nx::core::access::AbstractAccessRightsManager::ownAccessRightsChanged,
+        this,
+        [this](const QSet<QnUuid>& subjectIds)
+        {
+            if (subjectIds.contains(d->groupId))
+                updateStateFrom(d->groupId);
+        });
+
     const auto resetEditingContext =
         [this]()
         {

@@ -157,6 +157,16 @@ UserSettingsDialog::UserSettingsDialog(
             }
         });
 
+    connect(
+        systemContext->accessRightsManager(),
+        &nx::core::access::AbstractAccessRightsManager::ownAccessRightsChanged,
+        this,
+        [this](const QSet<QnUuid>& subjectIds)
+        {
+            if (d->user && subjectIds.contains((*d->user)->getId()))
+                updateStateFrom(*d->user);
+        });
+
     const auto resetEditingContext =
         [this]()
         {
@@ -548,6 +558,9 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
         connect(user.get(), &QnUserResource::digestChanged, this, updateState);
         connect(user.get(), &QnUserResource::userGroupsChanged, this, updateState);
         connect(user.get(), &QnUserResource::nameChanged, this, updateState);
+        connect(user.get(), &QnUserResource::fullNameChanged, this, updateState);
+        connect(user.get(), &QnUserResource::permissionsChanged, this, updateState);
+        connect(user.get(), &QnUserResource::enabledChanged, this, updateState);
     }
 
     d->isSaving = false;
