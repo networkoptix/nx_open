@@ -123,6 +123,7 @@ SystemSettings* SystemSettingsManager::systemSettings()
 }
 
 void SystemSettingsManager::saveSystemSettings(std::function<void(bool)> callback,
+    nx::utils::AsyncHandlerExecutor executor,
     const common::SessionTokenHelperPtr& helper)
 {
     const auto api = connectedServerApi();
@@ -152,7 +153,7 @@ void SystemSettingsManager::saveSystemSettings(std::function<void(bool)> callbac
         network::rest::Params{},
         nx::reflect::json::serialize(*d->systemSettings.get()),
         handler,
-        thread());
+        executor);
 }
 
 } // namespace nx::vms::client::core
