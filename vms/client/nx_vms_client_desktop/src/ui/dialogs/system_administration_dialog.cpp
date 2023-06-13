@@ -132,7 +132,7 @@ void QnSystemAdministrationDialog::applyChanges()
                 });
         });
 
-    systemContext()->systemSettingsManager()->saveSystemSettings(callback);
+    systemContext()->systemSettingsManager()->saveSystemSettings(callback, this);
 
     updateButtonBox();
 }

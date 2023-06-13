@@ -4,6 +4,7 @@
 
 #include <functional>
 
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/system_context_aware.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
@@ -28,6 +29,7 @@ public:
     nx::vms::api::SystemSettings* systemSettings();
 
     void saveSystemSettings(std::function<void(bool)> callback = {},
+        nx::utils::AsyncHandlerExecutor executor = {},
         const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
 signals:

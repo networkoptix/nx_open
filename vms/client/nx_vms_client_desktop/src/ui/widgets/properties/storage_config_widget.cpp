@@ -953,7 +953,7 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
                         });
                 });
 
-            systemContext()->systemSettingsManager()->saveSystemSettings(callback);
+            systemContext()->systemSettingsManager()->saveSystemSettings(callback, this);
         };
 
     if (m_metadataWatcher->metadataMayExist())
