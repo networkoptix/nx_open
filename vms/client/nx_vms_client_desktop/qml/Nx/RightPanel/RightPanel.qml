@@ -19,7 +19,7 @@ TabControl
             leftPadding: 0
             rightPadding: 0
             focusFrameEnabled: false
-            icon.source: "qrc:/skin/events/tabs/notifications.png"
+            icon.source: "qrc:/skin/events/tabs/notifications.svg"
             text: qsTr("Notifications")
         }
 
