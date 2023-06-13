@@ -302,6 +302,12 @@ void QnMainWindowTitleBarWidget::activatePreviousTab()
         d->systemBar->activatePreviousTab();
 }
 
+bool QnMainWindowTitleBarWidget::isSystemTabBarUpdating() const
+{
+    Q_D(const QnMainWindowTitleBarWidget);
+    return d->systemBar && d->systemBar->isUpdating();
+}
+
 void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);

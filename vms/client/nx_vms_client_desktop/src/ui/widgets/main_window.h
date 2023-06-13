@@ -72,6 +72,8 @@ public:
      */
     bool handleKeyPress(int key);
 
+    bool isSystemTabBarUpdating();
+
 public slots:
     bool handleOpenFile(const QString &message);
 

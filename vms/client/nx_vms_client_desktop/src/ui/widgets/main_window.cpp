@@ -577,9 +577,16 @@ void MainWindow::setWelcomeScreenVisible(bool visible)
     // If we switch back to system tab, we should call activatePreviousSystemTab() on m_ui to
     // synchronize its tabs with m_titleBar.
     if (visible)
-        m_titleBar->activateHomeTab();
+    {
+        if (isSystemTabBarUpdating())
+            welcomeScreen()->setGlobalPreloaderVisible(true);
+        else
+            m_titleBar->activateHomeTab();
+    }
     else
+    {
         m_ui->activatePreviousSystemTab();
+    }
 
     updateWidgetsVisibility();
 }
@@ -803,6 +810,11 @@ bool MainWindow::handleKeyPress(int key)
             break;
     }
     return true;
+}
+
+bool MainWindow::isSystemTabBarUpdating()
+{
+    return m_titleBar->isSystemTabBarUpdating();
 }
 
 void MainWindow::updateContentsMargins()

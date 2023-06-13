@@ -36,6 +36,7 @@ public:
     void setTabBarStuffVisible(bool visible);
     void activateHomeTab();
     void activatePreviousTab();
+    bool isSystemTabBarUpdating() const;
 
 signals:
     void yChanged(int newY);
