@@ -9,6 +9,7 @@
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_fields/unique_id_field.h>
 #include <nx/vms/rules/events/generic_event.h>
 #include <nx/vms/rules/events/server_started_event.h>
 #include <nx/vms/rules/utils/api.h>
@@ -79,6 +80,8 @@ void VmsRulesDialog::duplicateRule(QnUuid id)
         return;
 
     clone->setId(QnUuid::createUuid()); //< Change id to prevent rule override on save request.
+    if (auto uniqueIdField = clone->eventFilters().at(0)->fieldByType<vms::rules::UniqueIdField>())
+        uniqueIdField->setId(QnUuid::createUuid()); //< Fix field uniqueness after cloning. TODO: #mmalofeev fix this workaround.
 
     EditVmsRuleDialog editVmsRuleDialog{m_parentWidget};
 
