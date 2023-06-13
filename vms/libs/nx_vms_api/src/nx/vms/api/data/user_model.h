@@ -9,7 +9,6 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-#include "access_rights_data.h"
 #include "resource_data.h"
 #include "type_traits.h"
 #include "user_data_ex.h"
@@ -124,9 +123,9 @@ struct NX_VMS_API UserModelV1: public UserModelBase
     UserModelV1& operator=(UserModelV1&&) = default;
     bool operator==(const UserModelV1& other) const = default;
 
-    using DbReadTypes = std::tuple<UserData, AccessRightsData>;
-    using DbUpdateTypes = std::tuple<UserDataEx, std::optional<AccessRightsData>>;
-    using DbListTypes = std::tuple<UserDataList, AccessRightsDataList>;
+    using DbReadTypes = std::tuple<UserData>;
+    using DbUpdateTypes = std::tuple<UserDataEx>;
+    using DbListTypes = std::tuple<UserDataList>;
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserModelV1> fromDbTypes(DbListTypes data);
@@ -146,12 +145,12 @@ struct NX_VMS_API UserModelV3: public UserModelBase
     /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/userGroups`. */
     std::vector<QnUuid> groupIds;
 
-    /**%apidoc
-     * Resource ids (can be obtained from `GET /rest/v{3-}/devices`, `GET /rest/v{3-}/servers`,
-     * etc.) or Resource Group ids (can be obtained from `GET /rest/v{3-}/resourceGroups`) with
-     * access rights for this User.
+    /**%apidoc[opt]
+     * Access rights per Resource (can be obtained from `/rest/v{3-}/devices`,
+     * `/rest/v{3-}/servers`, etc.) or Resource Group (can be obtained from
+     * `/rest/v{3-}/resourceGroups`).
      */
-    std::optional<std::map<QnUuid, AccessRights>> resourceAccessRights;
+    std::map<QnUuid, AccessRights> resourceAccessRights;
 
     UserModelV3() = default;
     UserModelV3(const UserModelV3&) = default;
@@ -160,9 +159,9 @@ struct NX_VMS_API UserModelV3: public UserModelBase
     UserModelV3& operator=(UserModelV3&&) = default;
     bool operator==(const UserModelV3& other) const = default;
 
-    using DbReadTypes = std::tuple<UserData, AccessRightsData>;
-    using DbUpdateTypes = std::tuple<UserDataEx, std::optional<AccessRightsData>>;
-    using DbListTypes = std::tuple<UserDataList, AccessRightsDataList>;
+    using DbReadTypes = std::tuple<UserData>;
+    using DbUpdateTypes = std::tuple<UserDataEx>;
+    using DbListTypes = std::tuple<UserDataList>;
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<UserModelV3> fromDbTypes(DbListTypes data);

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "access_rights_data.h"
 #include "user_data.h"
 
 namespace nx::vms::api {
@@ -23,7 +22,7 @@ struct NX_VMS_API UserDataDeprecated: ResourceData
     /**
      * Converts this legacy user data into the new one assigning default values to new fields.
      */
-    std::tuple<UserData, AccessRightsData> toUserData() const;
+    UserData toUserData() const;
 
     bool isAdmin = false;
     GlobalPermissions permissions = GlobalPermission::none;

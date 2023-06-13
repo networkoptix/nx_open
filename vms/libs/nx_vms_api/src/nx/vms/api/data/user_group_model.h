@@ -8,7 +8,6 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-#include "access_rights_data.h"
 #include "user_data.h"
 #include "user_external_id.h"
 #include "user_group_data.h"
@@ -40,12 +39,12 @@ struct NX_VMS_API UserGroupModel
     /**%apidoc[opt] List of User Groups to inherit permissions. */
     std::vector<QnUuid> parentGroupIds;
 
-    /**%apidoc
-     * Resource ids (can be obtained from `GET /rest/v{3-}/devices`, `GET /rest/v{3-}/servers`,
-     * etc.) or Resource Group ids (can be obtained from `GET /rest/v{3-}/resourceGroups`) with
-     * access rights for this Users Group.
+    /**%apidoc[opt]
+     * Access rights per Resource (can be obtained from `/rest/v{3-}/devices`,
+     * `/rest/v{3-}/servers`, etc.) or Resource Group (can be obtained from
+     * `/rest/v{3-}/resourceGroups`).
      */
-    std::optional<std::map<QnUuid, AccessRights>> resourceAccessRights;
+    std::map<QnUuid, AccessRights> resourceAccessRights;
 
     /**%apidoc[readonly] */
     nx::vms::api::UserAttributes attributes{};
@@ -57,9 +56,9 @@ struct NX_VMS_API UserGroupModel
     UserGroupModel& operator=(UserGroupModel&&) = default;
     bool operator==(const UserGroupModel& other) const = default;
 
-    using DbReadTypes = std::tuple<UserGroupData, AccessRightsData>;
-    using DbUpdateTypes = std::tuple<UserGroupData, std::optional<AccessRightsData>>;
-    using DbListTypes = std::tuple<UserGroupDataList, AccessRightsDataList>;
+    using DbReadTypes = std::tuple<UserGroupData>;
+    using DbUpdateTypes = std::tuple<UserGroupData>;
+    using DbListTypes = std::tuple<UserGroupDataList>;
 
     QnUuid getId() const { return id; }
     void setId(QnUuid id_) { id = std::move(id_); }

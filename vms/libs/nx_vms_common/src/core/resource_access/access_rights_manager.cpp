@@ -52,7 +52,7 @@ void AccessRightsManager::resetAccessRights(const QHash<QnUuid, ResourceAccessMa
 
     NX_DEBUG(this, "Access rights are reset; %1 subjects are defined", accessRights.size());
     if (!accessRights.empty())
-        NX_VERBOSE(this, accessRights);
+        NX_VERBOSE(this, nx::containerString(nx::utils::constKeyValueRange(accessRights)));
 
     emit accessRightsReset();
 }
@@ -73,7 +73,7 @@ bool AccessRightsManager::setOwnResourceAccessMap(const QnUuid& subjectId,
     }
 
     NX_DEBUG(this, "Access rights are set for subject %1", subjectId);
-    NX_VERBOSE(this, value);
+    NX_VERBOSE(this, nx::containerString(nx::utils::constKeyValueRange(value)));
 
     emit ownAccessRightsChanged({subjectId});
     return true;
@@ -97,7 +97,7 @@ bool AccessRightsManager::removeSubjects(const QSet<QnUuid>& subjectIds)
         return false;
 
     NX_DEBUG(this, "Access rights are cleared for %1 subjects: %2",
-        removedSubjectIds.size(), removedSubjectIds);
+        removedSubjectIds.size(), nx::containerString(removedSubjectIds));
 
     emit ownAccessRightsChanged(removedSubjectIds);
     return true;

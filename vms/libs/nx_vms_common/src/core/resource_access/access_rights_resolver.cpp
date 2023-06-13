@@ -6,8 +6,6 @@
 
 #include <QtCore/QPointer>
 
-#include <nx/vms/api/data/access_rights_data.h>
-
 #include "abstract_access_rights_manager.h"
 #include "resolvers/inherited_resource_access_resolver.h"
 #include "resolvers/intercom_layout_access_resolver.h"

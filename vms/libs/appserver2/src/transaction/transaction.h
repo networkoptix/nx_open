@@ -12,6 +12,7 @@
 #include <nx/fusion/serialization/xml.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/crypt/symmetrical.h>
+#include <nx/vms/api/data/access_rights_data_deprecated.h>
 #include <nx/vms/api/data/database_dump_to_file_data.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/hardware_id_mapping.h>
@@ -703,38 +704,15 @@ APPLY(502, removeUser, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(503, getAccessRights, nx::vms::api::AccessRightsDataList, \
+/* Transaction 503 (getAccessRights) removed, code is forbidden. */ \
+APPLY(504, setAccessRightsDeprecated, nx::vms::api::AccessRightsDataDeprecated, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        false, /*isRemoveOperation*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       UserNotificationManagerHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<PowerUserAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(504, setAccessRights, nx::vms::api::AccessRightsData, \
-                       true, /* persistent*/ \
-                       false, /* system*/ \
-                       false, /*isRemoveOperation*/ \
-                       &createHashForApiAccessRightsDataHelper, /* getHash*/ \
-                       UserNotificationManagerHelper(), /* trigger notification*/ \
-                       ModifyAccessRightsChecker(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(),                     \
-                       RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(509, removeAccessRights, nx::vms::api::IdData, /* Remove records from vms_access_rights by resource id */ \
-                       true, /* persistent*/ \
-                       false, /* system*/ \
-                       true, /*isRemoveOperation*/ \
-                       CreateHashByIdRfc4122Helper("access_rights"), /* getHash*/ \
-                       &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
-                       RemoveResourceAccess(), /* save permission checker */ \
-                       ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),                     \
@@ -775,6 +753,7 @@ APPLY(507, removeUserGroup, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
+/* Transaction 509 (removeAccessRights) removed, code is forbidden. */ \
 APPLY(510, saveUsers,  nx::vms::api::UserDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \

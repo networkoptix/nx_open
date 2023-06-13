@@ -17,7 +17,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/format.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>

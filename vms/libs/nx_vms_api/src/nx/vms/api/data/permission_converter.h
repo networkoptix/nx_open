@@ -2,26 +2,22 @@
 
 #pragma once
 
+#include <map>
 #include <optional>
 #include <vector>
 
 #include <nx/utils/uuid.h>
-
-#include "access_rights_data.h"
+#include <nx/vms/api/types/access_rights_types.h>
 
 namespace nx::vms::api {
 
-// TODO: Move to UserDataDeprecated with all related conversion stuff.
+NX_VMS_API std::map<QnUuid, AccessRights> migrateAccessRights(
+    GlobalPermissions* permissions, const std::vector<QnUuid>& accessibleResources);
+
 namespace PermissionConverter
 {
-    NX_VMS_API AccessRightsData accessRights(
-        GlobalPermissions* permissions,
-        const QnUuid& id,
-        const std::optional<std::vector<QnUuid>>& accessibleResources = std::nullopt);
-
     NX_VMS_API void extractFromResourceAccessRights(
-        const std::vector<AccessRightsData>& allAccessRights,
-        const QnUuid& id,
+        const std::map<QnUuid, AccessRights>& resourceAccessRights,
         GlobalPermissions* permissions,
         std::optional<std::vector<QnUuid>>* accessibleResources);
 };

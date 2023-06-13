@@ -6,6 +6,7 @@
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::api {
 
@@ -277,6 +278,15 @@ NX_REFLECTION_ENUM_CLASS(SpecialResourceGroup,
     allServers,
     allVideowalls
 )
+
+// Special resource group ids.
+NX_VMS_API extern const QnUuid kAllDevicesGroupId;
+NX_VMS_API extern const QnUuid kAllWebPagesGroupId;
+NX_VMS_API extern const QnUuid kAllServersGroupId;
+NX_VMS_API extern const QnUuid kAllVideoWallsGroupId;
+
+NX_VMS_API std::optional<SpecialResourceGroup> specialResourceGroup(const QnUuid& id);
+NX_VMS_API QnUuid specialResourceGroupId(SpecialResourceGroup group);
 
 // GoogleTest printers.
 NX_VMS_API void PrintTo(GlobalPermission value, std::ostream* os);

@@ -71,24 +71,4 @@ ErrorCode AbstractUserManager::removeUserRoleSync(const QnUuid& id)
         });
 }
 
-ErrorCode AbstractUserManager::getAccessRightsSync(
-    nx::vms::api::AccessRightsDataList* outDataList)
-{
-    return detail::callSync(
-        [&](auto handler)
-        {
-            getAccessRights(std::move(handler));
-        },
-        outDataList);
-}
-
-ErrorCode AbstractUserManager::setAccessRightsSync(const nx::vms::api::AccessRightsData& data)
-{
-    return detail::callSync(
-        [&](auto handler)
-        {
-            setAccessRights(data, std::move(handler));
-        });
-}
-
 } // namespace ec2

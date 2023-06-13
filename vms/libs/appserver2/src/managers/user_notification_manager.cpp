@@ -46,11 +46,19 @@ void QnUserNotificationManager::triggerNotification(
 }
 
 void QnUserNotificationManager::triggerNotification(
-    const QnTransaction<nx::vms::api::AccessRightsData>& tran,
+    const QnTransaction<nx::vms::api::AccessRightsDataDeprecated>& tran,
     NotificationSource /*source*/)
 {
-    NX_ASSERT(tran.command == ApiCommand::setAccessRights);
+    NX_ASSERT(tran.command == ApiCommand::setAccessRightsDeprecated);
     emit accessRightsChanged(tran.params);
+}
+
+void QnUserNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::UserDataDeprecated>& tran,
+    NotificationSource source)
+{
+    NX_ASSERT(tran.command == ApiCommand::saveUserDeprecated);
+    emit addedOrUpdated(tran.params.toUserData(), source);
 }
 
 } // namespace ec2

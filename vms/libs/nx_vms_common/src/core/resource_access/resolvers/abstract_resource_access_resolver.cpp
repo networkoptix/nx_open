@@ -12,7 +12,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/api/data/access_rights_data.h>
 
 using namespace nx::vms::api;
 

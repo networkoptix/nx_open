@@ -58,6 +58,6 @@ const std::set<QnUuid> kAllPowerUserGroupIds{
     kPowerUsersGroupId};
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    UserGroupData, (ubjson)(json)(xml)(sql_record)(csv_record), UserRoleData_Fields)
+    UserGroupData, (ubjson)(json)(xml)(sql_record)(csv_record), UserGroupData_Fields)
 
 } // namespace nx::vms::api

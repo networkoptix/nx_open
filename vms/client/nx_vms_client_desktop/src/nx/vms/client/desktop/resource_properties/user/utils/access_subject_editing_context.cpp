@@ -21,7 +21,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/common/system_context.h>
 
 #include "proxy_access_rights_manager.h"

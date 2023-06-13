@@ -5,6 +5,7 @@
 #include <QtCore/QCryptographicHash>
 
 #include <api/model/password_data.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_properties.h>
 #include <nx/network/aio/timer.h>
@@ -606,6 +607,15 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         {
             m_attributes = localOther->m_attributes;
             notifiers << [r = toSharedPointer(this)]{ emit r->attributesChanged(r); };
+        }
+
+        if (m_resourceAccessRights != localOther->m_resourceAccessRights)
+        {
+            m_resourceAccessRights = localOther->m_resourceAccessRights;
+            auto manager = systemContext()->accessRightsManager();
+            nx::core::access::ResourceAccessMap map{
+                m_resourceAccessRights.begin(), m_resourceAccessRights.end()};
+            notifiers << [id = getId(), map, manager] { manager->setOwnResourceAccessMap(id, map); };
         }
     }
 }

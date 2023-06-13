@@ -9,7 +9,6 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>

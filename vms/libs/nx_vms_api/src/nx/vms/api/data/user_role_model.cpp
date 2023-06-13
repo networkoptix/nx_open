@@ -19,16 +19,14 @@ UserRoleModel::DbUpdateTypes UserRoleModel::toDbTypes() &&
     userRole.name = std::move(name);
     userRole.description = std::move(description);
     userRole.permissions = std::move(permissions);
-
-    auto accessRights = PermissionConverter::accessRights(
-        &userRole.permissions, userRole.id, accessibleResources);
-    return {std::move(userRole), std::move(accessRights)};
+    userRole.resourceAccessRights = migrateAccessRights(
+        &userRole.permissions, accessibleResources.value_or(std::vector<QnUuid>{}));
+    return {std::move(userRole)};
 }
 
 std::vector<UserRoleModel> UserRoleModel::fromDbTypes(DbListTypes all)
 {
     auto& baseList = std::get<UserGroupDataList>(all);
-    auto& allAccessRights = std::get<AccessRightsDataList>(all);
 
     std::vector<UserRoleModel> result;
     result.reserve(baseList.size());
@@ -40,7 +38,7 @@ std::vector<UserRoleModel> UserRoleModel::fromDbTypes(DbListTypes all)
         model.description = std::move(baseData.description);
         model.permissions = std::move(baseData.permissions);
         PermissionConverter::extractFromResourceAccessRights(
-            allAccessRights, model.id, &model.permissions, &model.accessibleResources);
+            baseData.resourceAccessRights, &model.permissions, &model.accessibleResources);
         result.emplace_back(std::move(model));
     }
     return result;

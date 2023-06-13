@@ -46,15 +46,6 @@ public:
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
-    virtual int getAccessRights(
-        Handler<nx::vms::api::AccessRightsDataList> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
-
-    virtual int setAccessRights(
-        const nx::vms::api::AccessRightsData& data,
-        Handler<> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
-
 private:
     decltype(auto) processor() { return m_queryProcessor->getAccess(m_userSession); }
 
@@ -174,35 +165,6 @@ int QnUserManager<QueryProcessorType>::removeUserRole(
     processor().processUpdateAsync(
         ApiCommand::removeUserGroup,
         nx::vms::api::IdData(id),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
-    return requestId;
-}
-
-template<class QueryProcessorType>
-int QnUserManager<QueryProcessorType>::getAccessRights(
-    Handler<nx::vms::api::AccessRightsDataList> handler,
-    nx::utils::AsyncHandlerExecutor handlerExecutor)
-{
-    handler = handlerExecutor.bind(std::move(handler));
-    const int requestId = generateRequestID();
-    processor().template processQueryAsync<QnUuid, nx::vms::api::AccessRightsDataList>(
-        ApiCommand::getAccessRights,
-        QnUuid(),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
-    return requestId;
-}
-
-template<class QueryProcessorType>
-int QnUserManager<QueryProcessorType>::setAccessRights(
-    const nx::vms::api::AccessRightsData& data,
-    Handler<> handler,
-    nx::utils::AsyncHandlerExecutor handlerExecutor)
-{
-    handler = handlerExecutor.bind(std::move(handler));
-    const int requestId = generateRequestID();
-    processor().processUpdateAsync(
-        ApiCommand::setAccessRights,
-        data,
         [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
     return requestId;
 }

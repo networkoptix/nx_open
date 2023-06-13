@@ -965,10 +965,15 @@ bool QnResourceAccessManager::canModifyUser(
 
     const auto newPermissions = accumulatePermissions(update.permissions, update.groupIds);
 
+    const auto accessRightMap =
+        systemContext()->accessRightsManager()->ownResourceAccessMap(update.id);
+
     const bool permissionsChanged = oldPermissions != newPermissions
         || userResource->getRawPermissions() != update.permissions
         || nx::utils::toQSet(userResource->groupIds()) != nx::utils::toQSet(update.groupIds)
-        || userResource->isEnabled() != update.isEnabled;
+        || userResource->isEnabled() != update.isEnabled
+        || accessRightMap != QHash<QnUuid, AccessRights>{
+            update.resourceAccessRights.begin(), update.resourceAccessRights.end()};
 
     // Cannot modify own permissions.
     if (subject.user() == target && permissionsChanged)

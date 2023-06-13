@@ -26,7 +26,7 @@ void UserDataDeprecated::fillId()
     }
 }
 
-std::tuple<UserData, AccessRightsData> UserDataDeprecated::toUserData() const
+UserData UserDataDeprecated::toUserData() const
 {
     UserData newUserData;
     static_cast<nx::vms::api::ResourceData&>(newUserData) =
@@ -57,11 +57,10 @@ std::tuple<UserData, AccessRightsData> UserDataDeprecated::toUserData() const
     else
         newUserData.type = nx::vms::api::UserType::local;
     newUserData.fullName = this->fullName;
+    newUserData.resourceAccessRights =
+        migrateAccessRights(&newUserData.permissions, /*accessibleResources*/ {});
 
-    auto accessRights = PermissionConverter::accessRights(
-        &newUserData.permissions, newUserData.id);
-
-    return {std::move(newUserData), std::move(accessRights)};
+    return {std::move(newUserData)};
 }
 
 std::optional<QnUuid> UserDataDeprecated::permissionPresetToGroupId(GlobalPermissions preset)

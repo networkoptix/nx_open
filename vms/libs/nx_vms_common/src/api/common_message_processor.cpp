@@ -29,8 +29,10 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/data/access_rights_data_deprecated.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/hardware_id_mapping.h>
+#include <nx/vms/api/data/permission_converter.h>
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
@@ -701,15 +703,21 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(
     }
 }
 
-void QnCommonMessageProcessor::on_accessRightsChanged(const AccessRightsData& accessRights)
+void QnCommonMessageProcessor::on_accessRightsChanged(const AccessRightsDataDeprecated& accessRights)
 {
-    m_context->accessRightsManager()->setOwnResourceAccessMap(accessRights.userId,
-        {accessRights.resourceRights.begin(), accessRights.resourceRights.end()});
+    nx::vms::api::GlobalPermissions permissions = nx::vms::api::GlobalPermission::none;
+    if (auto user = resourcePool()->getResourceById<QnUserResource>(accessRights.userId))
+        permissions = user->getRawPermissions();
+    auto converted = nx::vms::api::migrateAccessRights(&permissions, accessRights.resourceIds);
+    m_context->accessRightsManager()->setOwnResourceAccessMap(
+        accessRights.userId, {converted.begin(), converted.end()});
 }
 
 void QnCommonMessageProcessor::on_userGroupChanged(const UserGroupData& userGroup)
 {
     m_context->userGroupManager()->addOrUpdate(userGroup);
+    m_context->accessRightsManager()->setOwnResourceAccessMap(userGroup.id,
+        {userGroup.resourceAccessRights.begin(), userGroup.resourceAccessRights.end()});
 }
 
 void QnCommonMessageProcessor::on_userGroupRemoved(const QnUuid& userGroupId)
@@ -885,15 +893,6 @@ void QnCommonMessageProcessor::resetVmsRules(const nx::vms::api::rules::RuleList
     emit vmsRulesReset(m_context->peerId(), vmsRules);
 }
 
-void QnCommonMessageProcessor::resetAccessRights(const AccessRightsDataList& accessRights)
-{
-    QHash<QnUuid, nx::core::access::ResourceAccessMap> accessMaps;
-    for (auto& data: accessRights)
-        accessMaps.insert(data.userId, {data.resourceRights.begin(), data.resourceRights.end()});
-
-    m_context->accessRightsManager()->resetAccessRights(accessMaps);
-}
-
 void QnCommonMessageProcessor::resetUserGroups(const UserGroupDataList& userGroups)
 {
     m_context->userGroupManager()->resetAll(userGroups);
@@ -1019,7 +1018,6 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetResources(fullData);
     resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
-    resetAccessRights(fullData.accessRights);
     resetUserGroups(fullData.userGroups);
     resetLicenses(fullData.licenses);
 
@@ -1028,6 +1026,13 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetVmsRules(fullData.vmsRules);
 
     m_context->showreelManager()->resetShowreels(fullData.showreels);
+
+    QHash<QnUuid, nx::core::access::ResourceAccessMap> accessMaps;
+    for (const auto& u: fullData.users)
+        accessMaps.insert(u.id, {u.resourceAccessRights.begin(), u.resourceAccessRights.end()});
+    for (const auto& g: fullData.userGroups)
+        accessMaps.insert(g.id, {g.resourceAccessRights.begin(), g.resourceAccessRights.end()});
+    m_context->accessRightsManager()->resetAccessRights(accessMaps);
 
     m_context->resourceAccessManager()->endUpdate();
 
@@ -1046,6 +1051,8 @@ void QnCommonMessageProcessor::updateResource(
 {
     QnUserResourcePtr qnUser(ec2::fromApiToResource(user));
     updateResource(qnUser, source);
+    m_context->accessRightsManager()->setOwnResourceAccessMap(
+        user.id, {user.resourceAccessRights.begin(), user.resourceAccessRights.end()});
 }
 
 void QnCommonMessageProcessor::updateResource(

@@ -82,6 +82,7 @@ class NX_VMS_COMMON_API QnUserResource: public QnResource
 
 public:
     friend void ec2::fromResourceToApi(const QnUserResourcePtr&, nx::vms::api::UserData&);
+    friend void ec2::fromApiToResource(const nx::vms::api::UserData&, QnUserResourcePtr&, bool);
 
     static const QnUuid kAdminGuid;
     static const QString kIntegrationRequestDataProperty;
@@ -198,4 +199,5 @@ private:
     QString m_fullName;
     nx::vms::api::UserExternalId m_externalId;
     nx::vms::api::UserAttributes m_attributes;
+    std::map<QnUuid, nx::vms::api::AccessRights> m_resourceAccessRights;
 };
