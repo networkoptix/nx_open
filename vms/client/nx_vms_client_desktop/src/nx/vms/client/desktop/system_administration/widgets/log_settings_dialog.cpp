@@ -100,7 +100,7 @@ void ConfigurableLogSettings::intersectWith(const ConfigurableLogSettings& other
         maxFileSizeB = {};
 
     if (maxFileTime != other.maxFileTime)
-        maxFileTime = {};
+        maxFileTime = std::nullopt;
 }
 
 ConfigurableLogSettings ConfigurableLogSettings::defaults()
@@ -354,7 +354,12 @@ void LogSettingsDialog::setMaxFileTime(ConfigurableLogSettings::Time time)
             std::chrono::seconds(*time).count(), ui->splitByTimeValue, ui->splitByTimeUnits);
     }
 
-    ui->splitByTimeChechBox->setChecked(time != kDontSplitByTime);
+    if (time == std::nullopt)
+        ui->splitByTimeChechBox->setCheckState(Qt::PartiallyChecked);
+    else if (time == kDontSplitByTime)
+        ui->splitByTimeChechBox->setCheckState(Qt::Unchecked);
+    else
+        ui->splitByTimeChechBox->setCheckState(Qt::Checked);
 }
 
 } // namespace nx::vms::client::desktop
