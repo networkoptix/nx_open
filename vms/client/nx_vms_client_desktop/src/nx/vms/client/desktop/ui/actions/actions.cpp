@@ -334,7 +334,7 @@ void initialize(Manager* manager, Action* root)
             .pulledText(ContextMenu::tr("New Layout"))
             .shortcut("Ctrl+T")
             .condition(!condition::showreelIsRunning())
-            .icon(qnSkin->icon("titlebar/new_layout.png"));
+            .icon(qnSkin->icon("titlebar/plus_16.svg", nullptr, nullptr, core::SvgIconColorer::kTitleBarIconSubstitutions));
 
         factory(OpenNewWindowAction)
             .flags(Main | GlobalHotkey)
