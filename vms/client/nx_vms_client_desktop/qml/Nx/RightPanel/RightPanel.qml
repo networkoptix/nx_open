@@ -78,7 +78,7 @@ TabControl
             leftPadding: 0
             rightPadding: 0
             focusFrameEnabled: false
-            icon.source: "qrc:/skin/events/tabs/bookmarks.png"
+            icon.source: "qrc:/skin/events/tabs/bookmarks.svg"
             text: qsTr("Bookmarks")
         }
 
