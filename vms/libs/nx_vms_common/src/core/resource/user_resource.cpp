@@ -370,8 +370,7 @@ bool QnUserResource::isBuiltInAdmin() const
 
 bool QnUserResource::isAdministrator() const
 {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    return nx::utils::contains(m_groupIds, nx::vms::api::kAdministratorsGroupId);
+    return m_isAdministratorCache;
 }
 
 std::vector<QnUuid> QnUserResource::groupIds() const
@@ -387,8 +386,11 @@ void QnUserResource::setGroupIds(const std::vector<QnUuid>& value)
         NX_MUTEX_LOCKER locker(&m_mutex);
         if (m_groupIds == value)
             return;
+
         previousValue = m_groupIds;
         m_groupIds = value;
+        m_isAdministratorCache = nx::utils::contains(
+            m_groupIds, nx::vms::api::kAdministratorsGroupId);
     }
 
     NX_VERBOSE(this, "User groups changed from %1 to %2",
@@ -576,6 +578,8 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         {
             const auto previousGroupIds = m_groupIds;
             m_groupIds = localOther->m_groupIds;
+            m_isAdministratorCache = nx::utils::contains(
+                m_groupIds, nx::vms::api::kAdministratorsGroupId);
             notifiers << [r = toSharedPointer(this), previousGroupIds]
                 { emit r->userGroupsChanged(r, previousGroupIds); };
         }

@@ -194,6 +194,7 @@ private:
     QString m_realm;
     std::atomic<GlobalPermissions> m_permissions;
     std::vector<QnUuid> m_groupIds;
+    std::atomic<bool> m_isAdministratorCache{false};
     std::atomic<bool> m_isEnabled{true};
     QString m_email;
     QString m_fullName;
