@@ -835,7 +835,8 @@ void ConnectActionsHandler::updatePreloaderVisibility()
             // Show welcome screen, hide preloader.
             resourceModeAction->setChecked(false);
             welcomeScreen->setConnectingToSystem(/*systemId*/ {});
-            welcomeScreen->setGlobalPreloaderVisible(false);
+            if (!mainWindow()->isSystemTabBarUpdating())
+                welcomeScreen->setGlobalPreloaderVisible(false);
             break;
         }
         case LogicalState::connecting:
@@ -1230,6 +1231,8 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
         if (auto welcomeScreen = mainWindow()->welcomeScreen())
             welcomeScreen->dropConnectingState();
     }
+    if (force)
+        menu()->trigger(ui::action::RemoveSystemFromTabBarAction);
 
     clearConnection();
     return true;

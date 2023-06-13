@@ -25,6 +25,7 @@ public:
     void rebuildTabs();
     void activateHomeTab();
     void activatePreviousTab();
+    bool isUpdating() const;
 
 protected:
     virtual QSize tabSizeHint(int index) const override;

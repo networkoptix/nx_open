@@ -129,6 +129,11 @@ void SystemTabBar::activatePreviousTab()
     setCurrentIndex(m_lastTabIndex);
 }
 
+bool SystemTabBar::isUpdating() const
+{
+    return m_updating;
+}
+
 QSize SystemTabBar::tabSizeHint(int index) const
 {
     int width;
@@ -165,6 +170,7 @@ void SystemTabBar::at_currentTabChanged(int index)
         mainWindow()->setWelcomeScreenVisible(false);
         if (currentIndex() != m_lastTabIndex)
         {
+            QScopedValueRollback<bool> guard(m_updating, true);
             m_lastTabIndex = index;
 
             auto modelIndex = workbench()->windowContext()->systemTabBarModel()->index(index);
