@@ -28,6 +28,9 @@ if(NOT WINDOWS)
     string(REPLACE ";" ":" python_path "${python_path}")
 endif()
 
+get_target_property(testTargetList unit_tests TESTS)
+message(STATUS "Ready to build unit tests archive out of ${testTargetList}")
+
 add_custom_command(
     OUTPUT ${package_file}
     COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${python_path}"

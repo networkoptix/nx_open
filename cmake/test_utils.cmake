@@ -3,7 +3,9 @@
 enable_testing()
 
 add_custom_target(unit_tests)
-set_target_properties(unit_tests PROPERTIES FOLDER utils)
+set_target_properties(unit_tests PROPERTIES
+    FOLDER utils
+    TESTS "")
 
 set(testTempDirectory "${CMAKE_BINARY_DIR}" CACHE STRING "Temp directory for running tests.")
 set(testMetaInformationFile "${CMAKE_BINARY_DIR}/unit_tests_info.yml")
@@ -84,9 +86,16 @@ function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
 
     add_test(NAME ${target} COMMAND ${target})
 
+    # If PROJECT was specified for the current module then using it.
+    set(_nx_add_test_project ${NX_ADD_TEST_PROJECT})
+    if("${_nx_add_test_project}" STREQUAL "")
+        # If PROJECT is not specified for the current module then using global value.
+        set(_nx_add_test_project ${NX_TEST_JIRA_PROJECT})
+    endif()
+
     # Write unit test metainformation.
     nx_store_test_metainformation(${target}
-        PROJECT ${NX_ADD_TEST_PROJECT}
+        PROJECT ${_nx_add_test_project}
         COMPONENT ${NX_ADD_TEST_COMPONENT})
 
     if(WINDOWS)
