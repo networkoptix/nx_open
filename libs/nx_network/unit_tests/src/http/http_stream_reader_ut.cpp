@@ -822,7 +822,7 @@ TEST_F(HttpStreamReader, parsing_can_be_resumed_after_failure)
 
     ASSERT_EQ(1, messages.size());
     ASSERT_EQ(Method::get, messages[0].request->requestLine.method);
-    ASSERT_EQ("/abc/def/ghi/jkl/mn/oi/prs/tquv/wxyz", messages[0].request->requestLine.url);
+    ASSERT_EQ(nx::utils::Url("/abc/def/ghi/jkl/mn/oi/prs/tquv/wxyz"), messages[0].request->requestLine.url);
     ASSERT_EQ(http_1_1, messages[0].request->requestLine.version);
     ASSERT_EQ(2, messages[0].request->headers.size());
 }

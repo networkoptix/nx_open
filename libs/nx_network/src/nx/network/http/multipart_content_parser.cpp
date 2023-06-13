@@ -200,8 +200,16 @@ bool MultipartContentParser::processLine(const ConstBufferRefType& lineBuffer)
                 {
                     // Content-Length is known.
                     m_contentLength = nx::utils::stoul(contentLengthIter->second);
-                    m_state = depleteLineFeedBeforeBinaryData;
-                    m_nextState = readingSizedBinaryData;
+                    if (m_contentLength == 0)
+                    {
+                        m_state = waitingBoundary;
+                        m_nextFilter->processData("");
+                    }
+                    else
+                    {
+                        m_state = depleteLineFeedBeforeBinaryData;
+                        m_nextState = readingSizedBinaryData;
+                    }
                 }
                 else
                 {
