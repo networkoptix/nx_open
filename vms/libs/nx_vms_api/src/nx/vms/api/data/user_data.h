@@ -83,6 +83,9 @@ struct NX_VMS_API UserData: ResourceData
     /**%apidoc[opt] List of groups to inherit permissions. */
     std::vector<QnUuid> groupIds;
 
+    /**%apidoc[opt] Access rights per Resource or Resource Group. */
+    std::map<QnUuid, AccessRights> resourceAccessRights;
+
     /** Checks if this user is a member of the Administrators group. */
     bool isAdministrator() const;
 
@@ -116,6 +119,7 @@ struct NX_VMS_API UserData: ResourceData
     (fullName) \
     (email) \
     (permissions) \
+    (resourceAccessRights) \
     (groupIds) \
     (externalId) \
     (attributes) \

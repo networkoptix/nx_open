@@ -11,7 +11,6 @@
 #include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/url.h>
-#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>

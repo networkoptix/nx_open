@@ -261,7 +261,6 @@ private:
     {
         static_assert(
             std::is_same_v<T, nx::vms::api::StoredFileDataList> ||
-            std::is_same_v<T, nx::vms::api::AccessRightsDataList> ||
             std::is_same_v<T, nx::vms::api::UserDataList> ||
             std::is_same_v<T, nx::vms::api::UserGroupDataList> ||
             std::is_same_v<T, nx::vms::api::LayoutDataList> ||
@@ -282,8 +281,6 @@ private:
             std::is_same_v<T, nx::vms::api::rules::RuleList>);
         if constexpr(std::is_same_v<T, nx::vms::api::StoredFileDataList>)
             return ApiCommand::Value::getStoredFiles;
-        else if constexpr(std::is_same_v<T, nx::vms::api::AccessRightsDataList>)
-            return ApiCommand::Value::getAccessRights;
         else if constexpr(std::is_same_v<T, nx::vms::api::UserDataList>)
             return ApiCommand::Value::getUsers;
         else if constexpr(std::is_same_v<T, nx::vms::api::UserGroupDataList>)
@@ -329,7 +326,6 @@ private:
     {
         static_assert(
             std::is_same_v<T, nx::vms::api::StoredFileData> ||
-            std::is_same_v<T, nx::vms::api::AccessRightsData> ||
             std::is_same_v<T, nx::vms::api::UserGroupData> ||
             std::is_same_v<T, nx::vms::api::UserDataEx> ||
             std::is_same_v<T, nx::vms::api::LayoutData> ||
@@ -350,8 +346,6 @@ private:
             std::is_same_v<T, nx::vms::api::rules::Rule>);
         if constexpr(std::is_same_v<T, nx::vms::api::StoredFileData>)
             return ApiCommand::Value::updateStoredFile;
-        else if constexpr(std::is_same_v<T, nx::vms::api::AccessRightsData>)
-            return ApiCommand::Value::setAccessRights;
         else if constexpr (std::is_same_v<T, nx::vms::api::UserDataEx>)
             return ApiCommand::Value::saveUser;
         else if constexpr (std::is_same_v<T, nx::vms::api::UserGroupData>)

@@ -22,10 +22,14 @@ public:
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<nx::vms::api::AccessRightsData>& tran,
+        const QnTransaction<nx::vms::api::UserGroupData>& tran,
+        NotificationSource source);
+
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::AccessRightsDataDeprecated>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<nx::vms::api::UserGroupData>& tran,
+        const QnTransaction<nx::vms::api::UserDataDeprecated>& tran,
         NotificationSource source);
 };
 

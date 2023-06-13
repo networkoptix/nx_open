@@ -6,7 +6,7 @@
 
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/api/data/access_rights_data_deprecated.h>
 #include <nx/vms/api/data/user_data_ex.h>
 #include <nx/vms/api/data/user_group_data.h>
 
@@ -27,7 +27,7 @@ signals:
     void userRoleAddedOrUpdated(const nx::vms::api::UserGroupData& userRole);
     void removed(const QnUuid& id, ec2::NotificationSource source);
     void userRoleRemoved(const QnUuid& id);
-    void accessRightsChanged(const nx::vms::api::AccessRightsData& access);
+    void accessRightsChanged(const nx::vms::api::AccessRightsDataDeprecated& access);
 };
 
 /**
@@ -84,19 +84,6 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     ErrorCode removeUserRoleSync(const QnUuid& id);
-
-    virtual int getAccessRights(
-        Handler<nx::vms::api::AccessRightsDataList> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
-
-    ErrorCode getAccessRightsSync(nx::vms::api::AccessRightsDataList* outDataList);
-
-    virtual int setAccessRights(
-        const nx::vms::api::AccessRightsData& data,
-        Handler<> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
-
-    ErrorCode setAccessRightsSync(const nx::vms::api::AccessRightsData& data);
 };
 
 } // namespace ec2

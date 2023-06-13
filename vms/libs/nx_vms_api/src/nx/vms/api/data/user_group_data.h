@@ -30,6 +30,9 @@ struct NX_VMS_API UserGroupData: IdData
     /**%apidoc[opt] Own user global permissions. */
     GlobalPermissions permissions = GlobalPermission::none;
 
+    /**%apidoc[opt] Access rights per Resource or Resource Group. */
+    std::map<QnUuid, AccessRights> resourceAccessRights;
+
     /**%apidoc[opt] List of roles to inherit permissions. */
     std::vector<QnUuid> parentGroupIds;
 
@@ -53,7 +56,7 @@ struct NX_VMS_API UserGroupData: IdData
     bool operator==(const UserGroupData& other) const = default;
     QString toString() const;
 };
-#define UserRoleData_Fields \
+#define UserGroupData_Fields \
     IdData_Fields \
     (name) \
     (description) \
@@ -61,7 +64,8 @@ struct NX_VMS_API UserGroupData: IdData
     (permissions) \
     (parentGroupIds) \
     (attributes) \
-    (externalId)
+    (externalId) \
+    (resourceAccessRights)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserGroupData)
 
 NX_VMS_API extern const QnUuid kAdministratorsGroupId; //< ex-Owners.

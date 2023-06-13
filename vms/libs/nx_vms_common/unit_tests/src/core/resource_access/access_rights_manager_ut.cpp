@@ -11,7 +11,6 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 

@@ -38,12 +38,12 @@ TEST(Permissions, BackwardCompatibility)
     for (const auto& origin: deprecatedPermissions)
     {
         auto permissions = origin.permissions;
-        auto converted =
-            PermissionConverter::accessRights(&permissions, userId, origin.accessibleResources);
+        auto converted = migrateAccessRights(
+            &permissions, origin.accessibleResources.value_or(std::vector<QnUuid>{}));
         ASSERT_EQ(permissions, GlobalPermission::none);
         PermissionsV1 convertedBack;
         PermissionConverter::extractFromResourceAccessRights(
-            {converted}, userId, &convertedBack.permissions, &convertedBack.accessibleResources);
+            converted, &convertedBack.permissions, &convertedBack.accessibleResources);
         ASSERT_EQ(nx::reflect::json::serialize(origin), nx::reflect::json::serialize(convertedBack));
     }
 }
@@ -59,16 +59,15 @@ TEST(Permissions, CasesNotPreservingBackwardCompatibility)
         {GlobalPermission::userInput, {}},
     };
     const auto expectedNoPermissions = nx::reflect::json::serialize(PermissionsV1{});
-    const auto userId = QnUuid::createUuid();
     for (const auto& origin: deprecatedPermissions)
     {
         auto permissions = origin.permissions;
-        auto converted =
-            PermissionConverter::accessRights(&permissions, userId, origin.accessibleResources);
+        auto converted = api::migrateAccessRights(
+            &permissions, origin.accessibleResources.value_or(std::vector<QnUuid>{}));
         ASSERT_EQ(permissions, GlobalPermission::none);
         PermissionsV1 convertedBack;
         PermissionConverter::extractFromResourceAccessRights(
-            {converted}, userId, &convertedBack.permissions, &convertedBack.accessibleResources);
+            converted, &convertedBack.permissions, &convertedBack.accessibleResources);
         ASSERT_EQ(expectedNoPermissions, nx::reflect::json::serialize(convertedBack));
     }
 }

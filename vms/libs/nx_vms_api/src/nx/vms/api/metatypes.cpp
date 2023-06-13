@@ -8,7 +8,6 @@
 
 #include <nx/fusion/serialization/json_functions.h>
 
-#include "data/access_rights_data.h"
 #include "data/analytics_data.h"
 #include "data/camera_attributes_data.h"
 #include "data/camera_data.h"
@@ -75,8 +74,6 @@ void Metatypes::initialize()
     qRegisterMetaType<AccessRight>();
     qRegisterMetaType<AccessRights>();
 
-    qRegisterMetaType<AccessRightsData>();
-    qRegisterMetaType<AccessRightsDataList>();
     qRegisterMetaType<AnalyticsEngineData>();
     qRegisterMetaType<AnalyticsPluginData>();
     qRegisterMetaType<CameraAttributesData>();

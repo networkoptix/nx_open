@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include <core/resource_access/resource_access_map.h>
-#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 

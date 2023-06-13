@@ -18,7 +18,6 @@ using RuleList = std::vector<Rule>;
 enum class PeerType;
 enum class ResourceStatus;
 
-struct AccessRightsData;
 struct AnalyticsEngineData;
 struct AnalyticsPluginData;
 struct CameraData;
@@ -47,7 +46,6 @@ struct VideowallControlMessageData;
 struct VideowallData;
 struct WebPageData;
 
-using AccessRightsDataList = std::vector<AccessRightsData>;
 using AnalyticsEngineDataList = std::vector<AnalyticsEngineData>;
 using AnalyticsPluginDataList = std::vector<AnalyticsPluginData>;
 using CameraDataList = std::vector<CameraData>;

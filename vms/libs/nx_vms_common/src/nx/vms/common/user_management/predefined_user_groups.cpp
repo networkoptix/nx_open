@@ -4,8 +4,6 @@
 
 #include <unordered_map>
 
-#include <nx/vms/api/data/access_rights_data.h>
-
 using namespace nx::core::access;
 using namespace nx::vms::api;
 

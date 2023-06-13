@@ -160,13 +160,8 @@ void UserGroupRequestChain::requestSaveGroup(const UserGroupRequest::AddOrUpdate
                 group.permissions = userGroup->permissions;
 
                 userGroupManager()->addOrUpdate(group);
-                if (userGroup->resourceAccessRights)
-                {
-                    updateResourceAccessRights(
-                        systemContext(),
-                        userGroup->id,
-                        *userGroup->resourceAccessRights);
-                }
+                updateResourceAccessRights(
+                    systemContext(), userGroup->id, userGroup->resourceAccessRights);
             }
             else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
             {

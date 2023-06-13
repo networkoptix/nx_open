@@ -490,13 +490,8 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                     user->setRawPermissions(state.globalPermissions);
                     user->setEnabled(state.userEnabled);
                     user->setGroupIds(data->groupIds);
-                    if (data->resourceAccessRights)
-                    {
-                        UserGroupRequestChain::updateResourceAccessRights(
-                            systemContext(),
-                            user->getId(),
-                            *data->resourceAccessRights);
-                    }
+                    UserGroupRequestChain::updateResourceAccessRights(
+                        systemContext(), user->getId(), data->resourceAccessRights);
                 }
 
                 saveStateComplete(state);

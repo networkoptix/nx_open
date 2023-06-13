@@ -6,7 +6,6 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <ui/workbench/workbench_access_controller.h>
 

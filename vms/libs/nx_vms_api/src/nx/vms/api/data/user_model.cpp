@@ -85,17 +85,15 @@ UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
     }
     if (!userRoleId.isNull())
         user.groupIds.push_back(std::move(userRoleId));
+    user.resourceAccessRights = migrateAccessRights(
+        &user.permissions, accessibleResources.value_or(std::vector<QnUuid>{}));
 
-    auto accessRights = PermissionConverter::accessRights(
-        &user.permissions, user.id, accessibleResources);
-
-    return {std::move(user), std::move(accessRights)};
+    return {std::move(user)};
 }
 
 std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
 {
     auto& baseList = std::get<std::vector<UserData>>(data);
-    auto& allAccessRights = std::get<AccessRightsDataList>(data);
 
     std::vector<UserModelV1> result;
     result.reserve(baseList.size());
@@ -114,7 +112,7 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
         }
 
         PermissionConverter::extractFromResourceAccessRights(
-            allAccessRights, model.id, &model.permissions, &model.accessibleResources);
+            baseData.resourceAccessRights, &model.permissions, &model.accessibleResources);
 
         if (!model.isOwner && (baseData.groupIds.empty()
             || !UserDataDeprecated::permissionPresetToGroupId(model.permissions)))
@@ -135,23 +133,13 @@ UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
 {
     auto user = std::move(*this).toUserData();
     user.groupIds = std::move(groupIds);
-    std::optional<AccessRightsData> accessRights;
-    if (resourceAccessRights)
-    {
-        AccessRightsData data;
-        data.userId = user.id;
-        data.resourceRights = *std::move(resourceAccessRights);
-        data.checkResourceExists = CheckResourceExists::no;
-        accessRights = std::move(data);
-    }
-
-    return {std::move(user), std::move(accessRights)};
+    user.resourceAccessRights = std::move(resourceAccessRights);
+    return {std::move(user)};
 }
 
 std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
 {
     auto& baseList = std::get<std::vector<UserData>>(data);
-    auto& allAccessRights = std::get<AccessRightsDataList>(data);
 
     std::vector<UserModelV3> result;
     result.reserve(baseList.size());
@@ -161,10 +149,8 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
         static_cast<UserModelBase&>(model) = fromUserData(std::move(baseData));
 
         model.groupIds = std::move(baseData.groupIds);
-        auto accessRights = nx::utils::find_if(allAccessRights,
-            [id = model.getId()](const auto& accessRights) { return accessRights.userId == id; });
-        if (accessRights)
-            model.resourceAccessRights = std::move(accessRights->resourceRights);
+        if (!baseData.resourceAccessRights.empty())
+            model.resourceAccessRights = std::move(baseData.resourceAccessRights);
 
         result.push_back(std::move(model));
     }

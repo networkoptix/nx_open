@@ -224,9 +224,6 @@ void apiIdDataTriggerNotificationHelper(
             return notificationParams.cameraNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
-        case ApiCommand::removeAccessRights:
-            //#akolesnikov no notification needed
-            break;
         case ApiCommand::removeAnalyticsPlugin:
         case ApiCommand::removeAnalyticsEngine:
             return notificationParams.analyticsNotificationManager->triggerNotification(
@@ -250,11 +247,6 @@ QnUuid createHashForServerFootageDataHelper(const nx::vms::api::ServerFootageDat
 QnUuid createHashForApiCameraAttributesDataHelper(const nx::vms::api::CameraAttributesData& params)
 {
     return QnAbstractTransaction::makeHash(params.cameraId.toRfc4122(), "camera_attributes");
-}
-
-QnUuid createHashForApiAccessRightsDataHelper(const nx::vms::api::AccessRightsData& params)
-{
-    return QnAbstractTransaction::makeHash(params.userId.toRfc4122(), "access_rights");
 }
 
 QnUuid createHashForApiLicenseDataHelper(const nx::vms::api::LicenseData& params)
@@ -311,21 +303,6 @@ struct UserNotificationManagerHelper
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
         notificationParams.userNotificationManager->triggerNotification(tran, notificationParams.source);
-    }
-
-    // This is required for proper transaction handling on mobile client when it's connected to the
-    // old VMS server.
-    void operator ()(
-        const QnTransaction<nx::vms::api::UserDataDeprecated>& tran,
-        const NotificationParams& notificationParams)
-    {
-        auto [userData, accessRightsData] = tran.params.toUserData();
-
-        (*this)(QnTransaction<nx::vms::api::UserData>(
-            ApiCommand::Value::saveUser, tran.peerID, std::move(userData)), notificationParams);
-
-        (*this)(QnTransaction<nx::vms::api::AccessRightsData>(
-            ApiCommand::Value::setAccessRights, tran.peerID, std::move(accessRightsData)), notificationParams);
     }
 };
 
@@ -720,48 +697,6 @@ struct RemoveResourceAccess
     }
 };
 
-struct ModifyAccessRightsChecker
-{
-    Result operator()(
-        SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
-        const nx::vms::api::AccessRightsData& param)
-    {
-        if (hasSystemAccess(accessData))
-            return Result();
-
-        auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(param.userId);
-
-        const auto accessRightMap = systemContext->accessRightsManager()->ownResourceAccessMap(
-            param.userId);
-
-        // CRUD API PATCH merges with existing shared resources so they can be not changed.
-        std::map<QnUuid, nx::vms::api::AccessRights> sharedResourceRights;
-        if (user || systemContext->userGroupManager()->contains(param.userId))
-        {
-            sharedResourceRights = {accessRightMap.keyValueBegin(), accessRightMap.keyValueEnd()};
-        }
-        else
-        {
-            // We can clear shared Resources even after the User or Role is deleted.
-            if (!param.resourceRights.empty()
-                && (param.checkResourceExists == nx::vms::api::CheckResourceExists::yes))
-            {
-                return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
-                    "To set shared Resources, %1 must be a valid User or Role."),
-                    param.userId));
-            }
-        }
-
-        if (sharedResourceRights == param.resourceRights)
-            return Result();
-
-        return systemContext->resourceAccessManager()->hasPowerUserPermissions(accessData)
-            ? Result()
-            : Result(ErrorCode::forbidden, ServerApiErrors::tr("Admin permissions required."));
-    }
-};
-
 struct SaveUserAccess
 {
     Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
@@ -828,12 +763,6 @@ struct SaveUserAccess
             }
         }
 
-        if (!existingUser && param.name.isEmpty())
-        {
-            return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
-                "Won't save new user with empty name.")));
-        }
-
         if (!existingUser && param.isAdministrator())
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
@@ -855,8 +784,7 @@ struct SaveUserAccess
                 nx::branding::shortCloudName()));
         }
 
-        auto r = ModifyResourceAccess()(systemContext, accessData, param);
-        return r;
+        return ModifyResourceAccess()(systemContext, accessData, param);
     }
 
     Result operator()(
@@ -864,10 +792,7 @@ struct SaveUserAccess
         const Qn::UserAccessData& accessData,
         const nx::vms::api::UserDataDeprecated& param)
     {
-        const auto [userData, accessRightsData] = param.toUserData();
-        if (const auto r = (*this)(systemContext, accessData, userData); !r)
-            return r;
-        return ModifyAccessRightsChecker()(systemContext, accessData, accessRightsData);
+        return (*this)(systemContext, accessData, param.toUserData());
     }
 };
 

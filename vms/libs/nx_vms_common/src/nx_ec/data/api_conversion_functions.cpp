@@ -584,6 +584,8 @@ void fromApiToResource(const UserData& src, QnUserResourcePtr& dst, bool setPass
             src.digest,
             src.cryptSha512Hash});
     }
+
+    dst->m_resourceAccessRights = src.resourceAccessRights;
 }
 
 void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
@@ -608,6 +610,7 @@ void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
     dst.attributes = src->m_attributes;
     if (dst.fullName.isNull())
         dst.fullName = src->m_fullName;
+    dst.resourceAccessRights = src->m_resourceAccessRights;
 }
 
 void fromApiToResource(const VideowallItemData& src, QnVideoWallItem& dst)

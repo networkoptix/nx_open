@@ -3,7 +3,6 @@
 #pragma once
 
 #include "../rules/rule.h"
-#include "access_rights_data.h"
 #include "analytics_data.h"
 #include "camera_attributes_data.h"
 #include "camera_data.h"
@@ -35,7 +34,6 @@ struct NX_VMS_API FullInfoData
     CameraAttributesDataList cameraUserAttributesList;
     UserDataList users;
     UserGroupDataList userGroups;
-    AccessRightsDataList accessRights;
     LayoutDataList layouts;
     VideowallDataList videowalls;
     EventRuleDataList rules;
@@ -69,7 +67,6 @@ struct NX_VMS_API FullInfoData
     (storages) \
     (resStatusList) \
     (webPages) \
-    (accessRights) \
     (userGroups) \
     (showreels) \
     (analyticsPlugins) \

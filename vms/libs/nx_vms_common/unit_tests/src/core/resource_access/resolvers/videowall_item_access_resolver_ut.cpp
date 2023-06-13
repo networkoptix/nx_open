@@ -8,7 +8,6 @@
 #include <core/resource_access/resolvers/videowall_item_access_resolver.h>
 #include <core/resource_access/resolvers/own_resource_access_resolver.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 

@@ -22,18 +22,8 @@ UserGroupModel::DbUpdateTypes UserGroupModel::toDbTypes() &&
     userRole.attributes = std::move(attributes);
     userRole.permissions = std::move(permissions);
     userRole.parentGroupIds = std::move(parentGroupIds);
-
-    std::optional<AccessRightsData> accessRights;
-    if (resourceAccessRights)
-    {
-        AccessRightsData data;
-        data.userId = userRole.id;
-        data.resourceRights = *std::move(resourceAccessRights);
-        data.checkResourceExists = CheckResourceExists::no;
-        accessRights = std::move(data);
-    }
-
-    return {std::move(userRole), std::move(accessRights)};
+    userRole.resourceAccessRights = std::move(resourceAccessRights);
+    return {std::move(userRole)};
 }
 
 std::vector<UserGroupModel> UserGroupModel::fromDbTypes(DbListTypes all)
@@ -53,12 +43,8 @@ std::vector<UserGroupModel> UserGroupModel::fromDbTypes(DbListTypes all)
         model.permissions = std::move(baseData.permissions);
         model.attributes = std::move(baseData.attributes);
         model.parentGroupIds = std::move(baseData.parentGroupIds);
-
-        auto accessRights = nx::utils::find_if(
-            std::get<AccessRightsDataList>(all),
-            [&](const auto& accessRights) { return accessRights.userId == model.id; });
-        if (accessRights)
-            model.resourceAccessRights = std::move(accessRights->resourceRights);
+        if (!baseData.resourceAccessRights.empty())
+            model.resourceAccessRights = std::move(baseData.resourceAccessRights);
 
         result.emplace_back(std::move(model));
     }

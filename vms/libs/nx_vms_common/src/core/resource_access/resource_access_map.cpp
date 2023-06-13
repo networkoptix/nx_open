@@ -8,7 +8,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/format.h>
 #include <nx/utils/range_adapters.h>
-#include <nx/vms/api/data/access_rights_data.h>
 
 using namespace nx::vms::api;
 

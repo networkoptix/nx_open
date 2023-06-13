@@ -18,7 +18,6 @@
 #include <nx/utils/log/format.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
