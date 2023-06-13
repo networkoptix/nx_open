@@ -19,7 +19,7 @@ TabControl
             leftPadding: 0
             rightPadding: 0
             focusFrameEnabled: false
-            icon.source: "qrc:/skin/events/tabs/notifications.svg"
+            icon.source: "image://svg/skin/events/tabs/notifications.svg"
             text: qsTr("Notifications")
         }
 
@@ -48,7 +48,7 @@ TabControl
             leftPadding: 0
             rightPadding: 0
             focusFrameEnabled: false
-            icon.source: "qrc:/skin/events/tabs/motion.svg"
+            icon.source: "image://svg/skin/events/tabs/motion.svg"
             text: qsTr("Motion")
         }
 
@@ -78,7 +78,7 @@ TabControl
             leftPadding: 0
             rightPadding: 0
             focusFrameEnabled: false
-            icon.source: "qrc:/skin/events/tabs/bookmarks.svg"
+            icon.source: "image://svg/skin/events/tabs/bookmarks.svg"
             text: qsTr("Bookmarks")
         }
 
@@ -107,7 +107,7 @@ TabControl
             leftPadding: 0
             rightPadding: 0
             focusFrameEnabled: false
-            icon.source: "qrc:/skin/events/tabs/events.svg"
+            icon.source: "image://svg/skin/events/tabs/events.svg"
             text: qsTr("Events")
         }
 
@@ -136,7 +136,7 @@ TabControl
             leftPadding: 0
             rightPadding: 0
             focusFrameEnabled: false
-            icon.source: "qrc:/skin/events/tabs/analytics.png"
+            icon.source: "image://svg/skin/events/tabs/analytics.svg"
             text: qsTr("Analytics")
         }
 
