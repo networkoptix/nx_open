@@ -99,7 +99,11 @@ public:
         MediaFlags_LiveOnly             = 0x40000,
 
         // Packets that can be pipelined with some delay from live
-        MediaFlags_Delayed              = 0x80000
+        MediaFlags_Delayed              = 0x80000,
+
+        // Media packet from old archive version that should be BOM decoded before decrpyption
+        // This flag can be removed in a 5.3
+        MediaFlags_BomDecoding         = 0x100000
     )
 
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)
