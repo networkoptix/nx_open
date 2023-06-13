@@ -63,7 +63,7 @@ class NxOpenConan(ConanFile):
     requires = (
         f"ffmpeg/{ffmpeg_version_and_revision}",
         "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
-        "qt/6.5.0" "#081e1bd49931aabdf34898e47147f49d",
+        "qt/6.5.0" "#5c7afebaa73643574946b288e38f4517",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
     )
 
