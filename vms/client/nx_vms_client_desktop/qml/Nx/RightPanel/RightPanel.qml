@@ -107,7 +107,7 @@ TabControl
             leftPadding: 0
             rightPadding: 0
             focusFrameEnabled: false
-            icon.source: "qrc:/skin/events/tabs/events.png"
+            icon.source: "qrc:/skin/events/tabs/events.svg"
             text: qsTr("Events")
         }
 
