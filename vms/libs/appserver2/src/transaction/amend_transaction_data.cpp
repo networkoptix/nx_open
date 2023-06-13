@@ -127,6 +127,14 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     if (accessData == Qn::kSystemAccess)
         return true;
 
+    // All owners should be able to see all password data. This is required for merge with
+    // taking remote settings.
+    if (const auto accessUser = accessManager->systemContext()->resourcePool()
+        ->getResourceById<QnUserResource>(accessData.userId); accessUser && accessUser->isOwner())
+    {
+        return true;
+    }
+
     if (userData->id == QnUserResource::kAdminGuid)
     {
        // Only admin should see it's own password hashes!
