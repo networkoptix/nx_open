@@ -440,7 +440,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     {
         NX_MUTEX_LOCKER lock(&m_socketMutex);
         m_tcpSock = nx::network::SocketFactory::createStreamSocket(
-            nx::network::ssl::kAcceptAnyCertificate, isSslRequired);
+            nx::network::ssl::kAcceptAnyCertificate, isSslRequired, m_natTraversal);
     }
 
     m_tcpSock->setRecvTimeout(TCP_RECEIVE_TIMEOUT_MS);
@@ -1765,6 +1765,13 @@ void QnRtspClient::addRequestHeader(const QString& requestName, const nx::networ
 QElapsedTimer QnRtspClient::lastReceivedDataTimer() const
 {
     return m_lastReceivedDataTimer;
+}
+
+void QnRtspClient::setCloudConnectEnabled(bool enabled)
+{
+    m_natTraversal = enabled
+        ? nx::network::NatTraversalSupport::enabled
+        : nx::network::NatTraversalSupport::disabled;
 }
 
 void QnRtspClient::setIgnoreQopInDigest(bool value)
