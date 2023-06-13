@@ -46,6 +46,10 @@ function(nx_go_add_test target)
             set(target_ut ${target}_${package}_ut)
         endif()
 
+        if(NX_TEST_JIRA_PROJECT)
+            nx_store_test_metainformation(${target_ut} PROJECT ${NX_TEST_JIRA_PROJECT})
+        endif()
+
         nx_go_build_test(
             ${target_ut}
             ${CMAKE_CURRENT_SOURCE_DIR}

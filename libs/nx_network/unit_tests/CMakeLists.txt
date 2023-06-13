@@ -8,5 +8,6 @@ nx_add_test(nx_network_ut
                   # This dependency is needed to verify legacy compatibility with nx_fusion.
     PRIVATE_LIBS
         udt
+    PROJECT NXLIB
     FOLDER common/tests
 )

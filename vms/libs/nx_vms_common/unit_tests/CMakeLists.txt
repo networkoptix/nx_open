@@ -11,5 +11,7 @@ nx_add_test(nx_vms_common_ut
         Qt6::Test
     PRIVATE_LIBS
         nx_vms_common_test_support
+    PROJECT VMS
+    COMPONENT Server
     FOLDER common/tests
 )

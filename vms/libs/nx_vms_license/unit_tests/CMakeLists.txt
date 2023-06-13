@@ -5,5 +5,7 @@ nx_add_test(nx_vms_license_ut
         nx_utils
         nx_vms_license
         nx_vms_common_test_support
+    PROJECT VMS
+    COMPONENT Server
     FOLDER common/tests
 )
