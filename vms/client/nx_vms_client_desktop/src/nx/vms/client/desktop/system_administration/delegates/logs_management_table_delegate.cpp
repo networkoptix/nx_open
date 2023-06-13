@@ -14,6 +14,7 @@ namespace nx::vms::client::desktop {
 namespace {
 
 static constexpr int kExtraTextMargin = 5;
+static constexpr qreal kOpacityForDisabledCheckbox = 0.3;
 
 } // namespace
 
@@ -154,11 +155,16 @@ void LogsManagementTableDelegate::paintCheckBoxColumn(
             break;
     }
 
+    painter->save();
+    if (!index.data(LogsManagementModel::EnabledRole).toBool())
+        painter->setOpacity(kOpacityForDisabledCheckbox);
+
     const auto widget = styleOption.widget;
     checkMarkOption.rect =
         style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &checkMarkOption, widget);
     style->drawPrimitive(
         QStyle::PE_IndicatorItemViewItemCheck, &checkMarkOption, painter, widget);
+    painter->restore();
 }
 
 } // namespace nx::vms::client::desktop
