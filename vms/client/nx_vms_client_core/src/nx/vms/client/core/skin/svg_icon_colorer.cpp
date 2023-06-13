@@ -76,7 +76,7 @@ QByteArray substituteColors(
 
 } // namespace
 
-const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitutions = {
+const SvgIconColorer::IconSubstitutions SvgIconColorer::kTreeIconSubstitutions = {
     { QnIcon::Disabled, {
         { kBasePrimaryColor, "dark14" },
         { kBaseSecondaryColor, "dark17" },
@@ -87,7 +87,7 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitution
         { kBaseSecondaryColor, "light1" },
         { kBaseWindowTextColor, "light10" },
     }},
-    { QnIcon::Active, {
+    { QnIcon::Active, {  //< Hovered
         { kBasePrimaryColor, "brand_core" },
         { kBaseSecondaryColor, "light3" },
         { kBaseWindowTextColor, "light14" },
@@ -98,6 +98,32 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitution
         { kBaseWindowTextColor, "light16" },
     }},
 };
+
+const SvgIconColorer::IconSubstitutions SvgIconColorer::kTitleBarIconSubstitutions = {
+    { QnIcon::Disabled, {
+        { kBasePrimaryColor, "dark14" },
+        { kBaseSecondaryColor, "dark17" },
+        { kBaseWindowTextColor, "light16" },
+    }},
+    { QnIcon::Selected, {
+        { kBasePrimaryColor, "light4" },
+        { kBaseSecondaryColor, "light1" },
+        { kBaseWindowTextColor, "light10" },
+    }},
+    { QnIcon::Active, {  //< Hovered
+        { kBasePrimaryColor, "light4" },
+        { kBaseSecondaryColor, "light3" },
+        { kBaseWindowTextColor, "light14" },
+    }},
+    { QnIcon::Error, {
+        { kBasePrimaryColor, "red_l2" },
+        { kBaseSecondaryColor, "red_l3" },
+        { kBaseWindowTextColor, "light16" },
+    }},
+};
+
+const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitutions 
+    = kTreeIconSubstitutions;
 
 SvgIconColorer::SvgIconColorer(
     const QByteArray& sourceIconData,

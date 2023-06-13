@@ -50,6 +50,8 @@ public:
     QByteArray makeIcon(QIcon::Mode mode) const;
 
     static const IconSubstitutions kDefaultIconSubstitutions;
+    static const IconSubstitutions kTreeIconSubstitutions;
+    static const IconSubstitutions kTitleBarIconSubstitutions;
 
 private:
     void initializeDump();
