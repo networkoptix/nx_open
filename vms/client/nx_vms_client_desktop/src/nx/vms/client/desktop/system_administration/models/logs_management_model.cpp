@@ -166,6 +166,9 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
 
                 case Qt::ForegroundRole:
                     return logLevelColor(unit);
+                
+                case Qt::ToolTipRole:
+                    return isOnline(unit) ? logLevelTooltip(logLevel(unit)) : "";
             }
             break;
 
@@ -267,6 +270,27 @@ void LogsManagementModel::onItemsChanged(QList<LogsManagementUnitPtr> items)
         // Redraw items.
         emit dataChanged(index(first, 0), index(last, ColumnCount - 1));
     }
+}
+
+QString LogsManagementModel::logLevelTooltip(nx::utils::log::Level level) const
+{
+    switch (level)
+    {
+        case nx::utils::log::Level::undefined:
+            return {};
+        case nx::utils::log::Level::info:
+            return tr("Default Logging level");
+        case nx::utils::log::Level::none:
+        case nx::utils::log::Level::error:
+        case nx::utils::log::Level::warning:
+            return tr("Non-default Logging level. We recommend setting it to “info”");
+        case nx::utils::log::Level::debug:
+        case nx::utils::log::Level::verbose:
+            return tr("Logging level degrades the performance of the system");
+    }
+
+    NX_ASSERT(false, "Unexpected value (%1)", level);
+    return {};
 }
 
 } // namespace nx::vms::client::desktop

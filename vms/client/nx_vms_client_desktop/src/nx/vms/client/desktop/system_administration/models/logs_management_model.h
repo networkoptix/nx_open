@@ -49,6 +49,7 @@ public:
 private:
     void onItemsListChanged();
     void onItemsChanged(QList<LogsManagementUnitPtr> items);
+    QString logLevelTooltip(nx::utils::log::Level level) const;
 
 private:
     QPointer<LogsManagementWatcher> m_watcher;
