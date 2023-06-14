@@ -9,6 +9,7 @@
 #include <core/resource/resource.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
@@ -28,6 +29,33 @@
 #include "actions.h"
 
 namespace nx::vms::client::desktop::ui::action {
+
+static const QColor kBasePrimaryColor = "#a5b7c0"; //< Value of light10 in default customization.
+static const QColor kBaseSecondaryColor = "#e1e7ea"; //< Value of light4 in default customization.
+static const QColor kBaseWindowTextColor = "#698796"; //< Value of light16 ('windowText').
+
+const core::SvgIconColorer::IconSubstitutions kTitleBarIconSubstitutions = {
+    { QnIcon::Disabled, {
+        { kBasePrimaryColor, "dark14" },
+        { kBaseSecondaryColor, "dark17" },
+        { kBaseWindowTextColor, "light16" },
+    }},
+    { QnIcon::Selected, {
+        { kBasePrimaryColor, "light4" },
+        { kBaseSecondaryColor, "light1" },
+        { kBaseWindowTextColor, "light10" },
+    }},
+    { QnIcon::Active, {  //< Hovered
+        { kBasePrimaryColor, "light4" },
+        { kBaseSecondaryColor, "light3" },
+        { kBaseWindowTextColor, "light14" },
+    }},
+    { QnIcon::Error, {
+        { kBasePrimaryColor, "red_l2" },
+        { kBaseSecondaryColor, "red_l3" },
+        { kBaseWindowTextColor, "light16" },
+    }},
+};
 
 class ContextMenu
 {
@@ -334,7 +362,10 @@ void initialize(Manager* manager, Action* root)
             .pulledText(ContextMenu::tr("New Layout"))
             .shortcut("Ctrl+T")
             .condition(!condition::showreelIsRunning())
-            .icon(qnSkin->icon("titlebar/plus_16.svg", nullptr, nullptr, core::SvgIconColorer::kTitleBarIconSubstitutions));
+            .icon(qnSkin->icon("titlebar/plus_16.svg",
+                nullptr,
+                nullptr,
+                kTitleBarIconSubstitutions));
 
         factory(OpenNewWindowAction)
             .flags(Main | GlobalHotkey)
@@ -366,7 +397,10 @@ void initialize(Manager* manager, Action* root)
         .flags(TitleBar | SingleTarget | NoTarget)
         .text(ContextMenu::tr("Open Layout...")) //< To be displayed on button tooltip
         .childFactory(new OpenCurrentUserLayoutFactory(manager))
-        .icon(qnSkin->icon("titlebar/dropdown.png"));
+        .icon(qnSkin->icon("titlebar/arrow_down_16.svg",
+            nullptr,
+            nullptr,
+            kTitleBarIconSubstitutions));
 
     factory()
         .flags(TitleBar)

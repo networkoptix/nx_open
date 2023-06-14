@@ -99,29 +99,6 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kTreeIconSubstitutions =
     }},
 };
 
-const SvgIconColorer::IconSubstitutions SvgIconColorer::kTitleBarIconSubstitutions = {
-    { QnIcon::Disabled, {
-        { kBasePrimaryColor, "dark14" },
-        { kBaseSecondaryColor, "dark17" },
-        { kBaseWindowTextColor, "light16" },
-    }},
-    { QnIcon::Selected, {
-        { kBasePrimaryColor, "light4" },
-        { kBaseSecondaryColor, "light1" },
-        { kBaseWindowTextColor, "light10" },
-    }},
-    { QnIcon::Active, {  //< Hovered
-        { kBasePrimaryColor, "light4" },
-        { kBaseSecondaryColor, "light3" },
-        { kBaseWindowTextColor, "light14" },
-    }},
-    { QnIcon::Error, {
-        { kBasePrimaryColor, "red_l2" },
-        { kBaseSecondaryColor, "red_l3" },
-        { kBaseWindowTextColor, "light16" },
-    }},
-};
-
 const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitutions 
     = kTreeIconSubstitutions;
 
