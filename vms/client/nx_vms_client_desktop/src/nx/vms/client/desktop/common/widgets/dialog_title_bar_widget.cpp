@@ -44,7 +44,7 @@ public:
         font.setWeight(kCaptionFontWeight);
         ui->captionLabel->setFont(font);
 
-        ui->helpButton->setIcon(qnSkin->icon("titlebar/window_question.png"));
+        ui->helpButton->setIcon(qnSkin->icon("titlebar/window_question.svg"));
         ui->minimizeButton->setIcon(qnSkin->icon("titlebar/window_minimize.svg"));
         const QColor background = core::colorTheme()->color("dark7");
         const core::SvgIconColorer::IconSubstitutions colorSubs = {
