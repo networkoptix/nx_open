@@ -46,7 +46,11 @@ public:
 
         ui->helpButton->setIcon(qnSkin->icon("titlebar/window_question.png"));
         ui->minimizeButton->setIcon(qnSkin->icon("titlebar/window_minimize.png"));
-        ui->closeButton->setIcon(qnSkin->icon("titlebar/window_close.png"));
+        const QColor background = core::colorTheme()->color("dark7");
+        const core::SvgIconColorer::IconSubstitutions colorSubs = {
+            { QnIcon::Active, {{ background, "red_d1" }}},
+            { QnIcon::Pressed, {{ background, "red_d1" }}}};
+        ui->closeButton->setIcon(qnSkin->icon("titlebar/window_close.svg", nullptr, nullptr, colorSubs));
 
         ui->helpButton->setFixedSize(qnSkin->maximumSize(ui->helpButton->icon()));
         ui->minimizeButton->setFixedSize(qnSkin->maximumSize(ui->minimizeButton->icon()));
