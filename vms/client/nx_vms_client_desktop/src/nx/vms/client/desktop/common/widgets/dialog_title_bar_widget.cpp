@@ -171,7 +171,7 @@ private:
     void updateState()
     {
         ui->maximizeButton->setIcon(m_window && (m_window->isMaximized() || m_window->isFullScreen())
-            ? qnSkin->icon("titlebar/window_restore.png")
+            ? qnSkin->icon("titlebar/window_restore.svg")
             : qnSkin->icon("titlebar/window_maximize.svg"));
 
         ui->maximizeButton->setFixedSize(qnSkin->maximumSize(ui->maximizeButton->icon()));
