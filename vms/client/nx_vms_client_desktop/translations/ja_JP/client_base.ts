@@ -3427,13 +3427,13 @@ to %1</source>
     <message numerus="yes">
       <source>and %n users more...</source>
       <translation>
-        <numerusform>さらに %n ユーザー...</numerusform>
+        <numerusform>ほか %n ユーザー...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
       <translation>
-        <numerusform>さらに %n 件...</numerusform>
+        <numerusform>ほか %n 件...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8346,7 +8346,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>...and %n more</source>
       <translation>
-        <numerusform>... さらに %n 件</numerusform>
+        <numerusform>...ほか %n 件</numerusform>
       </translation>
     </message>
   </context>
