@@ -60,12 +60,6 @@ QmlResourceBrowserWidget::QmlResourceBrowserWidget(QnWorkbenchContext* context, 
     setResizeMode(QQuickWidget::ResizeMode::SizeRootObjectToView);
     setSource(QUrl("Nx/LeftPanel/private/ResourceBrowserWrapper.qml"));
 
-    // Avoid shortcut ambiguity with Welcome Screen and other possible places.
-    installEventHandler(this, {QEvent::Show, QEvent::Hide}, this,
-        [this]() { action(ui::action::SearchResourcesAction)->setEnabled(isVisible()); });
-
-    action(ui::action::SearchResourcesAction)->setEnabled(false);
-
     installEventHandler(this, QEvent::Move, this, &QmlResourceBrowserWidget::positionChanged);
 
     connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this,

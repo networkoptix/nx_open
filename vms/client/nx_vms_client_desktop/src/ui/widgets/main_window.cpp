@@ -455,19 +455,19 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     }
 
     installEventHandler(m_view->viewport(), QEvent::Show, this,
-            [this]()
-            {
-                if (m_initialized)
-                    return;
+        [this]
+        {
+            if (m_initialized)
+                return;
 
-                const auto audioDispatcher = AudioDispatcher::instance();
-                const auto window = windowHandle();
-                audioDispatcher->requestAudio(window);
-                audioDispatcher->setPrimaryAudioSource(window);
+            const auto audioDispatcher = AudioDispatcher::instance();
+            const auto window = windowHandle();
+            audioDispatcher->requestAudio(window);
+            audioDispatcher->setPrimaryAudioSource(window);
 
-                m_initialized = true;
-                setWelcomeScreenVisible(true);
-            });
+            m_initialized = true;
+            setWelcomeScreenVisible(true);
+        });
 
     updateWidgetsVisibility();
 }
@@ -515,7 +515,7 @@ void MainWindow::updateWidgetsVisibility()
     m_titleBar->setTabBarStuffVisible(!m_welcomeScreenVisible);
 
     const auto switchWidgetsCallback =
-        [this]()
+        [this]
         {
             const auto currentWidget = m_welcomeScreen && m_welcomeScreenVisible
                 ? static_cast<QWidget*>(m_welcomeScreen)
@@ -523,6 +523,10 @@ void MainWindow::updateWidgetsVisibility()
 
             if (currentWidget != m_viewLayout->currentWidget())
                 m_viewLayout->setCurrentWidget(currentWidget);
+
+            // We cannot synchronize it with QmlResourceBrowserWidget visibility inside it,
+            // because it can be isVisible being non-current in QStackedLayout.
+            action(ui::action::SearchResourcesAction)->setEnabled(currentWidget != m_welcomeScreen);
         };
 
     switchWidgetsCallback();
