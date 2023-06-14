@@ -45,7 +45,7 @@ public:
         ui->captionLabel->setFont(font);
 
         ui->helpButton->setIcon(qnSkin->icon("titlebar/window_question.png"));
-        ui->minimizeButton->setIcon(qnSkin->icon("titlebar/window_minimize.png"));
+        ui->minimizeButton->setIcon(qnSkin->icon("titlebar/window_minimize.svg"));
         const QColor background = core::colorTheme()->color("dark7");
         const core::SvgIconColorer::IconSubstitutions colorSubs = {
             { QnIcon::Active, {{ background, "red_d1" }}},
