@@ -20,7 +20,7 @@ SearchLineEdit::SearchLineEdit(QWidget* parent):
         [this]() { emit textChanged(m_lineEdit->text()); }, 0, this))
 {
     m_lineEdit->setPlaceholderText(tr("Search"));
-    m_glassIcon = m_lineEdit->addAction(qnSkin->icon("theme/input_search.png"),
+    m_glassIcon = m_lineEdit->addAction(qnSkin->icon("theme/input_search_16.svg"),
         QLineEdit::LeadingPosition);
     m_lineEdit->setClearButtonEnabled(true);
 
