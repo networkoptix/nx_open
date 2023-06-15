@@ -58,6 +58,9 @@ QString AuthResultTranslations::toErrorMessage(AuthResult value) const
 
         case Auth_WrongSessionToken:
             return tr("The session key is invalid or expired.");
+
+        case Auth_ClashedLogin:
+            return tr("More than one user with the same login are presented.");
     }
 
     NX_ASSERT(false, "Unhandled value: %1", value);

@@ -563,7 +563,7 @@ QnUserResourcePtr fromApiToResource(const UserData& src, bool setPasswordHashes)
     return dst;
 }
 
-void fromApiToResource(const UserData& src, QnUserResourcePtr& dst, bool setPasswordHashes)
+void fromApiToResource(const UserData& src, const QnUserResourcePtr& dst, bool setPasswordHashes)
 {
     NX_ASSERT(dst->userType() == src.type, "Unexpected user type");
 

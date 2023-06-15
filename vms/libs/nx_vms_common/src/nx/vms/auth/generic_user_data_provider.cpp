@@ -34,24 +34,21 @@ GenericUserDataProvider::~GenericUserDataProvider()
     directDisconnectAll();
 }
 
-QnResourcePtr GenericUserDataProvider::findResByName(const nx::String& nxUserName) const
+std::pair<QnResourcePtr, bool> GenericUserDataProvider::findResByName(
+    const nx::String& nxUserName) const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    const auto& lowerName = nxUserName.toLower();
-    for (const QnUserResourcePtr& user: m_users)
-    {
-        if (user->getName().toUtf8().toLower() == lowerName)
-            return user;
-    }
+    if (auto r = resourcePool()->userByName(nxUserName); r.first || r.second)
+        return r;
 
+    NX_MUTEX_LOCKER lock(&m_mutex);
     for (const QnMediaServerResourcePtr& server : m_servers)
     {
         if (server->getId() == QnUuid::fromStringSafe(nxUserName))
-            return server;
+            return {server, /*hasClash*/ false};
     }
 
     NX_VERBOSE(this, nx::format("Unable to get user by name: %1").arg(nxUserName));
-    return QnResourcePtr();
+    return {};
 }
 
 AuthResult GenericUserDataProvider::authorize(
@@ -139,27 +136,27 @@ std::tuple<AuthResult, QnResourcePtr> GenericUserDataProvider::authorize(
     nx::network::http::HttpHeaders* const responseHeaders)
 {
     auto res = findResByName(authorizationHeader.userid());
-    if (!res)
-        return std::make_tuple(Auth_WrongLogin, QnResourcePtr());
+    if (!res.first)
+        return std::make_tuple(res.second ? Auth_ClashedLogin : Auth_WrongLogin, QnResourcePtr());
     return std::make_tuple(
-        authorize(res, method, authorizationHeader, responseHeaders),
-        res);
+        authorize(res.first, method, authorizationHeader, responseHeaders),
+        res.first);
 }
 
 void GenericUserDataProvider::at_resourcePool_resourceAdded(const QnResourcePtr& res)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-
-    if (auto user = res.dynamicCast<QnUserResource>())
-        m_users.insert(user->getId(), user);
-    else if (auto server = res.dynamicCast<QnMediaServerResource>())
+    if (auto server = res.dynamicCast<QnMediaServerResource>())
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
         m_servers.insert(server->getId(), server);
+    }
 }
 
 void GenericUserDataProvider::at_resourcePool_resourceRemoved(const QnResourcePtr& res)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-
-    m_users.remove(res->getId());
-    m_servers.remove(res->getId());
+    if (res.dynamicCast<QnMediaServerResource>())
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_servers.remove(res->getId());
+    }
 }

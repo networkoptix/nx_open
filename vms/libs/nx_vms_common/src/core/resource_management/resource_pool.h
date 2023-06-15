@@ -295,7 +295,7 @@ public:
 
     QnUserResourcePtr getAdministrator() const;
 
-    QnUserResourcePtr userByName(const QString& name) const;
+    std::pair<QnUserResourcePtr, bool /*hasClash*/> userByName(const QString& name) const;
 
     /**
      * @brief getVideoWallItemByUuid            Find videowall item by uuid.

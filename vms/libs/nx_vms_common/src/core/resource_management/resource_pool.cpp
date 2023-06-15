@@ -506,7 +506,7 @@ QnUserResourcePtr QnResourcePool::getAdministrator() const
     return QnUserResourcePtr();
 }
 
-QnUserResourcePtr QnResourcePool::userByName(const QString& name) const
+std::pair<QnUserResourcePtr, bool> QnResourcePool::userByName(const QString& name) const
 {
     NX_READ_LOCKER locker(&m_resourcesMutex);
     const auto it = d->usersByName.find(name.toLower());

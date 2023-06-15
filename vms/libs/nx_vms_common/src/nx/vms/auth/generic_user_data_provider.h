@@ -21,7 +21,8 @@ public:
     GenericUserDataProvider(QnCommonModule* commonModule);
     ~GenericUserDataProvider();
 
-    virtual QnResourcePtr findResByName(const nx::String& nxUserName) const override;
+    virtual std::pair<QnResourcePtr, bool /*hasClash*/> findResByName(
+        const nx::String& nxUserName) const override;
 
     virtual nx::vms::common::AuthResult authorize(
         const QnResourcePtr& res,
@@ -36,7 +37,6 @@ public:
 
 private:
     mutable nx::Mutex m_mutex;
-    QMap<QnUuid, QnUserResourcePtr> m_users;
     QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
 
 private slots:
