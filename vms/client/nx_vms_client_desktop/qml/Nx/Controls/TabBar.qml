@@ -193,7 +193,9 @@ TabBar
                         radius: 0
                         width: tabBar.scrollerWidth / 2 - 0.5
                         height: parent.height
-                        icon.source: "qrc:///skin/tab_bar/tab_prev.png"
+                        icon.source: "image://svg/skin/tab_bar/arrow_left_24.svg"
+                        icon.width: 24
+                        icon.height: 24
                         enabled: tabBar.canScrollLeft
                         onClicked:
                             tabBar.scrollToNext(tabBar.contentItem.contentX - 1, -1)
@@ -216,6 +218,8 @@ TabBar
                         width: tabBar.scrollerWidth / 2 - 0.5
                         height: parent.height
                         icon.source: "image://svg/skin/tab_bar/arrow_right_24.svg"
+                        icon.width: 24
+                        icon.height: 24
                         enabled: tabBar.canScrollRight
                         onClicked:
                             tabBar.scrollToNext(tabBar.contentItem.contentX + tabBar.width - tabBar.scrollerWidth + 1, 1)
