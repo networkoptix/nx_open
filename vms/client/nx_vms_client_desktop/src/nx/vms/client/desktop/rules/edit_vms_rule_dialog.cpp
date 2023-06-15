@@ -23,6 +23,7 @@
 
 #include "dialog_details/action_type_picker_widget.h"
 #include "dialog_details/event_type_picker_widget.h"
+#include "dialog_details/styled_frame.h"
 #include "params_widgets/editor_factory.h"
 #include "utils/confirmation_dialogs.h"
 
@@ -91,11 +92,6 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
         m_contentWidget = new QWidget;
         auto contentLayout = new QHBoxLayout{m_contentWidget};
 
-        const auto kFrameStyle =
-        QString{".QFrame{border: 1px solid %1; border-radius: 4px; background-color: %2}"}
-            .arg(core::colorTheme()->color("dark13").name())
-            .arg(core::colorTheme()->color("dark8").name());
-
         auto eventLayout = new QVBoxLayout;
         eventLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
 
@@ -106,11 +102,15 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
                 .arg(common::html::colored(tr("EVENT"), core::colorTheme()->color("light10"))));
         eventLayout->addWidget(eventLabel);
 
-        auto eventFrame = new QFrame;
-        eventFrame->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
-        eventFrame->setStyleSheet(kFrameStyle);
+        auto eventFrame = new StyledFrame;
+        eventFrame->setContentsMargins(
+            0,
+            style::Metrics::kDefaultTopLevelMargin,
+            0,
+            style::Metrics::kDefaultTopLevelMargin);
 
         auto eventFrameLayout = new QVBoxLayout{eventFrame};
+        eventFrameLayout->setSpacing(0);
         m_eventTypePicker = new EventTypePickerWidget;
         m_eventTypePicker->init(systemContext()->vmsRulesEngine());
         connect(
@@ -126,6 +126,8 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
         eventFrameLayout->addStretch();
 
         eventLayout->addWidget(eventFrame);
+
+        eventLayout->addStretch(1);
 
         contentLayout->addLayout(eventLayout);
 
@@ -144,11 +146,15 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
                 .arg(common::html::colored(tr("ACTION"), core::colorTheme()->color("light10"))));
         actionLayout->addWidget(actionLabel);
 
-        auto actionFrame = new QFrame;
-        actionFrame->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
-        actionFrame->setStyleSheet(kFrameStyle);
+        auto actionFrame = new StyledFrame;
+        actionFrame->setContentsMargins(
+            0,
+            style::Metrics::kDefaultTopLevelMargin,
+            0,
+            style::Metrics::kDefaultTopLevelMargin);
 
         auto actionFrameLayout = new QVBoxLayout{actionFrame};
+        actionFrameLayout->setSpacing(0);
         m_actionTypePicker = new ActionTypePickerWidget;
         m_actionTypePicker->init(systemContext()->vmsRulesEngine());
         connect(
@@ -164,6 +170,8 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
         actionFrameLayout->addStretch();
 
         actionLayout->addWidget(actionFrame);
+
+        actionLayout->addStretch(1);
 
         contentLayout->addLayout(actionLayout);
 

@@ -13,11 +13,13 @@ namespace nx::vms::client::desktop::rules {
 template<typename F>
 class HttpParametersPickerBase: public DropdownTextPickerWidgetBase<F>
 {
+    using base = DropdownTextPickerWidgetBase<F>;
+
 public:
     using DropdownTextPickerWidgetBase<F>::DropdownTextPickerWidgetBase;
 
 protected:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
     using DropdownTextPickerWidgetBase<F>::m_comboBox;
 
     void updateUi() override

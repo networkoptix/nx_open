@@ -13,14 +13,14 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<EnterFullscreenAction>(),
-        .displayName = tr("Set to fullscreen"),
+        .displayName = tr("Set to Fullscreen"),
         .flags = ItemFlag::instant,
         .fields = {
             makeFieldDescriptor<TargetSingleDeviceField>(
                 utils::kCameraIdFieldName, tr("Camera"), {}, {}, {utils::kLayoutIdsFieldName}),
-            utils::makeTargetUserFieldDescriptor(
-                tr("Set for"), {}, utils::UserFieldPreset::All),
             makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName, tr("On Layout")),
+            utils::makeTargetUserFieldDescriptor(
+                tr("Set for"), {}, utils::UserFieldPreset::All, /*visible*/ false),
             utils::makePlaybackFieldDescriptor(tr("Playback Time")),
         }
     };

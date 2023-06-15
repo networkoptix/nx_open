@@ -8,6 +8,9 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/workbench/workbench_context.h>
 
+#include "../dialog_details/dotted_line.h"
+#include "../picker_widgets/plain_picker_widget.h"
+
 namespace nx::vms::client::desktop::rules {
 
 CommonParamsWidget::CommonParamsWidget(QnWorkbenchContext* context, QWidget* parent):
@@ -18,13 +21,32 @@ CommonParamsWidget::CommonParamsWidget(QnWorkbenchContext* context, QWidget* par
 void CommonParamsWidget::onDescriptorSet()
 {
     auto layout = new QVBoxLayout;
-    layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
+    layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
 
     m_pickers.clear();
+
+    bool isPreviousPlain{true};
     for (const auto& fieldDescriptor: descriptor().fields)
     {
+        if (!fieldDescriptor.properties.value("visible", true).toBool())
+            continue;
+
         PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor, context(), this);
+        if (picker == nullptr)
+            continue;
+
+        const bool isCurrentPlain = dynamic_cast<PlainPickerWidget*>(picker) != nullptr;
+        if (!isCurrentPlain || !isPreviousPlain)
+        {
+            layout->addSpacing(4);
+
+            auto dottedLine = new DottedLineWidget;
+            layout->addWidget(dottedLine);
+        }
+
+        isPreviousPlain = isCurrentPlain;
+
         m_pickers.push_back(picker);
         layout->addWidget(picker);
     }

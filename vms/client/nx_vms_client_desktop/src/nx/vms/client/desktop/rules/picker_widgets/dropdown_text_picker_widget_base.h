@@ -5,17 +5,19 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QHBoxLayout>
 
-#include "picker_widget.h"
+#include "field_picker_widget.h"
 #include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
 
 template<typename F, typename D = QComboBox>
-class DropdownTextPickerWidgetBase: public FieldPickerWidget<F>
+class DropdownTextPickerWidgetBase: public PlainFieldPickerWidget<F>
 {
+    using base = PlainFieldPickerWidget<F>;
+
 public:
     DropdownTextPickerWidgetBase(QnWorkbenchContext* context, CommonParamsWidget* parent):
-        FieldPickerWidget<F>(context, parent)
+        base(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
         m_comboBox = new D;
@@ -32,7 +34,7 @@ public:
     }
 
 protected:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
 
     D* m_comboBox{nullptr};
 

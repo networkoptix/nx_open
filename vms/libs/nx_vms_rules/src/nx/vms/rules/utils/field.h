@@ -33,6 +33,8 @@ namespace utils {
 
 static constexpr auto kAcknowledgeFieldName = "acknowledge";
 static constexpr auto kCameraIdFieldName = "cameraId";
+static constexpr auto kCaptionFieldName = "caption";
+static constexpr auto kDescriptionFieldName = "description";
 static constexpr auto kDeviceIdsFieldName = "deviceIds";
 static constexpr auto kDurationFieldName = "duration";
 static constexpr auto kEmailsFieldName = "emails";
@@ -118,6 +120,7 @@ FieldDescriptor makeTargetUserFieldDescriptor(
     const QString& displayName,
     const QString& description = {},
     UserFieldPreset preset = UserFieldPreset::Power,
+    bool visible = true,
     const QStringList& linkedFields = {});
 
 FieldDescriptor makeActionFlagFieldDescriptor(

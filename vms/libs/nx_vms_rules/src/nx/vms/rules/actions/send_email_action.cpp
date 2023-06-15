@@ -13,16 +13,21 @@ const ItemDescriptor& SendEmailAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<SendEmailAction>(),
-        .displayName = tr("Send email"),
+        .displayName = tr("Send Email"),
         .description = "",
         .flags = {ItemFlag::aggregationByTypeSupported, ItemFlag::omitLogging},
         .fields = {
             utils::makeTargetUserFieldDescriptor(
-                tr("to"), {}, utils::UserFieldPreset::Power, {utils::kEmailsFieldName}),
-            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
+                tr("To"),
+                {},
+                utils::UserFieldPreset::Power,
+                /*visible*/ true,
+                {utils::kEmailsFieldName}),
+            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
             makeFieldDescriptor<ActionTextField>(
-                utils::kEmailsFieldName, tr("Additional recipients")),
-            makeFieldDescriptor<EmailMessageField>("message", tr("Email Message"))
+                utils::kEmailsFieldName, tr("Additional Recipients")),
+            makeFieldDescriptor<EmailMessageField>(
+                "message", tr("Email Message"), {}, {{ "visible", false }})
         }
     };
     return kDescriptor;

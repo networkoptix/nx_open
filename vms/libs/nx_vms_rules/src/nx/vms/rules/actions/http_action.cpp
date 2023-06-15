@@ -5,11 +5,14 @@
 #include "../action_builder_fields/content_type_field.h"
 #include "../action_builder_fields/http_auth_type_field.h"
 #include "../action_builder_fields/http_method_field.h"
+#include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/password_field.h"
 #include "../action_builder_fields/text_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
+
+using namespace std::chrono_literals;
 
 namespace nx::vms::rules {
 
@@ -17,17 +20,21 @@ const ItemDescriptor& HttpAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<HttpAction>(),
-        .displayName = tr("Do HTTP(S) request"),
+        .displayName = tr("HTTP(S) Request"),
         .description = "",
         .fields = {
-            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
-            makeFieldDescriptor<TextWithFields>("url", tr("HTTP(S) URL")),
-            makeFieldDescriptor<TextWithFields>("content", tr("HTTP(S) content")),
+            makeFieldDescriptor<TextWithFields>("url", tr("URL")),
+            makeFieldDescriptor<TextWithFields>("content", tr("Content")),
             makeFieldDescriptor<ContentTypeField>("contentType", tr("Content type")),
+            makeFieldDescriptor<HttpMethodField>("method", tr("Method")),
+            makeFieldDescriptor<HttpAuthTypeField>("authType", tr("Authentication Type")),
             makeFieldDescriptor<ActionTextField>("login", tr("Login")),
             makeFieldDescriptor<PasswordField>("password", tr("Password")),
-            makeFieldDescriptor<HttpMethodField>("method", tr("Request method")),
-            makeFieldDescriptor<HttpAuthTypeField>("authType", tr("Authentication type")),
+            utils::makeTimeFieldDescriptor<OptionalTimeField>(
+                utils::kIntervalFieldName,
+                tr("Action throttling"),
+                {},
+                {.initialValue = 0s, .defaultValue = 1s, .maximumValue = std::chrono::days(24855), .minimumValue = 1s})
         }
     };
     return kDescriptor;

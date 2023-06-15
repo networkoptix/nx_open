@@ -12,14 +12,13 @@ const ItemDescriptor& OpenLayoutAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<OpenLayoutAction>(),
-        .displayName = tr("Open layout"),
+        .displayName = tr("Open Layout"),
         .flags = ItemFlag::instant,
         .fields = {
-            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
+            makeFieldDescriptor<LayoutField>("layoutId", {}),
+            utils::makeTargetUserFieldDescriptor(tr("To"), {}, utils::UserFieldPreset::None),
             utils::makePlaybackFieldDescriptor(tr("Playback Time")),
-            makeFieldDescriptor<LayoutField>("layoutId", tr("Layout")),
-            utils::makeTargetUserFieldDescriptor(
-                tr("Show to"), {}, utils::UserFieldPreset::None)
+            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
         },
         .permissions = {.resourcePermissions = {{"layoutId", Qn::ReadPermission}}},
     };

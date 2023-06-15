@@ -17,11 +17,11 @@ const ItemDescriptor& SpeakAction::manifest()
         .displayName = tr("Speak"),
         .flags = {ItemFlag::instant, ItemFlag::executeOnClientAndServer},
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
-            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
-            utils::makeTargetUserFieldDescriptor(tr("Speak to users")),
-            makeFieldDescriptor<TextWithFields>(utils::kTextFieldName, tr("Speak the following")),
+            makeFieldDescriptor<TextWithFields>(utils::kTextFieldName, tr("Text")),
+            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At Device")),
+            utils::makeTargetUserFieldDescriptor(tr("To users")),
             makeFieldDescriptor<VolumeField>("volume", tr("Volume"), {}, {}, {utils::kTextFieldName}),
+            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
         }
     };
     return kDescriptor;

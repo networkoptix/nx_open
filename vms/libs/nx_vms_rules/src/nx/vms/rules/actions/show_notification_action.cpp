@@ -16,27 +16,30 @@ const ItemDescriptor& NotificationAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<NotificationAction>(),
-        .displayName = tr("Show Notification"),
+        .displayName = tr("Show Desktop Notification"),
         .description = "",
         .fields = {
             makeFieldDescriptor<EventIdField>("id", "Event ID"),
             utils::makeTargetUserFieldDescriptor(tr("To")),
-            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName, tr("Force Acknowledgement")),
+            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
+
             makeFieldDescriptor<TextWithFields>("caption", tr("Caption"), QString(),
                 {
-                    { "text", "{@EventCaption}" }
+                    { "text", "{@EventCaption}" },
+                    { "visible", false }
                 }),
             makeFieldDescriptor<TextWithFields>("description", tr("Description"), QString(),
                 {
-                    { "text", "{@EventDescription}" }
+                    { "text", "{@EventDescription}" },
+                    { "visible", false }
                 }),
             makeFieldDescriptor<TextWithFields>("tooltip", tr("Tooltip"), QString(),
                 {
-                    { "text", "{@ExtendedEventDescription}" }
+                    { "text", "{@ExtendedEventDescription}" },
+                    { "visible", false }
                 }),
             makeFieldDescriptor<EventDevicesField>(utils::kDeviceIdsFieldName, "Event devices"),
-
             utils::makeExtractDetailFieldDescriptor("sourceName", utils::kSourceNameDetailName),
             utils::makeExtractDetailFieldDescriptor("level", utils::kLevelDetailName),
             utils::makeExtractDetailFieldDescriptor("icon", utils::kIconDetailName),

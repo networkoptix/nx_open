@@ -7,11 +7,11 @@
 
 #include <nx/vms/rules/action_builder_fields/volume_field.h>
 
-#include "picker_widget.h"
+#include "field_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
-class VolumePicker: public FieldPickerWidget<vms::rules::VolumeField>
+class VolumePicker: public PlainFieldPickerWidget<vms::rules::VolumeField>
 {
     Q_OBJECT
 

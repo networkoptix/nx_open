@@ -16,13 +16,13 @@ const ItemDescriptor& RepeatSoundAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<RepeatSoundAction>(),
-        .displayName = tr("Repeat sound"),
+        .displayName = tr("Repeat Sound"),
         .flags = {ItemFlag::prolonged, ItemFlag::executeOnClientAndServer},
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
-            utils::makeTargetUserFieldDescriptor(
-                tr("Play to users"), {}, utils::UserFieldPreset::None),
             makeFieldDescriptor<SoundField>(utils::kSoundFieldName, tr("Sound")),
+            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
+            utils::makeTargetUserFieldDescriptor(
+                tr("To"), {}, utils::UserFieldPreset::None),
             makeFieldDescriptor<VolumeField>(
                 "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),
 

@@ -94,10 +94,10 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PoeOverBudgetEvent>(),
-        .displayName = tr("PoE over Budget"),
+        .displayName = tr("PoE Over Budget"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            utils::makeStateFieldDescriptor(tr("State")),
+            utils::makeStateFieldDescriptor(tr("Begin When")),
             makeFieldDescriptor<SourceServerField>(utils::kServerIdFieldName, tr("Server")),
         },
         .permissions = {.globalPermission = GlobalPermission::powerUser},

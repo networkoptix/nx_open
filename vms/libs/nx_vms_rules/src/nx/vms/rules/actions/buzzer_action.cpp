@@ -18,13 +18,13 @@ const ItemDescriptor& BuzzerAction::manifest()
         .displayName = tr("Buzzer"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<TargetServerField>(utils::kServerIdsFieldName, tr("Servers")),
-            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
+            makeFieldDescriptor<TargetServerField>(utils::kServerIdsFieldName, tr("At")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
                 tr("Fixed duration"),
                 {},
-                {.initialValue = 1s, .defaultValue = 1s, .maximumValue = 24h, .minimumValue = 1s})
+                {.initialValue = 1s, .defaultValue = 1s, .maximumValue = 24h, .minimumValue = 1s}),
+            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
         }
     };
     return kDescriptor;

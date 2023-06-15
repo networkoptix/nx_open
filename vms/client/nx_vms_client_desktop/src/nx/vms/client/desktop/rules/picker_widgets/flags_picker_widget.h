@@ -11,6 +11,7 @@
 #include "picker_widget.h"
 #include "picker_widget_strings.h"
 #include "picker_widget_utils.h"
+#include "plain_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -21,11 +22,13 @@ namespace nx::vms::client::desktop::rules {
  * - nx.events.fields.analyticsEventLevel
  */
 template<typename F>
-class FlagsPicker: public FieldPickerWidget<F>
+class FlagsPicker: public PlainFieldPickerWidget<F>
 {
+    using base = PlainFieldPickerWidget<F>;
+
 public:
     FlagsPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
-        FieldPickerWidget<F>(context, parent)
+        base(context, parent)
     {
         auto flagsLayout = new QHBoxLayout;
         flagsLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
@@ -48,7 +51,7 @@ public:
     }
 
 private:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
 
     std::map<QCheckBox*, typename F::value_type::enum_type> m_checkBoxes;
 

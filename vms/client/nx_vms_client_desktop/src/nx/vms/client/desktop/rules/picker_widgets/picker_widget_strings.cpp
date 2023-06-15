@@ -85,11 +85,11 @@ QString DropdownTextPickerWidgetStrings::state(api::rules::State value)
     switch (value)
     {
         case api::rules::State::instant:
-            return tr("Occurs");
+            return tr("Event Occurs");
         case api::rules::State::started:
-            return tr("Starts");
+            return tr("Event Starts");
         case api::rules::State::stopped:
-            return tr("Stops");
+            return tr("Event Stops");
         default:
             return tr("None");
     }

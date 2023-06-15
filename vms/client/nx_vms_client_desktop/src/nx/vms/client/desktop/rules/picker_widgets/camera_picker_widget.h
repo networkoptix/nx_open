@@ -21,10 +21,11 @@ template<typename F, typename Policy>
 class CameraPickerWidgetBase: public ResourcePickerWidgetBase<F>
 {
 public:
+    using base = ResourcePickerWidgetBase<F>;
     using ResourcePickerWidgetBase<F>::ResourcePickerWidgetBase;
 
 protected:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
     using ResourcePickerWidgetBase<F>::updateUi;
 
     void onSelectButtonClicked() override

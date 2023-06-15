@@ -10,6 +10,7 @@
 #include "../utils/completer.h"
 #include "picker_widget.h"
 #include "picker_widget_utils.h"
+#include "plain_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -20,11 +21,13 @@ namespace nx::vms::client::desktop::rules {
  * - nx.actions.fields.textWithFields
  */
 template<typename F>
-class MultilineTextPickerWidget: public FieldPickerWidget<F>
+class MultilineTextPickerWidget: public PlainFieldPickerWidget<F>
 {
+    using base = PlainFieldPickerWidget<F>;
+
 public:
     MultilineTextPickerWidget(QnWorkbenchContext* context, CommonParamsWidget* parent):
-        FieldPickerWidget<F>(context, parent)
+        base(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
 
@@ -44,14 +47,14 @@ public:
     }
 
 private:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
 
     QTextEdit* m_textEdit{nullptr};
     Completer* m_completer{nullptr};
 
     virtual void onDescriptorSet() override
     {
-        FieldPickerWidget<F>::onDescriptorSet();
+        base::onDescriptorSet();
         m_textEdit->setPlaceholderText(m_fieldDescriptor->description);
     };
 

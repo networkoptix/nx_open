@@ -4,16 +4,18 @@
 
 #include <QtWidgets/QComboBox>
 
-#include "picker_widget.h"
+#include "plain_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
-class PresetPickerWidget: public PickerWidget
+class PresetPickerWidget: public PlainPickerWidget
 {
     Q_OBJECT
 
 public:
     PresetPickerWidget(QnWorkbenchContext* context, CommonParamsWidget* parent);
+
+    void updateUi() override;
 
 private:
     QComboBox* m_comboBox{nullptr};

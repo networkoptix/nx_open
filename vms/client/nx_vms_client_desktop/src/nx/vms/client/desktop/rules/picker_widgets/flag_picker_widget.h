@@ -5,25 +5,35 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QHBoxLayout>
 
-#include <nx/vms/rules/action_builder_fields/flag_field.h>
+#include <nx/vms/client/desktop/style/helper.h>
 
-#include "picker_widget.h"
 #include "picker_widget_utils.h"
+#include "plain_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
 /** Used for types that could be represented as a boolean value. */
 template<typename F>
-class FlagPicker: public FieldPickerWidget<F>
+class FlagPicker: public PlainFieldPickerWidget<F>
 {
+    using base = PlainFieldPickerWidget<F>;
+
 public:
     FlagPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
-        FieldPickerWidget<F>(context, parent)
+        base(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
+        contentLayout->setContentsMargins(0, 4, 0, 4);
+        contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+
+        contentLayout->addWidget(new QWidget);
+
         m_checkBox = new QCheckBox;
         m_checkBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         contentLayout->addWidget(m_checkBox);
+
+        contentLayout->setStretch(0, 1);
+        contentLayout->setStretch(1, 5);
 
         m_contentWidget->setLayout(contentLayout);
 
@@ -35,7 +45,7 @@ public:
     }
 
 private:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
 
     QCheckBox* m_checkBox{nullptr};
 

@@ -14,15 +14,15 @@ const ItemDescriptor& PlaySoundAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PlaySoundAction>(),
-        .displayName = tr("Play sound"),
+        .displayName = tr("Play Sound"),
         .flags = {ItemFlag::instant, ItemFlag::executeOnClientAndServer},
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
-            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
-            utils::makeTargetUserFieldDescriptor(tr("Play to users")),
-            makeFieldDescriptor<SoundField>(utils::kSoundFieldName, tr("Sound")),
+            makeFieldDescriptor<SoundField>(utils::kSoundFieldName, {}),
+            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
+            utils::makeTargetUserFieldDescriptor(tr("To Users")),
             makeFieldDescriptor<VolumeField>(
                 "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),
+            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
         }
     };
     return kDescriptor;

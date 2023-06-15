@@ -18,18 +18,13 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceRecordingAction>(),
-        .displayName = tr("Camera recording"),
+        .displayName = tr("Camera Recording"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
+            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("On")),
             utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<StreamQualityField>("quality", tr("Quality")),
             makeFieldDescriptor<FpsField>("fps", tr("FPS"), {}, {}, {utils::kDeviceIdsFieldName}),
-            utils::makeTimeFieldDescriptor<OptionalTimeField>(
-                utils::kDurationFieldName,
-                tr("Fixed duration"),
-                {},
-                {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 9999h, .minimumValue = 1s}),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordBeforeFieldName,
                 tr("Pre-recording"),
@@ -41,7 +36,12 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
                 tr("Post-recording"),
                 {},
                 {.initialValue = 0s, .maximumValue = 600s, .minimumValue = 0s},
-                {utils::kDurationFieldName})
+                {utils::kDurationFieldName}),
+            utils::makeTimeFieldDescriptor<OptionalTimeField>(
+                utils::kDurationFieldName,
+                tr("Action throttling"),
+                {},
+                {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 9999h, .minimumValue = 1s})
         }
     };
     return kDescriptor;

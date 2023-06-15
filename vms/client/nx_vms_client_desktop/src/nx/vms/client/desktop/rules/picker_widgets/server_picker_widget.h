@@ -19,11 +19,13 @@ namespace nx::vms::client::desktop::rules {
 template<typename F, typename Policy>
 class ServerPickerWidgetBase: public ResourcePickerWidgetBase<F>
 {
+    using base = ResourcePickerWidgetBase<F>;
+
 public:
     using ResourcePickerWidgetBase<F>::ResourcePickerWidgetBase;
 
 protected:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
     using ResourcePickerWidgetBase<F>::m_selectButton;
     using ResourcePickerWidgetBase<F>::updateUi;
 

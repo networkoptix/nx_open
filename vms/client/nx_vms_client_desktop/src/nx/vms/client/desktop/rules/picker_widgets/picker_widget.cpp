@@ -5,8 +5,6 @@
 #include <QtWidgets/QHBoxLayout>
 
 #include <nx/vms/client/desktop/rules/params_widgets/common_params_widget.h>
-#include <nx/vms/client/desktop/style/helper.h>
-#include <ui/widgets/common/elided_label.h>
 
 namespace nx::vms::client::desktop::rules {
 
@@ -17,22 +15,6 @@ PickerWidget::PickerWidget(QnWorkbenchContext* context, CommonParamsWidget* pare
     QWidget(parent),
     QnWorkbenchContextAware(context)
 {
-    auto mainLayout = new QHBoxLayout;
-    mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
-
-    m_label = new WidgetWithHint<QnElidedLabel>;
-    m_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    m_label->setElideMode(Qt::ElideRight);
-    m_label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
-    mainLayout->addWidget(m_label);
-
-    m_contentWidget = new QWidget;
-    mainLayout->addWidget(m_contentWidget);
-
-    mainLayout->setStretch(0, 1);
-    mainLayout->setStretch(1, 5);
-
-    setLayout(mainLayout);
 }
 
 void PickerWidget::setDescriptor(const FieldDescriptor& descriptor)
@@ -50,16 +32,6 @@ std::optional<FieldDescriptor> PickerWidget::descriptor() const
 bool PickerWidget::hasDescriptor() const
 {
     return m_fieldDescriptor != std::nullopt;
-}
-
-void PickerWidget::setReadOnly(bool value)
-{
-    m_contentWidget->setEnabled(!value);
-}
-
-void PickerWidget::onDescriptorSet()
-{
-    m_label->setText(m_fieldDescriptor->displayName);
 }
 
 CommonParamsWidget* PickerWidget::parentParamsWidget() const

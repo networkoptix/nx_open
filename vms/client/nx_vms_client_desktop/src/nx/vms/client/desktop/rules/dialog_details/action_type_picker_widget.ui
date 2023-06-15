@@ -15,26 +15,21 @@
     <number>8</number>
    </property>
    <property name="leftMargin">
-    <number>0</number>
+    <number>16</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>4</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>16</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>4</number>
    </property>
    <item>
     <widget class="QLabel" name="doLabel">
-     <property name="font">
-      <font>
-       <bold>true</bold>
-      </font>
-     </property>
      <property name="text">
-      <string>Do</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -45,11 +40,6 @@
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5">
      <item>
       <widget class="QComboBox" name="actionTypeComboBox">
-       <property name="font">
-        <font>
-         <bold>true</bold>
-        </font>
-       </property>
        <property name="currentText">
         <string/>
        </property>

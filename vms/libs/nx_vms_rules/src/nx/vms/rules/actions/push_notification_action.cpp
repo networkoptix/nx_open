@@ -15,10 +15,9 @@ const ItemDescriptor& PushNotificationAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PushNotificationAction>(),
-        .displayName = tr("Send mobile notification"),
+        .displayName = tr("Send Mobile Notification"),
         .fields = {
             utils::makeTargetUserFieldDescriptor(tr("To")),
-            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<TextWithFields>("caption", tr("Header"), QString(),
                 {
                     { "text", "{@EventCaption}" }
@@ -27,7 +26,8 @@ const ItemDescriptor& PushNotificationAction::manifest()
                 {
                     { "text", "{@EventDescription}" }
                 }),
-            makeFieldDescriptor<ActionFlagField>("addSource", tr("Add source device name in body")),
+            makeFieldDescriptor<ActionFlagField>("addSource", tr("Add Source Device name to Body")),
+            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
 
             makeFieldDescriptor<EventDevicesField>(utils::kDeviceIdsFieldName, "Event devices"),
             utils::makeExtractDetailFieldDescriptor("level", utils::kLevelDetailName),

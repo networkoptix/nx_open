@@ -9,7 +9,6 @@
 #include <nx/vms/rules/utils/type.h>
 
 #include "analytics_object_attributes_picker_widget.h"
-#include "blank_picker_widget.h"
 #include "camera_picker_widget.h"
 #include "customizable_icon_picker_widget.h"
 #include "dropdown_id_picker_widget.h"
@@ -24,6 +23,7 @@
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
 #include "oneline_text_picker_widget.h"
+#include "optional_duration_picker_widget.h"
 #include "output_port_picker_widget.h"
 #include "ptz_preset_picker_widget.h"
 #include "server_picker_widget.h"
@@ -178,7 +178,7 @@ PickerWidget* PickerFactory::createWidget(
     else if (descriptor.id == fieldMetatype<nx::vms::rules::LayoutField>())
         pickerWidget = new SingleTargetLayoutPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::OptionalTimeField>())
-        pickerWidget = new OptionalDurationPicker<nx::vms::rules::OptionalTimeField>(context, parent);
+        pickerWidget = new OptionalDurationPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::OutputPortField>())
         pickerWidget = new OutputPortPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::PasswordField>())
@@ -205,10 +205,9 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new DurationPicker<nx::vms::rules::TimeField>(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::VolumeField>())
         pickerWidget = new VolumePicker(context, parent);
-    else
-        pickerWidget = new BlankPicker(context, parent);
 
-    pickerWidget->setDescriptor(descriptor);
+    if (pickerWidget != nullptr)
+        pickerWidget->setDescriptor(descriptor);
 
     return pickerWidget;
 }

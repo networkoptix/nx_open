@@ -7,17 +7,19 @@
 
 #include <nx/vms/rules/utils/field.h>
 
-#include "picker_widget.h"
 #include "picker_widget_utils.h"
+#include "plain_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
 template<typename F>
-class NumberPicker: public FieldPickerWidget<F>
+class NumberPicker: public PlainFieldPickerWidget<F>
 {
+    using base = PlainFieldPickerWidget<F>;
+
 public:
     NumberPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
-        FieldPickerWidget<F>(context, parent)
+        base(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
 
@@ -35,7 +37,7 @@ public:
     }
 
 protected:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
 
     QSpinBox* m_spinBox{nullptr};
 

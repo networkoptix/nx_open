@@ -43,10 +43,10 @@ const ItemDescriptor& MotionEvent::manifest()
         .displayName = tr("Motion on Camera"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            utils::makeStateFieldDescriptor(tr("State")),
+            utils::makeStateFieldDescriptor(tr("Begin When")),
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
-                tr("Camera"),
+                tr("Occurs at"),
                 {},
                 {{"acceptAll", true}}),
         },

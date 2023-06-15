@@ -4,7 +4,7 @@
 
 #include <nx/vms/rules/event_filter_fields/lookup_field.h>
 
-#include "picker_widget.h"
+#include "field_picker_widget.h"
 
 class QComboBox;
 class QStackedWidget;
@@ -12,7 +12,7 @@ class QLineEdit;
 
 namespace nx::vms::client::desktop::rules {
 
-class LookupPicker: public FieldPickerWidget<vms::rules::LookupField>
+class LookupPicker: public TitledFieldPickerWidget<vms::rules::LookupField>
 {
     Q_OBJECT
 

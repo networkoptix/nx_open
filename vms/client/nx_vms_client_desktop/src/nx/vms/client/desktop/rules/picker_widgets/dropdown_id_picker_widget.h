@@ -21,17 +21,19 @@
 #include <ui/widgets/common/elided_label.h>
 #include <ui/widgets/common/tree_combo_box.h>
 
-#include "picker_widget.h"
+#include "field_picker_widget.h"
 #include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
 
 template<typename F, typename D>
-class DropdownIdPickerWidgetBase: public FieldPickerWidget<F>
+class DropdownIdPickerWidgetBase: public PlainFieldPickerWidget<F>
 {
+    using base = PlainFieldPickerWidget<F>;
+
 public:
     DropdownIdPickerWidgetBase(QnWorkbenchContext* context, CommonParamsWidget* parent):
-        FieldPickerWidget<F>(context, parent)
+        base(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
         m_comboBox = new D;
@@ -48,7 +50,7 @@ public:
     }
 
 protected:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
 
     D* m_comboBox{nullptr};
 
