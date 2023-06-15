@@ -683,7 +683,7 @@ void decodeAndCheck(
     video->compressionType = codecId;
     video->flags = QnAbstractMediaData::MediaFlags_AVKey;
     video->timestamp = 1;
-    video->context = QnFfmpegHelper::createVideoCodecParameters(video.get());
+    video->context = QnFfmpegHelper::createVideoCodecParametersAnnexB(video.get());
     // Decode.
     DecoderConfig decoderConfig;
     auto decoder = std::make_unique<QnFfmpegVideoDecoder>(

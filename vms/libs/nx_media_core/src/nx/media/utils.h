@@ -17,7 +17,7 @@ NX_MEDIA_CORE_API bool extractSps(
 
 NX_MEDIA_CORE_API QSize getFrameSize(const QnCompressedVideoData* frame);
 NX_MEDIA_CORE_API double getDefaultSampleAspectRatio(const QSize& srcSize);
-NX_MEDIA_CORE_API bool fillExtraData(
+NX_MEDIA_CORE_API bool fillExtraDataAnnexB(
     const QnCompressedVideoData* video, uint8_t** outExtradata, int* outSize);
 
 // Build video header(sps, pps, vps(in hevc case)) in ffmpeg extra data format.

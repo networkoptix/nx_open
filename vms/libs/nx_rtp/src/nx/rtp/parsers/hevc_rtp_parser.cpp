@@ -19,7 +19,7 @@ static constexpr char kSdpSeiPrefix[] = "sprop-sei";
 
 bool isKeyFrame(const uint8_t* data, int64_t size)
 {
-    auto nalUnits = nx::media::nal::findNalUnitsAnnexB(data, size);
+    auto nalUnits = nx::media::nal::findNalUnitsMp4(data, size);
     for (const auto& nalu: nalUnits)
     {
         nx::media::hevc::NalUnitHeader nalHeader;
@@ -123,20 +123,20 @@ void HevcParser::parseFmtp(const QStringList& fmtpParams)
         parameterSet = NALUnit::dropBorderedStartCodes(parameterSet);
         if (param.startsWith(kSdpVpsPrefix))
         {
-            m_context.spropVps = parameterSet;
+            m_context.vps = parameterSet;
         }
         else if (param.startsWith(kSdpSpsPrefix))
         {
-            m_context.spropSps = parameterSet;
+            m_context.sps = parameterSet;
             extractPictureDimensionsFromSps((uint8_t*)parameterSet.data(), parameterSet.size());
         }
         else if (param.startsWith(kSdpPpsPrefix))
         {
-            m_context.spropPps = parameterSet;
+            m_context.pps = parameterSet;
         }
         else if (param.startsWith(kSdpSeiPrefix))
         {
-            m_context.spropSei = parameterSet;
+            m_context.sei = parameterSet;
         }
     }
 }
@@ -422,12 +422,13 @@ QnCompressedVideoDataPtr HevcParser::createVideoData(const uint8_t* rtpBuffer, u
 
     // Check all nal units for key frame slice
     if (isKeyFrame((const uint8_t*)result->data(), result->dataSize()))
+    {
         result->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-
-    auto codecParameters = QnFfmpegHelper::createVideoCodecParameters(result.get());
+        auto codecParameters = QnFfmpegHelper::createVideoCodecParametersMp4(
+            result.get(), result->width, result->height);
     if (codecParameters && (!m_codecParameters || !m_codecParameters->isEqual(*codecParameters)))
         m_codecParameters = codecParameters;
-
+    }
     result->context = m_codecParameters;
     result->timestamp = rtpTime;
     return result;
@@ -481,33 +482,29 @@ nx::utils::ByteArray HevcParser::buildParameterSetsIfNeeded()
 {
     constexpr int kHeaderReservedSize = 64;
     nx::utils::ByteArray buffer(/*aligment*/ 1, kHeaderReservedSize, /*padding*/ 0);
-    if (!m_context.inStreamVpsFound && m_context.spropVps)
+    if (!m_context.inStreamVpsFound && m_context.vps)
     {
+        uint32_t sizeData = htonl(m_context.vps->size());
+        buffer.write((const char*)&sizeData, sizeof(uint32_t));
         buffer.write(
-            (char*)NALUnit::kStartCodeLong,
-            sizeof(NALUnit::kStartCodeLong));
-
-        buffer.write(
-            m_context.spropVps->data(),
-            m_context.spropVps->size());
+            m_context.vps->data(),
+            m_context.vps->size());
     }
-    if (!m_context.inStreamSpsFound && m_context.spropSps)
+    if (!m_context.inStreamSpsFound && m_context.sps)
     {
+        uint32_t sizeData = htonl(m_context.sps->size());
+        buffer.write((const char*)&sizeData, sizeof(uint32_t));
         buffer.write(
-            (char*)NALUnit::kStartCodeLong,
-            sizeof(NALUnit::kStartCodeLong));
-        buffer.write(
-            m_context.spropSps->data(),
-            m_context.spropSps->size());
+            m_context.sps->data(),
+            m_context.sps->size());
     }
-    if (!m_context.inStreamPpsFound && m_context.spropPps)
+    if (!m_context.inStreamPpsFound && m_context.pps)
     {
+        uint32_t sizeData = htonl(m_context.pps->size());
+        buffer.write((const char*)&sizeData, sizeof(uint32_t));
         buffer.write(
-            (char*)NALUnit::kStartCodeLong,
-            sizeof(NALUnit::kStartCodeLong));
-        buffer.write(
-            m_context.spropPps->data(),
-            m_context.spropPps->size());
+            m_context.pps->data(),
+            m_context.pps->size());
     }
     return buffer;
 }

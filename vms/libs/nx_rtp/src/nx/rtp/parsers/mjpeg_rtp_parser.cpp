@@ -628,7 +628,7 @@ Result MjpegParser::processData(
 
         videoData->timestamp = rtpHeader.getTimestamp();
 
-        auto codecParameters = QnFfmpegHelper::createVideoCodecParameters(videoData.get());
+        auto codecParameters = QnFfmpegHelper::createVideoCodecParametersAnnexB(videoData.get());
         if (codecParameters && (!m_codecParameters || !m_codecParameters->isEqual(*codecParameters)))
             m_codecParameters = codecParameters;
         videoData->context = m_codecParameters;

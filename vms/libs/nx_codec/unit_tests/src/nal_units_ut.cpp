@@ -116,6 +116,24 @@ TEST(NalUnits, find4BytesStartcodes)
         ASSERT_EQ(sizes[1].data, data + 11);
         ASSERT_EQ(sizes[1].size, 5);
     }
+
+    // Dropped first startcode
+    {
+        uint8_t data[] = {
+            0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x01, 0xff, 0xff, 0xff,
+            0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+
+        auto sizes = nx::media::nal::findNalUnitsAnnexB(data, sizeof(data), true);
+        ASSERT_EQ(sizes.size(), 3);
+        ASSERT_EQ(sizes[0].data, data);
+        ASSERT_EQ(sizes[0].size, 4);
+
+        ASSERT_EQ(sizes[1].data, data + 7);
+        ASSERT_EQ(sizes[1].size, 3);
+
+        ASSERT_EQ(sizes[2].data, data + 14);
+        ASSERT_EQ(sizes[2].size, 6);
+    }
 }
 
 

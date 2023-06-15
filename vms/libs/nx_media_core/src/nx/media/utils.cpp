@@ -118,7 +118,7 @@ double getDefaultSampleAspectRatio(const QSize& srcSize)
     return 1.0;
 }
 
-bool fillExtraData(const QnCompressedVideoData* video, uint8_t** outExtradata, int* outSize)
+bool fillExtraDataAnnexB(const QnCompressedVideoData* video, uint8_t** outExtradata, int* outSize)
 {
     if (*outExtradata)
         return true;

@@ -14,8 +14,8 @@ std::vector<uint8_t> buildExtraDataMp4(const QnCompressedVideoData* frame)
 {
     std::vector<uint8_t> extradata;
     auto extraDataBuilder = frame->compressionType == AV_CODEC_ID_H264
-        ? nx::media::h264::buildExtraDataMp4
-        : nx::media::hevc::buildExtraDataMp4;
+        ? nx::media::h264::buildExtraDataMp4FromAnnexB
+        : nx::media::hevc::buildExtraDataMp4FromAnnexB;
     if (frame->context && frame->context->getExtradata() && frame->context->getExtradataSize())
     {
         extradata = extraDataBuilder(
@@ -59,7 +59,7 @@ QnCompressedVideoDataPtr convertStartCodesToSizes(const QnCompressedVideoData* v
 bool isMp4Format(const QnCompressedVideoData* data)
 {
     if (data->compressionType != AV_CODEC_ID_H264 && data->compressionType != AV_CODEC_ID_H265)
-        return true;
+        return false;
 
     if (!data->context)
         return false;

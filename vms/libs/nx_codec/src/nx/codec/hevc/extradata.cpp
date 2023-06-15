@@ -54,10 +54,14 @@ std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size)
     return extraData;
 }
 
-std::vector<uint8_t> buildExtraDataMp4(const uint8_t* data, int32_t size)
+std::vector<uint8_t> buildExtraDataMp4FromAnnexB(const uint8_t* data, int32_t size)
+{
+    return buildExtraDataMp4(nal::findNalUnitsAnnexB(data, size));
+}
+
+std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalUnits)
 {
     HEVCDecoderConfigurationRecord hvcc;
-    auto nalUnits = nx::media::nal::findNalUnitsAnnexB(data, size);
     for (const auto& nalu: nalUnits)
     {
         NalUnitType unitType = (NalUnitType)((*nalu.data & kPayloadHeaderNalUnitTypeMask) >> 1);

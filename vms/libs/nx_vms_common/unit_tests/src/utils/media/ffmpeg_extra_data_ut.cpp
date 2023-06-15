@@ -15,7 +15,7 @@ TEST(media, build_extradata_h264)
     const int kSpsSize = 18;
     const int kPpsSize = 4;
 
-    std::vector<uint8_t> extradata = nx::media::h264::buildExtraDataMp4(
+    std::vector<uint8_t> extradata = nx::media::h264::buildExtraDataMp4FromAnnexB(
         frameData, sizeof(frameData));
 
     ASSERT_EQ(extradata.size(), 33);

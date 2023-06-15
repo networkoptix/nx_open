@@ -104,7 +104,7 @@ CodecParametersPtr StorageRecordingContext::getVideoCodecParameters(
         codecParameters = std::make_shared<CodecParameters>(videoData->context->getAvCodecParameters());
 
     if (!codecParameters)
-        codecParameters = QnFfmpegHelper::createVideoCodecParameters(videoData.get());
+        codecParameters = QnFfmpegHelper::createVideoCodecParametersAnnexB(videoData.get());
 
     return codecParameters;
 }
@@ -137,8 +137,8 @@ void StorageRecordingContext::allocateFfmpegObjects(
                 }
                 auto avCodecParams = codecParams->getAvCodecParameters();
                 if (!avCodecParams)
-                    throw ErrorEx(Error::Code::invalidAudioCodec, "Invalid audio codec");
-                if (!nx::media::fillExtraData(
+                    throw ErrorEx(Error::Code::invalidAudioCodec, "Invalid video codec");
+                if (!nx::media::fillExtraDataAnnexB(
                     videoData.get(), &avCodecParams->extradata, &avCodecParams->extradata_size))
                 {
                     throw ErrorEx(Error::Code::videoStreamAllocation, "Failed to build extra data");
