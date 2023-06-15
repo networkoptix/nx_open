@@ -889,7 +889,9 @@ void Workbench::submit(WorkbenchState& state)
             if (isLayoutSupported(resource, /*allowLocals*/ false))
                 state.layoutUuids.push_back(sourceId(resource));
 
-            if (ini().enableMultiSystemTabBar && resource->hasFlags(Qn::local))
+            if (ini().enableMultiSystemTabBar
+                && resource->hasFlags(Qn::local)
+                && !resource->getItems().empty())
             {
                 WorkbenchState::UnsavedLayout unsavedLayout;
                 unsavedLayout.id = resource->getId();
