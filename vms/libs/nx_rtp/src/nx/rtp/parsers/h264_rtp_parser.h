@@ -49,9 +49,11 @@ private:
     bool isPacketStartsNewFrame(const quint8* curPtr, const quint8* bufferEnd) const;
 
     QnCompressedVideoDataPtr createVideoData(const quint8* rtpBuffer, quint32 rtpTime);
+   // handleAggregationPacket();
     bool isBufferOverflow() const;
 
     void updateNalFlags(const quint8* data, int dataLen);
+    void handleSingleNalunitPacket(uint8_t* buffer, int offset, int size);
 };
 
 } // namespace nx::rtp

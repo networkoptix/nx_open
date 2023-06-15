@@ -6,6 +6,7 @@
 
 #include <nx/codec/nal_units.h>
 #include <nx/utils/bit_stream.h>
+#include <nx/utils/log/log.h>
 
 #ifdef _MSC_VER
 #    pragma warning(disable: 4189) /* C4189: '?' : local variable is initialized but not referenced. */
@@ -2008,11 +2009,30 @@ namespace h264
 
 namespace nx::media::nal {
 
-std::vector<NalUnitInfo> findNalUnitsAnnexB(const uint8_t* data, int32_t size)
+std::vector<NalUnitInfo> findNalUnitsMp4(const uint8_t* data, int32_t size)
+{
+    std::vector<NalUnitInfo> result;
+    const uint8_t* current = data;
+    while (current + 4 < data + size)
+    {
+        uint32_t naluSize = ntohl(*(uint32_t*)current);
+        if (naluSize > uint32_t(data + size - current))
+        {
+            NX_WARNING(NX_SCOPE_TAG, "Invalid NAL unit size: %1", naluSize);
+            break;
+        }
+        result.emplace_back(NalUnitInfo{current + kNalUnitSizeLength, (int)naluSize});
+        current += kNalUnitSizeLength + naluSize;
+    }
+    return result;
+}
+
+std::vector<NalUnitInfo> findNalUnitsAnnexB(
+    const uint8_t* data, int32_t size, bool droppedFirstStartcode)
 {
     std::vector<NalUnitInfo> result;
     const uint8_t* dataEnd = data + size;
-    const uint8_t* naluStart = NALUnit::findNextNAL(data, dataEnd);
+    const uint8_t* naluStart = droppedFirstStartcode ? data : NALUnit::findNextNAL(data, dataEnd);
     const uint8_t* nextNaluStart = nullptr;
     while (naluStart < dataEnd)
     {

@@ -11,16 +11,16 @@ namespace nx::rtp {
 static const int kMinIdrCountToDetectIFrameByIdr = 2;
 
 H264Parser::H264Parser():
-        VideoStreamParser(),
-        m_spsInitialized(false),
-        m_builtinSpsFound(false),
-        m_builtinPpsFound(false),
-        m_keyDataExists(false),
-        m_idrCounter(0),
-        m_frameExists(false),
-        m_firstSeqNum(0),
-        m_packetPerNal(0),
-        m_lastRtpTime(0)
+    VideoStreamParser(),
+    m_spsInitialized(false),
+    m_builtinSpsFound(false),
+    m_builtinPpsFound(false),
+    m_keyDataExists(false),
+    m_idrCounter(0),
+    m_frameExists(false),
+    m_firstSeqNum(0),
+    m_packetPerNal(0),
+    m_lastRtpTime(0)
 {
     StreamParser::setFrequency(90'000);
 }
@@ -48,12 +48,13 @@ void H264Parser::setSdpInfo(const Sdp::Media& sdp)
                     if (nal.size() > 0 && NALUnit::decodeType(nal[0]) == nuSPS)
                         decodeSpsInfo((uint8_t*)nal.data(), nal.size());
 
+                    uint32_t sizeData = htonl(nal.size());
                     m_sdpSpsPps.insert(m_sdpSpsPps.end(),
-                        NALUnit::kStartCodeLong,
-                        NALUnit::kStartCodeLong + sizeof(NALUnit::kStartCodeLong));
+                        (uint8_t*) &sizeData,
+                        (uint8_t*) &sizeData + sizeof(uint32_t));
                     m_sdpSpsPps.insert(m_sdpSpsPps.end(),
-                        (uint8_t*)nal.data(),
-                        (uint8_t*)nal.data() + nal.size());
+                        (uint8_t*) nal.data(),
+                        (uint8_t*) nal.data() + nal.size());
                 }
             }
         }
@@ -94,17 +95,22 @@ QnCompressedVideoDataPtr H264Parser::createVideoData(const quint8* rtpBuffer, qu
         result = m_chunks.buildFrame(rtpBuffer, nullptr, 0);
 
     result->compressionType = AV_CODEC_ID_H264;
-    if (m_keyDataExists)
-        result->flags = QnAbstractMediaData::MediaFlags_AVKey;
-
-    auto codecParameters = QnFfmpegHelper::createVideoCodecParameters(result.get());
-    if (codecParameters && (!m_codecParameters || !m_codecParameters->isEqual(*codecParameters)))
-        m_codecParameters = codecParameters;
-
-    result->context = m_codecParameters;
     result->timestamp = rtpTime;
     result->width = m_spsInitialized ? m_sps.getWidth() : -1;
     result->height = m_spsInitialized ? m_sps.getHeight() : -1;
+
+    if (m_keyDataExists)
+    {
+        result->flags = QnAbstractMediaData::MediaFlags_AVKey;
+        auto codecParameters = QnFfmpegHelper::createVideoCodecParametersMp4(
+            result.get(), result->width, result->height);
+        if (codecParameters && (!m_codecParameters || !m_codecParameters->isEqual(*codecParameters)))
+            m_codecParameters = codecParameters;
+    }
+
+
+    result->context = m_codecParameters;
+
     clear();
     return result;
 }
@@ -144,40 +150,35 @@ bool H264Parser::isFirstSliceNal(
     return macroNum == 0;
 }
 
-void H264Parser::updateNalFlags(const quint8* data, int dataLen)
+void H264Parser::updateNalFlags(const uint8_t* data, int size)
 {
-    const quint8* dataEnd = data + dataLen;
-    while (data < dataEnd)
+    const auto nalUnitType = NALUnit::decodeType(*data);
+
+    if (nalUnitType == nuSPS)
     {
-        const auto nalUnitType = NALUnit::decodeType(*data);
-
-        if (nalUnitType == nuSPS)
+        m_builtinSpsFound = true;
+        decodeSpsInfo(data, size);
+    }
+    else if (nalUnitType == nuPPS)
+    {
+        m_builtinPpsFound = true;
+    }
+    else if (NALUnit::isSliceNal(nalUnitType))
+    {
+        m_frameExists = true;
+        if (nalUnitType == nuSliceIDR)
         {
-            m_builtinSpsFound = true;
-            decodeSpsInfo(data, dataLen);
+            m_keyDataExists = true;
+            if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr)
+            {
+                if (isFirstSliceNal(nalUnitType, data, size))
+                    ++m_idrCounter;
+            }
         }
-        else if (nalUnitType == nuPPS)
-            m_builtinPpsFound = true;
-        else if (NALUnit::isSliceNal(nalUnitType))
+        else if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr && NALUnit::isIFrame(data, size))
         {
-            m_frameExists = true;
-            if (nalUnitType == nuSliceIDR)
-            {
-                m_keyDataExists = true;
-                if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr)
-                {
-                    if (isFirstSliceNal(nalUnitType, data, dataLen))
-                        ++m_idrCounter;
-                }
-            }
-            else if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr && NALUnit::isIFrame(data, dataLen))
-            {
-                m_keyDataExists = true;
-            }
-            break; //< optimization
+            m_keyDataExists = true;
         }
-
-        data = NALUnit::findNextNAL(data, dataEnd);
     }
 }
 
@@ -246,7 +247,6 @@ Result H264Parser::processData(
 {
     gotData = false;
     int nalUnitLen;
-    quint8 nalUnitType;
 
     quint8* rtpBuffer = rtpBufferBase + bufferOffset;
     quint8* curPtr = rtpBuffer;
@@ -266,26 +266,24 @@ Result H264Parser::processData(
     }
     m_lastRtpTime = rtpHeader.getTimestamp();
 
-
     m_packetPerNal++;
-
-    int packetType = *curPtr & 0x1f;
+    uint8_t packetType = NALUnit::decodeType(*curPtr);
     int nalRefIDC = *curPtr++ & 0xe0;
 
     switch (packetType)
     {
         case STAP_B_PACKET:
-        {
-            if (bufferEnd-curPtr < 2)
-            {
-                clear();
-                return {false, NX_FMT("Failed to parse RTP packet, invalid STAP_B_PACKET")};
-            }
-            curPtr += 2;
-            // TODO: #lbusygin fallthrough here, is it deliberately?
-        }
         case STAP_A_PACKET:
         {
+            if (packetType == STAP_B_PACKET)
+            {
+                if (bufferEnd-curPtr < 2)
+                {
+                    clear();
+                    return {false, NX_FMT("Failed to parse RTP packet, invalid STAP_B_PACKET")};
+                }
+                curPtr += 2;
+            }
             while (curPtr < bufferEnd)
             {
                 if (bufferEnd-curPtr < 2)
@@ -302,7 +300,6 @@ Result H264Parser::processData(
                         "Failed to parse RTP packet, invalid NAL unit length in STAP_A_PACKET")};
                 }
 
-                nalUnitType = NALUnit::decodeType(*curPtr);
                 m_chunks.addChunk((int) (curPtr - rtpBufferBase), nalUnitLen, true);
                 updateNalFlags(curPtr, bufferEnd - curPtr);
                 curPtr += nalUnitLen;
@@ -317,7 +314,7 @@ Result H264Parser::processData(
                 clear();
                 return {false, NX_FMT("Failed to parse RTP packet, invalid FU_A_PACKET")};
             }
-            nalUnitType = NALUnit::decodeType(*curPtr);
+            uint8_t nalUnitType = NALUnit::decodeType(*curPtr); // FU header.
             if (*curPtr & 0x80) // FU_A first packet
             {
                 updateNalFlags(curPtr, bufferEnd - curPtr);
@@ -363,18 +360,15 @@ Result H264Parser::processData(
         case MTAP16_PACKET:
         case MTAP24_PACKET:
         {
-            // Not implemented
+            // Not implemented.
             clear();
             return {false, "Got MTAP packet. Not implemented yet"};
         }
-        default:
+        default: // Single NAl unit packet.
         {
             curPtr--;
-            nalUnitType = NALUnit::decodeType(*curPtr);
-            m_chunks.addChunk(
-                (int) (curPtr - rtpBufferBase), (quint16) (bufferEnd - curPtr), true);
-            updateNalFlags(curPtr, bufferEnd - curPtr);
-            break; // ignore unknown data
+            handleSingleNalunitPacket(
+                rtpBufferBase, int(curPtr - rtpBufferBase), int(bufferEnd - curPtr));
         }
     }
 
@@ -395,6 +389,17 @@ Result H264Parser::processData(
     }
 
     return {true};
+}
+
+void H264Parser::handleSingleNalunitPacket(uint8_t* buffer, int offset, int size)
+{
+    // Check data for other NAL units, some cameras send multiple units in Single NAL unit packet.
+    auto nalUnits = nx::media::nal::findNalUnitsAnnexB(buffer + offset, size, true);
+    for (const auto& nalu: nalUnits)
+    {
+        m_chunks.addChunk(nalu.data - buffer, nalu.size, true);
+        updateNalFlags(nalu.data, nalu.size);
+    }
 }
 
 } // namespace nx::rtp

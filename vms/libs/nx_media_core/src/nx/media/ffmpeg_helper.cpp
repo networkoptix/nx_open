@@ -6,6 +6,8 @@
 #include <QtCore/QDebug>
 
 #include <nx/codec/nal_units.h>
+#include <nx/media/h264_utils.h>
+#include <nx/codec/hevc/extradata.h>
 #include <nx/media/audio/format.h>
 #include <nx/media/av_codec_helper.h>
 #include <nx/media/codec_parameters.h>
@@ -113,14 +115,42 @@ qint64 QnFfmpegHelper::getFileSizeByIOContext(AVIOContext* ioContext)
     return 0;
 }
 
-CodecParametersPtr QnFfmpegHelper::createVideoCodecParameters(
+CodecParametersPtr QnFfmpegHelper::createVideoCodecParametersMp4(
+    const QnCompressedVideoData* video, int width, int height)
+{
+    auto codecParams = std::make_shared<CodecParameters>();
+    auto avCodecParams = codecParams->getAvCodecParameters();
+    avCodecParams->codec_type = AVMEDIA_TYPE_VIDEO;
+    avCodecParams->codec_id = video->compressionType;
+    avCodecParams->width = width;
+    avCodecParams->height = height;
+
+    // Fill ffmpeg extra data.
+    auto nalUnits = nx::media::nal::findNalUnitsMp4((const uint8_t*)video->data(), video->dataSize());
+    std::vector<uint8_t> extradata;
+    if (video->compressionType == AV_CODEC_ID_H264)
+        extradata = nx::media::h264::buildExtraDataMp4(nalUnits);
+    else if (video->compressionType == AV_CODEC_ID_H265)
+        extradata = nx::media::hevc::buildExtraDataMp4(nalUnits);
+
+    if (extradata.empty())
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to build extradata");
+        return nullptr;
+    }
+
+    codecParams->setExtradata(extradata.data(), extradata.size());
+    return codecParams;
+}
+
+CodecParametersPtr QnFfmpegHelper::createVideoCodecParametersAnnexB(
     const QnCompressedVideoData* data, const std::vector<uint8_t>* externalExtradata)
 {
     auto codecParams = std::make_shared<CodecParameters>();
     auto avCodecParams = codecParams->getAvCodecParameters();
     avCodecParams->codec_type = AVMEDIA_TYPE_VIDEO;
     avCodecParams->codec_id = data->compressionType;
-    if (!nx::media::fillExtraData(data, &avCodecParams->extradata, &avCodecParams->extradata_size))
+    if (!nx::media::fillExtraDataAnnexB(data, &avCodecParams->extradata, &avCodecParams->extradata_size))
     {
         if (!externalExtradata || externalExtradata->empty())
             return nullptr;

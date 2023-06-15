@@ -24,17 +24,17 @@ private:
     struct Chunk
     {
         Chunk() = default;
-        Chunk(int bufferOffset, uint16_t len, bool nalStart = false):
+        Chunk(int bufferOffset, uint16_t size, bool nalStart = false):
             bufferStart(nullptr),
             bufferOffset(bufferOffset),
-            len(len),
+            size(size),
             nalStart(nalStart)
         {
         }
 
         uint8_t* bufferStart = nullptr;
         int bufferOffset = 0;
-        uint16_t len = 0;
+        uint16_t size = 0;
         bool nalStart = false;
     };
 

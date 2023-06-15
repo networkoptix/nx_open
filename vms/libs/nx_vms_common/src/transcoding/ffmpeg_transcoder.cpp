@@ -234,8 +234,13 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             if (m_container.compare("mp4", Qt::CaseInsensitive) == 0
                 ||  m_container.compare("ismv", Qt::CaseInsensitive) == 0)
             {
-                if (!nx::media::fillExtraData(video.get(), &m_videoCodecParameters->extradata, &m_videoCodecParameters->extradata_size))
+                if (!nx::media::fillExtraDataAnnexB(
+                    video.get(),
+                    &m_videoCodecParameters->extradata,
+                    &m_videoCodecParameters->extradata_size))
+                {
                     NX_WARNING(this, "Failed to build extra data");
+                }
             }
 
             m_videoCodecParameters->width = videoWidth;

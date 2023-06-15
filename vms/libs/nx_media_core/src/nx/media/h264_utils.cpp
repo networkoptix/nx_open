@@ -94,21 +94,6 @@ std::vector<nal::NalUnitInfo> decodeNalUnits(
         return nal::findNalUnitsAnnexB((const uint8_t*)data->data(), data->dataSize());
 }
 
-void getSpsPps(const uint8_t* data, int32_t size,
-    std::vector<std::vector<uint8_t>>& spsVector,
-    std::vector<std::vector<uint8_t>>& ppsVector)
-{
-    auto nalUnits = nal::findNalUnitsAnnexB(data, size);
-    for (const auto& nalu: nalUnits)
-    {
-        const auto nalType = NALUnit::decodeType(*nalu.data);
-        if (nalType == nuSPS)
-            spsVector.emplace_back(nalu.data, nalu.data + nalu.size);
-        else if (nalType == nuPPS)
-            ppsVector.emplace_back(nalu.data, nalu.data + nalu.size);
-    }
-}
-
 std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size)
 {
     std::vector<uint8_t> extraData;
@@ -126,12 +111,23 @@ std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size)
     return extraData;
 }
 
-std::vector<uint8_t> buildExtraDataMp4(const uint8_t* data, int32_t size)
+std::vector<uint8_t> buildExtraDataMp4FromAnnexB(const uint8_t* data, int32_t size)
+{
+    return buildExtraDataMp4(nal::findNalUnitsAnnexB(data, size));
+}
+
+std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalUnits)
 {
     std::vector<std::vector<uint8_t>> spsVector;
     std::vector<std::vector<uint8_t>> ppsVector;
-    getSpsPps(data, size, spsVector, ppsVector);
-
+    for (const auto& nalu: nalUnits)
+    {
+        const auto nalType = NALUnit::decodeType(*nalu.data);
+        if (nalType == nuSPS)
+            spsVector.emplace_back(nalu.data, nalu.data + nalu.size);
+        else if (nalType == nuPPS)
+            ppsVector.emplace_back(nalu.data, nalu.data + nalu.size);
+    }
     if (spsVector.empty() || ppsVector.empty())
     {
         NX_WARNING(NX_SCOPE_TAG, "Failed to write h264 extra data, no sps/pps found");

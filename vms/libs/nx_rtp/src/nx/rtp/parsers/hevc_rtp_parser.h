@@ -17,10 +17,10 @@ struct NX_RTP_API HevcContext
 {
     int rtpChannel = 0;
     int spropMaxDonDiff = 0;
-    std::optional<QByteArray> spropVps = std::nullopt;
-    std::optional<QByteArray> spropSps = std::nullopt;
-    std::optional<QByteArray> spropPps = std::nullopt;
-    std::optional<QByteArray> spropSei = std::nullopt;
+    std::optional<QByteArray> vps = std::nullopt;
+    std::optional<QByteArray> sps = std::nullopt;
+    std::optional<QByteArray> pps = std::nullopt;
+    std::optional<QByteArray> sei = std::nullopt;
     bool inStreamVpsFound = false;
     bool inStreamSpsFound = false;
     bool inStreamPpsFound = false;

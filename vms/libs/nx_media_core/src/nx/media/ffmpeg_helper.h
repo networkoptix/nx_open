@@ -30,8 +30,11 @@ public:
      */
     static void copyAvCodecContextField(void **fieldPtr, const void* data, size_t size);
 
-    static CodecParametersPtr createVideoCodecParameters(
+    static CodecParametersPtr createVideoCodecParametersAnnexB(
         const QnCompressedVideoData* data, const std::vector<uint8_t>* externalExtradata = nullptr);
+
+    static CodecParametersPtr createVideoCodecParametersMp4(
+        const QnCompressedVideoData* video, int width, int height);
 
     /**
      * @return Either a codec found in ffmpeg registry, or a static instance of a stub AVCodec in case
