@@ -6525,24 +6525,24 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
       <translation>
-        <numerusform>%n は自動検出</numerusform>
+        <numerusform>このうち %n 台は自動検出で追加されました。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
       <translation>
-        <numerusform>%n カメラは自動検出</numerusform>
+        <numerusform>%n カメラは自動検出で追加されました。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
       <translation>
-        <numerusform>%n I/Oモジュールは自動検出</numerusform>
+        <numerusform>%n I/O モジュールは自動検出で追加されました。</numerusform>
       </translation>
     </message>
     <message>
       <source>They may be auto-discovered again after removing.</source>
-      <translation>削除した後に再度自動検索されるかもしれません</translation>
+      <translation>これらは削除後に再び自動検出される可能性があります。</translation>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>

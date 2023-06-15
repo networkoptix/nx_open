@@ -246,11 +246,11 @@
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>メディアエラーが多すぎます。デバイス障害ダイアログを開いて詳細を確認してください。</translation>
+      <translation>多数のメディアエラー。デバイス障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>メディアエラーが多すぎます。カメラ障害ダイアログを開いて詳細を確認してください。</translation>
+      <translation>多数のメディアエラー。カメラ障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
@@ -274,7 +274,7 @@
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>メディアエラーが多すぎます。I/Oモジュール障害ダイアログを開いて詳細を確認してください。</translation>
+      <translation>多数のメディアエラー。I/Oモジュール障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
