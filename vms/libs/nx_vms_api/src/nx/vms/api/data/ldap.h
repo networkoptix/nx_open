@@ -130,6 +130,11 @@ struct NX_VMS_API LdapSettings: LdapSettingsBase
      */
     std::chrono::seconds masterSyncServerCheckIntervalS = 10s;
 
+    /**%apidoc[opt]
+     * If `true` new LDAP users will be imported with enabled HTTP Digest.
+     */
+    bool isHttpDigestEnabledOnImport = false;
+
     bool operator==(const LdapSettings&) const = default;
     Void getId() const { return Void(); }
 };
@@ -138,7 +143,8 @@ struct NX_VMS_API LdapSettings: LdapSettingsBase
     (continuousSync) \
     (continuousSyncIntervalS) \
     (preferredMasterSyncServer) \
-    (masterSyncServerCheckIntervalS)
+    (masterSyncServerCheckIntervalS) \
+    (isHttpDigestEnabledOnImport)
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(LdapSettings, LdapSettings_Fields)
 
