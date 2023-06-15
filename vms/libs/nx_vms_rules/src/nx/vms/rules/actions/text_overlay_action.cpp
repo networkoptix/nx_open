@@ -17,19 +17,19 @@ const ItemDescriptor& TextOverlayAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<TextOverlayAction>(),
-        .displayName = tr("Show text overlay"),
+        .displayName = tr("Show Text Overlay"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
-            utils::makeTargetUserFieldDescriptor(
-                tr("Show to"), {}, utils::UserFieldPreset::All),
+            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Display text for"),
+                tr("Action Throttling"),
                 {},
                 {.initialValue = 5s, .maximumValue = 30s, .minimumValue = 5s}),
-            makeFieldDescriptor<TextWithFields>("text", tr("Text")),
+            makeFieldDescriptor<TextWithFields>("text", tr("Custom Text")),
 
+            utils::makeTargetUserFieldDescriptor(
+                tr("Show to"), {}, utils::UserFieldPreset::All, /*visible*/ false),
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
             utils::makeExtractDetailFieldDescriptor("extendedCaption", utils::kExtendedCaptionDetailName),
             utils::makeExtractDetailFieldDescriptor("detailing", utils::kDetailingDetailName),

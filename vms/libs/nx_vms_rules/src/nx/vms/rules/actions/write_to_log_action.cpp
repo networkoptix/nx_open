@@ -11,9 +11,9 @@ const ItemDescriptor& WriteToLogAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<WriteToLogAction>(),
-        .displayName = tr("Write to log"),
+        .displayName = tr("Write to Log"),
         .fields = {
-            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
+            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
         }
     };
     return kDescriptor;

@@ -7,7 +7,7 @@
 namespace nx::vms::client::desktop::rules {
 
 PresetPickerWidget::PresetPickerWidget(QnWorkbenchContext* context, CommonParamsWidget* parent):
-    PickerWidget(context, parent)
+    PlainPickerWidget(context, parent)
 {
     auto contentLayout = new QHBoxLayout;
     m_comboBox = new QComboBox;
@@ -15,6 +15,10 @@ PresetPickerWidget::PresetPickerWidget(QnWorkbenchContext* context, CommonParams
     contentLayout->addWidget(m_comboBox);
 
     m_contentWidget->setLayout(contentLayout);
+}
+
+void PresetPickerWidget::updateUi()
+{
 }
 
 } // namespace nx::vms::client::desktop::rules

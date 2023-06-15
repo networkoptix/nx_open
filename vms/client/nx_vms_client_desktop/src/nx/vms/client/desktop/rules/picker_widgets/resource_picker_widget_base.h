@@ -5,17 +5,19 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
-#include "picker_widget.h"
 #include "picker_widget_utils.h"
+#include "field_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
 template<typename F>
-class ResourcePickerWidgetBase: public FieldPickerWidget<F>
+class ResourcePickerWidgetBase: public PlainFieldPickerWidget<F>
 {
+    using base = PlainFieldPickerWidget<F>;
+
 public:
     explicit ResourcePickerWidgetBase(QnWorkbenchContext* context, CommonParamsWidget* parent):
-        FieldPickerWidget<F>(context, parent)
+        base(context, parent)
     {
         auto contentLayout = new QVBoxLayout;
 
@@ -33,7 +35,7 @@ public:
     }
 
 protected:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
 
     QPushButton* m_selectButton{nullptr};
 

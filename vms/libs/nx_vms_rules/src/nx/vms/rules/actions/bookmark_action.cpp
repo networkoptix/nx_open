@@ -18,13 +18,13 @@ const ItemDescriptor& BookmarkAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<BookmarkAction>(),
-        .displayName = tr("Bookmark"),
+        .displayName = tr("Create Bookmark"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
+            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Fixed duration"),
+                tr("Duration"),
                 {},
                 {.initialValue = 5s, .defaultValue = 5s, .maximumValue = 600s, .minimumValue = 5s}),
             utils::makeTimeFieldDescriptor<TimeField>(
@@ -38,7 +38,7 @@ const ItemDescriptor& BookmarkAction::manifest()
                 {},
                 {.initialValue = 0s, .maximumValue = 600s, .minimumValue = 0s},
                 {utils::kDurationFieldName}),
-            makeFieldDescriptor<ActionTextField>("tags", tr("Tags")),
+            makeFieldDescriptor<ActionTextField>("tags", tr("Add Tags")),
 
             // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
             utils::makeExtractDetailFieldDescriptor("name", utils::kExtendedCaptionDetailName),

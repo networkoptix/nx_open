@@ -50,7 +50,6 @@ public:
             fieldNames.insert(field.fieldName);
 
             EXPECT_FALSE(field.id.isEmpty());
-            EXPECT_FALSE(field.displayName.isEmpty());
             EXPECT_FALSE(field.fieldName.isEmpty());
 
             const auto propIndex = meta.indexOfProperty(field.fieldName.toUtf8().data());

@@ -4,12 +4,12 @@
 
 namespace nx::vms::client::desktop::rules {
 
-#define PICKER_WIDGET_COMMON_USINGS using FieldPickerWidget<F>::m_label;\
-    using FieldPickerWidget<F>::m_contentWidget;\
-    using FieldPickerWidget<F>::m_fieldDescriptor;\
-    using FieldPickerWidget<F>::theField;\
-    using FieldPickerWidget<F>::connect;\
-    using FieldPickerWidget<F>::resourcePool;\
-    using FieldPickerWidget<F>::parentParamsWidget;
+#define BASE_COMMON_USINGS using base::m_label;\
+    using base::m_contentWidget;\
+    using base::m_fieldDescriptor;\
+    using base::theField;\
+    using base::connect;\
+    using base::resourcePool;\
+    using base::parentParamsWidget;
 
 } // namespace nx::vms::client::desktop::rules

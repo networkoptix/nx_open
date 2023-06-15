@@ -108,13 +108,14 @@ const ItemDescriptor& AnalyticsEvent::manifest()
         .description = "",
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
-            utils::makeStateFieldDescriptor(tr("State")),
-            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Camera")),
+            utils::makeStateFieldDescriptor(tr("Begin When")),
+            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Occurs at")),
             makeFieldDescriptor<AnalyticsEventTypeField>(
-                "eventTypeId", tr("Event Type"), {}, {}, {utils::kCameraIdFieldName}),
-            makeFieldDescriptor<KeywordsField>("caption", tr("Caption"), kKeywordFieldDescription),
+                "eventTypeId", tr("Of Type"), {}, {}, {utils::kCameraIdFieldName}),
             makeFieldDescriptor<KeywordsField>(
-                "description", tr("Description"), kKeywordFieldDescription),
+                utils::kCaptionFieldName, tr("And Caption"), kKeywordFieldDescription),
+            makeFieldDescriptor<KeywordsField>(
+                utils::kDescriptionFieldName, tr("And Description"), kKeywordFieldDescription),
             // TODO: #amalov Consider adding following fields in 5.1+.
             // makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
         },

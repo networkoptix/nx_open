@@ -94,7 +94,7 @@ const ItemDescriptor& DeviceDisconnectedEvent::manifest()
         .fields = {
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
-                tr("Device ID"),
+                tr("Device"),
                 {},
                 {{"acceptAll", true}}),
         },

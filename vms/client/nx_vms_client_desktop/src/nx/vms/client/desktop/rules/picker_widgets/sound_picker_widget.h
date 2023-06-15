@@ -7,13 +7,13 @@
 
 #include <nx/vms/rules/action_builder_fields/sound_field.h>
 
-#include "picker_widget.h"
+#include "field_picker_widget.h"
 
 namespace nx::vms::client::desktop { class ServerNotificationCache; }
 
 namespace nx::vms::client::desktop::rules {
 
-class SoundPicker: public FieldPickerWidget<vms::rules::SoundField>
+class SoundPicker: public PlainFieldPickerWidget<vms::rules::SoundField>
 {
     Q_OBJECT
 

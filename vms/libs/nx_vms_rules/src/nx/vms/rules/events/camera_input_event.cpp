@@ -66,18 +66,18 @@ const ItemDescriptor& CameraInputEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<CameraInputEvent>(),
-        .displayName = tr("Input Signal on Camera"),
+        .displayName = tr("Input Signal on Device"),
         .flags = ItemFlag::prolonged,
         .fields = {
             utils::makeStateFieldDescriptor(tr("State")),
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
-                tr("Camera"),
+                tr("Occurs at"),
                 {},
                 {{"acceptAll", true}}),
             makeFieldDescriptor<InputPortField>(
                 "inputPortId",
-                tr("Input ID"),
+                tr("With ID"),
                 {},
                 {},
                 {utils::kCameraIdFieldName}),

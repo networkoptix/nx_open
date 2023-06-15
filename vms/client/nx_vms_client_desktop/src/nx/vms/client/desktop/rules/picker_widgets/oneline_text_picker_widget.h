@@ -10,7 +10,7 @@
 #include <nx/vms/rules/event_filter_fields/customizable_text_field.h>
 #include <nx/vms/rules/event_filter_fields/text_field.h>
 
-#include "picker_widget.h"
+#include "field_picker_widget.h"
 #include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
@@ -27,11 +27,13 @@ namespace nx::vms::client::desktop::rules {
  */
 
 template<typename F>
-class OnelineTextPickerWidgetBase: public FieldPickerWidget<F>
+class OnelineTextPickerWidgetBase: public PlainFieldPickerWidget<F>
 {
+    using base = PlainFieldPickerWidget<F>;
+
 public:
     OnelineTextPickerWidgetBase(QnWorkbenchContext* context, CommonParamsWidget* parent):
-        FieldPickerWidget<F>(context, parent)
+        PlainFieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
 
@@ -49,7 +51,7 @@ public:
     }
 
 protected:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
 
     QLineEdit* m_lineEdit{nullptr};
 
@@ -59,6 +61,8 @@ protected:
 template<typename F>
 class OnelineTextPickerWidgetCommon: public OnelineTextPickerWidgetBase<F>
 {
+    using base = OnelineTextPickerWidgetBase<F>;
+
 public:
     OnelineTextPickerWidgetCommon(QnWorkbenchContext* context, CommonParamsWidget* parent):
         OnelineTextPickerWidgetBase<F>(context, parent)
@@ -68,7 +72,7 @@ public:
     }
 
 protected:
-    PICKER_WIDGET_COMMON_USINGS
+    BASE_COMMON_USINGS
     using OnelineTextPickerWidgetBase<F>::m_lineEdit;
 
     void updateUi() override

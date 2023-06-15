@@ -100,14 +100,14 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
         .fields = {
             makeFieldDescriptor<SourceCameraField>(
                 utils::kCameraIdFieldName,
-                tr("Camera"),
+                tr("Occurs at"),
                 {},
                 {{"acceptAll", true}}),
             makeFieldDescriptor<AnalyticsEngineField>(
-                "engineId", tr("Source"), {}, {}, {utils::kCameraIdFieldName}),
-            makeFieldDescriptor<KeywordsField>("caption", tr("Caption")),
-            makeFieldDescriptor<KeywordsField>("description", tr("Description")),
-            makeFieldDescriptor<AnalyticsEventLevelField>("level", tr("Level")),
+                "engineId", tr("For Plugin"), {}, {}, {utils::kCameraIdFieldName}),
+            makeFieldDescriptor<KeywordsField>(utils::kCaptionFieldName, tr("And Caption")),
+            makeFieldDescriptor<KeywordsField>(utils::kDescriptionFieldName, tr("And Description")),
+            makeFieldDescriptor<AnalyticsEventLevelField>("level", tr("And Level Is")),
         },
         .permissions = {
             .resourcePermissions = {{utils::kCameraIdFieldName, Qn::ViewContentPermission}}

@@ -16,16 +16,16 @@ const ItemDescriptor& DeviceOutputAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceOutputAction>(),
-        .displayName = tr("Camera output"),
+        .displayName = tr("Device Output"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("Cameras")),
+            makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
+            makeFieldDescriptor<OutputPortField>("outputPortId", tr("Output ID")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Fixed duration"),
+                tr("Duration"),
                 {},
                 {.initialValue = 1s, .defaultValue = 1s, .minimumValue = 1s}),
-            makeFieldDescriptor<OutputPortField>("outputPortId", tr("Output ID")),
         }
     };
     return kDescriptor;

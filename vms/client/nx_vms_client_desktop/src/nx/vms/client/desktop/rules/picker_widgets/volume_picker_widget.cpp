@@ -24,7 +24,7 @@ constexpr auto kOneHundredPercent = 100;
 } // namespace
 
 VolumePicker::VolumePicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
-    FieldPickerWidget<vms::rules::VolumeField>(context, parent)
+    PlainFieldPickerWidget<vms::rules::VolumeField>(context, parent)
 {
     auto contentLayout = new QHBoxLayout;
 

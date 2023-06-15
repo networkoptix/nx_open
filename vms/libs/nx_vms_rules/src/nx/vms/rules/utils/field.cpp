@@ -78,6 +78,7 @@ FieldDescriptor makeTargetUserFieldDescriptor(
     const QString& displayName,
     const QString& description,
     UserFieldPreset preset,
+    bool visible,
     const QStringList& linkedFields)
 {
     QVariantMap props;
@@ -85,6 +86,9 @@ FieldDescriptor makeTargetUserFieldDescriptor(
         props["acceptAll"] = true;
     if (preset == UserFieldPreset::Power)
         props["ids"] = QVariant::fromValue(nx::utils::toQSet(vms::api::kAllPowerUserGroupIds));
+
+    if (!visible)
+        props["visible"] = false;
 
     return makeFieldDescriptor<TargetUserField>(
         utils::kUsersFieldName,

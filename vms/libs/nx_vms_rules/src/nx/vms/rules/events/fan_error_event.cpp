@@ -43,9 +43,9 @@ const ItemDescriptor& FanErrorEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<FanErrorEvent>(),
-        .displayName = tr("Fan Error"),
+        .displayName = tr("Fan Failure"),
         .fields = {
-            makeFieldDescriptor<SourceServerField>(utils::kServerIdFieldName, tr("Server")),
+            makeFieldDescriptor<SourceServerField>(utils::kServerIdFieldName, tr("At")),
         },
         .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/fan_error.mustache"
