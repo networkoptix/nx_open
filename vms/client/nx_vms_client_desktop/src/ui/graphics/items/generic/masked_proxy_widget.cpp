@@ -102,7 +102,7 @@ void QnMaskedProxyWidget::paint(QPainter* painter,
 
     if (m_updatesEnabled)
     {
-        const int devicePixelRatio = scene()
+        const qreal devicePixelRatio = scene()
             ? sceneDevicePixelRatio(scene())
             : painter->device()->devicePixelRatio();
 
@@ -135,7 +135,7 @@ void QnMaskedProxyWidget::paint(QPainter* painter,
         painter->drawPixmap(renderRect, m_pixmap, sourceRect);
 }
 
-bool QnMaskedProxyWidget::ensurePixmap(const QSize& logicalSize, int devicePixelRatio)
+bool QnMaskedProxyWidget::ensurePixmap(const QSize& logicalSize, qreal devicePixelRatio)
 {
     const QSize targetSize = logicalSize * devicePixelRatio;
 
@@ -152,7 +152,7 @@ bool QnMaskedProxyWidget::ensurePixmap(const QSize& logicalSize, int devicePixel
     return false;
 }
 
-void QnMaskedProxyWidget::renderWidgetRect(const QRect& logicalRect, int devicePixelRatio)
+void QnMaskedProxyWidget::renderWidgetRect(const QRect& logicalRect, qreal devicePixelRatio)
 {
     const QRect widgetRect = rect().toAlignedRect();
     QRect updateRect = logicalRect;

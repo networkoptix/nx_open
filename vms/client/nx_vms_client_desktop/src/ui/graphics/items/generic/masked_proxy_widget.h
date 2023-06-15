@@ -54,8 +54,8 @@ protected:
     virtual bool sceneEvent(QEvent* event) override;
 
 private:
-    bool ensurePixmap(const QSize& logicalSize, int devicePixelRatio); //< returns true if pixmap was changed
-    void renderWidgetRect(const QRect& logicalRect, int devicePixelRatio);
+    bool ensurePixmap(const QSize& logicalSize, qreal devicePixelRatio); //< returns true if pixmap was changed
+    void renderWidgetRect(const QRect& logicalRect, qreal devicePixelRatio);
     void syncDirtyRect();
 
 public slots:
