@@ -28,7 +28,7 @@ UserWatcher::UserWatcher(SystemContext* systemContext, QObject* parent):
             {
                 // Here we use the same method as server in order to select the correct user when
                 // there are multiple users with the same name.
-                if (const auto user = resourcePool()->userByName(username))
+                if (const auto user = resourcePool()->userByName(username).first)
                     setUser(user);
             }
         }

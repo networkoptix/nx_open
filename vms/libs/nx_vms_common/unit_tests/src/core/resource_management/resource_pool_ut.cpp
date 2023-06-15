@@ -141,43 +141,45 @@ TEST_F(QnResourcePoolTest, userByName)
 
     const auto localUser = addUser({}, kName, nx::vms::api::UserType::local);
     const auto ldapUser = addUser({}, kName, nx::vms::api::UserType::ldap);
-    ASSERT_EQ(resourcePool()->userByName(kName), localUser);
+    ASSERT_EQ(resourcePool()->userByName(kName).first, localUser);
 
     const auto localUser2 = addUser({}, kName, nx::vms::api::UserType::local);
-    ASSERT_EQ(resourcePool()->userByName(kName), QnUserResourcePtr());
+    ASSERT_EQ(
+        resourcePool()->userByName(kName), std::make_pair(QnUserResourcePtr(), /*hasClash*/ true));
 
     localUser->setEnabled(false);
-    ASSERT_EQ(resourcePool()->userByName(kName), localUser2);
+    ASSERT_EQ(resourcePool()->userByName(kName).first, localUser2);
 
     resourcePool()->removeResources({localUser2});
-    ASSERT_EQ(resourcePool()->userByName(kName), ldapUser);
+    ASSERT_EQ(resourcePool()->userByName(kName).first, ldapUser);
 
     const auto ldapUser2 = addUser({}, kName, nx::vms::api::UserType::ldap);
     ldapUser->setEnabled(false);
-    ASSERT_EQ(resourcePool()->userByName(kName), ldapUser2);
+    ASSERT_EQ(resourcePool()->userByName(kName).first, ldapUser2);
 
     resourcePool()->removeResources({ldapUser2});
-    ASSERT_EQ(resourcePool()->userByName(kName), QnUserResourcePtr());
+    ASSERT_EQ(resourcePool()->userByName(kName).first, localUser);
 
     ldapUser->setEnabled(true);
-    ASSERT_EQ(resourcePool()->userByName(kName), ldapUser);
+    ASSERT_EQ(resourcePool()->userByName(kName).first, ldapUser);
 
     const auto cloudUser = addUser({}, kName, nx::vms::api::UserType::cloud);
-    ASSERT_EQ(resourcePool()->userByName(kName), cloudUser);
+    ASSERT_EQ(resourcePool()->userByName(kName).first, cloudUser);
 
     cloudUser->setEnabled(false);
-    ASSERT_EQ(resourcePool()->userByName(kName), ldapUser);
+    ASSERT_EQ(resourcePool()->userByName(kName).first, ldapUser);
 
     const auto otherLocalUser = addUser({}, kName2, nx::vms::api::UserType::local);
-    ASSERT_EQ(resourcePool()->userByName(kName), ldapUser);
-    ASSERT_EQ(resourcePool()->userByName(kName2), otherLocalUser);
+    ASSERT_EQ(resourcePool()->userByName(kName).first, ldapUser);
+    ASSERT_EQ(resourcePool()->userByName(kName2).first, otherLocalUser);
 
     otherLocalUser->setName(kName);
-    ASSERT_EQ(resourcePool()->userByName(kName), otherLocalUser);
-    ASSERT_EQ(resourcePool()->userByName(kName2), QnUserResourcePtr());
+    ASSERT_EQ(resourcePool()->userByName(kName).first, otherLocalUser);
+    ASSERT_EQ(resourcePool()->userByName(kName2),
+        std::make_pair(QnUserResourcePtr(), /*hasClash*/ false));
 
     cloudUser->setEnabled(true);
-    ASSERT_EQ(resourcePool()->userByName(kName), cloudUser);
+    ASSERT_EQ(resourcePool()->userByName(kName).first, cloudUser);
 }
 
 } // namespace nx::vms::common::test

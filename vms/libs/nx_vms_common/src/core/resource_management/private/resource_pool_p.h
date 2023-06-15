@@ -22,7 +22,11 @@ struct QnResourcePool::Private
 
     struct SameNameUsers
     {
-        QnUserResourcePtr main() const { return m_main; }
+        std::pair<QnUserResourcePtr, bool /*hasClash*/> main() const
+        {
+            return {m_main, m_hasClash};
+        }
+
         bool empty() const { return m_byPriority.empty(); }
 
         void add(QnUserResourcePtr user);
@@ -32,6 +36,7 @@ struct QnResourcePool::Private
     private:
         QnUserResourcePtr m_main;
         std::map<size_t, std::list<QnUserResourcePtr>> m_byPriority;
+        bool m_hasClash = false;
     };
 
 public:

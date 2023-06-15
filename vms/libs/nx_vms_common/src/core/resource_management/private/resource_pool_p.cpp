@@ -155,22 +155,30 @@ void QnResourcePool::Private::SameNameUsers::remove(const QnUserResourcePtr& use
 void QnResourcePool::Private::SameNameUsers::selectMainUser()
 {
     m_main.reset();
+    m_hasClash = false;
+    size_t disabled = 0;
+    size_t total = 0;
     for (const auto& [p, users]: m_byPriority)
     {
         for (const auto& u: users)
         {
             if (!u->isEnabled())
+            {
+                ++disabled;
                 continue;
+            }
 
             if (m_main) //< We have a clash of the same priority!
             {
                 NX_VERBOSE(this, "Clashed user name detected: %1", m_main->getName().toLower());
                 m_main.reset();
+                m_hasClash = true;
                 return;
             }
 
             m_main = u;
         }
+        total += users.size();
 
         if (m_main) //< Main of higher priority found.
         {
@@ -179,6 +187,18 @@ void QnResourcePool::Private::SameNameUsers::selectMainUser()
         }
     }
 
-    // TODO: Find out if it makes sense to return disabled user if there are no other users.
+    if (disabled != 0 && disabled == total)
+    {
+        for (const auto& [p, users]: m_byPriority)
+        {
+            for (const auto& u: users)
+            {
+                m_main = users.front();
+                NX_VERBOSE(this, "Selected disabled main user: %1", m_main);
+                return;
+            }
+        }
+    }
+
     NX_VERBOSE(this, "No user for name could be selected");
 }

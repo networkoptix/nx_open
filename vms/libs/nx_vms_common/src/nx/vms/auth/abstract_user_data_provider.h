@@ -26,7 +26,8 @@ public:
     /**
      * Can find user or mediaserver.
      */
-    virtual QnResourcePtr findResByName(const nx::String& nxUserName) const = 0;
+    virtual std::pair<QnResourcePtr, bool /*hasClash*/> findResByName(
+        const nx::String& nxUserName) const = 0;
 
     /**
      * Authorizes authorizationHeader with resource res.

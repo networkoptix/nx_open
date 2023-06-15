@@ -26,7 +26,8 @@ NX_REFLECTION_ENUM(AuthResult,
     Auth_InvalidCsrfToken, /**< For cookie login. */
     Auth_LockedOut, /**< Locked out for a period of time. */
     Auth_WrongSessionToken, /**< session token is invalid or expired. */
-    Auth_DisabledBasicAndDigest /**< HTTP basic and digest are disabled. */
+    Auth_DisabledBasicAndDigest, /**< HTTP basic and digest are disabled. */
+    Auth_ClashedLogin /**< More than one user with the same login are presented. */
 )
 
 NX_VMS_COMMON_API QString toErrorMessage(AuthResult value);

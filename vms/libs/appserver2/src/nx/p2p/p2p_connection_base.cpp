@@ -341,11 +341,13 @@ void ConnectionBase::onHttpClientDone()
 
     NX_DEBUG(
         this, "Ping supported: %1. useWebsocket: %2, "
-        "ping supported header present: %3, header value: %4",
+        "ping supported header present: %3%4",
         pingSupported,
         useWebsocketMode,
         pingSupportedHeaderIt != headers.cend(),
-        pingSupportedHeaderIt->second == "true");
+        pingSupportedHeaderIt != headers.cend()
+            ? ", header value: " + pingSupportedHeaderIt->second
+            : "");
 
     if (useWebsocketMode)
     {
