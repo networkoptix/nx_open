@@ -215,7 +215,7 @@ TabBar
                         radius: 0
                         width: tabBar.scrollerWidth / 2 - 0.5
                         height: parent.height
-                        icon.source: "qrc:///skin/tab_bar/tab_next.png"
+                        icon.source: "image://svg/skin/tab_bar/arrow_right_24.svg"
                         enabled: tabBar.canScrollRight
                         onClicked:
                             tabBar.scrollToNext(tabBar.contentItem.contentX + tabBar.width - tabBar.scrollerWidth + 1, 1)

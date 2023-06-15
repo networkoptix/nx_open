@@ -1465,7 +1465,7 @@ void Style::drawPrimitive(PrimitiveElement element,
                                     icon = qnSkin->icon("tab_bar/tab_prev.png");
                                     break;
                                 case PE_IndicatorArrowRight:
-                                    icon = qnSkin->icon("tab_bar/tab_next.png");
+                                    icon = qnSkin->icon("tab_bar/arrow_right_24.svg");
                                     break;
                                 default:
                                     break;
