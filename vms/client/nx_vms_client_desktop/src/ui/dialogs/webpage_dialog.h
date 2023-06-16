@@ -57,8 +57,9 @@ public:
 
 private:
     void updateTitle();
+    void updateText();
     void updateWarningLabel();
-    static QString getTypeTitle(QnWebPageResource::Options flags);
+    QString getTitle(QnWebPageResource::Options flags);
 
 private:
     CurrentSystemServers m_serversWatcher;
