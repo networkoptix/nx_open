@@ -685,6 +685,7 @@ Handle ServerConnection::addFileDownload(
 }
 
 Handle ServerConnection::addCamera(
+    const QnUuid& targetServerId,
     const nx::vms::api::DeviceModelForSearch& device,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrData<nx::vms::api::DeviceModelForSearch>>::type&& callback,
@@ -694,6 +695,8 @@ Handle ServerConnection::addCamera(
         prepareUrl(QString("/rest/v3/devices"), {}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(device));
+
+    proxyRequestUsingServer(request, targetServerId);
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
@@ -706,6 +709,7 @@ Handle ServerConnection::addCamera(
 }
 
 Handle ServerConnection::searchCamera(
+    const QnUuid& targetServerId,
     const nx::vms::api::DeviceSearch& deviceSearchData,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
@@ -715,6 +719,8 @@ Handle ServerConnection::searchCamera(
         prepareUrl(QString("/rest/v3/devices/*/searches/"), {}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(deviceSearchData));
+    
+    proxyRequestUsingServer(request, targetServerId);
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
@@ -727,6 +733,7 @@ Handle ServerConnection::searchCamera(
 }
 
 Handle ServerConnection::searchCameraStatus(
+    const QnUuid& targetServerId,
     const QnUuid& searchId,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
@@ -734,6 +741,8 @@ Handle ServerConnection::searchCameraStatus(
 {
     auto request = prepareRequest(nx::network::http::Method::get,
         prepareUrl(NX_FMT("/rest/v3/devices/*/searches/%1", searchId), {}));
+
+    proxyRequestUsingServer(request, targetServerId);
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
@@ -747,15 +756,24 @@ Handle ServerConnection::searchCameraStatus(
 
 Handle ServerConnection::searchCameraStop(
     const QnUuid& targetServerId,
-    const QnUuid& processUuid,
-    GetCallback callback,
+    const QnUuid& searchId,
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
 {
-    return executePost(
-        "/api/manualCamera/stop",
-        nx::network::rest::Params{{"uuid", processUuid.toString()}},
-        callback,
-        targetThread);
+    auto request = prepareRequest(nx::network::http::Method::delete_,
+        prepareUrl(NX_FMT("/rest/v3/devices/*/searches/%1", searchId), {}));
+
+    proxyRequestUsingServer(request, targetServerId);
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
 }
 
 Handle ServerConnection::executeAnalyticsAction(

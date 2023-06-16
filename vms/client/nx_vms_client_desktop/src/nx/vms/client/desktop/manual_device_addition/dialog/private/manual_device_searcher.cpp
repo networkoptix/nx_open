@@ -107,9 +107,10 @@ void ManualDeviceSearcher::stop()
         return;
 
     const auto stopCallback = nx::utils::guarded(this,
-        [this](bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& result)
+        [this](bool success, rest::Handle /*handle*/, rest::ServerConnection::ErrorOrEmpty result)
         {
-            if (!success || result.error != nx::network::rest::Result::NoError)
+            auto error = std::get_if<nx::network::rest::Result>(&result);
+            if (!success || (error && error->error != nx::network::rest::Result::NoError))
                 stop(); //< Try to stop one more time.
             else if (m_status.state != QnManualResourceSearchStatus::Finished)
                 abort();
@@ -118,6 +119,7 @@ void ManualDeviceSearcher::stop()
     connectedServerApi()->searchCameraStop(
         m_server->getId(),
         m_searchProcessId,
+        systemContext()->getSessionTokenHelper(),
         stopCallback,
         QThread::currentThread());
 }
@@ -227,7 +229,8 @@ void ManualDeviceSearcher::searchForDevices(
     else
         deviceSearchData.target = nx::vms::api::DeviceSearchIpRange{urlOrStartAddress, endAddress};
 
-    connectedServerApi()->searchCamera(deviceSearchData,
+    connectedServerApi()->searchCamera(m_server->getId(),
+        deviceSearchData,
         systemContext()->getSessionTokenHelper(),
         startCallback,
         QThread::currentThread());
@@ -312,7 +315,8 @@ void ManualDeviceSearcher::updateStatus()
             updateDevices(result->devices.value_or(std::vector<api::DeviceModelForSearch>{}));
         });
 
-    connectedServerApi()->searchCameraStatus(m_searchProcessId,
+    connectedServerApi()->searchCameraStatus(m_server->getId(),
+        m_searchProcessId,
         systemContext()->getSessionTokenHelper(),
         startCallback,
         QThread::currentThread());
