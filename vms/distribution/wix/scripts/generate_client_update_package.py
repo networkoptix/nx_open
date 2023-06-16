@@ -36,6 +36,7 @@ qt_libraries = [
     'QuickControls2Impl',
     'QuickLayouts',
     'QuickShapes',
+    'QuickEffects',
     'ShaderTools',
     'WebEngineCore',
     'WebEngineQuick',
