@@ -277,6 +277,7 @@ public:
 
 signals:
     void resourceAccessReset();
+    void permissionsDependencyChanged(const QnResourcePtr& resource);
 
 private:
     bool canCreateResourceInternal(
@@ -305,6 +306,9 @@ private:
         const QnUserResourcePtr& targetUser) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
         const nx::vms::api::UserGroupData& targetGroup) const;
+
+    void handleResourcesAdded(const QnResourceList& resources);
+    void handleResourcesRemoved(const QnResourceList& resources);
 
 private:
     const std::unique_ptr<nx::core::access::AccessRightsResolver> m_accessRightsResolver;

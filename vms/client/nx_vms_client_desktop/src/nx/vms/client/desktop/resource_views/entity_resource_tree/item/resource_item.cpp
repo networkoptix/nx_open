@@ -231,9 +231,6 @@ QVariant ResourceItem::resourceIconKeyData() const
 
                 m_connectionsGuard.add(layout->connect(layout, &QnResource::parentIdChanged,
                     discardIconCache));
-
-                m_connectionsGuard.add(layout->connect(layout, &QnLayoutResource::lockedChanged,
-                    discardIconCache));
             }
 
             if (m_resource->hasFlags(Qn::web_page))
