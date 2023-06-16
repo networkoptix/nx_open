@@ -1,18 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
-import QtQuick.Controls 2.14
-import QtQuick.Layouts 1.14
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
 
 Control
 {
     id: buttons
 
-    padding: 16
+    padding: 20
 
     property SwipeView pages: null
 
@@ -23,7 +23,7 @@ Control
         id: bar
 
         implicitWidth: prevButton.width + nextButton.width + closeButton.width + 16
-        implicitHeight: 20
+        implicitHeight: 24
 
         readonly property bool isFirstPage: pages && (pages.currentIndex === 0)
         readonly property bool isLastPage: pages && (pages.currentIndex === pages.count - 1)
@@ -79,20 +79,6 @@ Control
                 else
                     pages.incrementCurrentIndex()
             }
-        }
-
-        TextButton
-        {
-            id: closeButton
-
-            icon.source: "qrc:///skin/text_buttons/clear.png"
-            color: pressed || hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light9
-
-            anchors.verticalCenter: bar.verticalCenter
-            anchors.right: bar.right
-
-            onClicked:
-                buttons.closeRequested()
         }
     }
 }
