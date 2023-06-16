@@ -2,6 +2,8 @@
 
 #include "user_group_request_chain.h"
 
+#include <boost/iterator/transform_iterator.hpp>
+
 #include <api/server_rest_connection.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
@@ -147,12 +149,6 @@ void UserGroupRequestChain::requestSaveGroup(const UserGroupRequest::AddOrUpdate
                     systemContext()->userGroupManager()->find(
                         data.groupData.id).value_or(api::UserGroupData{});
 
-                if (!group.id.isNull() && group.parentGroupIds != data.originalParents)
-                {
-                    requestComplete(success);
-                    return; //< Already updated.
-                }
-
                 group.id = userGroup->id;
                 group.name = userGroup->name;
                 group.description = userGroup->description;
@@ -160,7 +156,8 @@ void UserGroupRequestChain::requestSaveGroup(const UserGroupRequest::AddOrUpdate
                 group.permissions = userGroup->permissions;
 
                 userGroupManager()->addOrUpdate(group);
-                updateResourceAccessRights(
+
+                updateLayoutSharing(
                     systemContext(), userGroup->id, userGroup->resourceAccessRights);
             }
             else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
@@ -248,22 +245,20 @@ void UserGroupRequestChain::requestUpdateUser(const UserGroupRequest::UpdateUser
         thread());
 }
 
-void UserGroupRequestChain::updateResourceAccessRights(
+void UserGroupRequestChain::updateLayoutSharing(
     nx::vms::client::desktop::SystemContext* systemContext,
     const QnUuid& id,
     const std::map<QnUuid, nx::vms::api::AccessRights>& accessRights)
 {
-    nx::core::access::ResourceAccessMap accessMap;
-    for (const auto& [k ,v]: accessRights)
-        accessMap.insert(k, v);
-
-    const auto accessRightsManager = systemContext->accessRightsManager();
-
-    // Layouts require special handling.
     const auto resourcePool = systemContext->resourcePool();
 
-    const auto layouts = resourcePool->getResourcesByIds(nx::utils::keyRange(accessMap))
-        .filtered<LayoutResource>(
+    const auto getKey = [](const auto& pair) { return pair.first; };
+
+    const auto keys = nx::utils::rangeAdapter(
+        boost::make_transform_iterator(accessRights.cbegin(), getKey),
+        boost::make_transform_iterator(accessRights.cend(), getKey));
+
+    const auto layouts = resourcePool->getResourcesByIds(keys).filtered<LayoutResource>(
         [](const QnLayoutResourcePtr& layout)
         {
             return !layout->isFile()
@@ -280,8 +275,6 @@ void UserGroupRequestChain::updateResourceAccessRights(
 
         resourceSystemContext->layoutSnapshotManager()->save(layout);
     }
-
-    accessRightsManager->setOwnResourceAccessMap(id, accessMap);
 }
 
 nx::vms::api::UserGroupModel UserGroupRequestChain::fromGroupId(const QnUuid& groupId)

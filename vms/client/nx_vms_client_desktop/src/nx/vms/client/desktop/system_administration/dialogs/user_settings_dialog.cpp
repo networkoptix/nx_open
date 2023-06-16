@@ -475,23 +475,20 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                     return;
                 }
 
-                if (!d->user || d->user->isNull())
-                {
-                    saveStateComplete(state);
-                    return;
-                }
-
                 if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
                 {
-                    auto user = *d->user;
-                    user->setName(data->name);
-                    user->setEmail(state.email);
-                    user->setFullName(state.fullName);
-                    user->setRawPermissions(state.globalPermissions);
-                    user->setEnabled(state.userEnabled);
-                    user->setGroupIds(data->groupIds);
-                    UserGroupRequestChain::updateResourceAccessRights(
-                        systemContext(), user->getId(), data->resourceAccessRights);
+                    if (auto user = d->user.value_or(QnUserResourcePtr{}))
+                    {
+                        user->setName(data->name);
+                        user->setEmail(state.email);
+                        user->setFullName(state.fullName);
+                        user->setRawPermissions(state.globalPermissions);
+                        user->setEnabled(state.userEnabled);
+                        user->setGroupIds(data->groupIds);
+                    }
+
+                    UserGroupRequestChain::updateLayoutSharing(
+                        systemContext(), data->id, data->resourceAccessRights);
                 }
 
                 saveStateComplete(state);
