@@ -207,6 +207,11 @@ public:
             return hasPermission(subject, target, Qn::ReadWriteSavePermission);
     }
 
+    bool hasAccessToAllCameras(
+        const Qn::UserAccessData& userAccessData,
+        nx::vms::api::AccessRights accessRights,
+        QnResourcePool* resourcePool) const;
+
 //-------------------------------------------------------------------------------------------------
 // Layout
 

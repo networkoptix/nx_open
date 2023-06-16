@@ -1104,3 +1104,22 @@ bool QnResourceAccessManager::canCreateWebPage(const QnResourceAccessSubject& su
     /* Only power users can add new web pages. */
     return hasPowerUserPermissions(subject);
 }
+
+bool QnResourceAccessManager::hasAccessToAllCameras(
+    const Qn::UserAccessData& userAccessData,
+    nx::vms::api::AccessRights accessRights,
+    QnResourcePool* resourcePool) const
+{
+    auto user =
+        resourcePool->getResourceById<QnUserResource>(userAccessData.userId);
+    if (!user)
+        return false;
+
+    if (user->isAdministrator())
+        return true;
+
+    return hasAccessRights(user,
+        nx::vms::api::kAllDevicesGroupId,
+        accessRights | nx::vms::api::AccessRight::view);
+}
+
