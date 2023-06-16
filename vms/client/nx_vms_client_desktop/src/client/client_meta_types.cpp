@@ -88,6 +88,7 @@
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
 #include <nx/vms/client/desktop/utils/mouse_spy.h>
 #include <nx/vms/client/desktop/utils/server_file_cache.h>
+#include <nx/vms/client/desktop/utils/session_aware_attached.h>
 #include <nx/vms/client/desktop/utils/upload_state.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_payload.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
@@ -272,6 +273,7 @@ void QnClientMetaTypes::registerQmlTypes()
     LookupListsDialog::registerQmlTypes();
     joystick::JoystickManager::registerQmlType();
     TimeDurationSuffixModel::registerQmlType();
+    SessionAware::registerQmlType();
 
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");

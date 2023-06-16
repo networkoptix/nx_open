@@ -66,6 +66,8 @@ Rectangle
         {
             transientParent: control.Window.window
 
+            SessionAware.onTryClose: reject()
+
             onAccepted:
             {
                 control.loginAttribute = loginAttribute
@@ -94,6 +96,8 @@ Rectangle
             property string initUri
             property string initAdminDn
             property string initPassword
+
+            SessionAware.onTryClose: reject()
 
             onAccepted:
             {
@@ -131,6 +135,8 @@ Rectangle
             self: control.self
             testState: control.testState
             testMessage: control.testMessage
+
+            SessionAware.onTryClose: reject()
 
             onAccepted:
             {
