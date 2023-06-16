@@ -142,7 +142,11 @@ bool CloudStreamSocket::connect(const SocketAddress& addr, std::chrono::millisec
     // CloudStreamSocket::shutdown() which also accesses both m_connectPromisePtr and m_isClosed.
     if (m_isClosed)
     {
-        m_connectPromisePtr.store(nullptr);
+        // NOTE: a concurrent thread may invoke shutdown or close setting the promise to signalled state.
+        // So, making sure the promise is always set to the signalled state and waiting on it.
+        if (auto promisePtr = m_connectPromisePtr.exchange(nullptr); promisePtr)
+            promisePtr->set_value(SystemError::badDescriptor);
+        promise.get_future().wait();
         SystemError::setLastErrorCode(SystemError::badDescriptor);
         return false;
     }
