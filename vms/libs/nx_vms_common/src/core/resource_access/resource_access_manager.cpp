@@ -1235,3 +1235,20 @@ bool QnResourceAccessManager::canCreateWebPage(const QnResourceAccessSubject& su
     /* Only admins can add new web pages. */
     return hasGlobalPermission(subject, GlobalPermission::admin);
 }
+
+bool QnResourceAccessManager::hasAccessToAllCameras(
+    const Qn::UserAccessData& userAccessData,
+    QnResourcePool* resourcePool) const
+{
+    auto user =
+        resourcePool->getResourceById<QnUserResource>(userAccessData.userId);
+    if (!user)
+        return false;
+
+    if (user->isOwner())
+        return true;
+
+    const auto permissions = globalPermissions(user);
+    return permissions & (GlobalPermission::admin | GlobalPermission::accessAllMedia);
+}
+
