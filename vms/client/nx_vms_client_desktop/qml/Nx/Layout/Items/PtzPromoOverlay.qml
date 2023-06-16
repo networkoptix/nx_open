@@ -1,12 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
-import QtQuick.Controls 2.14
-import QtQml.Models 2.11
+import QtQuick
+import QtQuick.Controls
+import QtQml.Models
 
-import Nx.Controls 1.0
+import Nx.Controls
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 Control
 {
@@ -86,8 +86,8 @@ Control
     {
         contentItem: Item
         {
-            implicitWidth: 272
-            implicitHeight: Math.max(240, pages.implicitHeight)
+            implicitWidth: 280
+            implicitHeight: 240
 
             PromoPages
             {
@@ -112,7 +112,7 @@ Control
                             imageUrl: model.imageUrl
                             title: model.title
                             text: model.text
-                            verticalAlignment: model.imageUrl ? Qt.AlignTop : Qt.AlignVCenter
+                            verticalAlignment: model.imageUrl ? Qt.AlignVCenter : Qt.AlignTop
                         }
                     }
                 }

@@ -1,9 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
+import QtQuick
+import QtQuick.Layouts
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
 
 Item
 {
@@ -16,38 +17,38 @@ Item
     property int verticalAlignment: Qt.AlignTop
 
     implicitWidth: content.implicitWidth
-    implicitHeight: content.implicitHeight
+    implicitHeight: 120
 
-    Column
+    ColumnLayout
     {
         id: content
 
-        spacing: 8
+        anchors.top: ((promoPage.verticalAlignment & Qt.AlignTop)
+            || (promoPage.verticalAlignment & Qt.AlignVCenter)
+            || !promoPage.verticalAlignment)
+                ? parent.top
+                : undefined
+
+        anchors.bottom: ((promoPage.verticalAlignment & Qt.AlignBottom)
+            || (promoPage.verticalAlignment & Qt.AlignVCenter))
+                ? parent.bottom
+                : undefined
 
         width: promoPage.width
 
-        anchors.top: (promoPage.verticalAlignment & Qt.AlignTop) || !promoPage.verticalAlignment
-            ? promoPage.top
-            : undefined
-
-        anchors.bottom: promoPage.verticalAlignment & Qt.AlignBottom
-            ? promoPage.bottom
-            : undefined
-
-        anchors.verticalCenter: promoPage.verticalAlignment & Qt.AlignVCenter
-            ? promoPage.verticalCenter
-            : undefined
+        spacing: 8
 
         Text
         {
             id: titleItem
 
+            Layout.fillWidth: true
+
             topPadding: 8
             bottomPadding: imageItem.source ? 0 : 8
-            width: promoPage.width
             horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
 
+            wrapMode: Text.Wrap
             font.weight: Font.Medium
             font.pixelSize: 16
 
@@ -59,10 +60,13 @@ Item
         {
             id: imageItem
 
-            sourceSize: Qt.size(240, 120)
-            width: promoPage.width
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
             horizontalAlignment: Text.AlignHCenter
-            fillMode: Image.Pad
+
+            fillMode: Image.PreserveAspectFit
+
             visible: source != ""
         }
 
@@ -70,14 +74,15 @@ Item
         {
             id: textItem
 
-            width: promoPage.width
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
+            Layout.fillWidth: true
 
+            horizontalAlignment: Text.AlignHCenter
+
+            wrapMode: Text.Wrap
             font.weight: Font.Normal
             font.pixelSize: 13
-
             color: ColorTheme.colors.light4
+
             visible: !!text
         }
     }
