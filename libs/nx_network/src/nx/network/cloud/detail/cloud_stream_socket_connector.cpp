@@ -19,8 +19,7 @@ CloudStreamSocketConnector::CloudStreamSocketConnector(
 
 CloudStreamSocketConnector::~CloudStreamSocketConnector()
 {
-    if (isInSelfAioThread())
-        pleaseStopSync();
+    pleaseStopSync();
 }
 
 void CloudStreamSocketConnector::connect(
