@@ -324,6 +324,8 @@ Item
 
                                 PasswordChangeDialog
                                 {
+                                    id: dialog
+
                                     transientParent: control.Window.window
                                     visible: false
 
@@ -336,6 +338,12 @@ Item
                                     onAccepted:
                                     {
                                         control.password = newPassword
+                                    }
+
+                                    Connections
+                                    {
+                                        target: control.Window.window
+                                        function onClosing() { dialog.reject() }
                                     }
                                 }
                             }
@@ -367,6 +375,8 @@ Item
 
                             PasswordChangeDialog
                             {
+                                id: dialog
+
                                 transientParent: control.Window.window
                                 visible: false
 
@@ -383,6 +393,12 @@ Item
                                 {
                                     allowInsecureCheckBox.checked = true
                                     control.password = newPassword
+                                }
+
+                                Connections
+                                {
+                                    target: control.Window.window
+                                    function onClosing() { dialog.reject() }
                                 }
                             }
                         }
