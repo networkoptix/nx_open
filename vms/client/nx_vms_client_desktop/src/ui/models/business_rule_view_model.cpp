@@ -18,6 +18,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/utils/std_helpers.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -31,8 +32,8 @@
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/event/events/events.h>
@@ -71,12 +72,6 @@ QSet<QnUuid> toIdSet(const QVector<QnUuid>& src)
 QSet<QnUuid> toIds(const QnResourceList& resources)
 {
     return nx::utils::toQSet(resources.ids());
-}
-
-template<typename List>
-inline std::vector<QnUuid> toStdVector(const List& values)
-{
-    return {values.cbegin(), values.cend()};
 }
 
 QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, vms::api::EventType eventType)
@@ -247,7 +242,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     for (const auto actionType: lexComparator.lexSortedActions(clientActions))
         addActionItem(actionType);
 
-    m_actionParams.additionalResources = toStdVector(nx::vms::api::kAllPowerUserGroupIds);
+    m_actionParams.additionalResources = nx::toStdVector(nx::vms::api::kAllPowerUserGroupIds);
 
     updateActionTypesModel();
     updateEventStateModel();
@@ -770,7 +765,7 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
 
         actionParams.allUsers = false;
         actionParams.additionalResources = additionalUserIsRequired
-            ? toStdVector(nx::vms::api::kAllPowerUserGroupIds)
+            ? nx::toStdVector(nx::vms::api::kAllPowerUserGroupIds)
             : std::vector<QnUuid>();
 
         switch (m_actionType)

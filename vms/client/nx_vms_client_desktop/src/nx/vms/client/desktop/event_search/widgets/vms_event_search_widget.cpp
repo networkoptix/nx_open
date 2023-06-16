@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "event_search_widget.h"
+#include "vms_event_search_widget.h"
 
 #include <algorithm>
 #include <chrono>
@@ -12,8 +12,6 @@
 #include <QtGui/QAction>
 #include <QtWidgets/QMenu>
 
-#include <client/client_module.h>
-#include <client/client_runtime_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -22,50 +20,54 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
-#include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
+#include <nx/vms/client/desktop/event_search/models/vms_event_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
-#include <nx/vms/event/event_fwd.h>
-#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/events/analytics_event.h>
+#include <nx/vms/rules/group.h>
+#include <nx/vms/rules/manifest.h>
+#include <nx/vms/rules/utils/type.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
-using namespace std::chrono;
-
 namespace nx::vms::client::desktop {
 
+using namespace std::chrono;
+using namespace nx::vms::rules;
+
+namespace {
+
+static const auto kAnalyticsEventType = utils::type<AnalyticsEvent>();
+
+} // namespace
+
 // ------------------------------------------------------------------------------------------------
-// EventSearchWidget::Private
+// VmsEventSearchWidget::Private
 
-class EventSearchWidget::Private: public QObject
+class VmsEventSearchWidget::Private: public QObject
 {
-    Q_DECLARE_TR_FUNCTIONS(EventSearchWidget::Private)
-    EventSearchWidget* const q;
+    VmsEventSearchWidget* const q;
     SelectableTextButton* const m_typeSelectionButton;
-    EventSearchListModel* const m_eventModel;
-
-    using EventType = nx::vms::api::EventType;
+    VmsEventSearchListModel* const m_eventModel;
 
 public:
-    Private(EventSearchWidget* q);
+    Private(VmsEventSearchWidget* q);
     void resetType();
 
 private:
     void setupTypeSelection();
+    QMenu* createEventGroupMenu(const nx::vms::rules::Group& group);
 
     QAction* addMenuAction(
         QMenu* menu,
         const QString& title,
-        EventType type,
-        const QString& subType = QString(),
+        const QString& type,
+        const QString& subType = {},
         bool dynamicTitle = false) const;
-
-    QMenu* createDeviceIssuesMenu(QWidget* parent) const;
-    QMenu* createServerEventsMenu(QWidget* parent) const;
 
     void updateServerEventsMenu();
     void updateAnalyticsMenu();
@@ -76,42 +78,34 @@ private:
 
     QAction* m_analyticsEventsSubmenuAction = nullptr;
     QAction* m_analyticsEventsSingleAction = nullptr;
-
-    using EventTypeDescriptors = std::map<QString, nx::vms::api::analytics::EventTypeDescriptor>;
-    struct EngineInfo
-    {
-        QString name;
-        EventTypeDescriptors eventTypes;
-
-        bool operator<(const EngineInfo& other) const
-        {
-            QCollator collator;
-            collator.setNumericMode(true);
-            collator.setCaseSensitivity(Qt::CaseInsensitive);
-            return collator.compare(name, other.name) < 0;
-        }
-    };
 };
 
-EventSearchWidget::Private::Private(EventSearchWidget* q):
+VmsEventSearchWidget::Private::Private(VmsEventSearchWidget* q):
     q(q),
     m_typeSelectionButton(q->createCustomFilterButton()),
-    m_eventModel(qobject_cast<EventSearchListModel*>(q->model()))
+    m_eventModel(qobject_cast<VmsEventSearchListModel*>(q->model()))
 {
     NX_ASSERT(m_eventModel);
 
     setupTypeSelection();
 
     const auto updateServerEventsMenuIfNeeded =
-        [this](const QnResourcePtr& resource)
+        [this](const QnResourceList& resources)
         {
-            if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
-                updateServerEventsMenu();
+            if (std::any_of(
+                resources.begin(),
+                resources.end(),
+                [this](const QnResourcePtr& resource) {
+                    return resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake);
+                }))
+                {
+                    updateServerEventsMenu();
+                }
         };
 
-    connect(q->resourcePool(), &QnResourcePool::resourceAdded,
+    connect(q->resourcePool(), &QnResourcePool::resourcesAdded,
         this, updateServerEventsMenuIfNeeded);
-    connect(q->resourcePool(), &QnResourcePool::resourceRemoved,
+    connect(q->resourcePool(), &QnResourcePool::resourcesRemoved,
         this, updateServerEventsMenuIfNeeded);
 
     const auto updateAnalyticsMenuIfEventModelIsOnline =
@@ -143,61 +137,36 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
             m_serverEventsSubmenuAction->setEnabled(serverEventsVisible);
 
-            const bool isServerEvent = nx::vms::event::parentEvent(
-                m_eventModel->selectedEventType()) == EventType::anyServerEvent;
+            const bool isServerEvent =
+                m_eventModel->selectedEventType() == kServerIssueEventGroup;
 
             if (isServerEvent)
                 resetType();
         });
 
     connect(q->accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
-        q, &EventSearchWidget::updateAllowance);
+        q, &VmsEventSearchWidget::updateAllowance);
 
     connect(q->model(), &AbstractSearchListModel::isOnlineChanged,
-        q, &EventSearchWidget::updateAllowance);
+        q, &VmsEventSearchWidget::updateAllowance);
 }
 
-void EventSearchWidget::Private::resetType()
+void VmsEventSearchWidget::Private::resetType()
 {
     m_typeSelectionButton->deactivate();
 }
 
-void EventSearchWidget::Private::setupTypeSelection()
+void VmsEventSearchWidget::Private::setupTypeSelection()
 {
     using namespace nx::vms::event;
 
     m_typeSelectionButton->setIcon(qnSkin->icon("text_buttons/event_rules.png"));
 
-    auto eventFilterMenu = q->createDropdownMenu();
-    auto analyticsEventsMenu = q->createDropdownMenu();
+    auto eventFilterMenu =
+        createEventGroupMenu(q->systemContext()->vmsRulesEngine()->eventGroups());
+    auto defaultAction = eventFilterMenu->actions()[0];
 
-    analyticsEventsMenu->setTitle(tr("Analytics events"));
-
-    StringsHelper helper(q->systemContext());
-
-    auto defaultAction = addMenuAction(
-        eventFilterMenu, tr("Any event"), EventType::undefinedEvent);
-
-    eventFilterMenu->addSeparator();
-
-    m_analyticsEventsSubmenuAction = eventFilterMenu->addMenu(analyticsEventsMenu);
-    m_analyticsEventsSubmenuAction->setVisible(false);
-
-    for (const auto type: allEvents())
-    {
-        if (parentEvent(type) == EventType::anyEvent && type != EventType::analyticsSdkEvent)
-            addMenuAction(eventFilterMenu, helper.eventName(type), type);
-    }
-
-    m_analyticsEventsSingleAction = addMenuAction(eventFilterMenu,
-        helper.eventName(EventType::analyticsSdkEvent), EventType::analyticsSdkEvent);
-
-    eventFilterMenu->addSeparator();
-    q->addDeviceDependentAction(eventFilterMenu->addMenu(createDeviceIssuesMenu(eventFilterMenu)),
-        tr("Device issues"), tr("Camera issues"));
-
-    m_serverEventsSubmenuAction =
-        eventFilterMenu->addMenu(createServerEventsMenu(eventFilterMenu));
+    m_typeSelectionButton->setMenu(eventFilterMenu);
 
     connect(m_typeSelectionButton, &SelectableTextButton::stateChanged, this,
         [defaultAction](SelectableTextButton::State state)
@@ -207,13 +176,63 @@ void EventSearchWidget::Private::setupTypeSelection()
         });
 
     defaultAction->trigger();
-    m_typeSelectionButton->setMenu(eventFilterMenu);
 }
 
-QAction* EventSearchWidget::Private::addMenuAction(
+QMenu* VmsEventSearchWidget::Private::createEventGroupMenu(const Group& group)
+{
+    // TODO: #amalov Device dependent headers.
+    static const auto groupHeaders = QMap<std::string, QString>{
+        {"", tr("Any event")},
+        {kDeviceIssueEventGroup, tr("Camera issues")},
+        {kServerIssueEventGroup, tr("Server events")},
+    };
+
+    const auto engine = q->context()->systemContext()->vmsRulesEngine();
+    auto result = q->createDropdownMenu();
+
+    addMenuAction(result, group.name, QString::fromStdString(group.id));
+    result->addSeparator();
+
+    for (const auto& eventId: group.items)
+    {
+        auto eventAction =
+            addMenuAction(result, engine->eventDescriptor(eventId)->displayName, eventId);
+
+        // Creating analytics events submenu for active event types.
+        if (eventId == rules::utils::type<AnalyticsEvent>())
+        {
+            m_analyticsEventsSingleAction = eventAction;
+
+            auto analyticsEventsMenu = q->createDropdownMenu();
+            analyticsEventsMenu->setTitle(tr("Analytics events"));
+
+            m_analyticsEventsSubmenuAction = result->addMenu(analyticsEventsMenu);
+            m_analyticsEventsSubmenuAction->setVisible(false);
+        }
+    }
+
+    result->addSeparator();
+
+    for (const auto& subGroup : group.groups)
+    {
+        auto groupMenu = createEventGroupMenu(subGroup);
+
+        if (subGroup.id == kServerIssueEventGroup)
+            m_serverEventsSubmenuAction = groupMenu->menuAction();
+        else if (subGroup.id == kDeviceIssueEventGroup)
+            m_cameraIssuesSubmenuAction = groupMenu->menuAction();
+
+        result->addMenu(groupMenu);
+    }
+
+    result->setTitle(groupHeaders.value(group.id));
+    return result;
+}
+
+QAction* VmsEventSearchWidget::Private::addMenuAction(
     QMenu* menu,
     const QString& title,
-    EventType type,
+    const QString& type,
     const QString& subType,
     bool dynamicTitle) const
 {
@@ -222,7 +241,7 @@ QAction* EventSearchWidget::Private::addMenuAction(
         [this, action, type, subType]()
         {
             m_typeSelectionButton->setText(action->text());
-            m_typeSelectionButton->setState(type == EventType::undefinedEvent
+            m_typeSelectionButton->setState(type.isEmpty()
                 ? SelectableTextButton::State::deactivated
                 : SelectableTextButton::State::unselected);
 
@@ -246,57 +265,31 @@ QAction* EventSearchWidget::Private::addMenuAction(
     return action;
 }
 
-QMenu* EventSearchWidget::Private::createDeviceIssuesMenu(QWidget* parent) const
+void VmsEventSearchWidget::Private::updateServerEventsMenu()
 {
-    auto menu = new QMenu(parent);
-    menu->setProperty(style::Properties::kMenuAsDropdown, true);
-    menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    NX_ASSERT(m_serverEventsSubmenuAction);
+    auto serverMenu = m_serverEventsSubmenuAction->menu();
 
-    q->addDeviceDependentAction(
-        addMenuAction(menu, QString(), vms::api::EventType::anyCameraEvent, QString(), true),
-        tr("Any device issue"),
-        tr("Any camera issue"));
+    const auto eventGroups = q->systemContext()->vmsRulesEngine()->eventGroups();
+    const auto serverGroup = eventGroups.findGroup(kServerIssueEventGroup);
+    NX_ASSERT(serverGroup);
 
-    menu->addSeparator();
+    WidgetUtils::clearMenu(serverMenu);
 
-    nx::vms::event::StringsHelper stringsHelper(q->systemContext());
-    for (const auto type: nx::vms::event::childEvents(EventType::anyCameraEvent))
-        addMenuAction(menu, stringsHelper.eventName(type), type);
+    // TODO: #amalov Check action availability (nvr presence).
+    // It may be easier just to hide unavailable events.
+    auto newMenu = createEventGroupMenu(*serverGroup);
+    for (auto action : newMenu->actions())
+    {
+        action->setParent(serverMenu);
+        serverMenu->addAction(action);
+    }
 
-    return menu;
+    WidgetUtils::clearMenu(newMenu);
+    newMenu->deleteLater();
 }
 
-QMenu* EventSearchWidget::Private::createServerEventsMenu(QWidget* parent) const
-{
-    auto menu = new QMenu(parent);
-    menu->setProperty(style::Properties::kMenuAsDropdown, true);
-    menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-
-    menu->setTitle(tr("Server events"));
-
-    addMenuAction(menu, tr("Any server event"), EventType::anyServerEvent);
-    menu->addSeparator();
-
-    const auto accessibleServerEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
-        nx::vms::event::childEvents(EventType::anyServerEvent), q->resourcePool());
-
-    nx::vms::event::StringsHelper stringsHelper(q->systemContext());
-    for (const auto type: accessibleServerEvents)
-        addMenuAction(menu, stringsHelper.eventName(type), type);
-
-    return menu;
-}
-
-void EventSearchWidget::Private::updateServerEventsMenu()
-{
-    m_typeSelectionButton->menu()->removeAction(m_serverEventsSubmenuAction);
-    m_serverEventsSubmenuAction->menu()->deleteLater();
-    m_serverEventsSubmenuAction->deleteLater();
-    m_serverEventsSubmenuAction = m_typeSelectionButton->menu()->insertMenu(
-        m_cameraIssuesSubmenuAction, createServerEventsMenu(m_typeSelectionButton->menu()));
-}
-
-void EventSearchWidget::Private::updateAnalyticsMenu()
+void VmsEventSearchWidget::Private::updateAnalyticsMenu()
 {
     NX_ASSERT(m_analyticsEventsSubmenuAction && m_analyticsEventsSingleAction);
 
@@ -316,8 +309,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
                 // Leaf node - event type.
                 if (node->nodeType == NodeType::eventType)
                 {
-                    addMenuAction(parent, node->text, EventType::analyticsSdkEvent,
-                        node->entityId);
+                    addMenuAction(parent, node->text, kAnalyticsEventType, node->entityId);
 
                     if (!currentSelectionStillAvailable
                         && currentSelection == node->entityId)
@@ -346,8 +338,6 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
 
     if (NX_ASSERT(analyticsMenu))
     {
-        using namespace nx::vms::event;
-
         auto analyticsEventsSearchTreeBuilder =
             q->context()->findInstance<AnalyticsEventsSearchTreeBuilder>();
 
@@ -357,11 +347,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
 
         if (!root->children.empty())
         {
-            addMenuAction(
-                analyticsMenu,
-                tr("Any analytics event"),
-                EventType::analyticsSdkEvent,
-                {});
+            addMenuAction(analyticsMenu, tr("Any analytics event"), kAnalyticsEventType, {});
 
             analyticsMenu->addSeparator();
             addItemRecursive(analyticsMenu, root);
@@ -377,43 +363,43 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
 }
 
 // ------------------------------------------------------------------------------------------------
-// EventSearchWidget
+// VmsEventSearchWidget
 
-EventSearchWidget::EventSearchWidget(QnWorkbenchContext* context, QWidget* parent):
-    base_type(context, new EventSearchListModel(context), parent),
+VmsEventSearchWidget::VmsEventSearchWidget(QnWorkbenchContext* context, QWidget* parent):
+    base_type(context, new VmsEventSearchListModel(context), parent),
     d(new Private(this))
 {
     setRelevantControls(Control::cameraSelector | Control::timeSelector | Control::previewsToggler);
     setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/events.svg"));
 }
 
-EventSearchWidget::~EventSearchWidget()
+VmsEventSearchWidget::~VmsEventSearchWidget()
 {
     // Required here for forward-declared scoped pointer destruction.
 }
 
-void EventSearchWidget::resetFilters()
+void VmsEventSearchWidget::resetFilters()
 {
     base_type::resetFilters();
     d->resetType();
 }
 
-QString EventSearchWidget::placeholderText(bool /*constrained*/) const
+QString VmsEventSearchWidget::placeholderText(bool /*constrained*/) const
 {
     return makePlaceholderText(tr("No events"),
         tr("Try changing the filters or create an Event Rule"));
 }
 
-QString EventSearchWidget::itemCounterText(int count) const
+QString VmsEventSearchWidget::itemCounterText(int count) const
 {
     return tr("%n events", "", count);
 }
 
-bool EventSearchWidget::calculateAllowance() const
+bool VmsEventSearchWidget::calculateAllowance() const
 {
     return model()->isOnline()
         && accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewLogs)
-        && systemContext()->vmsRulesEngine()->isOldEngineEnabled();
+        && systemContext()->vmsRulesEngine()->isEnabled();
 }
 
 } // namespace nx::vms::client::desktop

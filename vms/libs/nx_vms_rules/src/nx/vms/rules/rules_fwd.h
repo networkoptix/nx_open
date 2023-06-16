@@ -27,6 +27,7 @@ class Router;
 
 struct FieldDescriptor;
 struct ItemDescriptor;
+struct Group;
 
 using EventPtr = QSharedPointer<BasicEvent>;
 using ActionPtr = QSharedPointer<BasicAction>;

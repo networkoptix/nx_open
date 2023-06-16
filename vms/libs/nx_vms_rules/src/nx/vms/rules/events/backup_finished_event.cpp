@@ -2,6 +2,7 @@
 
 #include "backup_finished_event.h"
 
+#include "../group.h"
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
@@ -36,6 +37,7 @@ const ItemDescriptor& BackupFinishedEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<BackupFinishedEvent>(),
+        .groupId = kServerIssueEventGroup,
         .displayName = tr("Backup Finished"),
         .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/backup_finished.mustache"

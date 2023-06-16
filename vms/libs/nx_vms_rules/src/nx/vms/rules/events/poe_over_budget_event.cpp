@@ -5,6 +5,7 @@
 #include <nx/vms/common/html/html.h>
 
 #include "../event_filter_fields/source_server_field.h"
+#include "../group.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
@@ -94,6 +95,8 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PoeOverBudgetEvent>(),
+
+        .groupId = kServerIssueEventGroup,
         .displayName = tr("PoE Over Budget"),
         .flags = ItemFlag::prolonged,
         .fields = {

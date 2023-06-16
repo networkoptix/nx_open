@@ -53,6 +53,7 @@
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/user_group_model.h>
 #include <nx/vms/api/data/user_model.h>
+#include <nx/vms/api/rules/event_log_fwd.h>
 #include <nx/vms/auth/auth_result.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
@@ -381,6 +382,12 @@ public:
 
     Handle getEvents(const QnEventLogMultiserverRequestData& request,
         Result<EventLogData>::type callback,
+        QThread* targetThread = nullptr);
+
+    Handle eventLog(
+        QnUuid serverId,
+        const nx::vms::api::rules::EventLogFilter& filter,
+        Result<ErrorOrData<nx::vms::api::rules::EventLogRecordList>>::type callback,
         QThread* targetThread = nullptr);
 
     /* Get camera credentials. */

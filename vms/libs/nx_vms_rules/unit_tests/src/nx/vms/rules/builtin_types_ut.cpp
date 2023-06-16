@@ -13,6 +13,7 @@
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
+#include <nx/vms/rules/group.h>
 #include <nx/vms/rules/plugin.h>
 #include <nx/vms/rules/utils/serialization.h>
 
@@ -30,6 +31,20 @@ public:
     BuiltinTypesTest(): TestEngineHolder(context()->systemContext())
     {
         initialize(engine.get());
+    }
+
+    bool testGroupValidity(const std::string& id, const Group& group)
+    {
+        if (id == group.id)
+            return true;
+
+        for (const auto& g : group.groups)
+        {
+            if (testGroupValidity(id, g))
+                return true;
+        }
+
+        return false;
     }
 
     template<class T>
@@ -138,6 +153,9 @@ public:
 
         testManifestValidity<T>();
         testPermissionsValidity<T>();
+
+        SCOPED_TRACE(nx::format("Group id: %1", manifest.groupId).toStdString());
+        EXPECT_TRUE(testGroupValidity(manifest.groupId, defaultEventGroups()));
 
         // Check if all fields are registered.
         for (const auto& field : manifest.fields)

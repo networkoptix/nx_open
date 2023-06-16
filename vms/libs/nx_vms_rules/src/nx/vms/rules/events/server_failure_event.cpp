@@ -2,6 +2,7 @@
 
 #include "server_failure_event.h"
 
+#include "../group.h"
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
@@ -72,6 +73,7 @@ const ItemDescriptor& ServerFailureEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ServerFailureEvent>(),
+        .groupId = kServerIssueEventGroup,
         .displayName = tr("Server Failure"),
         .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/mediaserver_failure.mustache"

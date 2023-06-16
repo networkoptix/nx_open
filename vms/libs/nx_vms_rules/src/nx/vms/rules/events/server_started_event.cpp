@@ -2,6 +2,7 @@
 
 #include "server_started_event.h"
 
+#include "../group.h"
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
@@ -42,6 +43,7 @@ const ItemDescriptor& ServerStartedEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ServerStartedEvent>(),
+        .groupId = kServerIssueEventGroup,
         .displayName = tr("Server Started"),
         .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/mediaserver_started.mustache"

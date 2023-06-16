@@ -4,6 +4,7 @@
 
 #include <nx/utils/range_adapters.h>
 
+#include "../group.h"
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
@@ -69,6 +70,7 @@ const ItemDescriptor& ServerConflictEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<ServerConflictEvent>(),
+        .groupId = kServerIssueEventGroup,
         .displayName = tr("Server Conflict"),
         .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/mediaserver_conflict.mustache"

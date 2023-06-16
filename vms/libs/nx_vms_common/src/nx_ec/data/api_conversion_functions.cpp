@@ -20,6 +20,7 @@
 #include <nx/network/app_info.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/std_helpers.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
@@ -50,12 +51,6 @@ namespace {
 
 template<typename T>
 QVector<T> fromStdVector(const std::vector<T>& v)
-{
-    return {v.begin(), v.end()};
-}
-
-template<typename T>
-std::vector<T> toStdVector(const QVector<T>& v)
 {
     return {v.begin(), v.end()};
 }
@@ -94,8 +89,8 @@ void fromResourceToApi(const vms::event::RulePtr& src, EventRuleData& dst)
     dst.id = src->id();
     dst.eventType = src->eventType();
 
-    dst.eventResourceIds = toStdVector(src->eventResources());
-    dst.actionResourceIds = toStdVector(src->actionResources());
+    dst.eventResourceIds = nx::toStdVector(src->eventResources());
+    dst.actionResourceIds = nx::toStdVector(src->actionResources());
 
     dst.eventCondition = QJson::serialized(src->eventParams());
     dst.actionParams = QJson::serialized(src->actionParams());
@@ -134,7 +129,7 @@ void fromResourceToApi(const vms::event::AbstractActionPtr& src, EventActionData
     dst.actionType = src->actionType();
     dst.toggleState = src->getToggleState();
     dst.receivedFromRemoteHost = src->isReceivedFromRemoteHost();
-    dst.resourceIds = toStdVector(src->getResources());
+    dst.resourceIds = nx::toStdVector(src->getResources());
 
     dst.params = QJson::serialized(src->getParams());
     dst.runtimeParams = QJson::serialized(src->getRuntimeParams());

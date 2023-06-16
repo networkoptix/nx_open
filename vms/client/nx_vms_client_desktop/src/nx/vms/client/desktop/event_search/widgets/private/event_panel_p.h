@@ -74,6 +74,7 @@ private:
     SimpleMotionSearchWidget* m_motionTab = nullptr;
     OverlappableSearchWidget* m_bookmarksTab = nullptr;
     OverlappableSearchWidget* m_eventsTab = nullptr;
+    OverlappableSearchWidget* m_vmsEventsTab = nullptr;
     OverlappableSearchWidget* m_analyticsTab = nullptr;
 
     QList<SynchronizerData> m_synchronizers;
