@@ -138,6 +138,10 @@ public:
             return hasPermission(subject, target, Qn::ReadWriteSavePermission);
     }
 
+    bool hasAccessToAllCameras(
+        const Qn::UserAccessData& userAccessData,
+        QnResourcePool* resourcePool) const;
+
 //-------------------------------------------------------------------------------------------------
 // Layout
 
