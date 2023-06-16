@@ -16,13 +16,13 @@ namespace nx::vms::api::rules {
 struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
 {
     /**%apidoc[opt] List of event resource flexible ids. */
-    nx::vms::api::json::ValueOrArray<QString> eventResourceId;
+    std::optional<nx::vms::api::json::ValueOrArray<QString>> eventResourceId;
 
     /**%apidoc[opt]
      * List of event types. See /rest/v{3-}/events/manifest/events for event manifests
      * with possible event types.
      */
-    nx::vms::api::json::ValueOrArray<QString> eventType;
+    std::optional<nx::vms::api::json::ValueOrArray<QString>> eventType;
 
     /**%apidoc[opt]
      * Event subtype, for advanced analytics event filtering.
@@ -36,7 +36,7 @@ struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
      * List of action types. See /rest/v{3-}/events/manifest/actions for action manifests
      * with possible action types.
      */
-    nx::vms::api::json::ValueOrArray<QString> actionType;
+    std::optional<nx::vms::api::json::ValueOrArray<QString>> actionType;
 
     /**%apidoc[opt] VMS Rule id. */
     QnUuid ruleId;
@@ -60,11 +60,16 @@ struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
     EventLogFilter():
         ServerTimePeriod(ServerTimePeriod::infinite())
     {}
+
+    EventLogFilter(const ServerTimePeriod& period):
+        ServerTimePeriod(period)
+    {}
 };
 
 #define EventLogFilter_Fields \
     ServerTimePeriod_Fields(eventResourceId)(eventType)(eventSubtype)(actionType)(ruleId)(text)(eventsOnly)(order)(limit)
 
+NX_REFLECTION_INSTRUMENT(EventLogFilter, EventLogFilter_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(EventLogFilter, (json), NX_VMS_API)
 
 struct NX_VMS_API EventLogRecord
@@ -92,6 +97,7 @@ struct NX_VMS_API EventLogRecord
 #define EventLogRecord_Fields \
     (timestampMs)(eventData)(actionData)(aggregationCount)(ruleId)
 
+NX_REFLECTION_INSTRUMENT(EventLogRecord, EventLogRecord_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(sql_record), NX_VMS_API)
 
 } // namespace nx::vms::rules

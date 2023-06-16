@@ -8,6 +8,7 @@
 #include <nx/vms/common/system_context.h>
 
 #include "../event_filter_fields/source_camera_field.h"
+#include "../group.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
@@ -88,6 +89,7 @@ const ItemDescriptor& DeviceDisconnectedEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceDisconnectedEvent>(),
+        .groupId = kDeviceIssueEventGroup,
         .displayName = tr("Device Disconnected"),
         .description = "",
         .flags = {ItemFlag::aggregationByTypeSupported},

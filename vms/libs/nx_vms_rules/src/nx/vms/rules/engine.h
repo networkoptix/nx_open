@@ -107,6 +107,7 @@ public:
      * @return Event description by event id if the event is registered, std::nullopt otherwise.
      */
     std::optional<ItemDescriptor> eventDescriptor(const QString& id) const;
+    Group eventGroups() const;
 
     /**
     * Builds an event from the eventData and returns it.

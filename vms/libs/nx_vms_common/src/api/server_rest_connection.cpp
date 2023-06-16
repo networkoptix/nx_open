@@ -2,9 +2,9 @@
 
 #include "server_rest_connection.h"
 
-#include <QtNetwork/QAuthenticator>
-
 #include <atomic>
+
+#include <QtNetwork/QAuthenticator>
 
 #include <api/helpers/chunks_request_data.h>
 #include <api/helpers/empty_request_data.h>
@@ -32,9 +32,11 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/reflect/json.h>
 #include <nx/reflect/string_conversion.h>
+#include <nx/reflect/urlencoded/serializer.h>
 #include <nx/utils/buffer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/vms/api/analytics/device_agent_active_setting_changed_request.h>
 #include <nx/vms/api/analytics/device_agent_settings_request.h>
@@ -43,6 +45,7 @@
 #include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/api/data/storage_encryption_data.h>
 #include <nx/vms/api/data/system_information.h>
+#include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/common/api/helpers/parser_helper.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
@@ -252,6 +255,12 @@ rest::ServerConnection::Result<nx::network::rest::JsonResult>::type extractJsonR
         {
             callback(success, requestId, result.deserialized<T>());
         };
+}
+
+// Returns '*' on null id.
+QString formatRestId(QnUuid id)
+{
+    return id.isNull() ? QString("*") : id.toSimpleString();
 }
 
 std::map<nx::vms::api::PeerType, QString> peerTypeToUserAgentDict = {
@@ -1164,6 +1173,25 @@ Handle ServerConnection::getEvents(const QnEventLogMultiserverRequestData& reque
     QThread* targetThread)
 {
     return executeGet(lit("/ec2/getEvents"), request.toParams(), callback, targetThread);
+}
+
+Handle ServerConnection::eventLog(
+    QnUuid serverId,
+    const nx::vms::api::rules::EventLogFilter& filter,
+    Result<ErrorOrData<nx::vms::api::rules::EventLogRecordList>>::type callback,
+    QThread* targetThread)
+{
+    QJsonValue value;
+    QJson::serialize(filter, &value);
+    NX_ASSERT(value.isObject());
+    auto params = nx::network::rest::Params::fromJson(value.toObject());
+    params.remove("serverId");
+
+    return executeGet(
+        NX_FMT("rest/v3/servers/%1/eventLog", formatRestId(serverId)),
+        params,
+        std::move(callback),
+        targetThread);
 }
 
 Handle ServerConnection::getCameraCredentials(

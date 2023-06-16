@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/common/system_context.h>
 
+#include "../group.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
@@ -140,6 +141,7 @@ const ItemDescriptor& NetworkIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<NetworkIssueEvent>(),
+        .groupId = kDeviceIssueEventGroup,
         .displayName = tr("Network Issue"),
         .flags = {ItemFlag::aggregationByTypeSupported},
         .permissions = {

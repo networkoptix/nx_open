@@ -9,8 +9,9 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 
-#include "../utils/field.h"
+#include "../group.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
 
@@ -93,6 +94,7 @@ const ItemDescriptor& DeviceIpConflictEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<DeviceIpConflictEvent>(),
+        .groupId = kDeviceIssueEventGroup,
         .displayName = tr("Device IP Conflict"),
         .permissions = {.resourcePermissions = {{utils::kDeviceIdsFieldName, Qn::WritePermission}}},
         .emailTemplatePath = ":/email_templates/camera_ip_conflict.mustache"

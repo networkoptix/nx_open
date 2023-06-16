@@ -22,6 +22,7 @@
 #include "event_connector.h"
 #include "event_filter.h"
 #include "event_filter_field.h"
+#include "group.h"
 #include "manifest.h"
 #include "router.h"
 #include "rule.h"
@@ -289,6 +290,27 @@ std::optional<ItemDescriptor> Engine::eventDescriptor(const QString& eventId) co
     return m_eventDescriptors.contains(eventId)
         ? std::optional<ItemDescriptor>(m_eventDescriptors.value(eventId))
         : std::nullopt;
+}
+
+Group Engine::eventGroups() const
+{
+    QMap<std::string, QStringList> eventByGroup;
+
+    for (const auto& descriptor: m_eventDescriptors)
+        eventByGroup[descriptor.groupId].push_back(descriptor.id);
+
+    auto result = defaultEventGroups();
+
+    auto visitor =
+        [&eventByGroup](Group& group, auto visitor)->void
+        {
+            group.items = std::move(eventByGroup.value(group.id));
+            for (auto& subgroup: group.groups)
+                visitor(subgroup, visitor);
+        };
+
+    visitor(result, visitor);
+    return result;
 }
 
 bool Engine::registerAction(const ItemDescriptor& descriptor, const ActionConstructor& constructor)

@@ -8,6 +8,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/common/system_context.h>
 
+#include "../group.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
@@ -54,6 +55,7 @@ const ItemDescriptor& LicenseIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<LicenseIssueEvent>(),
+        .groupId = kServerIssueEventGroup,
         .displayName = tr("License Issue"),
         .permissions = {
             .resourcePermissions = {{utils::kDeviceIdsFieldName, Qn::ViewContentPermission}}

@@ -9,6 +9,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/api/data/server_time_period.h>
 #include <utils/common/util.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTimePeriod,
@@ -216,6 +217,16 @@ QnTimePeriod QnTimePeriod::truncatedFront(qint64 timeMs) const
 qint64 QnTimePeriod::bound(qint64 timeMs) const
 {
     return qBound(startTimeMs, timeMs, endTimeMs() - 1);
+}
+
+nx::vms::api::ServerTimePeriod QnTimePeriod::toServerPeriod() const
+{
+    return isInfinite()
+        ? nx::vms::api::ServerTimePeriod::infinite()
+        : nx::vms::api::ServerTimePeriod{
+            .startTimeMs = startTime(),
+            .durationMs = duration(),
+        };
 }
 
 void PrintTo(const QnTimePeriod& period, ::std::ostream* os)

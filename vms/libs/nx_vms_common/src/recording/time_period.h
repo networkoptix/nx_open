@@ -9,6 +9,8 @@
 #include <nx/fusion/serialization/compressed_time_fwd.h>
 #include <nx/reflect/instrument.h>
 
+namespace nx::vms::api { struct ServerTimePeriod; }
+
 struct NX_VMS_COMMON_API QnTimePeriod
 {
     /**
@@ -71,6 +73,8 @@ struct NX_VMS_COMMON_API QnTimePeriod
     {
         return fromInterval(startTime.count(), endTime.count());
     };
+
+    nx::vms::api::ServerTimePeriod toServerPeriod() const;
 
     bool isLeftIntersection(const QnTimePeriod& other) const;
 

@@ -36,6 +36,7 @@ public:
         motion,
         bookmarks,
         events,
+        vmsEvents,
         analytics
     )
     Q_ENUM(Tab)

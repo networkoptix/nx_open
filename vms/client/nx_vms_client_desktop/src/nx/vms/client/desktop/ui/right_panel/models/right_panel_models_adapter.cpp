@@ -11,9 +11,9 @@
 #include <QtCore/QDeadlineTimer>
 #include <QtCore/QSet>
 #include <QtCore/QTimer>
+#include <QtGui/QAction>
 #include <QtGui/QDesktopServices>
 #include <QtQml/QtQml>
-#include <QtGui/QAction>
 
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
@@ -1014,6 +1014,7 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
             q->setSourceModel(new BookmarkSearchListModel(m_context, this));
             break;
 
+        // TODO: #amalov Investigate the need of event model and default types here.
         case Type::events:
         {
             const auto eventsModel = new EventSearchListModel(m_context, this);

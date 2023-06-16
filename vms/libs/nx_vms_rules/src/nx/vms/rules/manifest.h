@@ -88,10 +88,13 @@ struct ItemDescriptor
     /**%apidoc Item unique id. */
     QString id;
 
+    /**%apidoc[opt] Item group unique id. Empty value is root group. */
+    std::string groupId;
+
     /**%apidoc Display name. */
     QString displayName;
 
-    /**%apidoc Item description, to show hint to the user. */
+    /**%apidoc[opt] Item description, to show hint to the user. */
     QString description;
 
     ItemFlags flags = ItemFlag::instant;
@@ -106,7 +109,7 @@ struct ItemDescriptor
     QString emailTemplatePath; // TODO: #mmalofeev split ItemDescriptor to EventDescriptior and ActionDescriptor.
 };
 #define nx_vms_rules_ItemDescriptor_Fields \
-    (id)(displayName)(description)(flags)(fields)(permissions)(emailTemplatePath)
+    (id)(groupId)(displayName)(description)(flags)(fields)(permissions)(emailTemplatePath)
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const ItemDescriptor& value, QJsonValue* target);
 

@@ -2,6 +2,7 @@
 
 #include "storage_issue_event.h"
 
+#include "../group.h"
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
@@ -104,6 +105,7 @@ const ItemDescriptor& StorageIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<StorageIssueEvent>(),
+        .groupId = kServerIssueEventGroup,
         .displayName = tr("Storage Issue"),
         .permissions = {.globalPermission = GlobalPermission::powerUser},
         .emailTemplatePath = ":/email_templates/storage_failure.mustache"
