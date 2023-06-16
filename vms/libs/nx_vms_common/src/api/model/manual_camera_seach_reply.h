@@ -22,6 +22,8 @@ struct QnManualResourceSearchEntry
     QString vendor;
     QString physicalId;
     QString mac;
+    QString groupId;
+    QString groupName;
     bool existsInPool = false;
 
     QnManualResourceSearchEntry() = default;
@@ -34,6 +36,8 @@ struct QnManualResourceSearchEntry
         const QString& vendor,
         const QString& physicalId,
         const QString& mac,
+        const QString& groupId,
+        const QString& groupName,
         bool existsInPool)
         :
         name(name),
@@ -43,6 +47,8 @@ struct QnManualResourceSearchEntry
         vendor(vendor),
         physicalId(physicalId),
         mac(mac),
+        groupId(groupId),
+        groupName(groupName),
         existsInPool(existsInPool)
     {
     }
