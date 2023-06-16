@@ -12,6 +12,7 @@
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/actions/show_on_alarm_layout_action.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
 #include <ui/workbench/workbench_context.h>
@@ -19,28 +20,6 @@
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::rules;
-
-namespace {
-
-// TODO: #amalov Remove when routing is ready.
-bool checkUserPermissions(const QnUserResourcePtr& user, const ActionPtr& action)
-{
-    if (!user)
-        return false;
-
-    const auto propValue = action->property(rules::utils::kUsersFieldName);
-    if (!propValue.isValid() || !propValue.canConvert<UuidSelection>())
-        return false;
-
-    const auto userSelection = propValue.value<UuidSelection>();
-    if (userSelection.all || userSelection.ids.contains(user->getId()))
-        return true;
-
-    const auto userGroups = nx::vms::common::userGroupsWithParents(user);
-    return userGroups.intersects(userSelection.ids);
-}
-
-} // namespace
 
 NotificationActionExecutor::NotificationActionExecutor(QObject* parent):
     QnWorkbenchContextAware(parent)
@@ -78,7 +57,7 @@ void NotificationActionExecutor::onContextUserChanged()
 
 void NotificationActionExecutor::execute(const ActionPtr& action)
 {
-    if (!checkUserPermissions(context()->user(), action))
+    if (!vms::rules::checkUserPermissions(context()->user(), action))
         return;
 
     auto notificationAction = action.dynamicCast<NotificationActionBase>();

@@ -21,6 +21,7 @@
 #include <nx/vms/rules/actions/text_overlay_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/manifest.h>
+#include <nx/vms/rules/utils/action.h>
 #include <ui/graphics/items/controls/html_text_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -246,11 +247,11 @@ void QnWorkbenchTextOverlaysHandler::at_resourceWidgetAdded(QnResourceWidget* wi
 
 void QnWorkbenchTextOverlaysHandler::execute(const nx::vms::rules::ActionPtr& action)
 {
-    if (!context()->user())
-        return;
-
     const auto overlayAction = action.dynamicCast<nx::vms::rules::TextOverlayAction>();
     if (!NX_ASSERT(overlayAction))
+        return;
+
+    if (!nx::vms::rules::checkUserPermissions(context()->user(), action))
         return;
 
     const auto ruleId = overlayAction->ruleId();
