@@ -345,7 +345,7 @@ FocusScope
                 width: parent ? parent.width : 0
                 implicitHeight: Math.max(button.implicitHeight, delegateLoader.implicitHeight)
                 enabled: itemFlags & Qt.ItemIsEnabled
-
+                clip: treeView.clipDelegates
                 opacity: enabled ? 1.0 : 0.3
 
                 readonly property bool isSelectable: treeView.selectionEnabled
@@ -652,8 +652,6 @@ FocusScope
 
                     signal startEditing()
                     signal finishEditing()
-
-                    clip: treeView.clipDelegates
 
                     sourceComponent: treeView.delegate
 

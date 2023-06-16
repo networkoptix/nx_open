@@ -112,6 +112,12 @@ QnResourceAccessManager::QnResourceAccessManager(
 {
     connect(m_accessRightsResolver.get(), &AccessRightsResolver::resourceAccessReset,
         this, &QnResourceAccessManager::resourceAccessReset, Qt::DirectConnection);
+
+    connect(resourcePool(), &QnResourcePool::resourcesAdded,
+        this, &QnResourceAccessManager::handleResourcesAdded);
+
+    connect(resourcePool(), &QnResourcePool::resourcesRemoved,
+        this, &QnResourceAccessManager::handleResourcesRemoved);
 }
 
 bool QnResourceAccessManager::hasPowerUserPermissions(const Qn::UserAccessData& accessData) const
@@ -318,6 +324,39 @@ ResourceAccessDetails QnResourceAccessManager::accessDetails(
 QnResourceAccessManager::Notifier* QnResourceAccessManager::createNotifier(QObject* parent)
 {
     return m_accessRightsResolver->createNotifier(parent);
+}
+
+void QnResourceAccessManager::handleResourcesAdded(const QnResourceList& resources)
+{
+    for (const auto& resource: resources)
+    {
+        connect(resource.get(), &QnResource::flagsChanged,
+            this, &QnResourceAccessManager::permissionsDependencyChanged);
+
+        if (const auto& camera = resource.objectCast<QnVirtualCameraResource>())
+        {
+            connect(camera.get(), &QnVirtualCameraResource::scheduleEnabledChanged,
+                this, &QnResourceAccessManager::permissionsDependencyChanged);
+
+            connect(camera.get(), &QnVirtualCameraResource::licenseTypeChanged,
+                this, &QnResourceAccessManager::permissionsDependencyChanged);
+
+            connect(camera.get(), &QnVirtualCameraResource::capabilitiesChanged,
+                this, &QnResourceAccessManager::permissionsDependencyChanged);
+        }
+
+        if (const auto& layout = resource.objectCast<QnLayoutResource>())
+        {
+            connect(layout.get(), &QnLayoutResource::lockedChanged,
+                this, &QnResourceAccessManager::permissionsDependencyChanged);
+        }
+    }
+}
+
+void QnResourceAccessManager::handleResourcesRemoved(const QnResourceList& resources)
+{
+    for (const auto& resource: resources)
+        resource->disconnect(this);
 }
 
 bool QnResourceAccessManager::canCreateResourceInternal(

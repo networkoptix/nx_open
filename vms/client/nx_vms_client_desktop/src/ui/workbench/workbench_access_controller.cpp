@@ -62,6 +62,9 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(
         connect(resourceAccessManager(), &QnResourceAccessManager::resourceAccessReset,
             this, &QnWorkbenchAccessController::recalculateAllPermissions);
 
+        connect(resourceAccessManager(), &QnResourceAccessManager::permissionsDependencyChanged,
+            this, &QnWorkbenchAccessController::updatePermissions);
+
         const auto handleSubjectsChanged =
             [this](const QSet<QnUuid>& changedSubjectIds)
             {
@@ -448,26 +451,13 @@ void QnWorkbenchAccessController::recalculateAllPermissions()
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr& resource)
 {
-    connect(resource.get(), &QnResource::flagsChanged, this,
-        &QnWorkbenchAccessController::updatePermissions);
-
-    if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
-    {
-        connect(camera.get(), &QnVirtualCameraResource::scheduleEnabledChanged, this,
-            &QnWorkbenchAccessController::updatePermissions);
-
-        connect(camera.get(),
-            &QnVirtualCameraResource::licenseTypeChanged,
-            this,
-            &QnWorkbenchAccessController::updatePermissions);
-    }
-
     // Capture password setting or dropping for layout.
-    if (const auto& fileLayout = resource.dynamicCast<QnFileLayoutResource>())
+    if (const auto& fileLayout = resource.objectCast<QnFileLayoutResource>())
     {
         connect(fileLayout.get(), &QnFileLayoutResource::passwordChanged, this,
             &QnWorkbenchAccessController::updatePermissions);
-        // readOnly may also change when re-reading encrypted layout.
+
+        // `readOnly` may also change when re-reading encrypted layout.
         connect(fileLayout.get(), &QnFileLayoutResource::readOnlyChanged, this,
             &QnWorkbenchAccessController::updatePermissions);
     }
