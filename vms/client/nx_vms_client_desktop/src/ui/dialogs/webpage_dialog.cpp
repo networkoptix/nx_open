@@ -77,7 +77,7 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent, EditMode editMode):
         "Proxying all contents exposes any service or device on the server's network to the users"
         " of this webpage"));
 
-    ui->integrationAlertLabel->setText(tr("This resource may interact with the Desktop Client and"
+    ui->integrationAlertLabel->setText(tr("An integration may interact with the Desktop Client and"
         " request access to the user session"));
 
     ui->clientApiAlertLabel->setText(tr("The web page can interact with the Desktop Client and"
@@ -139,7 +139,7 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent, EditMode editMode):
             setSubtype(checked ? WebPageSubtype::clientApi : WebPageSubtype::none);
         });
 
-    updateTitle();
+    updateText();
     updateSelectServerMenuButtonVisibility();
 }
 
@@ -160,31 +160,39 @@ void QnWebpageDialog::updateTitle()
             Option::Integration, subtype() == nx::vms::api::WebPageSubtype::clientApi);
     }
 
-    const QString type = getTypeTitle(titleOptions);
-
-    switch (m_editMode)
-    {
-        case AddPage:
-        {
-            return setWindowTitle(tr(
-                "Add %1", /*comment*/ "%1 is a Web Page type (like Proxied Web Page)").arg(type));
-        }
-        case EditPage:
-        {
-            return setWindowTitle(tr(
-                "Edit %1", /*comment*/ "%1 is a Web Page type (like Proxied Web Page)").arg(type));
-        }
-    }
+    setWindowTitle(getTitle(titleOptions));
 }
 
-QString QnWebpageDialog::getTypeTitle(QnWebPageResource::Options options)
+void QnWebpageDialog::updateText()
 {
+    const bool isIntegration =
+        subtype() == nx::vms::api::WebPageSubtype::clientApi && ini().webPagesAndIntegrations;
+
+     ui->proxyViaServerCheckBox->setText(isIntegration
+        ? tr("Proxy this integration through the server")
+        : tr("Proxy this web page through the server"));
+
+    ui->disableCertificateCheckBox->setText(isIntegration
+        ? tr("Allow opening this integration without SSL certificate checking")
+        : tr("Allow opening this web page without SSL certificate checking"));
+
+    updateTitle();
+}
+
+QString QnWebpageDialog::getTitle(QnWebPageResource::Options options)
+{
+    const bool isNew = m_editMode == AddPage;
+
     switch (options)
     {
-        case QnWebPageResource::WebPage: return tr("Web Page");
-        case QnWebPageResource::ProxiedWebPage: return tr("Proxied Web Page");
-        case QnWebPageResource::Integration: return tr("Integration");
-        case QnWebPageResource::ProxiedIntegration: return tr("Proxied Integration");
+        case QnWebPageResource::WebPage:
+            return isNew ? tr("New Web Page") : tr("Edit Web Page");
+        case QnWebPageResource::ProxiedWebPage:
+            return isNew ? tr("New Proxied Web Page") : tr("Edit Proxied Web Page");
+        case QnWebPageResource::Integration:
+            return isNew ? tr("New Integration") : tr("Edit Integration");
+        case QnWebPageResource::ProxiedIntegration:
+            return isNew ? tr("New Proxied Integration") : tr("Edit Proxied Integration");
     }
 
     NX_ASSERT(false, "Unexpected value (%1)", options);
@@ -253,7 +261,7 @@ void QnWebpageDialog::setProxyId(QnUuid id)
 
     m_initialProxyId = id;
 
-    updateTitle();
+    updateText();
 }
 
 WebPageSubtype QnWebpageDialog::subtype() const
@@ -276,7 +284,7 @@ void QnWebpageDialog::setSubtype(WebPageSubtype value)
     }
 
     m_subtype = value;
-    updateTitle();
+    updateText();
 }
 
 QStringList QnWebpageDialog::proxyDomainAllowList() const

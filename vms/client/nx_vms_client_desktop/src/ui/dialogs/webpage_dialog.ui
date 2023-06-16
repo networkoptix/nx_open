@@ -100,11 +100,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QCheckBox" name="proxyViaServerCheckBox">
-             <property name="text">
-              <string>Proxy this webpage via server</string>
-             </property>
-            </widget>
+            <widget class="QCheckBox" name="proxyViaServerCheckBox"/>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout1">
@@ -176,11 +172,7 @@
         <number>16</number>
        </property>
        <item>
-        <widget class="QCheckBox" name="disableCertificateCheckBox">
-         <property name="text">
-          <string>Allow opening web page without SSL certificate checking</string>
-         </property>
-        </widget>
+        <widget class="QCheckBox" name="disableCertificateCheckBox"/>
        </item>
        <item>
         <widget class="QCheckBox" name="clientApiCheckBox">
@@ -234,16 +226,22 @@
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+    <widget class="nx::vms::client::desktop::AlertLabel" name="integrationAlertLabel" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="visible">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::AlertLabel" name="integrationAlertLabel" native="true">
-     <property name="visible">
-      <bool>false</bool>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
@@ -276,12 +274,6 @@
    <class>nx::vms::client::desktop::AlertLabel</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/alert_label.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>nx::vms::client::desktop::AlertBar</class>
-   <extends>QWidget</extends>
-   <header>nx/vms/client/desktop/common/widgets/control_bars.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
