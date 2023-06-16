@@ -314,6 +314,7 @@ copyQtLibs()
         QuickControls2Impl
         QuickLayouts
         QuickShapes
+        QuickEffects
         ShaderTools
         XcbQpa
         DBus

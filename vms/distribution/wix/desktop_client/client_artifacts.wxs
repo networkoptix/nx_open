@@ -35,6 +35,7 @@
             <Component><File Name="Qt6QuickTemplates2.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6QuickLayouts.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6QuickShapes.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt6QuickEffects.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6ShaderTools.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6WebEngineCore.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6WebEngineQuick.dll" KeyPath="yes" DiskId="3"/></Component>
