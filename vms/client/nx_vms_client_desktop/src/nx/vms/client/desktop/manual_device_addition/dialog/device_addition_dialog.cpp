@@ -615,6 +615,7 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
             Qt::Unchecked, Qt::CheckStateRole);
 
         connectedServerApi()->addCamera(
+            server->getId(),
             device,
             systemContext()->getSessionTokenHelper(),
             /*callback*/ {});

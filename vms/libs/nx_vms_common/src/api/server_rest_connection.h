@@ -498,18 +498,21 @@ public:
         std::optional<QnUuid> proxyToServer = {});
 
     Handle addCamera(
+        const QnUuid& targetServerId,
         const nx::vms::api::DeviceModelForSearch& devices,
         nx::vms::common::SessionTokenHelperPtr helper,
         Result<ErrorOrData<nx::vms::api::DeviceModelForSearch>>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle searchCamera(
+        const QnUuid& targetServerId,
         const nx::vms::api::DeviceSearch& deviceSearchData,
         nx::vms::common::SessionTokenHelperPtr helper,
         Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle searchCameraStatus(
+        const QnUuid& targetServerId,
         const QnUuid& searchId,
         nx::vms::common::SessionTokenHelperPtr helper,
         Result<ErrorOrData<nx::vms::api::DeviceSearch>>::type&& callback,
@@ -518,7 +521,8 @@ public:
     Handle searchCameraStop(
         const QnUuid& targetServerId,
         const QnUuid& processUuid,
-        GetCallback callback,
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrEmpty>::type callback,
         QThread* targetThread = nullptr);
 
     Handle executeAnalyticsAction(
