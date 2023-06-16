@@ -2,6 +2,9 @@
 
 #include "action.h"
 
+#include <core/resource/user_resource.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
+
 #include "../action_builder.h"
 #include "../action_builder_fields/optional_time_field.h"
 #include "../basic_action.h"
@@ -74,6 +77,23 @@ bool hasTargetServer(const vms::rules::ItemDescriptor& actionDescriptor)
         {
             return fieldDescriptor.fieldName == vms::rules::utils::kServerIdsFieldName;
         });
+}
+
+bool checkUserPermissions(const QnUserResourcePtr& user, const ActionPtr& action)
+{
+    if (!user)
+        return false;
+
+    const auto propValue = action->property(utils::kUsersFieldName);
+    if (!propValue.isValid() || !propValue.canConvert<UuidSelection>())
+        return false;
+
+    const auto userSelection = propValue.value<UuidSelection>();
+    if (userSelection.all || userSelection.ids.contains(user->getId()))
+        return true;
+
+    const auto userGroups = nx::vms::common::userGroupsWithParents(user);
+    return userGroups.intersects(userSelection.ids);
 }
 
 } // namespace nx::vms::rules

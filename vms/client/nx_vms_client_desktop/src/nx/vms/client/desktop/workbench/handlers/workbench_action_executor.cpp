@@ -23,6 +23,7 @@
 #include <nx/vms/rules/actions/ptz_preset_action.h>
 #include <nx/vms/rules/actions/speak_action.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -36,28 +37,6 @@
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::rules;
-
-namespace {
-
-// TODO: #amalov Remove when routing is ready.
-bool checkUserPermissions(const QnUserResourcePtr& user, const ActionPtr& action)
-{
-    if (!user)
-        return false;
-
-    const auto propValue = action->property(rules::utils::kUsersFieldName);
-    if (!propValue.isValid() || !propValue.canConvert<UuidSelection>())
-        return false;
-
-    const auto userSelection = propValue.value<UuidSelection>();
-    if (userSelection.all || userSelection.ids.contains(user->getId()))
-        return true;
-
-    const auto userGroups = nx::vms::common::userGroupsWithParents(user);
-    return userGroups.intersects(userSelection.ids);
-}
-
-} // namespace
 
 WorkbenchActionExecutor::WorkbenchActionExecutor(QObject* parent):
     QnWorkbenchContextAware(parent)
