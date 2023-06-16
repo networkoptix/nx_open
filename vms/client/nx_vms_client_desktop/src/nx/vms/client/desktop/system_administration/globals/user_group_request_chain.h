@@ -59,8 +59,8 @@ struct UserGroupRequest
 /**
  * Helper class for applying a chain of modifications to users and groups. After each successful
  * request changes are applied immediately to avoid waiting for data from message bus.
- */
-class UserGroupRequestChain:
+ */ 
+class UserGroupRequestChain: 
     public RequestChain<UserGroupRequest::Type>,
     SystemContextAware,
     public QObject
@@ -79,7 +79,7 @@ public:
         m_tokenHelper = tokenHelper;
     }
 
-    static void updateLayoutSharing(
+    static void updateResourceAccessRights(
         nx::vms::client::desktop::SystemContext* systemContext,
         const QnUuid& id,
         const std::map<QnUuid, nx::vms::api::AccessRights>& accessRights);
