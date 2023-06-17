@@ -29,6 +29,9 @@ void fromDataToResource(
         dstItems.push_back(itemData);
     }
     resource->setItems(dstItems);
+
+    for (const auto& param: data.parameters)
+        resource->setProperty(param.name, param.value, /*markDirty*/ false);
 }
 
 void fromResourceToData(
@@ -60,6 +63,8 @@ void fromResourceToData(
 
         data.items.push_back(itemData);
     }
+
+    data.parameters = resource->getProperties();
 }
 
 } // namespace nx::vms::client::desktop

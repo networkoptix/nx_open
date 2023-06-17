@@ -10,6 +10,8 @@
 #include <nx/vms/event/event_fwd.h>
 #include <ui/workbench/workbench_state_manager.h>
 
+#include <vx/fwd/vxfwd.h>
+
 class QnWorkbenchLayout;
 typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;
 
@@ -19,6 +21,12 @@ struct StreamSynchronizationState;
 
 namespace ui {
 namespace workbench {
+
+LayoutResourceList alreadyExistingLayouts(
+    QnResourcePool* resourcePool,
+    const QString& name,
+    const QnUuid& parentId,
+    const LayoutResourcePtr& layout = LayoutResourcePtr());
 
 class LayoutsHandler: public QObject, public QnSessionAwareDelegate
 {
@@ -107,6 +115,8 @@ private:
     void openLayouts(
         const LayoutResourceList& layouts,
         const StreamSynchronizationState& playbackState);
+
+    friend class vx::MenuActionHandler;
 };
 
 } // namespace workbench

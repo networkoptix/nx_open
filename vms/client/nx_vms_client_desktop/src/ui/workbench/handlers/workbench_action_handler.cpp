@@ -457,12 +457,6 @@ void ActionHandler::addToLayout(
         return;
     }
 
-    if (!menu()->canTrigger(action::OpenInLayoutAction, action::Parameters(resource)
-        .withArgument(Qn::LayoutResourceRole, layout)))
-    {
-        return;
-    }
-
     // Force cloud resource descriptor for cloud layouts.
     QnLayoutItemData data = layoutItemFromResource(resource,
         /*forceCloud*/ layout->hasFlags(Qn::cross_system));
@@ -2595,6 +2589,12 @@ void ActionHandler::at_createZoomWindowAction_triggered() {
     addParams.rotation = widget->item()->rotation();
     addParams.displayRoi = widget->item()->displayRoi();
     addParams.displayAnalyticsObjects = widget->item()->displayAnalyticsObjects();
+
+    action::Parameters actionParams = action::Parameters(widget->resource()->toResourcePtr())
+        .withArgument(Qn::LayoutResourceRole, workbench()->currentLayoutResource());
+    if (!menu()->canTrigger(action::OpenInLayoutAction, actionParams))
+        return; // TODO(elric): gdm will implement this one properly, merge the fix from master.
+
     addToLayout(
         workbench()->currentLayoutResource(),
         widget->resource()->toResourcePtr(),

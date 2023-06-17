@@ -78,8 +78,6 @@ namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
 
-namespace {
-
 QString generateUniqueLayoutName(
     QnResourcePool* resourcePool,
     const QnUserResourcePtr &user,
@@ -108,7 +106,7 @@ LayoutResourceList alreadyExistingLayouts(
     QnResourcePool* resourcePool,
     const QString& name,
     const QnUuid& parentId,
-    const LayoutResourcePtr& layout = LayoutResourcePtr())
+    const LayoutResourcePtr& layout)
 {
     LayoutResourceList result;
     for (const auto& existingLayout:
@@ -187,8 +185,6 @@ bool hasCrossSystemItems(const LayoutResourcePtr& layout)
                 && crossSystemResourceSystemId(item.resource) != currentCloudSystemId;
         });
 }
-
-} // namespace
 
 LayoutsHandler::LayoutsHandler(QObject *parent):
     QObject(parent),

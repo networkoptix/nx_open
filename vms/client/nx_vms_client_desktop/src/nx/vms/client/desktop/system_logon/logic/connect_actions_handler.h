@@ -61,6 +61,8 @@ public:
     explicit ConnectActionsHandler(QObject *parent = 0);
     ~ConnectActionsHandler();
 
+    LogicalState logicalState() const;
+
 signals:
     void stateChanged(LogicalState logicalValue, QPrivateSignal);
 
@@ -73,8 +75,6 @@ private:
         StorePreferredCloudServer = 1 << 3,
     };
     Q_DECLARE_FLAGS(ConnectionOptions, ConnectionOption)
-
-    LogicalState logicalState() const;
 
     bool disconnectFromServer(DisconnectFlags flags);
 

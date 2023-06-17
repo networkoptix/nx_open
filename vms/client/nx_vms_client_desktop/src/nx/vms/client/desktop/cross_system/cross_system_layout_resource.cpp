@@ -9,6 +9,7 @@ namespace nx::vms::client::desktop {
 CrossSystemLayoutResource::CrossSystemLayoutResource()
 {
     addFlags(Qn::cross_system);
+    forceUsingLocalProperties();
 }
 
 void CrossSystemLayoutResource::update(const CrossSystemLayoutData& layoutData)

@@ -24,6 +24,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
+#include <vx/graphics/resource_widget_factory.h>
+
 namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
@@ -43,6 +45,9 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
     const auto resource = item->resource();
     if (!resource)
         return nullptr;
+
+    if (auto result = vx::ResourceWidgetFactory::createWidget(item))
+        return result;
 
     auto systemContext = SystemContext::fromResource(resource);
 

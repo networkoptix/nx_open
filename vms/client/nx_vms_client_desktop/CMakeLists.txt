@@ -81,6 +81,11 @@ set(qt_widgets_root "${open_source_root}/artifacts/qt_widgets/src")
 file(GLOB_RECURSE qt_widgets_sources "${qt_widgets_root}/qt_widgets/*")
 file(GLOB_RECURSE qt_widgets_headers "${qt_widgets_root}/qt_widgets/*.h")
 
+file(GLOB_RECURSE vx_sources "${vx_root}/vx/*")
+file(GLOB_RECURSE vx_headers "${vx_root}/vx/*.h")
+nx_find_files(vx_uis "${vx_root}/vx" "ui")
+qt5_wrap_ui(vx_uics ${vx_uis})
+
 set(qt_images_root "${open_source_root}/artifacts/qt_images/src")
 nx_find_files(qt_images_sources "${qt_images_root}/qt_images" "cpp")
 nx_find_files(qt_images_headers "${qt_images_root}/qt_images" "h")
@@ -100,6 +105,8 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         ${qt_styles_sources}
         ${qt_widgets_sources}
         ${qt_images_sources}
+        ${vx_sources}
+        ${vx_uics}
     FORCE_INCLUDE
         ${nx_utils_dir}/src/nx/utils/literal.h
     ADDITIONAL_RESOURCES
@@ -117,6 +124,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         ${qt_styles_headers}
         ${qt_widgets_headers}
         ${qt_imagess_headers}
+        ${vx_headers}
     OTHER_SOURCES
         ${QML_FILES}
         ${SHADER_FILES}
@@ -156,6 +164,7 @@ target_include_directories(nx_vms_client_desktop
     PRIVATE ${qt_styles_root}
     PRIVATE ${qt_widgets_root}
     PRIVATE ${qt_images_root}
+    PRIVATE ${vx_root}
 )
 
 if(WINDOWS)

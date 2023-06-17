@@ -98,6 +98,8 @@
 #include <utils/common/event_processors.h>
 #include "nx/utils/guarded_callback.h"
 
+#include <vx/hooks/handler_registration.h>
+
 #ifdef Q_OS_WIN
     #include <nx/vms/client/desktop/platforms/windows/gdi_win.h>
 #endif
@@ -303,6 +305,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
     context->instance<KeyboardModifiersWatcher>();
+
+    vx::registerHandlers(context);
 
     const auto timeModeNotifier = qnSettings->notifier(QnClientSettings::TIME_MODE);
     const auto updateTimeMode =

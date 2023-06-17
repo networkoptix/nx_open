@@ -4,6 +4,7 @@
 
 #include <nx/reflect/instrument.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop {
@@ -26,9 +27,10 @@ struct CrossSystemLayoutData
     qint32 fixedHeight = 0;
 
     std::vector<CrossSystemLayoutItemData> items;
+    nx::vms::api::ResourceParamDataList parameters;
 };
 #define CrossSystemLayoutData_Fields (id)(name)(cellAspectRatio)(cellSpacing) \
-    (locked)(fixedWidth)(fixedHeight)(items)
+    (locked)(fixedWidth)(fixedHeight)(items)(parameters)
 NX_REFLECTION_INSTRUMENT(CrossSystemLayoutData, CrossSystemLayoutData_Fields)
 
 void fromDataToResource(
