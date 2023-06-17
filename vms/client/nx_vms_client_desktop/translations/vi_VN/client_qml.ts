@@ -262,7 +262,7 @@
     <name>ClosedTileItem</name>
     <message>
       <source>Offline</source>
-      <translation>Ẩn</translation>
+      <translation>Ngoại tuyến</translation>
     </message>
     <message>
       <source>Unreachable</source>
@@ -344,7 +344,7 @@
     </message>
     <message>
       <source>Fisheye</source>
-      <translation>Fisheye</translation>
+      <translation>Mắt cá</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
@@ -355,7 +355,7 @@
     <name>EventsPanel</name>
     <message>
       <source>Category</source>
-      <translation>Loài</translation>
+      <translation>Loại</translation>
     </message>
     <message>
       <source>See %1 for other events</source>
@@ -378,7 +378,7 @@
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation>Đồ họa</translation>
+      <translation>Số liệu</translation>
     </message>
     <message>
       <source>Click to add</source>
@@ -393,11 +393,11 @@
     <name>FigureEditorDialog</name>
     <message>
       <source>Clear</source>
-      <translation>Tẩy</translation>
+      <translation>Xóa</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -415,7 +415,7 @@
     <name>FisheyeDewarpingSettings</name>
     <message>
       <source>Image is not round</source>
-      <translation>Hình ảnh không hợp lệ</translation>
+      <translation>Hình ảnh không tròn</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
@@ -455,7 +455,7 @@
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation>Chỉnh sửa thư viện ảnh</translation>
+      <translation>Chỉnh sửa cuộn camera</translation>
     </message>
     <message>
       <source>Lens projection</source>
@@ -463,15 +463,15 @@
     </message>
     <message>
       <source>Equidistant</source>
-      <translation>Equidistant</translation>
+      <translation>Cách đều nhau</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation>Stereographic</translation>
+      <translation>Lập thể</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation>Equisolid</translation>
+      <translation>Cân bằng</translation>
     </message>
     <message>
       <source>Size</source>

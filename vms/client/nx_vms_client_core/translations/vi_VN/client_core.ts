@@ -70,7 +70,7 @@
     <name>RemoteConnectionErrorStrings</name>
     <message>
       <source>Client version: %1</source>
-      <translation>Phiên bản máy trạm: %1</translation>
+      <translation>Phiên bản máy khách: %1</translation>
     </message>
     <message>
       <source>Server version: %1.</source>

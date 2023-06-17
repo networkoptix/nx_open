@@ -1025,11 +1025,11 @@
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>Sauvegarder la mise en page Cloud</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>Enregistrer la mise en page du nuage sous...</translation>
     </message>
   </context>
   <context>
@@ -1340,15 +1340,15 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>Copier les paramètres</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Si votre système n'a pas accès à Internet, veuillez envoyer la clé de licence et l'ID de matériel fournis à %1 pour recevoir le fichier d'activation.</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Si votre système n'a pas accès à Internet, veuillez envoyer la clé de licence et l'ID matériel fournis à votre équipe support régionale pour recevoir le fichier d'activation :</translation>
     </message>
   </context>
   <context>
@@ -1564,12 +1564,12 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
+      <translation>Impossible de tester les paramètres de messagerie en raison de l'absence de connexion Internet sur l'un des serveurs actifs</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <translation>%1  utilisateurs commenceront à recevoir des e-mails immédiatement après l'application de ces paramètres</translation>
     </message>
   </context>
   <context>
@@ -1890,19 +1890,19 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Sélectionner le dossier...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>Impossible d'enregistrer les logs dans le dossier sélectionné</translation>
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>Téléchargement terminé!</translation>
     </message>
     <message>
       <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation type="unfinished">NVIDIA hardware acceleration is in beta mode</translation>
+      <translation>L'accélération matérielle NVIDIA est en mode bêta</translation>
     </message>
   </context>
   <context>
@@ -2218,22 +2218,22 @@ Clé de licence : %2</translation>
     <message>
       <source>Connected to %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connected to %1</translation>
+      <translation>Connecté à %1</translation>
     </message>
     <message>
       <source>Disconnected from %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnected from %1</translation>
+      <translation>Déconnecté de %1</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <translation>Connecté à %1 via %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <translation>Déconnecté de %1 via %2</translation>
     </message>
   </context>
   <context>
@@ -2510,7 +2510,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Appliquer les modifications avant de quitter ?</translation>
     </message>
   </context>
   <context>
@@ -2552,7 +2552,7 @@ Clé de licence : %2</translation>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
-      <translation type="unfinished">%1 Running</translation>
+      <translation>%1 en cours</translation>
     </message>
   </context>
   <context>
@@ -3125,7 +3125,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
+      <translation>Échec de la connexion au système &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3227,7 +3227,7 @@ to %1</source>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>Base de données restaurée avec succès. L'application serveur va bientôt redémarrer.</translation>
     </message>
   </context>
   <context>
@@ -3586,7 +3586,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Sélectionner le dossier...</translation>
     </message>
   </context>
   <context>
@@ -4387,7 +4387,7 @@ to %1</source>
     <name>QnPopupSettingsWidget</name>
     <message>
       <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the System you are logged in to and will be removed in future versions.</translation>
+      <translation>Ces paramètres s'appliquent uniquement au système auquel vous êtes connecté et seront supprimés dans les futures versions.</translation>
     </message>
   </context>
   <context>
@@ -4398,7 +4398,7 @@ to %1</source>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Appliquer les modifications avant de quitter ?</translation>
     </message>
   </context>
   <context>
@@ -4582,7 +4582,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Sélectionner le dossier...</translation>
     </message>
   </context>
   <context>
@@ -5038,11 +5038,11 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</translation>
+      <translation>Les serveurs avec basculement activé prendront automatiquement les caméras des serveurs hors ligne avec le même ID d'emplacement.</translation>
     </message>
     <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
-      <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
+      <translation>Le certificat reçu du serveur ne correspond pas au certificat épinglé.</translation>
     </message>
   </context>
   <context>
@@ -5405,11 +5405,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>Utiliser pour stocker des données d'analyse et de mouvement</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>Stocke les données d'analyse et de mouvement</translation>
     </message>
   </context>
   <context>
@@ -5655,15 +5655,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Remote archive synchronization has been stopped</source>
-      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
+      <translation>La synchronisation des archives à distance a été arrêtée</translation>
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>Le stockage des données d'analyse n'est pas configuré</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>Le stockage système est utilisé pour les données d'analyse</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -5671,11 +5671,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Remote archive synchronization is available</source>
-      <translation type="unfinished">Remote archive synchronization is available</translation>
+      <translation>La synchronisation des archives à distance est disponible</translation>
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Nous vous recommandons de choisir un autre emplacement pour celui-ci au lieu de la partition système.</translation>
     </message>
   </context>
   <context>
