@@ -15,4 +15,3 @@ TEST(mediaFilters, H2645Mp4ToAnnexB)
     result->compressionType = AV_CODEC_ID_H264;
     filter.processData(result);
 }
-
