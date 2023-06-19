@@ -81,6 +81,34 @@ bool isAnnexb(const QnCompressedVideoData* data)
     return !isMp4Format(data);
 }
 
+void AnnexbToMp4::updateCodecParameters(const QnCompressedVideoData* frame)
+{
+    std::vector<uint8_t> extradata = buildExtraDataMp4(frame);
+    if (extradata.empty())
+        return;
+
+    CodecParametersPtr context;
+    if (frame->context)
+    {
+        context = std::make_shared<CodecParameters>(frame->context->getAvCodecParameters());
+    }
+    else
+    {
+        context = std::make_shared<CodecParameters>();
+        context->getAvCodecParameters()->codec_type = AVMEDIA_TYPE_VIDEO;
+        context->getAvCodecParameters()->codec_id = frame->compressionType;
+    }
+    context->setExtradata(extradata.data(), extradata.size());
+
+    QSize streamResolution = nx::media::getFrameSize(frame);
+    if (streamResolution.isEmpty())
+        return;
+
+    context->getAvCodecParameters()->width = streamResolution.width();
+    context->getAvCodecParameters()->height = streamResolution.height();
+    m_context = context;
+}
+
 QnCompressedVideoDataPtr AnnexbToMp4::process(const QnCompressedVideoData* frame)
 {
     if (frame->compressionType != AV_CODEC_ID_H264 && frame->compressionType != AV_CODEC_ID_H265)
@@ -94,24 +122,13 @@ QnCompressedVideoDataPtr AnnexbToMp4::process(const QnCompressedVideoData* frame
 
     if (frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
     {
-        std::vector<uint8_t> extradata = buildExtraDataMp4(frame);
-        if (!m_context && extradata.empty())
-        {
-            NX_WARNING(this, "Failed to build extra data");
-            return nullptr;
-        }
+        updateCodecParameters(frame);
+    }
 
-        auto context = std::make_shared<CodecParameters>(frame->context->getAvCodecParameters());
-        context->setExtradata(extradata.data(), extradata.size());
-
-        QSize streamResolution = nx::media::getFrameSize(frame);
-        if (streamResolution.isEmpty())
-            return nullptr;
-
-        context->getAvCodecParameters()->width = streamResolution.width();
-        context->getAvCodecParameters()->height = streamResolution.height();
-
-        m_context = context;
+    if (!m_context)
+    {
+        NX_WARNING(this, "Failed to build codec parameters");
+        return nullptr;
     }
 
     auto result = convertStartCodesToSizes(frame);
