@@ -19,6 +19,9 @@ public:
     QnCompressedVideoDataPtr process(const QnCompressedVideoData* frame);
 
 private:
+    void updateCodecParameters(const QnCompressedVideoData* frame);
+
+private:
     CodecParametersConstPtr m_context;
 };
 
