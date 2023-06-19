@@ -14,13 +14,27 @@
 
 using namespace std::chrono;
 
+namespace nx::vms::client::desktop::joystick {
+
 namespace {
 
 constexpr milliseconds kEnumerationInterval = 2500ms;
 
-} // namespace
+QString getConfigsDebugInfo(const DeviceConfigs& configs)
+{
+    QStringList results;
 
-namespace nx::vms::client::desktop::joystick {
+    int i = 0;
+    for (const JoystickDescriptor& config: configs)
+    {
+        results.append(nx::format("%1) Manufacturer: %2, model: %3")
+            .args(++i, config.manufacturer, config.model));
+    }
+
+    return results.join('\n');
+}
+
+} // namespace
 
 ManagerLinux::ManagerLinux(QObject* parent):
     base_type(parent)
@@ -28,6 +42,8 @@ ManagerLinux::ManagerLinux(QObject* parent):
     connect(&m_enumerateTimer, &QTimer::timeout, this, &ManagerLinux::enumerateDevices);
     m_enumerateTimer.setInterval(kEnumerationInterval);
     m_enumerateTimer.start();
+
+    NX_VERBOSE(this, "Known joystick configs:\n%1", getConfigsDebugInfo(getKnownJoystickConfigs()));
 }
 
 void ManagerLinux::enumerateDevices()
@@ -70,7 +86,10 @@ void ManagerLinux::enumerateDevices()
 
         const auto model = findDeviceModel(modelAndManufacturer);
         if (model.isEmpty())
+        {
+            NX_VERBOSE(this, "Model is not found.");
             continue;
+        }
 
         const auto config = createDeviceDescription(findDeviceModel(modelAndManufacturer));
         DeviceLinux* deviceLinux = new DeviceLinux(config, path, pollTimer());
