@@ -14,17 +14,20 @@ MouseEvent::MouseEvent(const QMouseEvent* event):
     buttons(event->buttons()),
     modifiers(event->modifiers())
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
 HoverEvent::HoverEvent(const QHoverEvent* event):
     position(event->pos())
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
 KeyEvent::KeyEvent(const QKeyEvent* event):
     key(event->key()),
     modifiers(event->modifiers())
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
 } // namespace scene
