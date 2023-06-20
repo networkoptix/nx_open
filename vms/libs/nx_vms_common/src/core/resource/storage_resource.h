@@ -70,7 +70,7 @@ public:
     bool isWritable() const;
     bool isDbReady() const;
 
-    virtual qint64 nxOccupedSpace() const { return 0; }
+    virtual qint64 nxOccupiedSpace() const { return 0; }
 
     virtual QIODevice* open(
         const QString &fileName,
