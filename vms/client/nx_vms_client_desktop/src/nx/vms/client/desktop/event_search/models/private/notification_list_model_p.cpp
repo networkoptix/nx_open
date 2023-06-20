@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/event_search/utils/event_data.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -944,58 +945,11 @@ QPixmap NotificationListModel::Private::pixmapForAction(
     const QString& cloudSystemId,
     const QColor& color) const
 {
-    using nx::vms::event::Level;
-    using nx::vms::rules::Icon;
+    QnResourceList devices;
+    if (needIconDevices(action->icon()))
+        devices = getActionDevices(action, cloudSystemId);
 
-    static const auto iconFromLevel = QMap<Level, Icon>{
-        {Level::critical, Icon::critical},
-        {Level::important, Icon::important}
-    };
-
-    auto icon = action->icon();
-    if (icon == Icon::calculated)
-        icon = iconFromLevel.value(action->level(), Icon::none);
-
-    switch (icon)
-    {
-        case Icon::none:
-            return {};
-
-        case Icon::alert:
-            return qnSkin->pixmap("events/alert.png");
-
-        case Icon::important:
-            return qnSkin->pixmap("events/alert_yellow.png");
-
-        case Icon::critical:
-            return qnSkin->pixmap("events/alert_red.png");
-
-        case Icon::server:
-            return qnSkin->pixmap("events/server.png");
-
-        case Icon::camera:
-            return toPixmap(qnResIconCache->icon(QnResourceIconCache::Camera));
-
-        case Icon::motion:
-            return qnSkin->pixmap("events/motion.svg");
-
-        case Icon::resource:
-        {
-            const auto devices = getActionDevices(action, cloudSystemId);
-            return toPixmap(!devices.isEmpty()
-                ? qnResIconCache->icon(devices.front())
-                : qnResIconCache->icon(QnResourceIconCache::Camera));
-        }
-
-        case Icon::custom:
-            return SoftwareTriggerPixmaps::colorizedPixmap(
-                action->customIcon(),
-                color.isValid() ? color : QPalette().light().color());
-
-        default:
-            NX_ASSERT(false, "Unhandled icon");
-            return {};
-    }
+    return eventIcon(action->icon(), action->level(), action->customIcon(), color, devices);
 }
 
 int NotificationListModel::Private::maximumCount() const

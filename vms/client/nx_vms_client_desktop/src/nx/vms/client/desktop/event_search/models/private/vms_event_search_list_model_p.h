@@ -65,7 +65,7 @@ private:
 
     QString title(const QVariantMap& details) const;
     QString description(const QVariantMap& details) const;
-    QString iconPath(const EventPtr& event, const QVariantMap& details) const;
+    QPixmap iconPixmap(const EventPtr& event, const QVariantMap& details) const;
     static QColor color(const QVariantMap& details);
     static bool hasPreview(const EventPtr& event);
 

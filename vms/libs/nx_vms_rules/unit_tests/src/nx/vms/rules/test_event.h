@@ -103,7 +103,7 @@ public:
         auto result = base_type::details(context);
         result[utils::kSourceNameDetailName] = "Test resource";
         nx::vms::rules::utils::insertLevel(result, nx::vms::event::Level::none);
-        nx::vms::rules::utils::insertIcon(result, nx::vms::rules::Icon::calculated);
+        nx::vms::rules::utils::insertIcon(result, nx::vms::rules::Icon::alert);
         result[nx::vms::rules::utils::kCustomIconDetailName] = "test";
         nx::vms::rules::utils::insertClientAction(result, nx::vms::rules::ClientAction::none);
         result[nx::vms::rules::utils::kUrlDetailName] = "http://localhost";

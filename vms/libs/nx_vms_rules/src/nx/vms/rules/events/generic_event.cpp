@@ -59,7 +59,7 @@ QString GenericEvent::extendedCaption() const
 
 Icon GenericEvent::icon() const
 {
-    return deviceIds().isEmpty() ? Icon::alert : Icon::camera;
+    return deviceIds().isEmpty() ? Icon::alert : Icon::resource;
 }
 
 const ItemDescriptor& GenericEvent::manifest()
