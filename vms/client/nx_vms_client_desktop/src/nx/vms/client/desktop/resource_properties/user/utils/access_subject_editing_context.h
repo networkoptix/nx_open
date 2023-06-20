@@ -90,12 +90,15 @@ public:
 
     static nx::vms::api::AccessRights relevantAccessRights(const QnResourcePtr& resource);
 
-    static void modifyAccessRights(nx::core::access::ResourceAccessMap& accessMap,
-        const QnUuid& resourceOrGroupId, nx::vms::api::AccessRights accessRightsMask, bool value,
-        bool withDependent);
+    static void modifyAccessRightMap(nx::core::access::ResourceAccessMap& accessRightMap,
+        const QnUuid& resourceOrGroupId,
+        nx::vms::api::AccessRights modifiedRightsMask,
+        bool value,
+        bool withDependent,
+        nx::vms::api::AccessRights relevantRightsMask);
 
     Q_INVOKABLE void modifyAccessRights(const QList<QnResource*>& resources,
-        nx::vms::api::AccessRights accessRights, bool value, bool withDependent);
+        nx::vms::api::AccessRights modifiedRightsMask, bool value, bool withDependent);
 
     static nx::vms::api::AccessRights dependentAccessRights(nx::vms::api::AccessRight dependingOn);
     static nx::vms::api::AccessRights requiredAccessRights(nx::vms::api::AccessRight requiredFor);

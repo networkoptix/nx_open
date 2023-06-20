@@ -448,8 +448,13 @@ AccessRights AccessSubjectEditingContext::relevantAccessRights(const QnResourceP
     return {};
 }
 
-void AccessSubjectEditingContext::modifyAccessRights(ResourceAccessMap& accessMap,
-    const QnUuid& resourceOrGroupId, AccessRights accessRightsMask, bool value, bool withDependent)
+void AccessSubjectEditingContext::modifyAccessRightMap(
+    ResourceAccessMap& accessRightMap,
+    const QnUuid& resourceOrGroupId,
+    AccessRights modifiedRightsMask,
+    bool value,
+    bool withDependent,
+    AccessRights relevantRightsMask)
 {
     if (withDependent)
     {
@@ -457,49 +462,57 @@ void AccessSubjectEditingContext::modifyAccessRights(ResourceAccessMap& accessMa
             ? kRequiredAccessRights
             : kDependentAccessRights;
 
-        const auto sourceRights = accessRightsMask;
+        const auto sourceRights = modifiedRightsMask;
         for (AccessRightInt flag = 1; flag != 0; flag <<= 1)
         {
             const auto accessRight = static_cast<AccessRight>(flag);
             if (sourceRights.testFlag(accessRight))
-                accessRightsMask |= dependencies.value(accessRight);
+                modifiedRightsMask |= dependencies.value(accessRight);
         }
     }
 
-    const auto accessRights = accessMap.value(resourceOrGroupId);
+    if (value)
+        modifiedRightsMask &= relevantRightsMask;
+
+    const auto accessRights = accessRightMap.value(resourceOrGroupId);
     const auto newAccessRights = value
-        ? accessRights | accessRightsMask
-        : accessRights & ~accessRightsMask;
+        ? accessRights | modifiedRightsMask
+        : accessRights & ~modifiedRightsMask;
 
     if (newAccessRights == accessRights)
         return;
 
     if (newAccessRights != 0)
-        accessMap.emplace(resourceOrGroupId, newAccessRights);
+        accessRightMap.emplace(resourceOrGroupId, newAccessRights);
     else
-        accessMap.remove(resourceOrGroupId);
+        accessRightMap.remove(resourceOrGroupId);
 }
 
 void AccessSubjectEditingContext::modifyAccessRights(const QList<QnResource*>& resources,
-    AccessRights accessRights, bool value, bool withDependent)
+    AccessRights modifiedRightsMask, bool value, bool withDependent)
 {
     auto map = ownResourceAccessMap();
+    AccessRights relevantRightsMask = kFullAccessRights;
+
     for (const auto& resource: resources)
     {
         if (!resource)
             continue;
 
         const auto resourcePtr = resource->toSharedPointer();
-        AccessRights accessRightsMask = accessRights & relevantAccessRights(resourcePtr);
+        AccessRights accessRightsMask = modifiedRightsMask & relevantAccessRights(resourcePtr);
 
         if (value)
         {
             // Don't grant access rights already granted by resource group access rights.
             if (const auto groupId = specialResourceGroupFor(resourcePtr); !groupId.isNull())
                 accessRightsMask &= ~ownResourceAccessMap().value(groupId);
+
+            relevantRightsMask = relevantAccessRights(resourcePtr);
         }
 
-        modifyAccessRights(map, resourcePtr->getId(), accessRightsMask, value, withDependent);
+        modifyAccessRightMap(
+            map, resourcePtr->getId(), accessRightsMask, value, withDependent, relevantRightsMask);
     }
 
     setOwnResourceAccessMap(map);
