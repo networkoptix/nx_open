@@ -20,7 +20,7 @@ int getMegapixels(const auto& camera)
     {
         // In case of device don't provide megapixel information then it requires license
         // without megapixels restriction.
-        megapixels = std::numeric_limits<int>::max();
+        megapixels = nx::vms::api::SaasCloudStorageParameters::kUnlimitedResolution;
     }
     return megapixels;
 }
@@ -38,9 +38,6 @@ IntegrationServiceUsageHelper::IntegrationServiceUsageHelper(SystemContext* cont
     CloudServiceUsageHelper(parent),
     SystemContextAware(context)
 {
-    connect(
-        context->saasServiceManager(), &saas::ServiceManager::dataChanged,
-        this, &IntegrationServiceUsageHelper::invalidateCache);
 }
 
 void IntegrationServiceUsageHelper::invalidateCache()
@@ -49,7 +46,7 @@ void IntegrationServiceUsageHelper::invalidateCache()
     m_cache.reset();
 }
 
-void IntegrationServiceUsageHelper::updateCacheUnsafe()
+void IntegrationServiceUsageHelper::updateCacheUnsafe() const
 {
     m_cache = QMap<QnUuid, nx::vms::api::LicenseSummaryData>();
 
@@ -90,7 +87,7 @@ nx::vms::api::LicenseSummaryData IntegrationServiceUsageHelper::info(const QnUui
     return m_cache->value(id);
 }
 
-QMap<QnUuid, nx::vms::api::LicenseSummaryData> IntegrationServiceUsageHelper::allInfo()
+QMap<QnUuid, nx::vms::api::LicenseSummaryData> IntegrationServiceUsageHelper::allInfo() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
@@ -99,12 +96,24 @@ QMap<QnUuid, nx::vms::api::LicenseSummaryData> IntegrationServiceUsageHelper::al
     return *m_cache;
 }
 
-void IntegrationServiceUsageHelper::proposeChange(const QnUuid& resourceId, const QSet<QnUuid>& integrations)
+void IntegrationServiceUsageHelper::proposeChange(
+    const QnUuid& resourceId, const QSet<QnUuid>& integrations)
 {
-    if (const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(resourceId))
+    std::vector<Propose> data;
+    data.push_back(Propose{resourceId, integrations});
+    proposeChange(data);
+}
+
+void IntegrationServiceUsageHelper::proposeChange(const std::vector<Propose>& data)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    updateCacheUnsafe();
+
+    for (const auto& propose: data)
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        updateCacheUnsafe();
+        const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(propose.resourceId);
+        if (!camera)
+            continue;
         for (const auto& id: camera->userEnabledAnalyticsEngines())
         {
             if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
@@ -116,7 +125,7 @@ void IntegrationServiceUsageHelper::proposeChange(const QnUuid& resourceId, cons
                 }
             }
         }
-        for (const auto& id: integrations)
+        for (const auto& id: propose.integrations)
         {
             if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
             {
@@ -133,6 +142,8 @@ void IntegrationServiceUsageHelper::proposeChange(const QnUuid& resourceId, cons
 bool IntegrationServiceUsageHelper::isOverflow() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!m_cache)
+        updateCacheUnsafe();
 
     for (auto itr = m_cache->begin(); itr != m_cache->end(); ++itr)
     {
@@ -157,22 +168,34 @@ void CloudStorageServiceUsageHelper::updateCache()
     updateCacheUnsafe();
 }
 
-void CloudStorageServiceUsageHelper::updateCacheUnsafe()
+void CloudStorageServiceUsageHelper::invalidateCache()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_cache.reset();
+}
+
+void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const
 {
     using namespace nx::vms::api;
 
-    m_cache = std::map<int, nx::vms::api::LicenseSummaryData>();
     auto& cache = *m_cache;
-
     const auto saasData = m_context->saasServiceManager()->data();
     auto cloudStorageData = systemContext()->saasServiceManager()->cloudStorageData();
-    for (const auto& [_, parameters]: cloudStorageData)
+    for (const auto& [_, parameters] : cloudStorageData)
     {
         auto& cacheData = cache[parameters.maxResolution];
         cacheData.total += parameters.totalChannelNumber;
         if (saasData.state == SaasState::active)
             cacheData.available += parameters.totalChannelNumber;
     }
+}
+
+void CloudStorageServiceUsageHelper::updateCacheUnsafe() const
+{
+    using namespace nx::vms::api;
+
+    m_cache = std::map<int, nx::vms::api::LicenseSummaryData>();
+    calculateAvailableUnsafe();
 
     auto cameras = systemContext()->resourcePool()->getAllCameras();
     for (const auto& camera: cameras)
@@ -186,17 +209,17 @@ void CloudStorageServiceUsageHelper::updateCacheUnsafe()
             ++it->second.inUse;
         }
     }
+    borrowUsages();
 }
 
-void CloudStorageServiceUsageHelper::proposeChange(const QSet<QnUuid>& devices)
+void CloudStorageServiceUsageHelper::setUsedDevices(const QSet<QnUuid>& devices)
 {
     using namespace nx::vms::api;
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-    updateCacheUnsafe();
 
-    for (auto& [_, info] : *m_cache)
-        info.inUse = 0;
+    m_cache = std::map<int, nx::vms::api::LicenseSummaryData>();
+    calculateAvailableUnsafe();
 
     for (const auto& id: devices)
     {
@@ -214,21 +237,21 @@ void CloudStorageServiceUsageHelper::proposeChange(const QSet<QnUuid>& devices)
     borrowUsages();
 }
 
-void CloudStorageServiceUsageHelper::borrowUsages()
+void CloudStorageServiceUsageHelper::borrowUsages() const
 {
     for (auto it = m_cache->begin(); it != m_cache->end(); ++it)
     {
         auto& data = it->second;
-        if (data.inUse > data.available)
+        int lack = data.inUse - data.available;
+        for (auto itNext = std::next(it); lack > 0 && itNext != m_cache->end(); ++itNext)
         {
-            for (auto itNext = std::next(it); itNext != m_cache->end(); ++itNext)
+            auto& dataNext = itNext->second;
+            const int free = std::min(lack, dataNext.available - dataNext.inUse);
+            if (free > 0)
             {
-                auto& dataNext = itNext->second;
-                if (dataNext.inUse < dataNext.available)
-                {
-                    ++dataNext.inUse;
-                    --data.inUse;
-                }
+                dataNext.inUse += free;
+                data.inUse -= free;
+                lack -= free;
             }
         }
     }
@@ -238,7 +261,7 @@ bool CloudStorageServiceUsageHelper::isOverflow() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
-        return false;
+        updateCacheUnsafe();
     return std::any_of(m_cache->begin(), m_cache->end(),
         [](const auto& value)
         {
@@ -250,7 +273,7 @@ std::map<int, nx::vms::api::LicenseSummaryData> CloudStorageServiceUsageHelper::
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
-        return std::map<int, nx::vms::api::LicenseSummaryData>();
+        updateCacheUnsafe();
     return *m_cache;
 }
 
