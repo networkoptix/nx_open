@@ -453,7 +453,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
     result |= Qn::ReadPermission;
 
-    if (accessRights.testAnyFlags(AccessRight::view | AccessRight::viewArchive))
+    constexpr AccessRights kViewContentRequirements = AccessRight::view
+        | AccessRight::viewArchive
+        | AccessRight::viewBookmarks
+        | AccessRight::userInput;
+
+    if (accessRights.testAnyFlags(kViewContentRequirements))
         result |= Qn::ViewContentPermission;
 
     const bool isLiveAllowed = !camera->needsToChangeDefaultPassword()

@@ -1740,9 +1740,9 @@ TEST_F(ResourceAccessManagerTest, accessRightsIndependency)
     static const std::map<AccessRight, Qn::Permissions> kTestAccessRights{
         {AccessRight::view, Qn::ViewContentPermission | Qn::ViewLivePermission},
         {AccessRight::viewArchive, Qn::ViewContentPermission | Qn::ViewFootagePermission},
-        {AccessRight::viewBookmarks, Qn::ViewBookmarksPermission},
+        {AccessRight::viewBookmarks, Qn::ViewContentPermission | Qn::ViewBookmarksPermission},
         {AccessRight::manageBookmarks, Qn::ManageBookmarksPermission},
-        {AccessRight::userInput, Qn::UserInputPermissions},
+        {AccessRight::userInput, Qn::ViewContentPermission | Qn::UserInputPermissions},
         {AccessRight::edit, Qn::GenericEditPermissions}};
 
     for (const auto [testAccessRight, expectedPermissions]: kTestAccessRights)
