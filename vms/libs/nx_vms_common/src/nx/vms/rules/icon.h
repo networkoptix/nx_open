@@ -7,13 +7,12 @@
 namespace nx::vms::rules {
 
 NX_REFLECTION_ENUM_CLASS(Icon,
-    calculated, //< Icon is calculated from event level. Default value.
+    alert, //< Alert icon color is calculated from the event level. Default value.
     none,
-    alert,
-    important,
-    critical,
     server,
-    camera,
+    storage,
+    connection,
+    license,
     motion,
     resource,
     custom)

@@ -40,6 +40,7 @@ QVariantMap LicenseIssueEvent::details(common::SystemContext* context) const
     utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::critical);
+    utils::insertIcon(result, nx::vms::rules::Icon::license);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::licensesSettings);
 
     return result;

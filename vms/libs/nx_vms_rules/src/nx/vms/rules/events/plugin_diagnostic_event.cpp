@@ -34,23 +34,6 @@ nx::vms::event::Level calculateLevel(nx::vms::api::EventLevel eventLevel)
     }
 }
 
-Icon calculateIcon(nx::vms::api::EventLevel eventLevel)
-{
-    using nx::vms::api::EventLevel;
-
-    switch (eventLevel)
-    {
-        case EventLevel::ErrorEventLevel:
-            return Icon::critical;
-
-        case EventLevel::WarningEventLevel:
-            return Icon::important;
-
-        default:
-            return Icon::alert;
-    }
-}
-
 } // namespace
 
 PluginDiagnosticEvent::PluginDiagnosticEvent(
@@ -75,7 +58,6 @@ QVariantMap PluginDiagnosticEvent::details(common::SystemContext* context) const
 
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertLevel(result, calculateLevel(level()));
-    utils::insertIcon(result, calculateIcon(level()));
 
     return result;
 }

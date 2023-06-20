@@ -23,6 +23,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/event_search/utils/event_data.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
@@ -161,19 +162,8 @@ QVariant VmsEventSearchListModel::Private::data(
         case Qt::DisplayRole:
             return title(details);
 
-        case Qn::DecorationPathRole:
-            return iconPath(event, details);
-
         case Qt::DecorationRole:
-            if (const auto customIcon = details.value(rules::utils::kCustomIconDetailName);
-                customIcon.isValid())
-            {
-                return QVariant::fromValue(SoftwareTriggerPixmaps::colorizedPixmap(
-                    customIcon.toString(),
-                    QPalette().light().color()));
-            }
-            handled = false;
-            return {};
+            return iconPixmap(event, details);
 
         case Qt::ForegroundRole:
             return QVariant::fromValue(color(details));
@@ -516,77 +506,25 @@ QString VmsEventSearchListModel::Private::description(const QVariantMap& details
         .join(common::html::kLineBreak);
 }
 
-QString VmsEventSearchListModel::Private::iconPath(
+QPixmap VmsEventSearchListModel::Private::iconPixmap(
     const EventPtr& event,
     const QVariantMap& details) const
 {
-    // TODO: #amalov Current icon selection uses notification logic.
-    // See EventSearchListModel::Private::iconPath and unify the icons.
-    // Consider using icon cache.
-
     using nx::vms::event::Level;
     using nx::vms::rules::Icon;
 
-    static const auto iconFromLevel = QMap<Level, Icon>{
-        {Level::critical, Icon::critical},
-        {Level::important, Icon::important}
-    };
+    const auto icon = details.value(rules::utils::kIconDetailName).value<Icon>();
+    const auto level = details.value(rules::utils::kLevelDetailName).value<Level>();
+    const auto customIcon = details.value(rules::utils::kCustomIconDetailName).toString();
 
-    auto icon = details.value(rules::utils::kIconDetailName).value<Icon>();
-
-    if (icon == Icon::calculated)
+    QnResourceList devices;
+    if (needIconDevices(icon))
     {
-        const auto level = details.value(rules::utils::kLevelDetailName).value<Level>();
-        icon = iconFromLevel.value(level, Icon::none);
+        devices = q->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            rules::utils::getDeviceIds(AggregatedEventPtr::create(event)));
     }
 
-    switch (icon)
-    {
-        case Icon::none:
-            return {};
-
-        case Icon::alert:
-            return "events/alert.png";
-
-        case Icon::important:
-            return "events/alert_yellow.png";
-
-        case Icon::critical:
-            return "events/alert_red.png";
-
-        case Icon::server:
-            return "events/server.png";
-
-        case Icon::camera:
-            return "tree/camera.svg";
-
-        case Icon::motion:
-            return "events/motion.svg";
-
-        case Icon::resource:
-        {
-            const auto devices = q->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                rules::utils::getDeviceIds(AggregatedEventPtr::create(event)));
-
-            return QnDeviceDependentStrings::getNameFromSet(
-                q->resourcePool(),
-                {"tree/io.svg", "tree/camera.svg"},
-                devices);
-        }
-
-        case Icon::custom:
-        {
-            const auto customIcon = details.value(rules::utils::kCustomIconDetailName);
-
-            return customIcon.isValid()
-                ? SoftwareTriggerPixmaps::pixmapsPath() + customIcon.toString()+ ".png"
-                : QString();
-        }
-
-        default:
-            NX_ASSERT(false, "Unhandled icon");
-            return {};
-    }
+    return eventIcon(icon, level, customIcon, color(details), devices);
 }
 
 QColor VmsEventSearchListModel::Private::color(const QVariantMap& details)
