@@ -4,7 +4,6 @@
 
 #include <chrono>
 
-#include <api/model/storage_space_reply.h>
 #include <api/server_rest_connection.h>
 #include <client/client_module.h>
 #include <common/common_module.h>
@@ -15,7 +14,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/rest/params.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_scan_info.h>
+#include <nx/vms/api/data/storage_space_data.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
@@ -36,7 +37,7 @@ static constexpr auto kUpdateRebuildStatusDelay = 1s;
 
 void processStorage(
     const QnClientStorageResourcePtr& storage,
-    const nx::vms::api::StorageSpaceData& spaceInfo)
+    const nx::vms::api::StorageSpaceDataV1& spaceInfo)
 {
     storage->setFreeSpace(spaceInfo.freeSpace);
     storage->setTotalSpace(spaceInfo.totalSpace);
@@ -44,7 +45,18 @@ void processStorage(
     storage->setSpaceLimit(spaceInfo.reservedSpace);
     storage->setStatus(
         spaceInfo.isOnline ? nx::vms::api::ResourceStatus::online : nx::vms::api::ResourceStatus::offline);
-    storage->setStatusFlag(spaceInfo.storageStatus);
+    nx::vms::api::StorageRuntimeFlags runtimeFlags;
+    if (spaceInfo.storageStatus.testFlag(nx::vms::api::StorageStatus::beingChecked))
+        runtimeFlags |= nx::vms::api::StorageRuntimeFlag::beingChecked;
+    if (spaceInfo.storageStatus.testFlag(nx::vms::api::StorageStatus::beingRebuilt))
+        runtimeFlags |= nx::vms::api::StorageRuntimeFlag::beingRebuilt;
+    if (spaceInfo.storageStatus.testFlag(nx::vms::api::StorageStatus::disabled))
+        runtimeFlags |= nx::vms::api::StorageRuntimeFlag::disabled;
+    if (spaceInfo.storageStatus.testFlag(nx::vms::api::StorageStatus::tooSmall))
+        runtimeFlags |= nx::vms::api::StorageRuntimeFlag::tooSmall;
+    if (spaceInfo.storageStatus.testFlag(nx::vms::api::StorageStatus::used))
+        runtimeFlags |= nx::vms::api::StorageRuntimeFlag::used;
+    storage->setRuntimeStatusFlags(runtimeFlags);
 }
 
 QnMediaServerResourcePtr getServerForResource(const QnResourcePtr& resource)
@@ -116,7 +128,7 @@ struct ServerPoolInfo
 struct QnServerStorageManager::ServerInfo
 {
     std::array<ServerPoolInfo, static_cast<int>(QnServerStoragesPool::Count)> storages{};
-    QSet<QString> protocols;
+    QSet<std::string> protocols;
     bool fastInfoReady = false;
 };
 
@@ -285,11 +297,11 @@ bool QnServerStorageManager::isServerValid(const QnMediaServerResourcePtr& serve
     return server->getStatus() == nx::vms::api::ResourceStatus::online;
 }
 
-QSet<QString> QnServerStorageManager::protocols(const QnMediaServerResourcePtr& server) const
+QSet<std::string> QnServerStorageManager::protocols(const QnMediaServerResourcePtr& server) const
 {
     return m_serverInfo.contains(server)
         ? m_serverInfo[server].protocols
-        : QSet<QString>();
+        : QSet<std::string>();
 }
 
 nx::vms::api::StorageScanInfo QnServerStorageManager::rebuildStatus(
@@ -545,7 +557,7 @@ int QnServerStorageManager::requestStorageSpace(const QnMediaServerResourcePtr& 
 int QnServerStorageManager::requestStorageStatus(
     const QnMediaServerResourcePtr& server,
     const QString& storageUrl,
-    std::function<void(const QnStorageStatusReply&)> callback)
+    std::function<void(const StorageStatusReply&)> callback)
 {
     if (!isServerValid(server) || !connection())
         return 0;
@@ -556,11 +568,11 @@ int QnServerStorageManager::requestStorageStatus(
         [callback = std::move(callback)](
             bool success,
             rest::Handle /*requestId*/,
-            rest::RestResultWithData<QnStorageStatusReply> result)
+            rest::RestResultWithData<StorageStatusReply> result)
         {
             if (!success || result.error != nx::network::rest::Result::NoError)
             {
-                callback(QnStorageStatusReply());
+                callback(StorageStatusReply());
                 return;
             }
 
@@ -588,7 +600,7 @@ int QnServerStorageManager::requestRecordingStatistics(const QnMediaServerResour
 }
 
 void QnServerStorageManager::at_storageSpaceReply(
-    bool success, int handle, const QnStorageSpaceReply& reply)
+    bool success, int handle, const nx::vms::api::StorageSpaceReply& reply)
 {
     for (const auto& spaceInfo: reply.storages)
     {

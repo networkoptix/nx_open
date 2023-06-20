@@ -5,6 +5,7 @@
 #include <map>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/api/data/storage_init_result.h>
 
 #include "core/resource/storage_resource.h"
 
@@ -27,7 +28,7 @@ public:
     //!Implementation of QnStorageResource::getTotalSpace
     virtual qint64 getTotalSpace() const override { return 0; }
     //!Implementation of QnStorageResource::isStorageAvailable
-    virtual Qn::StorageInitResult initOrUpdate() override { return Qn::StorageInit_Ok; }
+    virtual nx::vms::api::StorageInitResult initOrUpdate() override { return nx::vms::api::StorageInitResult::ok; }
     //!Implementation of QnStorageResource::removeFile
     virtual bool removeFile( const QString& path ) override;
     //!Implementation of QnStorageResource::removeDir

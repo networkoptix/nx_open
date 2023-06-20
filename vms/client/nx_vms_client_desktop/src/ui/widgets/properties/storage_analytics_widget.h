@@ -8,7 +8,7 @@
 #include <QtWidgets/QWidget>
 
 #include <api/model/recording_stats_reply.h>
-#include <api/model/storage_space_reply.h>
+#include <nx/vms/api/data/storage_space_reply.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
@@ -85,7 +85,7 @@ private:
 
     // Map from averaging period to recording stats.
     QMap<quint64, QnRecordingStatsReply> m_recordingsStatData;
-    QnStorageSpaceDataList m_availableStorages;
+    nx::vms::api::StorageSpaceDataListV1 m_availableStorages;
     qint64 m_availableStorageSpace = 0;
 
     void updateTotalTablesGeometry();
@@ -98,7 +98,7 @@ private:
     void atReceivedStats(
         bool success, int handle, const QnRecordingStatsReply& data);
     void atReceivedSpaceInfo(QnMediaServerResourcePtr server,
-        bool success, int handle, const QnStorageSpaceReply& data);
+        bool success, int handle, const nx::vms::api::StorageSpaceReply& data);
 
 private slots:
     void atEventsGrid_customContextMenuRequested(const QPoint&);

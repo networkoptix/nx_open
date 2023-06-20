@@ -27,7 +27,7 @@ struct QnCameraStatsData
 namespace QnRecordingStats {
 
 qint64 calculateAvailableSpace(const QnRecordingStatsReply& stats,
-    const QnStorageSpaceDataList& storages);
+    const nx::vms::api::StorageSpaceDataListV1& storages);
 
 QnCameraStatsData transformStatsToModelData(const QnRecordingStatsReply& stats,
     QnMediaServerResourcePtr server, QnResourcePool* resourcePool);

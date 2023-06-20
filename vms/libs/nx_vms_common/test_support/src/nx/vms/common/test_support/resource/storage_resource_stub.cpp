@@ -20,10 +20,10 @@ QIODevice* StorageResourceStub::openInternal(const QString&, QIODevice::OpenMode
     return NULL;
 }
 
-Qn::StorageInitResult StorageResourceStub::initOrUpdate()
+nx::vms::api::StorageInitResult StorageResourceStub::initOrUpdate()
 {
     NX_ASSERT(false);
-    return Qn::StorageInit_CreateFailed;
+    return nx::vms::api::StorageInitResult::createFailed;
 }
 
 QnAbstractStorageResource::FileInfoList StorageResourceStub::getFileList(const QString&)

@@ -22,12 +22,13 @@
 #include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/data/storage_flags.h>
+#include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/ec2/ec_connection_notification_manager.h>
-#include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/data/api_fwd.h>
@@ -986,12 +987,10 @@ struct ModifyResourceParamAccess
 
     Result checkMetadataStorageAccess(
         SystemContext* systemContext,
-        const Qn::UserAccessData& accessData,
+        const Qn::UserAccessData& /*accessData*/,
         const nx::vms::api::ResourceParamWithRefData& param)
     {
         const auto resPool = systemContext->resourcePool();
-
-
         const auto metadataStorageId = QnUuid::fromStringSafe(param.value);
         const auto server = resPool->getResourceById<QnMediaServerResource>(param.resourceId);
         if (!NX_ASSERT(server))
@@ -1008,6 +1007,12 @@ struct ModifyResourceParamAccess
         {
             return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
                 "Storage %1 does not belong to this Server."), param.value));
+        }
+
+        if (!((*storage)->persistentStatusFlags().testFlag(nx::vms::api::StoragePersistentFlag::dbReady)))
+        {
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "Storage %1 can not store analytics."), param.value));
         }
 
         return Result();

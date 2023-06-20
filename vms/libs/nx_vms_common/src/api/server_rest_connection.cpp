@@ -1694,7 +1694,7 @@ Handle ServerConnection::testEmailSettings(
 Handle ServerConnection::getStorageStatus(
     const QnUuid& serverId,
     const QString& path,
-    Result<RestResultWithData<QnStorageStatusReply>>::type&& callback,
+    Result<RestResultWithData<StorageStatusReply>>::type&& callback,
     QThread* targetThread)
 {
     nx::network::rest::Params params;

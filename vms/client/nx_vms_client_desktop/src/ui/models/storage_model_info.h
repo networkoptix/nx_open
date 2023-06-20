@@ -5,6 +5,7 @@
 #include <api/model/api_model_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/storage_space_data.h>
 
 struct QnStorageModelInfo
 {
@@ -21,7 +22,7 @@ struct QnStorageModelInfo
     bool isDbReady;
 
     QnStorageModelInfo();
-    explicit QnStorageModelInfo(const nx::vms::api::StorageSpaceData& reply);
+    explicit QnStorageModelInfo(const nx::vms::api::StorageSpaceDataV1& reply);
     explicit QnStorageModelInfo(const QnStorageResourcePtr& storage);
 };
 

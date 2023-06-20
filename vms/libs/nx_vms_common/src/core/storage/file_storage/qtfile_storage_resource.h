@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/vms/api/data/storage_space_data.h>
+
 #include "core/resource/storage_resource.h"
 
 /*
@@ -17,7 +19,7 @@ public:
     static QnStorageResource* instance(const QString&);
 
     virtual int getCapabilities() const override;
-    virtual Qn::StorageInitResult initOrUpdate() override;
+    virtual nx::vms::api::StorageInitResult initOrUpdate() override;
     virtual FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;
     virtual bool removeFile(const QString& url) override;

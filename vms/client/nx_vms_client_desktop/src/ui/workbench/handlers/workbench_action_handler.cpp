@@ -66,6 +66,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -2962,7 +2963,7 @@ void ActionHandler::confirmAnalyticsStorageLocation()
             nx::utils::erase_if(
                 storages,
                 [](const auto& s)
-                { return !(s->statusFlag() & nx::vms::api::StorageStatus::dbReady); });
+                { return !s->persistentStatusFlags().testFlag(nx::vms::api::StoragePersistentFlag::dbReady); });
 
             if (storages.empty())
                 continue;
@@ -2973,8 +2974,8 @@ void ActionHandler::confirmAnalyticsStorageLocation()
                     // TODO: #spanasenko use proper enums
                     bool aMayBeUsed = a->getStorageType() == "local" && a->isWritable();
                     bool bMayBeUsed = b->getStorageType() == "local" && b->isWritable();
-                    bool aIsSystem = a->statusFlag() & nx::vms::api::StorageStatus::system;
-                    bool bIsSystem = b->statusFlag() & nx::vms::api::StorageStatus::system;
+                    bool aIsSystem = a->persistentStatusFlags().testFlag(nx::vms::api::StoragePersistentFlag::system);
+                    bool bIsSystem = b->persistentStatusFlags().testFlag(nx::vms::api::StoragePersistentFlag::system);
 
                     // Only writable local storages should be used.
                     if (aMayBeUsed && !bMayBeUsed)
@@ -3006,7 +3007,7 @@ void ActionHandler::confirmAnalyticsStorageLocation()
 
             const auto& best = storages.front();
 
-            if (best->statusFlag() & nx::vms::api::StorageStatus::system)
+            if (best->persistentStatusFlags().testFlag(nx::vms::api::StoragePersistentFlag::system))
             {
                 const auto defaultDir = storages.empty()
                     ? tr("the largest available partition") //< Should be unreachable, but...

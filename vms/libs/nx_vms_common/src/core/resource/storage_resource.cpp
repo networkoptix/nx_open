@@ -2,10 +2,12 @@
 
 #include "storage_resource.h"
 
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_property_key.h>
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/reflect/to_string.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/utils/log/log.h>
-
-#include <core/resource/media_server_resource.h>
 
 const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
 const qint64 QnStorageResource::kThirdPartyStorageLimit = 10LL * 1024 * 1024 * 1024; // 10 gb
@@ -214,24 +216,33 @@ bool QnStorageResource::isDbReady() const
     return getCapabilities() & QnAbstractStorageResource::cap::DBReady;
 }
 
-void QnStorageResource::setStatusFlag(nx::vms::api::StorageStatuses status)
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_status = status;
-}
-
 QIODevice* QnStorageResource::open(const QString& fileName, QIODevice::OpenMode openMode)
 {
     return openInternal(fileName, openMode);
 }
 
-nx::vms::api::StorageStatuses QnStorageResource::statusFlag() const
+void QnStorageResource::setRuntimeStatusFlags(nx::vms::api::StorageRuntimeFlags flags)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_status;
+    m_runtimeStatusFlags = flags;
 }
 
-bool QnStorageResource::canStoreAnalytics() const
+nx::vms::api::StorageRuntimeFlags QnStorageResource::runtimeStatusFlags() const
 {
-    return isOnline() && isDbReady();
+    return m_runtimeStatusFlags;
+}
+
+void QnStorageResource::setPersistentStatusFlags(nx::vms::api::StoragePersistentFlags flags)
+{
+    setProperty(
+        ResourcePropertyKey::kPersistentStorageStatusFlagsKey,
+        QString::fromStdString(nx::reflect::toString(flags)));
+}
+
+nx::vms::api::StoragePersistentFlags QnStorageResource::persistentStatusFlags() const
+{
+    const auto resultStr = getProperty(ResourcePropertyKey::kPersistentStorageStatusFlagsKey);
+    if (resultStr.isEmpty())
+        return nx::vms::api::StoragePersistentFlags();
+
+    return nx::reflect::fromString<nx::vms::api::StoragePersistentFlags>(resultStr.toStdString());
 }

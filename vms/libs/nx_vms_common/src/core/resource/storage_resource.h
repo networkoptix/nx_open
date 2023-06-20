@@ -2,10 +2,9 @@
 
 #pragma once
 
+#include <core/resource/abstract_storage_resource.h>
 #include <nx/utils/crypt/encryptable.h>
-#include <nx/vms/api/data/storage_status_list.h>
-
-#include "abstract_storage_resource.h"
+#include <nx/vms/api/data/storage_flags.h>
 
 class QnAbstractMediaStreamDataProvider;
 
@@ -39,8 +38,11 @@ public:
     void setUsedForWriting(bool isUsedForWriting);
     bool isUsedForWriting() const;
 
-    void setStatusFlag(nx::vms::api::StorageStatuses status);
-    nx::vms::api::StorageStatuses statusFlag() const;
+    void setRuntimeStatusFlags(nx::vms::api::StorageRuntimeFlags flags);
+    nx::vms::api::StorageRuntimeFlags runtimeStatusFlags() const;
+
+    void setPersistentStatusFlags(nx::vms::api::StoragePersistentFlags flags);
+    nx::vms::api::StoragePersistentFlags persistentStatusFlags() const;
 
     static QString urlToPath(const QString &url);
     static QString urlWithoutCredentials(const QString& url);
@@ -77,8 +79,6 @@ public:
         const QString &fileName,
         QIODevice::OpenMode openMode) override;
 
-    virtual bool canStoreAnalytics() const;
-
 signals:
     void isUsedForWritingChanged(const QnResourcePtr& resource);
     void isBackupChanged(const QnResourcePtr& resource);
@@ -95,5 +95,5 @@ private:
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable nx::Mutex m_bitrateMtx;
     bool m_isBackup = false;
-    nx::vms::api::StorageStatuses m_status = nx::vms::api::StorageStatus::none;
+    std::atomic<nx::vms::api::StorageRuntimeFlags> m_runtimeStatusFlags;
 };

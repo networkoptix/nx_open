@@ -6,11 +6,10 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QDialog>
 
+#include <api/model/storage_status_reply.h>
+#include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/models/storage_model_info.h>
-
-#include "api/model/storage_status_reply.h"
-#include "core/resource/resource_fwd.h"
 
 struct QnStorageStatusReply;
 class QnServerStorageManager;
@@ -65,7 +64,7 @@ private slots:
     void updateComboBox();
 
     void at_protocolComboBox_currentIndexChanged();
-    void atStorageStatusReply(const QnStorageStatusReply& reply);
+    void atStorageStatusReply(const StorageStatusReply& reply);
 
     QString normalizePath(QString path);
 
@@ -73,7 +72,7 @@ private:
     QScopedPointer<Ui::StorageUrlDialog> ui;
     QnServerStorageManager* m_storageManager;
     QnMediaServerResourcePtr m_server;
-    QnStorageStatusReply m_reply;
+    StorageStatusReply m_reply;
     QSet<QString> m_protocols;
     QList<ProtocolDescription> m_descriptions;
     QHash<QString, QString> m_urlByProtocol;

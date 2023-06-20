@@ -8,7 +8,7 @@
 #include <QtWidgets/QMenu>
 
 #include <analytics/db/analytics_db_types.h>
-#include <api/model/storage_space_reply.h>
+#include <api/model/storage_status_reply.h>
 #include <api/server_rest_connection.h>
 #include <common/common_globals.h>
 #include <core/resource/camera_resource.h>
@@ -18,6 +18,7 @@
 #include <nx/analytics/utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
@@ -646,7 +647,10 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
 
     auto storageManager = qnServerStorageManager;
     QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, storageManager, this));
-    dialog->setProtocols(storageManager->protocols(m_server));
+    QSet<QString> protocols;
+    for (const auto& p: storageManager->protocols(m_server))
+        protocols.insert(QString::fromStdString(p));
+    dialog->setProtocols(protocols);
     dialog->setCurrentServerStorages(m_model->storages());
     if (!dialog->exec())
         return;
@@ -1029,7 +1033,7 @@ void QnStorageConfigWidget::updateWarnings()
 
         if (storageData.id == m_model->metadataStorageId())
         {
-            if (storage->statusFlag() & vms::api::StorageStatus::system)
+            if (storage->persistentStatusFlags().testFlag(vms::api::StoragePersistentFlag::system))
                 analyticsIsOnSystemDrive = true;
 
             if (!storageData.isUsed)

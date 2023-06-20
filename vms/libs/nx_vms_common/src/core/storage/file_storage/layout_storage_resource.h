@@ -7,6 +7,7 @@
 
 #include <core/resource/storage_resource.h>
 #include <nx/core/layout/layout_file_info.h>
+#include <nx/vms/api/data/storage_init_result.h>
 
 #include "layout_storage_stream.h"
 
@@ -56,7 +57,7 @@ public:
     virtual void setUrl(const QString& value) override; // URL for Layout File is always plain file path!
 
     virtual int getCapabilities() const override;
-    virtual Qn::StorageInitResult initOrUpdate() override;
+    virtual nx::vms::api::StorageInitResult initOrUpdate() override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;
     virtual bool removeFile(const QString& url) override;

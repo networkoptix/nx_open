@@ -48,7 +48,9 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/overlapped_id_data.h>
 #include <nx/vms/api/data/remote_archive_synchronization_status.h>
+#include <nx/vms/api/data/storage_init_result.h>
 #include <nx/vms/api/data/storage_scan_info.h>
+#include <nx/vms/api/data/storage_space_data.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/user_group_model.h>
@@ -654,7 +656,7 @@ public:
     Handle getStorageStatus(
         const QnUuid& serverId,
         const QString& path,
-        Result<RestResultWithData<QnStorageStatusReply>>::type&& callback,
+        Result<RestResultWithData<StorageStatusReply>>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle setStorageEncryptionPassword(

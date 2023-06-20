@@ -8,6 +8,7 @@
 #include <QtCore/QFileInfo>
 
 #include "resource.h"
+#include <nx/vms/api/data/storage_init_result.h>
 
 class NX_VMS_COMMON_API QnAbstractStorageResource: public QnResource
 {
@@ -87,7 +88,7 @@ public:
     ///**
     // * \returns                         Whether the storage is physically accessible.
     // */
-    virtual Qn::StorageInitResult initOrUpdate() = 0;
+    virtual nx::vms::api::StorageInitResult initOrUpdate() = 0;
 
     /**
      * \param url                       Url of the file to delete.

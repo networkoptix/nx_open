@@ -3,6 +3,7 @@
 #pragma once
 
 #include <core/resource/storage_resource.h>
+#include <nx/vms/api/data/storage_init_result.h>
 
 #include "client_resource_fwd.h"
 
@@ -27,7 +28,7 @@ public:
 
     static QnClientStorageResourcePtr newStorage(const QnMediaServerResourcePtr &parentServer, const QString &url);
 
-    virtual Qn::StorageInitResult initOrUpdate() override;
+    virtual nx::vms::api::StorageInitResult initOrUpdate() override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;
     virtual bool removeFile(const QString& url) override;

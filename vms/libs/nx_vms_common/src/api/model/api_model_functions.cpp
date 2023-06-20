@@ -15,8 +15,6 @@
 #include "ping_reply.h"
 #include "recording_stats_reply.h"
 #include "statistics_reply.h"
-#include "storage_space_reply.h"
-#include "storage_status_reply.h"
 #include "system_settings_reply.h"
 #include "test_email_settings_reply.h"
 #include "time_reply.h"
@@ -32,8 +30,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnManualResourceSearchEntry,
     (ubjson)(xml)(json)(csv_record), QnManualResourceSearchEntry_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnManualCameraSearchReply, (ubjson)(xml)(json)(csv_record), QnManualCameraSearchReply_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnStorageSpaceReply, (ubjson)(xml)(json)(csv_record), QnStorageSpaceReply_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnStatisticsDataItem, (ubjson)(xml)(json)(csv_record), QnStatisticsDataItem_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
@@ -68,8 +64,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnAuthSession, (ubjson)(xml)(json)(csv_record)(sql_record), QnAuthSession_Fields)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnStorageStatusReply, (ubjson)(xml)(json)(csv_record), QnStorageStatusReply_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnBackupStatusData, (ubjson)(xml)(json)(csv_record), QnBackupStatusData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
