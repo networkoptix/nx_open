@@ -17,6 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/format.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
@@ -35,21 +36,24 @@ using namespace nx::vms::api;
 
 namespace {
 
-void modifyAccessRights(ResourceAccessMap& accessMap, const QnUuid& resourceOrGroupId,
-    AccessRights accessRightsMask, bool value)
+void modifyAccessRightMap(ResourceAccessMap& accessRightMap, const QnUuid& resourceOrGroupId,
+    AccessRights modifiedRightsMask, bool value)
 {
-    const auto accessRights = accessMap.value(resourceOrGroupId);
-    const auto newAccessRights = value
-        ? accessRights | accessRightsMask
-        : accessRights & ~accessRightsMask;
+    AccessSubjectEditingContext::modifyAccessRightMap(
+        accessRightMap,
+        resourceOrGroupId,
+        modifiedRightsMask,
+        value,
+        /*withDependent*/ false,
+        /*relevantRightsMask*/ kFullAccessRights);
+}
 
-    if (newAccessRights == accessRights)
-        return;
+AccessRights relevantAccessRights(const QnUuid& resourceGroupId)
+{
+    if (const auto group = specialResourceGroup(resourceGroupId))
+        return AccessSubjectEditingContext::relevantAccessRights(*group);
 
-    if (newAccessRights != 0)
-        accessMap.emplace(resourceOrGroupId, newAccessRights);
-    else
-        accessMap.remove(resourceOrGroupId);
+    return kFullAccessRights;
 }
 
 } // namespace
@@ -274,11 +278,18 @@ void ResourceAccessRightsModel::toggle(int index, bool withDependentAccessRights
     const bool itemWasChecked = outerGroupWasChecked || itemAccessRights.testFlag(toggledRight);
     const bool itemWillBeChecked = !(itemWasChecked || allChildrenWereChecked);
 
+    const auto relevantRights = isGroup
+        ? relevantAccessRights(groupId())
+        : relevantAccessRights(outerGroupId);
+
+    if (!NX_ASSERT(relevantRights.testFlag(toggledRight)))
+        return;
+
     AccessRights toggledMask = toggledRight;
     if (withDependentAccessRights)
     {
         toggledMask |= (itemWillBeChecked
-            ? AccessSubjectEditingContext::requiredAccessRights(toggledRight)
+            ? (AccessSubjectEditingContext::requiredAccessRights(toggledRight) & relevantRights)
             : AccessSubjectEditingContext::dependentAccessRights(toggledRight));
     }
 
@@ -292,7 +303,7 @@ void ResourceAccessRightsModel::toggle(int index, bool withDependentAccessRights
             : toggledMask;
 
         for (const auto& itemId: d->getGroupContents(id))
-            modifyAccessRights(accessMap, itemId, mask, itemWasChecked);
+            modifyAccessRightMap(accessMap, itemId, mask, itemWasChecked);
     }
 
     if (outerGroupWasChecked)
@@ -301,13 +312,13 @@ void ResourceAccessRightsModel::toggle(int index, bool withDependentAccessRights
         // we must toggle the group off, and explicitly toggle all its children on.
 
         for (const auto& itemId: d->getGroupContents(outerGroupId))
-            modifyAccessRights(accessMap, itemId, toggledMask, true);
+            modifyAccessRightMap(accessMap, itemId, toggledMask, true);
 
-        modifyAccessRights(accessMap, outerGroupId, toggledMask, false);
+        modifyAccessRightMap(accessMap, outerGroupId, toggledMask, false);
     }
 
     // Toggle the item.
-    modifyAccessRights(accessMap, id, toggledMask, itemWillBeChecked);
+    modifyAccessRightMap(accessMap, id, toggledMask, itemWillBeChecked);
     d->context->setOwnResourceAccessMap(accessMap);
 }
 
