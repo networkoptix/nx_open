@@ -60,13 +60,11 @@ public:
     QnSharedResourcePointer(QSharedPointer<Resource>&& other):
         base_type(std::move(other))
     {
-        other.clear();
     }
 
     QnSharedResourcePointer<Resource>& operator=(QSharedPointer<Resource>&& other)
     {
         base_type::operator=(std::move(other));
-        other.clear();
         return *this;
     }
 
@@ -74,14 +72,12 @@ public:
     QnSharedResourcePointer(QSharedPointer<OtherResource>&& other):
         base_type(std::move(other))
     {
-        other.clear();
     }
 
     template<class OtherResource>
     QnSharedResourcePointer<Resource>& operator=(QSharedPointer<OtherResource>&& other)
     {
         base_type::operator=(std::move(other));
-        other.reset();
         return *this;
     }
 
