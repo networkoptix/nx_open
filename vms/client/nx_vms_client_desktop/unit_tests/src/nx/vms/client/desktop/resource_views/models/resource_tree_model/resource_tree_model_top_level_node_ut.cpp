@@ -96,24 +96,25 @@ TEST_F(ResourceTreeModelTest, emptyIntegrationsNodeIsHiddenIfLoggedIn)
     ASSERT_TRUE(noneMatches(integrationsNodeCondition()));
 }
 
-TEST_F(ResourceTreeModelTest, emptyWebPagesNodeIsHidden)
+TEST_F(ResourceTreeModelTest, emptyWebPagesNodeIsVisibleOnlyForPowerUser)
 {
     // When user with power user permissions is logged in.
     loginAsPowerUser("power_user");
 
-    // Then there is no "Integrations" node in the tree.
-    ASSERT_TRUE(noneMatches(webPagesNodeCondition()));
+    // Then there is single "Web Pages" node in the tree with no children.
+    ASSERT_TRUE(onlyOneMatches(webPagesNodeCondition()));
+    ASSERT_TRUE(noneMatches(directChildOf(webPagesNodeCondition())));
 
     // When user with live viewer permissions is logged in.
     loginAsLiveViewer("live_viewer");
 
-    // Then there is no "Integrations" node in the tree.
+    // Then there is no "Web Pages" node in the tree.
     ASSERT_TRUE(noneMatches(webPagesNodeCondition()));
 
     // When no one is logged in.
     logout();
 
-    // Then there is no "Integrations" node in the tree.
+    // Then there is no "Web Pages" node in the tree.
     ASSERT_TRUE(noneMatches(webPagesNodeCondition()));
 }
 
