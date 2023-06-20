@@ -3,6 +3,7 @@
 #pragma once
 
 #include <core/resource/storage_resource.h>
+#include <nx/vms/api/data/storage_init_result.h>
 
 namespace nx {
 
@@ -13,7 +14,7 @@ public:
     StorageResourceStub();
     virtual ~StorageResourceStub();
 
-    virtual Qn::StorageInitResult initOrUpdate() override;
+    virtual nx::vms::api::StorageInitResult initOrUpdate() override;
 
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;

@@ -3,6 +3,7 @@
 #include "avi_archive_delegate.h"
 
 #include <chrono>
+
 #include <stdint.h>
 
 #include <QtCore/QDataStream>
@@ -27,6 +28,7 @@
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/video_data_packet.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/storage_init_result.h>
 #include <nx/vms/common/application_context.h>
 #include <recording/helpers/recording_context_helpers.h>
 #include <utils/common/util.h>
@@ -448,7 +450,7 @@ bool QnAviArchiveDelegate::open(
                     __func__, hidePassword(url), hidePassword(m_storage->getUrl()));
 
                 if (const auto initResult = m_storage->initOrUpdate();
-                    initResult != Qn::StorageInitResult::StorageInit_Ok)
+                    initResult != nx::vms::api::StorageInitResult::ok)
                 {
                     NX_DEBUG(this, "%1: Storage %2 initialization status is %3",
                         __func__, hidePassword(m_storage->getUrl()), initResult);

@@ -7,17 +7,17 @@
 
 #include <api/model/api_model_fwd.h>
 #include <api/model/recording_stats_reply.h>
+#include <api/model/storage_status_reply.h>
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/id_data.h>
 #include <nx/vms/api/data/storage_scan_info.h>
+#include <nx/vms/api/data/storage_space_reply.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <server/server_storage_manager_fwd.h>
-
-struct QnStorageStatusReply;
 
 /**
  * Client-side class to monitor server-related storages state: storages structure, space, roles and
@@ -41,7 +41,7 @@ public:
      */
     static QnServerStorageManager* instance();
 
-    QSet<QString> protocols(const QnMediaServerResourcePtr& server) const;
+    QSet<std::string> protocols(const QnMediaServerResourcePtr& server) const;
     nx::vms::api::StorageScanInfo rebuildStatus(
         const QnMediaServerResourcePtr& server, QnServerStoragesPool pool) const;
 
@@ -71,7 +71,7 @@ public:
     int requestStorageStatus(
         const QnMediaServerResourcePtr& server,
         const QString& storageUrl,
-        std::function<void(const QnStorageStatusReply&)> callback);
+        std::function<void(const StorageStatusReply&)> callback);
 
     int requestRecordingStatistics(const QnMediaServerResourcePtr& server,
         qint64 bitrateAnalyzePeriodMs,
@@ -79,7 +79,7 @@ public:
 
 signals:
     void serverProtocolsChanged(
-        const QnMediaServerResourcePtr& server, const QSet<QString>& protocols);
+        const QnMediaServerResourcePtr& server, const QSet<std::string>& protocols);
 
     void serverRebuildStatusChanged(const QnMediaServerResourcePtr& server,
         QnServerStoragesPool pool, const nx::vms::api::StorageScanInfo& status);
@@ -95,7 +95,7 @@ signals:
     void activeMetadataStorageChanged(const QnMediaServerResourcePtr& server);
 
     void storageSpaceRecieved(QnMediaServerResourcePtr server,
-        bool success, int handle, const QnStorageSpaceReply& reply);
+        bool success, int handle, const nx::vms::api::StorageSpaceReply& reply);
 
 private:
     void invalidateRequests();
@@ -120,7 +120,7 @@ private:
 
 private:
     void at_archiveRebuildReply(bool success, int handle, const nx::vms::api::StorageScanInfoFull& reply);
-    void at_storageSpaceReply(bool success, int handle, const QnStorageSpaceReply& reply);
+    void at_storageSpaceReply(bool success, int handle, const nx::vms::api::StorageSpaceReply& reply);
 
 private:
     struct ServerInfo;

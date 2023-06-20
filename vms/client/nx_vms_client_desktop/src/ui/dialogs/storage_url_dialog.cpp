@@ -12,6 +12,7 @@
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/api/data/storage_init_result.h>
 #include <nx/vms/client/desktop/common/utils/scoped_cursor_rollback.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -158,7 +159,7 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
     return QString::fromUtf8(QUrl::toPercentEncoding(url.toString()));
 }
 
-void QnStorageUrlDialog::atStorageStatusReply(const QnStorageStatusReply& reply)
+void QnStorageUrlDialog::atStorageStatusReply(const StorageStatusReply& reply)
 {
     m_reply = reply;
 }
@@ -187,7 +188,7 @@ void QnStorageUrlDialog::accept()
     QString url = makeUrl(urlText, ui->loginLineEdit->text(), ui->passwordLineEdit->text());
     m_storageManager->requestStorageStatus(m_server, url,
         [loop, tool = QPointer<QnStorageUrlDialog>(this)](
-            const QnStorageStatusReply& reply)
+            const StorageStatusReply& reply)
         {
             if (tool)
                 tool->atStorageStatusReply(reply);

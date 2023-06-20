@@ -3,9 +3,9 @@
 #include "storage_model_info.h"
 
 #include <api/model/storage_status_reply.h>
-#include <nx/vms/api/data/storage_space_data.h>
-
 #include <core/resource/client_storage_resource.h>
+#include <nx/vms/api/data/storage_flags.h>
+#include <nx/vms/api/data/storage_space_data.h>
 
 QnStorageModelInfo::QnStorageModelInfo()
     : id()
@@ -21,7 +21,7 @@ QnStorageModelInfo::QnStorageModelInfo()
     , isDbReady(false)
 {}
 
-QnStorageModelInfo::QnStorageModelInfo(const nx::vms::api::StorageSpaceData& reply)
+QnStorageModelInfo::QnStorageModelInfo(const nx::vms::api::StorageSpaceDataV1& reply)
     : id(reply.storageId)
     , isUsed(reply.isUsedForWriting)
     , url(reply.url)
@@ -45,6 +45,6 @@ QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr &storage )
     , isBackup(storage->isBackup())
     , isExternal(storage->isExternal())
     , isOnline(storage->getStatus() == nx::vms::api::ResourceStatus::online)
-    , isDbReady(storage->statusFlag().testFlag(nx::vms::api::StorageStatus::dbReady))
+    , isDbReady(storage->persistentStatusFlags().testFlag(nx::vms::api::StoragePersistentFlag::dbReady))
 {}
 

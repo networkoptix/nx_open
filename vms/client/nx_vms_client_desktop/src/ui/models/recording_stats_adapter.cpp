@@ -32,7 +32,7 @@ bool isActive(const QnSecurityCamResourcePtr& resource, const QnCamRecordingStat
 
 qint64 QnRecordingStats::calculateAvailableSpace(
     const QnRecordingStatsReply& stats,
-    const QnStorageSpaceDataList& storages)
+    const nx::vms::api::StorageSpaceDataListV1& storages)
 {
     qint64 availableSpace = 0;
 

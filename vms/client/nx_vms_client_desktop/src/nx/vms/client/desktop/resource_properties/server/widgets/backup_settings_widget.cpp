@@ -5,12 +5,13 @@
 
 #include <algorithm>
 
-#include <QtWidgets/QTabBar>
 #include <QtCore/QTimer>
+#include <QtWidgets/QTabBar>
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
+#include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
@@ -41,8 +42,8 @@ bool backupStorageConfigured(const QnMediaServerResourcePtr& server)
     return std::any_of(std::cbegin(storageResourceList), std::cend(storageResourceList),
         [](const auto& storageResource)
         {
-            const auto statusFlags = storageResource->statusFlag();
-            return !statusFlags.testFlag(nx::vms::api::StorageStatus::disabled)
+            const auto statusFlags = storageResource->runtimeStatusFlags();
+            return !statusFlags.testFlag(nx::vms::api::StorageRuntimeFlag::disabled)
                 && storageResource->isBackup()
                 && storageResource->isUsedForWriting();
         });
@@ -57,8 +58,8 @@ int enabledStoragesCount(const QnMediaServerResourcePtr& server)
     return std::count_if(std::cbegin(storageResourceList), std::cend(storageResourceList),
         [](const auto& storageResource)
         {
-            const auto statusFlags = storageResource->statusFlag();
-            return !statusFlags.testFlag(nx::vms::api::StorageStatus::disabled)
+            const auto statusFlags = storageResource->runtimeStatusFlags();
+            return !statusFlags.testFlag(nx::vms::api::StorageRuntimeFlag::disabled)
                 && storageResource->isUsedForWriting();
         });
 }

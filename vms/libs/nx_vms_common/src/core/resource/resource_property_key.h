@@ -173,6 +173,10 @@ NX_VMS_COMMON_API extern const QString kMetadataStorageIdKey;
 } // namespace Server
 
 NX_VMS_COMMON_API extern const std::set<QString> kWriteOnlyNames;
+
+// Storage
+NX_VMS_COMMON_API extern const QString kPersistentStorageStatusFlagsKey;
+
 } // namespace ResourcePropertyKey
 
 //-------------------------------------------------------------------------------------------------
@@ -251,10 +255,6 @@ NX_VMS_COMMON_API extern const QString kUseInvertedActiveStateForOpenIdleState;
 
 // TODO: Rename?
 NX_VMS_COMMON_API extern const QString kNeedToReloadAllAdvancedParametersAfterApply;
-
-// Storage
-// TODO: Rename?
-NX_VMS_COMMON_API extern const QString kSpace;
 
 NX_VMS_COMMON_API extern const QString kNoVideoSupport;
 

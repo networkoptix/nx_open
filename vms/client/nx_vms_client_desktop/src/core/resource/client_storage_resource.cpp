@@ -96,10 +96,10 @@ QIODevice* QnClientStorageResource::openInternal(const QString&, QIODevice::Open
     return nullptr;
 }
 
-Qn::StorageInitResult QnClientStorageResource::initOrUpdate()
+nx::vms::api::StorageInitResult QnClientStorageResource::initOrUpdate()
 {
     NX_ASSERT(false);
-    return Qn::StorageInit_CreateFailed;
+    return nx::vms::api::StorageInitResult::createFailed;
 }
 
 QnAbstractStorageResource::FileInfoList QnClientStorageResource::getFileList(const QString&)

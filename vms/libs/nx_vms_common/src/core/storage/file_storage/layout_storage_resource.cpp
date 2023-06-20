@@ -169,7 +169,7 @@ int QnLayoutFileStorageResource::getCapabilities() const
     return ListFile | ReadFile;
 }
 
-Qn::StorageInitResult QnLayoutFileStorageResource::initOrUpdate()
+nx::vms::api::StorageInitResult QnLayoutFileStorageResource::initOrUpdate()
 {
      const QString tmpDir = closeDirPath(getUrl())
         + "tmp"
@@ -177,12 +177,12 @@ Qn::StorageInitResult QnLayoutFileStorageResource::initOrUpdate()
 
     QDir dir(tmpDir);
     if (dir.exists() && dir.removeRecursively())
-        return Qn::StorageInit_Ok;
+        return nx::vms::api::StorageInitResult::ok;
 
     if (dir.mkpath(tmpDir) && dir.rmdir(tmpDir))
-        return Qn::StorageInit_Ok;
+        return nx::vms::api::StorageInitResult::ok;
 
-    return Qn::StorageInit_WrongPath;
+    return nx::vms::api::StorageInitResult::wrongPath;
 }
 
 QnAbstractStorageResource::FileInfoList QnLayoutFileStorageResource::getFileList(

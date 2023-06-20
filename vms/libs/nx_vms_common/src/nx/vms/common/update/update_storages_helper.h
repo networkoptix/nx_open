@@ -4,15 +4,16 @@
 
 #include <optional>
 
-#include <api/model/storage_status_reply.h>
+#include <nx/vms/api/data/storage_space_data.h>
 
 namespace nx::vms::common::update::storage {
 
-using ServerToStorages = std::pair<QnUuid, QnStorageSpaceDataList>;
+using ServerToStorages = std::pair<QnUuid, nx::vms::api::StorageSpaceDataList>;
 using ServerToStoragesList = std::vector<ServerToStorages>;
 
 NX_VMS_COMMON_API std::optional<nx::vms::api::StorageSpaceData> selectOne(
-    const QnStorageSpaceDataList& candidates, int64_t minTotalSpaceGb);
+    const nx::vms::api::StorageSpaceDataList& candidates, int64_t minTotalSpaceGb);
+
 NX_VMS_COMMON_API QList<QnUuid> selectServers(
     const ServerToStoragesList& serverToStorages, int64_t minStorageTotalSpaceGb);
 

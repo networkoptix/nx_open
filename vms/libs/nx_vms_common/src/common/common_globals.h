@@ -385,10 +385,6 @@ namespace Qn {
         );
     }
 
-    /**
-     * backup settings
-     */
-
     enum StorageInitResult
     {
         StorageInit_Ok,

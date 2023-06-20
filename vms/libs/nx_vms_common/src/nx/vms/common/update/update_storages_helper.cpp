@@ -5,9 +5,9 @@
 namespace nx::vms::common::update::storage {
 
 std::optional<nx::vms::api::StorageSpaceData> selectOne(
-    const QnStorageSpaceDataList& candidates, int64_t minTotalSpaceGb)
+    const nx::vms::api::StorageSpaceDataList& candidates, int64_t minTotalSpaceGb)
 {
-    QnStorageSpaceDataList filtered;
+    nx::vms::api::StorageSpaceDataList filtered;
     std::copy_if(
         candidates.cbegin(), candidates.cend(), std::back_inserter(filtered),
         [minTotalSpaceGb](const nx::vms::api::StorageSpaceData& data)
@@ -29,7 +29,7 @@ std::optional<nx::vms::api::StorageSpaceData> selectOne(
 }
 
 QList<QnUuid> selectServers(
-    const ServerToStoragesList& serverToStorages, int64_t minStorageTotalSpaceGb)
+    const ServerToStoragesList  & serverToStorages, int64_t minStorageTotalSpaceGb)
 {
     std::vector<std::pair<QnUuid, int64_t>> serverToMaxStorageSpace;
     for (const auto& p: serverToStorages)

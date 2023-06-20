@@ -16,8 +16,6 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/recording_stats_reply.h>
 #include <api/model/statistics_reply.h>
-#include <api/model/storage_space_reply.h>
-#include <api/model/storage_status_reply.h>
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/time_reply.h>
 #include <api/model/update_information_reply.h>
@@ -194,7 +192,6 @@ void QnCommonMetaTypes::initialize()
     // Required for queuing arguments of type 'QnArchiveStreamReader*' in QObject::connect.
     qRegisterMetaType<QnArchiveStreamReader>();
 
-    qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStatisticsReply>();
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnTestEmailSettingsReply>();

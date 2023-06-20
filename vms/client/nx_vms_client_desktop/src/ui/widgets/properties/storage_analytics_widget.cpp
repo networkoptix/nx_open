@@ -314,7 +314,7 @@ void QnStorageAnalyticsWidget::querySpaceFromServer()
 }
 
 void QnStorageAnalyticsWidget::atReceivedSpaceInfo(QnMediaServerResourcePtr server,
-    bool success, int handle, const QnStorageSpaceReply& data)
+    bool success, int handle, const nx::vms::api::StorageSpaceReply& data)
 {
     if (server != m_server)
         return;

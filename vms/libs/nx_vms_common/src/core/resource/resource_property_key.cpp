@@ -125,6 +125,9 @@ const std::set<QString> kWriteOnlyNames{
     kDefaultCredentials,
 };
 
+// Storage
+const QString kPersistentStorageStatusFlagsKey("persistentStorageStatusFlags");
+
 } // namespace ResourcePropertyKey
 
 namespace ResourceDataKey {

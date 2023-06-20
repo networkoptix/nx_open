@@ -8,15 +8,8 @@ namespace nx::vms::api {
 
 struct StorageScanInfo;
 
-struct StorageSpaceData;
-
-typedef QList<nx::vms::api::StorageSpaceData> StorageSpaceDataList;
-
 } // namespace nx::vms::api
 
-typedef QList<nx::vms::api::StorageSpaceData> QnStorageSpaceDataList;
-
-struct QnStorageSpaceReply;
 struct QnVirtualCameraReply;
 struct QnVirtualCameraStatusReply;
 

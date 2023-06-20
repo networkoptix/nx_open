@@ -2,24 +2,17 @@
 
 #pragma once
 
-#include <api/model/api_model_fwd.h>
 #include <common/common_globals.h>
-#include <core/resource/resource_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/vms/api/data/storage_space_data.h>
-#include <utils/common/id.h>
 
 /**%apidoc Details about the requested folder. */
-struct NX_VMS_COMMON_API QnStorageStatusReply
+struct NX_VMS_COMMON_API StorageStatusReply
 {
-    bool pluginExists;
-    nx::vms::api::StorageSpaceData storage;
-    Qn::StorageInitResult status;
-
-    QnStorageStatusReply();
+    bool pluginExists = false;
+    nx::vms::api::StorageSpaceDataV1 storage;
+    Qn::StorageInitResult status = Qn::StorageInit_CreateFailed;
 };
-#define QnStorageStatusReply_Fields (pluginExists)(storage)(status)
-QN_FUSION_DECLARE_FUNCTIONS(QnStorageStatusReply, (json)(ubjson), NX_VMS_COMMON_API)
-
-NX_VMS_COMMON_API nx::vms::api::StorageSpaceData fromResourceToApi(
-    const QnStorageResourcePtr& storage, bool fastCreate);
+#define StorageStatusReply_Fields (pluginExists)(storage)(status)
+NX_REFLECTION_INSTRUMENT(StorageStatusReply, StorageStatusReply_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(StorageStatusReply, (json)(ubjson), NX_VMS_COMMON_API)
