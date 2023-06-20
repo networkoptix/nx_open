@@ -106,6 +106,12 @@ Rectangle
                     control.continuousSync = true
                     control.continuousSyncEditable = true
                     control.lastSync = ""
+
+                    control.syncIntervalS = kDefaultSyncIntervalS
+                    control.searchTimeoutS = kDefaultSearchTimeoutS
+
+                    control.loginAttribute = "" //< Auto.
+                    control.groupObjectClass = "" //< Auto.
                 }
 
                 control.uri = ldapScheme + hostAndPort
@@ -189,12 +195,6 @@ Rectangle
                 connectionSettingsDialog.initUri = control.uri
                 connectionSettingsDialog.initAdminDn = control.adminDn
                 connectionSettingsDialog.initPassword = control.password
-
-                control.syncIntervalS = kDefaultSyncIntervalS
-                control.searchTimeoutS = kDefaultSearchTimeoutS
-
-                control.loginAttribute = "" //< Auto.
-                control.groupObjectClass = "" //< Auto.
 
                 connectionSettingsDialog.show()
             }
