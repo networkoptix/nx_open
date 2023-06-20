@@ -8138,10 +8138,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>None of your Servers is connected to the Internet.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>System connected to %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation></translation>
@@ -8174,6 +8170,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Internal error. Please try again later.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>None of your Servers has connection to %1.</source>
+        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11445,6 +11446,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
         <source>Cannot find a resource with the specified ID.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Cannot add resources from other Systems.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
