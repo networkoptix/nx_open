@@ -812,9 +812,12 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createWebPagesGroupEntity() const
     if (hasPowerUserPermissions())
         flags |= Qt::ItemIsDropEnabled;
 
-    return makeFlatteningGroup(m_itemFactory->createWebPagesItem(flags),
-        std::move(webPagesList),
-        FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
+    const auto flatteningPolicy = hasPowerUserPermissions()
+        ? FlatteningGroupEntity::AutoFlatteningPolicy::noPolicy
+        : FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy;
+
+    return makeFlatteningGroup(
+        m_itemFactory->createWebPagesItem(flags), std::move(webPagesList), flatteningPolicy);
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createLocalFilesGroupEntity() const
