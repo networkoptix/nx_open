@@ -52,6 +52,8 @@ NX_REFLECTION_INSTRUMENT(SaasLocalRecordingParameters, SaasLocalRecordingParamet
 /**%apidoc Saas service parameters for 'cloudStorage' service type */
 struct NX_VMS_API SaasCloudStorageParameters
 {
+    static const int kUnlimitedResolution;
+
     /**%apidoc Amount of channels */
     int totalChannelNumber = 0;
 
@@ -59,7 +61,7 @@ struct NX_VMS_API SaasCloudStorageParameters
     int days = 0;
 
     /**%apidoc Maxumum camera resolution in megapixels */
-    int maxResolution = 0;
+    int maxResolution = kUnlimitedResolution;
 
     static SaasCloudStorageParameters fromParams(const SaasServiceParameters& parameters);
 };

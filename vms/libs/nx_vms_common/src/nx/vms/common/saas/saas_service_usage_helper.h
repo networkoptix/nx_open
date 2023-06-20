@@ -39,7 +39,7 @@ public:
      */
     nx::vms::api::LicenseSummaryData info(const QnUuid& id);
 
-    QMap<QnUuid, nx::vms::api::LicenseSummaryData> allInfo();
+    QMap<QnUuid, nx::vms::api::LicenseSummaryData> allInfo() const;
 
     /*
      *  @return true if there are not enough licenses for any integration.
@@ -47,19 +47,27 @@ public:
     bool isOverflow() const;
 
 
+    struct Propose
+    {
+        QnUuid resourceId;
+        QSet<QnUuid> integrations;
+    };
+
     /* Propose change in integration usage for some resource.
      *  @param resourceId Resource Id.
      *  @param integrations Set of used integration.
      */
     void proposeChange(const QnUuid& resourceId, const QSet<QnUuid>& integrations);
 
-private:
+    void proposeChange(const std::vector<Propose>& data);
+
     void invalidateCache();
+private:
     void updateCache();
-    void updateCacheUnsafe();
+    void updateCacheUnsafe() const;
 private:
     //Summary by integrationId.
-    std::optional<QMap<QnUuid, nx::vms::api::LicenseSummaryData>> m_cache;
+    mutable std::optional<QMap<QnUuid, nx::vms::api::LicenseSummaryData>> m_cache;
     mutable nx::Mutex m_mutex;
 };
 
@@ -84,18 +92,20 @@ public:
     std::map<int, nx::vms::api::LicenseSummaryData> allInfo() const;
 
     /* Propose change that resources are used for cloud storage.
-     *  @param devices Set of used resources.
+     *  @param devices New full set of resources that is going to be used.
      */
-    void proposeChange(const QSet<QnUuid>& devices);
+    void setUsedDevices(const QSet<QnUuid>& devices);
+
+    void invalidateCache();
 
 private:
-    void invalidateCache();
     void updateCache();
-    void updateCacheUnsafe();
-    void borrowUsages();
+    void updateCacheUnsafe() const;
+    void borrowUsages() const;
+    void calculateAvailableUnsafe() const;
 private:
     //Summary by megapixels.
-    std::optional<std::map<int, nx::vms::api::LicenseSummaryData>> m_cache;
+    mutable std::optional<std::map<int, nx::vms::api::LicenseSummaryData>> m_cache;
     mutable nx::Mutex m_mutex;
 };
 

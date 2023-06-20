@@ -6,6 +6,8 @@
 
 namespace nx::vms::api {
 
+const int SaasCloudStorageParameters::kUnlimitedResolution = std::numeric_limits<int>::max();
+
 bool fromString(const std::string& value, SaasDateTime* target)
 {
     if (value.empty())
@@ -15,9 +17,9 @@ bool fromString(const std::string& value, SaasDateTime* target)
     return true;
 }
 
-const QString SaasService::kLocalRecordingServiceType("localRecording");
+const QString SaasService::kLocalRecordingServiceType("local_recording");
 const QString SaasService::kAnalyticsIntegrationServiceType("analytics");
-const QString SaasService::kCloudRecordingType("cloudStorage");
+const QString SaasService::kCloudRecordingType("cloud_storage");
 
 template <typename T>
 struct Field
@@ -70,6 +72,8 @@ SaasCloudStorageParameters SaasCloudStorageParameters::fromParams(const SaasServ
     fieldFromMap(result, parameters, totalChannelNumber);
     fieldFromMap(result, parameters, days);
     fieldFromMap(result, parameters, maxResolution);
+    if (result.maxResolution == 0)
+        result.maxResolution = kUnlimitedResolution;
     return result;
 }
 

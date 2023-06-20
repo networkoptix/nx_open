@@ -125,12 +125,13 @@ std::map<QnUuid, nx::vms::api::SaasAnalyticsParamters> ServiceManager::analytics
             if (service.type != SaasService::kAnalyticsIntegrationServiceType)
                 continue;
 
-            const auto params = SaasAnalyticsParamters::fromParams(service.parameters);
+            auto params = SaasAnalyticsParamters::fromParams(service.parameters);
+            params.totalChannelNumber *= purshase.quantity;
             const auto itResult = result.find(params.integrationId);
             if (itResult == result.end())
                 result.emplace(params.integrationId, params);
             else
-                itResult->second.totalChannelNumber += params.totalChannelNumber * purshase.quantity;
+                itResult->second.totalChannelNumber += params.totalChannelNumber;
         }
     }
     return result;
@@ -150,7 +151,8 @@ std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> ServiceManager::cloud
             if (service.type != SaasService::kCloudRecordingType)
                 continue;
 
-            const auto params = SaasCloudStorageParameters::fromParams(service.parameters);
+            auto params = SaasCloudStorageParameters::fromParams(service.parameters);
+            params.totalChannelNumber *= purshase.quantity;
             result.emplace(serviceId,  params);
         }
     }
