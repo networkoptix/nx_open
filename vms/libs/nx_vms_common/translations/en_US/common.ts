@@ -376,6 +376,13 @@
     </message>
 </context>
 <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
         <source>Audio context was not specified.</source>
@@ -1431,10 +1438,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>RTP timeout (milliseconds)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Max RTSP connection duration (seconds)</source>
         <translation></translation>
     </message>
@@ -1591,11 +1594,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-        <comment>%1 is a company name</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Expose IP addresses for autodiscovery</source>
         <translation></translation>
     </message>
@@ -1638,6 +1636,11 @@
     <message>
         <source>Update releases.json file URL</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+        <comment>%1 is a company name</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2335,13 +2338,6 @@
     </message>
     <message>
         <source>Also play on source camera</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-        <source>Removed camera</source>
         <translation></translation>
     </message>
 </context>
