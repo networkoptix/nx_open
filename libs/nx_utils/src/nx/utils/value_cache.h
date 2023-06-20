@@ -29,7 +29,7 @@ public:
     CachedValue(
         MoveOnlyFunc<ValueType()> valueGenerator,
         std::chrono::milliseconds expirationTime = std::chrono::milliseconds::zero())
-    :
+        :
         m_valueGenerator(std::move(valueGenerator)),
         m_expirationTime(expirationTime)
     {
@@ -39,17 +39,13 @@ public:
     {
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
-            if (m_value.has_value() && (m_expirationTime == std::chrono::milliseconds::zero()
-                    || !m_timer.hasExpired(m_expirationTime)))
-            return *m_value;
+            if (m_value
+                && (m_expirationTime.count() == 0 || !m_timer.hasExpired(m_expirationTime)))
+            {
+                return *m_value;
+            }
         }
-        ValueType value = m_valueGenerator();
-        {
-            NX_MUTEX_LOCKER lock(&m_mutex);
-            m_value = std::move(value);
-            m_timer.restart();
-            return *m_value;
-        }
+        return updated();
     }
 
     void reset()
@@ -66,6 +62,21 @@ public:
             m_value = std::move(value);
             m_timer.restart();
         }
+    }
+
+    ValueType updated() const
+    {
+        ValueType value = m_valueGenerator();
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_value = std::move(value);
+        m_timer.restart();
+        return *m_value;
+    }
+
+    bool isExpired() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        return m_timer.hasExpired(m_expirationTime);
     }
 
 private:

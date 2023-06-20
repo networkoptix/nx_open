@@ -103,8 +103,7 @@ TEST(CachedValue, Base)
 
      returnValue += 1;
      ASSERT_EQ(value.get(), 1);
-     value.update();
-     ASSERT_EQ(value.get(), 2);
+     ASSERT_EQ(value.updated(), 2);
 }
 
 TEST(CachedValue, ConstructionAndCopy)
@@ -192,8 +191,7 @@ TEST(CachedValue, LongTimeOfValueGeneration)
             timeShift.applyRelativeShift(expiryTime + 1ms);
             return SomeType(n++);
         }, expiryTime);
-    value.update();
-    EXPECT_EQ(value.get().m_value, 0);
+    EXPECT_EQ(value.updated().m_value, 0);
 
     expectSpecialFunctionCalls(catcherMocks[1], 1, -1, 2, 0);
     timeShift.applyRelativeShift(expiryTime + 1ms);

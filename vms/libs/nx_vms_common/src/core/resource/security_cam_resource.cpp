@@ -356,8 +356,7 @@ void QnSecurityCamResource::updateAudioRequiredOnDevice(const QString& deviceId)
 void QnSecurityCamResource::updateAudioRequired()
 {
     auto prevValue = m_cachedAudioRequired.get();
-    m_cachedAudioRequired.update();
-    if (prevValue != m_cachedAudioRequired.get())
+    if (prevValue != m_cachedAudioRequired.updated())
         emit audioRequiredChanged(::toSharedPointer(this));
 }
 
