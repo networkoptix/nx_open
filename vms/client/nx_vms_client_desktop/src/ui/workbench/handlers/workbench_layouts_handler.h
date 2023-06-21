@@ -98,6 +98,8 @@ private:
     void openLayouts(
         const LayoutResourceList& layouts,
         const StreamSynchronizationState& playbackState);
+
+    QString generateUniqueLayoutName(const QnUserResourcePtr& user) const;
 };
 
 } // namespace workbench
