@@ -7,6 +7,7 @@
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
 #include <client/client_globals.h>
+#include <core/resource/bookmark_sort.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -264,7 +265,8 @@ void QnSearchBookmarksModelPrivate::sort(int column, Qt::SortOrder order)
     {
         Q_Q(QnSearchBookmarksModel);
 
-        QnCameraBookmark::sortBookmarks(systemContext(), m_bookmarks, m_filter.orderBy);
+        nx::vms::common::sortBookmarks(m_bookmarks, m_filter.orderBy.column,
+            m_filter.orderBy.order, systemContext()->resourcePool());
 
         const auto startIndex = q->index(0, 0);
         const auto finishIndex = q->index(m_bookmarks.size() - 1,

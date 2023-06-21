@@ -101,11 +101,6 @@ struct NX_VMS_COMMON_API QnCameraBookmark
     static QString tagsToString(
         const QnCameraBookmarkTags& tags, const QString& delimiter = QStringLiteral(", "));
 
-    static void sortBookmarks(
-        nx::vms::common::SystemContext* systemContext,
-        QnCameraBookmarkList& bookmarks,
-        const QnBookmarkSortOrder orderBy);
-
     static QnCameraBookmarkList mergeCameraBookmarks(
         nx::vms::common::SystemContext* systemContext,
         const QnMultiServerCameraBookmarkList& source,
@@ -140,6 +135,20 @@ struct NX_VMS_COMMON_API QnCameraBookmarkSearchFilter
     using milliseconds = std::chrono::milliseconds;
     /** Minimum start time for the bookmark. Zero means no limit. */
     milliseconds startTimeMs{};
+
+    /**
+     * Time point around which bookmarks are going to be returned. If parameter is specified then
+     * request returns nearest (by start time) limit/2 bookmarks before the split point and nearest
+     * limit/2 bookmarks after.
+     * To derminate nearest bookmarks start time field is taken into consideration. If there are
+     * bookmarks with the same start time then guid field is used to determine the order.
+     * After bookmarks are gathered they are sorted by the specified column.
+     * In case of ascending sorting (whatever the sorting column is) the split point is right after
+     * the specified time point. In case of descending order the split point is right before the
+     * specified time point.
+     * In addition to the sort filed all returned bookmarks are sorted by the guid field.
+     */
+    std::optional<std::chrono::milliseconds> centralTimePointMs;
 
     /** Maximum end time for the bookmark. Zero means no limit. */
     milliseconds endTimeMs{};

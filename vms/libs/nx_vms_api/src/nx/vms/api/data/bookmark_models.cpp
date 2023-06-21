@@ -7,7 +7,6 @@
 namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkFilter, (json), BookmarkFilter_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TailBookmarkFilter, (json), TailBookmarkFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Bookmark, (json), Bookmark_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkWithRule, (json), BookmarkWithRule_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkTagFilter, (json), BookmarkTagFilter_Fields)

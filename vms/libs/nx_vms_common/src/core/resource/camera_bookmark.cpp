@@ -25,8 +25,9 @@ QnMultiServerCameraBookmarkList sortEachList(
     QnMultiServerCameraBookmarkList sources,
     const QnBookmarkSortOrder& sortProp)
 {
+    const auto resourcePool = systemContext->resourcePool();
     for (auto& source: sources)
-        QnCameraBookmark::sortBookmarks(systemContext, source, sortProp);
+        nx::vms::common::sortBookmarks(source, sortProp.column, sortProp.order, resourcePool);
 
     return std::move(sources);
 }
@@ -145,18 +146,6 @@ QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &tags, const Q
             validTags << trimmed;
     }
     return validTags.join(delimiter);
-}
-
-// TODO: #sivanov Create unit tests.
-void QnCameraBookmark::sortBookmarks(
-    SystemContext* systemContext,
-    QnCameraBookmarkList &bookmarks,
-    const QnBookmarkSortOrder orderBy)
-{
-    const auto pred = ::createBookmarkSortPredicate(
-        orderBy.column, orderBy.order, systemContext->resourcePool());
-
-    std::sort(bookmarks.begin(), bookmarks.end(), pred);
 }
 
 milliseconds QnCameraBookmark::creationTime() const
