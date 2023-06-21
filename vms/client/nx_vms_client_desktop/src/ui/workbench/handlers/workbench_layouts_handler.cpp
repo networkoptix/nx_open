@@ -78,23 +78,6 @@ namespace workbench {
 
 namespace {
 
-QString generateUniqueLayoutName(
-    QnResourcePool* resourcePool,
-    const QnUserResourcePtr &user,
-    const QString &defaultName,
-    const QString &nameTemplate)
-{
-    QStringList usedNames;
-    QnUuid parentId = user ? user->getId() : QnUuid();
-    for (const auto layout: resourcePool->getResources<LayoutResource>())
-    {
-        if (layout->isShared() || layout->getParentId() == parentId)
-            usedNames.push_back(layout->getName());
-    }
-
-    return nx::utils::generateUniqueString(usedNames, defaultName, nameTemplate);
-}
-
 /**
  * @brief alreadyExistingLayouts    Check if layouts with same name already exist.
  * @param name                      Suggested new name.
@@ -470,10 +453,8 @@ void LayoutsHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
     dialog->setWindowTitle(tr("Save Layout As"));
     dialog->setText(tr("Enter Layout Name:"));
 
-    QString proposedName = hasSavePermission
-        ? layout->getName()
-        : generateUniqueLayoutName(
-            resourcePool(), context()->user(), layout->getName(), layout->getName() + lit(" %1"));
+    QString proposedName =
+        hasSavePermission ? layout->getName() : generateUniqueLayoutName(context()->user());
 
     dialog->setName(proposedName);
     setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
@@ -914,6 +895,21 @@ void LayoutsHandler::openLayouts(
     workbench()->setCurrentLayout(lastLayout);
 }
 
+QString LayoutsHandler::generateUniqueLayoutName(const QnUserResourcePtr& user) const
+{
+    QStringList usedNames;
+    QnUuid parentId = user ? user->getId() : QnUuid();
+    for (const auto& layout: resourcePool()->getResources<LayoutResource>())
+    {
+        if (layout->isShared() || layout->getParentId() == parentId)
+            usedNames.push_back(layout->getName());
+    }
+
+    return nx::utils::generateUniqueString(usedNames,
+        tr("New Layout") + " 1",
+        tr("New Layout") + " %1");
+}
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -934,7 +930,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindowWidget()));
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
-    dialog->setName(generateUniqueLayoutName(resourcePool(), user, tr("New Layout"), tr("New Layout %1")));
+    dialog->setName(generateUniqueLayoutName(user));
     dialog->setWindowModality(Qt::ApplicationModal);
 
     if (!dialog->exec())
@@ -1035,11 +1031,7 @@ void LayoutsHandler::at_openNewTabAction_triggered()
     auto resource = LayoutResourcePtr(new LayoutResource());
     resource->setIdUnsafe(QnUuid::createUuid());
     resource->addFlags(Qn::local);
-    resource->setName(generateUniqueLayoutName(
-        resourcePool(),
-        context()->user(),
-        tr("New Layout"),
-        tr("New Layout %1")));
+    resource->setName(generateUniqueLayoutName(context()->user()));
     if (context()->user())
         resource->setParentId(context()->user()->getId());
 
@@ -1153,22 +1145,14 @@ void LayoutsHandler::at_openInNewTabAction_triggered()
     if (hasCrossSystemResources)
     {
         appContext()->cloudLayoutsSystemContext()->resourcePool()->addResource(layout);
-        layout->setName(generateUniqueLayoutName(
-            layout->resourcePool(),
-            /*user*/ {},
-            tr("New Layout"),
-            tr("New Layout %1")));
+        layout->setName(generateUniqueLayoutName(/*user*/ {}));
     }
     else
     {
         if (context()->user())
             layout->setParentId(context()->user()->getId());
         resourcePool()->addResource(layout);
-        layout->setName(generateUniqueLayoutName(
-            resourcePool(),
-            context()->user(),
-            tr("New Layout"),
-            tr("New Layout %1")));
+        layout->setName(generateUniqueLayoutName(context()->user()));
     }
 
     if (calledFromScene)
