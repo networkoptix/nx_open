@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "transaction/transaction_descriptor.h"
+#include <nx/vms/api/data/storage_space_data.h>
+#include <transaction/transaction_descriptor.h>
 
 #include <gtest/gtest.h>
 
@@ -63,9 +64,31 @@ TEST_F(CanModifyStorageTest, ResourceExists_EqualParentIds_DifferentUrls)
     data.hasExistingStorage = true;
     data.request.parentId = existingResource.parentId;
     data.request.url = "some://other/url";
-    ASSERT_EQ(ErrorCode::badRequest, canModifyStorage(data));
+    ASSERT_EQ(ErrorCode::forbidden, canModifyStorage(data));
     ASSERT_TRUE(logFuncCalled);
     ASSERT_TRUE(getExistingStorageCalled);
+}
+
+TEST_F(CanModifyStorageTest, ForbiddenMainCloudStorage)
+{
+    data.modifyResourceResult = ErrorCode::ok;
+    data.hasExistingStorage = false;
+    data.request.parentId = existingResource.parentId;
+    data.request.url = existingResource.url;
+    data.storageType = nx::vms::api::kCloudStorageType;
+    data.isBackup = false;
+    ASSERT_EQ(ErrorCode::forbidden, canModifyStorage(data));
+}
+
+TEST_F(CanModifyStorageTest, AllowedBackupCloudStorage)
+{
+    data.modifyResourceResult = ErrorCode::ok;
+    data.hasExistingStorage = false;
+    data.request.parentId = existingResource.parentId;
+    data.request.url = existingResource.url;
+    data.storageType = nx::vms::api::kCloudStorageType;
+    data.isBackup = true;
+    ASSERT_EQ(ErrorCode::ok, canModifyStorage(data));
 }
 
 } // namespace ec2::transaction_descriptor::test

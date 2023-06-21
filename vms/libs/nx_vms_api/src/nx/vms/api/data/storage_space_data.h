@@ -117,4 +117,6 @@ using StorageSpaceDataWithDbInfo = StorageSpaceDataWithDbInfoV3;
 using StorageSpaceDataWithDbInfoListV3 = std::vector<StorageSpaceDataWithDbInfoV3>;
 using StorageSpaceDataWithDbInfoList = StorageSpaceDataWithDbInfoListV3;
 
+constexpr const char* const kCloudStorageType = "cloud";
+
 } // namespace nx::vms::api
