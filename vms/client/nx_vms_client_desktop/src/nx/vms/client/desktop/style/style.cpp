@@ -4021,7 +4021,7 @@ QIcon Style::standardIcon(
         case SP_FileDialogToParent:
             return qnSkin->icon("standard_icons/arrow_up_24.svg");
         case SP_FileDialogListView:
-            return qnSkin->icon("standard_icons/sp_file_dialog_list_view.png");
+            return qnSkin->icon("standard_icons/hamburger_menu_24.svg");
         case SP_FileDialogDetailedView:
             return qnSkin->icon("standard_icons/sp_file_dialog_detailed_view.png");
         case SP_FileDialogNewFolder:
