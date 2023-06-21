@@ -4014,7 +4014,7 @@ QIcon Style::standardIcon(
             return qnSkin->icon("standard_icons/sp_line_edit_clear_button.png");
         case SP_ArrowLeft:
         case SP_ArrowBack:
-            return qnSkin->icon("standard_icons/sp_arrow_back.png");
+            return qnSkin->icon("standard_icons/arrow_left_24.svg");
         case SP_ArrowRight:
         case SP_ArrowForward:
             return qnSkin->icon("standard_icons/sp_arrow_forward.png");
