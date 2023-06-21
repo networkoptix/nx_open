@@ -64,6 +64,9 @@ struct QnStartupParameters
     QRect windowGeometry;
     const static QString kWindowGeometryKey;
 
+    bool skipAutoLogin = false;
+    const static QString kSkipAutoLoginKey;
+
     QString delayedDrop;
     QString instantDrop;
     QString layoutRef;

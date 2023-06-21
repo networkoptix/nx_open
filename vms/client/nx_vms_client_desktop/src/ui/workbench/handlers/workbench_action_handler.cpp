@@ -1128,7 +1128,9 @@ void ActionHandler::at_openNewWindowAction_triggered()
 
 void ActionHandler::at_openWelcomeScreenAction_triggered()
 {
-    appContext()->clientStateHandler()->createNewWindow();
+    appContext()->clientStateHandler()->createNewWindow(
+        /*logonData*/ std::nullopt,
+        /*args*/ {QnStartupParameters::kSkipAutoLoginKey});
 }
 
 void ActionHandler::at_reviewShowreelInNewWindowAction_triggered()
