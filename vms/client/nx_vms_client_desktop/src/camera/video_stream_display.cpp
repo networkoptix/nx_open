@@ -433,9 +433,12 @@ void QnVideoStreamDisplay::flushReverseBlock(
     QnCompressedVideoDataPtr data,
     QnFrameScaler::DownscaleFactor forceScaleFactor)
 {
-    CLVideoDecoderOutputPtr decodedFrame(new CLVideoDecoderOutput());
-    while (dec->decode(nullptr, &decodedFrame))
+    while (true)
     {
+        CLVideoDecoderOutputPtr decodedFrame(new CLVideoDecoderOutput());
+        if (!dec->decode(nullptr, &decodedFrame))
+            break;
+
         CLVideoDecoderOutputPtr tmpOutFrame(new CLVideoDecoderOutput());
         if (!downscaleOrForward(decodedFrame, tmpOutFrame, forceScaleFactor))
             continue;
