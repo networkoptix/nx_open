@@ -19,6 +19,7 @@
 #include <ui/widgets/main_window.h>
 #include <utils/common/delayed.h>
 
+#include "nx/vms/client/desktop/system_logon/ui/welcome_screen.h"
 #include "private/close_tab_button.h"
 #include "system_tab_bar_model.h"
 
@@ -92,6 +93,11 @@ SystemTabBar::SystemTabBar(QWidget *parent):
         &QAction::triggered,
         this,
         &SystemTabBar::at_systemDisconnected);
+    connect(mainWindow()->welcomeScreen(), &WelcomeScreen::globalPreloaderVisibleChanged, this,
+        [this](bool visible)
+        {
+            setEnabled(!visible);
+        });
 }
 
 void SystemTabBar::rebuildTabs()

@@ -161,8 +161,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     base_type(parent, flags),
     QnWorkbenchContextAware(context),
     d(new Private(this)),
-    m_welcomeScreen(qnRuntime->isDesktopMode() ? new WelcomeScreen(this) : nullptr),
-    m_titleBar(new QnMainWindowTitleBarWidget(context, this))
+    m_welcomeScreen(qnRuntime->isDesktopMode() ? new WelcomeScreen(this) : nullptr)
 {
     QnHiDpiWorkarounds::init();
 
@@ -254,6 +253,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     else
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
+    m_titleBar = new QnMainWindowTitleBarWidget(context, this);
     m_controller.reset(new QnWorkbenchController(this));
     if (qnRuntime->isVideoWallMode())
         m_controller->setMenuEnabled(false);

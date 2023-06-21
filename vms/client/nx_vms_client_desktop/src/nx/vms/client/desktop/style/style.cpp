@@ -2194,7 +2194,7 @@ void Style::drawControl(ControlElement element,
                             ? QPalette::Active
                             : QPalette::Inactive;
                         QColor color = option->palette.color(colorGroup, QPalette::Base);
-                        if (isTabHovered(tab, widget))
+                        if (isTabHovered(tab, widget) && widget->isEnabled())
                             color = core::colorTheme()->lighter(color, 1);
                         painter->fillRect(rect, color);
 
