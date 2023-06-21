@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <vector>
 
+#include <QtCore/QCollator>
 #include <QtCore/QPointer>
 #include <QtQml/QtQml>
 
@@ -16,6 +17,7 @@
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/format.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -449,6 +451,9 @@ void ResourceAccessRightsModel::Private::updateInfo(bool suppressSignals)
                     const auto accessViaResourceGroup = !resourceGroupId.isNull()
                         && context->hasOwnAccessRight(resourceGroupId, accessRightList[i]);
 
+                    if (accessViaResourceGroup)
+                        newInfo.parentResourceGroupId = resourceGroupId;
+
                     newInfo.providedVia = accessViaResourceGroup
                         ? ResourceAccessInfo::ProvidedVia::ownResourceGroup
                         : ResourceAccessInfo::ProvidedVia::own;
@@ -491,12 +496,15 @@ void ResourceAccessRightsModel::Private::updateInfo(bool suppressSignals)
             else if (!details.empty())
             {
                 newInfo.providedVia = ResourceAccessInfo::ProvidedVia::parentUserGroup;
+            }
+
+            if (newInfo.providedVia != ResourceAccessInfo::ProvidedVia::none)
+            {
+                const QSet<QnUuid> providerIds{details.keyBegin(), details.keyEnd()};
 
                 // Show only the direct parents which provide current access rights.
                 const auto directParents =
                     context->subjectHierarchy()->directParents(context->currentSubjectId());
-
-                const QSet<QnUuid> providerIds{details.keyBegin(), details.keyEnd()};
 
                 newInfo.providerUserGroups = {};
                 for (const auto& key: directParents)
@@ -590,7 +598,7 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
 {
     using namespace nx::vms::common;
 
-    if (!resource)
+    if (!context)
         return {};
 
     QStringList groups, layouts, videoWalls;
@@ -604,15 +612,19 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
             groupsData.push_back(*group);
     }
 
+    QCollator collator;
+    collator.setCaseSensitivity(Qt::CaseInsensitive);
+    collator.setNumericMode(true);
+
     std::sort(groupsData.begin(), groupsData.end(),
-        [](const auto& left, const auto& right)
+        [&collator](const auto& left, const auto& right)
         {
             // Predefined groups go first.
             const auto predefinedLeft = PredefinedUserGroups::contains(left.id);
             const auto predefinedRight = PredefinedUserGroups::contains(right.id);
             if (predefinedLeft != predefinedRight)
                 return predefinedLeft;
-            else if (predefinedLeft)
+            if (predefinedLeft)
                 return left.id < right.id;
 
             // Sort according to type: local, ldap, cloud.
@@ -626,35 +638,74 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
                 return left.id == nx::vms::api::kDefaultLdapGroupId;
             }
 
-            // Case Insensitive sort.
-            const int ret = nx::utils::naturalStringCompare(
-                left.name, right.name, Qt::CaseInsensitive);
-
             // Sort identical names by UUID.
-            if (ret == 0)
+            if (left.name == right.name)
                 return left.id < right.id;
 
-            return ret < 0;
+            // Case insensitive numeric-aware search.
+            return collator(left.name, right.name);
         });
 
     for (const auto& group: groupsData)
-        groups << html::bold(group.name);
+        groups << group.name;
 
     for (const auto& providerResource: accessInfo.indirectProviders)
     {
         if (auto layout = providerResource.dynamicCast<QnLayoutResource>())
-            layouts << html::bold(layout->getName());
+            layouts << layout->getName();
         else if (auto videoWall = providerResource.dynamicCast<QnVideoWallResource>())
-            videoWalls << html::bold(videoWall->getName());
+            videoWalls << videoWall->getName();
     }
 
+    std::sort(layouts.begin(), layouts.end(), collator);
+    std::sort(videoWalls.begin(), videoWalls.end(), collator);
+
     const auto makeDescription =
-        [this](const QString& single, const QString& plural, const QStringList& list)
+        [this](const QString& single, const QString& plural, QStringList list)
         {
+            for (auto& name: list)
+                name = html::bold(name);
+
             return list.size() == 1
                 ? nx::format(single, list.front()).toQString()
                 : nx::format(plural, list.join(", ")).toQString();
         };
+
+    const auto resourceGroupName =
+        [this](const QnUuid& resourceGroupId) -> std::optional<QString>
+        {
+            const auto group = specialResourceGroup(resourceGroupId);
+            if (!group)
+                return {};
+
+            switch (*group)
+            {
+                case SpecialResourceGroup::allDevices:
+                    return tr("Cameras & Devices");
+
+                case SpecialResourceGroup::allWebPages:
+                    return tr("Web Pages & Integrations");
+
+                case SpecialResourceGroup::allServers:
+                    return tr("Health Monitors");
+
+                case SpecialResourceGroup::allVideowalls:
+                    return tr("Video Walls");
+            }
+
+            return {};
+        };
+
+    if (accessInfo.providedVia == ResourceAccessInfo::ProvidedVia::own)
+    {
+        descriptions << tr("Access granted by custom permissions");
+    }
+    else if (auto nodeName = resourceGroupName(accessInfo.parentResourceGroupId))
+    {
+        descriptions << tr("Access granted by %1",
+            "`%1` will be substituted with a resource group like `Cameras & Devices`")
+                .arg(html::bold(*nodeName));
+    }
 
     if (!groups.empty())
     {

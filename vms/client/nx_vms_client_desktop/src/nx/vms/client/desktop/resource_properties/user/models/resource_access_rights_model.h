@@ -40,6 +40,7 @@ public:
     ProvidedVia providedVia{ProvidedVia::none};
     QVector<QnUuid> providerUserGroups;
     QVector<QnResourcePtr> indirectProviders;
+    QnUuid parentResourceGroupId;
     int checkedChildCount = 0;
     int totalChildCount = 0;
 
