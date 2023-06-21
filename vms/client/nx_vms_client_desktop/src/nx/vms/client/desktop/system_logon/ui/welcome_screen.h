@@ -185,7 +185,7 @@ signals:
 
     void resetAutoLogin();
 
-    void globalPreloaderVisibleChanged();
+    void globalPreloaderVisibleChanged(bool visible);
 
     void globalPreloaderEnabledChanged();
 

@@ -272,7 +272,7 @@ void WelcomeScreen::setGlobalPreloaderVisible(bool value)
         return;
 
     m_globalPreloaderVisible = value;
-    emit globalPreloaderVisibleChanged();
+    emit globalPreloaderVisibleChanged(value);
 }
 
 bool WelcomeScreen::globalPreloaderEnabled() const
