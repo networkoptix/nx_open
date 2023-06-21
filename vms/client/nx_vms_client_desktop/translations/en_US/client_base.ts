@@ -3013,6 +3013,10 @@ to %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation></translation>
     </message>
+    <message>
+        <source>System will be accessible only through local network.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCloudResultInfo</name>

@@ -248,7 +248,7 @@ bool QnCloudManagementWidget::confirmCloudDisconnect()
     }
     else
     {
-        infoText.append("System will be accessible only through local network.");
+        infoText.append(tr("System will be accessible only through local network."));
     }
     messageBox.setInformativeText(infoText);
 
