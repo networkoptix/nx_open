@@ -4025,7 +4025,7 @@ QIcon Style::standardIcon(
         case SP_FileDialogDetailedView:
             return qnSkin->icon("standard_icons/sp_file_dialog_detailed_view.png");
         case SP_FileDialogNewFolder:
-            return qnSkin->icon("standard_icons/sp_file_dialog_new_folder.png");
+            return qnSkin->icon("standard_icons/add_folder_24.svg");
         case SP_MessageBoxInformation:
             return qnSkin->icon("standard_icons/sp_message_box_information.png");
         case SP_MessageBoxQuestion:
