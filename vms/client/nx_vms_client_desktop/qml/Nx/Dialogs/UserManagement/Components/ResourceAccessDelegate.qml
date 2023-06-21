@@ -98,16 +98,7 @@ Item
                     acceptedButtons: cell.toggleable ? Qt.LeftButton : Qt.NoButton
 
                     GlobalToolTip.enabled: !delegateRoot.frameSelectionActive
-                    GlobalToolTip.text:
-                    {
-                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup
-                            && delegateRoot.editingEnabled)
-                        {
-                            return qsTr("Access granted by parent node. Deselect it to enable editing")
-                        }
-
-                        return model.toolTip
-                    }
+                    GlobalToolTip.text: model.toolTip
 
                     readonly property int accessRight: model.accessRight
 
