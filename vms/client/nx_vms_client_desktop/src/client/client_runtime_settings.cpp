@@ -5,6 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/common/application_context.h>
 
 #include "client_startup_parameters.h"
 
@@ -65,6 +66,11 @@ QnClientRuntimeSettings::~QnClientRuntimeSettings()
 QnClientRuntimeSettings* QnClientRuntimeSettings::instance()
 {
     return s_instance;
+}
+
+QString QnClientRuntimeSettings::locale() const
+{
+    return nx::vms::common::appContext()->locale();
 }
 
 bool QnClientRuntimeSettings::isDesktopMode() const

@@ -43,9 +43,6 @@ public:
         /** Use OpenGL double buffering. */
         GL_DOUBLE_BUFFER,
 
-        /** Current locale. */
-        LOCALE,
-
         /** Maximum simultaneous scene items overridden value. 0 means default. */
         MAX_SCENE_ITEMS_OVERRIDE,
 
@@ -72,6 +69,9 @@ public:
      */
     int maxSceneItems() const;
 
+    /** Compatibility function. */
+    QString locale() const; //< TODO: #sivanov Remove in the next release.
+
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(bool, isSoftwareYuv, setSoftwareYuv, SOFTWARE_YUV, false)
@@ -85,7 +85,6 @@ private:
         QN_DECLARE_RW_PROPERTY(bool, isAcsMode, setAcsMode, ACS_MODE, false)
         QN_DECLARE_RW_PROPERTY(bool, showFullInfo, setShowFullInfo, SHOW_FULL_INFO, false)
         QN_DECLARE_RW_PROPERTY(bool, isGlDoubleBuffer, setGLDoubleBuffer, GL_DOUBLE_BUFFER, true)
-        QN_DECLARE_RW_PROPERTY(QString, locale, setLocale, LOCALE, QString())
         QN_DECLARE_RW_PROPERTY(int, maxSceneItemsOverride, setMaxSceneItemsOverride,
             MAX_SCENE_ITEMS_OVERRIDE, 0)
         QN_DECLARE_RW_PROPERTY(bool, isClientUpdateAllowed, setClientUpdateAllowed,
