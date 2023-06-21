@@ -89,9 +89,11 @@ struct CanModifyStorageData
     nx::vms::api::StorageData request;
     std::function<void(const QString&)> logErrorFunc;
     std::function<nx::vms::api::ResourceData()> getExistingStorageDataFunc;
+    QString storageType;
+    bool isBackup = false;
 };
 
-ErrorCode canModifyStorage(const CanModifyStorageData& data);
+Result canModifyStorage(const CanModifyStorageData& data);
 
 } // namespace transaction_descriptor
 

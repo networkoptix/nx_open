@@ -23,6 +23,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/data/storage_flags.h>
+#include <nx/vms/api/data/storage_space_data.h>
 #include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
@@ -39,30 +40,6 @@ using namespace nx::vms;
 using SystemContext = nx::vms::common::SystemContext;
 
 namespace ec2 {
-
-namespace transaction_descriptor {
-
-ErrorCode canModifyStorage(const CanModifyStorageData& data)
-{
-    if (data.modifyResourceResult != ErrorCode::ok)
-        return data.modifyResourceResult;
-
-    if (!data.hasExistingStorage)
-        return ErrorCode::ok;
-
-    const auto existingStorage = data.getExistingStorageDataFunc();
-    if (existingStorage.parentId == data.request.parentId
-        && data.request.url != existingStorage.url)
-    {
-        data.logErrorFunc(nx::format(
-            "Got inconsistent update request for storage '%1'. Urls differ.", data.request.id));
-        return ErrorCode::badRequest;
-    }
-
-    return ErrorCode::ok;
-}
-
-} // namespace transaction_descriptor
 
 namespace detail {
 
@@ -632,6 +609,8 @@ struct ModifyStorageAccess
         transaction_descriptor::CanModifyStorageData data;
         const auto existingResource = systemContext->resourcePool()->getResourceById(param.id);
         data.hasExistingStorage = (bool) existingResource;
+        data.storageType = param.storageType;
+        data.isBackup = param.isBackup;
         data.getExistingStorageDataFunc =
             [&]()
             {
@@ -1773,6 +1752,44 @@ DescriptorBaseContainer transactionDescriptors = {
 #undef TRANSACTION_DESCRIPTOR_APPLY
 
 } // namespace detail
+
+namespace transaction_descriptor {
+
+Result canModifyStorage(const CanModifyStorageData& data)
+{
+    if (data.modifyResourceResult != ErrorCode::ok)
+        return data.modifyResourceResult;
+
+    // For now only backup cloud storages are supported. It may change later.
+    if (data.storageType == nx::vms::api::kCloudStorageType && !data.isBackup)
+    {
+        return Result(
+            ErrorCode::forbidden,
+            nx::format(
+                detail::ServerApiErrors::tr(
+                    "%1 storage can be only in the backup storage pool.",
+                    /*comment*/ "%1 is the short cloud name (like Cloud)"),
+                nx::branding::shortCloudName()));
+    }
+
+    if (!data.hasExistingStorage)
+        return ErrorCode::ok;
+
+    const auto existingStorage = data.getExistingStorageDataFunc();
+    if (existingStorage.parentId == data.request.parentId
+        && data.request.url != existingStorage.url)
+    {
+        data.logErrorFunc(nx::format(
+            "Got inconsistent update request for storage '%1'. Urls differ.", data.request.id));
+        return Result(
+            ErrorCode::forbidden,
+            detail::ServerApiErrors::tr("Changing storage URL is prohibited."));
+    }
+
+    return ErrorCode::ok;
+}
+
+} // namespace transaction_descriptor
 
 detail::TransactionDescriptorBase *getTransactionDescriptorByValue(ApiCommand::Value v)
 {
