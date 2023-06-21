@@ -80,7 +80,7 @@ FocusScope
                 Image
                 {
                     visible: extras.flags & ResourceTree.ResourceExtraStatusFlag.locked
-                    source: "qrc:///skin/tree/locked.svg"
+                    source: "image://svg/skin/tree/locked.svg"
                     sourceSize: Qt.size(20, 20)
                 }
 
