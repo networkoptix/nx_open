@@ -4017,7 +4017,7 @@ QIcon Style::standardIcon(
             return qnSkin->icon("standard_icons/arrow_left_24.svg");
         case SP_ArrowRight:
         case SP_ArrowForward:
-            return qnSkin->icon("standard_icons/sp_arrow_forward.png");
+            return qnSkin->icon("standard_icons/arrow_right_24.svg");
         case SP_FileDialogToParent:
             return qnSkin->icon("standard_icons/sp_file_dialog_to_parent.png");
         case SP_FileDialogListView:
