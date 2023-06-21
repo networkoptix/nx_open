@@ -687,7 +687,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("Enable deprecated API functions (unsecure)"); });
 
     m_insecureDeprecatedApiInUseEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        Names::insecureDeprecatedApiInUseEnabled, true, this,
+        Names::insecureDeprecatedApiInUseEnabled, false, this,
         []
         {
             return nx::format(tr(
