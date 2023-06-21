@@ -185,14 +185,15 @@ std::function<bool(const QnCameraBookmark&, const QnCameraBookmark&)>
         sortField, sortOrder == Qt::AscendingOrder, resourcePool);
 }
 
-namespace nx::vms::api {
+namespace nx::vms::common {
 
-std::function<bool(const Bookmark&, const Bookmark&)> createBookmarkSortPredicate(
-    BookmarkSortField sortField,
+std::function<bool(const nx::vms::api::Bookmark&, const nx::vms::api::Bookmark&)>
+    createBookmarkSortPredicate(
+    nx::vms::api::BookmarkSortField sortField,
     Qt::SortOrder sortOrder,
     QnResourcePool* resourcePool)
 {
-    return createGenericBookmarkSortPredicate<Bookmark>(
+    return createGenericBookmarkSortPredicate<nx::vms::api::Bookmark>(
         sortField, sortOrder == Qt::AscendingOrder, resourcePool);
 }
 
