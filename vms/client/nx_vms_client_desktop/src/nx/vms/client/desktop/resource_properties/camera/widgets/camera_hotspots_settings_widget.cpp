@@ -90,6 +90,8 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
 
     ui->hotspotsItemView->setItemDelegate(hotspotsDelegate.get());
     ui->hotspotsItemView->setModel(hotspotsModel.get());
+    ui->hotspotsItemView->setEditTriggers(
+        QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
 
     auto header = ui->hotspotsItemView->header();
     header->setSectionResizeMode(
