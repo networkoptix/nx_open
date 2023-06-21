@@ -4019,7 +4019,7 @@ QIcon Style::standardIcon(
         case SP_ArrowForward:
             return qnSkin->icon("standard_icons/arrow_right_24.svg");
         case SP_FileDialogToParent:
-            return qnSkin->icon("standard_icons/sp_file_dialog_to_parent.png");
+            return qnSkin->icon("standard_icons/arrow_up_24.svg");
         case SP_FileDialogListView:
             return qnSkin->icon("standard_icons/sp_file_dialog_list_view.png");
         case SP_FileDialogDetailedView:
