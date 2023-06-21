@@ -42,6 +42,7 @@
 #include <nx/vms/api/data/storage_encryption_data.h>
 #include <nx/vms/api/data/system_information.h>
 #include <nx/vms/common/api/helpers/parser_helper.h>
+#include <nx/vms/common/application_context.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
@@ -2504,6 +2505,8 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     request.method = method;
     request.contentType = contentType;
     request.messageBody = messageBody;
+    request.headers.emplace(Qn::kAcceptLanguageHeader,
+        nx::vms::common::appContext()->locale().toStdString());
     return request;
 }
 

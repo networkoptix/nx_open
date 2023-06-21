@@ -266,7 +266,8 @@ struct ApplicationContext::Private
         runtimeSettings = std::make_unique<QnClientRuntimeSettings>(startupParameters);
         runtimeSettings->setGLDoubleBuffer(settings->isGlDoubleBuffer());
         runtimeSettings->setMaximumLiveBufferMs(settings->maximumLiveBufferMs());
-        runtimeSettings->setLocale(settings->locale());
+
+        common::appContext()->setLocale(settings->locale());
 
         #ifdef Q_OS_MACX
             if (mac_isSandboxed())
