@@ -7,15 +7,16 @@
 #include <common/common_meta_types.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <network/cloud/cloud_media_server_endpoint_verificator.h>
+#include <nx/branding.h>
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/socket_global.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
-#include <utils/media/ffmpeg_initializer.h>
 #include <utils/media/ffmpeg_helper.h>
+#include <utils/media/ffmpeg_initializer.h>
 
 // Resources initialization must be located outside of the namespace.
 static void initializeResources()
@@ -37,6 +38,7 @@ struct ApplicationContext::Private
     mutable nx::Mutex mutex;
     QMap<QnUuid, int> longToShortInstanceId;
     const PeerType localPeerType;
+    QString locale{nx::branding::defaultLocale()};
 
     std::unique_ptr<QnLongRunnablePool> longRunnablePool;
     std::unique_ptr<QnLongRunableCleanup> longRunableCleanup;
@@ -117,6 +119,16 @@ void ApplicationContext::deinitNetworking()
 nx::vms::api::PeerType ApplicationContext::localPeerType() const
 {
     return d->localPeerType;
+}
+
+QString ApplicationContext::locale() const
+{
+    return d->locale;
+}
+
+void ApplicationContext::setLocale(const QString& value)
+{
+    d->locale = value;
 }
 
 void ApplicationContext::setModuleShortId(const QnUuid& id, int number)

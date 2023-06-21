@@ -46,6 +46,12 @@ public:
 
     PeerType localPeerType() const;
 
+    /** Application language locale code (in form `en_US`). */
+    QString locale() const;
+
+    /** Set application language locale code (in form `en_US`). */
+    void setLocale(const QString& value);
+
     void setModuleShortId(const QnUuid& id, int number);
     int moduleShortId(const QnUuid& id) const;
     QString moduleDisplayName(const QnUuid& id) const;

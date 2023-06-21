@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization_format.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
@@ -156,10 +157,8 @@ public:
 
     void setupClient(nx::network::http::AsyncClient* client)
     {
-        static const std::string kAcceptLanguage = "Accept-Language";
-
         NX_CRITICAL(client);
-        client->addAdditionalHeader(kAcceptLanguage, m_locale);
+        client->addAdditionalHeader(Qn::kAcceptLanguageHeader, m_locale);
         NetworkManager::setDefaultTimeouts(client);
     }
 

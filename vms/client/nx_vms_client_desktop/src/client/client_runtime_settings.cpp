@@ -2,6 +2,8 @@
 
 #include "client_runtime_settings.h"
 
+#include <nx/vms/common/application_context.h>
+
 #include "client_settings.h"
 #include "client_startup_parameters.h"
 
@@ -48,6 +50,11 @@ QnClientRuntimeSettings::QnClientRuntimeSettings(
 
 QnClientRuntimeSettings::~QnClientRuntimeSettings()
 {
+}
+
+QString QnClientRuntimeSettings::locale() const
+{
+    return nx::vms::common::appContext()->locale();
 }
 
 bool QnClientRuntimeSettings::isDesktopMode() const
