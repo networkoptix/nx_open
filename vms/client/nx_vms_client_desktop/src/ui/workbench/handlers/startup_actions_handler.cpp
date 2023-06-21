@@ -579,7 +579,7 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
         return true;
 
     // Attempt auto-login, if needed.
-    return attemptAutoLogin();
+    return !startupParameters.skipAutoLogin && attemptAutoLogin();
 }
 
 bool StartupActionsHandler::attemptAutoLogin()

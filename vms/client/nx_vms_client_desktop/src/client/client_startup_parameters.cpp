@@ -69,6 +69,7 @@ const QString QnStartupParameters::kStateFileKey(lit("--stateFile"));
 const QString QnStartupParameters::kScreenKey(lit("--screen"));
 const QString QnStartupParameters::kFullScreenDisabledKey(lit("--no-fullscreen"));
 const QString QnStartupParameters::kWindowGeometryKey(lit("--window-geometry"));
+const QString QnStartupParameters::kSkipAutoLoginKey("--skip-auto-login");
 
 QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** argv)
 {
@@ -91,6 +92,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.forceLocalSettings,   "--local-settings");
     addParserParam(commandLineParser, &result.fullScreenDisabled,   kFullScreenDisabledKey);
     addParserParam(commandLineParser, &result.skipMediaFolderScan,  "--skip-media-folder-scan");
+    addParserParam(commandLineParser, &result.skipAutoLogin, kSkipAutoLoginKey);
     addParserParam(commandLineParser, &result.engineVersion,        "--override-version");
     addParserParam(commandLineParser, &result.vmsProtocolVersion,   "--override-protocol-version");
     addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
