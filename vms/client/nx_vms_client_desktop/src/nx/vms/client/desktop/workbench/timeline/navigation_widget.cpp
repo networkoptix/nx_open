@@ -84,7 +84,7 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
     initButton(m_jumpBackwardButton, ui::action::JumpToStartAction,
         "slider/navigation/rewind_backward_32.svg");
     initButton(m_stepBackwardButton, ui::action::PreviousFrameAction,
-        "slider/navigation/step_backward.png");
+        "slider/navigation/step_backward_32.svg");
     initButton(m_playButton, ui::action::PlayPauseAction,
         "slider/navigation/play.png", "slider/navigation/pause_32.svg");
     initButton(m_stepForwardButton, ui::action::NextFrameAction,
@@ -242,8 +242,14 @@ void NavigationWidget::updatePlaybackButtonsIcons()
     updatePlaybackButtonsTooltips();
 
     m_stepBackwardButton->setIcon(playing
-        ? qnSkin->icon("slider/navigation/backward_32.svg", nullptr, nullptr, kNavigationIconSubstitutions)
-        : qnSkin->icon("slider/navigation/step_backward.png"));
+        ? qnSkin->icon("slider/navigation/backward_32.svg",
+            nullptr,
+            nullptr,
+            kNavigationIconSubstitutions)
+        : qnSkin->icon("slider/navigation/step_backward_32.svg",
+            nullptr,
+            nullptr,
+            kNavigationIconSubstitutions));
     m_stepForwardButton->setIcon(playing
         ? qnSkin->icon("slider/navigation/forward.png")
         : qnSkin->icon("slider/navigation/step_forward.png"));

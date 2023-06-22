@@ -47,7 +47,7 @@ Item
 
                     width: 32
                     height: 32
-                    iconBaseName: "slider/navigation/rewind_backward"
+                    iconBaseName: "slider/navigation/rewind_backward_32"
                 }
 
                 DeprecatedIconButton
@@ -56,7 +56,7 @@ Item
 
                     width: 32
                     height: 32
-                    iconBaseName: "slider/navigation/step_backward"
+                    iconBaseName: "slider/navigation/step_backward_32"
                     visible: !timeline.playing
                 }
 
@@ -66,7 +66,7 @@ Item
 
                     width: 32
                     height: 32
-                    iconBaseName: "slider/navigation/backward"
+                    iconBaseName: "slider/navigation/backward_32"
                     visible: timeline.playing
                 }
 
@@ -78,7 +78,7 @@ Item
                     height: 32
                     checkable: true
                     iconBaseName: "slider/navigation/play"
-                    iconCheckedBaseName: "slider/navigation/pause"
+                    iconCheckedBaseName: "slider/navigation/pause_32"
                 }
 
                 DeprecatedIconButton
