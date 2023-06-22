@@ -122,9 +122,10 @@ bool Skin::hasFile(const char* name) const
 QIcon Skin::icon(const QString& name,
     const QString& checkedName,
     const QnIcon::Suffixes* suffixes,
-    const SvgIconColorer::IconSubstitutions& svgColorSubstitutions)
+    const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
+    const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions)
 {
-    return m_iconLoader->load(name, checkedName, suffixes, svgColorSubstitutions);
+    return m_iconLoader->load(name, checkedName, suffixes, svgColorSubstitutions, svgCheckedColorSubstitutions);
 }
 
 QIcon Skin::icon(const char* name, const char* checkedName)

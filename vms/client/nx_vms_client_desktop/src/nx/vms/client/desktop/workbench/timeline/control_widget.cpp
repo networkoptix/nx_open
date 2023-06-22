@@ -56,6 +56,51 @@ bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, cons
     return true;
 };
 
+
+// TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin will be ready
+static const QColor kBasePrimaryColor = "#ffffff";
+static const QColor kBackgroundColor = "#212A2F";
+static const QColor kCheckedColor = "#171C1F";
+
+//{ Normal, Disabled, Active, Selected }
+const core::SvgIconColorer::IconSubstitutions kNavigationIconSubstitutions = {
+    { QnIcon::Normal, {
+        { kBackgroundColor, "dark7"},
+    }},
+    { QnIcon::Disabled, {
+        { kBasePrimaryColor, "dark11"},
+        { kBackgroundColor, "dark6" },
+    }},
+    { QnIcon::Active, {  //< Hovered
+        { kBackgroundColor, "dark8" },
+    }},
+    { QnIcon::Pressed, {
+        { kBackgroundColor, "dark5"},
+    }},
+};
+
+//{ Normal, Disabled, Active, Selected }
+const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitutions = {
+    
+    { QnIcon::Normal, {
+        { kBackgroundColor, "dark7"},
+        { kCheckedColor, "green_l3"},
+    }},
+    { QnIcon::Disabled, {
+        { kBasePrimaryColor, "dark11"},
+        { kBackgroundColor, "dark6" },
+        { kCheckedColor, "green_l3"},
+    }},
+    { QnIcon::Active, {  //< Hovered
+        { kBackgroundColor, "dark8" },
+        { kCheckedColor, "green_l3"},
+    }},
+    { QnIcon::Pressed, {
+        { kBackgroundColor, "dark5"},
+        { kCheckedColor, "green_l3"},
+    }},
+};
+
 } // namespace
 
 using namespace ui;
@@ -77,7 +122,7 @@ ControlWidget::ControlWidget(QnWorkbenchContext* context, QWidget* parent):
         "slider/buttons/unmute.png", "slider/buttons/mute.png");
 
     initButton(m_liveButton, ui::action::JumpToLiveAction,
-        "slider/buttons/live.png",
+        "slider/buttons/live_52x24.svg",
         /*checkedIconPath*/ "",
         /*connectToAction*/ false);
     connect(m_liveButton, &QAbstractButton::clicked, this,
@@ -87,7 +132,7 @@ ControlWidget::ControlWidget(QnWorkbenchContext* context, QWidget* parent):
         });
 
     initButton(m_syncButton, ui::action::ToggleSyncAction,
-        "slider/buttons/sync.png");
+        "slider/buttons/sync_52x24.svg");
     initButton(m_thumbnailsButton, ui::action::ToggleThumbnailsAction,
         "slider/buttons/thumbnails.png");
     initButton(m_calendarButton, ui::action::ToggleCalendarAction,
@@ -210,9 +255,21 @@ void ControlWidget::initButton(
     QAction* buttonAction = action(actionType);
 
     button->setCustomPaintFunction(paintButtonFunction);
-    button->setIcon(!checkedIconPath.isEmpty()
-        ? qnSkin->icon(iconPath, checkedIconPath)
-        : qnSkin->icon(iconPath));
+    // TODO @pprivalov remove this temporary solution
+    if (iconPath.endsWith(".svg"))
+    {
+        button->setIcon(qnSkin->icon(iconPath,
+            nullptr,
+            nullptr,
+            kNavigationIconSubstitutions,
+            kNavigationIconCheckedSubstitutions));
+    }
+    else
+    {
+        button->setIcon(!checkedIconPath.isEmpty()
+            ? qnSkin->icon(iconPath, checkedIconPath)
+            : qnSkin->icon(iconPath));
+    }
 
     const bool smallIcon = !checkedIconPath.isEmpty();
     button->setObjectName(buttonAction->text());

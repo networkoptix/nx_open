@@ -28,7 +28,8 @@ public:
         const QString& checkedName = QString(),
         const QnIcon::Suffixes* suffixes = nullptr,
         const SvgIconColorer::IconSubstitutions& svgColorSubstitutions =
-            SvgIconColorer::kDefaultIconSubstitutions);
+            SvgIconColorer::kDefaultIconSubstitutions,
+        const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {});
 
     static const QnIcon::Suffixes kDefaultSuffixes;
 
@@ -43,7 +44,8 @@ private:
         Skin* skin,
         const QString& name,
         const QString& checkedName,
-        const SvgIconColorer::IconSubstitutions& substitutions);
+        const SvgIconColorer::IconSubstitutions& substitutions,
+        const SvgIconColorer::IconSubstitutions& checkedSubstitutions);
 
 private:
     QHash<QString, QIcon> m_iconByKey;
