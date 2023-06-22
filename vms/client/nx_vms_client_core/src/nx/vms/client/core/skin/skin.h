@@ -41,7 +41,8 @@ public:
         const QString& checkedName = QString(),
         const QnIcon::Suffixes* suffixes = nullptr,
         const SvgIconColorer::IconSubstitutions& svgColorSubstitutions =
-            SvgIconColorer::kDefaultIconSubstitutions);
+            SvgIconColorer::kDefaultIconSubstitutions,
+        const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {});
     QIcon icon(const char* name, const char* checkedName = nullptr);
     QIcon icon(const QIcon& icon);
 

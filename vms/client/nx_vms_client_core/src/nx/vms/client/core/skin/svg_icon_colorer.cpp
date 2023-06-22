@@ -150,7 +150,8 @@ void SvgIconColorer::dumpIconIfNeeded(const QByteArray& data, const QString& suf
 
 QByteArray SvgIconColorer::makeIcon(QIcon::Mode mode) const
 {
-    const ColorSubstitutions substitutions = (mode == QnIcon::Normal)
+    const ColorSubstitutions substitutions =
+        (mode == QnIcon::Normal && !m_substitutions.contains(mode))
         ? colorTheme()->getColorSubstitutions()
         : colorMapFromStringMap(m_substitutions.value(mode));
 
