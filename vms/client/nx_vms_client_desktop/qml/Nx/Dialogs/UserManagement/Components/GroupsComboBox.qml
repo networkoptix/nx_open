@@ -278,8 +278,7 @@ Control
         id: popupObject
 
         width: control.width
-
-        height: contentItem.height
+        height: popupContent.implicitHeight
 
         padding: 0
         topPadding: 2
@@ -318,20 +317,18 @@ Control
             if (searchField.focus)
                 searchField.forceActiveFocus()
 
-            contentItem.groupCount = allowedParents.rowCount()
+            popupContent.groupCount = allowedParents.rowCount()
         }
 
         contentItem: Item
         {
-            id: contentItem
-
-            width: parent.width
+            id: popupContent
 
             property int groupCount: 0
-            onGroupCountChanged: height = updateHeight(groupCount)
-            height: updateHeight(groupCount)
+            onGroupCountChanged: implicitHeight = computeHeight(groupCount)
+            implicitHeight: computeHeight(groupCount)
 
-            function updateHeight(count)
+            function computeHeight(count)
             {
                 return 46 + 28 * Math.max(1, Math.min(count, 5)) + 7 + 4
             }
@@ -398,7 +395,7 @@ Control
                         ? new RegExp(`(${NxGlobals.makeSearchRegExpNoAnchors(text)})`, 'i')
                         : ""
                     allowedParents.setFilterRegularExpression(currentSearchRegExp)
-                    contentItem.groupCount = allowedParents.rowCount()
+                    popupContent.groupCount = allowedParents.rowCount()
                 }
 
                 anchors
