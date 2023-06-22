@@ -4014,18 +4014,18 @@ QIcon Style::standardIcon(
             return qnSkin->icon("standard_icons/sp_line_edit_clear_button.png");
         case SP_ArrowLeft:
         case SP_ArrowBack:
-            return qnSkin->icon("standard_icons/arrow_left_24.svg");
+            return qnSkin->icon("standard_icons/arrow_left_2px_24.svg");
         case SP_ArrowRight:
         case SP_ArrowForward:
-            return qnSkin->icon("standard_icons/arrow_right_24.svg");
+            return qnSkin->icon("standard_icons/arrow_right_2px_24.svg");
         case SP_FileDialogToParent:
-            return qnSkin->icon("standard_icons/arrow_up_24.svg");
+            return qnSkin->icon("standard_icons/arrow_up_2px_24.svg");
         case SP_FileDialogListView:
-            return qnSkin->icon("standard_icons/hamburger_menu_24.svg");
+            return qnSkin->icon("standard_icons/hamburger_menu_2px_24.svg");
         case SP_FileDialogDetailedView:
-            return qnSkin->icon("standard_icons/sp_file_dialog_detailed_view.png");
+            return qnSkin->icon("standard_icons/sp_file_dialog_detailed_view_24.svg");
         case SP_FileDialogNewFolder:
-            return qnSkin->icon("standard_icons/add_folder_24.svg");
+            return qnSkin->icon("standard_icons/add_folder_2px_24.svg");
         case SP_MessageBoxInformation:
             return qnSkin->icon("standard_icons/sp_message_box_information.png");
         case SP_MessageBoxQuestion:
