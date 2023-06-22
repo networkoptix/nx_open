@@ -86,7 +86,7 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
     initButton(m_stepBackwardButton, ui::action::PreviousFrameAction,
         "slider/navigation/step_backward.png");
     initButton(m_playButton, ui::action::PlayPauseAction,
-        "slider/navigation/play.png", "slider/navigation/pause.png");
+        "slider/navigation/play.png", "slider/navigation/pause_32.svg");
     initButton(m_stepForwardButton, ui::action::NextFrameAction,
         "slider/navigation/step_forward.png");
     initButton(m_jumpForwardButton, ui::action::JumpToEndAction,
@@ -210,8 +210,8 @@ void NavigationWidget::initButton(
 
     button->setCustomPaintFunction(paintButtonFunction);
     button->setIcon(isCheckable
-        ? qnSkin->icon(iconPath, checkedIconPath)
-        : qnSkin->icon(iconPath));
+        ? qnSkin->icon(iconPath, checkedIconPath, nullptr, kNavigationIconSubstitutions)
+        : qnSkin->icon(iconPath, nullptr, nullptr, kNavigationIconSubstitutions));
     button->setFixedSize({32, 32});
     button->setToolTip(buttonAction->toolTip());
     button->setCheckable(isCheckable);
