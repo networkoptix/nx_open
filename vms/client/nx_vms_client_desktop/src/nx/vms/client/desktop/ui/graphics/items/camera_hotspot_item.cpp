@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/vms/client/desktop/workbench/widgets/thumbnail_tooltip.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -139,6 +140,8 @@ CameraHotspotItem::CameraHotspotItem(
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
+    setProperty(Qn::NoHandScrollOver, true);
+
     d->initTooltip();
 }
 
@@ -209,6 +212,28 @@ void CameraHotspotItem::paint(
     painter->drawPixmap(option->rect.topLeft() + pixmapOffset, hotspotPixmap);
 }
 
+void CameraHotspotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+    event->accept();
+
+    d->contextMenu = new QMenu();
+    QObject::connect(d->contextMenu, &QMenu::aboutToHide, d->contextMenu, &QMenu::deleteLater);
+
+    const auto openAction = d->contextMenu->addAction(tr("Open Camera"));
+    QObject::connect(openAction, &QAction::triggered,
+        [this] { d->openItem(); });
+
+    const auto openInNewTabAction = d->contextMenu->addAction(tr("Open Camera in new Tab"));
+    QObject::connect(openInNewTabAction, &QAction::triggered,
+        [this] { d->opemItemInNewLayout(); });
+
+    const auto openInPlaceAction = d->contextMenu->addAction(tr("Open Camera in place"));
+    QObject::connect(openInPlaceAction, &QAction::triggered,
+        [this] { d->openItemInPlace(); });
+
+    QnHiDpiWorkarounds::showMenu(d->contextMenu, QCursor::pos());
+}
+
 void CameraHotspotItem::hoverEnterEvent(QGraphicsSceneHoverEvent*)
 {
     if (!d->tooltip)
@@ -236,38 +261,6 @@ void CameraHotspotItem::hoverLeaveEvent(QGraphicsSceneHoverEvent*)
 {
     if (d->tooltip)
         d->tooltip->hide();
-}
-
-void CameraHotspotItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
-{
-    if (event->button() == Qt::RightButton && event->modifiers() == Qt::NoModifier)
-    {
-        event->accept();
-
-        d->contextMenu = new QMenu();
-        QObject::connect(d->contextMenu, &QMenu::aboutToHide, d->contextMenu, &QMenu::deleteLater);
-
-        const auto openAction = d->contextMenu->addAction(tr("Open Camera"));
-        QObject::connect(openAction, &QAction::triggered,
-            [this] { d->openItem(); });
-
-        const auto openInNewTabAction = d->contextMenu->addAction(tr("Open Camera in new Tab"));
-        QObject::connect(openInNewTabAction, &QAction::triggered,
-            [this] { d->opemItemInNewLayout(); });
-
-        const auto openInPlaceAction = d->contextMenu->addAction(tr("Open Camera in place"));
-        QObject::connect(openInPlaceAction, &QAction::triggered,
-            [this] { d->openItemInPlace(); });
-
-        // TODO: #vbreus VMS-38379, implementation is pending, action is unavailable to user for now.
-        openInPlaceAction->setEnabled(false);
-
-        QnHiDpiWorkarounds::showMenu(d->contextMenu, QCursor::pos());
-
-        return;
-    }
-
-    base_type::mousePressEvent(event);
 }
 
 void CameraHotspotItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
