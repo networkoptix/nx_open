@@ -82,7 +82,7 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
         this, &NavigationWidget::geometryChanged);
 
     initButton(m_jumpBackwardButton, ui::action::JumpToStartAction,
-        "slider/navigation/rewind_backward.png");
+        "slider/navigation/rewind_backward_32.svg");
     initButton(m_stepBackwardButton, ui::action::PreviousFrameAction,
         "slider/navigation/step_backward.png");
     initButton(m_playButton, ui::action::PlayPauseAction,
