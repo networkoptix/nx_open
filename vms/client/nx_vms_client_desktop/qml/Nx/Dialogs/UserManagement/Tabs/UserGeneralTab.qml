@@ -434,6 +434,7 @@ Item
                     CenteredField
                     {
                         visible: allowInsecureCheckBox.checked
+                            && control.userType != UserSettingsGlobal.CloudUser
 
                         InsecureWarning
                         {
