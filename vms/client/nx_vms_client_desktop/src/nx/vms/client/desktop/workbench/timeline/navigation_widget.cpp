@@ -47,6 +47,22 @@ bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, cons
     return true;
 };
 
+// TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin will be ready
+static const QColor kBasePrimaryColor = "#e1e7ea";
+static const QColor kBackgroundColor = "#212a2f";
+
+const core::SvgIconColorer::IconSubstitutions kNavigationIconSubstitutions = {
+    { QnIcon::Disabled, {
+        { kBackgroundColor, "dark17" },
+    }},
+    { QnIcon::Selected, {
+        { kBackgroundColor, "dark4" },
+    }},
+    { QnIcon::Active, {  //< Hovered
+        { kBackgroundColor, "dark8" },
+    }},
+};
+
 } // namespace
 
 NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent):
@@ -226,7 +242,7 @@ void NavigationWidget::updatePlaybackButtonsIcons()
     updatePlaybackButtonsTooltips();
 
     m_stepBackwardButton->setIcon(playing
-        ? qnSkin->icon("slider/navigation/backward.png")
+        ? qnSkin->icon("slider/navigation/backward_32.svg", nullptr, nullptr, kNavigationIconSubstitutions)
         : qnSkin->icon("slider/navigation/step_backward.png"));
     m_stepForwardButton->setIcon(playing
         ? qnSkin->icon("slider/navigation/forward.png")
