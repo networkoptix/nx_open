@@ -19,10 +19,11 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 
 // We removed common metatype declaration but for some reason it's still required here for proper
@@ -595,11 +596,49 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
     QStringList groups, layouts, videoWalls;
     QStringList descriptions;
 
+    std::vector<nx::vms::api::UserGroupData> groupsData;
+
     for (const auto& groupId: accessInfo.providerUserGroups)
     {
         if (const auto group = resource->systemContext()->userGroupManager()->find(groupId))
-            groups << html::bold(group->name);
+            groupsData.push_back(*group);
     }
+
+    std::sort(groupsData.begin(), groupsData.end(),
+        [](const auto& left, const auto& right)
+        {
+            // Predefined groups go first.
+            const auto predefinedLeft = PredefinedUserGroups::contains(left.id);
+            const auto predefinedRight = PredefinedUserGroups::contains(right.id);
+            if (predefinedLeft != predefinedRight)
+                return predefinedLeft;
+            else if (predefinedLeft)
+                return left.id < right.id;
+
+            // Sort according to type: local, ldap, cloud.
+            if (left.type != right.type)
+                return left.type < right.type;
+
+            // "LDAP Default" goes in front of all LDAP groups.
+            if (left.id == nx::vms::api::kDefaultLdapGroupId
+                || right.id == nx::vms::api::kDefaultLdapGroupId)
+            {
+                return left.id == nx::vms::api::kDefaultLdapGroupId;
+            }
+
+            // Case Insensitive sort.
+            const int ret = nx::utils::naturalStringCompare(
+                left.name, right.name, Qt::CaseInsensitive);
+
+            // Sort identical names by UUID.
+            if (ret == 0)
+                return left.id < right.id;
+
+            return ret < 0;
+        });
+
+    for (const auto& group: groupsData)
+        groups << html::bold(group.name);
 
     for (const auto& providerResource: accessInfo.indirectProviders)
     {
