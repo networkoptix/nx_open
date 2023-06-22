@@ -137,11 +137,12 @@ Item
                 {
                     text: qsTr("Description")
 
-                    TextArea
+                    TextAreaWithScroll
                     {
                         id: descriptionTextArea
+
                         width: parent.width
-                        height: 60
+                        height: 64
                         readOnly: !control.nameEditable
                         wrapMode: TextEdit.Wrap
                     }

@@ -29,6 +29,7 @@ DialogPanel 1.0 DialogPanel.qml
 DoubleSpinBox 1.0 DoubleSpinBox.qml
 DropArea 1.0 DropArea.qml
 DropdownMenu 1.0 DropdownMenu.qml
+EditContextMenu 1.0 EditContextMenu.qml
 Fader 1.0 Fader.qml
 GroupBox 1.0 GroupBox.qml
 ImageButton 1.0 ImageButton.qml
@@ -75,6 +76,7 @@ TabBar 1.0 TabBar.qml
 TabControl 1.0 TabControl.qml
 TableView 1.0 TableView.qml
 TextArea 1.0 TextArea.qml
+TextAreaWithScroll 1.0 TextAreaWithScroll.qml
 TextButton 1.0 TextButton.qml
 TextField 1.0 TextField.qml
 TextFieldWithWarning 1.0 TextFieldWithWarning.qml

@@ -12,6 +12,7 @@ Menu
 
     property bool readActionsVisible: true
     property bool selectionActionsEnabled: true
+    property bool editingEnabled: true
 
     signal cutAction
     signal copyAction
@@ -31,7 +32,7 @@ Menu
         shortcut: "Ctrl+X"
         onTriggered: menu.cutAction()
         visible: menu.readActionsVisible
-        enabled: menu.selectionActionsEnabled
+        enabled: menu.selectionActionsEnabled && menu.editingEnabled
     }
 
     Action
@@ -48,12 +49,13 @@ Menu
         text: "Paste"
         shortcut: "Ctrl+V"
         onTriggered: menu.pasteAction()
+        enabled: menu.editingEnabled
     }
 
     Action
     {
         text: "Delete"
         onTriggered: menu.deleteAction()
-        enabled: menu.selectionActionsEnabled
+        enabled: menu.selectionActionsEnabled && menu.editingEnabled
     }
 }

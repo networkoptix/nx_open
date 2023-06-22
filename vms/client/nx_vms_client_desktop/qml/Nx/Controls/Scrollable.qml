@@ -72,7 +72,12 @@ Item
                 var maxY = (flickable.originY + flickable.bottomMargin
                     + flickable.contentHeight) - flickable.height
 
-                flickable.contentY = Math.max(minY, Math.min(maxY, flickable.contentY - pixelDelta))
+
+                const newContentY = Math.max(minY, Math.min(maxY, flickable.contentY - pixelDelta))
+                const accepted = flickable.contentY != newContentY
+                flickable.contentY = newContentY
+
+                return accepted
             }
         }
     }
@@ -87,10 +92,8 @@ Item
 
         onWheel: (wheel) =>
         {
-            if (flickable.contentHeight < flickable.height)
-                return;
-
-            flickable.scrollContentY(gearbox.transform(getPixelDelta(wheel)))
+            wheel.accepted = flickable.contentHeight > flickable.height
+                && flickable.scrollContentY(gearbox.transform(getPixelDelta(wheel)))
         }
 
         function getPixelDelta(wheel)
