@@ -16,7 +16,7 @@ TextArea
 
     color: enabled ? ColorTheme.text : ColorTheme.transparent(ColorTheme.text, 0.3)
 
-    background: TextFieldBackground { control: parent }
+    background: TextFieldBackground { control: textArea }
 
     selectByMouse: true
     selectedTextColor: ColorTheme.brightText
@@ -25,6 +25,6 @@ TextArea
     onTextChanged:
     {
         if (activeFocus)
-            control.textEdited()
+            textArea.textEdited()
     }
 }
