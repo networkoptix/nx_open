@@ -3,7 +3,7 @@
 #pragma once
 
 #include <QtCore/QCoreApplication>
-#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsObject>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
@@ -13,10 +13,9 @@ class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
-class CameraHotspotItem: public QGraphicsItem
+class CameraHotspotItem: public QGraphicsObject
 {
-    using base_type = QGraphicsItem;
-    Q_DECLARE_TR_FUNCTIONS(CameraHotspotItem)
+    using base_type = QGraphicsObject;
 
 public:
     CameraHotspotItem(
@@ -35,9 +34,9 @@ public:
         QWidget* widget = nullptr) override;
 
 protected:
+    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
