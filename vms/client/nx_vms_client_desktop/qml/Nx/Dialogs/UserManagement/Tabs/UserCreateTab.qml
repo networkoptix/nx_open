@@ -160,7 +160,7 @@ Item
                     readonly property bool isLocalUser:
                         control.userType == UserSettingsGlobal.LocalUser
 
-                    onIsLocalUser:
+                    onIsLocalUserChanged:
                     {
                         // Hide empty email warning when switching user type cloud -> local.
                         if (isLocalUser && !text)
