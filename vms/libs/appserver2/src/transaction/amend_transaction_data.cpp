@@ -100,13 +100,27 @@ bool amendOutputDataIfNeeded(
     nx::vms::api::StorageData* storageData)
 {
     nx::utils::Url url(storageData->url);
+    const nx::utils::log::Tag kLogTag(QString("AmendStorageData"));
     if (url.password().isEmpty())
+    {
+        NX_VERBOSE(kLogTag, "%1: Url '%2' password is empty", __func__, storageData->url);
         return false;
+    }
 
     if (accessData == Qn::kSystemAccess || accessManager->hasPowerUserPermissions(accessData))
+    {
+        NX_VERBOSE(
+            kLogTag, "%1: Decyphering url '%2' password",
+            __func__, url.toDisplayString(QUrl::RemovePassword));
         url.setPassword(nx::crypt::decodeStringFromHexStringAES128CBC((url.password())));
+    }
     else
+    {
+        NX_VERBOSE(
+            kLogTag, "%1: Masking url '%2' password",
+            __func__, url.toDisplayString(QUrl::RemovePassword));
         url.setPassword(kHiddenPasswordFiller);
+    }
 
     storageData->url = url.toString();
     return true;

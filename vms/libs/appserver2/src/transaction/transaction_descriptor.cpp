@@ -1011,10 +1011,16 @@ struct ModifyResourceParamAccess
 
         if (!((*storage)->persistentStatusFlags().testFlag(nx::vms::api::StoragePersistentFlag::dbReady)))
         {
+            NX_DEBUG(
+                this, "%1: Storage %2 is not db ready. Returning forbidden.",
+                __func__, nx::utils::url::hidePassword((*storage)->getUrl()));
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "Storage %1 can not store analytics."), param.value));
         }
 
+        NX_DEBUG(
+            this, "%1: Storage %2 is db ready. Returning OK.",
+            __func__, nx::utils::url::hidePassword((*storage)->getUrl()));
         return Result();
     }
 
