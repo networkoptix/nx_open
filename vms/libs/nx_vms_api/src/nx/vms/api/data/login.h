@@ -65,8 +65,8 @@ NX_REFLECTION_INSTRUMENT(LoginSessionRequest, LoginSessionRequest_Fields);
 
 struct NX_VMS_API LoginSessionFilter
 {
-    /**%apidoc If the value "current" is used, the token is obtained from authorization.
-     * %example current
+    /**%apidoc If the value "-" is used, the token is obtained from authorization.
+     * %example -
      */
     std::string token;
 

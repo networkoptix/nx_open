@@ -2,10 +2,14 @@
 
 #include "access_rights_types.h"
 
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/to_string.h>
 
 namespace nx::vms::api {
+
+QN_FUSION_ADAPT_STRUCT(PermissionsModel, PermissionsModel_Fields)
+QN_FUSION_DEFINE_FUNCTIONS(PermissionsModel, (json))
 
 const QnUuid kAllDevicesGroupId{"00000000-0000-0000-0000-200000000001"};
 const QnUuid kAllWebPagesGroupId{"00000000-0000-0000-0000-200000000002"};
