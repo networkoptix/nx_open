@@ -134,7 +134,7 @@ ControlWidget::ControlWidget(QnWorkbenchContext* context, QWidget* parent):
     initButton(m_syncButton, ui::action::ToggleSyncAction,
         "slider/buttons/sync_52x24.svg");
     initButton(m_thumbnailsButton, ui::action::ToggleThumbnailsAction,
-        "slider/buttons/thumbnails.png");
+        "slider/buttons/thumbnails_52x24.svg");
     initButton(m_calendarButton, ui::action::ToggleCalendarAction,
         "slider/buttons/calendar.png");
 
