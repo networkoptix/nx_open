@@ -104,6 +104,7 @@ Control
             {
                 x: 10
                 iconUrl: "image://svg/skin/misc/corner_arrow_back.svg"
+                id: "backArrowButton"
 
                 readonly property int kMinYear: 1970
 
@@ -129,6 +130,7 @@ Control
             {
                 x: parent.width - width - 10
                 iconUrl: "image://svg/skin/misc/corner_arrow_forward.svg"
+                id: "forwardArrowButton"
 
                 onReleased:
                 {
