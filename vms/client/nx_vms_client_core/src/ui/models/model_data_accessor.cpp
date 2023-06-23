@@ -106,6 +106,26 @@ QVariant ModelDataAccessor::getData(const QModelIndex& index, const QString& rol
     return m_model->data(index, role);
 }
 
+bool ModelDataAccessor::setData(
+    int row,
+    int column,
+    const QVariant& value,
+    const QString& roleName) const
+{
+    if (!m_model)
+        return false;
+
+    const auto index = m_model->index(row, column);
+    if (!index.isValid() || !NX_ASSERT(m_model->checkIndex(index)))
+        return false;
+
+    const auto role = m_model->roleNames().key(roleName.toUtf8(), -1);
+    if (role == -1)
+        return false;
+
+    return m_model->setData(index, value, role);
+}
+
 bool ModelDataAccessor::setHeaderData(
     int section,
     Qt::Orientation orientation,

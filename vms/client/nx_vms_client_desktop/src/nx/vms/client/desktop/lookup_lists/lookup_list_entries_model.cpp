@@ -23,6 +23,8 @@ QString attribute(const nx::vms::api::LookupListData& list, int column)
 LookupListEntriesModel::LookupListEntriesModel(QObject* parent):
     base_type(parent)
 {
+    for (int i = 0; i < m_checkBoxCount_TEMP; ++i)
+        m_checkBoxState_TEMP[i] = Qt::Unchecked;
 }
 
 LookupListEntriesModel::~LookupListEntriesModel()
@@ -72,6 +74,12 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
     {
         case Qt::DisplayRole:
         {
+            if (index.column() == kCheckBoxColumnIndex)
+            {
+                if (index.row() < m_checkBoxCount_TEMP)
+                    return m_checkBoxState_TEMP[index.row()];
+            }
+
             const auto key = attribute(m_data->rawData(), index.column());
             if (key.isEmpty())
                 return QString();
@@ -93,6 +101,33 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
     }
 
     return {};
+}
+
+bool LookupListEntriesModel::setData(
+    const QModelIndex& index,
+    const QVariant& value,
+    int role)
+{
+    if (!NX_ASSERT(m_data))
+        return {};
+
+    switch (role)
+    {
+        case Qt::EditRole:
+        {
+            if (index.column() == kCheckBoxColumnIndex)
+            {
+                if (index.row() < m_checkBoxCount_TEMP)
+                {
+                    m_checkBoxState_TEMP[index.row()] = value.toInt();
+                    emit dataChanged(index, index, {Qt::DisplayRole});
+                    return true;
+                }
+            }
+        }
+    }
+
+    return QAbstractTableModel::setData(index, value, role);
 }
 
 QHash<int, QByteArray> LookupListEntriesModel::roleNames() const

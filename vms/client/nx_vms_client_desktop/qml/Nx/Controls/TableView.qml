@@ -90,25 +90,39 @@ TableView
 
                     property var headerDataAccessor: ModelDataAccessor
                     {
-                        function getCheckState(columnIndex)
+                        function updateCheckState()
                         {
-                            if (!control.model)
-                                return Qt.Unchecked
+                            if (!isCheckbox)
+                                return
 
-                            let state = control.model.headerData(
-                                index,
-                                Qt.Horizontal,
-                                Qt.CheckStateRole)
+                            let hasCheckedValues = false
+                            let hasUncheckedValues = false
 
-                            return state != null ? state : Qt.Unchecked
+                            for (let row = 0; row < control.model.rowCount(); ++row)
+                            {
+                                const val = headerDataAccessor.getData(
+                                    control.model.index(row, index),
+                                    "display")
+
+                                if (val === Qt.Checked)
+                                    hasCheckedValues = true
+                                if (val === Qt.Unchecked)
+                                    hasUncheckedValues = true
+                            }
+
+                            if (hasCheckedValues && hasUncheckedValues)
+                                headerButton.setCheckState(Qt.PartiallyChecked)
+                            else if (hasCheckedValues)
+                                headerButton.setCheckState(Qt.Checked)
+                            else if (hasUncheckedValues)
+                                headerButton.setCheckState(Qt.Unchecked)
+                            else
+                                console.warn("Unexpected model check states")
                         }
 
                         model: control.model
 
-                        Component.onCompleted:
-                        {
-                            headerButton.setCheckState(getCheckState(index))
-                        }
+                        Component.onCompleted: updateCheckState()
 
                         onHeaderDataChanged: (orientation, first, last) =>
                         {
@@ -118,9 +132,10 @@ TableView
                             if (orientation !== Qt.Horizontal)
                                 return
 
-                            headerButton.setCheckState(getCheckState(index))
                             headerButton.text = model.headerData(index, Qt.Horizontal)
                         }
+
+                        onDataChanged: updateCheckState()
                     }
 
                     width: control.columnWidthProvider(index)
@@ -133,11 +148,11 @@ TableView
                     isCheckbox: isCheckboxColumn(control.model, index)
                     onCheckStateChanged: (checkState) =>
                     {
-                        headerDataAccessor.setHeaderData(
-                            index,
-                            Qt.Horizontal,
-                            checkState,
-                            Qt.CheckStateRole)
+                        if (checkState === Qt.PartiallyChecked)
+                            return
+
+                        for (let row = 0; row < control.model.rowCount(); ++row)
+                            headerDataAccessor.setData(row, index, checkState, "edit")
                     }
 
                     onClicked:
