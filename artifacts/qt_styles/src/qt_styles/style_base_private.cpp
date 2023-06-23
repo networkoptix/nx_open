@@ -42,6 +42,8 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyle>
 
+#include <nx/vms/client/desktop/style/helper.h>
+
 namespace {
 
 QWindow* qt_getWindow(const QWidget* widget)
@@ -186,8 +188,9 @@ void StyleBasePrivate::drawToolButton(
             }
             else
             {
+                shiftX += widget->contentsMargins().left();
                 pr.setWidth(pmSize.width() + 8);
-                tr.adjust(pr.width(), 0, 0, 0);
+                tr.adjust(pr.width() + nx::style::Metrics::kInterSpace, 0, 0, 0);
                 pr.translate(shiftX, shiftY);
                 if (!hasArrow)
                 {

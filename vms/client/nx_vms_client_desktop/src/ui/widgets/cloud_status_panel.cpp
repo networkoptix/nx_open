@@ -6,9 +6,10 @@
 #include <QtWidgets/QMenu>
 
 #include <nx/branding.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -65,9 +66,10 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     Q_D(QnCloudStatusPanel);
 
     setProperty(nx::style::Properties::kDontPolishFontProperty, true);
-    setPopupMode(QToolButton::InstantPopup);
+    setPopupMode(QToolButton::MenuButtonPopup);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
-    setPaletteColor(this, QPalette::Window, nx::vms::client::core::colorTheme()->color("dark8"));
+    setPaletteColor(this, QPalette::Window, nx::vms::client::core::colorTheme()->color("dark7"));
+    setContentsMargins(10, 0, 0, 0);
 
     QFont font = qApp->font();
     font.setPixelSize(kFontPixelSize);
@@ -79,35 +81,40 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     connect(this, &QnCloudStatusPanel::justPressed, qnCloudStatusWatcher,
         &CloudStatusWatcher::updateSystems);
 
-    connect(this, &QnCloudStatusPanel::clicked, this,
-        [this, d]
+    auto showMenu = [this, d]
+    {
+        if (qnCloudStatusWatcher->status() == CloudStatusWatcher::LoggedOut)
         {
-            if (qnCloudStatusWatcher->status() == CloudStatusWatcher::LoggedOut)
+            context()->menu()->trigger(action::LoginToCloud);
+            return;
+        }
+
+        const auto menu =
+            [d]() -> QMenu*
             {
-                context()->menu()->trigger(action::LoginToCloud);
-                return;
-            }
-
-            const auto menu =
-                [d]() -> QMenu*
+                switch (qnCloudStatusWatcher->status())
                 {
-                    switch (qnCloudStatusWatcher->status())
-                    {
-                        case CloudStatusWatcher::Online:
-                            return d->loggedInMenu;
-                        case CloudStatusWatcher::Offline:
-                            return d->offlineMenu;
-                        default:
-                            return nullptr;
-                    }
-                }();
+                    case CloudStatusWatcher::Online:
+                        return d->loggedInMenu;
+                    case CloudStatusWatcher::Offline:
+                        return d->offlineMenu;
+                    default:
+                        return nullptr;
+                }
+            }();
 
-            if (!menu)
-                return;
+        if (!menu)
+            return;
 
-            QnHiDpiWorkarounds::showMenu(menu,
-                QnHiDpiWorkarounds::safeMapToGlobal(this, rect().bottomLeft()));
-        });
+        QnHiDpiWorkarounds::showMenu(menu,
+            QnHiDpiWorkarounds::safeMapToGlobal(this, rect().bottomLeft()));
+    };
+
+    connect(this, &QnCloudStatusPanel::clicked, this, showMenu);
+
+    QMenu* mockMenu = new QMenu(this);
+    setMenu(mockMenu);
+    connect(mockMenu, &QMenu::aboutToShow, this, showMenu);
 
     d->updateUi();
 }
@@ -119,6 +126,7 @@ QnCloudStatusPanel::~QnCloudStatusPanel()
 QSize QnCloudStatusPanel::minimumSizeHint() const
 {
     auto base = base_type::minimumSizeHint();
+    base = nx::vms::client::core::Geometry::dilated(base, contentsMargins());
     if (base.width() < kMinimumPanelWidth)
         base.setWidth(kMinimumPanelWidth);
     return base;
