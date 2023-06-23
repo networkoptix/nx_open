@@ -322,6 +322,9 @@ public:
     Q_INVOKABLE static QSizeF dilated(const QSizeF& size, const QMarginsF& amount);
 
     /** Dilates the given size by the given amount. */
+    Q_INVOKABLE static QSize dilated(const QSize& size, const QMargins& amount);
+
+    /** Dilates the given size by the given amount. */
     Q_INVOKABLE static QSizeF dilated(const QSizeF& size, qreal amount);
 
     /** Erodes the given size by the given amount. */

@@ -64,6 +64,7 @@
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/dialog.h>
+#include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/delayed.h>
@@ -1494,6 +1495,12 @@ void Style::drawPrimitive(PrimitiveElement element,
                             break;
                     }
                 }
+                else if (qobject_cast<const QnCloudStatusPanel*>(widget))
+                {
+                    QIcon icon = qnSkin->icon("titlebar/cloud_dropdown.svg");
+                    icon.paint(painter, option->rect);
+                    return;
+                }
             }
 
             Direction direction = Direction::up;
@@ -1533,6 +1540,20 @@ void Style::drawPrimitive(PrimitiveElement element,
                 QnScopedPainterPenRollback penRollback(painter, brush.color());
                 painter->drawRoundedRect(Geometry::eroded(QRectF(widget->rect()), 0.5), 2.0, 2.0);
             }
+            return;
+        }
+
+        case PE_IndicatorButtonDropDown:
+        {
+            QColor color = option->palette.window().color();
+            const bool pressed = option->state.testFlag(State_Sunken);
+            const bool enabled = option->state.testFlag(State_Enabled);
+            const bool hovered = option->state.testFlag(State_MouseOver) && enabled;
+            if (pressed)
+                color = core::colorTheme()->darker(color, 1);
+            else if (hovered)
+                color = core::colorTheme()->lighter(color, 1);
+            painter->fillRect(option->rect, color);
             return;
         }
 

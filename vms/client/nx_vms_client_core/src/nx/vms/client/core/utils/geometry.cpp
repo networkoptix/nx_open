@@ -526,6 +526,11 @@ QSizeF Geometry::dilated(const QSizeF& size, const QMarginsF& amount)
     return size + sizeDelta(amount);
 }
 
+QSize Geometry::dilated(const QSize& size, const QMargins& amount)
+{
+    return size + sizeDelta(amount);
+}
+
 QSizeF Geometry::dilated(const QSizeF& size, qreal amount)
 {
     return QSizeF(size.width() + amount, size.height() + amount);
