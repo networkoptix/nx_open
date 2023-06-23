@@ -63,11 +63,6 @@ struct NX_VMS_API UserModelBase
     std::optional<QnLatin1Array> hash; /**<%apidoc[unused] */
     std::optional<QnLatin1Array> cryptSha512Hash; /**<%apidoc[unused] */
 
-    UserModelBase() = default;
-    UserModelBase(const UserModelBase&) = default;
-    UserModelBase(UserModelBase&&) = default;
-    UserModelBase& operator=(const UserModelBase&) = default;
-    UserModelBase& operator=(UserModelBase&&) = default;
     bool operator==(const UserModelBase& other) const = default;
 
     QnUuid getId() const { return id; }
@@ -116,11 +111,6 @@ struct NX_VMS_API UserModelV1: public UserModelBase
      */
     std::optional<std::vector<QnUuid>> accessibleResources;
 
-    UserModelV1() = default;
-    UserModelV1(const UserModelV1&) = default;
-    UserModelV1(UserModelV1&&) = default;
-    UserModelV1& operator=(const UserModelV1&) = default;
-    UserModelV1& operator=(UserModelV1&&) = default;
     bool operator==(const UserModelV1& other) const = default;
 
     using DbReadTypes = std::tuple<UserData>;
@@ -152,11 +142,6 @@ struct NX_VMS_API UserModelV3: public UserModelBase
      */
     std::map<QnUuid, AccessRights> resourceAccessRights;
 
-    UserModelV3() = default;
-    UserModelV3(const UserModelV3&) = default;
-    UserModelV3(UserModelV3&&) = default;
-    UserModelV3& operator=(const UserModelV3&) = default;
-    UserModelV3& operator=(UserModelV3&&) = default;
     bool operator==(const UserModelV3& other) const = default;
 
     using DbReadTypes = std::tuple<UserData>;

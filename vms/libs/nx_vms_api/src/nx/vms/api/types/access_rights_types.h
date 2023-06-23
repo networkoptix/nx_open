@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include <nx/fusion/fusion/fusion_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/serialization/flags.h>
 #include <nx/utils/uuid.h>
@@ -229,6 +231,8 @@ constexpr GlobalPermissions kAssignableGlobalPermissions =
 
 constexpr GlobalPermissions kDeprecatedGlobalPermissions{~kNonDeprecatedGlobalPermissions};
 
+// -------------------------------------------------------------------------------------------------
+
 /**%apidoc
  * Flags describing User access rights towards particular Resources.
  * %// Stored in the database. QFlags uses int internally, so we are limited to 32 bits.
@@ -278,6 +282,28 @@ NX_REFLECTION_ENUM_CLASS(SpecialResourceGroup,
     allServers,
     allVideowalls
 )
+
+// -------------------------------------------------------------------------------------------------
+
+struct NX_VMS_API PermissionsModel
+{
+    /**%apidoc All inherited group ids, can be obtained from `GET /rest/v{3-}/userGroups` */
+    std::vector<QnUuid> groupIds;
+
+    /**%apidoc[opt] All inherited permissions. */
+    GlobalPermissions permissions = GlobalPermission::none;
+
+    /**%apidoc[opt]
+     * All inherited access rights per Resource (can be obtained from `/rest/v{3-}/devices`,
+     * `/rest/v{3-}/servers`, etc.) or Resource Group (can be obtained from
+     * `/rest/v{3-}/resourceGroups`).
+     */
+    std::map<QnUuid, AccessRights> resourceAccessRights;
+};
+#define PermissionsModel_Fields (groupIds)(permissions)(resourceAccessRights)
+
+QN_FUSION_DECLARE_FUNCTIONS(PermissionsModel, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PermissionsModel, PermissionsModel_Fields)
 
 // Special resource group ids.
 NX_VMS_API extern const QnUuid kAllDevicesGroupId;

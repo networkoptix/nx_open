@@ -518,6 +518,12 @@ void QnUserResource::setIntegrationRequestData(
         QString::fromStdString(serializedIntegrationRequestData));
 }
 
+std::map<QnUuid, nx::vms::api::AccessRights> QnUserResource::ownResourceAccessRights() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return m_resourceAccessRights;
+}
+
 void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)
 {
     base_type::updateInternal(source, notifiers);

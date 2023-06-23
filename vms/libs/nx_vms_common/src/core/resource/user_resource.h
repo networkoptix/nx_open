@@ -156,6 +156,8 @@ public:
     void setIntegrationRequestData(
         std::optional<nx::vms::api::analytics::IntegrationRequestData> integrationRequestData);
 
+    std::map<QnUuid, nx::vms::api::AccessRights> ownResourceAccessRights() const;
+
     virtual nx::vms::api::ResourceStatus getStatus() const override;
 
     /*

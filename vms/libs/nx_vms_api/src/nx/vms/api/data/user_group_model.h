@@ -49,11 +49,6 @@ struct NX_VMS_API UserGroupModel
     /**%apidoc[readonly] */
     nx::vms::api::UserAttributes attributes{};
 
-    UserGroupModel() = default;
-    UserGroupModel(const UserGroupModel&) = default;
-    UserGroupModel(UserGroupModel&&) = default;
-    UserGroupModel& operator=(const UserGroupModel&) = default;
-    UserGroupModel& operator=(UserGroupModel&&) = default;
     bool operator==(const UserGroupModel& other) const = default;
 
     using DbReadTypes = std::tuple<UserGroupData>;
