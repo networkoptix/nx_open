@@ -53,6 +53,8 @@ TableView
 
         DelegateChoice
         {
+            id: delegateChoice
+
             roleValue: "checkbox"
 
             Rectangle
@@ -63,10 +65,18 @@ TableView
 
                 CheckBox
                 {
+                    id: checkBox
+
                     x: 8
                     y: 6
                     anchors.verticalCenter: parent.verticalCenter
-                    // checked: control.model["checked"]
+                    checked: model.display
+                    onCheckStateChanged:
+                    {
+                        if (checkState !== model.display)
+                            model.edit = checkState
+                    }
+
                 }
             }
         }
