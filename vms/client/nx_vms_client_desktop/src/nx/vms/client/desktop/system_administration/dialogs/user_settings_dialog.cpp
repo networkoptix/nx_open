@@ -163,7 +163,7 @@ UserSettingsDialog::UserSettingsDialog(
         this,
         [this](const QSet<QnUuid>& subjectIds)
         {
-            if (d->user && subjectIds.contains((*d->user)->getId()))
+            if (d->user && !d->user->isNull() && subjectIds.contains((*d->user)->getId()))
                 updateStateFrom(*d->user);
         });
 
