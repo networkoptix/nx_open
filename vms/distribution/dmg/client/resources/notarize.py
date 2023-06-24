@@ -2,28 +2,14 @@
 
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+import argparse
+import datetime
+import json
+import logging
 import os
-import io
+import subprocess
 import sys
 import time
-import argparse
-import plistlib
-import datetime
-import logging
-import subprocess
-
-
-def get_request_uuid(request_result):
-    uuid_data = request_result.get("notarization-upload", None)
-    return uuid_data["RequestUUID"] if uuid_data else None
-
-
-def get_upload_error_message(request_result):
-    error_data = request_result.get('product-errors')
-    if not error_data or not len(error_data):
-        return None
-
-    return error_data[0].get('message')
 
 
 def masked_command(command, masked_secrets=()):
@@ -32,97 +18,109 @@ def masked_command(command, masked_secrets=()):
             arg = arg.replace(secret, "*****")
         return arg
 
-    return (masked_arg(arg) for arg in command)
+    return [masked_arg(arg) for arg in command]
 
 
 def execute(command, masked_secrets=()):
     try:
-        logging.info(f"-- Running: {masked_command(command, masked_secrets)}")
+        logging.info(f"Running: {masked_command(command, masked_secrets)}")
         output = subprocess.check_output(command)
-        return True, output
+        return output
     except subprocess.CalledProcessError as error:
-        return False, error.output
+        logging.error(f"Command execution failed. Output: {output}")
 
 
-def upload_for_notarization(options):
+def upload_for_notarization(args):
     command = [
-        'xcrun', 'altool', '--notarize-app',
-        '--output-format', 'xml',
-        '-f', options.dmg_file_name,
-        '--primary-bundle-id', options.bundle_id,
-        '-itc_provider', options.team_id,
-        '-u', options.user,
-        '-p', options.password
+        "xcrun", "notarytool", "submit",
+        args.dmg_file_name,
+        "--team-id", args.team_id,
+        "--apple-id", args.apple_id,
+        "--password", args.password,
+        "--output-format", "json"
     ]
 
-    success, output = execute(command, masked_secrets=[options.user, options.password])
-    request_result = None
+    output = execute(command, masked_secrets=[args.apple_id, args.password])
+    if output is None:
+        return False
 
-    if success:
-        try:
-            request_result = plistlib.load(io.BytesIO(output))
-        except plistlib.InvalidFileException:
-            pass
+    try:
+        request_result = json.loads(output)
+    except json.JSONDecodeError:
+        logging.error(f"Failed to parse command output. Output: {output}")
+        return False
 
-    if not request_result:
-        logging.error("xcrun failed uploading the file to notarization. Output:\n", output)
-        return None, None
+    request_id = request_result.get("id")
+    if not request_id:
+        logging.error(f"Upload unsuccessful: {request_result.get('message')}")
+        return False
 
-    request_id = get_request_uuid(request_result)
-    if success and request_id:
-        return request_id, ""
-
-    return None, get_upload_error_message(request_result)
+    logging.info(f"Upload successful, upload id: {request_id}")
+    return request_id
 
 
-def check_notarization_completion(options):
+def check_notarization_status(request_id, args):
     command = [
-        'xcrun', 'altool',
-        '--notarization-info', options.request_id,
-        '-u', options.user,
-        '-p', options.password,
-        '--output-format', 'xml'
+        "xcrun", "notarytool",
+        "info", request_id,
+        "--apple-id", args.apple_id,
+        "--password", args.password,
+        "--team-id", args.team_id,
+        "--output-format", "json"
     ]
 
-    success, output = execute(command, masked_secrets=[options.user, options.password])
-    progress_data = plistlib.load(io.BytesIO(output))
-    info = progress_data.get('notarization-info')
-    if not success or not info:
-        return False, False, "Unexpected error: no data returned"
+    output = execute(command, masked_secrets=[args.apple_id, args.password])
+    if output is None:
+        return False
 
-    status = info.get('Status', None)
+    try:
+        info = json.loads(output)
+    except json.JSONDecodeError:
+        logging.error(f"Failed to parse command output. Output: {output}")
+        return False
+
+    status = info.get("status").lower()
     if not status:
-        return False, False, "Enexpected error: no status field"
+        logging.error(f"There's no status in the command output: {output}")
+        return False
 
-    if status == 'in progress':
-        return False, False, "In progress"
+    if status == "in progress" or status == "accepted":
+        return status
 
-    if status == 'success':
-        return True, True, "Success"
+    message = info.get("message")
+    logging.error(f"Notarization failed. Status: {status}. Message: {message}.")
 
-    return True, False, "See errors in:\n{}".format(info.get('LogFileURL'))
+    return False
 
 
-def wait_for_notarization_completion(options, check_period_seconds):
-    timeout = options.timeout * 60
+def wait_for_notarization_completion(request_id, args):
+    timeout = args.timeout * 60
     start_time = time.monotonic()
-    completed = False
-    while (time.monotonic() - start_time) < timeout and not completed:
-        completed, success, error = check_notarization_completion(options)
-        if not completed:
-            time.sleep(check_period_seconds)
+
+    while (time.monotonic() - start_time) < timeout:
+        status = check_notarization_status(request_id, args)
+
+        if status == "in progress":
+            retry_period = 30
+            logging.info(f"Notarization is in progress. Waiting {retry_period} sec...")
+            time.sleep(retry_period)
             continue
 
-        return success, error
+        if status == "accepted":
+            return True
 
-    return False, "Operation timeout"
+        return False
 
 
 def staple_app(dmg_file_name):
-    command = ['xcrun', 'stapler', 'staple', dmg_file_name]
-    success, output = execute(command)
+    command = ["xcrun", "stapler", "staple", dmg_file_name]
+    output = execute(command)
+    if output is None:
+        logging.error("Cannot staple application.")
+        return False
+
     logging.debug(output)
-    return success
+    return True
 
 
 def show_critical_error_and_exit(message):
@@ -130,115 +128,60 @@ def show_critical_error_and_exit(message):
     sys.exit(1)
 
 
-def add_standard_parser_parameters(parser):
-    parser.add_argument(
-        '--user',
-        metavar='<Apple Developer ID>',
-        help="User can also be specified with NOTARIZATION_USER environment variable")
-
-    parser.add_argument(
-        '--password',
-        metavar="<Apple Developer Password>",
-        help="Password can also be specified with NOTARIZATION_PASSWORD environment variable")
-
-    parser.add_argument(
-        '--timeout',
-        metavar="<Timeout of operation in minutes>",
-        type=int,
-        default=20)
-
-
-def setup_notarize_parser(subparsers):
-    notarizationParser = subparsers.add_parser('notarize')
-    add_standard_parser_parameters(notarizationParser)
-    notarizationParser.add_argument(
-        '--team-id',
-        metavar="<Apple Team ID>",
-        required=True)
-
-    notarizationParser.add_argument(
-        '--file-name',
-        metavar="<Dmg File Name>",
-        dest='dmg_file_name',
-        required=True)
-
-    notarizationParser.add_argument(
-        '--bundle-id',
-        metavar="<Application Bundle ID>",
-        required=True)
-
-
-def setup_check_parser(subparsers):
-    checkParsers = subparsers.add_parser('check')
-    add_standard_parser_parameters(checkParsers)
-    checkParsers.add_argument(
-        '--request-id',
-        metavar="<Request ID>",
-        required=True)
-
-
 def main():
-    logging.basicConfig(
-        level=logging.INFO, format='%(message)s')
+    logging.basicConfig(level=logging.DEBUG, format="%(message)s")
 
-    parser = argparse.ArgumentParser(
-        description="Notarizes specified application")
-    subparsers = parser.add_subparsers()
-    setup_notarize_parser(subparsers)
-    setup_check_parser(subparsers)
+    parser = argparse.ArgumentParser(description="Notarizes the specified application")
+    parser.add_argument("--apple-id",
+        help="Apple ID can also be specified with NOTARIZATION_USER environment variable")
+    parser.add_argument("--password",
+        help="Password can also be specified with NOTARIZATION_PASSWORD environment variable")
+    parser.add_argument("--team-id", help="Apple team ID", required=True)
+    parser.add_argument("--timeout", help="Timeout of operation in minutes", type=int, default=20)
+    parser.add_argument("--continue-with-request-id", dest="request_id",
+        help="Continue a timed out notarization process using the specified request ID")
+    parser.add_argument("dmg_file_name", help="DMG file name")
 
-    if not len(sys.argv) > 1:
-        parser.print_help()
-        exit()
+    args = parser.parse_args()
 
     start_time = time.monotonic()
-    options = parser.parse_args()
 
-    if not options.user:
-        options.user = os.getenv("NOTARIZATION_USER")
-        if not options.user:
+    if not args.apple_id:
+        args.apple_id = os.getenv("NOTARIZATION_USER")
+        if not args.apple_id:
             show_critical_error_and_exit(
                 "Notarization user is not specified. See --help for details.")
-    if not options.password:
-        options.password = os.getenv("NOTARIZATION_PASSWORD")
-        if not options.password:
+    if not args.password:
+        args.password = os.getenv("NOTARIZATION_PASSWORD")
+        if not args.password:
             show_critical_error_and_exit(
                 "Notarization password is not specified. See --help for details.")
 
-    if not os.path.exists(options.dmg_file_name):
-        show_critical_error_and_exit(f"File {options.dmg_file_name} does not exist.")
+    if not os.path.exists(args.dmg_file_name):
+        show_critical_error_and_exit(f"File {args.dmg_file_name} does not exist.")
 
-    need_upload = 'request_id' not in options or options.request_id is None
-    if need_upload:
-        options.request_id, upload_error = upload_for_notarization(options)
+    if not args.request_id:
+        request_id = upload_for_notarization(args)
+    else:
+        request_id = args.request_id
 
-    if not options.request_id:
-        message = "Can't upload package for notarization, see errors: {}\n"
-        show_critical_error_and_exit(message.format(upload_error))
+    if not request_id:
+        show_critical_error_and_exit(
+            f"Cannot upload package for notarization, see errors: {error}")
 
-    if need_upload:
-        logging.info("Upload successful, upload id: %s", options.request_id)
-
-    check_period_seconds = 30
-    success, notarizationError = wait_for_notarization_completion(
-        options, check_period_seconds)
+    result = wait_for_notarization_completion(request_id, args)
 
     time_elapsed = time.monotonic() - start_time
-    elapsedTimeMessage = "Total time: {}\n".format(
-        datetime.timedelta(seconds=time_elapsed))
+    logging.info(f"Total time: {datetime.timedelta(seconds=time_elapsed)}")
 
-    if not success:
-        message = "Notarization failed: {0}\n{1}\n"
-        show_critical_error_and_exit(
-            message.format(notarizationError, elapsedTimeMessage))
+    if not result:
+        sys.exit(1)
 
-    if not staple_app(options.dmg_file_name):
-        message = "Can't staple application: {0}\n{1}"
-        show_critical_error_and_exit(
-            message.format(notarizationError, elapsedTimeMessage))
+    if not staple_app(args.dmg_file_name):
+        sys.exit(1)
 
-    logging.info("Notarization successful!\n\n%s", elapsedTimeMessage)
+    logging.info("Notarization successful.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
