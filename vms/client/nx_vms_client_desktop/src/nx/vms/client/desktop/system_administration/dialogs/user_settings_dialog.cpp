@@ -3,7 +3,6 @@
 #include "user_settings_dialog.h"
 
 #include <algorithm>
-#include <optional>
 
 #include <QtGui/QGuiApplication>
 #include <QtWidgets/QPushButton>
@@ -77,7 +76,7 @@ struct UserSettingsDialog::Private
     QmlProperty<bool> ldapError;
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
-    std::optional<QnUserResourcePtr> user;
+    QnUserResourcePtr user;
     rest::Handle m_currentRequest = -1;
 
     Private(UserSettingsDialog* parent, DialogType dialogType):
@@ -118,8 +117,8 @@ UserSettingsDialog::UserSettingsDialog(
         connect(d->sessionNotifier, &SessionNotifier::forcedUpdateRequested, this,
             [this]
             {
-                if (d->user)
-                    updateStateFrom(*d->user);
+                if (d->user || d->dialogType == CreateUser)
+                    updateStateFrom(d->user);
             });
     }
 
@@ -143,7 +142,7 @@ UserSettingsDialog::UserSettingsDialog(
         this,
         [this](const QnResourceList& resources)
         {
-            if (!d->user || d->user->isNull())
+            if (!d->user)
                 return;
 
             for (const auto& resource: resources)
@@ -163,8 +162,8 @@ UserSettingsDialog::UserSettingsDialog(
         this,
         [this](const QSet<QnUuid>& subjectIds)
         {
-            if (d->user && !d->user->isNull() && subjectIds.contains((*d->user)->getId()))
-                updateStateFrom(*d->user);
+            if (d->user && subjectIds.contains(d->user->getId()))
+                updateStateFrom(d->user);
         });
 
     const auto resetEditingContext =
@@ -239,9 +238,6 @@ QString UserSettingsDialog::validateEmail(const QString& email, bool forCloud)
 
 QString UserSettingsDialog::validateLogin(const QString& login)
 {
-    if (!NX_ASSERT(d->user))
-        return {};
-
     TextValidateFunction validateFunction =
         [this](const QString& text) -> ValidationResult
         {
@@ -261,7 +257,7 @@ QString UserSettingsDialog::validateLogin(const QString& login)
                     continue;
 
                 // Allow our own login.
-                if (!d->user->isNull() && (*d->user)->getName() == text)
+                if (d->user && d->user->getName() == text)
                     continue;
 
                 return ValidationResult(tr("User with specified login already exists."));
@@ -289,7 +285,7 @@ void UserSettingsDialog::onDeleteRequested()
 
     if (!ui::messages::Resources::deleteResources(
         appContext()->mainWindowContext()->workbenchContext()->mainWindowWidget(),
-        {*d->user},
+        {d->user},
         /*allowSilent*/ false))
     {
         return;
@@ -307,10 +303,10 @@ void UserSettingsDialog::onDeleteRequested()
                 if (success)
                     reject();
                 else
-                    ui::messages::Resources::deleteResourcesFailed(d->parentWidget, {*d->user});
+                    ui::messages::Resources::deleteResourcesFailed(d->parentWidget, {d->user});
             });
 
-        qnResourcesChangesManager->deleteResource(*d->user, callback);
+        qnResourcesChangesManager->deleteResource(d->user, callback);
     }
     else
     {
@@ -323,7 +319,7 @@ void UserSettingsDialog::onDeleteRequested()
                     reject();
             });
 
-        qnResourcesChangesManager->deleteResources({*d->user}, callback);
+        qnResourcesChangesManager->deleteResources({d->user}, callback);
     }
 }
 
@@ -403,7 +399,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
 void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
 {
-    if (!NX_ASSERT(d->user))
+    if (!NX_ASSERT(d->user || d->dialogType == CreateUser))
         return;
 
     if (d->dialogType == EditUser && !isModified())
@@ -487,16 +483,16 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
 
                 if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
                 {
-                    if (auto user = d->user.value_or(QnUserResourcePtr{}))
+                    if (d->user)
                     {
                         // Update user locally ahead of receiving update from the server
                         // to avoid UI blinking.
-                        user->setName(data->name);
-                        user->setEmail(state.email);
-                        user->setFullName(state.fullName);
-                        user->setRawPermissions(state.globalPermissions);
-                        user->setEnabled(state.userEnabled);
-                        user->setGroupIds(data->groupIds);
+                        d->user->setName(data->name);
+                        d->user->setEmail(state.email);
+                        d->user->setFullName(state.fullName);
+                        d->user->setRawPermissions(state.globalPermissions);
+                        d->user->setEnabled(state.userEnabled);
+                        d->user->setGroupIds(data->groupIds);
                     }
 
                     UserGroupRequestChain::updateLayoutSharing(
@@ -513,10 +509,10 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
 
 void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
 {
-    if (d->user && *d->user == user)
+    if (d->dialogType == EditUser && d->user == user)
         return; //< Do not reset state upon setting the same user.
 
-    if (d->user.has_value() && user && isModified())
+    if (d->dialogType == EditUser && d->user && user && isModified())
     {
         const QString mainText = tr("Apply changes?");
 
@@ -548,14 +544,14 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
 
     d->tabIndex = 0;
 
-    if (auto oldUser = d->user.value_or(QnUserResourcePtr{}))
-        oldUser->disconnect(this);
+    if (d->user)
+        d->user->disconnect(this);
 
     d->user = user;
 
     if (user)
     {
-        const auto updateState = [this]() { updateStateFrom(*d->user); };
+        const auto updateState = [this]() { updateStateFrom(d->user); };
 
         connect(user.get(), &QnResource::propertyChanged, this, updateState);
         connect(user.get(), &QnUserResource::digestChanged, this, updateState);
