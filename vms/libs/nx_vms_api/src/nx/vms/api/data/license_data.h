@@ -8,7 +8,8 @@
 
 #include "data_macros.h"
 #include "map.h"
-#include "nx/reflect/instrument.h"
+#include <nx/reflect/instrument.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace vms {
@@ -133,6 +134,12 @@ struct NX_VMS_API LicenseSummaryData
     int inUse = 0;
 
     bool operator==(const LicenseSummaryData& other) const = default;
+};
+
+struct NX_VMS_API LicenseSummaryDataEx: public LicenseSummaryData
+{
+    /**%apidoc There are not enough licenses for these devices. */
+    std::set<QnUuid> excessDevices;
 };
 
 #define DetailedLicenseData_Fields \

@@ -242,6 +242,63 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServiceUsage)
     ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
 }
 
+TEST_F(SaasServiceUsageHelperTest, CloudRecordingExcessDevices)
+{
+    using namespace nx::vms::api;
+
+    auto cameras1 = addCameras(/*size*/ 250, /* megapixels*/ 5, /*useBackup*/ true);
+    auto cameras2 = addCameras(/*size*/ 100, /* megapixels*/ 6, /*useBackup*/ true);
+    ASSERT_TRUE(m_cloudeStorageHelper->isOverflow());
+
+    auto info = m_cloudeStorageHelper->allInfo();
+    ASSERT_EQ(50, info[5].excessDevices.size());
+    
+    // Check last 50 cameras of 5 megapixels cameras with bigger id is claimed as excees devices.
+    std::set<QnUuid> expectedExceessDevices;
+    for (const auto& camera: cameras1)
+        expectedExceessDevices.insert(camera->getId());
+    while (expectedExceessDevices.size() > 50)
+        expectedExceessDevices.erase(expectedExceessDevices.begin());
+    const auto excessDevices = info[5].excessDevices;
+    for (auto it1 = expectedExceessDevices.begin(), it2 = excessDevices.begin();
+         it1 != expectedExceessDevices.end(); ++it1, ++it2)
+    {
+        ASSERT_EQ(*it1, *it2);
+    }
+}
+
+TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasMapping)
+{
+    using namespace nx::vms::api;
+
+    // Available services:
+    // 1. "60a18a70-452b-46a1-9bfd-e66af6fbd0de": 50 channels, 5 megapixels
+    // 2. "60a18a70-452b-46a1-9bfd-e66af6fbd0dd": 100 channels, 10 megapixels
+    // 3. "60a18a70-452b-46a1-9bfd-e66af6fbd0dc": 150 channels, unlimited megapixels
+
+    auto cameras2 = addCameras(/*size*/ 150, /* megapixels*/ 6, /*useBackup*/ true);
+    auto mapping = m_cloudeStorageHelper->servicesByCameras();
+    std::map<QnUuid, int> serviceUsages;
+    for (const auto& [cameraId, serviceId]: mapping)
+        ++serviceUsages[serviceId];
+
+    ASSERT_EQ(0, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0de")]);
+    ASSERT_EQ(100, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dd")]);
+    ASSERT_EQ(50, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dc")]);
+
+    auto cameras1 = addCameras(/*size*/ 200, /* megapixels*/ 5, /*useBackup*/ true);
+    m_cloudeStorageHelper->invalidateCache();
+    mapping = m_cloudeStorageHelper->servicesByCameras();
+    serviceUsages.clear();
+    for (const auto& [cameraId, serviceId]: mapping)
+        ++serviceUsages[serviceId];
+    
+    ASSERT_EQ(50, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0de")]);
+    ASSERT_EQ(100, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dd")]);
+    ASSERT_EQ(150, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dc")]);
+    ASSERT_EQ(50, serviceUsages[QnUuid()]);
+}
+
 TEST_F(SaasServiceUsageHelperTest, LocalRecordingServiceLoaded)
 {
     using namespace nx::vms::api;
