@@ -360,7 +360,7 @@ Item
 
                 case StatusOverlay.OfflineOverlay:
                     return makeErrorOverlayData(qsTr("No signal"),
-                        "qrc:///skin/item_placeholders/offline.svg")
+                        "image://svg/skin/item_placeholders/offline.svg")
 
                 case StatusOverlay.AnalogWithoutLicenseOverlay:
                 case StatusOverlay.VideowallWithoutLicenseOverlay:
