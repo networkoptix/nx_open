@@ -49,10 +49,10 @@ Button
     iconUrl:
     {
         if (sortOrder === HeaderButton.AscendingOrder)
-            return "qrc:///skin/table_view/ascending.svg"
+            return "image://svg/skin/table_view/ascending.svg"
 
         if (sortOrder === HeaderButton.DescendingOrder)
-            return "qrc:///skin/table_view/descending.svg"
+            return "image://svg/skin/table_view/descending.svg"
 
         return ""
     }
