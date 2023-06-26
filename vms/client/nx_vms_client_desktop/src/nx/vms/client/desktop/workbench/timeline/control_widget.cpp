@@ -119,7 +119,7 @@ ControlWidget::ControlWidget(QnWorkbenchContext* context, QWidget* parent):
         this, &ControlWidget::geometryChanged);
 
     initButton(m_muteButton, ui::action::ToggleMuteAction,
-        "slider/buttons/unmute.png", "slider/buttons/mute.png");
+        "slider/buttons/sound_24.svg", "slider/buttons/unmute_24.svg");
 
     initButton(m_liveButton, ui::action::JumpToLiveAction,
         "slider/buttons/live_52x24.svg",
@@ -255,21 +255,17 @@ void ControlWidget::initButton(
     QAction* buttonAction = action(actionType);
 
     button->setCustomPaintFunction(paintButtonFunction);
-    // TODO @pprivalov remove this temporary solution
-    if (iconPath.endsWith(".svg"))
-    {
-        button->setIcon(qnSkin->icon(iconPath,
+    button->setIcon(!checkedIconPath.isEmpty()
+        ? qnSkin->icon(iconPath,
+            checkedIconPath,
+            nullptr,
+            kNavigationIconSubstitutions,
+            kNavigationIconCheckedSubstitutions)
+        : qnSkin->icon(iconPath,
             nullptr,
             nullptr,
             kNavigationIconSubstitutions,
             kNavigationIconCheckedSubstitutions));
-    }
-    else
-    {
-        button->setIcon(!checkedIconPath.isEmpty()
-            ? qnSkin->icon(iconPath, checkedIconPath)
-            : qnSkin->icon(iconPath));
-    }
 
     const bool smallIcon = !checkedIconPath.isEmpty();
     button->setObjectName(buttonAction->text());
