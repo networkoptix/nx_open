@@ -152,8 +152,8 @@ QByteArray SvgIconColorer::makeIcon(QIcon::Mode mode) const
 {
     const ColorSubstitutions substitutions =
         (mode == QnIcon::Normal && !m_substitutions.contains(mode))
-        ? colorTheme()->getColorSubstitutions()
-        : colorMapFromStringMap(m_substitutions.value(mode));
+            ? colorTheme()->getColorSubstitutions()
+            : colorMapFromStringMap(m_substitutions.value(mode));
 
     const QString suffix = (mode == QnIcon::Normal)
         ? ""
