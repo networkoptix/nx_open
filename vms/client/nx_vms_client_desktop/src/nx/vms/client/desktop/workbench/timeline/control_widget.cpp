@@ -136,7 +136,7 @@ ControlWidget::ControlWidget(QnWorkbenchContext* context, QWidget* parent):
     initButton(m_thumbnailsButton, ui::action::ToggleThumbnailsAction,
         "slider/buttons/thumbnails_52x24.svg");
     initButton(m_calendarButton, ui::action::ToggleCalendarAction,
-        "slider/buttons/calendar.png");
+        "slider/buttons/calendar_52x24.svg");
 
     statisticsModule()->controls()->registerSlider(
         "volume_slider",
