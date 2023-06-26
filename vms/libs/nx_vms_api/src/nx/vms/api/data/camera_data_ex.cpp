@@ -11,7 +11,7 @@ namespace api {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     CameraDataEx, (ubjson)(xml)(csv_record)(sql_record), CameraDataEx_Fields)
 
-// TODO #lbusygin: remove backward compatibility support in 5.2
+// TODO #lbusygin: remove backward compatibility support in 6.0
 namespace detail {
 
 QN_FUSION_DEFINE_FUNCTIONS(CameraDataEx, (json))

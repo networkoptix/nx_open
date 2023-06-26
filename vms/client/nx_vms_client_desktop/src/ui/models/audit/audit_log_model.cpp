@@ -465,7 +465,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
             result = nx::format(tr("Connected to %1 via %2",
                 "%1 is the Cloud name (like Nx Cloud), "
                     "%2 is a description of the agent used for establishing the connection "
-                    "(like Nx Witness Desktop Client 5.2.0.0)"),
+                    "(like Nx Witness Desktop Client 6.0.0.0)"),
                 nx::branding::cloudName(),
                 data->extractParam("userAgent"));
             break;
@@ -474,7 +474,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
                 tr("Disconnected from %1 via %2",
                     "%1 is the Cloud name (like Nx Cloud), "
                     "%2 is a description of the agent used for establishing the connection "
-                    "(like Nx Witness Desktop Client 5.2.0.0)"),
+                    "(like Nx Witness Desktop Client 6.0.0.0)"),
                 nx::branding::cloudName(),
                 data->extractParam("userAgent"));
             break;

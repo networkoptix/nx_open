@@ -7,7 +7,7 @@
 
 namespace nx::vms::common {
 
-// TODO: #amalov Remove in 5.2.
+// TODO: #amalov Remove in 6.0.
 class NX_VMS_COMMON_API BusinessEventFilterResourcePropertyAdaptor:
     public QnLexicalResourcePropertyAdaptor<quint64>
 {

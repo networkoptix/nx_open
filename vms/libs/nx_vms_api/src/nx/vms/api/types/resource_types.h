@@ -240,7 +240,7 @@ enum ServerFlag
     SF_HasPublicIP = 0x004,
     SF_deprecated_IfListCtrl = 0x008,
 
-    /**%apidoc[unused] Removed in 5.2 because no longer used. */
+    /**%apidoc[unused] Removed in 6.0 because no longer used. */
     SF_deprecated_TimeCtrl = 0x010,
 
     /**%apidoc[unused]
