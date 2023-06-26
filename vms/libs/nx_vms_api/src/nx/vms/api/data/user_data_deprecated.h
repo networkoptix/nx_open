@@ -6,7 +6,7 @@
 
 namespace nx::vms::api {
 
-// VMS Transaction structure before 5.2.
+// VMS Transaction structure before 6.0.
 struct NX_VMS_API UserDataDeprecated: ResourceData
 {
     UserDataDeprecated(): ResourceData(UserData::kResourceTypeId) {}

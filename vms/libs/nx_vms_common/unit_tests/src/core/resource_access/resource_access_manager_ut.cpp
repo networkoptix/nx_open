@@ -283,7 +283,7 @@ TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsViewer)
 }
 
 // Check permissions for another viewer's layout when the user is logged in as Power User.
-// Since 5.2 Power Users no longer have access to other users' layouts.
+// Since 6.0 Power Users no longer have access to other users' layouts.
 TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsPowerUser)
 {
     loginAs(kPowerUsersGroupId);
@@ -296,7 +296,7 @@ TEST_F(ResourceAccessManagerTest, checkNonOwnViewersLayoutAsPowerUser)
 }
 
 // Check permissions for another Power User's layout when the user is logged in as Power User.
-// Since 5.2 Power Users no longer have access to other users' layouts.
+// Since 6.0 Power Users no longer have access to other users' layouts.
 TEST_F(ResourceAccessManagerTest, checkNonOwnPowerUsersLayoutAsPowerUser)
 {
     loginAs(kPowerUsersGroupId);

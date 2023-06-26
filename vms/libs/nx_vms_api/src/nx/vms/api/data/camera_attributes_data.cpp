@@ -23,7 +23,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraAttributesData,
     (ubjson)(xml)(sql_record)(csv_record), CameraAttributesData_Fields)
 
-// TODO #lbusygin: remove backward compatibility support in 5.2
+// TODO #lbusygin: remove backward compatibility support in 6.0
 struct CameraAttributesDataBackwardCompatibility: public CameraAttributesData
 {
     bool licenseUsed = false;
