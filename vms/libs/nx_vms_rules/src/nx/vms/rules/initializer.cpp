@@ -89,14 +89,17 @@ void Initializer::registerFields() const
     registerEventField<IntField>();
     registerEventField<KeywordsField>();
     m_engine->registerEventField(
-        fieldMetatype<LookupField>(),
-        [this] { return new LookupField(this->m_context); });
+        fieldMetatype<ObjectLookupField>(),
+        [this] { return new ObjectLookupField(this->m_context); });
     registerEventField<SourceCameraField>();
     registerEventField<SourceServerField>();
     m_engine->registerEventField(
         fieldMetatype<SourceUserField>(),
         [this] { return new SourceUserField(systemContext()); });
     registerEventField<StateField>();
+    m_engine->registerEventField(
+        fieldMetatype<TextLookupField>(),
+        [this] { return new TextLookupField(this->m_context); });
     registerEventField<UniqueIdField>();
 
     registerActionField<ActionIntField>();

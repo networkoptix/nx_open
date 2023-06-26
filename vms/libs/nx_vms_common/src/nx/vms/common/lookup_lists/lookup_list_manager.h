@@ -22,7 +22,7 @@ class NX_VMS_COMMON_API LookupListManager: public QObject
     using base_type = QObject;
 
 public:
-    LookupListManager(QObject* parent = nullptr);
+    explicit LookupListManager(QObject* parent = nullptr);
     virtual ~LookupListManager() override;
 
     bool isInitialized() const;
@@ -37,6 +37,8 @@ public:
 
 signals:
     void initialized();
+    void addedOrUpdated(QnUuid id);
+    void removed(QnUuid id);
 
 private:
     struct Private;

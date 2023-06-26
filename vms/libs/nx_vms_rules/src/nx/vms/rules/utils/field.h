@@ -41,6 +41,7 @@ static constexpr auto kEmailsFieldName = "emails";
 static constexpr auto kEngineIdFieldName = "engineId";
 static constexpr auto kIntervalFieldName = "interval";
 static constexpr auto kLayoutIdsFieldName = "layoutIds";
+static constexpr auto kObjectTypeIdFieldName = "objectTypeId";
 static constexpr auto kOmitLoggingFieldName = "omitLogging";
 static constexpr auto kPlaybackTimeFieldName = "playbackTime";
 static constexpr auto kRecordAfterFieldName = "recordAfter";

@@ -19,9 +19,9 @@
 #include "http_parameters_picker_widget.h"
 #include "input_port_picker_widget.h"
 #include "keywords_picker_widget.h"
-#include "lookup_picker_widget.h"
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
+#include "object_lookup_picker_widget.h"
 #include "oneline_text_picker_widget.h"
 #include "optional_duration_picker_widget.h"
 #include "output_port_picker_widget.h"
@@ -35,6 +35,7 @@
 #include "stream_quality_picker_widget.h"
 #include "target_layout_picker_widget.h"
 #include "target_user_picker_widget.h"
+#include "text_lookup_picker_widget.h"
 #include "volume_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
@@ -156,8 +157,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new NumberPicker<nx::vms::rules::IntField>(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::KeywordsField>())
         pickerWidget = new KeywordsPicker(context, parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::LookupField>())
-        pickerWidget = new LookupPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::ObjectLookupField>())
+        pickerWidget = new ObjectLookupPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceCameraField>())
         pickerWidget = createSourceCameraPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceServerField>())
@@ -166,6 +167,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new SourceUserPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::StateField>())
         pickerWidget = new StatePicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::TextLookupField>())
+        pickerWidget = new TextLookupPicker(context, parent);
     // Action field based pickers.
     else if (descriptor.id == fieldMetatype<nx::vms::rules::ActionFlagField>())
         pickerWidget = new FlagPicker<nx::vms::rules::ActionFlagField>(context, parent);
