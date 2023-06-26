@@ -86,7 +86,7 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
     initButton(m_stepBackwardButton, ui::action::PreviousFrameAction,
         "slider/navigation/step_backward_32.svg");
     initButton(m_playButton, ui::action::PlayPauseAction,
-        "slider/navigation/play.png", "slider/navigation/pause_32.svg");
+        "slider/navigation/play_32.svg", "slider/navigation/pause_32.svg");
     initButton(m_stepForwardButton, ui::action::NextFrameAction,
         "slider/navigation/step_forward.png");
     initButton(m_jumpForwardButton, ui::action::JumpToEndAction,
