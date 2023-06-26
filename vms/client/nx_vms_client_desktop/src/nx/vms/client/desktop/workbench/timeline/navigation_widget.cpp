@@ -47,7 +47,7 @@ bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, cons
     return true;
 };
 
-// TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin will be ready
+// TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin is ready
 static const QColor kBasePrimaryColor = "#e1e7ea";
 static const QColor kBackgroundColor = "#212a2f";
 
@@ -88,7 +88,7 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
     initButton(m_playButton, ui::action::PlayPauseAction,
         "slider/navigation/play_32.svg", "slider/navigation/pause_32.svg");
     initButton(m_stepForwardButton, ui::action::NextFrameAction,
-        "slider/navigation/step_forward.png");
+        "slider/navigation/step_forward_32.svg");
     initButton(m_jumpForwardButton, ui::action::JumpToEndAction,
         "slider/navigation/rewind_forward_32.svg");
 
@@ -251,9 +251,14 @@ void NavigationWidget::updatePlaybackButtonsIcons()
             nullptr,
             kNavigationIconSubstitutions));
     m_stepForwardButton->setIcon(playing
-            ? qnSkin->icon(
-                "slider/navigation/forward_32.svg", nullptr, nullptr, kNavigationIconSubstitutions)
-            : qnSkin->icon("slider/navigation/step_forward.png"));
+        ? qnSkin->icon("slider/navigation/forward_32.svg",
+            nullptr,
+            nullptr,
+            kNavigationIconSubstitutions)
+        : qnSkin->icon("slider/navigation/step_forward_32.svg",
+            nullptr,
+            nullptr,
+            kNavigationIconSubstitutions));
 }
 
 void NavigationWidget::updatePlaybackButtonsEnabled()
