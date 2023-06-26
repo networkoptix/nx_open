@@ -251,8 +251,9 @@ void NavigationWidget::updatePlaybackButtonsIcons()
             nullptr,
             kNavigationIconSubstitutions));
     m_stepForwardButton->setIcon(playing
-        ? qnSkin->icon("slider/navigation/forward.png")
-        : qnSkin->icon("slider/navigation/step_forward.png"));
+            ? qnSkin->icon(
+                "slider/navigation/forward_32.svg", nullptr, nullptr, kNavigationIconSubstitutions)
+            : qnSkin->icon("slider/navigation/step_forward.png"));
 }
 
 void NavigationWidget::updatePlaybackButtonsEnabled()
