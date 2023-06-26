@@ -181,6 +181,7 @@ void SystemTabBar::at_currentTabChanged(int index)
 
             auto modelIndex = workbench()->windowContext()->systemTabBarModel()->index(index);
             auto logonData = modelIndex.data(Qn::LogonDataRole).value<LogonData>();
+            logonData.storePassword = true;
 
             appContext()->clientStateHandler()->saveWindowsConfiguration();
             menu()->trigger(ui::action::ConnectAction,
