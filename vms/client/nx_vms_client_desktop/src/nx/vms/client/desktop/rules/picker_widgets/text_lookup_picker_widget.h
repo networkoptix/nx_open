@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/vms/rules/event_filter_fields/lookup_field.h>
+#include <nx/vms/rules/event_filter_fields/text_lookup_field.h>
 
 #include "field_picker_widget.h"
 
@@ -12,17 +12,15 @@ class QLineEdit;
 
 namespace nx::vms::client::desktop::rules {
 
-class LookupPicker: public TitledFieldPickerWidget<vms::rules::LookupField>
+class TextLookupPicker: public TitledFieldPickerWidget<vms::rules::TextLookupField>
 {
     Q_OBJECT
 
 public:
-    LookupPicker(QnWorkbenchContext* context, CommonParamsWidget* parent);
+    TextLookupPicker(QnWorkbenchContext* context, CommonParamsWidget* parent);
 
 private:
     QComboBox* m_checkTypeComboBox{nullptr};
-    QComboBox* m_checkSourceComboBox{nullptr};
-
     QStackedWidget* m_stackedWidget{nullptr};
     QLineEdit* m_lineEdit{nullptr};
     QComboBox* m_lookupListComboBox{nullptr};

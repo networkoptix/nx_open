@@ -7,8 +7,8 @@
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/vms/common/system_context.h>
 
-#include "../event_filter_fields/analytics_object_attributes_field.h"
 #include "../event_filter_fields/analytics_object_type_field.h"
+#include "../event_filter_fields/object_lookup_field.h"
 #include "../event_filter_fields/source_camera_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
@@ -101,8 +101,9 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
         .fields = {
             makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Occurs At")),
             makeFieldDescriptor<AnalyticsObjectTypeField>(
-                "objectTypeId", tr("Of Type"), {}, {}, {utils::kCameraIdFieldName}),
-            makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
+                utils::kObjectTypeIdFieldName, tr("Of Type"), {}, {}, {utils::kCameraIdFieldName}),
+            makeFieldDescriptor<ObjectLookupField>(
+                "attributes", tr("And Object"), {}, {}, {utils::kObjectTypeIdFieldName}),
         },
         .permissions = {
             .resourcePermissions = {

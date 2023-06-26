@@ -8,9 +8,8 @@
 #include <nx/vms/common/system_context.h>
 
 #include "../event_filter_fields/analytics_event_type_field.h"
-#include "../event_filter_fields/analytics_object_attributes_field.h"
-#include "../event_filter_fields/keywords_field.h"
 #include "../event_filter_fields/source_camera_field.h"
+#include "../event_filter_fields/text_lookup_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/string_helper.h"
@@ -101,7 +100,6 @@ QString AnalyticsEvent::extendedCaption(common::SystemContext* context) const
 
 const ItemDescriptor& AnalyticsEvent::manifest()
 {
-    static const QString kKeywordFieldDescription = tr("Keywords separated by space");
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<AnalyticsEvent>(),
         .displayName = tr("Analytics Event"),
@@ -112,10 +110,8 @@ const ItemDescriptor& AnalyticsEvent::manifest()
             makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Occurs at")),
             makeFieldDescriptor<AnalyticsEventTypeField>(
                 "eventTypeId", tr("Of Type"), {}, {}, {utils::kCameraIdFieldName}),
-            makeFieldDescriptor<KeywordsField>(
-                utils::kCaptionFieldName, tr("And Caption"), kKeywordFieldDescription),
-            makeFieldDescriptor<KeywordsField>(
-                utils::kDescriptionFieldName, tr("And Description"), kKeywordFieldDescription),
+            makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName, tr("And Caption")),
+            makeFieldDescriptor<TextLookupField>(utils::kDescriptionFieldName, tr("And Description")),
             // TODO: #amalov Consider adding following fields in 5.1+.
             // makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
         },

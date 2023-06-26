@@ -238,11 +238,12 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventFieldRegistration<InputPortField>();
     testEventFieldRegistration<IntField>();
     testEventFieldRegistration<KeywordsField>();
-    testEventFieldRegistration<LookupField>(systemContext());
+    testEventFieldRegistration<ObjectLookupField>(systemContext());
     testEventFieldRegistration<SourceCameraField>();
     testEventFieldRegistration<SourceServerField>();
     testEventFieldRegistration<SourceUserField>(systemContext());
     testEventFieldRegistration<StateField>();
+    testEventFieldRegistration<TextLookupField>(systemContext());
     testEventFieldRegistration<UniqueIdField>();
 
     testEventRegistration<AnalyticsEvent>();

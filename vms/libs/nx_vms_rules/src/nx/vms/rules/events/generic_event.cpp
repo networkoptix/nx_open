@@ -4,7 +4,7 @@
 
 #include "../event_filter_fields/customizable_flag_field.h"
 #include "../event_filter_fields/dummy_field.h"
-#include "../event_filter_fields/lookup_field.h"
+#include "../event_filter_fields/text_lookup_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
@@ -70,9 +70,9 @@ const ItemDescriptor& GenericEvent::manifest()
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
             utils::makeStateFieldDescriptor(tr("State"), {}, State::instant),
-            makeFieldDescriptor<LookupField>("source", tr("And Source")),
-            makeFieldDescriptor<LookupField>(utils::kCaptionFieldName, tr("And Caption")),
-            makeFieldDescriptor<LookupField>(utils::kDescriptionFieldName, tr("And Description")),
+            makeFieldDescriptor<TextLookupField>("source", tr("And Source")),
+            makeFieldDescriptor<TextLookupField>(utils::kCaptionFieldName, tr("And Caption")),
+            makeFieldDescriptor<TextLookupField>(utils::kDescriptionFieldName, tr("And Description")),
             makeFieldDescriptor<CustomizableFlagField>(utils::kOmitLoggingFieldName, tr("Omit logging")),
 
             makeFieldDescriptor<DummyField>(utils::kDeviceIdsFieldName, utils::kDeviceIdsFieldName)

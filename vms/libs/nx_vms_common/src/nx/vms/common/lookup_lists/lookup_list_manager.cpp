@@ -68,30 +68,42 @@ const nx::vms::api::LookupListDataList& LookupListManager::lookupLists() const
 
 void LookupListManager::addOrUpdate(nx::vms::api::LookupListData list)
 {
-    NX_MUTEX_LOCKER lk(&d->mutex);
-    if (!d->initialized)
-        return;
+    const auto id = list.id;
 
-    auto iter = std::find_if(d->data.begin(), d->data.end(),
-        [id = list.id](const auto& item) { return item.id == id; });
+    {
+        NX_MUTEX_LOCKER lk(&d->mutex);
+        if (!d->initialized)
+            return;
 
-    if (iter != d->data.end())
-        *iter = std::move(list);
-    else
-        d->data.push_back(std::move(list));
+        auto iter = std::find_if(d->data.begin(), d->data.end(),
+            [id](const auto& item) { return item.id == id; });
+
+        if (iter != d->data.end())
+            *iter = std::move(list);
+        else
+            d->data.push_back(std::move(list));
+    }
+
+    emit addedOrUpdated(id);
 }
 
 void LookupListManager::remove(const QnUuid& id)
 {
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    if (!d->initialized)
-        return;
+    {
+        NX_MUTEX_LOCKER lock(&d->mutex);
+        if (!d->initialized)
+            return;
 
-    auto iter = std::find_if(d->data.begin(), d->data.end(),
-        [id](const auto& item) { return item.id == id; });
+        auto iter = std::find_if(d->data.begin(), d->data.end(),
+            [id](const auto& item) { return item.id == id; });
 
-    if (iter != d->data.end())
+        if (iter == d->data.end())
+            return;
+
         d->data.erase(iter);
+    }
+
+    emit removed(id);
 }
 
 } // namespace nx::vms::common

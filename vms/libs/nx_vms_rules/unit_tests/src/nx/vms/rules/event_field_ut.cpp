@@ -80,7 +80,7 @@ TEST_F(EventFieldContextTest, SourceUserField)
     EXPECT_TRUE(field.match(userIdValue));
 }
 
-class LookupFieldContextTest: public nx::vms::common::test::ContextBasedTest
+class LookupFieldTestBase: public nx::vms::common::test::ContextBasedTest
 {
 protected:
     using Attributes = nx::common::metadata::Attributes;
@@ -102,139 +102,194 @@ protected:
     }
 };
 
-TEST_F(LookupFieldContextTest, emptyLookupList)
+class TextLookupFieldTest: public LookupFieldTestBase
+{
+};
+
+TEST_F(TextLookupFieldTest, emptyLookupList)
 {
     const auto listId = makeAndRegisterList();
 
-    LookupField field{systemContext()};
-    field.setSource(LookupSource::lookupList);
+    TextLookupField field{systemContext()};
     field.setValue(listId.toString());
 
-    // An empty List will always return false for 'in' comparison.
-    field.setCheckType(LookupCheckType::in);
-    ASSERT_FALSE(field.match(QVariant{"1"}));
+    field.setCheckType(TextLookupCheckType::inList);
+    // An empty List will always return false for 'inList' comparison.
+    ASSERT_FALSE(field.match(QString{"foo"}));
+
+    // And always return true for 'notInList' comparison.
+    field.setCheckType(TextLookupCheckType::notInList);
+    ASSERT_TRUE(field.match(QString{"foo"}));
+}
+
+TEST_F(TextLookupFieldTest, emptyKeywords)
+{
+    TextLookupField field{systemContext()};
+    field.setValue("");
+
+    // An empty keywords always return true for 'containsKeywords' comparison.
+    field.setCheckType(TextLookupCheckType::containsKeywords);
+    ASSERT_TRUE(field.match(QString{"foo"}));
+    // And always return true for 'doesNotContainKeywords' comparison.
+    field.setCheckType(TextLookupCheckType::doesNotContainKeywords);
+    ASSERT_FALSE(field.match(QString{"foo"}));
+}
+
+TEST_F(TextLookupFieldTest, lookupInKeywordsWorksProperly)
+{
+    TextLookupField field{systemContext()};
+    field.setValue("foo bar");
+
+    field.setCheckType(TextLookupCheckType::containsKeywords);
+    // Check values list contains.
+    ASSERT_TRUE(field.match(QString{"foo"}));
+    ASSERT_TRUE(field.match(QString{"bar"}));
+    ASSERT_TRUE(field.match(QString{"foo_bar"}));
+    // Check value list does not contains.
+    ASSERT_FALSE(field.match(QString{"baz"}));
+
+    field.setCheckType(TextLookupCheckType::doesNotContainKeywords);
+    ASSERT_FALSE(field.match(QString{"foo"}));
+    ASSERT_FALSE(field.match(QString{"bar"}));
+    ASSERT_FALSE(field.match(QString{"foo_bar"}));
+    ASSERT_TRUE(field.match(QString{"baz"}));
+}
+
+TEST_F(TextLookupFieldTest, lookupInListWorksProperly)
+{
+    const auto listId = makeAndRegisterList({"foo"},
+        {
+            {{"foo", "1"}},
+            {{"foo", "2"}},
+            {{"foo", "three"}}
+        });
+
+    TextLookupField field{systemContext()};
+    field.setValue(listId.toString());
+
+    field.setCheckType(TextLookupCheckType::inList);
+    // Check attributes lookup list contains.
+    ASSERT_TRUE(field.match(QString{"1"}));
+    ASSERT_TRUE(field.match(QString{"2"}));
+    ASSERT_TRUE(field.match(QString{"three"}));
+    // Check attribute lookup list does not contains.
+    ASSERT_FALSE(field.match(QString{"four"}));
+
+    field.setCheckType(TextLookupCheckType::notInList);
+    ASSERT_FALSE(field.match(QString{"1"}));
+    ASSERT_FALSE(field.match(QString{"2"}));
+    ASSERT_FALSE(field.match(QString{"three"}));
+    ASSERT_TRUE(field.match(QString{"four"}));
+}
+
+class ObjectLookupFieldTest: public LookupFieldTestBase
+{
+};
+
+TEST_F(ObjectLookupFieldTest, emptyLookupList)
+{
+    const auto listId = makeAndRegisterList();
+
+    ObjectLookupField field{systemContext()};
+    field.setValue(listId.toString());
+
+    field.setCheckType(ObjectLookupCheckType::inList);
+    // An empty List will always return false for 'inList' comparison.
     ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "bar"}})));
-    // And always return true for 'out' comparison.
-    field.setCheckType(LookupCheckType::out);
-    ASSERT_TRUE(field.match(QVariant{"1"}));
+
+    // And always return true for 'notInList' comparison.
+    field.setCheckType(ObjectLookupCheckType::notInList);
     ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "bar"}})));
 }
 
-TEST_F(LookupFieldContextTest, emptyKeywords)
+TEST_F(ObjectLookupFieldTest, emptyAttributes)
 {
-    LookupField field{systemContext()};
-    field.setSource(LookupSource::keywords);
-    field.setValue(""); //< Transforms to lookup list {'keyword': ''}.
+    ObjectLookupField field{systemContext()};
+    field.setValue("");
 
-    // An empty keywords always return true for 'in' comparison.
-    field.setCheckType(LookupCheckType::in);
-    ASSERT_TRUE(field.match(QVariant{"1"}));
-    // And always return true for 'out' comparison.
-    field.setCheckType(LookupCheckType::out);
-    ASSERT_FALSE(field.match(QVariant{"1"}));
+    field.setCheckType(ObjectLookupCheckType::hasAttributes);
+    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "bar"}})));
+    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"baz", "quux"}})));
 }
 
-TEST_F(LookupFieldContextTest, emptyListAttributeMatchAnyInputValue)
+TEST_F(ObjectLookupFieldTest, emptyListAttributeMatchAnyInputValue)
 {
     const auto listId = makeAndRegisterList({"foo"},
         {
             {{"foo", ""}} //< The entry accepts any value for the 'foo' attribute.
         });
 
-    LookupField field{systemContext()};
-    field.setSource(LookupSource::lookupList);
+    ObjectLookupField field{systemContext()};
     field.setValue(listId.toString());
 
-    field.setCheckType(LookupCheckType::in);
+    field.setCheckType(ObjectLookupCheckType::inList);
     ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
     ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}})));
 
-    field.setCheckType(LookupCheckType::out);
+    field.setCheckType(ObjectLookupCheckType::notInList);
     ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
     ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}})));
 }
 
-TEST_F(LookupFieldContextTest, keywordsSource)
+TEST_F(ObjectLookupFieldTest, lookupWithAttributesWorksProperly)
 {
-    LookupField field{systemContext()};
-    field.setSource(LookupSource::keywords);
+    ObjectLookupField field{systemContext()};
+    field.setCheckType(ObjectLookupCheckType::hasAttributes);
 
-    field.setValue("foo bar"); //< Transforms to lookup list {'keyword': 'foo', 'keyword': 'bar'}.
+    field.setValue("foo=1");
+    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
+    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}})));
+    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"baz", "3"}})));
 
-    field.setCheckType(LookupCheckType::in);
-    // Check values list contains.
-    ASSERT_TRUE(field.match(QVariant{"foo"}));
-    ASSERT_TRUE(field.match(QVariant{"bar"}));
-    ASSERT_TRUE(field.match(QVariant{"foo_bar"}));
-    // Check value list does not contains.
-    ASSERT_FALSE(field.match(QVariant{"baz"}));
+    field.setValue("foo=1 bar=two");
+    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"bar", "two"}})));
+    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
+    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"bar", "2"}})));
 
-    field.setCheckType(LookupCheckType::out);
-    ASSERT_FALSE(field.match(QVariant{"foo"}));
-    ASSERT_FALSE(field.match(QVariant{"bar"}));
-    ASSERT_FALSE(field.match(QVariant{"foo_bar"}));
-    ASSERT_TRUE(field.match(QVariant{"baz"}));
+    field.setValue("foo=1 bar!=two");
+    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"bar", "three"}})));
+    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
+    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"bar", "two"}})));
 }
 
-TEST_F(LookupFieldContextTest, lookupListSource)
+TEST_F(ObjectLookupFieldTest, lookupInListWorksProperly)
 {
-    const auto listId = makeAndRegisterList({"foo", "bar"},
+    const auto listId = makeAndRegisterList({"foo", "bar.baz", "bar.quux"},
         {
-            {{"foo", "1"}, {"bar", "one"}},
-            {{"foo", "2"}, {"bar", "two"}}
+            {{"foo", "1"}, {"bar.baz", "one"}, {"bar.quux", "0x1"}},
+            {{"foo", "2"}, {"bar.baz", "two"}, {"bar.quux", "0x2"}}
         });
 
-    LookupField field{systemContext()};
-    field.setSource(LookupSource::lookupList);
+    ObjectLookupField field{systemContext()};
     field.setValue(listId.toString());
 
-    field.setCheckType(LookupCheckType::in);
+    field.setCheckType(ObjectLookupCheckType::inList);
     // Check attributes lookup list contains.
-    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"bar", "one"}})));
-    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}, {"bar", "two"}})));
+    ASSERT_TRUE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "1"}, {"bar.baz", "one"}, {"bar.quux", "0x1"}})));
+    ASSERT_TRUE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "2"}, {"bar.baz", "two"}, {"bar.quux", "0x2"}})));
     // Check attribute lookup list does not contains.
-    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "3"}, {"bar", "three"}})));
+    ASSERT_FALSE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "3"}, {"bar.baz", "three"}, {"bar.quux", "0x3"}})));
     // Check attribute lookup list partially not contains.
-    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"baz", "three"}})));
+    ASSERT_FALSE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "1"}, {"baz.baz", "one"}, {"bar.quux", "0x3"}})));
+    // Check attribute name list does not contain.
+    ASSERT_FALSE(field.match(
+        QVariant::fromValue(Attributes{{"unexpected", "1"}, {"baz.baz", "one"}, {"bar.quux", "0x3"}})));
 
-    field.setCheckType(LookupCheckType::out);
-    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"bar", "one"}})));
-    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}, {"bar", "two"}})));
-    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "3"}, {"bar", "three"}})));
-    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"baz", "three"}})));
-}
-
-TEST_F(LookupFieldContextTest, lookupListSelectedAttributes)
-{
-    const auto listId = makeAndRegisterList({"foo", "bar", "baz"},
-        {
-            {{"foo", "1"}, {"bar", "one"}, {"baz", "0x1"}},
-            {{"foo", "2"}, {"bar", "two"}, {"baz", "0x2"}},
-            {{"foo", "3"}, {"bar", ""}, {"baz", "0x3"}}, //< The entry accepts any value for the 'bar' attribute.
-        });
-
-    LookupField field{systemContext()};
-    field.setSource(LookupSource::lookupList);
-    field.setValue(listId.toString());
-    // Checks only few attributes from the lookup list.
-    field.setAttributes({"foo", "bar"});
-
-    field.setCheckType(LookupCheckType::in);
-    // Check attributes lookup list contains.
-    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"bar", "one"}, {"baz", "0x1"}})));
-    // Check attributes where not selected attribute is not fit any record.
-    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}, {"bar", "two"}, {"baz", "invalid"}})));
-    // Check the case when the first attribute is in the lookup list, the second might be any value
-    // and the third attribute is absent(must not be a problem as not selected as attribute to check).
-    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "3"}, {"bar", "any"}})));
-    // Check attributes lookup list not contains.
-    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "4"}, {"bar", "four"}, {"baz", "0x4"}})));
-
-    field.setCheckType(LookupCheckType::out);
-    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"bar", "one"}, {"baz", "0x1"}})));
-    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}, {"bar", "two"}, {"baz", "invalid"}})));
-    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "3"}, {"bar", "any"}})));
-    ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "4"}, {"bar", "four"}, {"baz", "0x4"}})));
+    field.setCheckType(ObjectLookupCheckType::notInList);
+    ASSERT_FALSE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "1"}, {"bar.baz", "one"}, {"bar.quux", "0x1"}})));
+    ASSERT_FALSE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "2"}, {"bar.baz", "two"}, {"bar.quux", "0x2"}})));
+    ASSERT_TRUE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "3"}, {"bar.baz", "three"}, {"bar.quux", "0x3"}})));
+    ASSERT_TRUE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "1"}, {"baz.baz", "one"}, {"bar.quux", "0x3"}})));
+    ASSERT_TRUE(field.match(
+        QVariant::fromValue(Attributes{{"unexpected", "1"}, {"baz.baz", "one"}, {"bar.quux", "0x3"}})));
 }
 
 TEST(EventFieldTest, SimpleTypes)

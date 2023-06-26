@@ -1,29 +1,27 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "lookup_picker_widget.h"
+#include "text_lookup_picker_widget.h"
 
+#include <QtCore/QSortFilterProxyModel>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
 
-#include <api/common_message_processor.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/rules/field_types.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_lookup_list_manager.h>
 #include <ui/widgets/common/elided_label.h>
+
+#include "../model_view/lookup_lists_model.h"
 
 namespace nx::vms::client::desktop::rules {
 
-using LookupCheckType = vms::rules::LookupCheckType;
-using LookupSource = vms::rules::LookupSource;
+using LookupCheckType = vms::rules::TextLookupCheckType;
 
-LookupPicker::LookupPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
-    TitledFieldPickerWidget<vms::rules::LookupField>(context, parent)
+TextLookupPicker::TextLookupPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    TitledFieldPickerWidget<vms::rules::TextLookupField>(context, parent)
 {
     setCheckBoxEnabled(false);
 
@@ -37,16 +35,20 @@ LookupPicker::LookupPicker(QnWorkbenchContext* context, CommonParamsWidget* pare
     auto comboBoxesLayout = new QHBoxLayout;
 
     m_checkTypeComboBox = new QComboBox;
-    m_checkTypeComboBox->addItem(tr("Contains"), QVariant::fromValue(LookupCheckType::in));
-    m_checkTypeComboBox->addItem(tr("Does not Contain"), QVariant::fromValue(LookupCheckType::out));
+    m_checkTypeComboBox->addItem(
+        tr("Contains keywords"),
+        QVariant::fromValue(LookupCheckType::containsKeywords));
+    m_checkTypeComboBox->addItem(
+        tr("Does not contain keywords"),
+        QVariant::fromValue(LookupCheckType::doesNotContainKeywords));
+    m_checkTypeComboBox->addItem(
+        tr("Contains list entries"),
+        QVariant::fromValue(LookupCheckType::inList));
+    m_checkTypeComboBox->addItem(
+        tr("Does not contain list entries"),
+        QVariant::fromValue(LookupCheckType::notInList));
 
     comboBoxesLayout->addWidget(m_checkTypeComboBox);
-
-    m_checkSourceComboBox = new QComboBox;
-    m_checkSourceComboBox->addItem(tr("Keywords"), QVariant::fromValue(LookupSource::keywords));
-    m_checkSourceComboBox->addItem(tr("List Entries"), QVariant::fromValue(LookupSource::lookupList));
-
-    comboBoxesLayout->addWidget(m_checkSourceComboBox);
 
     typeLayout->addLayout(comboBoxesLayout);
 
@@ -84,8 +86,15 @@ LookupPicker::LookupPicker(QnWorkbenchContext* context, CommonParamsWidget* pare
         lookupListsLayout->addWidget(lookupListsLabel);
 
         m_lookupListComboBox = new QComboBox;
-        for (const auto& list: systemContext()->lookupListManager()->lookupLists())
-            m_lookupListComboBox->addItem(list.name, QVariant::fromValue(list.id));
+
+        auto lookupListsModel = new LookupListsModel{context, this};
+        lookupListsModel->setObjectTypeId("");
+        auto sortModel = new QSortFilterProxyModel{this};
+        sortModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+        sortModel->setSourceModel(lookupListsModel);
+        sortModel->sort(0);
+
+        m_lookupListComboBox->setModel(sortModel);
 
         lookupListsLayout->addWidget(m_lookupListComboBox);
 
@@ -109,37 +118,6 @@ LookupPicker::LookupPicker(QnWorkbenchContext* context, CommonParamsWidget* pare
         });
 
     connect(
-        m_checkSourceComboBox,
-        &QComboBox::activated,
-        this,
-        [this]
-        {
-            theField()->setSource(m_checkSourceComboBox->currentData().value<LookupSource>());
-            theField()->setValue("");
-        });
-
-    const auto lookupListNotificationManager =
-        systemContext()->messageProcessor()->connection()->lookupListNotificationManager().get();
-    connect(
-        lookupListNotificationManager,
-        &ec2::AbstractLookupListNotificationManager::addedOrUpdated,
-        this,
-        [this](const nx::vms::api::LookupListData& data)
-        {
-            if (m_lookupListComboBox->findData(QVariant::fromValue(data.id)) != -1)
-                m_lookupListComboBox->addItem(data.name, QVariant::fromValue(data.id));
-        });
-
-    connect(
-        lookupListNotificationManager,
-        &ec2::AbstractLookupListNotificationManager::removed,
-        this,
-        [this](QnUuid id)
-        {
-            m_lookupListComboBox->removeItem(m_lookupListComboBox->findData(QVariant::fromValue(id)));
-        });
-
-    connect(
         m_lookupListComboBox,
         &QComboBox::activated,
         this,
@@ -158,22 +136,36 @@ LookupPicker::LookupPicker(QnWorkbenchContext* context, CommonParamsWidget* pare
         });
 }
 
-void LookupPicker::updateUi()
+void TextLookupPicker::updateUi()
 {
     m_checkTypeComboBox->setCurrentIndex(
         m_checkTypeComboBox->findData(QVariant::fromValue(theField()->checkType())));
-    m_checkSourceComboBox->setCurrentIndex(
-        m_checkSourceComboBox->findData(QVariant::fromValue(theField()->source())));
-    if (theField()->source() == LookupSource::keywords)
+    switch (theField()->checkType())
     {
-        m_stackedWidget->setCurrentIndex(0);
-        m_lineEdit->setText(theField()->value());
-    }
-    else
-    {
-        m_stackedWidget->setCurrentIndex(1);
-        m_lookupListComboBox->setCurrentIndex(
-            m_lookupListComboBox->findData(QVariant::fromValue(QnUuid{theField()->value()})));
+        case LookupCheckType::containsKeywords:
+        case LookupCheckType::doesNotContainKeywords:
+            if (QnUuid::isUuidString(theField()->value()))
+                theField()->setValue({});
+
+            m_stackedWidget->setCurrentIndex(0);
+            m_lineEdit->setText(theField()->value());
+            return;
+        case LookupCheckType::inList:
+        case LookupCheckType::notInList:
+            if (!QnUuid::isUuidString(theField()->value()))
+                theField()->setValue({});
+
+            const auto matches = m_lookupListComboBox->model()->match(
+                m_lookupListComboBox->model()->index(0, 0),
+                LookupListsModel::LookupListIdRole,
+                QVariant::fromValue(QnUuid{theField()->value()}),
+                /*hits*/ 1,
+                Qt::MatchExactly);
+
+            m_lookupListComboBox->setCurrentIndex(matches.size() == 1 ? matches[0].row() : -1);
+
+            m_stackedWidget->setCurrentIndex(1);
+            return;
     }
 }
 
