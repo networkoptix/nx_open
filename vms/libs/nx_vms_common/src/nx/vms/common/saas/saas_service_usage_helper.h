@@ -4,6 +4,7 @@
 
 #include <QtCore/QObject>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <nx/utils/thread/mutex.h>
@@ -17,29 +18,36 @@ namespace nx::vms::common::saas {
  *  for local and cloud licenses.
  *  This class is intended to calculate other (new) services for cloud licenses
  */
-class NX_VMS_COMMON_API CloudServiceUsageHelper: public QObject
+class NX_VMS_COMMON_API CloudServiceUsageHelper: 
+    public QObject,
+    public /*mixin*/ SystemContextAware
 {
 public:
-    CloudServiceUsageHelper(QObject* parent = nullptr);
+    CloudServiceUsageHelper(
+        SystemContext* context,
+        QObject* parent = nullptr);
+
+protected:
+    QnVirtualCameraResourceList getAllCameras() const;
 };
 
  /*
   *  Helper class to calculate integration licenses usages.
   */
-class NX_VMS_COMMON_API IntegrationServiceUsageHelper:
-    public CloudServiceUsageHelper,
-    public /*mixin*/ SystemContextAware
+class NX_VMS_COMMON_API IntegrationServiceUsageHelper: public CloudServiceUsageHelper
 {
 public:
-    IntegrationServiceUsageHelper(SystemContext* context, QObject* parent = nullptr);
+    IntegrationServiceUsageHelper(
+        SystemContext* context,
+        QObject* parent = nullptr);
 
     /*
      *  @param id Integration id.
      *  @return Information about available licenses per integration.
      */
-    nx::vms::api::LicenseSummaryData info(const QnUuid& id);
+    nx::vms::api::LicenseSummaryDataEx info(const QnUuid& id);
 
-    QMap<QnUuid, nx::vms::api::LicenseSummaryData> allInfo() const;
+    QMap<QnUuid, nx::vms::api::LicenseSummaryDataEx> allInfo() const;
 
     /*
      *  @return true if there are not enough licenses for any integration.
@@ -67,19 +75,19 @@ private:
     void updateCacheUnsafe() const;
 private:
     //Summary by integrationId.
-    mutable std::optional<QMap<QnUuid, nx::vms::api::LicenseSummaryData>> m_cache;
+    mutable std::optional<QMap<QnUuid, nx::vms::api::LicenseSummaryDataEx>> m_cache;
     mutable nx::Mutex m_mutex;
 };
 
 /*
   *  Helper class to calculate integration licenses usages.
   */
-class NX_VMS_COMMON_API CloudStorageServiceUsageHelper:
-    public CloudServiceUsageHelper,
-    public /*mixin*/ SystemContextAware
+class NX_VMS_COMMON_API CloudStorageServiceUsageHelper: public CloudServiceUsageHelper
 {
 public:
-    CloudStorageServiceUsageHelper(SystemContext* context, QObject* parent = nullptr);
+    CloudStorageServiceUsageHelper(
+        SystemContext* context,
+        QObject* parent = nullptr);
 
     /*
      *  @return true if there are not enough licenses for any integration.
@@ -89,7 +97,14 @@ public:
     /*
      *  @return Information about available license usages per megapixels.
      */
-    std::map<int, nx::vms::api::LicenseSummaryData> allInfo() const;
+    std::map<int, nx::vms::api::LicenseSummaryDataEx> allInfo() const;
+
+    /*
+     * @return Information about cameras which consumes SAAS services.
+     * key - cameraId, value - serviceId. If there is not enough services for some camera
+     * then the service value is an empty UUID.
+     */
+    std::map<QnUuid, QnUuid> servicesByCameras() const;
 
     /* Propose change that resources are used for cloud storage.
      *  @param devices New full set of resources that is going to be used.
@@ -105,7 +120,7 @@ private:
     void calculateAvailableUnsafe() const;
 private:
     //Summary by megapixels.
-    mutable std::optional<std::map<int, nx::vms::api::LicenseSummaryData>> m_cache;
+    mutable std::optional<std::map<int, nx::vms::api::LicenseSummaryDataEx>> m_cache;
     mutable nx::Mutex m_mutex;
 };
 
