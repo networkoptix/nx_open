@@ -57,13 +57,14 @@ bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, cons
 };
 
 
-// TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin will be ready
+// TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin is ready.
 static const QColor kBasePrimaryColor = "#ffffff";
 static const QColor kBackgroundColor = "#212A2F";
 static const QColor kCheckedColor = "#171C1F";
 
-//{ Normal, Disabled, Active, Selected }
-const core::SvgIconColorer::IconSubstitutions kNavigationIconSubstitutions = {
+// { Normal, Disabled, Active, Selected, Pressed, Error }
+const core::SvgIconColorer::IconSubstitutions kNavigationIconSubstitutions =
+{
     { QnIcon::Normal, {
         { kBackgroundColor, "dark7"},
     }},
@@ -79,9 +80,9 @@ const core::SvgIconColorer::IconSubstitutions kNavigationIconSubstitutions = {
     }},
 };
 
-//{ Normal, Disabled, Active, Selected }
-const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitutions = {
-    
+// { Normal, Disabled, Active, Selected, Pressed, Error }
+const core::SvgIconColorer::IconSubstitutions kNavigationIconCheckedSubstitutions =
+{
     { QnIcon::Normal, {
         { kBackgroundColor, "dark7"},
         { kCheckedColor, "green_l3"},

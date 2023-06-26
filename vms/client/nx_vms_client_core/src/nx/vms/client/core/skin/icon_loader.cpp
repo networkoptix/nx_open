@@ -280,7 +280,8 @@ QIcon IconLoader::loadSvgIconInternal(
         if (NX_ASSERT(source.open(QIODevice::ReadOnly), "Cannot load icon %1", checkedName))
         {
             const QByteArray checkedData = source.readAll();
-            const core::SvgIconColorer colorer(checkedData, checkedName, substitutions);
+            const core::SvgIconColorer colorer(checkedData, checkedName, 
+                checkedSubstitutions.empty() ? substitutions : checkedSubstitutions);
             builder.addSvg(colorer, QnIcon::Normal, QIcon::On);
             for (const auto& modeSubstitutions: substitutions.keys())
                 builder.addSvg(colorer, modeSubstitutions, QIcon::On);
@@ -289,7 +290,6 @@ QIcon IconLoader::loadSvgIconInternal(
     else if (!checkedSubstitutions.empty())
     {
         const core::SvgIconColorer checkedColorer(baseData, name, checkedSubstitutions);
-        //builder.addSvg(checkedColorer, QnIcon::Normal, QIcon::On);
         for (const auto& modeSubstitutions: checkedSubstitutions.keys())
             builder.addSvg(checkedColorer, modeSubstitutions, QIcon::On);
     }
