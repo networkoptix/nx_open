@@ -90,7 +90,7 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
     initButton(m_stepForwardButton, ui::action::NextFrameAction,
         "slider/navigation/step_forward.png");
     initButton(m_jumpForwardButton, ui::action::JumpToEndAction,
-        "slider/navigation/rewind_forward.png");
+        "slider/navigation/rewind_forward_32.svg");
 
     auto mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(3);
