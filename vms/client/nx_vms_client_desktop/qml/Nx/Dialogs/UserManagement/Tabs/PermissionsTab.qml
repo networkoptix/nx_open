@@ -19,8 +19,6 @@ Item
 {
     id: control
 
-    property bool enabled: true
-
     required property AccessSubjectEditingContext editingContext
 
     readonly property int columnCount: availableAccessRightDescriptors.length
@@ -32,13 +30,15 @@ Item
 
     property bool automaticDependenciesSwitchVisible: false
 
-    readonly property bool editingEnabled: enabled
+    property bool editingEnabled: true
 
     readonly property var availableAccessRightDescriptors:
         Array.prototype.slice.call(AccessRightsList.items) //< Deep copy to JS for optimization.
 
     readonly property var availableAccessRights:
         Array.prototype.map.call(availableAccessRightDescriptors, item => item.accessRight)
+
+    enabled: editingEnabled
 
     Item
     {
@@ -119,6 +119,7 @@ Item
         readonly property real scrollBarWidth: scrollBarVisible ? scrollBar.width : 0
 
         property var currentSearchRegExp: null
+
         onFilterTextChanged:
         {
             // Search happens in an escaped text, so also escape filter text here.
@@ -457,7 +458,7 @@ Item
             anchors.verticalCenter: parent.verticalCenter
 
             checked: true
-            visible: control.enabled && control.automaticDependenciesSwitchVisible
+            visible: control.editingEnabled && control.automaticDependenciesSwitchVisible
 
             text: qsTr("Automatically add dependent access rights")
         }

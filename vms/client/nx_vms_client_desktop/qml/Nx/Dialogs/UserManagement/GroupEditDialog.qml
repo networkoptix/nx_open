@@ -149,7 +149,8 @@ DialogWithState
                 id: permissionSettings
                 anchors.fill: parent
 
-                enabled: !dialog.isPredefined && dialog.permissionsEditable && !dialog.isSaving
+                editingEnabled: !dialog.isPredefined && dialog.permissionsEditable
+                enabled: editingEnabled && !dialog.isSaving
 
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext

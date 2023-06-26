@@ -144,7 +144,8 @@ DialogWithState
                 id: permissionSettings
                 anchors.fill: parent
 
-                enabled: dialog.permissionsEditable && !dialog.isSaving
+                editingEnabled: dialog.permissionsEditable
+                enabled: editingEnabled && !dialog.isSaving
 
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext

@@ -132,6 +132,8 @@ DialogWithState
                 id: permissionSettings
                 anchors.fill: parent
 
+                enabled: !dialog.isSaving
+
                 buttonBox: buttonBox
                 editingContext: membersModel.editingContext
             }
