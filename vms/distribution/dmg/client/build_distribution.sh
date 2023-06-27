@@ -151,10 +151,7 @@ buildDistribution()
             exit 1
         fi
 
-        "$PYTHON" notarize.py notarize \
-            --team-id "${APPLE_TEAM_ID}" \
-            --file-name "${DISTRIBUTION_DMG}" \
-            --bundle-id "${BUNDLE_ID}"
+        "$PYTHON" notarize.py --team-id "${APPLE_TEAM_ID}" "${DISTRIBUTION_DMG}"
     fi
 
     mv update.json "$SRC/"
