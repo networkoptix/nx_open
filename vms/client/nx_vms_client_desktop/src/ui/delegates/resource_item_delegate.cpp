@@ -56,11 +56,10 @@ bool isCollapsibleNode(const QModelIndex& index)
 
 } // namespace
 
-
 QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     base_type(parent),
-    m_recordingIcon(qnSkin->icon("tree/recording.png")),
-    m_scheduledIcon(qnSkin->icon("tree/scheduled.png")),
+    m_recordingIcon(qnSkin->icon("tree/record_on.svg")),
+    m_scheduledIcon(qnSkin->icon("tree/record_part.svg")),
     m_lockedIcon(qnSkin->icon("tree/locked.svg")),
     m_fixedHeight(nx::style::Metrics::kViewRowHeight),
     m_rowSpacing(0),

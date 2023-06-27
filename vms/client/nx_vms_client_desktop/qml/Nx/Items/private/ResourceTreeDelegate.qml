@@ -91,13 +91,13 @@ FocusScope
                     source:
                     {
                         if (extras.flags & ResourceTree.ResourceExtraStatusFlag.recording)
-                            return "qrc:///skin/tree/recording.png"
+                            return "image://svg/skin/tree/record_on.svg"
 
                         if (extras.flags & ResourceTree.ResourceExtraStatusFlag.scheduled)
-                            return "qrc:///skin/tree/scheduled.png"
+                            return "image://svg/skin/tree/record_part.svg"
 
                         if (extras.flags & ResourceTree.ResourceExtraStatusFlag.hasArchive)
-                            return "qrc:///skin/tree/has_archive.png"
+                            return "image://svg/skin/tree/archive.svg"
 
                         return ""
                     }
