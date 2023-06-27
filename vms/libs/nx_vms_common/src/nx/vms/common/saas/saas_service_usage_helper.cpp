@@ -45,14 +45,14 @@ QnVirtualCameraResourceList CloudServiceUsageHelper::getAllCameras() const
     auto cameras = systemContext()->resourcePool()->getAllCameras(
         QnResourcePtr(), /*ignoreDesktopCameras*/ true);
     std::sort(
-        cameras.begin(), cameras.end(), 
-        [](const auto& left, const auto& right) 
-        { 
+        cameras.begin(), cameras.end(),
+        [](const auto& left, const auto& right)
+        {
             const int leftMegapixels = getMegapixels(left);
             const int rightMegapixels = getMegapixels(right);
             if (leftMegapixels != rightMegapixels)
                 return leftMegapixels > rightMegapixels;
-            return left->getId() < right->getId(); 
+            return left->getId() < right->getId();
         });
     return cameras;
 }
@@ -284,7 +284,7 @@ void CloudStorageServiceUsageHelper::borrowUsages() const
                 const size_t toDelete = std::min(data.excessDevices.size(), (size_t) free);
                 for (size_t i = 0; i < toDelete; ++i)
                     data.excessDevices.erase(data.excessDevices.begin());
-                
+
             }
         }
     }

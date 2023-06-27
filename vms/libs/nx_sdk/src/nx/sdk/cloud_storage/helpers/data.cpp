@@ -1377,20 +1377,20 @@ CloudDeviceReportEntry::CloudDeviceReportEntry(const char* jsonData): CloudDevic
 CloudDeviceReportEntry::CloudDeviceReportEntry(const nx::kit::Json& json)
 {
     id = getStringValue(json, "id");
-    megapixels = getIntValue(json, "megapixels");
+    serviceId = getStringValue(json, "serviceId");
 }
 
 nx::kit::Json CloudDeviceReportEntry::to_json() const
 {
     return nx::kit::Json::object({
         {"id", id},
-        {"megapixels", megapixels},
+        {"serviceId", serviceId}
     });
 }
 
 bool CloudDeviceReportEntry::operator==(const CloudDeviceReportEntry& other) const
 {
-    return id == other.id && megapixels == other.megapixels;
+    return id == other.id && serviceId == other.serviceId;
 }
 
 CloudDeviceReport::CloudDeviceReport(const char* jsonData): CloudDeviceReport(parseJson(jsonData))

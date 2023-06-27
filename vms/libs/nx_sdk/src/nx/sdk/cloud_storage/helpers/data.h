@@ -612,7 +612,7 @@ struct CloudDeviceReportEntry
     CloudDeviceReportEntry(const nx::kit::Json& json);
 
     std::string id;
-    int32_t megapixels = std::numeric_limits<int32_t>::max();
+    std::string serviceId;
 
     bool operator==(const CloudDeviceReportEntry& other) const;
     nx::kit::Json to_json() const;
