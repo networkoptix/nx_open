@@ -243,6 +243,9 @@ struct ArchiveFrameExtractor::Private
                 > kAcceptableTimeDivergence
             && frameTimeMs(streamWorker.currentFrame) <= request.timePoint)
         {
+            if (stop)
+                return;
+
             streamWorker.currentFrame = getNextVideoData();
             if (streamWorker.currentFrame)
             {
