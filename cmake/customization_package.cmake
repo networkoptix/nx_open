@@ -60,13 +60,14 @@ function(_set_customization_from_file)
         OUTPUT_VARIABLE customization_id
         ERROR_VARIABLE get_value_error
         RESULT_VARIABLE get_value_resilt
+        OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 
     if(NOT get_value_resilt STREQUAL "0")
         message(FATAL_ERROR "Customization listing failed: ${get_value_error}.")
     endif()
 
-    set(customization ${_customization} PARENT_SCOPE)
+    set(customization ${customization_id} PARENT_SCOPE)
 endfunction()
 
 macro(nx_load_customization_package)
