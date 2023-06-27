@@ -120,11 +120,10 @@ for Windows.
 - To use the obtained Customization Package rather than the default one coming from Conan
     (Nx-Meta-branded with placeholders), add the following arguments to the `<build>` script:
     ```
-    -DcustomizationPackageFile=<customization.zip> [-Dcustomization=<customization_id>]
+    -DcustomizationPackageFile=<customization.zip>
     ```
-    The value of `<customization_id>` can be obtained from the `"id": "<customization_id>"` line
-    of `description.json` inside the Customization Package zip file, and can be omitted for
-    Nx-Meta-branded Customization Packages (their `<customization_id>` is `metavms`).
+    NOTE: The value in the `"id":` field of `description.json` inside the specified zip file must
+    match the one in the Server in order to be able to connect to it.
 
 - To perform an incremental build after some changes, run the `<build>` script without arguments.
     - Note that there is no need to explicitly call the Generation stage after adding/deleting
