@@ -45,6 +45,14 @@ public:
         const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {});
     QIcon icon(const char* name, const char* checkedName = nullptr);
     QIcon icon(const QIcon& icon);
+    QIcon icon(const QString& name,
+        const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
+        const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {});
+    QIcon icon(const QString& name,
+        const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
+        const QString& checkedName,
+        const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {});
+    
 
     /**
      * Loads pixmap with appropriate size according to current hidpi settings.

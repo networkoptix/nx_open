@@ -138,6 +138,23 @@ QIcon Skin::icon(const QIcon& icon)
     return m_iconLoader->polish(icon);
 }
 
+QIcon Skin::icon(const QString& name,
+    const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
+    const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions)
+{
+    return m_iconLoader->load(
+        name, QString(), nullptr, svgColorSubstitutions, svgCheckedColorSubstitutions);
+}
+
+QIcon Skin::icon(const QString& name,
+    const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
+    const QString& checkedName,
+    const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions)
+{
+    return m_iconLoader->load(
+        name, checkedName, nullptr, svgColorSubstitutions, svgCheckedColorSubstitutions);
+}
+
 QPixmap Skin::pixmap(const QString& name, bool correctDevicePixelRatio, const QSize& desiredSize)
 {
     if (name.endsWith(".svg"))

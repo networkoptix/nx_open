@@ -272,7 +272,7 @@ QIcon IconLoader::loadSvgIconInternal(
     builder.addSvg(colorer, QnIcon::Normal, QIcon::Off);
     for (const auto& modeSubstitutions: substitutions.keys())
         builder.addSvg(colorer, modeSubstitutions, QIcon::Off);
-    
+
     if (!checkedName.isEmpty())
     {
         const auto checkedPath = skin->path(checkedName);
