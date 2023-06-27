@@ -3,7 +3,10 @@
 #include "thumbnail_loader.h"
 
 #include <nx/utils/math/math.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/vms/client/core/application_context.h>
 #include <recording/time_period.h>
+#include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
 
 using namespace std::literals::chrono_literals;
@@ -41,6 +44,25 @@ std::chrono::milliseconds timePeriodMidTime(const QnTimePeriod& timePeriod)
     return timePeriod.startTime() + timePeriod.duration() / 2;
 }
 
+class ArchiveFrameExtractorAsyncRelease: public QnLongRunnable
+{
+public:
+    ArchiveFrameExtractorAsyncRelease(
+        std::unique_ptr<nx::vms::client::desktop::ArchiveFrameExtractor> frameExtractor)
+        :
+        m_frameExtractor(std::move(frameExtractor))
+    {
+    }
+
+    virtual void run() override
+    {
+        m_frameExtractor.reset();
+    }
+
+private:
+    std::unique_ptr<nx::vms::client::desktop::ArchiveFrameExtractor> m_frameExtractor;
+};
+
 } // namespace
 
 namespace nx::vms::client::desktop::workbench::timeline {
@@ -57,6 +79,14 @@ ThumbnailLoader::ThumbnailLoader(const QnMediaResourcePtr& resource, Mode mode):
 
 ThumbnailLoader::~ThumbnailLoader()
 {
+    m_frameExtractor->disconnect(this);
+
+    auto frameExtractorAsyncRelease =
+        std::make_unique<ArchiveFrameExtractorAsyncRelease>(std::move(m_frameExtractor));
+    frameExtractorAsyncRelease->start();
+
+    nx::vms::common::appContext()->longRunableCleanup()->cleanupAsync(
+        std::move(frameExtractorAsyncRelease));
 }
 
 std::chrono::milliseconds ThumbnailLoader::timeStep() const
