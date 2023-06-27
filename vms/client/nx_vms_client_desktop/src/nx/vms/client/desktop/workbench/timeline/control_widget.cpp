@@ -258,13 +258,10 @@ void ControlWidget::initButton(
     button->setCustomPaintFunction(paintButtonFunction);
     button->setIcon(!checkedIconPath.isEmpty()
         ? qnSkin->icon(iconPath,
-            checkedIconPath,
-            nullptr,
             kNavigationIconSubstitutions,
+            checkedIconPath,
             kNavigationIconCheckedSubstitutions)
         : qnSkin->icon(iconPath,
-            nullptr,
-            nullptr,
             kNavigationIconSubstitutions,
             kNavigationIconCheckedSubstitutions));
 
