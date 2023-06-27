@@ -111,26 +111,29 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Unknown, QIcon());
 
     // Systems.
-    m_cache.insert(CurrentSystem, loadIcon("tree/system.png"));
-    m_cache.insert(OtherSystem, loadIcon("tree/local_system.svg"));
+    m_cache.insert(CurrentSystem, loadIcon("tree/system_local.svg"));
+    // TODO: pprivalov ask dbatov how it should looks actually
+    m_cache.insert(OtherSystem, loadIcon("tree/system_local.svg"));
     m_cache.insert(OtherSystems, loadIcon("tree/other_systems.svg"));
 
     // Servers.
-    m_cache.insert(Servers, loadIcon("tree/servers.png"));
-    m_cache.insert(Server, loadIcon("tree/server.png"));
-    m_cache.insert(Server | Offline, loadIcon("tree/server_offline.png"));
-    m_cache.insert(Server | Incompatible, loadIcon("tree/server_incompatible.png"));
-    m_cache.insert(Server | Control, loadIcon("tree/server_current.png"));
-    m_cache.insert(Server | Unauthorized, loadIcon("tree/server_unauthorized.png"));
+    m_cache.insert(Servers, loadIcon("tree/servers.svg"));
+    m_cache.insert(Server, loadIcon("tree/server.svg"));
+    m_cache.insert(Server | Offline, loadIcon("tree/server_offline.svg"));
+    m_cache.insert(Server | Incompatible, loadIcon("tree/server_incompatible.svg"));
+    m_cache.insert(Server | Control, loadIcon("tree/server_current.svg"));
+    m_cache.insert(Server | Unauthorized, loadIcon("tree/server_unauthorized.svg"));
     // TODO: separate icon for Server with mismatched certificate.
-    m_cache.insert(Server | MismatchedCertificate, loadIcon("tree/server_incompatible_disabled.png"));
+    // TODO: pprivalov check that it works correctly with svg and if previous todo is still valid
+    m_cache.insert(Server | MismatchedCertificate, loadIcon("tree/server_incompatible.svg"));
     // Read-only server that is auto-discovered.
+    // TODO: pprivalov check that correct collor is used
     m_cache.insert(Server | Incompatible | ReadOnly,
-        loadIcon("tree/server_incompatible_disabled.png"));
+        loadIcon("tree/server_incompatible.svg"));
     // Read-only server we are connected to.
-    m_cache.insert(Server | Control | ReadOnly, loadIcon("tree/server_incompatible.png"));
-    m_cache.insert(HealthMonitor, loadIcon("tree/health_monitor.png"));
-    m_cache.insert(HealthMonitor | Offline, loadIcon("tree/health_monitor_offline.png"));
+    m_cache.insert(Server | Control | ReadOnly, loadIcon("tree/server_incompatible.svg"));
+    m_cache.insert(HealthMonitor, loadIcon("tree/health_monitor.svg"));
+    m_cache.insert(HealthMonitor | Offline, loadIcon("tree/health_monitor_offline.svg"));
 
     // Layouts.
     m_cache.insert(Layouts, loadIcon("tree/layouts.svg"));
@@ -141,16 +144,16 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(SharedLayout, loadIcon("tree/layout_shared.svg"));
     m_cache.insert(CloudLayout, loadIcon("tree/layout_cloud.svg"));
     m_cache.insert(SharedLayouts, loadIcon("tree/layouts_shared.svg"));
-    m_cache.insert(Showreel, loadIcon("tree/showreel.png"));
-    m_cache.insert(Showreels, loadIcon("tree/showreels.png"));
+    m_cache.insert(Showreel, loadIcon("tree/layout_tour_20.svg"));
+    m_cache.insert(Showreels, loadIcon("tree/layout_tours_20.svg"));
 
     // Cameras.
-    m_cache.insert(Cameras, loadIcon("tree/cameras.png"));
+    m_cache.insert(Cameras, loadIcon("tree/cameras.svg"));
     m_cache.insert(Camera, loadIcon("tree/camera.svg"));
     m_cache.insert(Camera | Offline, loadIcon("tree/camera_offline.svg"));
     m_cache.insert(Camera | Unauthorized, loadIcon("tree/camera_unauthorized.svg"));
     m_cache.insert(Camera | Incompatible, loadIcon("tree/camera_alert.svg"));
-    m_cache.insert(VirtualCamera, loadIcon("tree/virtual_camera.png"));
+    m_cache.insert(VirtualCamera, loadIcon("tree/virtual_camera.svg"));
     m_cache.insert(CrossSystemStatus | Unauthorized, loadIcon("events/alert_yellow.png"));
     m_cache.insert(CrossSystemStatus | Control, loadIcon("legacy/loading.gif")); //< The Control uses to describe loading state.
     m_cache.insert(CrossSystemStatus | Offline, loadIcon("cloud/cloud_20_disabled.png"));
@@ -163,22 +166,22 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
 
     // Local files.
     m_cache.insert(LocalResources, loadIcon("tree/local.svg"));
-    m_cache.insert(Image, loadIcon("tree/snapshot.png"));
-    m_cache.insert(Image | Offline, loadIcon("tree/snapshot_offline.png"));
-    m_cache.insert(Media, loadIcon("tree/media.png"));
-    m_cache.insert(Media | Offline, loadIcon("tree/media_offline.png"));
+    m_cache.insert(Image, loadIcon("tree/snapshot.svg"));
+    m_cache.insert(Image | Offline, loadIcon("tree/snapshot_offline.svg"));
+    m_cache.insert(Media, loadIcon("tree/media.svg"));
+    m_cache.insert(Media | Offline, loadIcon("tree/media_offline.svg"));
 
     // Users.
     m_cache.insert(Users, loadIcon("tree/users.svg"));
     m_cache.insert(User, loadIcon("tree/user.svg"));
 
     // Videowalls.
-    m_cache.insert(VideoWall, loadIcon("tree/videowall.png"));
-    m_cache.insert(VideoWallItem, loadIcon("tree/screen.png"));
-    m_cache.insert(VideoWallItem | Locked, loadIcon("tree/screen_locked.png"));
-    m_cache.insert(VideoWallItem | Control, loadIcon("tree/screen_controlled.png"));
-    m_cache.insert(VideoWallItem | Offline, loadIcon("tree/screen_offline.png"));
-    m_cache.insert(VideoWallMatrix, loadIcon("tree/matrix.png"));
+    m_cache.insert(VideoWall, loadIcon("tree/videowall.svg"));
+    m_cache.insert(VideoWallItem, loadIcon("tree/screen.svg"));
+    m_cache.insert(VideoWallItem | Locked, loadIcon("tree/screen_locked.svg"));
+    m_cache.insert(VideoWallItem | Control, loadIcon("tree/screen_controlled.svg"));
+    m_cache.insert(VideoWallItem | Offline, loadIcon("tree/screen_offline.svg"));
+    m_cache.insert(VideoWallMatrix, loadIcon("tree/matrix.svg"));
 
     // Integrations.
     m_cache.insert(Integrations, loadIcon("tree/integrations.svg"));
@@ -191,9 +194,9 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(WebPageProxied, loadIcon("tree/webpage_proxied.svg"));
 
     // Analytics.
-    m_cache.insert(AnalyticsEngine, loadIcon("tree/server.png"));
-    m_cache.insert(AnalyticsEngines, loadIcon("tree/servers.png"));
-    m_cache.insert(AnalyticsEngine | Offline, loadIcon("tree/server_offline.png"));
+    m_cache.insert(AnalyticsEngine, loadIcon("tree/server.svg"));
+    m_cache.insert(AnalyticsEngines, loadIcon("tree/servers.svg"));
+    m_cache.insert(AnalyticsEngine | Offline, loadIcon("tree/server_offline.svg"));
 
     // Client.
     m_cache.insert(Client, loadIcon("tree/client.svg"));
@@ -403,13 +406,13 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 QIcon QnResourceIconCache::cameraRecordingStatusIcon(ResourceExtraStatus status)
 {
     if (status.testFlag(ResourceExtraStatusFlag::recording))
-        return qnSkin->icon("tree/recording.png");
+        return qnSkin->icon("tree/record_on.svg");
 
     if (status.testFlag(ResourceExtraStatusFlag::scheduled))
-        return qnSkin->icon("tree/scheduled.png");
+        return qnSkin->icon("tree/record_part.svg");
 
     if (status.testFlag(ResourceExtraStatusFlag::hasArchive))
-        return qnSkin->icon("tree/has_archive.png");
+        return qnSkin->icon("tree/archive.svg");
 
     return QIcon();
 }

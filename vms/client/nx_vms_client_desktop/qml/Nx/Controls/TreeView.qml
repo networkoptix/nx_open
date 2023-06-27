@@ -480,8 +480,8 @@ FocusScope
                             return ""
 
                         return model.expanded
-                            ? "qrc:/skin/tree/branch_open.png"
-                            : "qrc:/skin/tree/branch_closed.png"
+                            ? "image://svg/skin/tree/arrow_open_20.svg"
+                            : "image://svg/skin/tree/arrow_close_20.svg"
                     }
                 }
 
