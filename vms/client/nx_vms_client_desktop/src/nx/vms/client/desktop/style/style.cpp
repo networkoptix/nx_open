@@ -1317,8 +1317,8 @@ void Style::drawPrimitive(PrimitiveElement element,
                 return;
 
             auto icon = option->state.testFlag(State_Open)
-                ? qnSkin->icon("tree/branch_open.png")
-                : qnSkin->icon("tree/branch_closed.png");
+                ? qnSkin->icon("tree/arrow_open_20.svg")
+                : qnSkin->icon("tree/arrow_close_20.svg");
 
             const auto rect = qobject_cast<const QAbstractItemView*>(widget)
                 ? subElementRect(SE_TreeViewDisclosureItem, option, widget)

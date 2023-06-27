@@ -378,7 +378,7 @@ Item
                         id: placeholderAction
 
                         text: qsTr("Select Camera...")
-                        icon.source: "qrc:///skin/tree/cameras.png"
+                        icon.source: "qrc:///skin/tree/cameras.svg"
 
                         visible: d.isOnline
                             && resourceBrowser.scene.itemCount == 0

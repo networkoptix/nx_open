@@ -182,7 +182,7 @@ QPixmap Skin::getPixmapInternal(const QString& name)
         {
             pixmap = QPixmap::fromImage(QImage(fullPath), Qt::OrderedDither | Qt::OrderedAlphaDither);
             pixmap.setDevicePixelRatio(1); // Force to use not scaled images
-            NX_ASSERT(!pixmap.isNull());
+            NX_ASSERT(!pixmap.isNull(), "Can't find icon %1", fullPath);
         }
         QPixmapCache::insert(name, pixmap);
     }

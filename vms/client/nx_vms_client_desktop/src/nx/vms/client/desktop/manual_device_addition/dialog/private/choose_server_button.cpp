@@ -22,8 +22,8 @@ QIcon getIcon(const QnMediaServerResourcePtr& server)
 {
     // TODO: add icon for mismatchedCertificate status.
     return server->getStatus() == nx::vms::api::ResourceStatus::online
-        ? qnSkin->icon("tree/server.png")
-        : qnSkin->icon("tree/server_offline.png");
+        ? qnSkin->icon("tree/server.svg")
+        : qnSkin->icon("tree/server_offline.svg");
 }
 
 } // namespace
