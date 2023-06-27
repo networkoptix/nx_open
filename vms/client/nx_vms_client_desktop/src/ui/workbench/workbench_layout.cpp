@@ -889,7 +889,7 @@ QIcon QnWorkbenchLayout::calculateIcon() const
         return qnSkin->icon("layouts/cloud_layout.svg");
 
     if (d->resource->isPreviewSearchLayout())
-        return qnSkin->icon("layouts/preview_search.png");
+        return qnSkin->icon("layouts/search_20.svg");
 
     return d->resource->data(Qn::LayoutIconRole).value<QIcon>();
 }
