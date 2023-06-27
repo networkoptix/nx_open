@@ -210,8 +210,8 @@ void NavigationWidget::initButton(
 
     button->setCustomPaintFunction(paintButtonFunction);
     button->setIcon(isCheckable
-        ? qnSkin->icon(iconPath, checkedIconPath, nullptr, kNavigationIconSubstitutions)
-        : qnSkin->icon(iconPath, nullptr, nullptr, kNavigationIconSubstitutions));
+        ? qnSkin->icon(iconPath, kNavigationIconSubstitutions, checkedIconPath)
+        : qnSkin->icon(iconPath, kNavigationIconSubstitutions));
     button->setFixedSize({32, 32});
     button->setToolTip(buttonAction->toolTip());
     button->setCheckable(isCheckable);
@@ -243,21 +243,13 @@ void NavigationWidget::updatePlaybackButtonsIcons()
 
     m_stepBackwardButton->setIcon(playing
         ? qnSkin->icon("slider/navigation/backward_32.svg",
-            nullptr,
-            nullptr,
             kNavigationIconSubstitutions)
         : qnSkin->icon("slider/navigation/step_backward_32.svg",
-            nullptr,
-            nullptr,
             kNavigationIconSubstitutions));
     m_stepForwardButton->setIcon(playing
         ? qnSkin->icon("slider/navigation/forward_32.svg",
-            nullptr,
-            nullptr,
             kNavigationIconSubstitutions)
         : qnSkin->icon("slider/navigation/step_forward_32.svg",
-            nullptr,
-            nullptr,
             kNavigationIconSubstitutions));
 }
 
