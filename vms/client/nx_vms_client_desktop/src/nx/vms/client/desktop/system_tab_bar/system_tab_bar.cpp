@@ -135,6 +135,11 @@ void SystemTabBar::activatePreviousTab()
     setCurrentIndex(m_lastTabIndex);
 }
 
+bool SystemTabBar::isHomeTabActive() const
+{
+    return isHomeTab(currentIndex());
+}
+
 bool SystemTabBar::isUpdating() const
 {
     return m_updating;
@@ -145,7 +150,7 @@ QSize SystemTabBar::tabSizeHint(int index) const
     int width;
     if (isHomeTab(index))
     {
-        if (count() == 1 || !isHomeTab(currentIndex()))
+        if (count() == 1 || !isHomeTabActive())
             width = kFixedHomeIconWidth;
         else
             width = kFixedWideHomeIconWidth;
@@ -255,7 +260,7 @@ void SystemTabBar::updateHomeTab()
         closeButton->setVisible(false);
         setTabIcon(index, qnSkin->icon("titlebar/systems.svg"));
     }
-    else if (isHomeTab(currentIndex()))
+    else if (isHomeTabActive())
     {
         // Home tab is active.
         closeButton->setVisible(true);

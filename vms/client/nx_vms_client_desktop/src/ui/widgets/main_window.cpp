@@ -64,6 +64,8 @@
 #include <ui/graphics/view/graphics_view.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/widgets/main_window_title_bar_state.h>
+#include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <ui/workaround/vsync_workaround.h>
@@ -107,9 +109,6 @@
     #include <ui/workaround/mac_utils.h>
 #endif
 
-#include "layout_tab_bar.h"
-#include "main_window_title_bar_widget.h"
-
 using nx::vms::client::core::Geometry;
 
 namespace nx::vms::client::desktop {
@@ -150,11 +149,12 @@ struct MainWindow::Private
         q(owner)
     {
         screenManager = std::make_unique<ScreenManager>(appContext()->sharedMemoryManager());
+        titleBarStateStore.reset(new MainWindowTitleBarStateStore);
     }
-
 
     MainWindow* q;
     std::unique_ptr<ScreenManager> screenManager;
+    QSharedPointer<MainWindowTitleBarStateStore> titleBarStateStore;
 };
 
 MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
@@ -254,6 +254,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
     m_titleBar = new QnMainWindowTitleBarWidget(context, this);
+    m_titleBar->setStateStore(d->titleBarStateStore);
     m_controller.reset(new QnWorkbenchController(this));
     if (qnRuntime->isVideoWallMode())
         m_controller->setMenuEnabled(false);
@@ -573,23 +574,14 @@ void MainWindow::setWelcomeScreenVisible(bool visible)
         return;
 
     m_welcomeScreenVisible = visible;
-    // m_titleBar is visible while windowed mode or Welcome Screen is active.
-    // m_ui is visible in full-screen mode but not on Welcome Screen.
-    // If we switch system tab bar to Home Tab in full-screen mode, we click on m_ui which
-    // disappears right after that and unswitched m_titleBar appears instead. To synchronize home
-    // tabs we should call activateHomeTab().
-    // If we switch back to system tab, we should call activatePreviousSystemTab() on m_ui to
-    // synchronize its tabs with m_titleBar.
-    if (visible)
+    if (visible && isSystemTabBarUpdating())
     {
-        if (isSystemTabBarUpdating())
-            welcomeScreen()->setGlobalPreloaderVisible(true);
-        else
-            m_titleBar->activateHomeTab();
+        welcomeScreen()->setGlobalPreloaderVisible(true);
     }
     else
     {
-        m_ui->activatePreviousSystemTab();
+        if (ini().enableMultiSystemTabBar)
+            m_titleBar->setHomeTabActive(visible);
     }
 
     updateWidgetsVisibility();
@@ -814,6 +806,11 @@ bool MainWindow::handleKeyPress(int key)
             break;
     }
     return true;
+}
+
+QnMainWindowTitleBarWidget* MainWindow::titleBar() const
+{
+    return m_titleBar;
 }
 
 bool MainWindow::isSystemTabBarUpdating()

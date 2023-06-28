@@ -55,6 +55,7 @@
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
+#include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -420,6 +421,7 @@ void WorkbenchUi::storeSettings()
 
     QnPaneSettings& title = m_settings[Qn::WorkbenchPane::Title];
     title.state = makePaneState(isTitleOpened());
+    title.expanded = m_title->isExpanded();
 
     if (m_leftPanel)
     {
@@ -865,6 +867,15 @@ void WorkbenchUi::loadSettings(bool animated, bool useDefault /*unused?*/)
     if (m_leftPanel && !ini().newPanelsLayout)
         m_leftPanel->setPanelSize(m_settings[Qn::WorkbenchPane::Tree].span);
     setTitleOpened(m_settings[Qn::WorkbenchPane::Title].state == Qn::PaneState::Opened, animated);
+    if (ini().enableMultiSystemTabBar)
+    {
+        const bool expanded = m_settings[Qn::WorkbenchPane::Title].expanded;
+        m_title->setExpanded(expanded);
+        if (expanded)
+            mainWindow()->titleBar()->expand();
+        else
+            mainWindow()->titleBar()->collapse();
+    }
     setTimelineOpened(m_settings[Qn::WorkbenchPane::Navigation].state == Qn::PaneState::Opened, animated);
     setNotificationsOpened(m_settings[Qn::WorkbenchPane::Notifications].state == Qn::PaneState::Opened, animated);
     if (m_notifications && !ini().newPanelsLayout)
@@ -1212,12 +1223,6 @@ void WorkbenchUi::setTitleUsed(bool used)
     updateControlsVisibility(false);
 }
 
-void WorkbenchUi::activatePreviousSystemTab()
-{
-    if (m_title)
-        m_title->activatePreviousSystemTab();
-}
-
 void WorkbenchUi::setTitleOpened(bool opened, bool animate)
 {
     if (m_title)
@@ -1237,7 +1242,7 @@ bool WorkbenchUi::isTitleOpened() const
 
 void WorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 {
-    m_title = new TitleWorkbenchPanel(settings, mainWindow()->view(), m_controlsWidget, this);
+    m_title = new TitleWorkbenchPanel(settings, m_controlsWidget, this);
     m_connections << connect(m_title, &AbstractWorkbenchPanel::openedChanged, this,
         [this](bool opened)
         {

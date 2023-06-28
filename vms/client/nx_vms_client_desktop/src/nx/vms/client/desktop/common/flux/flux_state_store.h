@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <QtCore/QScopedValueRollback>
 
 namespace nx::vms::client::desktop {

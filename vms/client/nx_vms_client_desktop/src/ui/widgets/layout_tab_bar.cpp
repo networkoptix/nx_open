@@ -38,9 +38,52 @@ using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
+
 static const int kMinimumTabSizeWidth = 50;
 static const QnIndents kTabIndents = {12, 8};
+static const QMargins kSingleLevelContentMargins = {1, 0, 1, 0};
+static const QMargins kDoubleLevelContentMargins = {0, 4, 1, 4};
+
+// Palette colors for tabs in different modes:
+// - QPalette::Text - text;
+// - QPalette::Base - background;
+// - QPalette::Dark - right margin;
+// - QPalette::Light - left margin.
+
+QPalette singleLevelPalette(QWidget* widget)
+{
+    auto p = widget->palette();
+    // Active tab:
+    p.setColor(QPalette::Active, QPalette::Text, core::colorTheme()->color("light4"));
+    p.setColor(QPalette::Active, QPalette::Base, core::colorTheme()->color("dark10"));
+    p.setColor(QPalette::Active, QPalette::Light, core::colorTheme()->color("dark4"));
+    p.setColor(QPalette::Active, QPalette::Dark, core::colorTheme()->color("dark4"));
+
+    // Inactive tab:
+    p.setColor(QPalette::Inactive, QPalette::Text, core::colorTheme()->color("light16"));
+    p.setColor(QPalette::Inactive, QPalette::Base, core::colorTheme()->color("dark7"));
+    p.setColor(QPalette::Inactive, QPalette::Light, core::colorTheme()->color("dark6"));
+    p.setColor(QPalette::Inactive, QPalette::Dark, core::colorTheme()->color("dark8"));
+    return p;
 }
+
+QPalette doubleLevelPalette(QWidget* widget)
+{
+    auto p = widget->palette();
+    // Active tab:
+    p.setColor(QPalette::Active, QPalette::Text, core::colorTheme()->color("light4"));
+    p.setColor(QPalette::Active, QPalette::Base, core::colorTheme()->color("dark10"));
+
+    // Inactive tab:
+    p.setColor(QPalette::Inactive, QPalette::Text, core::colorTheme()->color("light10"));
+    p.setColor(QPalette::Inactive, QPalette::Base, core::colorTheme()->color("dark10"));
+
+    // Common
+    p.setColor(QPalette::Dark, core::colorTheme()->color("dark12"));
+    return p;
+}
+
+} // namespace
 
 QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     QTabBar(parent),
@@ -57,27 +100,9 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     setElideMode(Qt::ElideRight);
     setTabShape(this, nx::style::TabShape::Rectangular);
     setUsesScrollButtons(false);
-    setContentsMargins(0, 4, 1, 4);
     setProperty(nx::style::Properties::kSideIndentation, QVariant::fromValue(kTabIndents));
-
-    // Set palette colors for tabs:
-    // - QPalette::Text - text;
-    // - QPalette::Base - background;
-    // - QPalette::Dark - right margin;
-    // - QPalette::Light - left margin.
-    auto p = palette();
-
-    // Active tab:
-    p.setColor(QPalette::Active, QPalette::Text, core::colorTheme()->color("light4"));
-    p.setColor(QPalette::Active, QPalette::Base, core::colorTheme()->color("dark10"));
-
-    // Inactive tab:
-    p.setColor(QPalette::Inactive, QPalette::Text, core::colorTheme()->color("light10"));
-    p.setColor(QPalette::Inactive, QPalette::Base, core::colorTheme()->color("dark10"));
-
-    // Common
-    p.setColor(QPalette::Dark, core::colorTheme()->color("dark12"));
-    setPalette(p);
+    setDoubleLevelContentMargins();
+    setDoubleLevelPalette();
 
     connect(this, &QTabBar::currentChanged, this, &QnLayoutTabBar::at_currentChanged);
     connect(this, &QTabBar::tabMoved, this, &QnLayoutTabBar::at_tabMoved);
@@ -154,6 +179,26 @@ action::Parameters QnLayoutTabBar::currentParameters(action::ActionScope scope) 
         result.push_back(m_layouts[currentIndex]);
 
     return result;
+}
+
+void QnLayoutTabBar::setSingleLevelContentMargins()
+{
+    setContentsMargins(kSingleLevelContentMargins);
+}
+
+void QnLayoutTabBar::setSingleLevelPalette()
+{
+    setPalette(singleLevelPalette(this));
+}
+
+void QnLayoutTabBar::setDoubleLevelContentMargins()
+{
+    setContentsMargins(kDoubleLevelContentMargins);
+}
+
+void QnLayoutTabBar::setDoubleLevelPalette()
+{
+    setPalette(doubleLevelPalette(this));
 }
 
 void QnLayoutTabBar::submitCurrentLayout()

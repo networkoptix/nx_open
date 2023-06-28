@@ -24,6 +24,7 @@ namespace nx::vms::client::desktop {
 class WorkbenchUi;
 class ScreenManager;
 class WelcomeScreen;
+class MainWindowTitleBarStateStore;
 
 class MainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware
 {
@@ -60,6 +61,8 @@ public:
 
     WelcomeScreen* welcomeScreen() const;
     void setWelcomeScreenVisible(bool visible);
+
+    QnMainWindowTitleBarWidget* titleBar() const;
 
     void updateDecorationsState();
 
