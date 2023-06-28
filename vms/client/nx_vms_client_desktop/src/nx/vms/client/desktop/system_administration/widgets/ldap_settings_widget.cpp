@@ -173,6 +173,7 @@ struct LdapSettingsWidget::Private
         state.memberAttribute = settings.memberAttribute.value_or("");
 
         state.preferredSyncServer = settings.preferredMasterSyncServer;
+        state.isHttpDigestEnabledOnImport = settings.isHttpDigestEnabledOnImport;
 
         LdapState::stateToObject(state, quickWidget->rootObject());
     }
@@ -228,6 +229,7 @@ struct LdapSettingsWidget::Private
             settings.memberAttribute = state.memberAttribute;
 
         settings.preferredMasterSyncServer = state.preferredSyncServer;
+        settings.isHttpDigestEnabledOnImport = state.isHttpDigestEnabledOnImport;
 
         return settings;
     }

@@ -18,7 +18,7 @@ Dialog
 {
     id: dialog
 
-    property alias allowDigest: digestCheckBox.checked
+    property alias isHttpDigestEnabledOnImport: digestCheckBox.checked
 
     property alias loginAttribute: loginAttributeTextField.text
     property alias loginAttributeAuto: loginAttributeTextField.auto
