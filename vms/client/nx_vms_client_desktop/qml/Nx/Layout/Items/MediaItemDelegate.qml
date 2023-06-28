@@ -78,19 +78,19 @@ ResourceItemDelegate
 
         TitleBarButton
         {
-            iconUrl: "qrc:/skin/item/zoom_window.png"
+            iconUrl: "image://svg/skin/item/zoom_window.svg"
             checkable: true
         },
 
         TitleBarButton
         {
-            iconUrl: "qrc:/skin/item/ptz.png"
+            iconUrl: "image://svg/skin/item/ptz.svg"
             checkable: true
         },
 
         TitleBarButton
         {
-            iconUrl: "qrc:/skin/item/fisheye.png"
+            iconUrl: "image://svg/skin/item/fisheye.svg"
             checkable: true
         },
 
@@ -103,12 +103,12 @@ ResourceItemDelegate
 
         TitleBarButton
         {
-            iconUrl: "qrc:/skin/item/screenshot.png"
+            iconUrl: "image://svg/skin/item/screenshot.svg"
         },
 
         TitleBarButton
         {
-            iconUrl: "qrc:/skin/item/rotate.png"
+            iconUrl: "image://svg/skin/item/rotate.svg"
 
             onPressed: resourceItem.rotationInstrument.start(mousePosition, this)
             onMousePositionChanged: resourceItem.rotationInstrument.move(mousePosition, this)
@@ -120,7 +120,7 @@ ResourceItemDelegate
         {
             id: infoButton
 
-            iconUrl: "qrc:/skin/item/info.png"
+            iconUrl: "image://svg/skin/item/info.svg"
             checkable: true
 
             Binding
@@ -135,7 +135,7 @@ ResourceItemDelegate
 
         TitleBarButton
         {
-            iconUrl: "qrc:/skin/item/close.png"
+            iconUrl: "image://svg/skin/item/close.svg"
             onClicked: layoutItemData.layout.removeItem(layoutItemData.itemId)
         }
     ]

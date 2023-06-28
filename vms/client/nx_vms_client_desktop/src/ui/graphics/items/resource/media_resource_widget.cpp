@@ -940,7 +940,7 @@ void QnMediaResourceWidget::createButtons()
 
     {
         auto ioModuleButton = createStatisticAwareButton("media_widget_io_module");
-        ioModuleButton->setIcon(qnSkin->icon("item/io.png"));
+        ioModuleButton->setIcon(qnSkin->icon("item/io.svg"));
         ioModuleButton->setCheckable(true);
         ioModuleButton->setChecked(false);
         ioModuleButton->setToolTip(tr("I/O Module"));
@@ -1633,7 +1633,7 @@ void QnMediaResourceWidget::updateIconButton()
     {
         const auto zoomIconButton =
             m_hudOverlay->title()->leftButtonsBar()->button(Qn::RecordingStatusIconButton);
-        zoomIconButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+        zoomIconButton->setIcon(qnSkin->icon("item/zoom_window.svg"));
         zoomIconButton->setToolTip(tr("Zoom Window"));
         return;
     }
@@ -1772,7 +1772,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
         && !d->resource->hasFlags(Qn::local))
     {
         // Predefined colors for debug purposes under the ini flag.
-        QColor overlayColor = m_renderer->isLowQualityImage(0) 
+        QColor overlayColor = m_renderer->isLowQualityImage(0)
             ? Qt::red
             : Qt::green;
         overlayColor = toTransparent(overlayColor, 0.5);
