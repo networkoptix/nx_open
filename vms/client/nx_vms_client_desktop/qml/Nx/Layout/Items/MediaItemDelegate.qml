@@ -97,7 +97,7 @@ ResourceItemDelegate
         TitleBarButton
         {
             id: motionSearchButton
-            iconUrl: "qrc:/skin/item/search.png"
+            iconUrl: "image://svg/skin/item/motion.svg"
             checkable: true
         },
 
