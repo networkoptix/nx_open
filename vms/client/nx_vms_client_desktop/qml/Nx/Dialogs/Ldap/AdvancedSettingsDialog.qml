@@ -136,11 +136,6 @@ Dialog
 
                     Layout.fillWidth: true
                     textField.placeholderText: "member"
-
-                    validateFunc: (text) =>
-                    {
-                        return text ? "" : qsTr("This field cannot be empty")
-                    }
                 }
 
                 Item
