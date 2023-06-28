@@ -2,12 +2,11 @@
 
 #include "system_manager.h"
 
-#include "cdb_request_path.h"
-#include "data/system_data.h"
-
+#include <nx/branding.h>
 #include <nx/network/http/rest/http_rest_client.h>
 
-#include <nx/branding.h>
+#include "cdb_request_path.h"
+#include "data/system_data.h"
 
 namespace nx::cloud::db::client {
 
@@ -272,6 +271,78 @@ void SystemManager::getSystemOffers(
         nx::network::http::Method::get,
         kSystemOwnershipOffers,
         std::move(completionHandler));
+}
+
+void SystemManager::addSystemAttributes(
+    const std::string& systemId,
+    const std::vector<api::Attribute>& attributes,
+    std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler)
+{
+    executeRequest<std::vector<api::Attribute>>(
+        nx::network::http::Method::post,
+         nx::network::http::rest::substituteParameters(
+            kSystemAttributesPath, {systemId}),
+        std::move(attributes),
+        std::move(completionHandler));
+}
+
+void SystemManager::updateSystemAttributes(
+    const std::string& systemId,
+    const std::vector<api::Attribute>& attributes,
+    std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler)
+{
+    executeRequest<std::vector<api::Attribute>>(
+        nx::network::http::Method::put,
+         nx::network::http::rest::substituteParameters(
+            kSystemAttributesPath, {systemId}),
+        std::move(attributes),
+        std::move(completionHandler));
+}
+
+void SystemManager::addSystemAttribute(
+    const std::string& systemId,
+    const api::Attribute& attribute,
+    std::function<void(api::ResultCode, api::Attribute)> completionHandler)
+{
+    executeRequest<api::Attribute>(
+        nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(kSystemAttributePath, {systemId, attribute.name}),
+        std::move(attribute),
+        std::move(completionHandler));
+}
+
+void SystemManager::updateSystemAttribute(
+    const std::string& systemId,
+    const api::Attribute& attribute,
+    std::function<void(api::ResultCode, api::Attribute)> completionHandler)
+{
+    executeRequest<api::Attribute>(
+        nx::network::http::Method::put,
+        nx::network::http::rest::substituteParameters(kSystemAttributePath, {systemId, attribute.name}),
+        std::move(attribute),
+        std::move(completionHandler));
+}
+
+void SystemManager::getSystemAttributes(
+    const std::string& systemId,
+    std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler)
+{
+     executeRequest<std::vector<api::Attribute>>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(
+            kSystemAttributesPath, {systemId}),
+        std::move(completionHandler));
+}
+
+void SystemManager::deleteSystemAttribute(
+    const std::string& systemId,
+    const std::string& attrName,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+   executeRequest</*Reply*/ void>(
+        nx::network::http::Method::delete_,
+        nx::network::http::rest::substituteParameters(kSystemAttributePath, {systemId, attrName}),
+        std::move(completionHandler)); 
 }
 
 } // namespace nx::cloud::db::client

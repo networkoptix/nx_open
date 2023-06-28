@@ -57,6 +57,8 @@ nx::network::http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resul
         case ResultCode::retryLater:
         case ResultCode::vmsRequestFailure:
             return nx::network::http::StatusCode::serviceUnavailable;
+        case ResultCode::updateConflict:
+            return nx::network::http::StatusCode::conflict;
     }
 
     return nx::network::http::StatusCode::internalServerError;
@@ -84,6 +86,8 @@ ResultCode httpStatusCodeToResultCode(nx::network::http::StatusCode::Value statu
             return ResultCode::notImplemented;
         case nx::network::http::StatusCode::serviceUnavailable:
             return ResultCode::serviceUnavailable;
+        case nx::network::http::StatusCode::conflict:
+            return ResultCode::updateConflict;
         default:
             return ResultCode::unknownError;
     }

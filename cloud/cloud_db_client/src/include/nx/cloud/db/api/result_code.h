@@ -44,13 +44,16 @@ NX_REFLECTION_ENUM_CLASS(ResultCode,
     invalidTotp,
     invalidBackupCode,
     userPasswordRequired,
-
+    
     /** Credentials used for authentication are no longer valid. */
     credentialsRemovedPermanently,
 
     /** Received data in unexpected/unsupported format. */
     invalidFormat,
     retryLater,
+
+    /** Data constraints violation */
+    updateConflict, 
 
     unknownError
 );
