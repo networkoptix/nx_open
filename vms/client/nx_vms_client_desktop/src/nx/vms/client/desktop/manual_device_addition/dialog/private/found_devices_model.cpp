@@ -26,7 +26,7 @@ QFont selectionColumnFont()
 {
     QFont result;
     result.setPixelSize(13);
-    result.setWeight((QFont::Weight) 40);
+    result.setWeight(QFont::Light);
     return result;
 }
 
