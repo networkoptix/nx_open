@@ -461,4 +461,19 @@ struct SystemOfferPatch
     std::optional<OfferStatus> status;
 };
 
+/**
+ * System attribute 
+ */
+struct Attribute
+{
+    /**%apidoc Unique attribute name. */
+    std::string name;
+    
+    /**%apidoc Attribute value. */
+    std::string value;
+};
+
+/**%apidoc Array of Attributes. */
+using AttributesList = std::vector<Attribute>;
+
 } // namespace nx::cloud::db::api
