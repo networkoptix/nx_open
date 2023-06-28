@@ -34,6 +34,8 @@ Rectangle
     property bool syncIsRunning
     property bool syncRequested
     property var preferredSyncServer
+    property bool isHttpDigestEnabledOnImport
+
     property bool hideEmptyLdapWarning: false
 
     property bool modified
@@ -76,6 +78,7 @@ Rectangle
                 control.syncIntervalS = syncIntervalS
                 control.searchTimeoutS = searchTimeoutS
                 control.preferredSyncServer = preferredSyncServer
+                control.isHttpDigestEnabledOnImport = isHttpDigestEnabledOnImport
             }
         }
     }
@@ -478,6 +481,9 @@ Rectangle
                             advancedSettingsDialog.syncIntervalS = control.syncIntervalS
                             advancedSettingsDialog.searchTimeoutS = control.searchTimeoutS
                             advancedSettingsDialog.preferredSyncServer = control.preferredSyncServer
+                            advancedSettingsDialog.isHttpDigestEnabledOnImport =
+                                control.isHttpDigestEnabledOnImport
+
                             advancedSettingsDialog.show()
                         }
                     }
