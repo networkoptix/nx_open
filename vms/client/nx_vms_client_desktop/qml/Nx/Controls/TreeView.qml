@@ -483,6 +483,7 @@ FocusScope
                             ? "image://svg/skin/tree/arrow_open_20.svg"
                             : "image://svg/skin/tree/arrow_close_20.svg"
                     }
+                    sourceSize: Qt.size(20, 20)
                 }
 
                 MouseArea
