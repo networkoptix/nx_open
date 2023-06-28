@@ -8,19 +8,19 @@ ResourceItemDelegate
     [
         TitleBarButton
         {
-            iconUrl: "qrc:/skin/item/issues.png"
+            iconUrl: "image://svg/skin/item/checkissues.svg"
         },
 
         TitleBarButton
         {
-            iconUrl: "qrc:/skin/item/log.png"
+            iconUrl: "image://svg/skin/item/log.svg"
         },
 
         TitleBarButton
         {
             id: infoButton
 
-            iconUrl: "qrc:/skin/item/info.png"
+            iconUrl: "image://svg/skin/item/info.svg"
             checkable: true
 
             Binding
@@ -35,7 +35,7 @@ ResourceItemDelegate
 
         TitleBarButton
         {
-            iconUrl: "qrc:/skin/item/close.png"
+            iconUrl: "image://svg/skin/item/close.svg"
             onClicked: layoutItemData.layout.removeItem(layoutItemData.itemId)
         }
     ]
