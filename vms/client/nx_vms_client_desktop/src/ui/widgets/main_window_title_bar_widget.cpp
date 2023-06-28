@@ -37,6 +37,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/layout_tab_bar.h>
+#include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
@@ -49,9 +50,13 @@ using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
-const int kTitleBarHeight = 24;
-const QSize kControlButtonSize(32, 32);
-const auto kTabBarButtonSize = QSize(kTitleBarHeight, kTitleBarHeight);
+static const int kResizerHeight = 4;
+static const QSize kControlButtonSize(
+    QnMainWindowTitleBarWidget::kSystemBarHeight, QnMainWindowTitleBarWidget::kSystemBarHeight);
+static const QSize kTabBarButtonSize(
+    QnMainWindowTitleBarWidget::kLayoutBarHeight, QnMainWindowTitleBarWidget::kLayoutBarHeight);
+static const QMargins kSingleLevelVLineContentMargins = {0, 0, 0, 0};
+static const QMargins kDoubleLevelVLineContentMargins = {0, 5, 0, 5};
 
 QFrame* newVLine(const QString& lightColorName, const QString& shadowColorName)
 {
@@ -128,18 +133,28 @@ public:
 
 public:
     ToolButton* mainMenuButton = nullptr;
-    QnLayoutTabBar* tabBar = nullptr;
+    QnLayoutTabBar* layoutBar = nullptr;
     SystemTabBar* systemBar = nullptr;
     ToolButton* newTabButton = nullptr;
     ToolButton* currentLayoutsButton = nullptr;
     QnCloudStatusPanel* cloudPanel = nullptr;
     std::unique_ptr<MimeData> mimeData;
     bool skipDoubleClickFlag = false;
+    QnMainWindowTitleBarResizerWidget* resizer = nullptr;
+    QHBoxLayout* systemLayout = nullptr;
+    QHBoxLayout* tabLayout = nullptr;
+    QWidget* tabPlaceholder = nullptr;
+    QList<QWidget*> widgetsToTransfer;
+    QSharedPointer<QnMainWindowTitleBarWidget::Store> store;
 
     /** There are some rare scenarios with looping menus. */
     bool isMenuOpened = false;
 
     QSharedPointer<QMenu> mainMenuHolder;
+
+    // Inner state of the widget: expanded and homeTabActive:
+    bool expanded = true;
+    bool homeTabActive = true;
 };
 
 QnMainWindowTitleBarWidgetPrivate::QnMainWindowTitleBarWidgetPrivate(
@@ -210,23 +225,27 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
                                // TODO: #vkutin #gdm #ynikitenkov Lift this limitation in the
                                // future
 
-    d->tabBar = new QnLayoutTabBar(this);
-    d->tabBar->setFocusPolicy(Qt::NoFocus);
-    d->tabBar->setFixedHeight(kTitleBarHeight);
-    connect(d->tabBar, &QnLayoutTabBar::tabCloseRequested, d,
+    d->layoutBar = new QnLayoutTabBar(this);
+    d->layoutBar->setFocusPolicy(Qt::NoFocus);
+    d->layoutBar->setFixedHeight(kLayoutBarHeight);
+    connect(d->layoutBar, &QnLayoutTabBar::tabCloseRequested, d,
         &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
 
     d->cloudPanel = new QnCloudStatusPanel(this);
     d->cloudPanel->setFocusPolicy(Qt::NoFocus);
 
+    const QString styleSheet = QString("QToolButton:hover { background-color: %1 }")
+        .arg(core::colorTheme()->color("dark8").name());
     d->newTabButton = newActionButton(
         action::OpenNewTabAction,
         Qn::MainWindow_TitleBar_NewLayout_Help,
         kTabBarButtonSize);
+    d->newTabButton->setStyleSheet(styleSheet);
 
     d->currentLayoutsButton = newActionButton(
         action::OpenCurrentUserLayoutMenu,
         kTabBarButtonSize);
+    d->currentLayoutsButton->setStyleSheet(styleSheet);
     connect(d->currentLayoutsButton, &ToolButton::justPressed, this,
         [this]()
         {
@@ -244,13 +263,10 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             executeButtonMenu(d->currentLayoutsButton, layoutsMenu.data());
         });
 
-    if (ini().enableMultiSystemTabBar && qnSystemsFinder->systems().count() > 1)
+    if (ini().enableMultiSystemTabBar)
         initMultiSystemTabBar();
     else
         initLayoutsOnlyTabBar();
-
-    installEventHandler({this}, {QEvent::Resize, QEvent::Move},
-        this, &QnMainWindowTitleBarWidget::geometryChanged);
 }
 
 QnMainWindowTitleBarWidget::~QnMainWindowTitleBarWidget()
@@ -276,30 +292,81 @@ void QnMainWindowTitleBarWidget::setY(int y)
 QnLayoutTabBar* QnMainWindowTitleBarWidget::tabBar() const
 {
     Q_D(const QnMainWindowTitleBarWidget);
-    return d->tabBar;
+    return d->layoutBar;
+}
+
+void QnMainWindowTitleBarWidget::setStateStore(QSharedPointer<Store> store)
+{
+    Q_D(QnMainWindowTitleBarWidget);
+    d->store = store;
+    connect(this, &QnMainWindowTitleBarWidget::toggled,
+        store.data(), &MainWindowTitleBarStateStore::setExpanded);
+    connect(this, &QnMainWindowTitleBarWidget::homeTabActivationChanged,
+        store.data(), &MainWindowTitleBarStateStore::setHomeTabActive);
+    connect(store.data(), &MainWindowTitleBarStateStore::stateChanged, this,
+        [this](MainWindowTitleBarState state)
+        {
+            if (state.expanded)
+                expand();
+            else
+                collapse();
+
+            setHomeTabActive(state.homeTabActive);
+        });
+}
+
+QSharedPointer<QnMainWindowTitleBarWidget::Store> QnMainWindowTitleBarWidget::stateStore() const
+{
+    Q_D(const QnMainWindowTitleBarWidget);
+    return d->store;
 }
 
 void QnMainWindowTitleBarWidget::setTabBarStuffVisible(bool visible)
 {
     Q_D(const QnMainWindowTitleBarWidget);
-    d->tabBar->setVisible(visible);
+    d->layoutBar->setVisible(visible);
     d->newTabButton->setVisible(visible);
     d->currentLayoutsButton->setVisible(visible);
     action(action::OpenNewTabAction)->setEnabled(visible);
 }
 
-void QnMainWindowTitleBarWidget::activateHomeTab()
+void QnMainWindowTitleBarWidget::setHomeTabActive(bool isActive)
 {
-    Q_D(const QnMainWindowTitleBarWidget);
-    if (d->systemBar)
+    Q_D(QnMainWindowTitleBarWidget);
+    if (d->homeTabActive == isActive)
+        return;
+
+    if (isActive)
+    {
+        if (d->expanded)
+        {
+            for (auto widget: d->widgetsToTransfer)
+                widget->hide();
+            d->systemBar->show();
+        }
+        setFixedHeight(kSystemBarHeight);
         d->systemBar->activateHomeTab();
+    }
+    else
+    {
+        d->systemBar->activatePreviousTab();
+        for (auto widget: d->widgetsToTransfer)
+            widget->show();
+        if (!d->expanded)
+            d->systemBar->hide();
+        else
+            setFixedHeight(kFullTitleBarHeight);
+    }
+    d->tabPlaceholder->setVisible(!isActive);
+    d->resizer->setVisible(!isActive);
+    d->homeTabActive = isActive;
+    emit homeTabActivationChanged(isActive);
 }
 
-void QnMainWindowTitleBarWidget::activatePreviousTab()
+bool QnMainWindowTitleBarWidget::isExpanded() const
 {
     Q_D(const QnMainWindowTitleBarWidget);
-    if (d->systemBar)
-        d->systemBar->activatePreviousTab();
+    return d->expanded;
 }
 
 bool QnMainWindowTitleBarWidget::isSystemTabBarUpdating() const
@@ -310,12 +377,11 @@ bool QnMainWindowTitleBarWidget::isSystemTabBarUpdating() const
 
 void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    Q_D(QnMainWindowTitleBarWidget);
-
     base_type::mouseDoubleClickEvent(event);
 
 #ifndef Q_OS_MACX
-    if (d->skipDoubleClickFlag)
+    Q_D(QnMainWindowTitleBarWidget);
+        if (d->skipDoubleClickFlag)
     {
         d->skipDoubleClickFlag = false;
         return;
@@ -342,7 +408,7 @@ void QnMainWindowTitleBarWidget::dragMoveEvent(QDragMoveEvent* event)
     if (d->mimeData->isEmpty())
         return;
 
-    if (!qBetween(d->tabBar->pos().x(), event->pos().x(), d->cloudPanel->pos().x()))
+    if (!qBetween(d->layoutBar->pos().x(), event->pos().x(), d->cloudPanel->pos().x()))
         return;
 
     event->acceptProposedAction();
@@ -453,60 +519,85 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
-    QHBoxLayout* systemLayout = new QHBoxLayout();
-    QHBoxLayout* tabLayout = new QHBoxLayout();
-    tabLayout->setContentsMargins(0, 0, 0, 0);
-    tabLayout->setSpacing(0);
+    d->systemLayout = new QHBoxLayout();
+    d->tabLayout = new QHBoxLayout();
+    d->tabLayout->setContentsMargins(0, 0, 0, 0);
+    d->tabLayout->setSpacing(0);
 
-    auto tabPlaceholder = new QWidget(this);
-    tabPlaceholder->setStyleSheet(QString(".QWidget{ background-color: %1 }").arg(
-        core::colorTheme()->color("dark10").name()));
+    d->tabPlaceholder = new QWidget(this);
+    d->tabPlaceholder->setStyleSheet(QString(".QWidget{ background-color: %1 }")
+        .arg(core::colorTheme()->color("dark10").name()));
 
-    mainLayout->addLayout(systemLayout);
-    mainLayout->addWidget(tabPlaceholder);
-    tabPlaceholder->setLayout(tabLayout);
+    mainLayout->addLayout(d->systemLayout);
+    mainLayout->addWidget(d->tabPlaceholder);
+    d->tabPlaceholder->setLayout(d->tabLayout);
 
-    systemLayout->addWidget(d->mainMenuButton);
-    systemLayout->addWidget(newVLine(0, "dark8"));
-    systemLayout->addWidget(d->systemBar);
-    systemLayout->addStretch(1);
-    systemLayout->addSpacing(80);
-    systemLayout->addWidget(newVLine("dark8", "dark6"));
-    systemLayout->addWidget(d->cloudPanel);
-    systemLayout->addWidget(newVLine("dark8", "dark6"));
+    d->systemLayout->addWidget(d->mainMenuButton);
+    d->systemLayout->addWidget(newVLine(0, "dark8"));
+    d->systemLayout->addWidget(d->systemBar);
+    d->systemLayout->addStretch(1);
+    d->systemLayout->addSpacing(80);
+    d->systemLayout->addWidget(newVLine("dark8", "dark6"));
+    d->systemLayout->addWidget(d->cloudPanel);
+    d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     if (auto indicator = newRecordingIndicator(kControlButtonSize))
     {
-        systemLayout->addWidget(indicator);
-        systemLayout->addWidget(newVLine("dark8", "dark6"));
+        d->systemLayout->addWidget(indicator);
+        d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     }
-    systemLayout->addWidget(newActionButton(
+    d->systemLayout->addWidget(newActionButton(
         action::WhatsThisAction,
         Qn::MainWindow_ContextHelp_Help,
         kControlButtonSize));
-    systemLayout->addWidget(newVLine("dark8", "dark6"));
-    systemLayout->addWidget(newActionButton(
+    d->systemLayout->addWidget(newVLine("dark8", "dark6"));
+    d->systemLayout->addWidget(newActionButton(
         action::MinimizeAction,
         kControlButtonSize));
-    systemLayout->addWidget(newVLine("dark8", "dark6"));
-    systemLayout->addWidget(newActionButton(
+    d->systemLayout->addWidget(newVLine("dark8", "dark6"));
+    d->systemLayout->addWidget(newActionButton(
         action::EffectiveMaximizeAction,
         Qn::MainWindow_Fullscreen_Help,
         kControlButtonSize));
-    systemLayout->addWidget(newVLine("dark8", "dark6"));
+    d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     {
         const QColor background = core::colorTheme()->color("dark7");
         const core::SvgIconColorer::IconSubstitutions colorSubs = {
             { QnIcon::Active, {{ background, "red_d1" }}},
             { QnIcon::Pressed, {{ background, "red_d1" }}}};
         QIcon icon = qnSkin->icon("titlebar/window_close.svg", "", nullptr, colorSubs);
-        systemLayout->addWidget(newActionButton(action::ExitAction, icon));
+        d->systemLayout->addWidget(newActionButton(action::ExitAction, icon));
     }
-    tabLayout->addWidget(d->tabBar);
-    tabLayout->addWidget(d->newTabButton);
-    tabLayout->addWidget(newVLine(5, "dark12"));
-    tabLayout->addWidget(d->currentLayoutsButton);
-    tabLayout->addWidget(newVLine(5, "dark12"));
-    tabLayout->addStretch(1);
+    d->widgetsToTransfer << d->layoutBar;
+    d->tabLayout->addWidget(d->layoutBar);
+
+    d->widgetsToTransfer << d->newTabButton;
+    d->tabLayout->addWidget(d->newTabButton);
+
+    auto line = newVLine(5, "dark12");
+    d->widgetsToTransfer << line;
+    d->tabLayout->addWidget(line);
+
+    d->widgetsToTransfer << d->currentLayoutsButton;
+    d->tabLayout->addWidget(d->currentLayoutsButton);
+
+    line = newVLine(5, "dark12");
+    d->widgetsToTransfer << line;
+    d->tabLayout->addWidget(line);
+    d->tabLayout->addStretch(1);
+
+    d->resizer = new QnMainWindowTitleBarResizerWidget(this);
+    connect(d->resizer, &QnMainWindowTitleBarResizerWidget::collapsed, this,
+        &QnMainWindowTitleBarWidget::collapse);
+    connect(d->resizer, &QnMainWindowTitleBarResizerWidget::expanded, this,
+        &QnMainWindowTitleBarWidget::expand);
+
+    installEventHandler({this}, {QEvent::Resize, QEvent::Move}, this,
+        [this]()
+        {
+            Q_D(QnMainWindowTitleBarWidget);
+            d->resizer->setGeometry(0, height() - kResizerHeight, width(), kResizerHeight);
+            emit geometryChanged();
+        });
 }
 
 void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
@@ -520,7 +611,7 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
 
     layout->addWidget(d->mainMenuButton);
     layout->addWidget(newVLine());
-    layout->addWidget(d->tabBar);
+    layout->addWidget(d->layoutBar);
     layout->addWidget(newVLine());
 
     layout->addWidget(d->newTabButton);
@@ -544,14 +635,109 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
         action::WhatsThisAction,
         Qn::MainWindow_ContextHelp_Help,
         kControlButtonSize));
+    layout->addWidget(newVLine("dark8", "dark6"));
     layout->addWidget(newActionButton(
         action::MinimizeAction,
         kControlButtonSize));
+    layout->addWidget(newVLine("dark8", "dark6"));
     layout->addWidget(newActionButton(
         action::EffectiveMaximizeAction,
         Qn::MainWindow_Fullscreen_Help,
         kControlButtonSize));
-    layout->addWidget(newActionButton(
-        action::ExitAction,
-        kControlButtonSize));
+    layout->addWidget(newVLine("dark8", "dark6"));
+    {
+        const QColor background = core::colorTheme()->color("dark7");
+        const core::SvgIconColorer::IconSubstitutions colorSubs = {
+            { QnIcon::Active, {{ background, "red_d1" }}},
+            { QnIcon::Pressed, {{ background, "red_d1" }}}};
+        QIcon icon = qnSkin->icon("titlebar/window_close.svg",
+            /*checkedName*/ "",
+            /*suffixes*/ nullptr,
+            /*svgColorSubstitutions*/ colorSubs);
+        layout->addWidget(newActionButton(action::ExitAction, icon));
+    }
+}
+
+void QnMainWindowTitleBarWidget::collapse()
+{
+    Q_D(QnMainWindowTitleBarWidget);
+    if (!d->expanded)
+        return;
+
+    d->expanded = false;
+    int insertPosition = d->systemLayout->indexOf(d->systemBar);
+    d->systemBar->hide();
+    for (auto widget: d->widgetsToTransfer)
+    {
+        d->systemLayout->insertWidget(insertPosition++, widget);
+        widget->setFixedHeight(kSystemBarHeight);
+        if (auto line = qobject_cast<QFrame*>(widget))
+        {
+            line->setContentsMargins(kSingleLevelVLineContentMargins);
+            setPaletteColor(line, QPalette::Shadow, core::colorTheme()->color("dark8"));
+        }
+    }
+    d->tabPlaceholder->hide();
+    d->layoutBar->setSingleLevelContentMargins();
+    d->layoutBar->setSingleLevelPalette();
+    setFixedHeight(kSystemBarHeight);
+    emit toggled(false);
+}
+
+void QnMainWindowTitleBarWidget::expand()
+{
+    Q_D(QnMainWindowTitleBarWidget);
+    if (d->expanded)
+        return;
+
+    d->expanded = true;
+    int insertPosition = 0;
+    for (auto widget: d->widgetsToTransfer)
+    {
+        d->tabLayout->insertWidget(insertPosition++, widget);
+        widget->setFixedHeight(kLayoutBarHeight);
+        if (auto line = qobject_cast<QFrame*>(widget))
+        {
+            line->setContentsMargins(kDoubleLevelVLineContentMargins);
+            setPaletteColor(line, QPalette::Shadow, core::colorTheme()->color("dark12"));
+        }
+    }
+    d->tabPlaceholder->show();
+    d->systemBar->show();
+    d->layoutBar->setDoubleLevelContentMargins();
+    d->layoutBar->setDoubleLevelPalette();
+    setFixedHeight(kFullTitleBarHeight);
+    emit toggled(true);
+}
+
+QnMainWindowTitleBarResizerWidget::QnMainWindowTitleBarResizerWidget(
+    QnMainWindowTitleBarWidget* parent)
+    :
+    base_type(parent)
+{
+    setCursor(Qt::SplitVCursor);
+}
+
+void QnMainWindowTitleBarResizerWidget::mousePressEvent(QMouseEvent*)
+{
+    if (isEnabled())
+        m_isBeingMoved = true;
+}
+
+void QnMainWindowTitleBarResizerWidget::mouseReleaseEvent(QMouseEvent*)
+{
+    m_isBeingMoved = false;
+}
+
+void QnMainWindowTitleBarResizerWidget::mouseMoveEvent(QMouseEvent* event)
+{
+    if (m_isBeingMoved)
+    {
+        const int y = mapToParent(event->pos()).y();
+        auto parent = qobject_cast<QnMainWindowTitleBarWidget*>(this->parent());
+        if (y <= parent->kSystemBarHeight && parent->isExpanded())
+            emit collapsed();
+        else if (y >= parent->kFullTitleBarHeight && !parent->isExpanded())
+            emit expanded();
+    }
 }

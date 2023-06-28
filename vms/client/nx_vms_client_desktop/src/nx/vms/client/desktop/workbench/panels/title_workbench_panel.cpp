@@ -3,28 +3,25 @@
 #include "title_workbench_panel.h"
 
 #include <QtCore/QScopedValueRollback>
-
 #include <QtGui/QAction>
 
-#include <nx/vms/client/desktop/workbench/workbench_animations.h>
-
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/processors/hover_processor.h>
+#include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
-
-#include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_pane_settings.h>
+#include <ui/workbench/workbench_ui_globals.h>
 
 #include "buttons.h"
 
@@ -34,17 +31,17 @@ using namespace ui;
 
 TitleWorkbenchPanel::TitleWorkbenchPanel(
     const QnPaneSettings& settings,
-    QWidget* parentWidget,
     QGraphicsWidget* parentGraphicsWidget,
     QObject* parent)
     :
     base_type(settings, parentGraphicsWidget, parent),
-    m_widget(new QnMainWindowTitleBarWidget(context(), parentWidget)),
+    m_widget(new QnMainWindowTitleBarWidget(context(), mainWindow()->view())),
     m_showButton(newShowHideButton(parentGraphicsWidget, context(),
         action::ToggleTitleBarAction)),
     m_yAnimator(new VariantAnimator(this)),
     m_opacityProcessor(new HoverFocusProcessor(parentGraphicsWidget))
 {
+    m_widget->setStateStore(mainWindow()->titleBar()->stateStore());
     connect(m_widget, &QnMainWindowTitleBarWidget::geometryChanged, this,
         &TitleWorkbenchPanel::updateControlsGeometry);
 
@@ -194,9 +191,17 @@ QSize TitleWorkbenchPanel::sizeHint() const
     return m_widget->sizeHint();
 }
 
-void TitleWorkbenchPanel::activatePreviousSystemTab()
+void TitleWorkbenchPanel::setExpanded(bool value)
 {
-    m_widget->activatePreviousTab();
+    if (value)
+        m_widget->expand();
+    else
+        m_widget->collapse();
+}
+
+bool TitleWorkbenchPanel::isExpanded() const
+{
+    return m_widget->isExpanded();
 }
 
 void TitleWorkbenchPanel::updateControlsGeometry()

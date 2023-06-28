@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "abstract_workbench_panel.h"
+#include <nx/vms/client/desktop/workbench/panels/abstract_workbench_panel.h>
 
 class QnImageButtonWidget;
 class HoverFocusProcessor;
@@ -19,7 +19,6 @@ class TitleWorkbenchPanel: public AbstractWorkbenchPanel
 public:
     TitleWorkbenchPanel(
         const QnPaneSettings& settings,
-        QWidget* parentWidget,
         QGraphicsWidget* parentGraphicsWidget,
         QObject* parent = nullptr);
 
@@ -47,6 +46,8 @@ public:
 
     QSize sizeHint() const;
     void activatePreviousSystemTab();
+    void setExpanded(bool value);
+    bool isExpanded() const;
 
 private:
     void updateControlsGeometry();

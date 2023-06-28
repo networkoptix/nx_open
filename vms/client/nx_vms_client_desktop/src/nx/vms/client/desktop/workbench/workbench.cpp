@@ -91,8 +91,7 @@ public:
         m_state.currentLayoutId = QnUuid(state.value(kCurrentLayoutId).toString());
         m_state.runningTourId = QnUuid(state.value(kRunningTourId).toString());
         QJson::deserialize(state.value(kLayoutUuids), &m_state.layoutUuids);
-        if (ini().enableMultiSystemTabBar)
-            QJson::deserialize(state.value(kUnsavedLayouts), &m_state.unsavedLayouts);
+        QJson::deserialize(state.value(kUnsavedLayouts), &m_state.unsavedLayouts);
         return true;
     }
 
@@ -107,8 +106,7 @@ public:
             result[kCurrentLayoutId] = m_state.currentLayoutId.toString();
             result[kRunningTourId] = m_state.runningTourId.toString();
             QJson::serialize(m_state.layoutUuids, &result[kLayoutUuids]);
-            if (ini().enableMultiSystemTabBar)
-                QJson::serialize(m_state.unsavedLayouts, &result[kUnsavedLayouts]);
+            QJson::serialize(m_state.unsavedLayouts, &result[kUnsavedLayouts]);
             *state = result;
         }
     }
@@ -745,7 +743,7 @@ void Workbench::update(const WorkbenchState& state)
         }
     }
 
-    if (ini().enableMultiSystemTabBar && context()->user())
+    if (context()->user())
     {
         auto initialFillLayoutFromState =
             [](const LayoutResourcePtr& layout, const WorkbenchState::UnsavedLayout& state)
@@ -889,9 +887,7 @@ void Workbench::submit(WorkbenchState& state)
             if (isLayoutSupported(resource, /*allowLocals*/ false))
                 state.layoutUuids.push_back(sourceId(resource));
 
-            if (ini().enableMultiSystemTabBar
-                && resource->hasFlags(Qn::local)
-                && !resource->getItems().empty())
+            if (resource->hasFlags(Qn::local) && !resource->getItems().empty())
             {
                 WorkbenchState::UnsavedLayout unsavedLayout;
                 unsavedLayout.id = resource->getId();

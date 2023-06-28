@@ -13,8 +13,14 @@ Workbench pane appearance
 */
 struct QnPaneSettings
 {
-    Qn::PaneState state;    /**< pane state */
-    qreal span;             /**< horizontal pane height or vertical pane width, if applicable */
+    /** Pane state. */
+    Qn::PaneState state;
+
+    /** Horizontal pane height or vertical pane width, if applicable. */
+    qreal span;
+
+    /** Whether pane is expanded or collapsed, if applicable. */
+    bool expanded;
 
     QnPaneSettings(
         Qn::PaneState paneState = Qn::PaneState::Opened,
@@ -28,7 +34,7 @@ struct QnPaneSettings
     bool operator==(const QnPaneSettings& other) const;
 };
 
-#define QnPaneSettings_Fields (state)(span)
+#define QnPaneSettings_Fields (state)(span)(expanded)
 QN_FUSION_DECLARE_FUNCTIONS(QnPaneSettings, (json));
 NX_REFLECTION_INSTRUMENT(QnPaneSettings, QnPaneSettings_Fields)
 

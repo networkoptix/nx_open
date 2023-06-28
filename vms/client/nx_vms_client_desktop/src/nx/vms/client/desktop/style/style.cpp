@@ -73,7 +73,6 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
-#include "webview_style.h"
 #include "private/style_private.h"
 
 using namespace nx::style;
@@ -2220,7 +2219,7 @@ void Style::drawControl(ControlElement element,
                         painter->fillRect(rect, color);
 
                         auto margins = widget->contentsMargins();
-                        if (margins.right() > 0 && tab->position != QStyleOptionTab::End)
+                        if (margins.right() > 0)
                         {
                             painter->fillRect(rect.right() - margins.right() + 1,
                                 margins.top(),

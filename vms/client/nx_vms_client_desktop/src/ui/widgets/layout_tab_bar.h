@@ -24,6 +24,10 @@ public:
     virtual nx::vms::client::desktop::ui::action::ActionScope currentScope() const override;
     virtual nx::vms::client::desktop::ui::action::Parameters currentParameters(
         nx::vms::client::desktop::ui::action::ActionScope scope) const override;
+    void setSingleLevelContentMargins();
+    void setSingleLevelPalette();
+    void setDoubleLevelContentMargins();
+    void setDoubleLevelPalette();
 
 signals:
     void tabTextChanged();

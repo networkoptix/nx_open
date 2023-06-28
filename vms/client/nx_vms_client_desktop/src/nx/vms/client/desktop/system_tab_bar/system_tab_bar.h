@@ -25,6 +25,7 @@ public:
     void rebuildTabs();
     void activateHomeTab();
     void activatePreviousTab();
+    bool isHomeTabActive() const;
     bool isUpdating() const;
 
 protected:

@@ -116,7 +116,6 @@ public:
     bool isCalendarVisible() const;
 
     void setTitleUsed(bool titleUsed = true);
-    void activatePreviousSystemTab();
 
 private:
     void setFpsVisible(bool fpsVisible = true);
