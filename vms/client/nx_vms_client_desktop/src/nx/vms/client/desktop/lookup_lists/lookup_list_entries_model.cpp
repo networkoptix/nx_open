@@ -98,42 +98,65 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
 
             return "text";
         }
+
+        case ObjectTypeIdRole:
+        {
+            return m_data->rawData().objectTypeId;
+        }
+
+        case AttributeNameRole:
+        {
+            return attribute(m_data->rawData(), index.column());
+        }
     }
 
     return {};
 }
 
-bool LookupListEntriesModel::setData(
-    const QModelIndex& index,
-    const QVariant& value,
-    int role)
+bool LookupListEntriesModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     if (!NX_ASSERT(m_data))
-        return {};
+        return false;
 
-    switch (role)
+    if (role == Qt::EditRole)
     {
-        case Qt::EditRole:
+        if (index.column() == kCheckBoxColumnIndex)
         {
-            if (index.column() == kCheckBoxColumnIndex)
+            if (index.row() < m_checkBoxCount_TEMP)
             {
-                if (index.row() < m_checkBoxCount_TEMP)
-                {
-                    m_checkBoxState_TEMP[index.row()] = value.toInt();
-                    emit dataChanged(index, index, {Qt::DisplayRole});
-                    return true;
-                }
+                m_checkBoxState_TEMP[index.row()] = value.toInt();
+                emit dataChanged(index, index, {Qt::DisplayRole});
+                return true;
             }
         }
     }
 
-    return QAbstractTableModel::setData(index, value, role);
+    if (role != Qt::DisplayRole)
+        return false;
+
+    const auto key = attribute(m_data->rawData(), index.column());
+    if (key.isEmpty())
+        return false;
+
+    auto& entry = m_data->rawData().entries[index.row()];
+    auto iter = entry.find(key);
+
+    const auto valueAsString = value.toString();
+    if (valueAsString.isEmpty() && iter != entry.end())
+        entry.erase(iter);
+    else
+        entry[key] = valueAsString;
+
+    emit dataChanged(index, index, {Qt::DisplayRole});
+    return true;
 }
 
 QHash<int, QByteArray> LookupListEntriesModel::roleNames() const
 {
     auto roles = base_type::roleNames();
     roles[TypeRole] = "type";
+    roles[ObjectTypeIdRole] = "objectTypeId";
+    roles[AttributeNameRole] = "attributeName";
     return roles;
 }
 
@@ -154,19 +177,19 @@ void LookupListEntriesModel::setListModel(LookupListModel* value)
         emit headerDataChanged(Qt::Orientation::Horizontal, 0, columnCount() - 1);
 }
 
-void LookupListEntriesModel::addEntry(const QVariantMap& value)
+void LookupListEntriesModel::addEntry(const QVariantMap& values)
 {
     if (!NX_ASSERT(m_data))
         return;
 
-    if (!NX_ASSERT(!value.empty()))
+    if (!NX_ASSERT(!values.empty()))
         return;
 
     const int count = m_data->rawData().entries.size();
     beginInsertRows({}, count, count);
 
     nx::vms::api::LookupListEntry entry;
-    for (const auto& [name, value]: nx::utils::constKeyValueRange(value))
+    for (const auto& [name, value]: nx::utils::constKeyValueRange(values))
         entry[name] = value.toString();
     m_data->rawData().entries.push_back(std::move(entry));
 

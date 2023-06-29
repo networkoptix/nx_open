@@ -12,14 +12,21 @@ import Nx.Controls
 import Nx.Dialogs
 
 import nx.vms.client.desktop
+import nx.vms.client.desktop.analytics as Analytics
 
 TableView
 {
     id: control
 
+    required property Analytics.StateView taxonomy
+
     function getColumnWidth(columnIndex)
     {
-        return Math.max(124, getButtonItem(columnIndex).implicitWidth)
+        let w = explicitColumnWidth(columnIndex)
+        if (w >= 0)
+            return w
+
+        return implicitColumnWidth(columnIndex)
     }
 
     columnSpacing: 0
@@ -30,16 +37,23 @@ TableView
     columnWidthProvider: function (columnIndex)
     {
         if (isCheckboxColumn(control.model, columnIndex))
-            return Math.min(getButtonItem(columnIndex).implicitWidth, 124)
+            return Math.max(getButtonItem(columnIndex).implicitWidth, 28)
 
         // Stretch the last column to the entire free width.
         if (columnIndex === columns - 1)
         {
             let occupiedSpace = 0
-            for (let i = 0; i < columns - 2; ++i)
-                occupiedSpace += getColumnWidth(columnIndex)
+            for (let i = 0; i < columnIndex; ++i)
+            {
+                const w1 = getColumnWidth(i)
+                console.log("Width of " + i + " is " + w1)
+                occupiedSpace += getColumnWidth(i)
+            }
 
-            return width - occupiedSpace
+            // For some unknown yet reason we need to hardcode an indentation here.
+            const lastColumnWidth = width - occupiedSpace - 10
+            const lastColumnMinSize = getColumnWidth(columnIndex)
+            return Math.max(lastColumnWidth, lastColumnMinSize)
         }
 
         return getColumnWidth(columnIndex)
@@ -87,21 +101,16 @@ TableView
 
             Rectangle
             {
-                implicitWidth: Math.max(124, title.implicitWidth)
+                implicitWidth: Math.max(124, delegateItem.implicitWidth)
                 implicitHeight: 28
                 color: ColorTheme.colors.dark7
-
                 required property bool selected
 
-                Text
+                LookupListTableCellDelegate
                 {
-                    id: title
+                    id: delegateItem
 
-                    x: 8
-                    y: 6
-
-                    text: display || qsTr("ANY")
-                    color: display ? ColorTheme.light : ColorTheme.colors.dark17
+                    taxonomy: control.taxonomy
                 }
             }
         }

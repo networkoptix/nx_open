@@ -51,14 +51,14 @@ ModalDialog
                     Layout.alignment: Qt.AlignBaseline
                     horizontalAlignment: isGeneric ? Text.AlignRight : Text.AlignLeft
                 }
-                LookupListElementDelegate
+                LookupListElementEditor
                 {
                     taxonomy: dialog.taxonomy
                     objectTypeId: dialog.model.data.objectTypeId
                     attributeName: modelData
 
                     Layout.fillWidth: true
-                    onValueChanged: (value) =>
+                    onValueChanged:
                     {
                         // Value is a string or undefined, empty string is considered invalid.
                         // Also there is a separate check for zero numeric values.

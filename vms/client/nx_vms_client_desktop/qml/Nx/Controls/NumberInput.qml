@@ -14,6 +14,8 @@ FocusScope
     property var minimum: undefined
     property var maximum: undefined
 
+    signal editingFinished()
+
     readonly property var value:
     {
         if (textField.value === undefined)
@@ -134,6 +136,8 @@ FocusScope
         onTextChanged:
             value = valueFromText(text)
 
+        onEditingFinished: control.editingFinished()
+
         onValueChanged:
         {
             if (valueFromText(text) !== value)
@@ -143,14 +147,23 @@ FocusScope
         onActiveFocusChanged:
         {
             if (!activeFocus)
+            {
                 value = control.value
+                control.editingFinished()
+            }
         }
 
         Keys.onEnterPressed:
+        {
             value = control.value
+            control.editingFinished()
+        }
 
         Keys.onReturnPressed:
+        {
             value = control.value
+            control.editingFinished()
+        }
 
         function valueFromText(text)
         {
@@ -194,9 +207,6 @@ FocusScope
         }
     }
 
-    Component.onCompleted:
-        textField.updateValidator()
-
-    onModeChanged:
-        textField.updateValidator()
+    Component.onCompleted: textField.updateValidator()
+    onModeChanged: textField.updateValidator()
 }

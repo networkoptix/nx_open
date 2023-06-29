@@ -21,8 +21,14 @@ Control
     property Analytics.ObjectType objectType: taxonomy.objectTypeById(objectTypeId)
     property Analytics.Attribute attribute: findAttribute()
     property bool isGeneric: !objectType
+    property string value
 
-    signal valueChanged(string value)
+    signal editingFinished()
+
+    function setFocus()
+    {
+        loader.item.forceActiveFocus()
+    }
 
     function findAttributeRecursive(objectType, nameParts)
     {
@@ -65,7 +71,15 @@ Control
 
         TextField
         {
-            onTextChanged: valueChanged(text)
+            Connections
+            {
+                target: control
+                function onValueChanged() { text = control.value }
+            }
+
+            onTextChanged: control.value = text
+            onEditingFinished: control.editingFinished()
+            Component.onCompleted: text = control.value
         }
     }
 
@@ -82,7 +96,15 @@ Control
                 ? NumberInput.Integer
                 : NumberInput.Real
 
-            onValueChanged: control.valueChanged(value)
+            Connections
+            {
+                target: control
+                function onValueChanged() { setValue(control.value) }
+            }
+
+            onValueChanged: control.value = value
+            onEditingFinished: control.editingFinished()
+            Component.onCompleted: setValue(control.value)
         }
     }
 
@@ -96,10 +118,23 @@ Control
             valueRole: "value"
             model: [
                 {"text": qsTr("Any %1").arg(attribute.name), "value": undefined},
-                {"text": qsTr("Yes"), "value": "0"},
-                {"text": qsTr("No"), "value": "1"}
+                {"text": qsTr("Yes"), "value": "true"},
+                {"text": qsTr("No"), "value": "false"}
             ]
-            onActivated: valueChanged(currentValue)
+
+            Connections
+            {
+                target: control
+                function onValueChanged() { currentIndex = indexOfValue(control.value) }
+            }
+
+            onActivated:
+            {
+                control.value = value
+                control.editingFinished()
+            }
+
+            Component.onCompleted: currentIndex = indexOfValue(control.value)
         }
     }
 
@@ -118,7 +153,20 @@ Control
                     Array.prototype.map.call(attribute.colorSet.items,
                         name => ({"name": name, "color": attribute.colorSet.color(name)})))
             }
-            onActivated: valueChanged(currentValue)
+
+            Connections
+            {
+                target: control
+                function onValueChanged() { currentIndex = indexOfValue(control.value) }
+            }
+
+            onActivated:
+            {
+                control.value = value
+                control.editingFinished()
+            }
+
+            Component.onCompleted: currentIndex = indexOfValue(control.value)
         }
     }
 
@@ -136,7 +184,20 @@ Control
                     Array.prototype.map.call(attribute.enumeration.items,
                         text => ({"text": text, "value": text})))
             }
-            onActivated: valueChanged(currentValue)
+
+            Connections
+            {
+                target: control
+                function onValueChanged() { currentIndex = indexOfValue(control.value) }
+            }
+
+            onActivated:
+            {
+                control.value = value
+                control.editingFinished()
+            }
+
+            Component.onCompleted: currentIndex = indexOfValue(control.value)
         }
     }
 
@@ -178,6 +239,8 @@ Control
 
     contentItem: Loader
     {
+        id: loader
+
         sourceComponent: calculateComponent()
     }
 

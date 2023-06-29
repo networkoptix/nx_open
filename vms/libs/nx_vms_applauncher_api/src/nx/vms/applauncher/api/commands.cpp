@@ -2,6 +2,7 @@
 
 #include "commands.h"
 
+#include <nx/build_info.h>
 #include <nx/utils/ipc/named_pipe_socket.h>
 #include <nx/utils/log/log.h>
 
@@ -23,9 +24,12 @@ ResultType sendCommandToApplauncher(
     SystemError::ErrorCode resultCode = sock.connectToServerSync(pipeName.toStdString());
     if (resultCode != SystemError::noError)
     {
-        NX_WARNING(NX_SCOPE_TAG, nx::format("Failed to connect to local server %1. %2").args(
-            pipeName,
-            SystemError::toString(resultCode)));
+        if (nx::build_info::publicationType() != nx::build_info::PublicationType::local)
+        {
+            NX_WARNING(NX_SCOPE_TAG, "Failed to connect to local server %1. %2",
+                pipeName,
+                SystemError::toString(resultCode));
+        }
         return ResultType::connectError;
     }
 
@@ -34,9 +38,9 @@ ResultType sendCommandToApplauncher(
     resultCode = sock.write(serializedTask.data(), serializedTask.size(), &bytesWritten);
     if (resultCode != SystemError::noError)
     {
-        NX_WARNING(NX_SCOPE_TAG, nx::format("Failed to send launch task to local server %1. %2").args(
+        NX_WARNING(NX_SCOPE_TAG, "Failed to send launch task to local server %1. %2",
             launcherPipeName(),
-            SystemError::toString(resultCode)));
+            SystemError::toString(resultCode));
         return ResultType::connectError;
     }
 
@@ -45,9 +49,9 @@ ResultType sendCommandToApplauncher(
     resultCode = sock.read(buf, sizeof(buf), &bytesRead, timeoutMs);
     if (resultCode != SystemError::noError)
     {
-        NX_WARNING(NX_SCOPE_TAG, nx::format("Failed to read response from local server %1. %2").args(
+        NX_WARNING(NX_SCOPE_TAG, "Failed to read response from local server %1. %2",
             launcherPipeName(),
-            SystemError::toString(resultCode)));
+            SystemError::toString(resultCode));
         return ResultType::connectError;
     }
 
