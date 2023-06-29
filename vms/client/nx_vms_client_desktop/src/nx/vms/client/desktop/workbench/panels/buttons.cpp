@@ -124,34 +124,4 @@ QnImageButtonWidget* newPinTimelineButton(
     return button;
 }
 
-QnImageButtonWidget* newPinButton(
-    QGraphicsItem* parent,
-    QnWorkbenchContext* context,
-    action::IDType actionId,
-    bool smallIcon)
-{
-    NX_ASSERT(context);
-    const auto action = context->menu()->action(actionId);
-
-    QnImageButtonWidget* button = new QnImageButtonWidget(parent);
-    statisticsModule()->controls()->registerButton(
-        alias(action),
-        button);
-
-    if (action)
-        button->setDefaultAction(action);
-    else
-        button->setCheckable(true);
-
-    if (smallIcon)
-        button->setIcon(qnSkin->icon("panel/pin_small.png", "panel/unpin_small.png"));
-    else
-        button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
-
-    button->setFixedSize(core::Skin::maximumSize(button->icon()));
-
-    setHelpTopic(button, Qn::MainWindow_Pin_Help);
-    return button;
-}
-
 } //namespace nx::vms::client::desktop

@@ -32,10 +32,4 @@ QnImageButtonWidget* newPinTimelineButton(
     QnWorkbenchContext* context,
     nx::vms::client::desktop::ui::action::IDType actionId);
 
-QnImageButtonWidget* newPinButton(
-    QGraphicsItem* parent,
-    QnWorkbenchContext* context,
-    nx::vms::client::desktop::ui::action::IDType actionId,
-    bool smallIcon = false);
-
 } //namespace nx::vms::client::desktop
