@@ -59,7 +59,7 @@ set(traytool.name "${customization.vmsName} Tray Assistant")
 set(mediaserver.display.name "${customization.vmsName} Media Server")
 set(testcamera.name "${customization.companyName} ${customization.vmsName} Test Camera")
 
-set(quick_start_guide_file_name "quick_start_guide.pdf")
+set(quick_start_guide_file_name "quick-start-guide.pdf")
 set(quick_start_guide_document_name "Quick Start Guide")
 set(quick_start_guide_shortcut_name "${customization.vmsName} - ${quick_start_guide_document_name}")
 

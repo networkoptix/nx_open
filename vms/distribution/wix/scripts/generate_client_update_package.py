@@ -122,7 +122,7 @@ def create_client_update_file(config, output_file):
         qt_plugins_dir = os.path.join(qt_directory, 'plugins')
         tools.zip_files_to(zip, tools.qt_plugins_files(qt_plugins_dir, qt_plugins), qt_plugins_dir)
 
-        tools.zip_rdep_package_to(zip, config['help_directory'])
+        tools.zip_all_files(zip, config['help_directory'])
         tools.zip_rdep_package_to(zip, config['ucrt_directory'])
         tools.zip_all_files(zip, config['vcrt_directory'])
         tools.zip_rdep_package_to(zip, config['fonts_directory'])
