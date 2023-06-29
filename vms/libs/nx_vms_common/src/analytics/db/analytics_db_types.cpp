@@ -106,6 +106,7 @@ ObjectTrackEx::ObjectTrackEx(const ObjectTrack& data)
     objectPosition = data.objectPosition;
     bestShot = data.bestShot;
     analyticsEngineId = data.analyticsEngineId;
+    storageId = data.storageId;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Image, (json)(ubjson), Image_analytics_storage_Fields)
@@ -178,6 +179,9 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track,
     Options options) const
 {
     using namespace std::chrono;
+
+    if (!storageId.empty() && track.storageId != storageId)
+        return false;
 
     if (!objectTrackId.isNull() && track.id != objectTrackId)
         return false;
@@ -272,7 +276,8 @@ bool Filter::operator==(const Filter& right) const
         && timePeriod == right.timePeriod
         && freeText == right.freeText
         && sortOrder == right.sortOrder
-        && deviceIds == right.deviceIds;
+        && deviceIds == right.deviceIds
+        && storageId == right.storageId;
 }
 
 bool Filter::operator!=(const Filter& right) const
@@ -318,6 +323,9 @@ void serializeToParams(const Filter& filter, nx::network::rest::Params* params)
 
     if (filter.needFullTrack)
         params->insert(lit("needFullTrack"), "true");
+
+    if (!filter.storageId.empty())
+        params->insert("storageId", filter.storageId);
 
     params->insert("sortOrder", nx::reflect::toString(filter.sortOrder));
 }
@@ -434,6 +442,9 @@ bool deserializeFromParams(
     if (params.contains(lit("limit")))
         filter->maxObjectTracksToSelect = params.value(lit("limit")).toInt();
 
+    if (params.contains("storageId"))
+        filter->storageId = params.value("storageId").toStdString();
+
     if (params.contains(lit("maxObjectsToSelect")))
         filter->maxObjectTracksToSelect = params.value(lit("maxObjectsToSelect")).toInt();
 
@@ -458,6 +469,8 @@ bool deserializeFromParams(
 
 ::std::ostream& operator<<(::std::ostream& os, const Filter& filter)
 {
+    if (!filter.storageId.empty())
+        os << "storageId " << filter.storageId << "; ";
     for (const auto& deviceId: filter.deviceIds)
         os << "deviceId " << deviceId.toSimpleString().toStdString() << "; ";
     if (!filter.objectTypeId.empty())
