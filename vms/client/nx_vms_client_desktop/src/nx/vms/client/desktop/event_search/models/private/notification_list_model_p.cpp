@@ -762,7 +762,12 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     eventData.level = QnNotificationLevel::Value::CriticalNotification;
 
     eventData.extraAction = CommandActionPtr(new CommandAction());
-    eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge.png"));
+
+    static const QColor kBasicColor = "#A5B7C0";
+    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+        {QnIcon::Normal, {{kBasicColor, "light10"}}},
+    }; 
+    eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge_24.svg", kIconSubstitutions));
     eventData.extraAction->setText(tr("Acknowledge"));
 
     // TODO: #sivanov Fix hardcoded action parameters.
