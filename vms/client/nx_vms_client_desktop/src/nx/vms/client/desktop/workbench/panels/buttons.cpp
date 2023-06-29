@@ -3,6 +3,7 @@
 #include "buttons.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
@@ -26,6 +27,25 @@ QString alias(action::Action* action)
 {
     return QnLexical::serialized(action->id());
 }
+
+// TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin is ready
+static const QColor kBasePrimaryColor = "#6F8694"; // ~light16
+static const QColor kBackgroundColor = "#263137"; // dark8
+
+const core::SvgIconColorer::IconSubstitutions kSlideIconSubstitutions = {
+    { QnIcon::Normal, {
+        { kBasePrimaryColor, "light16"},
+        { kBackgroundColor, "dark8"}
+    }},
+    { QnIcon::Selected, { // Pressed
+        { kBasePrimaryColor, "light15"},
+        { kBackgroundColor, "dark7" },
+    }},
+    { QnIcon::Active, { // Hovered
+        { kBasePrimaryColor, "light17"},
+        { kBackgroundColor, "dark9" },
+    }},
+};
 
 } //namespace
 
@@ -72,7 +92,8 @@ T* newCustomShowHideButton(
     else
         button->setCheckable(true);
 
-    button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
+    button->setIcon(qnSkin->icon(
+        "panel/slide_right_12x32.svg", kSlideIconSubstitutions, "panel/slide_left_12x32.svg"));
     button->setFixedSize(core::Skin::maximumSize(button->icon()));
 
     button->setProperty(Qn::NoHandScrollOver, true);
@@ -114,7 +135,7 @@ QnImageButtonWidget* newPinTimelineButton(
     if (action)
         button->setDefaultAction(action);
 
-    button->setIcon(qnSkin->icon("panel/slide_pin_left.png"));
+    button->setIcon(qnSkin->icon("panel/pin_12x32.svg", kSlideIconSubstitutions));
     button->setFixedSize(core::Skin::maximumSize(button->icon()));
 
     button->setProperty(Qn::NoHandScrollOver, true);

@@ -2,30 +2,29 @@
 
 #include "search_edit.h"
 
-#include <QtGui/QPainter>
-#include <QtGui/QFocusEvent>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QLabel>
 #include <QtGui/QAction>
-#include <QtWidgets/QLineEdit>
+#include <QtGui/QFocusEvent>
+#include <QtGui/QPainter>
 #include <QtWidgets/QCompleter>
-#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QVBoxLayout>
 
-#include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/style/helper.h>
-#include <ui/workaround/widgets_signals_workaround.h>
-#include <ui/workaround/hidpi_workarounds.h>
-#include <ui/common/palette.h>
-
-#include <utils/common/scoped_value_rollback.h>
-#include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/utils/app_info.h>
-#include <utils/math/color_transformations.h>
-#include <utils/common/event_processors.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/icon.h>
+#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <ui/common/palette.h>
+#include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/common/delayed.h>
-#include "nx/vms/client/core/skin/icon.h"
+#include <utils/common/event_processors.h>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/math/color_transformations.h>
 
 namespace {
 
