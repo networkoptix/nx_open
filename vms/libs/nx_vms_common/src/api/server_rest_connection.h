@@ -127,6 +127,7 @@ class NX_VMS_COMMON_API ServerConnection:
     public QObject,
     public ServerConnectionBase
 {
+public:
     using Timeouts = nx::network::http::AsyncClient::Timeouts;
     using AbstractCertificateVerifier = nx::vms::common::AbstractCertificateVerifier;
 
@@ -390,7 +391,8 @@ public:
         QnUuid serverId,
         const nx::vms::api::rules::EventLogFilter& filter,
         Result<ErrorOrData<nx::vms::api::rules::EventLogRecordList>>::type callback,
-        QThread* targetThread = nullptr);
+        QThread* targetThread = nullptr,
+        std::optional<Timeouts> timeouts = std::nullopt);
 
     /* Get camera credentials. */
     Handle getCameraCredentials(
@@ -1022,7 +1024,8 @@ private:
         const nx::network::rest::Params& params,
         CallbackType callback,
         QThread* targetThread,
-        std::optional<QnUuid> proxyToServer = {});
+        std::optional<QnUuid> proxyToServer = {},
+        std::optional<Timeouts> timeouts = std::nullopt);
 
     template <typename ResultType> Handle executePost(
         const QString& path,

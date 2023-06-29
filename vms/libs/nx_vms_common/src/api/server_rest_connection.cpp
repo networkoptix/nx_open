@@ -1180,7 +1180,8 @@ Handle ServerConnection::eventLog(
     QnUuid serverId,
     const nx::vms::api::rules::EventLogFilter& filter,
     Result<ErrorOrData<nx::vms::api::rules::EventLogRecordList>>::type callback,
-    QThread* targetThread)
+    QThread* targetThread,
+    std::optional<Timeouts> timeouts)
 {
     QJsonValue value;
     QJson::serialize(filter, &value);
@@ -1192,7 +1193,9 @@ Handle ServerConnection::eventLog(
         NX_FMT("rest/v3/servers/%1/eventLog", formatRestId(serverId)),
         params,
         std::move(callback),
-        targetThread);
+        targetThread,
+        /*proxyToServer*/{},
+        timeouts);
 }
 
 Handle ServerConnection::getCameraCredentials(
@@ -2209,14 +2212,15 @@ Handle ServerConnection::executeGet(
     const nx::network::rest::Params& params,
     CallbackType callback,
     QThread* targetThread,
-    std::optional<QnUuid> proxyToServer)
+    std::optional<QnUuid> proxyToServer,
+    std::optional<Timeouts> timeouts)
 {
     auto request = this->prepareRequest(nx::network::http::Method::get, prepareUrl(path, params));
     if (proxyToServer)
         proxyRequestUsingServer(request, *proxyToServer);
 
     auto handle = request.isValid()
-        ? this->executeRequest(request, std::move(callback), targetThread)
+        ? this->executeRequest(request, std::move(callback), targetThread, timeouts)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);

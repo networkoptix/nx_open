@@ -89,14 +89,7 @@ QVariantMap BasicEvent::details(common::SystemContext* context) const
 
 QString BasicEvent::name(common::SystemContext* context) const
 {
-    const auto engine = context->vmsRulesEngine();
-    if (NX_ASSERT(engine))
-    {
-        if (const auto descriptor = engine->eventDescriptor(type()))
-            return descriptor->displayName;
-    }
-
-    return tr("Unknown event");
+    return utils::StringHelper(context).eventName(type());
 }
 
 QString BasicEvent::extendedCaption(common::SystemContext* context) const

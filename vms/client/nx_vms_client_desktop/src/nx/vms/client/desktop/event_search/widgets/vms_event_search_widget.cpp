@@ -30,6 +30,7 @@
 #include <nx/vms/rules/events/analytics_event.h>
 #include <nx/vms/rules/group.h>
 #include <nx/vms/rules/manifest.h>
+#include <nx/vms/rules/utils/string_helper.h>
 #include <nx/vms/rules/utils/type.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -187,19 +188,18 @@ QMenu* VmsEventSearchWidget::Private::createEventGroupMenu(const Group& group)
         {kServerIssueEventGroup, tr("Server events")},
     };
 
-    const auto engine = q->context()->systemContext()->vmsRulesEngine();
+    const auto stringHelper = rules::utils::StringHelper(q->systemContext());
     auto result = q->createDropdownMenu();
 
     addMenuAction(result, group.name, QString::fromStdString(group.id));
     result->addSeparator();
 
-    for (const auto& eventId: group.items)
+    for (const auto& eventType: group.items)
     {
-        auto eventAction =
-            addMenuAction(result, engine->eventDescriptor(eventId)->displayName, eventId);
+        auto eventAction = addMenuAction(result, stringHelper.eventName(eventType), eventType);
 
         // Creating analytics events submenu for active event types.
-        if (eventId == rules::utils::type<AnalyticsEvent>())
+        if (eventType == rules::utils::type<AnalyticsEvent>())
         {
             m_analyticsEventsSingleAction = eventAction;
 

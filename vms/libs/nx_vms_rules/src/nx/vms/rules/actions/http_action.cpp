@@ -9,6 +9,7 @@
 #include "../action_builder_fields/password_field.h"
 #include "../action_builder_fields/text_field.h"
 #include "../action_builder_fields/text_with_fields.h"
+#include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -78,6 +79,14 @@ QString HttpAction::password() const
 void HttpAction::setPassword(const QString& password)
 {
     m_password = password;
+}
+
+QVariantMap HttpAction::details(common::SystemContext* context) const
+{
+    auto result = BasicAction::details(context);
+    result[utils::kDestinationDetailName] = QUrl(url()).toString(QUrl::RemoveUserInfo);
+
+    return result;
 }
 
 } // namespace nx::vms::rules

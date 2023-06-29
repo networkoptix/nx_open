@@ -24,4 +24,12 @@ bool isLoggingAllowed(const ItemDescriptor& descriptor, const ItemPtr& item)
     return true;
 }
 
+inline bool aggregateByType(
+    const ItemDescriptor& eventDescriptor,
+    const ItemDescriptor& actionDescriptor)
+{
+    return actionDescriptor.flags.testFlag(ItemFlag::aggregationByTypeSupported)
+        && eventDescriptor.flags.testFlag(ItemFlag::aggregationByTypeSupported);
+}
+
 } // namespace nx::vms::rules::utils

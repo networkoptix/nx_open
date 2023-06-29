@@ -7,6 +7,7 @@
 #include "../action_builder_fields/target_device_field.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
+#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -38,6 +39,14 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
 ShowOnAlarmLayoutAction::ShowOnAlarmLayoutAction()
 {
     setLevel(nx::vms::event::Level::critical);
+}
+
+QVariantMap ShowOnAlarmLayoutAction::details(common::SystemContext* context) const
+{
+    auto result = BasicAction::details(context);
+    result.insert(utils::kDestinationDetailName, utils::StringHelper(context).subjects(users()));
+
+    return result;
 }
 
 } // namespace nx::vms::rules

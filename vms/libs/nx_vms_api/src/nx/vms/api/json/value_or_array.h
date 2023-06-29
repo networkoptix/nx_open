@@ -16,6 +16,11 @@ struct ValueOrArray
 {
     ValueOrArray() = default;
 
+    ValueOrArray(T value)
+    {
+        valueOrArray.push_back(std::move(value));
+    }
+
     ValueOrArray(std::initializer_list<T> init):
         valueOrArray(std::move(init))
     {}

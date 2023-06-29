@@ -6,9 +6,11 @@
 
 #include <QtCore/QSet>
 
+#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -44,6 +46,24 @@ void getUsersAndGroups(
 
     for (const auto& group: groups)
         groupIds.push_back(group.id);
+}
+
+template<class IdList>
+QnUserResourceSet allUsers(SystemContext* context, const IdList& ids)
+{
+    QnUserResourceList users;
+    QnUuidList groupIds;
+    nx::vms::common::getUsersAndGroups(context, ids, users, groupIds);
+
+    auto result = nx::utils::toQSet(users);
+
+    const auto groupUsers = context->accessSubjectHierarchy()->usersInGroups(
+        nx::utils::toQSet(groupIds));
+
+    for (const auto& user: groupUsers)
+        result.insert(user);
+
+    return result;
 }
 
 template<class IdList>

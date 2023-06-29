@@ -155,3 +155,8 @@ QDate QnDateRangeWidget::displayDate(qint64 timestampMs) const
     const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
     return timeWatcher->displayTime(timestampMs).date();
 }
+
+QnTimePeriod QnDateRangeWidget::period() const
+{
+    return QnTimePeriod::fromInterval(startTimeMs(), endTimeMs());
+}

@@ -484,6 +484,19 @@ EventPtr Engine::cloneEvent(const EventPtr& event) const
     return result;
 }
 
+ActionPtr Engine::buildAction(const EventData& data) const
+{
+    const QString type = data.value(utils::kType).toString();
+    const auto ctor = m_actionTypes.value(type);
+    if (!NX_ASSERT(ctor, "Unregistered action constructor: %1", type))
+        return {};
+
+    auto action = ActionPtr(ctor());
+    deserializeProperties(data, action.get());
+
+    return action;
+}
+
 ActionPtr Engine::cloneAction(const ActionPtr& action) const
 {
     if (!NX_ASSERT(action))

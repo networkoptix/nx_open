@@ -142,6 +142,7 @@ T getFieldValue(const E& event, const char* fieldName, T&& defaultValue = T())
     return value.value<T>();
 }
 
+// TODO: #amalov Consider moving to resource.h.
 NX_VMS_RULES_API QnUuidList getDeviceIds(const AggregatedEventPtr& event);
 NX_VMS_RULES_API QnUuidList getResourceIds(const AggregatedEventPtr& event);
 NX_VMS_RULES_API QnUuidList getResourceIds(const ActionPtr& action);

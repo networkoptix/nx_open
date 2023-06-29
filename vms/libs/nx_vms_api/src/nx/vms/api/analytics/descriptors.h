@@ -12,19 +12,9 @@
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/manifest_items.h>
 
-namespace nx::vms::api::analytics {
+#include "descriptors_fwd.h"
 
-using PluginId = QString;
-using EngineId = QnUuid;
-using GroupId = QString;
-using EventTypeId = QString;
-using ObjectTypeId = QString;
-using ActionTypeId = QString;
-using EnumTypeId = QString;
-using ColorTypeId = QString;
-using DeviceId = QnUuid;
-using ManifestItemId = QString;
-using AttributeListId = QString;
+namespace nx::vms::api::analytics {
 
 struct DescriptorScope
 {

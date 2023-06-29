@@ -10,6 +10,8 @@ namespace Ui {
 class DateRangeWidget;
 }
 
+struct QnTimePeriod;
+
 /**
  *  Class allows to select date range and automatically converts it to UTC, concerning selected
  *  time mode and using server time if needed.
@@ -25,7 +27,9 @@ public:
     /** Selected UTC date range in milliseconds since epoch. */
     qint64 startTimeMs() const;
     qint64 endTimeMs() const;
+
     void setRange(qint64 startTimeMs, qint64 endTimeMs);
+    QnTimePeriod period() const;
 
     /** Selected date range in system time spec. */
     QDate startDate() const;

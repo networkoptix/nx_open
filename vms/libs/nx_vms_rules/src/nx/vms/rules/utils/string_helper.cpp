@@ -16,7 +16,13 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
+#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/time/formatter.h>
+
+#include "../engine.h"
+#include "../field_types.h"
+#include "../manifest.h"
 
 namespace {
 
@@ -176,6 +182,50 @@ QString StringHelper::urlForCamera(
     const nx::utils::Url url = builder.toUrl();
     NX_ASSERT(url.isValid());
     return url.toWebClientStandardViolatingUrl();
+}
+
+QString StringHelper::subjects(const UuidSelection& selection) const
+{
+    if (selection.all)
+        return tr("All users");
+
+    // TODO: #amalov Remove dependency;
+    nx::vms::event::StringsHelper oldHelper(systemContext());
+    QnUserResourceList users;
+    nx::vms::api::UserGroupDataList groups;
+    nx::vms::common::getUsersAndGroups(systemContext(), selection.ids, users, groups);
+
+    const int numDeleted = int(selection.ids.size()) - (users.size() + groups.size());
+    NX_ASSERT(numDeleted >= 0);
+    if (numDeleted <= 0)
+        return oldHelper.actionSubjects(users, groups);
+
+    const QString removedSubjectsText = tr("%n Removed subjects", "", numDeleted);
+    return groups.empty() && users.empty()
+        ? removedSubjectsText
+        : oldHelper.actionSubjects(users, groups, false) + ", " + removedSubjectsText;
+}
+
+QString StringHelper::eventName(const QString& type) const
+{
+    if (const auto engine = systemContext()->vmsRulesEngine(); NX_ASSERT(engine))
+    {
+        if (const auto descriptor = engine->eventDescriptor(type))
+            return descriptor->displayName;
+    }
+
+    return tr("Unknown event");
+}
+
+QString StringHelper::actionName(const QString& type) const
+{
+    if (const auto engine = systemContext()->vmsRulesEngine(); NX_ASSERT(engine))
+    {
+        if (const auto descriptor = engine->actionDescriptor(type))
+            return descriptor->displayName;
+    }
+
+    return tr("Unknown action");
 }
 
 } // namespace nx::vms::rules::utils

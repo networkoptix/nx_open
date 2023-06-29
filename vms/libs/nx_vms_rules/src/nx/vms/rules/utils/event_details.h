@@ -22,6 +22,7 @@ static constexpr auto kCountDetailName = "count";
 static constexpr auto kCustomIconDetailName = "customIcon";
 // Keep in sync with StringHelper::notificationDescription().
 static constexpr auto kDescriptionDetailName = "description";
+static constexpr auto kDestinationDetailName = "destination";
 // Keep in sync with StringsHelper::eventDetails().
 static constexpr auto kDetailingDetailName = "detailing";
 static constexpr auto kEmailTemplatePathDetailName = "emailTemplate";

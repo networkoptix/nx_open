@@ -8,11 +8,15 @@
 #include <QtQml/QQmlEngine>
 
 #include <api/server_rest_connection.h>
+#include <core/resource/camera_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/lookup_list_data.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
+#include <nx/vms/client/desktop/event_search/dialogs/event_log_dialog.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
+#include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 
@@ -23,7 +27,8 @@ namespace nx::vms::client::desktop::rules {
 struct VmsRulesActionHandler::Private
 {
     VmsRulesActionHandler* const q;
-    std::unique_ptr<VmsRulesDialog> dialog;
+    std::unique_ptr<VmsRulesDialog> rulesDialog;
+    QPointer<EventLogDialog> eventLogDialog;
     std::optional<rest::Handle> requestId;
 
     void cancelRequest()
@@ -36,8 +41,8 @@ struct VmsRulesActionHandler::Private
 
     void handleError(const QString& text)
     {
-        if (dialog)
-            dialog->setError(text);
+        if (rulesDialog)
+            rulesDialog->setError(text);
     }
 
     void initialiseLookupLists()
@@ -118,11 +123,11 @@ VmsRulesActionHandler::VmsRulesActionHandler(QObject* parent):
             dialog->exec(Qt::ApplicationModal);
         });
 
-    connect(
-        action(ui::action::OpenEventRulesDialogAction),
-        &QAction::triggered,
-        this,
-        &VmsRulesActionHandler::openVmsRulesDialog);
+    connect(action(ui::action::OpenVmsRulesDialogAction), &QAction::triggered,
+        this, &VmsRulesActionHandler::openVmsRulesDialog);
+
+    connect(action(ui::action::OpenEventLogAction), &QAction::triggered,
+        this, &VmsRulesActionHandler::openEventLogDialog);
 }
 
 VmsRulesActionHandler::~VmsRulesActionHandler()
@@ -132,12 +137,39 @@ VmsRulesActionHandler::~VmsRulesActionHandler()
 
 void VmsRulesActionHandler::openVmsRulesDialog()
 {
-    d->dialog = std::make_unique<VmsRulesDialog>(systemContext(), mainWindowWidget());
+    d->rulesDialog = std::make_unique<VmsRulesDialog>(systemContext(), mainWindowWidget());
 
     d->initialiseLookupLists();
 
-    d->dialog->exec(Qt::ApplicationModal);
-    d->dialog.reset();
+    d->rulesDialog->exec(Qt::ApplicationModal);
+    d->rulesDialog.reset();
+}
+
+void VmsRulesActionHandler::openEventLogDialog()
+{
+    QnNonModalDialogConstructor<EventLogDialog> dialogConstructor(d->eventLogDialog, mainWindowWidget());
+
+    const auto parameters = menu()->currentParameters(sender());
+    const auto eventType = parameters.argument(Qn::EventTypeRole, QString());
+    const auto actionType = parameters.argument(Qn::ActionTypeRole, QString());
+    const auto eventDevices = parameters.resources().filtered<QnVirtualCameraResource>();
+
+    if (!eventType.isEmpty() || !actionType.isEmpty() || !eventDevices.isEmpty())
+    {
+        const auto now = QDateTime::currentMSecsSinceEpoch();
+        QnUuidSet eventDeviceIds;
+        for (const auto& device: eventDevices)
+            eventDeviceIds.insert(device->getId());
+
+        d->eventLogDialog->disableUpdateData();
+
+        d->eventLogDialog->setDateRange(now, now);
+        d->eventLogDialog->setEventType(eventType);
+        d->eventLogDialog->setActionType(actionType);
+        d->eventLogDialog->setEventDevices(eventDeviceIds);
+
+        d->eventLogDialog->enableUpdateData();
+    }
 }
 
 } // namespace nx::vms::client::desktop::rules

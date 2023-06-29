@@ -28,6 +28,7 @@
 #include "engine.h"
 #include "rule.h"
 #include "utils/action.h"
+#include "utils/common.h"
 #include "utils/event.h"
 #include "utils/field.h"
 
@@ -419,9 +420,7 @@ void ActionBuilder::processEvent(const EventPtr& event)
         return;
     }
 
-    const bool aggregateByType =
-        actionDescriptor->flags.testFlag(ItemFlag::aggregationByTypeSupported)
-        && eventDescriptor->flags.testFlag(ItemFlag::aggregationByTypeSupported);
+    const bool aggregateByType = utils::aggregateByType(*eventDescriptor, *actionDescriptor);
 
     static const auto aggregationKey = [](const EventPtr& e) { return e->aggregationKey(); };
     static const auto eventType = [](const EventPtr& e) { return e->type(); };
