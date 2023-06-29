@@ -48,7 +48,7 @@ static QnSmtpPresets smtpServerPresetPresets;
 static bool smtpInitialized = false;
 
 QnEmailSmtpServerPreset::QnEmailSmtpServerPreset():
-    connectionType(QnEmail::ConnectionType::unsecure),
+    connectionType(QnEmail::ConnectionType::insecure),
     port(kAutoPort)
 {}
 
@@ -62,11 +62,8 @@ QnEmailSmtpServerPreset::QnEmailSmtpServerPreset(
     port(port)
 {}
 
-QnEmailSettings::QnEmailSettings():
-    connectionType(QnEmail::ConnectionType::unsecure),
-    port(kAutoPort),
-    timeout(kDefaultSmtpTimeout)
-{}
+QnEmailSettings::QnEmailSettings(const nx::vms::api::EmailSettings& settings):
+    nx::vms::api::EmailSettings(settings){}
 
 int QnEmailSettings::defaultTimeoutSec()
 {
@@ -198,5 +195,4 @@ void QnEmailAddress::initSmtpPresets() const
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnEmailSmtpServerPreset, (json), QnEmailSmtpServerPreset_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnEmailSettings, (json), QnEmailSettings_Fields)
 

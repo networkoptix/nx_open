@@ -12,6 +12,7 @@
 #include <nx/branding.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/backup_settings.h>
+#include <nx/vms/api/data/email_settings.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/system_settings.h>
@@ -108,63 +109,17 @@ bool SystemSettings::isInitialized() const
 
 SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
 {
-    m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "smtpHost", QString(), this, [] { return tr("SMTP host"); });
+    m_emailSettingsAdaptor = new QnJsonResourcePropertyAdaptor<nx::vms::api::EmailSettings>(
+        "emailSettings", nx::vms::api::EmailSettings{}, this, [] { return tr("SMTP settings"); });
 
-    m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "emailFrom", QString(), this, [] { return tr("Email from"); });
+    connect(
+        m_emailSettingsAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::emailSettingsChanged,
+        Qt::QueuedConnection);
 
-    m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "smtpUser", QString(), this, [] { return tr("SMTP user"); });
-
-    m_smtpPasswordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::smtpPassword, QString(), this, [] { return tr("SMTP password"); });
-
-    m_signatureAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "emailSignature", QString(), this, [] { return tr("Email signature"); });
-
-    m_supportLinkAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "emailSupportEmail", nx::branding::supportAddress(), this,
-        [] { return tr("Email support link"); });
-
-    m_connectionTypeAdaptor = new QnReflectLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(
-        "smtpConnectionType", QnEmail::ConnectionType::unsecure, this,
-        [] { return tr("SMTP connection type"); });
-
-    m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        "smtpPort", QnEmailSettings::defaultPort(m_connectionTypeAdaptor->value()), this,
-        [] { return tr("SMTP port"); });
-
-    m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        "smtpTimeout", QnEmailSettings::defaultTimeoutSec(), this, [] { return tr("SMTP timeout (seconds)"); });
-
-    m_smtpNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "smtpName", QString(), this, [] { return tr("SMTP name"); });
-
-    AdaptorList result;
-    result
-        << m_serverAdaptor
-        << m_fromAdaptor
-        << m_userAdaptor
-        << m_smtpPasswordAdaptor
-        << m_signatureAdaptor
-        << m_supportLinkAdaptor
-        << m_connectionTypeAdaptor
-        << m_portAdaptor
-        << m_timeoutAdaptor
-        << m_smtpNameAdaptor;
-
-    for (auto adaptor: result)
-    {
-        connect(
-            adaptor,
-            &QnAbstractResourcePropertyAdaptor::valueChanged,
-            this,
-            &SystemSettings::emailSettingsChanged,
-            Qt::QueuedConnection);
-    }
-
-    return result;
+    return {m_emailSettingsAdaptor};
 }
 
 SystemSettings::AdaptorList SystemSettings::initStaticticsAdaptors()
@@ -1292,35 +1247,12 @@ void SystemSettings::setLdap(const nx::vms::api::LdapSettings& settings)
 
 QnEmailSettings SystemSettings::emailSettings() const
 {
-    QnEmailSettings result;
-    result.server = m_serverAdaptor->value();
-    result.email = m_fromAdaptor->value();
-    result.port = m_portAdaptor->value();
-    result.user = m_userAdaptor->value();
-    result.password = m_smtpPasswordAdaptor->value();
-    result.connectionType = m_connectionTypeAdaptor->value();
-    result.signature = m_signatureAdaptor->value();
-    result.supportEmail = m_supportLinkAdaptor->value();
-    result.timeout = m_timeoutAdaptor->value();
-    result.name = m_smtpNameAdaptor->value();
-    return result;
+    return m_emailSettingsAdaptor->value();
 }
 
-void SystemSettings::setEmailSettings(const QnEmailSettings& settings, bool savePassword)
+void SystemSettings::setEmailSettings(const QnEmailSettings& emailSettings)
 {
-    m_serverAdaptor->setValue(settings.server);
-    m_fromAdaptor->setValue(settings.email);
-    m_portAdaptor->setValue(settings.port);
-    m_userAdaptor->setValue(settings.user);
-    if (!settings.isValid())
-        m_smtpPasswordAdaptor->setValue(QString());
-    else if (savePassword)
-        m_smtpPasswordAdaptor->setValue(settings.password);
-    m_connectionTypeAdaptor->setValue(settings.connectionType);
-    m_signatureAdaptor->setValue(settings.signature);
-    m_supportLinkAdaptor->setValue(settings.supportEmail);
-    m_timeoutAdaptor->setValue(settings.timeout);
-    m_smtpNameAdaptor->setValue(settings.name);
+    m_emailSettingsAdaptor->setValue(static_cast<nx::vms::api::EmailSettings>(emailSettings));
 }
 
 void SystemSettings::synchronizeNow()
@@ -2233,16 +2165,7 @@ void SystemSettings::update(const vms::api::SystemSettings& value)
     m_useStorageEncryptionAdaptor->setValue(value.storageEncryption);
     m_showServersInTreeForNonAdminsAdaptor->setValue(value.showServersInTreeForNonAdmins);
     m_updateNotificationsEnabledAdaptor->setValue(value.updateNotificationsEnabled);
-    m_serverAdaptor->setValue(value.smtpHost);
-    m_fromAdaptor->setValue(value.emailFrom);
-    m_userAdaptor->setValue(value.smtpUser);
-    m_smtpPasswordAdaptor->setValue(value.smtpPassword);
-    m_signatureAdaptor->setValue(value.emailSignature);
-    m_supportLinkAdaptor->setValue(value.emailSupportEmail);
-    m_connectionTypeAdaptor->setValue(value.smtpConnectionType);
-    m_portAdaptor->setValue(value.smtpPort);
-    m_timeoutAdaptor->setValue(value.smtpTimeout);
-    m_smtpNameAdaptor->setValue(value.smtpName);
+    m_emailSettingsAdaptor->setValue(value.emailSettings);
     m_useCloudServiceToSendEmailAdaptor->setValue(value.useCloudServiceToSendEmail);
     m_timeSynchronizationEnabledAdaptor->setValue(value.timeSynchronizationEnabled);
     m_primaryTimeServerAdaptor->setValue(value.primaryTimeServer);

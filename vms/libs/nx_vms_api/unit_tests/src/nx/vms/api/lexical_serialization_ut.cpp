@@ -115,8 +115,8 @@ TEST(Lexical, peerType)
 
 TEST(Lexical, smtpConnectionType)
 {
-    EXPECT_EQ("Unsecure", nx::reflect::toString(ConnectionType::unsecure));
-    EXPECT_EQ(ConnectionType::unsecure, nx::reflect::fromString<ConnectionType>("Unsecure"));
+    EXPECT_EQ("insecure", nx::reflect::toString(ConnectionType::insecure));
+    EXPECT_EQ(ConnectionType::insecure, nx::reflect::fromString<ConnectionType>("insecure"));
 }
 
 // Compatibility with version < 5.0.

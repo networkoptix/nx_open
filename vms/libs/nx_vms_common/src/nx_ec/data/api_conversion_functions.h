@@ -8,7 +8,6 @@
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
-#include <nx/vms/api/data/email_settings_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/license_data.h>
@@ -68,13 +67,6 @@ NX_VMS_COMMON_API void fromResourceToApi(
 NX_VMS_COMMON_API void fromResourceListToApi(
     const QnVirtualCameraResourceList& src,
     nx::vms::api::CameraDataExList& dst);
-
-NX_VMS_COMMON_API void fromResourceToApi(
-    const QnEmailSettings& src,
-    nx::vms::api::EmailSettingsData& dst);
-NX_VMS_COMMON_API void fromApiToResource(
-    const nx::vms::api::EmailSettingsData& src,
-    QnEmailSettings& dst);
 
 NX_VMS_COMMON_API void fromApiToResource(
     const nx::vms::api::LayoutItemData& src,

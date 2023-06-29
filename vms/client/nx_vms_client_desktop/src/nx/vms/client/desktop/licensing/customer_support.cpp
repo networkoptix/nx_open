@@ -102,7 +102,7 @@ ContactAddress::ContactAddress(const QString& address):
 
 CustomerSupport::CustomerSupport(SystemContext* systemContext):
     CustomerSupport(
-        systemContext->globalSettings()->emailSettings().supportEmail,
+        systemContext->globalSettings()->emailSettings().supportAddress,
         systemContext->licensePool()->getLicenses())
 {
 }

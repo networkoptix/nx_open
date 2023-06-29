@@ -25,7 +25,6 @@
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
-#include <nx/vms/api/data/email_settings_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/license_data.h>
@@ -244,26 +243,6 @@ void fromResourceListToApi(
         dst.push_back(CameraDataEx());
         fromResourceToApi(srcCamera, dst.back());
     }
-}
-
-void fromResourceToApi(const QnEmailSettings& src, EmailSettingsData& dst)
-{
-    dst.host = src.server;
-    dst.port = src.port;
-    dst.user = src.user;
-    dst.from = src.email;
-    dst.password = src.password;
-    dst.connectionType = src.connectionType;
-}
-
-void fromApiToResource(const EmailSettingsData& src, QnEmailSettings& dst)
-{
-    dst.server = src.host;
-    dst.port = src.port;
-    dst.user = src.user;
-    dst.email = src.from;
-    dst.password = src.password;
-    dst.connectionType = src.connectionType;
 }
 
 void fromApiToResource(const LayoutItemData& src, nx::vms::common::LayoutItemData& dst)
