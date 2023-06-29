@@ -4,12 +4,12 @@
 
 #include <array>
 
+#include <QtGui/QColor>
 #include <QtWidgets/QGraphicsScene>
 
-#include <ui/graphics/items/generic/clickable_widgets.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
-
+#include <ui/graphics/items/generic/clickable_widgets.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -255,8 +255,12 @@ void QnIoModuleFormOverlayContentsPrivate::OutputPortItem::paint(QPainter* paint
     auto labelRect = buttonRect.adjusted(kButtonMargin, 0.0, -kIndicatorWidth, 0.0);
     paintLabel(painter, labelRect, Qt::AlignLeft);
 
-    // TODO: #vkutin #apats Icon for disabled state is required
-    auto icon = qnSkin->icon("io/button_indicator_off.png", "io/button_indicator_on.png");
+    static const QColor kBasicColor = "#383838";
+    const nx::vms::client::core::SvgIconColorer::IconSubstitutions kSlideIconSubstitutions = {
+        {QnIcon::Normal, {{kBasicColor, "dark8"}}},
+    };
+
+    auto icon = qnSkin->icon("io/button_indicator_off_24.svg", "io/button_indicator_on_24.svg");
     auto iconState = isOn() ? QIcon::On : QIcon::Off;
     auto iconRect = buttonRect;
     iconRect.setLeft(iconRect.right() - kIndicatorWidth);
