@@ -5,6 +5,9 @@
 #include <QtCore/QPointer>
 #include <QtWidgets/QAbstractButton>
 
+#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+
 class QGroupBox;
 
 namespace nx::vms::client::desktop {
@@ -44,6 +47,9 @@ public:
      * Appends line to the end of the existing hint text.
      */
     void addHintLine(const QString& hintLine);
+
+    static const QColor kBasicColor;
+    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions;
 
 protected:
     virtual bool event(QEvent* event) override;
