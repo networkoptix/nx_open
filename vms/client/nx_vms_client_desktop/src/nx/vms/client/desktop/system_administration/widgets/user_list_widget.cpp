@@ -762,7 +762,7 @@ void UserListWidget::Private::handleUsersTableClicked(const QModelIndex& index)
 
 void UserListWidget::Private::loadData()
 {
-    usersModel->resetUsers(q->resourcePool()->getResources<QnUserResource>());
+    usersModel->resetUsers();
 }
 
 } // namespace nx::vms::client::desktop

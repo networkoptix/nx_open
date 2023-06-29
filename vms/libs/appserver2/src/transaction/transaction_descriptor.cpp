@@ -647,6 +647,14 @@ struct RemoveResourceAccess
         auto userResource = resPool->getResourceById(accessData.userId)
             .dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
+
+        if (const auto user = target.dynamicCast<QnUserResource>();
+            user && user->attributes().testFlag(nx::vms::api::UserAttribute::readonly))
+        {
+            return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                "Removal of the User with readonly attribute is forbidden for VMS."));
+        }
+
         if (!systemContext->resourceAccessManager()->hasPermission(
             userResource, target, Qn::RemovePermission))
         {
@@ -664,13 +672,6 @@ struct RemoveResourceAccess
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "It is forbidden to delete own local storage %1."),
                 storage->getId().toSimpleString()));
-        }
-
-        if (const auto user = target.dynamicCast<QnUserResource>();
-            user && user->attributes().testFlag(nx::vms::api::UserAttribute::readonly))
-        {
-            return Result(ErrorCode::forbidden, ServerApiErrors::tr(
-                "Removal of the User with readonly attribute is forbidden for VMS."));
         }
 
         return Result();

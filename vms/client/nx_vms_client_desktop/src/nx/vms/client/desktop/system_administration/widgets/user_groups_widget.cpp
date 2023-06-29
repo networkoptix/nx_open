@@ -212,7 +212,10 @@ UserGroupsWidget::UserGroupsWidget(UserGroupManager* manager, QWidget* parent):
     connect(manager, &UserGroupManager::addedOrUpdated, d.get(),
         [this](const nx::vms::api::UserGroupData& group)
         {
-            d->groupsModel->addOrUpdateGroup(group);
+            if (group.attributes.testFlag(nx::vms::api::UserAttribute::hidden))
+                d->groupsModel->removeGroup(group.id);
+            else
+                d->groupsModel->addOrUpdateGroup(group);
         });
 
     connect(manager, &UserGroupManager::removed, d.get(),
