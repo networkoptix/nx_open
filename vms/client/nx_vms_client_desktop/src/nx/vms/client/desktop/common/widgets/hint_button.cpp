@@ -2,20 +2,20 @@
 
 #include "hint_button.h"
 
+#include <QtCore/QSize>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-#include <QtWidgets/QStyleOptionGroupBox>
 #include <QtWidgets/QGroupBox>
+#include <QtWidgets/QStyleOptionGroupBox>
 #include <QtWidgets/QToolTip>
-
-#include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/style/style.h>
-#include <nx/vms/client/desktop/style/helper.h>
-#include <ui/help/help_handler.h>
-#include <ui/help/help_topic_accessor.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/style/style.h>
+#include <ui/help/help_handler.h>
+#include <ui/help/help_topic_accessor.h>
 
 namespace {
 
@@ -35,10 +35,16 @@ QString makeColoredText(const QString& text, const QColor& color)
 
 namespace nx::vms::client::desktop {
 
+const QColor HintButton::kBasicColor = "#707070";
+const nx::vms::client::core::SvgIconColorer::IconSubstitutions HintButton::kIconSubstitutions = {
+    {QIcon::Normal, {{kBasicColor, "dark15"}}},
+    {QIcon::Active, {{kBasicColor, "dark14"}}},
+};              
+
 HintButton::HintButton(QWidget* parent):
     base_type(parent),
-    m_regularPixmap(qnSkin->pixmap("buttons/context_info.png")),
-    m_highlightedPixmap(qnSkin->pixmap("buttons/context_info_hovered.png"))
+    m_regularPixmap(qnSkin->icon("buttons/context_info_16.svg", kIconSubstitutions).pixmap(QSize(16,16))),
+    m_highlightedPixmap(qnSkin->icon("buttons/context_info_16.svg", kIconSubstitutions).pixmap(QSize(16,16), QIcon::Mode::Active))
 {
     const auto pixmapSizeScaled = m_regularPixmap.size() / m_regularPixmap.devicePixelRatioF();
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

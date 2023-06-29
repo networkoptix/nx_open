@@ -9,6 +9,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -39,9 +40,11 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
         "different Systems. Currently, only some features of regular layouts are available, but "
         "we will continue to expand the capabilities of %1 Layouts in future versions")
         .arg(nx::branding::shortCloudName()));
-    ui->helpIconLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
-    ui->helpLabel->setText(tr("Read more on the %1")
-        .arg(common::html::localLink(tr("help page"))));
+    ui->helpIconLabel->setPixmap(
+        qnSkin->icon("buttons/context_info_16.svg", HintButton::kIconSubstitutions)
+            .pixmap(QSize(16, 16)));
+    ui->helpLabel->setText(
+        tr("Read more on the %1").arg(common::html::localLink(tr("help page"))));
     connect(ui->helpLabel, &QLabel::linkActivated,
         [](){ QnHelpHandler::openHelpTopic(Qn::HelpTopic::CloudLayoutsIntroduction_help); });
     setHelpTopic(this, Qn::HelpTopic::CloudLayoutsIntroductionAssign_Help);
