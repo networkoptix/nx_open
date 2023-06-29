@@ -8,6 +8,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
+#include <nx/vms/rules/utils/event_details.h>
 
 namespace nx::vms::client::desktop {
 
@@ -93,6 +94,16 @@ QPixmap eventIcon(
 
             return {};
     }
+}
+
+QString eventTitle(const QVariantMap& details)
+{
+    auto detail = details.value(rules::utils::kAnalyticsEventTypeDetailName);
+
+    if (!detail.isValid())
+        detail = details.value(rules::utils::kNameDetailName);
+
+    return detail.toString();
 }
 
 } // namespace nx::vms::client::desktop

@@ -2,49 +2,56 @@
 
 #pragma once
 
+#include <vector>
+
 #include <nx/vms/api/rules/event_log.h>
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/rules/basic_event.h>
-#include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/rules_fwd.h>
 
 namespace nx::vms::client::desktop {
+
+class SystemContext;
 
 class EventModelData
 {
 public:
     EventModelData() = delete;
 
-    EventModelData(const nx::vms::api::rules::EventLogRecord& record):
-        m_record(record)
-    {}
+    EventModelData(const nx::vms::api::rules::EventLogRecord& record);
 
-    const nx::vms::api::rules::EventLogRecord& record() const
-    {
-        return m_record;
-    }
+    const nx::vms::api::rules::EventLogRecord& record() const;
 
-    nx::vms::rules::EventPtr event(SystemContext* context) const
-    {
-        if (!m_event)
-            m_event = context->vmsRulesEngine()->buildEvent(m_record.eventData);
+    nx::vms::rules::EventPtr event(SystemContext* context) const;
+    const QVariantMap& details(SystemContext* context) const;
+    QString eventType() const;
 
-        NX_ASSERT(m_event);
-        return m_event;
-    }
-
-    const QVariantMap& details(SystemContext* context) const
-    {
-        if (m_details.empty())
-            m_details = event(context)->details(context);
-
-        NX_ASSERT(!m_details.empty());
-        return m_details;
-    }
+protected:
+    nx::vms::api::rules::EventLogRecord m_record;
 
 private:
-    nx::vms::api::rules::EventLogRecord m_record;
     mutable nx::vms::rules::EventPtr m_event;
     mutable QVariantMap m_details;
 };
+
+class EventLogModelData: public EventModelData
+{
+public:
+    using EventModelData::EventModelData;
+
+    /** Special comparison string for event dialog column sorting. */
+    void setCompareString(const QString& str);
+    const QString& compareString() const;
+
+    nx::vms::rules::ActionPtr action(SystemContext* context) const;
+    const QVariantMap actionDetails(SystemContext* context) const;
+    QString actionType() const;
+
+private:
+    mutable nx::vms::rules::ActionPtr m_action;
+    mutable QVariantMap m_actionDetails;
+    QString m_compareString;
+};
+
+using EventModelDataList = std::vector<EventModelData>;
+using EventLogModelDataList = std::vector<EventLogModelData>;
 
 } // namespace nx::vms::client::desktop

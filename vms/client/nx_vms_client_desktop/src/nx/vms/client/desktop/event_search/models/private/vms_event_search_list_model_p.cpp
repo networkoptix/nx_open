@@ -160,7 +160,7 @@ QVariant VmsEventSearchListModel::Private::data(
     switch (role)
     {
         case Qt::DisplayRole:
-            return title(details);
+            return eventTitle(details);
 
         case Qt::DecorationRole:
             return iconPixmap(event, details);
@@ -488,16 +488,6 @@ rest::Handle VmsEventSearchListModel::Private::getEvents(
         return {};
 
     return api->eventLog(/*serverId*/ {}, filter, std::move(internalCallback), thread());
-}
-
-QString VmsEventSearchListModel::Private::title(const QVariantMap& details) const
-{
-    auto detail = details.value(rules::utils::kAnalyticsEventTypeDetailName);
-
-    if (!detail.isValid())
-        detail = details.value(rules::utils::kNameDetailName);
-
-    return detail.toString();
 }
 
 QString VmsEventSearchListModel::Private::description(const QVariantMap& details) const

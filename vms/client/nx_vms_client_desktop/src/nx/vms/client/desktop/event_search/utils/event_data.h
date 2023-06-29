@@ -19,4 +19,6 @@ QPixmap eventIcon(
     const QColor& color,
     const QnResourceList& devices);
 
+QString eventTitle(const QVariantMap& details);
+
 } // namespace nx::vms::client::desktop

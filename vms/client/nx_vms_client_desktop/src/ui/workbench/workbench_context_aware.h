@@ -74,8 +74,6 @@ public:
     /** Initialize context manually. */
     void initializeContext();
 
-    nx::vms::client::desktop::SystemContext* systemContext() const;
-
 protected:
     QAction* action(const nx::vms::client::desktop::ui::action::IDType id) const;
 

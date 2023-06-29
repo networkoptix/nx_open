@@ -54,4 +54,9 @@ QString BasicAction::uniqueKey() const
     return type();
 }
 
+QVariantMap BasicAction::details(common::SystemContext* context) const
+{
+    return {};
+}
+
 } // namespace nx::vms::rules

@@ -2200,12 +2200,20 @@ void initialize(Manager* manager, Action* root)
             .text("Open New Scene")
             .shortcut("Ctrl+Shift+E");
 
-        factory(OpenEventRulesDialogAction)
+        factory(OpenVmsRulesDialogAction)
             .flags(GlobalHotkey | Main | DevMode)
             .mode(DesktopMode)
             .requiredPowerUserPermissions()
-            .text("New Event Rules...")
+            .text("VMS Rules...")
             .shortcut("Ctrl+Alt+E")
+            .condition(!condition::showreelIsRunning()
+                && condition::hasNewEventRulesEngine());
+
+        factory(OpenEventLogAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .mode(DesktopMode)
+            .requiredGlobalPermission(GlobalPermission::viewLogs)
+            .text("Event log...")
             .condition(!condition::showreelIsRunning()
                 && condition::hasNewEventRulesEngine());
 

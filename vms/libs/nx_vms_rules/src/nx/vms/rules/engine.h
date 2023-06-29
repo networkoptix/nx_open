@@ -142,6 +142,7 @@ public:
      */
     std::optional<ItemDescriptor> actionDescriptor(const QString& id) const;
 
+    ActionPtr buildAction(const EventData& data) const;
     ActionPtr cloneAction(const ActionPtr& action) const;
 
     bool isActionFieldRegistered(const QString& fieldId) const;

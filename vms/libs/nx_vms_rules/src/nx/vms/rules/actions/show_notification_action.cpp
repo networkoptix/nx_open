@@ -8,6 +8,7 @@
 #include "../action_builder_fields/text_with_fields.h"
 #include "../utils/event_details.h"
 #include "../utils/field.h"
+#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -49,6 +50,14 @@ const ItemDescriptor& NotificationAction::manifest()
         }
     };
     return kDescriptor;
+}
+
+QVariantMap NotificationAction::details(common::SystemContext* context) const
+{
+    auto result = BasicAction::details(context);
+    result.insert(utils::kDestinationDetailName, utils::StringHelper(context).subjects(users()));
+
+    return result;
 }
 
 } // namespace nx::vms::rules

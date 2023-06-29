@@ -11,7 +11,11 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/common/system_context_aware.h>
 
-namespace nx::vms::rules::utils {
+namespace nx::vms::rules {
+
+struct UuidSelection;
+
+namespace utils {
 
 class NX_VMS_RULES_API StringHelper:
     public QObject,
@@ -50,6 +54,12 @@ public:
         std::chrono::microseconds timestamp,
         bool usePublicIp,
         const std::optional<nx::network::SocketAddress>& proxyAddress = std::nullopt) const;
+
+    QString subjects(const UuidSelection& selection) const;
+
+    QString eventName(const QString& type) const;
+    QString actionName(const QString& type) const;
 };
 
-} // namespace nx::vms::rules::utils
+} // namespace utils
+} // namespace nx::vms::rules

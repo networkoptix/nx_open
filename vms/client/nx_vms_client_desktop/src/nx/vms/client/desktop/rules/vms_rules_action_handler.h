@@ -22,6 +22,7 @@ private:
     nx::utils::ImplPtr<Private> d;
 
     void openVmsRulesDialog();
+    void openEventLogDialog();
 };
 
 } // namespace nx::vms::client::desktop::rules

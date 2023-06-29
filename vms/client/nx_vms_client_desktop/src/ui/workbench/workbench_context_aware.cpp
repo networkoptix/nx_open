@@ -69,11 +69,6 @@ void QnWorkbenchContextAware::initializeContext()
     init(m_parent);
 }
 
-SystemContext* QnWorkbenchContextAware::systemContext() const
-{
-    return dynamic_cast<SystemContext*>(context()->systemContext());
-}
-
 void QnWorkbenchContextAware::init(QObject* parent)
 {
     while (parent)

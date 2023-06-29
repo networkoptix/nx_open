@@ -9,6 +9,8 @@
 #include "field_types.h"
 #include "rules_fwd.h"
 
+namespace nx::vms::common { class SystemContext; }
+
 namespace nx::vms::rules {
 
 /**
@@ -44,6 +46,9 @@ public:
      * TODO: #amalov Carefully review and overload in descendant actions.
      */
     virtual QString uniqueKey() const;
+
+    /** Returns formatted action details. */
+    virtual QVariantMap details(common::SystemContext* context) const;
 
 protected:
     BasicAction() = default;

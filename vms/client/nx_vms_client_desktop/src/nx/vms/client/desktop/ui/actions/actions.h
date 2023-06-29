@@ -1390,11 +1390,11 @@ enum IDType
     OpenNewSceneAction,
 
     /**
-     * Opens new "Event Rules" dialog which should replace the old one at certain point.
+     * Opens new "VMS Rules" dialog which should replace the old one at certain point.
      * @note Developer Mode and presence of new Event Rules Engine are required.
      * @note Will replace 'OpenBusinessRulesAction'.
      */
-    OpenEventRulesDialogAction,
+    OpenVmsRulesDialogAction,
 
     /**
      * Control in which mode analytics objects must be displayed for the selected cameras.
@@ -1473,6 +1473,9 @@ enum IDType
      * Open Import From Devices dialog.
      */
     OpenImportFromDevices,
+
+    /** Open Event Log dialog. Should replace OpenBusinessLogAction. */
+    OpenEventLogAction,
 
     ActionCount,
 

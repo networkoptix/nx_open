@@ -38,6 +38,8 @@ public:
     QString password() const;
     void setPassword(const QString& password);
 
+    virtual QVariantMap details(common::SystemContext* context) const override;
+
 private:
     QString m_url;
     QString m_content;

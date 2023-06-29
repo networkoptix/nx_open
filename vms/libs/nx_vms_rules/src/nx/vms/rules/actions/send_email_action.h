@@ -24,6 +24,9 @@ class NX_VMS_RULES_API SendEmailAction: public nx::vms::rules::BasicAction
 
 public:
     static const ItemDescriptor& manifest();
+
+    QSet<QString> emailAddresses(common::SystemContext* context, bool activeOnly) const;
+    virtual QVariantMap details(common::SystemContext* context) const override;
 };
 
 } // namespace nx::vms::rules

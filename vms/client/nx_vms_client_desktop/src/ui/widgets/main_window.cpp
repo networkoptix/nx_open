@@ -379,7 +379,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
         addAction(screenRecordingAction);
     addAction(action(action::ShowFpsAction));
     addAction(action(action::OpenNewSceneAction));
-    addAction(action(action::OpenEventRulesDialogAction));
+    addAction(action(action::OpenVmsRulesDialogAction));
     addAction(action(action::CreateNewCustomGroupAction));
     addAction(action(action::RemoveCustomGroupAction));
     addAction(action(action::PreviousFrameAction));
