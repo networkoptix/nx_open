@@ -180,7 +180,7 @@ void VirtualCameraPreparer::checkLocally(VirtualCameraPayload& payload)
             if (auto virtualCamera = d->camera.dynamicCast<QnVirtualCameraResource>())
                 ignoreTimeZone = virtualCamera->virtualCameraIgnoreTimeZone();
 
-            if (!ignoreTimeZone)
+            if (ignoreTimeZone)
                 startDateTime.setTimeSpec(Qt::UTC);
 
             startTimeMs = startDateTime.toMSecsSinceEpoch() - timeOffsetMs;
@@ -259,5 +259,3 @@ void VirtualCameraPreparer::handlePrepareFinished(bool success, const QnVirtualC
 }
 
 } // namespace nx::vms::client::desktop
-
-
