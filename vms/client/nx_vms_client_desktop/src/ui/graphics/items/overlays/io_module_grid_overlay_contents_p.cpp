@@ -5,11 +5,10 @@
 #include <array>
 
 #include <QtGui/QPainter>
-
 #include <QtWidgets/QGraphicsScene>
 
 #include <nx/utils/log/assert.h>
-
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
 
@@ -28,6 +27,11 @@ constexpr int kIndicatorPadding = 2;
 
 constexpr int kMinimumItemWidth = 160;
 static const int kMinimumItemHeight = nx::style::Metrics::kButtonHeight;
+
+static const QColor kBasicColor = "#383838";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIoIconSubstitutions = {
+    {QnIcon::Normal, {{kBasicColor, "dark8"}}},
+};
 
 /* Private file scope functions: */
 
@@ -136,7 +140,8 @@ void QnIoModuleGridOverlayContentsPrivate::InputPortItem::paint(QPainter* painte
     paintId(painter, idRect, false);
 
     auto margin = nx::style::Metrics::kStandardPadding + effectiveIdWidth();
-    auto icon = qnSkin->icon("io/indicator_off.png", "io/indicator_on.png");
+    auto icon =
+        qnSkin->icon("io/indicator_off_28.svg", kIoIconSubstitutions, "io/indicator_on_28.svg");
     auto iconRect = QRectF(idRect.left() + margin, idRect.top(), kIndicatorWidth, idRect.height());
     auto iconState = isOn() ? QIcon::On : QIcon::Off;
     icon.paint(painter, iconRect.toRect(), Qt::AlignCenter, QIcon::Normal, iconState);
