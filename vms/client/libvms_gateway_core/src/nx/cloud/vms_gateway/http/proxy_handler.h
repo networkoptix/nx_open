@@ -44,11 +44,11 @@ private:
 
     network::http::StatusCode::Value cutTargetFromUrl(
         nx::network::http::Request* const request,
-        TargetHost* const targetHost);
+        nx::network::http::server::proxy::TargetHost* const targetHost);
 
     network::http::StatusCode::Value cutTargetFromPath(
         nx::network::http::Request* const request,
-        TargetHost* const targetHost);
+        nx::network::http::server::proxy::TargetHost* const targetHost);
 };
 
 } // namespace gateway

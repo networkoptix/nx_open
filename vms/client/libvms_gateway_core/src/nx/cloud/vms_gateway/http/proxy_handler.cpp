@@ -16,6 +16,7 @@ namespace cloud {
 namespace gateway {
 
 using SslMode = nx::network::http::server::proxy::SslMode;
+using TargetHost = nx::network::http::server::proxy::TargetHost;
 
 ProxyHandler::ProxyHandler(
     const conf::Settings& settings,
