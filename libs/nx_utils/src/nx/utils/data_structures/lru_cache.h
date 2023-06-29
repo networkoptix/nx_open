@@ -159,6 +159,11 @@ public:
         m_cacheList.clear();
     }
 
+    std::size_t size() const
+    {
+        return m_cacheMap.size();
+    }
+
 private:
     using IterT = typename std::list<std::pair<Key, Value>>::iterator;
 

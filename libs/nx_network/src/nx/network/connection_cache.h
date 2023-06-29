@@ -36,6 +36,8 @@ public:
 
         const SocketAddress addr;
         const bool isTls;
+
+        std::string toString() const;
     };
 
     /**
@@ -55,8 +57,7 @@ public:
         nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> handler);
 
     /**
-     * Returns the number of elements in the cache.
-     * @return Number of elements in the cache.
+     * @return The number of connections in the cache.
      */
     size_t size() const;
 

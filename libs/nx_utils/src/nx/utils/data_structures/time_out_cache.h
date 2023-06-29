@@ -142,6 +142,11 @@ public:
         m_lruCache.clear();
     }
 
+    std::size_t size() const
+    {
+        return m_lruCache.size();
+    }
+
 private:
     bool isExpired(const Item& item) const
     {

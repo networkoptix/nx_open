@@ -19,10 +19,21 @@ template<>
 class hash<nx::network::ConnectionCache::ConnectionInfo>
 {
 public:
-    size_t operator()(const nx::network::ConnectionCache::ConnectionInfo& info) const;
+    size_t operator()(const nx::network::ConnectionCache::ConnectionInfo& info) const
+    {
+        const size_t isTls = info.isTls ? 1 : 0;
+        return std::hash<SocketAddress>{}(info.addr) ^ isTls;
+    }
 };
 
 } // namespace std
+
+std::string ConnectionCache::ConnectionInfo::toString() const
+{
+    return nx::utils::buildString("addr: ", addr.toString(), ", isTls: ", isTls ? "true" : "false");
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class ConnectionCache::Private
 {
@@ -67,12 +78,7 @@ public:
     PollableContext pollableContext;
 };
 
-size_t std::hash<nx::network::ConnectionCache::ConnectionInfo>::operator()(
-    const nx::network::ConnectionCache::ConnectionInfo& info) const
-{
-    const size_t isTls = info.isTls ? 1 : 0;
-    return std::hash<SocketAddress>{}(info.addr) ^ isTls;
-}
+//-------------------------------------------------------------------------------------------------
 
 ConnectionCache::ConnectionCache(
     std::chrono::milliseconds expirationPeriod /*= kDefaultExpirationPeriod*/)
@@ -110,7 +116,9 @@ void ConnectionCache::put(ConnectionInfo addr, std::unique_ptr<AbstractStreamSoc
             socket->bindToAioThread(d->pollableContext.getAioThread());
             startMonitoringConnection(addr, socket.get());
             d->cache.put(std::move(addr), std::move(socket));
-            ++d->size;
+            d->size = d->cache.size();
+
+            NX_VERBOSE(this, "Store connection %1. Cache size %2", addr, d->size);
         });
 }
 
@@ -121,19 +129,24 @@ void ConnectionCache::take(
     d->pollableContext.dispatch(
         [this, info, handler = std::move(handler)]() mutable
         {
+            std::unique_ptr<AbstractStreamSocket> conn;
             auto result = d->cache.getValue(info);
             if (result.has_value())
             {
-                auto conn = std::move(result.value().get());
+                NX_VERBOSE(this, "Connection %1 found", info);
+
+                conn = std::move(result.value().get());
                 d->cache.erase(info);
-                --d->size;
                 conn->cancelRead();
-                handler(std::move(conn));
             }
             else
             {
-                handler(nullptr);
+                NX_VERBOSE(this, "Connection %1 was not found", info);
             }
+
+            d->size = d->cache.size();
+
+            handler(std::move(conn));
         });
 }
 
@@ -157,9 +170,11 @@ void ConnectionCache::startMonitoringConnection(
         {
             // Unexpected read or connection closed. Remove connection from the cache.
             if (result != SystemError::noError)
-                NX_DEBUG(this, "Connection closed due to an error: ", result);
+                NX_DEBUG(this, "Connection %1 closed due to an error: %2", addr, result);
             else if (bytesRead > 0)
-                NX_DEBUG(this, "Unexpected read from server.");
+                NX_DEBUG(this, "Unexpected (%1 bytes) read through connection %2", bytesRead, addr);
+            else
+                NX_VERBOSE(this, "Connection %1 closed gracefully", addr);
 
             take(addr, [](auto&&...) {});
         });
