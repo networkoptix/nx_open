@@ -24,7 +24,9 @@ class LookupListEntriesModel: public QAbstractTableModel
 
     enum DataRole
     {
-        TypeRole = Qt::UserRole
+        TypeRole = Qt::UserRole,
+        ObjectTypeIdRole,
+        AttributeNameRole
     };
 
 public:
@@ -49,7 +51,7 @@ public:
     LookupListModel* listModel() const;
     void setListModel(LookupListModel* value);
 
-    Q_INVOKABLE void addEntry(const QVariantMap& value);
+    Q_INVOKABLE void addEntry(const QVariantMap& values);
 
 signals:
     void listModelChanged();

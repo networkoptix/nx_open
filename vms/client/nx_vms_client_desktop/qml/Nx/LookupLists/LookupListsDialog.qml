@@ -244,6 +244,7 @@ Dialog
                 id: tableView
 
                 model: entriesModel
+                taxonomy: control.taxonomy
 
                 anchors
                 {

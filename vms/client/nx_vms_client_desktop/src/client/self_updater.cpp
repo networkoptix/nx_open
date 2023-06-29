@@ -9,26 +9,25 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QThread>
 
+#include <client/client_installations_manager.h>
 #include <client/client_module.h>
 #include <client/client_startup_parameters.h>
-#include <client/client_installations_manager.h>
-
+#include <nx/build_info.h>
 #include <nx/vms/utils/platform/protocol_handler.h>
 
 #if defined(Q_OS_LINUX)
     #include <nx/vms/utils/desktop_file_linux.h>
 #endif // defined(Q_OS_LINUX)
 
-#include <nx/utils/log/log.h>
-#include <nx/utils/file_system.h>
-#include <nx/utils/scope_guard.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <utils/applauncher_utils.h>
-
 #include <nx/branding.h>
 #include <nx/build_info.h>
+#include <nx/utils/file_system.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <platform/platform_abstraction.h>
 #include <platform/shortcuts/platform_shortcuts.h>
+#include <utils/applauncher_utils.h>
 
 namespace nx::vms::client::desktop {
 
@@ -102,8 +101,11 @@ bool runMinilaucherInternal(const QStringList& args)
 
     if (!QFileInfo::exists(minilauncherPath))
     {
-        NX_ERROR(typeid(SelfUpdater), "Can not start Minilauncher: file %1 does not exist.",
-            minilauncherPath);
+        if (nx::build_info::publicationType() != nx::build_info::PublicationType::local)
+        {
+            NX_ERROR(typeid(SelfUpdater), "Can not start Minilauncher: file %1 does not exist.",
+                minilauncherPath);
+        }
         return false;
     }
     else if (QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */

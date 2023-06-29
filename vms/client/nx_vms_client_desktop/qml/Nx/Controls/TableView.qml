@@ -59,7 +59,11 @@ TableView
 
     delegate: BasicTableCellDelegate {}
 
-    onWidthChanged: control.forceLayout()
+    onWidthChanged:
+    {
+        console.log("Width changed")
+        control.forceLayout()
+    }
 
     Rectangle
     {
@@ -138,7 +142,12 @@ TableView
                         onDataChanged: updateCheckState()
                     }
 
-                    width: control.columnWidthProvider(index)
+                    width: (index) =>
+                    {
+                        console.log("Recualculating width of " + index)
+                        const w = control.columnWidthProvider(index)
+                        return w >= 0 ? w : 124
+                    }
                     height: columnsHeader.buttonHeight
 
                     text: control.model
