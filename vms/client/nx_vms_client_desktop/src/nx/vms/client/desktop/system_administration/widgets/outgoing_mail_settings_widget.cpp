@@ -18,7 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/api/data/email_settings_data.h>
+#include <nx/vms/api/data/email_settings.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -179,8 +179,8 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
 
     ui->protocolComboBox->addItem(tr("TLS"), QVariant::fromValue(QnEmail::ConnectionType::tls));
     ui->protocolComboBox->addItem(tr("SSL"), QVariant::fromValue(QnEmail::ConnectionType::ssl));
-    ui->protocolComboBox->addItem(tr("Unsecure"),
-        QVariant::fromValue(QnEmail::ConnectionType::unsecure));
+    ui->protocolComboBox->addItem(tr("Insecure"),
+        QVariant::fromValue(QnEmail::ConnectionType::insecure));
 
     // Setup "Check" button.
 
@@ -368,8 +368,8 @@ void OutgoingMailSettingsWidget::Private::updateSmtpConfigurationStatus()
     if (!NX_ASSERT(!getUseCloudServiceFromDialog()))
         return;
 
-    const auto dialogData = getEmailSettingsFromDialog();
-    if (!QnEmailSettings::isValid(dialogData.emailFrom, dialogData.smtpHost))
+    const auto dialogData = getEmailSettingsFromDialog().emailSettings;
+    if (!QnEmailSettings::isValid(dialogData.email, dialogData.server))
     {
         setConfigurationStatus(NotConfigured);
         setConfigurationStatusHint(tr("Set your email address or SMTP server"));
@@ -452,9 +452,9 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
     }
     else
     {
-        auto settingsForTesting = getEmailSettingsFromDialog().emailSettings();
+        auto settingsForTesting = getEmailSettingsFromDialog().emailSettings;
 
-        if (!QnEmailSettings::isValid(settingsForTesting.from, settingsForTesting.host))
+        if (!QnEmailSettings::isValid(settingsForTesting.email, settingsForTesting.server))
         {
             setConfigurationStatus(NotConfigured);
             setConfigurationStatusHint("Additional info required");
@@ -501,33 +501,33 @@ void OutgoingMailSettingsWidget::Private::updateCloudServiceStatus()
 
 void OutgoingMailSettingsWidget::Private::loadEmailSettingsToDialog()
 {
-    const auto systemSetting = q->systemContext()->systemSettings();
+    const auto& emailSettings = q->systemContext()->systemSettings()->emailSettings;
 
     QnScopedValueRollback<bool> inputNotificationsGuard(&m_ignoreInputNotifications, true);
 
     m_passwordChanged = false;
 
-    ui->emailInput->setText(systemSetting->emailFrom);
-    ui->serverAddressInput->setText(systemSetting->smtpHost);
-    ui->userInput->setText(systemSetting->smtpUser);
+    ui->emailInput->setText(emailSettings.email);
+    ui->serverAddressInput->setText(emailSettings.server);
+    ui->userInput->setText(emailSettings.user);
 
     ui->passwordInput->setText({});
     ui->passwordInput->setHasRemotePassword(
-        QnEmailSettings::isValid(systemSetting->emailFrom, systemSetting->smtpHost));
+        QnEmailSettings::isValid(emailSettings.email, emailSettings.server));
 
     ui->protocolComboBox->setCurrentIndex(
-        ui->protocolComboBox->findData(QVariant::fromValue(systemSetting->smtpConnectionType)));
+        ui->protocolComboBox->findData(QVariant::fromValue(emailSettings.connectionType)));
 
-    if (isValidPort(systemSetting->smtpPort)
-        && systemSetting->smtpPort != QnEmailSettings::defaultPort(systemSetting->smtpConnectionType))
+    if (isValidPort(emailSettings.port)
+        && emailSettings.port != QnEmailSettings::defaultPort(emailSettings.connectionType))
     {
-        auto serverUrl = nx::utils::Url::fromUserInput(systemSetting->smtpHost);
-        serverUrl.setPort(systemSetting->smtpPort);
+        auto serverUrl = nx::utils::Url::fromUserInput(emailSettings.server);
+        serverUrl.setPort(emailSettings.port);
         ui->serverAddressInput->setText(serverUrl.displayAddress());
     }
 
-    ui->systemSignatureInput->setText(systemSetting->emailSignature);
-    ui->supportSignatureInput->setText(systemSetting->emailSupportEmail);
+    ui->systemSignatureInput->setText(emailSettings.signature);
+    ui->supportSignatureInput->setText(emailSettings.supportAddress);
 }
 
 void OutgoingMailSettingsWidget::Private::setUseCloudServiceToDialog(bool useCloudService)
@@ -546,8 +546,10 @@ nx::vms::api::SystemSettings OutgoingMailSettingsWidget::Private::getEmailSettin
 {
     auto result = *q->systemContext()->systemSettings();
 
-    result.emailSignature = ui->systemSignatureInput->text();
-    result.emailSupportEmail = ui->supportSignatureInput->text();
+    auto& emailSettings = result.emailSettings;
+
+    emailSettings.signature = ui->systemSignatureInput->text();
+    emailSettings.supportAddress = ui->supportSignatureInput->text();
 
     if (emailContentsSettingsOnly)
         return result;
@@ -556,15 +558,16 @@ nx::vms::api::SystemSettings OutgoingMailSettingsWidget::Private::getEmailSettin
     const auto serverUrlText = ui->serverAddressInput->text().trimmed();
     const auto serverUrl = nx::utils::Url::fromUserInput(serverUrlText);
 
-    result.emailFrom = emailAddress.value();
-    result.smtpHost = serverUrl.port() > 0
+    emailSettings.email = emailAddress.value();
+    emailSettings.server = serverUrl.port() > 0
         ? serverUrl.host()
         : serverUrlText;
-    result.smtpUser = ui->userInput->text();
-    result.smtpPassword = ui->passwordInput->text();
-    result.smtpConnectionType =
+    emailSettings.user = ui->userInput->text();
+    emailSettings.password = ui->passwordInput->text();
+    emailSettings.connectionType =
         ui->protocolComboBox->currentData().value<QnEmail::ConnectionType>();
-    result.smtpPort = serverUrl.port(QnEmailSettings::defaultPort(result.smtpConnectionType));
+    emailSettings.port =
+        serverUrl.port(QnEmailSettings::defaultPort(emailSettings.connectionType));
 
     return result;
 }
@@ -575,11 +578,12 @@ void OutgoingMailSettingsWidget::Private::fillEmailSettingsFromDialog() const
     const bool emailContentsSettingsOnly =
         getUseCloudServiceFromDialog() && emailContentsSettingsChanged();
     const auto settingsForTesting = getEmailSettingsFromDialog();
-    const auto systemSetting = q->systemContext()->systemSettings();
+    const auto systemSettings = q->systemContext()->systemSettings();
+    auto& emailSettings = systemSettings->emailSettings;
 
-    systemSetting->emailSignature = ui->systemSignatureInput->text();
-    systemSetting->emailSupportEmail = ui->supportSignatureInput->text();
-    systemSetting->useCloudServiceToSendEmail = getUseCloudServiceFromDialog();
+    emailSettings.signature = ui->systemSignatureInput->text();
+    emailSettings.supportAddress = ui->supportSignatureInput->text();
+    systemSettings->useCloudServiceToSendEmail = getUseCloudServiceFromDialog();
 
     if (emailContentsSettingsOnly)
         return;
@@ -588,20 +592,20 @@ void OutgoingMailSettingsWidget::Private::fillEmailSettingsFromDialog() const
     const auto serverUrlText = ui->serverAddressInput->text().trimmed();
     const auto serverUrl = nx::utils::Url::fromUserInput(serverUrlText);
 
-    systemSetting->emailFrom = emailAddress.value();
-    systemSetting->smtpHost = serverUrl.port() > 0
+    emailSettings.email = emailAddress.value();
+    emailSettings.server= serverUrl.port() > 0
         ? serverUrl.host()
         : serverUrlText;
-    if(!QnEmailSettings::isValid(systemSetting->emailFrom, systemSetting->smtpHost))
-        systemSetting->smtpPassword = QString();
+    if(!QnEmailSettings::isValid(emailSettings.email, emailSettings.server))
+        emailSettings.password = QString();
     else if (savePassword)
-        systemSetting->smtpPassword = ui->passwordInput->text();
+        emailSettings.password = ui->passwordInput->text();
 
-    systemSetting->smtpUser = ui->userInput->text();
-    systemSetting->smtpConnectionType =
+    emailSettings.user = ui->userInput->text();
+    emailSettings.connectionType =
         ui->protocolComboBox->currentData().value<QnEmail::ConnectionType>();
-    systemSetting->smtpPort =
-        serverUrl.port(QnEmailSettings::defaultPort(systemSetting->smtpConnectionType));
+    emailSettings.port =
+        serverUrl.port(QnEmailSettings::defaultPort(emailSettings.connectionType));
 }
 
 bool OutgoingMailSettingsWidget::Private::getUseCloudServiceFromDialog() const
@@ -662,22 +666,22 @@ QString OutgoingMailSettingsWidget::Private::smtpErrorCodeToString(nx::email::Sm
 
 bool OutgoingMailSettingsWidget::Private::smtpSettingsChanged() const
 {
-    const auto dialogSettings = getEmailSettingsFromDialog();
-    const auto storedSettings = q->systemContext()->systemSettings();
+    const auto dialogSettings = getEmailSettingsFromDialog().emailSettings;
+    const auto storedSettings = q->systemContext()->systemSettings()->emailSettings;
 
     const auto dialogSmtpSettingsFields = std::tie(
-        dialogSettings.emailFrom,
-        dialogSettings.smtpUser,
-        dialogSettings.smtpHost,
-        dialogSettings.smtpPort,
-        dialogSettings.smtpConnectionType);
+        dialogSettings.email,
+        dialogSettings.user,
+        dialogSettings.server,
+        dialogSettings.port,
+        dialogSettings.connectionType);
 
     const auto storedSmtpSettingsFields = std::tie(
-        storedSettings->emailFrom,
-        storedSettings->smtpUser,
-        storedSettings->smtpHost,
-        storedSettings->smtpPort,
-        storedSettings->smtpConnectionType);
+        storedSettings.email,
+        storedSettings.user,
+        storedSettings.server,
+        storedSettings.port,
+        storedSettings.connectionType);
 
     return dialogSmtpSettingsFields != storedSmtpSettingsFields;
 }
@@ -689,11 +693,11 @@ bool OutgoingMailSettingsWidget::Private::smtpSettingsPasswordChanged() const
 
 bool OutgoingMailSettingsWidget::Private::emailContentsSettingsChanged() const
 {
-    const auto dialogSettings = getEmailSettingsFromDialog();
-    const auto storedSettings = q->systemContext()->systemSettings();
+    const auto dialogSettings = getEmailSettingsFromDialog().emailSettings;
+    const auto storedSettings = q->systemContext()->systemSettings()->emailSettings;
 
-    return dialogSettings.emailSignature != storedSettings->emailSignature
-        || dialogSettings.emailSupportEmail != storedSettings->emailSupportEmail;
+    return dialogSettings.signature != storedSettings.signature
+        || dialogSettings.supportAddress != storedSettings.supportAddress;
 }
 
 bool OutgoingMailSettingsWidget::Private::useCloudServiceChanged() const

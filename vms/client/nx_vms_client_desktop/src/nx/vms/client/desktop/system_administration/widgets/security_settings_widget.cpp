@@ -199,6 +199,9 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
 
     connect(ui->archiveEncryptionGroupBox, &QGroupBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->showServersInTreeCheckBox, &QCheckBox::stateChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
 SecuritySettingsWidget::~SecuritySettingsWidget()

@@ -7,6 +7,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/vms/api/data/email_settings.h>
 
 #include "email_fwd.h"
 
@@ -83,21 +84,10 @@ struct QnEmailSmtpServerPreset
 };
 #define QnEmailSmtpServerPreset_Fields (server)(connectionType)(port)
 
-struct NX_VMS_COMMON_API QnEmailSettings
+struct NX_VMS_COMMON_API QnEmailSettings: nx::vms::api::EmailSettings
 {
-    QnEmailSettings();
-
-    QString email; //< Sender email. Used as MAIL FROM.
-    QString server; //< Target SMTP server.
-    QString user; //< Username for SMTP authorization.
-    QString password; //< Password for SMTP authorization.
-    QString signature; //< Signature text. Used in the email text.
-    QString supportEmail; //< Support link. Named as email to maintain compatibility.
-    QnEmail::ConnectionType connectionType; //< Connection protocol (TLS/SSL/Unsecure).
-    int port; //< SMTP server port.
-    int timeout; //< Connection timeout (Cannot be specified via client GUI).
-
-    QString name; //< EHLO SMTP command argument (Cannot be specified via client GUI).
+    QnEmailSettings() = default;
+    QnEmailSettings(const nx::vms::api::EmailSettings& settings);
 
     /**
      * @return True if <tt>email</tt> field contains valid email address and <tt>server</tt> field
@@ -106,11 +96,9 @@ struct NX_VMS_COMMON_API QnEmailSettings
     bool isValid() const;
 
     static bool isValid(const QString& email, const QString& server);
-    static int defaultPort(QnEmail::ConnectionType connectionType);
+    static int defaultPort(nx::vms::api::ConnectionType connectionType);
     static int defaultTimeoutSec();
 };
-#define QnEmailSettings_Fields \
-    (email)(server)(user)(password)(signature)(supportEmail)(connectionType)(port)(timeout)(name)
 
 /**
  * Generic email address class.

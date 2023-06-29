@@ -10,18 +10,11 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/client_update_settings.h>
-#include <nx/vms/api/data/email_settings_data.h>
-#include <nx/vms/api/types/smtp_types.h>
+#include <nx/vms/api/data/email_settings.h>
 
 #include "watermark_settings.h"
 
 namespace nx::vms::api {
-
-static constexpr int kTlsPort = 587;
-static constexpr int kSslPort = 465;
-static constexpr int kUnsecurePort = 25;
-static constexpr int kAutoPort = 0;
-static constexpr int kDefaultSmtpTimeout = 300;
 
 struct SystemSettings
 {
@@ -49,16 +42,7 @@ struct SystemSettings
 
     bool updateNotificationsEnabled = true;
 
-    QString smtpHost;
-    QString emailFrom;
-    QString smtpUser;
-    QString smtpPassword;
-    QString emailSignature;
-    QString emailSupportEmail;
-    ConnectionType smtpConnectionType = ConnectionType::unsecure;
-    int smtpPort = kUnsecurePort;
-    int smtpTimeout = kDefaultSmtpTimeout;
-    QString smtpName;
+    EmailSettings emailSettings;
     bool useCloudServiceToSendEmail = false;
 
     bool timeSynchronizationEnabled = true;
@@ -70,11 +54,6 @@ struct SystemSettings
     MetadataStorageChangePolicy metadataStorageChangePolicy = MetadataStorageChangePolicy::keep;
 
     bool operator==(const SystemSettings& other) const = default;
-
-    EmailSettingsData emailSettings()
-    {
-        return {smtpHost, smtpPort, smtpUser, emailFrom, smtpPassword, smtpConnectionType};
-    }
 };
 
 NX_REFLECTION_INSTRUMENT(SystemSettings, (cloudAccountName)(cloudSystemID)(defaultExportVideoCodec)
@@ -82,9 +61,8 @@ NX_REFLECTION_INSTRUMENT(SystemSettings, (cloudAccountName)(cloudSystemID)(defau
     (cameraSettingsOptimization)(statisticsAllowed)(cloudNotificationsLanguage)
     (auditTrailEnabled)(trafficEncryptionForced)(useHttpsOnlyForCameras)
     (videoTrafficEncryptionForced)(sessionLimitS)(storageEncryption)
-    (showServersInTreeForNonAdmins)(updateNotificationsEnabled)(smtpHost)(emailFrom)(smtpUser)
-    (smtpPassword)(emailSignature)(emailSupportEmail)(smtpConnectionType)(smtpPort)(smtpTimeout)
-    (smtpName)(useCloudServiceToSendEmail)(timeSynchronizationEnabled)(primaryTimeServer)
+    (showServersInTreeForNonAdmins)(updateNotificationsEnabled)(emailSettings)
+    (useCloudServiceToSendEmail)(timeSynchronizationEnabled)(primaryTimeServer)
     (customReleaseListUrl)(clientUpdateSettings)(backupSettings)(metadataStorageChangePolicy));
 
 NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeChronoDurationAsNumber)

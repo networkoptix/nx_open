@@ -1666,7 +1666,7 @@ Handle ServerConnection::getPluginInformation(
 }
 
 Handle ServerConnection::testEmailSettings(
-    const nx::vms::api::EmailSettingsData& settings,
+    const nx::vms::api::EmailSettings& settings,
     Result<RestResultWithData<QnTestEmailSettingsReply>>::type&& callback,
     QThread* targetThread,
     std::optional<QnUuid> proxyToServer)

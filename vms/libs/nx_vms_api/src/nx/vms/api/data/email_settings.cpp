@@ -1,15 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#pragma once
+#include "email_settings.h"
 
-#include <nx/reflect/enum_instrument.h>
+#include <nx/fusion/model_functions.h>
 
 namespace nx::vms::api {
 
-NX_REFLECTION_ENUM_CLASS(ConnectionType,
-    insecure = 0,
-    ssl = 1,
-    tls = 2
-)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EmailSettings, (json), EmailSettings_Fields)
 
 } // namespace nx::vms::api
+

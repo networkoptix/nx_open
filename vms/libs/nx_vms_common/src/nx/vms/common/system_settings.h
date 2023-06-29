@@ -27,6 +27,7 @@ class QSettings;
 namespace nx::vms::api {
 
 struct BackupSettings;
+struct EmailSettings;
 struct LdapSettings;
 struct ResourceParamWithRefData;
 struct SystemSettings;
@@ -96,7 +97,6 @@ struct SystemSettingNames
     static const inline std::set<QString> kWriteOnlyNames = {
         cloudAuthKey,
         ldap,
-        smtpPassword,
     };
 
     static const inline std::set<QString> kOwnerOnlyNames = {
@@ -214,7 +214,7 @@ public:
     void setAutoDiscoveryResponseEnabled(bool enabled);
 
     QnEmailSettings emailSettings() const;
-    void setEmailSettings(const QnEmailSettings& settings, bool savePassword = true);
+    void setEmailSettings(const QnEmailSettings& emailSettings);
 
     nx::vms::api::LdapSettings ldap() const;
     void setLdap(const nx::vms::api::LdapSettings& settings);
@@ -592,16 +592,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_clientStatisticsSettingsUrlAdaptor = nullptr;
 
     // set of email settings adaptors
-    QnResourcePropertyAdaptor<QString>* m_serverAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_fromAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_userAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_smtpPasswordAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_signatureAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_supportLinkAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QnEmail::ConnectionType>* m_connectionTypeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_portAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_timeoutAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_smtpNameAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::vms::api::EmailSettings>* m_emailSettingsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<nx::vms::api::LdapSettings>* m_ldapAdaptor = nullptr;
 
