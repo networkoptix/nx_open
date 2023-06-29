@@ -25,6 +25,7 @@
 #include <utils/math/color_transformations.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
+#include "nx/vms/client/core/skin/icon.h"
 
 namespace {
 
@@ -307,11 +308,45 @@ void SearchEdit::setupMenuButton()
 
 void SearchEdit::updateMenuButtonIcon()
 {
+    // TODO: @pprivalov Remove this old fashioned color substitutions when figma plugin is ready
+    static const QColor kBasePrimaryColor = "#B8B8BD";
+    static const QColor kBackgroundColor = "#263137";
+
+    const core::SvgIconColorer::IconSubstitutions kSearchDropIconSubstitutions = {
+        { QnIcon::Normal, {
+            { kBasePrimaryColor, "light16"},
+            { kBackgroundColor, "dark8"}
+        }},
+        { QnIcon::Selected, { // Pressed
+            { kBasePrimaryColor, "light15"},
+            { kBackgroundColor, "dark7" },
+        }},
+        { QnIcon::Active, { // Hovered
+            { kBasePrimaryColor, "light17"},
+            { kBackgroundColor, "dark9" },
+        }},
+    };
+
+    const core::SvgIconColorer::IconSubstitutions kSearchDropSelectedIconSubstitutions = {
+        { QnIcon::Normal, {
+            { kBasePrimaryColor, "light1"},
+            { kBackgroundColor, "dark8"}
+        }},
+        { QnIcon::Selected, { // Pressed
+            { kBasePrimaryColor, "light1"},
+            { kBackgroundColor, "dark7" },
+        }},
+        { QnIcon::Active, { // Hovered
+            { kBasePrimaryColor, "light1"},
+            { kBackgroundColor, "dark9" },
+        }},
+    };
+
     const auto kIcon = isMenuEnabled()
-        ? qnSkin->icon("panel/search_drop.png")
+        ? qnSkin->icon("panel/search_drop_40x32.svg", kSearchDropIconSubstitutions)
         : qnSkin->icon("panel/search.png");
     const auto kSelectedIcon = isMenuEnabled()
-        ? qnSkin->icon("panel/search_drop_selected.png")
+        ? qnSkin->icon("panel/search_drop_40x32.svg", kSearchDropSelectedIconSubstitutions)
         : qnSkin->icon("panel/search_selected.png");
 
     d->menuButton->setFixedSize(isMenuEnabled() ? QSize(40, 32) : QSize(32, 32));
