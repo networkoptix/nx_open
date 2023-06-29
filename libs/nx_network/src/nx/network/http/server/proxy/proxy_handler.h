@@ -7,18 +7,37 @@
 #include <nx/network/aio/abstract_async_connector.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/ssl/helpers.h>
+#include <nx/reflect/instrument.h>
+#include <nx/reflect/enum_instrument.h>
 
 #include "proxy_worker.h"
 #include "../abstract_http_request_handler.h"
 
 namespace nx::network::http::server::proxy {
 
-enum class SslMode
-{
+NX_REFLECTION_ENUM_CLASS(SslMode,
     followIncomingConnection,
     enabled,
-    disabled,
+    disabled
+);
+
+// Represents proxy target.
+struct NX_NETWORK_API TargetHost
+{
+    network::SocketAddress target;
+    SslMode sslMode = SslMode::followIncomingConnection;
+
+    /**
+     * Filled in case a redirect is needed to reach the requested target.
+     * If filled then proxy request will complete with a redirect to the specified URL.
+     */
+    std::optional<nx::utils::Url> redirectLocation;
+
+    TargetHost() = default;
+    TargetHost(network::SocketAddress target);
 };
+
+NX_REFLECTION_INSTRUMENT(TargetHost, (target)(sslMode)(redirectLocation))
 
 /**
  * Implements HTTP proxy. Every request that is received by this handler is treated as a request
@@ -41,22 +60,6 @@ enum class SslMode
 class NX_NETWORK_API AbstractProxyHandler:
     public RequestHandlerWithContext
 {
-public:
-    struct NX_NETWORK_API TargetHost
-    {
-        network::SocketAddress target;
-        SslMode sslMode = SslMode::followIncomingConnection;
-
-        /**
-         * Filled in case a redirect is needed to reach the requested target.
-         * If filled then proxy request will complete with a redirect to the specified URL.
-         */
-        std::optional<nx::utils::Url> redirectLocation;
-
-        TargetHost() = default;
-        TargetHost(network::SocketAddress target);
-    };
-
 public:
     AbstractProxyHandler();
 

@@ -27,7 +27,7 @@ protected:
     {
         handler(
             nx::network::http::StatusCode::ok,
-            TargetHost(m_targetAddress));
+            nx::network::http::server::proxy::TargetHost(m_targetAddress));
     }
 
 private:
