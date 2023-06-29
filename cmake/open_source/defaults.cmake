@@ -10,7 +10,7 @@ set(customization "metavms" CACHE STRING "Product customization")
 
 # Values for cache variables not used in open source libraries but needed by cmake scripts common
 # with the main project.
-set(productType "vms" CACHE STRING "Product type" FORCE)
+set(productType "all" CACHE STRING "Product type" FORCE)
 set(publicationType "local" CACHE STRING "Product publication type")
 
 set(withDesktopClient ON CACHE STRING "Enable desktop client")
