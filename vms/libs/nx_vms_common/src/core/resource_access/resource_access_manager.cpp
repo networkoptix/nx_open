@@ -350,6 +350,12 @@ void QnResourceAccessManager::handleResourcesAdded(const QnResourceList& resourc
             connect(layout.get(), &QnLayoutResource::lockedChanged,
                 this, &QnResourceAccessManager::permissionsDependencyChanged);
         }
+
+        if (const auto& user = resource.objectCast<QnUserResource>())
+        {
+            connect(user.get(), &QnUserResource::attributesChanged,
+                this, &QnResourceAccessManager::permissionsDependencyChanged);
+        }
     }
 }
 
@@ -719,6 +725,9 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const auto filterByUserType =
         [targetUser](Qn::Permissions permissions)
         {
+            if (targetUser->attributes().testFlag(UserAttribute::readonly))
+                return permissions & Qn::ReadPermission;
+
             switch (targetUser->userType())
             {
                 case nx::vms::api::UserType::ldap:
@@ -765,7 +774,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     if (targetUser->isAdministrator())
     {
         if (isSubjectAdministrator && !targetUser->isCloud())
-            return Qn::ReadWriteSavePermission | Qn::WriteDigestPermission;
+            return filterByUserType(Qn::ReadWriteSavePermission | Qn::WriteDigestPermission);
 
         return Qn::ReadPermission;
     }
@@ -799,6 +808,9 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                 result.setFlag(Qn::WriteNamePermission, false);
         }
     }
+
+    if (targetGroup.attributes.testFlag(UserAttribute::readonly))
+        return result & Qn::ReadPermission;
 
     return result;
 }
@@ -1166,4 +1178,3 @@ bool QnResourceAccessManager::hasAccessToAllCameras(
         nx::vms::api::kAllDevicesGroupId,
         accessRights | nx::vms::api::AccessRight::view);
 }
-

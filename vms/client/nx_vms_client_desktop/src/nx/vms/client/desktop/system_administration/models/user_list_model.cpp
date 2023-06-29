@@ -61,14 +61,33 @@ public:
             [this](const QnResourcePtr& resource)
             {
                 if (auto user = resource.dynamicCast<QnUserResource>())
-                    addUser(user);
+                {
+                    connect(user.get(), &QnUserResource::attributesChanged,
+                        [this](const QnResourcePtr& resource)
+                        {
+                            auto user = resource.dynamicCast<QnUserResource>();
+                            if (!NX_ASSERT(user))
+                                return;
+
+                            if (!user->attributes().testFlag(nx::vms::api::UserAttribute::hidden))
+                                addUser(user);
+                            else
+                                removeUser(user);
+                        });
+
+                    if (!user->attributes().testFlag(nx::vms::api::UserAttribute::hidden))
+                        addUser(user);
+                }
             });
 
         connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
             [this](const QnResourcePtr& resource)
             {
                 if (auto user = resource.dynamicCast<QnUserResource>())
+                {
+                    disconnect(user.get(), nullptr, this, nullptr);
                     removeUser(user);
+                }
             });
     }
 
@@ -172,7 +191,13 @@ void UserListModel::Private::resetUsers(const QnUserResourceList& value)
     for (const auto& user: users)
         removeUserInternal(user);
     users.clear();
-    users.insert(value.begin(), value.end());
+
+    for (const auto& user: value)
+    {
+        if (!user->attributes().testFlag(nx::vms::api::UserAttribute::hidden))
+            users.insert(user);
+    }
+
     for (const auto& user: users)
         addUserInternal(user);
     model->endResetModel();
@@ -195,13 +220,13 @@ void UserListModel::Private::addUser(const QnUserResourcePtr& user)
 void UserListModel::Private::removeUser(const QnUserResourcePtr& user)
 {
     const auto it = users.find(user);
-    if (it != users.end())
-    {
-        const auto row = users.index_of(it);
-        model->beginRemoveRows(QModelIndex(), row, row);
-        users.erase(user);
-        model->endRemoveRows();
-    }
+    if (it == users.end())
+        return;
+
+    const auto row = users.index_of(it);
+    model->beginRemoveRows(QModelIndex(), row, row);
+    users.erase(user);
+    model->endRemoveRows();
 
     removeUserInternal(user);
 }
@@ -245,7 +270,17 @@ void UserListModel::Private::removeUserInternal(const QnUserResourcePtr& user)
 
     prevName.remove(user->getId());
 
-    disconnect(user.get(), nullptr, this, nullptr);
+    disconnect(user.get(), &QnUserResource::nameChanged, this,
+        &UserListModel::Private::at_resourcePool_resourceChanged);
+    disconnect(user.get(), &QnUserResource::fullNameChanged, this,
+        &UserListModel::Private::at_resourcePool_resourceChanged);
+    disconnect(user.get(), &QnUserResource::permissionsChanged, this,
+        &UserListModel::Private::handleUserChanged);
+    disconnect(user.get(), &QnUserResource::userGroupsChanged, this,
+        &UserListModel::Private::handleUserChanged);
+    disconnect(user.get(), &QnUserResource::enabledChanged, this, nullptr);
+    disconnect(user.get(), &QnUserResource::digestChanged, this, nullptr);
+
     checkedUsers.remove(user);
     enableChangedUsers.remove(user);
     digestChangedUsers.remove(user);
@@ -565,9 +600,9 @@ QnUserResourceList UserListModel::users() const
     return result;
 }
 
-void UserListModel::resetUsers(const QnUserResourceList& value)
+void UserListModel::resetUsers()
 {
-    d->resetUsers(value);
+    d->resetUsers(resourcePool()->getResources<QnUserResource>());
 }
 
 void UserListModel::addUser(const QnUserResourcePtr& user)

@@ -53,7 +53,7 @@ public:
     void setDigestEnabled(const QnUserResourcePtr& user, bool enabled);
 
     QnUserResourceList users() const;
-    void resetUsers(const QnUserResourceList& value);
+    void resetUsers();
     void addUser(const QnUserResourcePtr& user);
     void removeUser(const QnUserResourcePtr& user);
 

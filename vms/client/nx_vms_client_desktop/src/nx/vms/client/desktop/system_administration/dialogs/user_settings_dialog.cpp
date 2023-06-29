@@ -560,6 +560,7 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
         connect(user.get(), &QnUserResource::fullNameChanged, this, updateState);
         connect(user.get(), &QnUserResource::permissionsChanged, this, updateState);
         connect(user.get(), &QnUserResource::enabledChanged, this, updateState);
+        connect(user.get(), &QnUserResource::attributesChanged, this, updateState);
     }
 
     d->isSaving = false;
