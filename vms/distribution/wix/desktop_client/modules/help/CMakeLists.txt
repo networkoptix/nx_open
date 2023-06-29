@@ -3,7 +3,7 @@
 include(wix_utils)
 
 nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_help.wixobj
-    SOURCE_DIR ${help_directory}/bin/help
+    SOURCE_DIR ${help_directory}/help
     TARGET_DIR_ALIAS HelpDirectoryReference
     COMPONENT_GROUP HelpComponentGroup)
 

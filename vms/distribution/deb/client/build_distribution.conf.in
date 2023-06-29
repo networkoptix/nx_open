@@ -30,7 +30,7 @@ INSTALLER_NAME="@customization.installerName@"
 LAUNCHER_VERSION_FILE="@launcher.version.file@"
 APPLAUNCHER_BINARY_NAME="@applauncher.binary.name@"
 CLIENT_BINARY_NAME="@client.binary.name@"
-CLIENT_HELP_PATH="@help_directory@/bin/help"
+CLIENT_HELP_PATH="@help_directory@/help"
 DISTRIBUTION_NAME="@client_distribution_name@"
 UPDATE_ZIP="@client_update_distribution_name@.zip"
 

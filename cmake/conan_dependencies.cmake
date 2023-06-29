@@ -101,12 +101,12 @@ if(CONAN_VMS_HELP_ROOT)
     set(help_directory ${CONAN_VMS_HELP_ROOT})
 endif()
 
-if(CONAN_MOBILE_CLIENT_HELP_ROOT)
-    set(mobile_help_directory ${CONAN_MOBILE_CLIENT_HELP_ROOT})
+if(CONAN_MOBILE_USER_MANUAL_ROOT)
+    set(mobile_help_directory ${CONAN_MOBILE_USER_MANUAL_ROOT})
 endif()
 
-if(CONAN_VMS_QUICK_START_GUIDE_ROOT)
-    set(quick_start_guide_directory ${CONAN_VMS_QUICK_START_GUIDE_ROOT})
+if(CONAN_QUICK_START_GUIDE_ROOT)
+    set(quick_start_guide_directory ${CONAN_QUICK_START_GUIDE_ROOT})
 endif()
 
 if(CONAN_NX_MOBILE_CLIENT_DEPENDENCIES_ROOT)

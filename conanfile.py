@@ -57,14 +57,18 @@ class NxOpenConan(ConanFile):
         "useClang": False,
         "skipCustomizationPackage": False,
         "customization": "default",
+        "quick_start_guide:format": "pdf",
     }
 
     ffmpeg_version_and_revision = "4.4#3798b16fa0e0317daf710c96f2c794c3"
+    help_version_and_revision = "5.1.0" "#094354ea7a0465e1334a7c04052761bb"
     requires = (
         f"ffmpeg/{ffmpeg_version_and_revision}",
         "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
         "qt/5.15.6" "#48b4cf4fa89839127f1cb92179c426ff",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
+        f"vms_help/{help_version_and_revision}",
+        f"quick_start_guide/{help_version_and_revision}",
     )
 
     def configure(self):
@@ -133,12 +137,6 @@ class NxOpenConan(ConanFile):
 
         if self.isArm32 or self.isArm64:
             self.requires("sse2neon/7bd15ea" "#d5c087ce33dbf1425b29d6435284d2c7")
-
-        self._add_documentation_requirements()
-
-    def _add_documentation_requirements(self):
-        self.requires(f"vms_help/5.1" "#a485d6e5685dd3a8873b6d75b26d521a")
-        self.requires(f"vms_quick_start_guide/5.0" "#cf0e958c5edf4045eb6bbc41ee2cba5e")
 
     def imports(self):
         if self.isLinux:
