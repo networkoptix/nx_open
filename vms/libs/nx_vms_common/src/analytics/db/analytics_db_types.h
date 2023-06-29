@@ -119,6 +119,13 @@ struct ObjectTrack
     ObjectRegion objectPosition;
     BestShot bestShot;
     QnUuid analyticsEngineId;
+    
+    /**
+     * Groups data under specified value. I.e., it allows to store multiple independent sets of
+     * data in a single DB instead of having to create a separate DB instance for each unique
+     * value of the storageId.
+     */
+    std::string storageId;
 };
 
 struct NX_VMS_COMMON_API ObjectTrackEx: public ObjectTrack
@@ -131,7 +138,7 @@ struct NX_VMS_COMMON_API ObjectTrackEx: public ObjectTrack
 
 #define ObjectTrack_analytics_storage_Fields \
     (id)(deviceId)(objectTypeId)(attributes)(firstAppearanceTimeUs)(lastAppearanceTimeUs)( \
-        objectPosition)(bestShot)(analyticsEngineId)
+        objectPosition)(bestShot)(analyticsEngineId)(storageId)
 
 #define ObjectTrackEx_analytics_storage_Fields \
     ObjectTrack_analytics_storage_Fields(objectPositionSequence)
@@ -155,6 +162,13 @@ struct NX_VMS_COMMON_API Filter
     };
 
     Q_DECLARE_FLAGS(Options, Option)
+
+    /**
+     * Groups data under specified value. I.e., it allows to store multiple independent sets of
+     * data in a single DB instead of having to create a separate DB instance for each unique
+     * value of the storageId.
+     */
+    std::string storageId;
 
     /** If empty, any device is matched. */
     std::set<QnUuid> deviceIds;
@@ -278,7 +292,7 @@ NX_VMS_COMMON_API std::set<QString> addDerivedTypeIds(
 
 #define Filter_analytics_storage_Fields \
     (deviceIds)(objectTypeId)(objectTrackId)(timePeriod)(boundingBox)(freeText)\
-    (maxObjectTracksToSelect)(needFullTrack)(sortOrder)(analyticsEngineId)
+    (maxObjectTracksToSelect)(needFullTrack)(sortOrder)(analyticsEngineId)(storageId)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json), NX_VMS_COMMON_API);
 
 NX_REFLECTION_INSTRUMENT(Filter, Filter_analytics_storage_Fields)
