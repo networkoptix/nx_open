@@ -6,11 +6,12 @@
 #include <nx/network/socket_factory.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/network/http/global_context.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
 
 namespace nx::network::http::server::proxy {
 
-AbstractProxyHandler::TargetHost::TargetHost(network::SocketAddress target):
+TargetHost::TargetHost(network::SocketAddress target):
     target(std::move(target))
 {
 }
@@ -36,11 +37,20 @@ void AbstractProxyHandler::processRequest(
 
     fixRequestHeaders();
 
+    NX_VERBOSE(this, "Detecting proxy target. %1, request.host %2, request.source %3",
+        m_request.requestLine, getHeaderValue(m_request.headers, "Host"), requestContext.clientEndpoint);
+
     detectProxyTarget(
         requestContext.connectionAttrs,
         requestContext.clientEndpoint,
         &m_request,
-        [this](auto&&... args) { startProxying(std::move(args)...); });
+        [this](StatusCode::Value resultCode, TargetHost proxyTarget)
+        {
+            NX_VERBOSE(this, "Detecting proxy target completed with result %1, target %2",
+                resultCode, nx::reflect::json::serialize(proxyTarget));
+
+            startProxying(resultCode, std::move(proxyTarget));
+        });
 }
 
 void AbstractProxyHandler::setTargetHostConnectionInactivityTimeout(

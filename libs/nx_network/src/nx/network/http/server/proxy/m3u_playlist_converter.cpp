@@ -3,6 +3,7 @@
 #include "m3u_playlist_converter.h"
 
 #include <nx/network/m3u/m3u_playlist.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::network::http::server::proxy {
 
@@ -33,6 +34,7 @@ nx::Buffer M3uPlaylistConverter::convert(
 
         nx::utils::Url url(entry.value);
         url = m_urlRewriter.originalResourceUrlToProxyUrl(url, m_proxyHostUrl, m_targetHost);
+        NX_VERBOSE(this, "Replacing URL %1 with %2", entry.value, url);
         entry.value = url.toString().toStdString();
     }
 

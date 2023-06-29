@@ -42,7 +42,7 @@ bool ReverseProxyHandler::add(
     const std::string_view& pathRegex,
     const nx::utils::Url& targetUrl)
 {
-    AbstractProxyHandler::TargetHost proxyTarget;
+    TargetHost proxyTarget;
     proxyTarget.target = url::getEndpoint(targetUrl);
     proxyTarget.sslMode = nx::utils::stricmp(targetUrl.scheme().toStdString(), "https") == 0
         ? SslMode::enabled : SslMode::disabled;
