@@ -51,7 +51,7 @@ protected:
 private slots:
     void reset();
     void updateData();
-    void at_gotdata(bool success, int requestNum, const QnAuditRecordList& data);
+    void at_gotdata(bool success, int requestNum, const QnLegacyAuditRecordList& data);
     void at_customContextMenuRequested(const QPoint& screenPos);
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
@@ -84,15 +84,15 @@ private:
 
     void setupGridCommon(nx::vms::client::desktop::TableView* grid, bool master);
 
-    QnAuditRecordRefList filterChildDataBySessions(const QnAuditRecordRefList& checkedRows);
-    QnAuditRecordRefList filterChildDataByCameras(const QnAuditRecordRefList& checkedRows);
+    QnLegacyAuditRecordRefList filterChildDataBySessions(const QnLegacyAuditRecordRefList& checkedRows);
+    QnLegacyAuditRecordRefList filterChildDataByCameras(const QnLegacyAuditRecordRefList& checkedRows);
     void setupFilterCheckbox(
         QCheckBox* checkbox,
         const QColor& activeColor,
-        Qn::AuditRecordTypes filteredTypes);
-    void processPlaybackAction(const QnAuditRecord* record);
-    void triggerAction(const QnAuditRecord* record, nx::vms::client::desktop::menu::IDType ActionId, int selectedPage);
-    QnAuditRecordRefList applyFilter();
+        Qn::LegacyAuditRecordTypes filteredTypes);
+    void processPlaybackAction(const QnLegacyAuditRecord* record);
+    void triggerAction(const QnLegacyAuditRecord* record, nx::vms::client::desktop::menu::IDType ActionId, int selectedPage);
+    QnLegacyAuditRecordRefList applyFilter();
     void makeSessionData();
     void makeCameraData();
     void setupContextMenu(nx::vms::client::desktop::TableView* gridMaster);
@@ -108,10 +108,10 @@ private:
     QnAuditLogDetailModel* m_detailModel;
     QSet<int> m_requests;
 
-    QnAuditRecordList m_allData;
-    QnAuditRecordList m_cameraData;
-    QnAuditRecordList m_sessionData;
-    QnAuditRecordRefList m_filteredData;
+    QnLegacyAuditRecordList m_allData;
+    QnLegacyAuditRecordList m_cameraData;
+    QnLegacyAuditRecordList m_sessionData;
+    QnLegacyAuditRecordRefList m_filteredData;
     bool m_updateDisabled;
     bool m_dirty;
 

@@ -40,7 +40,7 @@ const QByteArray QnAuditLogModel::CheckedParamName("checked");
 
 namespace
 {
-    QString firstResourceName(const QnAuditRecord *d1)
+    QString firstResourceName(const QnLegacyAuditRecord *d1)
     {
         auto resourcePool = qnClientCoreModule->resourcePool();
 
@@ -52,7 +52,7 @@ namespace
             return QString();
     }
 
-    QString firstResourceIp(const QnAuditRecord *d1)
+    QString firstResourceIp(const QnLegacyAuditRecord *d1)
     {
         auto resourcePool = qnClientCoreModule->resourcePool();
 
@@ -87,13 +87,13 @@ public:
         updateIndex();
     }
 
-    void setData(const QnAuditRecordRefList &data)
+    void setData(const QnLegacyAuditRecordRefList &data)
     {
         m_data = data;
         updateIndex();
     }
 
-    QnAuditRecordRefList data() const
+    QnLegacyAuditRecordRefList data() const
     {
         return m_data;
     }
@@ -109,21 +109,21 @@ public:
     }
 
 
-    inline QnAuditRecord* at(int row)
+    inline QnLegacyAuditRecord* at(int row)
     {
         return m_sortOrder == Qt::AscendingOrder ? m_data[row] : m_data[m_data.size() - 1 - row];
     }
 
     // comparators
 
-    typedef bool(*LessFunc)(const QnAuditRecord *d1, const QnAuditRecord *d2);
+    typedef bool(*LessFunc)(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2);
 
-    static bool lessThanTimestamp(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    static bool lessThanTimestamp(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
         return d1->createdTimeSec < d2->createdTimeSec;
     }
 
-    static bool lessThanEndTimestamp(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    static bool lessThanEndTimestamp(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
         const bool leftLoginSessionIsIncomplete =
             d1->rangeEndSec == 0 && d1->eventType == Qn::AR_Login;
@@ -138,37 +138,37 @@ public:
             : d1->rangeEndSec < d2->rangeEndSec;
     }
 
-    static bool lessThanDuration(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    static bool lessThanDuration(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
         return (d1->rangeEndSec - d1->rangeStartSec) < (d2->rangeEndSec - d2->rangeStartSec);
     }
 
-    static bool lessThanUserName(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    static bool lessThanUserName(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
         return d1->authSession.userName < d2->authSession.userName;
     }
 
-    static bool lessThanUserHost(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    static bool lessThanUserHost(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
         return d1->authSession.userHost < d2->authSession.userHost;
     }
 
-    static bool lessThanEventType(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    static bool lessThanEventType(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
         return d1->eventType < d2->eventType;
     }
 
-    static bool lessThanCameraName(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    static bool lessThanCameraName(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
         return firstResourceName(d1) < firstResourceName(d2);
     }
 
-    static bool lessThanCameraIp(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    static bool lessThanCameraIp(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
         return firstResourceIp(d1) < firstResourceIp(d2);
     }
 
-    static bool lessThanActivity(const QnAuditRecord *d1, const QnAuditRecord *d2)
+    static bool lessThanActivity(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
         return d1->extractParam(ChildCntParamName).toUInt() < d2->extractParam("childCnt").toUInt();
     }
@@ -217,7 +217,7 @@ public:
 private:
     Column m_sortCol;
     Qt::SortOrder m_sortOrder;
-    QnAuditRecordRefList m_data;
+    QnLegacyAuditRecordRefList m_data;
 };
 
 
@@ -225,12 +225,12 @@ private:
 // QnEventLogModel
 // -------------------------------------------------------------------------- //
 
-bool QnAuditLogModel::hasDetail(const QnAuditRecord* record)
+bool QnAuditLogModel::hasDetail(const QnLegacyAuditRecord* record)
 {
     return record->extractParam("detail") == "1";
 }
 
-void QnAuditLogModel::setDetail(QnAuditRecord* record, bool showDetail)
+void QnAuditLogModel::setDetail(QnLegacyAuditRecord* record, bool showDetail)
 {
     record->addParam("detail", showDetail ? "1" : "0");
 }
@@ -246,7 +246,7 @@ QnAuditLogModel::QnAuditLogModel(QObject *parent)
 QnAuditLogModel::~QnAuditLogModel() {
 }
 
-void QnAuditLogModel::setData(const QnAuditRecordRefList &data) {
+void QnAuditLogModel::setData(const QnLegacyAuditRecordRefList &data) {
     beginResetModel();
     m_index->setData(data);
     endResetModel();
@@ -311,7 +311,7 @@ QString QnAuditLogModel::formatDuration(int durationSecs)
         HumanReadable::kNoSuppressSecondUnit);
 }
 
-QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
+QString QnAuditLogModel::eventTypeToString(Qn::LegacyAuditRecordType eventType)
 {
     auto resourcePool = qnClientCoreModule->resourcePool();
     switch (eventType)
@@ -390,7 +390,7 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
     return QString();
 }
 
-QnVirtualCameraResourceList QnAuditLogModel::getCameras(const QnAuditRecord* record)
+QnVirtualCameraResourceList QnAuditLogModel::getCameras(const QnLegacyAuditRecord* record)
 {
     return record ? getCameras(record->resources) : QnVirtualCameraResourceList();
 }
@@ -417,7 +417,7 @@ QString QnAuditLogModel::getResourcesString(const std::vector<nx::Uuid>& resourc
     return result;
 }
 
-QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
+QString QnAuditLogModel::eventDescriptionText(const QnLegacyAuditRecord* data) const
 {
     QString result;
     switch (data->eventType)
@@ -483,7 +483,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
     return result;
 }
 
-QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* data, int row, bool hovered) const
+QString QnAuditLogModel::htmlData(const Column& column, const QnLegacyAuditRecord* data, int row, bool hovered) const
 {
     using namespace nx::vms::common;
 
@@ -552,7 +552,7 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
         return textData(column, data);
 }
 
-bool QnAuditLogModel::matches(const QnAuditRecord* record, const QStringList& keywords) const
+bool QnAuditLogModel::matches(const QnLegacyAuditRecord* record, const QStringList& keywords) const
 {
     static constexpr std::array<Column, 4> kColumnsToFilter =
         {
@@ -576,7 +576,7 @@ bool QnAuditLogModel::matches(const QnAuditRecord* record, const QStringList& ke
 
 bool QnAuditLogModel::matches(
     const Column& column,
-    const QnAuditRecord* data,
+    const QnLegacyAuditRecord* data,
     const QString& keyword) const
 {
     if (column == DescriptionColumn
@@ -593,7 +593,7 @@ bool QnAuditLogModel::matches(
     return textData(column, data).contains(keyword, Qt::CaseInsensitive);
 }
 
-QString QnAuditLogModel::textData(const Column& column, const QnAuditRecord* data) const
+QString QnAuditLogModel::textData(const Column& column, const QnLegacyAuditRecord* data) const
 {
     switch (column)
     {
@@ -785,9 +785,9 @@ bool QnAuditLogModel::setData(const QModelIndex &index, const QVariant &value, i
     }
 }
 
-QnAuditRecordRefList QnAuditLogModel::checkedRows()
+QnLegacyAuditRecordRefList QnAuditLogModel::checkedRows()
 {
-    QnAuditRecordRefList result;
+    QnLegacyAuditRecordRefList result;
     for (const auto& record : m_index->data())
     {
         if (record->extractParam(CheckedParamName) == "1")
@@ -796,12 +796,12 @@ QnAuditRecordRefList QnAuditLogModel::checkedRows()
     return result;
 }
 
-QnAuditRecord* QnAuditLogModel::rawData(int row) const
+QnLegacyAuditRecord* QnAuditLogModel::rawData(int row) const
 {
     return m_index->at(row);
 }
 
-QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
+QVariant QnAuditLogModel::colorForType(Qn::LegacyAuditRecordType actionType) const
 {
     switch (actionType)
     {
@@ -846,7 +846,7 @@ QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
     }
 }
 
-bool QnAuditLogModel::skipDate(const QnAuditRecord *record, int row) const
+bool QnAuditLogModel::skipDate(const QnLegacyAuditRecord *record, int row) const
 {
     if (row < 1)
         return false;
@@ -858,7 +858,7 @@ bool QnAuditLogModel::skipDate(const QnAuditRecord *record, int row) const
     return d1 == d2;
 }
 
-bool QnAuditLogModel::isDetailDataSupported(const QnAuditRecord *record) const
+bool QnAuditLogModel::isDetailDataSupported(const QnLegacyAuditRecord *record) const
 {
     switch (record->eventType)
     {
@@ -874,7 +874,7 @@ bool QnAuditLogModel::isDetailDataSupported(const QnAuditRecord *record) const
     return false;
 }
 
-QString QnAuditLogModel::descriptionTooltip(const QnAuditRecord *record) const
+QString QnAuditLogModel::descriptionTooltip(const QnLegacyAuditRecord *record) const
 {
     if (record->resources.empty() || !isDetailDataSupported(record))
         return QString();
@@ -897,7 +897,7 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
 
     const Column &column = m_columns[index.column()];
 
-    const QnAuditRecord *record = m_index->at(index.row());
+    const QnLegacyAuditRecord *record = m_index->at(index.row());
 
     switch (role)
     {
@@ -917,7 +917,7 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
         return htmlData(column, record, index.row(), false);
 
     case Qn::AuditRecordDataRole:
-        return QVariant::fromValue<QnAuditRecord*>(m_index->at(index.row()));
+        return QVariant::fromValue<QnLegacyAuditRecord*>(m_index->at(index.row()));
 
     case Qn::ColumnDataRole:
         return column;
@@ -989,7 +989,7 @@ void QnAuditLogModel::calcColorInterleaving()
     m_interleaveInfo.resize(m_index->size());
     for (int i = 0; i < m_index->size(); ++i)
     {
-        QnAuditRecord* record = m_index->at(i);
+        QnLegacyAuditRecord* record = m_index->at(i);
         if (record->authSession.id != prevSessionId) {
             colorIndex = (colorIndex + 1) % 2;
             prevSessionId = record->authSession.id;

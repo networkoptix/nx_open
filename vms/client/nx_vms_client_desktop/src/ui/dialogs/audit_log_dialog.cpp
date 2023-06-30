@@ -160,7 +160,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
         {
             if (index.column() == m_descriptionColumnIndex)
             {
-                const QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
+                const QnLegacyAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnLegacyAuditRecord*>();
                 if (record && !record->resources.empty())
                     ui->gridDetails->setCursor(Qt::PointingHandCursor);
             }
@@ -332,27 +332,27 @@ void QnAuditLogDialog::setupContextMenu(TableView* gridMaster)
     connect(m_selectAllAction, &QAction::triggered, this, &QnAuditLogDialog::at_selectAllAction_triggered);
 }
 
-QnAuditRecordRefList QnAuditLogDialog::applyFilter()
+QnLegacyAuditRecordRefList QnAuditLogDialog::applyFilter()
 {
-    QnAuditRecordRefList result;
+    QnLegacyAuditRecordRefList result;
     QStringList keywords = ui->filterLineEdit->text().split(lit(" "));
 
-    Qn::AuditRecordTypes disabledTypes = Qn::AR_NotDefined;
+    Qn::LegacyAuditRecordTypes disabledTypes = Qn::AR_NotDefined;
     for (const QCheckBox* checkBox: m_filterCheckboxes)
     {
         if (!checkBox->isChecked())
-            disabledTypes |= (Qn::AuditRecordTypes) checkBox->property(checkBoxFilterProperty).toInt();
+            disabledTypes |= (Qn::LegacyAuditRecordTypes) checkBox->property(checkBoxFilterProperty).toInt();
     }
 
     auto filter =
-        [&keywords, &disabledTypes, this](const QnAuditRecord& record)
+        [&keywords, &disabledTypes, this](const QnLegacyAuditRecord& record)
         {
             if (disabledTypes & record.eventType)
                 return false;
 
             return m_camerasModel->matches(&record, keywords);
         };
-    for (QnAuditRecord& record: m_allData)
+    for (QnLegacyAuditRecord& record: m_allData)
     {
         if (filter(record))
             result.push_back(&record);
@@ -360,14 +360,14 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
     return result;
 }
 
-QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRecordRefList& checkedRows)
+QnLegacyAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnLegacyAuditRecordRefList& checkedRows)
 {
     QMap<nx::Uuid, int> selectedSessions;
-    for (const QnAuditRecord* record: checkedRows)
+    for (const QnLegacyAuditRecord* record: checkedRows)
         selectedSessions.insert(record->authSession.id, record->rangeStartSec);
 
-    QnAuditRecordRefList result;
-    auto filter = [&selectedSessions] (const QnAuditRecord* record)
+    QnLegacyAuditRecordRefList result;
+    auto filter = [&selectedSessions] (const QnLegacyAuditRecord* record)
     {
         if (record->eventType == Qn::AR_Login)
             return selectedSessions.value(record->authSession.id) == record->rangeStartSec; // hide duplicate login from difference servers
@@ -378,10 +378,10 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRe
     return result;
 }
 
-QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRecordRefList& checkedRows)
+QnLegacyAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnLegacyAuditRecordRefList& checkedRows)
 {
     QSet<nx::Uuid> selectedCameras;
-    for (const QnAuditRecord* record: checkedRows)
+    for (const QnLegacyAuditRecord* record: checkedRows)
     {
         if (!record->resources.empty())
             selectedCameras << record->resources[0];
@@ -389,9 +389,9 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRec
     if (selectedCameras.empty())
         return {};
 
-    QnAuditRecordRefList result;
+    QnLegacyAuditRecordRefList result;
     auto filter =
-        [&selectedCameras] (const QnAuditRecord* record)
+        [&selectedCameras] (const auto* record)
         {
             for (const auto& id: record->resources)
             {
@@ -407,7 +407,7 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRec
 void QnAuditLogDialog::setupFilterCheckbox(
     QCheckBox* checkbox,
     const QColor& activeColor,
-    Qn::AuditRecordTypes filteredTypes)
+    Qn::LegacyAuditRecordTypes filteredTypes)
 {
     setPaletteColor(checkbox, QPalette::Active, QPalette::Text, activeColor);
     setPaletteColor(checkbox, QPalette::Inactive, QPalette::Text,
@@ -468,11 +468,11 @@ void QnAuditLogDialog::at_selectAllCheckboxChanged()
 void QnAuditLogDialog::at_currentTabChanged()
 {
     bool allEnabled = (ui->mainTabWidget->currentIndex() == sessionTabIndex);
-    const Qn::AuditRecordTypes camerasTypes = Qn::AR_ViewLive | Qn::AR_ViewArchive | Qn::AR_ExportVideo | Qn::AR_CameraUpdate | Qn::AR_CameraInsert | Qn::AR_CameraRemove;
+    const Qn::LegacyAuditRecordTypes camerasTypes = Qn::AR_ViewLive | Qn::AR_ViewArchive | Qn::AR_ExportVideo | Qn::AR_CameraUpdate | Qn::AR_CameraInsert | Qn::AR_CameraRemove;
 
     for(QCheckBox* checkBox: m_filterCheckboxes)
     {
-        Qn::AuditRecordTypes eventTypes = static_cast<Qn::AuditRecordTypes>(checkBox->property(checkBoxFilterProperty).toInt());
+        Qn::LegacyAuditRecordTypes eventTypes = static_cast<Qn::LegacyAuditRecordTypes>(checkBox->property(checkBoxFilterProperty).toInt());
         bool allowed = allEnabled || (camerasTypes & eventTypes);
 
         if (checkBox->isEnabled() == allowed)
@@ -499,10 +499,10 @@ void QnAuditLogDialog::at_filterChanged()
     if (ui->mainTabWidget->currentIndex() == sessionTabIndex)
     {
         QSet<nx::Uuid> filteredIdList;
-        for (const QnAuditRecord* record: m_filteredData)
+        for (const QnLegacyAuditRecord* record: m_filteredData)
             filteredIdList << record->authSession.id;
 
-        QnAuditRecordRefList filteredSessions;
+        QnLegacyAuditRecordRefList filteredSessions;
         for (auto& record: m_sessionData)
         {
             if (filteredIdList.contains(record.authSession.id))
@@ -514,13 +514,13 @@ void QnAuditLogDialog::at_filterChanged()
     else
     {
         QSet<nx::Uuid> filteredCameras;
-        for (const QnAuditRecord* record: m_filteredData)
+        for (const QnLegacyAuditRecord* record: m_filteredData)
         {
             for (const auto& id: record->resources)
             filteredCameras << id;
         }
 
-        QnAuditRecordRefList cameras;
+        QnLegacyAuditRecordRefList cameras;
         for (auto& record: m_cameraData)
         {
             if (NX_ASSERT(!record.resources.empty()))
@@ -544,7 +544,7 @@ void QnAuditLogDialog::at_updateDetailModel()
 
     if (ui->mainTabWidget->currentIndex() == sessionTabIndex)
     {
-        QnAuditRecordRefList checkedRows = m_sessionModel->checkedRows();
+        QnLegacyAuditRecordRefList checkedRows = m_sessionModel->checkedRows();
         auto data = filterChildDataBySessions(checkedRows);
         m_detailModel->setData(data);
         m_detailModel->calcColorInterleaving();
@@ -558,7 +558,7 @@ void QnAuditLogDialog::at_updateDetailModel()
     }
     else
     {
-        QnAuditRecordRefList checkedRows = m_camerasModel->checkedRows();
+        QnLegacyAuditRecordRefList checkedRows = m_camerasModel->checkedRows();
         auto data = filterChildDataByCameras(checkedRows);
         m_detailModel->setData(data);
         if (m_camerasModel->rowCount() != 0)
@@ -655,7 +655,7 @@ void QnAuditLogDialog::at_descriptionClicked(const QModelIndex& index)
     if (index.column() != m_descriptionColumnIndex)
         return;
 
-    QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
+    QnLegacyAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnLegacyAuditRecord*>();
     if (!record || record->resources.empty())
         return;
 
@@ -685,7 +685,7 @@ void QnAuditLogDialog::at_headerCheckStateChanged(Qt::CheckState state)
     }
 }
 
-void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
+void QnAuditLogDialog::processPlaybackAction(const QnLegacyAuditRecord* record)
 {
     QnResourceList resList;
     QnByteArrayConstRef archiveData = record->extractParam("archiveExist");
@@ -766,7 +766,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     menu()->trigger(menu::OpenInNewTabAction, layout);
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, menu::IDType actionId,
+void QnAuditLogDialog::triggerAction(const QnLegacyAuditRecord* record, menu::IDType actionId,
     int selectedPage)
 {
     QnResourceList resList = system()->resourcePool()->getResourcesByIds(record->resources);
@@ -815,7 +815,7 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
 {
     NX_ASSERT(index.column() == m_descriptionColumnIndex);
 
-    QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
+    QnLegacyAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnLegacyAuditRecord*>();
     if (!record)
         return;
 
@@ -917,7 +917,7 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
             success &= (result.error == UbjsonResult::Result::Error::NoError);
             if (!success)
                 NX_WARNING(this, "Audit log cannot be loaded: %1", result.errorString);
-            at_gotdata(success, handle, result.deserialized<QnAuditRecordList>());
+            at_gotdata(success, handle, result.deserialized<QnLegacyAuditRecordList>());
         });
 
     const auto onlineServers = system()->resourcePool()->getAllServers(
@@ -936,7 +936,7 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     }
 }
 
-void QnAuditLogDialog::at_gotdata(bool success, int requestNum, const QnAuditRecordList& records)
+void QnAuditLogDialog::at_gotdata(bool success, int requestNum, const QnLegacyAuditRecordList& records)
 {
     if (!m_requests.contains(requestNum))
         return;
@@ -951,8 +951,8 @@ void QnAuditLogDialog::makeSessionData()
 {
     m_sessionData.clear();
     QMap<nx::Uuid, int> activityPerSession;
-    QMap<nx::Uuid, QnAuditRecord> processedLogins;
-    for (const QnAuditRecord& record: m_allData)
+    QMap<nx::Uuid, QnLegacyAuditRecord> processedLogins;
+    for (const QnLegacyAuditRecord& record: m_allData)
     {
         if (record.isLoginType())
         {
@@ -965,7 +965,7 @@ void QnAuditLogDialog::makeSessionData()
             {
                 // Group sessions because of different servers may have same session
                 // or a single server can duplicate session after restart
-                QnAuditRecord& existRecord = itr.value();
+                QnLegacyAuditRecord& existRecord = itr.value();
                 existRecord.rangeStartSec = qMin(existRecord.rangeStartSec, record.rangeStartSec);
                 existRecord.rangeEndSec = (existRecord.rangeEndSec == 0 || record.rangeEndSec == 0)
                     ? 0 : qMax(existRecord.rangeEndSec, record.rangeEndSec);
@@ -976,7 +976,7 @@ void QnAuditLogDialog::makeSessionData()
     m_sessionData.reserve(processedLogins.size());
     for (auto& value: processedLogins)
         m_sessionData.push_back(std::move(value));
-    for (QnAuditRecord& record: m_sessionData) {
+    for (QnLegacyAuditRecord& record: m_sessionData) {
         record.addParam(QnAuditLogModel::ChildCntParamName, QByteArray::number(activityPerSession.value(record.authSession.id)));
         record.addParam(QnAuditLogModel::CheckedParamName, "1");
     }
@@ -986,7 +986,7 @@ void QnAuditLogDialog::makeCameraData()
 {
     m_cameraData.clear();
     QMap<nx::Uuid, int> activityPerCamera;
-    for (const QnAuditRecord& record: m_allData)
+    for (const QnLegacyAuditRecord& record: m_allData)
     {
         if (record.isPlaybackType() || record.isCameraType())
         {
@@ -996,7 +996,7 @@ void QnAuditLogDialog::makeCameraData()
     }
     for (auto itr = activityPerCamera.begin(); itr != activityPerCamera.end(); ++itr)
     {
-        QnAuditRecord cameraRecord;
+        QnLegacyAuditRecord cameraRecord;
         cameraRecord.resources.push_back(itr.key());
         cameraRecord.addParam(QnAuditLogModel::ChildCntParamName, QByteArray::number(itr.value())); // used for "user activity" column
         cameraRecord.addParam(QnAuditLogModel::CheckedParamName, "1");

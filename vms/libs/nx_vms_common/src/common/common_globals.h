@@ -9,6 +9,7 @@
 #include <nx/string.h>
 #include <nx/utils/serialization/flags.h>
 #include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/api/types/audit_record_type.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/resource_types.h>
 
@@ -216,38 +217,38 @@ namespace Qn {
     Q_DECLARE_FLAGS(IOPortTypes, IOPortType)
     Q_DECLARE_OPERATORS_FOR_FLAGS(IOPortTypes)
 
-    NX_REFLECTION_ENUM(AuditRecordType,
-        AR_NotDefined = 0x0000,
-        AR_UnauthorizedLogin = 0x0001,
-        AR_Login = 0x0002,
-        AR_UserUpdate = 0x0004,
-        AR_ViewLive = 0x0008,
-        AR_ViewArchive = 0x0010,
-        AR_ExportVideo = 0x0020,
-        AR_CameraUpdate = 0x0040,
-        AR_SystemNameChanged = 0x0080,
-        AR_SystemmMerge = 0x0100,
-        AR_SettingsChange = 0x0200,
-        AR_ServerUpdate = 0x0400,
-        AR_BEventUpdate = 0x0800,
-        AR_EmailSettings = 0x1000,
-        AR_CameraRemove = 0x2000,
-        AR_ServerRemove = 0x4000,
-        AR_BEventRemove = 0x8000,
-        AR_UserRemove = 0x10000,
-        AR_BEventReset = 0x20000,
-        AR_DatabaseRestore = 0x40000,
-        AR_CameraInsert = 0x80000,
-        AR_UpdateInstall = 0x100000,
-        AR_StorageInsert = 0x200000,
-        AR_StorageUpdate = 0x400000,
-        AR_StorageRemove = 0x800000,
-        AR_MitmAttack = 0x1000000,
-        AR_CloudBind = 0x2000000,
-        AR_CloudUnbind = 0x4000000
+    NX_REFLECTION_ENUM(LegacyAuditRecordType,
+        AR_NotDefined = static_cast<int>(nx::vms::api::AuditRecordType::notDefined),
+        AR_UnauthorizedLogin = static_cast<int>(nx::vms::api::AuditRecordType::unauthorizedLogin),
+        AR_Login = static_cast<int>(nx::vms::api::AuditRecordType::login),
+        AR_UserUpdate = static_cast<int>(nx::vms::api::AuditRecordType::userUpdate),
+        AR_ViewLive = static_cast<int>(nx::vms::api::AuditRecordType::viewLive),
+        AR_ViewArchive = static_cast<int>(nx::vms::api::AuditRecordType::viewArchive),
+        AR_ExportVideo = static_cast<int>(nx::vms::api::AuditRecordType::exportVideo),
+        AR_CameraUpdate = static_cast<int>(nx::vms::api::AuditRecordType::cameraUpdate),
+        AR_SystemNameChanged = static_cast<int>(nx::vms::api::AuditRecordType::systemNameChanged),
+        AR_SystemmMerge = static_cast<int>(nx::vms::api::AuditRecordType::systemmMerge),
+        AR_SettingsChange = static_cast<int>(nx::vms::api::AuditRecordType::settingsChange),
+        AR_ServerUpdate = static_cast<int>(nx::vms::api::AuditRecordType::serverUpdate),
+        AR_BEventUpdate = static_cast<int>(nx::vms::api::AuditRecordType::eventUpdate),
+        AR_EmailSettings = static_cast<int>(nx::vms::api::AuditRecordType::emailSettings),
+        AR_CameraRemove = static_cast<int>(nx::vms::api::AuditRecordType::cameraRemove),
+        AR_ServerRemove = static_cast<int>(nx::vms::api::AuditRecordType::serverRemove),
+        AR_BEventRemove = static_cast<int>(nx::vms::api::AuditRecordType::eventRemove),
+        AR_UserRemove = static_cast<int>(nx::vms::api::AuditRecordType::userRemove),
+        AR_BEventReset = static_cast<int>(nx::vms::api::AuditRecordType::eventReset),
+        AR_DatabaseRestore = static_cast<int>(nx::vms::api::AuditRecordType::databaseRestore),
+        AR_CameraInsert = static_cast<int>(nx::vms::api::AuditRecordType::cameraInsert),
+        AR_UpdateInstall = static_cast<int>(nx::vms::api::AuditRecordType::updateInstall),
+        AR_StorageInsert = static_cast<int>(nx::vms::api::AuditRecordType::storageInsert),
+        AR_StorageUpdate = static_cast<int>(nx::vms::api::AuditRecordType::storageUpdate),
+        AR_StorageRemove = static_cast<int>(nx::vms::api::AuditRecordType::storageRemove),
+        AR_MitmAttack = static_cast<int>(nx::vms::api::AuditRecordType::mitmAttack),
+        AR_CloudBind = static_cast<int>(nx::vms::api::AuditRecordType::cloudBind),
+        AR_CloudUnbind = static_cast<int>(nx::vms::api::AuditRecordType::cloudUnbind)
     )
-    Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(AuditRecordTypes)
+    Q_DECLARE_FLAGS(LegacyAuditRecordTypes, LegacyAuditRecordType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(LegacyAuditRecordTypes)
 
     enum IODefaultState {
         IO_OpenCircuit,

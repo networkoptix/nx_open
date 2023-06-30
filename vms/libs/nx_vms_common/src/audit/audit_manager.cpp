@@ -9,11 +9,5 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 
-QnAuditRecord QnAuditManager::prepareRecord(const QnAuthSession& authInfo, Qn::AuditRecordType recordType)
-{
-    QnAuditRecord result;
-    result.authSession = authInfo;
-    result.createdTimeSec = qnSyncTime->currentMSecsSinceEpoch() / 1000;
-    result.eventType = recordType;
-    return result;
-}
+QnAuditManager::~QnAuditManager()
+{}

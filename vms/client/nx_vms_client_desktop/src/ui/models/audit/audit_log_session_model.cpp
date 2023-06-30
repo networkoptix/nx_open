@@ -25,7 +25,7 @@ QVariant QnAuditLogMasterModel::data(const QModelIndex &index, int role) const
     {
         case Qn::AuditLogChartDataRole:
         {
-            const QnAuditRecord* record = rawData(index.row());
+            const QnLegacyAuditRecord* record = rawData(index.row());
             return record->extractParam(ChildCntParamName).toUInt() / (qreal) m_maxActivity;
         }
         case Qt::ForegroundRole:
@@ -62,7 +62,7 @@ QVariant QnAuditLogMasterModel::data(const QModelIndex &index, int role) const
     }
 }
 
-void QnAuditLogMasterModel::setData(const QnAuditRecordRefList &data)
+void QnAuditLogMasterModel::setData(const QnLegacyAuditRecordRefList &data)
 {
     base_type::setData(data);
     m_maxActivity = 0;

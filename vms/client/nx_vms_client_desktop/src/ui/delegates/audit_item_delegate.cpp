@@ -47,7 +47,7 @@ namespace
     }
 
     /* Get description button text from audit record: */
-    QString itemButtonText(const QnAuditRecord* record)
+    QString itemButtonText(const QnLegacyAuditRecord* record)
     {
         if (!record)
             return QString();
@@ -95,7 +95,7 @@ namespace
     }
 
     /* Calculate description button rectangle by audit record: */
-    QRect itemButtonRect(const QStyleOptionViewItem& option, const QnAuditRecord* record)
+    QRect itemButtonRect(const QStyleOptionViewItem& option, const QnLegacyAuditRecord* record)
     {
         return itemButtonRect(option, itemButtonText(record));
     }
@@ -106,7 +106,7 @@ namespace
         if (index.data(Qn::ColumnDataRole).toInt() != QnAuditLogModel::DescriptionColumn)
             return QRect();
 
-        return itemButtonRect(option, index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>());
+        return itemButtonRect(option, index.data(Qn::AuditRecordDataRole).value<QnLegacyAuditRecord*>());
     }
 };
 
@@ -206,7 +206,7 @@ QSize QnAuditItemDelegate::descriptionSizeHint(const QStyleOptionViewItem& optio
     QSize result = defaultSizeHint(option, index);
 
     /* Calculate height addition if this record has details and they're open: */
-    QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
+    QnLegacyAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnLegacyAuditRecord*>();
     if (record)
     {
         switch (record->eventType)
@@ -293,7 +293,7 @@ bool QnAuditItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* model, 
                         else
                         {
                             /* Do not produce clicks on description items without details: */
-                            const QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
+                            const QnLegacyAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnLegacyAuditRecord*>();
                             if (!record || record->resources.empty())
                                 break;
 
@@ -387,7 +387,7 @@ void QnAuditItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& s
     }
 
     /* Draw audit item: */
-    const QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
+    const QnLegacyAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnLegacyAuditRecord*>();
     if (record)
     {
         QnAuditLogModel::Column column = static_cast<QnAuditLogModel::Column>(index.data(Qn::ColumnDataRole).toInt());
@@ -458,7 +458,7 @@ void QnAuditItemDelegate::paintDateTime(const QStyle* style, QPainter* painter, 
 
 /* Description column complex drawing: */
 void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painter,
-    const QStyleOptionViewItem& option, const QModelIndex& index, const QnAuditRecord* record) const
+    const QStyleOptionViewItem& option, const QModelIndex& index, const QnLegacyAuditRecord* record) const
 {
     /* Paint first line hover and/or selection: */
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);

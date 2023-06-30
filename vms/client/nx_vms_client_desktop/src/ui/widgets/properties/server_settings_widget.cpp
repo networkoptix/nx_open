@@ -127,7 +127,7 @@ public:
                 if (!success)
                     NX_WARNING(this, "Audit log cannot be loaded: %1", result.errorString);
 
-                processData(success, handle, result.deserialized<QnAuditRecordList>());
+                processData(success, handle, result.deserialized<QnLegacyAuditRecordList>());
             });
 
         static const auto kLookupInterval = std::chrono::seconds{60};
@@ -154,7 +154,7 @@ public:
     }
 
 private:
-    void processData(bool success, int requestNum, const QnAuditRecordList& records)
+    void processData(bool success, int requestNum, const QnLegacyAuditRecordList& records)
     {
         if (!requests.contains(requestNum))
             return;
@@ -197,9 +197,7 @@ public:
 
 private:
     QPointer<QnServerSettingsWidget> q;
-
-    QnAuditRecordList m_data;
-
+    QnLegacyAuditRecordList m_data;
     std::string m_result;
     nx::Uuid m_serverId;
 };

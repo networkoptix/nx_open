@@ -14,7 +14,7 @@ namespace AuthMethod {
 
 enum Value
 {
-    NotDefined = 0,
+    notDefined = 0,
     noAuth = 1 << 0,
 
     httpBasic = 1 << 1, //< Authentication method described in rfc2617.
@@ -58,6 +58,26 @@ enum Value
 
     defaults = http | cookie | urlQueryDigest | xRuntimeGuid | urlQuerySessionToken | urlQueryTicket,
 };
+
+template<typename Visitor>
+constexpr auto nxReflectVisitAllEnumItems(Value*, Visitor&& visitor)
+{
+    using Item = nx::reflect::enumeration::Item<Value>;
+    return visitor(
+        Item{notDefined, "notDefined"},
+        Item{noAuth, "noAuth"},
+        Item{httpBasic, "httpBasic"},
+        Item{httpDigest, "httpDigest"},
+        Item{httpBearer, "httpBearer"},
+        Item{cookie, "cookie"},
+        Item{urlQueryDigest, "urlQueryDigest"},
+        Item{temporaryUrlQueryKey, "temporaryUrlQueryKey"},
+        Item{xRuntimeGuid, "xRuntimeGuid"},
+        Item{urlQuerySessionToken, "urlQuerySessionToken"},
+        Item{urlQueryTicket, "urlQueryTicket"},
+        Item{allowWithoutCsrf, "allowWithoutCsrf"}
+    );
+}
 
 Q_DECLARE_FLAGS(Values, Value);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Values);

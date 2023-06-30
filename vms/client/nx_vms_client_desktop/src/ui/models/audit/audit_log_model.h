@@ -45,7 +45,7 @@ public:
     /*
     * Model uses reference to the data. Data MUST be alive till model clear call
     */
-    virtual void setData(const QnAuditRecordRefList &data);
+    virtual void setData(const QnLegacyAuditRecordRefList &data);
 
     /*
     * Interleave colors for grouping records from a same session
@@ -54,7 +54,7 @@ public:
     void clearData();
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     void setData(const QModelIndexList &indexList, const QVariant &value, int role = Qt::EditRole);
-    QnAuditRecordRefList checkedRows();
+    QnLegacyAuditRecordRefList checkedRows();
 
     virtual void setColumns(const QList<Column> &columns);
 
@@ -69,39 +69,39 @@ public:
     void setCheckState(Qt::CheckState state);
     Qt::CheckState checkState() const;
 
-    bool matches(const QnAuditRecord* record, const QStringList& keywords) const;
+    bool matches(const QnLegacyAuditRecord* record, const QStringList& keywords) const;
 
     void setHeaderHeight(int value);
 
-    static bool hasDetail(const QnAuditRecord* record);
-    static void setDetail(QnAuditRecord* record, bool showDetail);
-    static QString eventTypeToString(Qn::AuditRecordType recordType);
+    static bool hasDetail(const QnLegacyAuditRecord* record);
+    static void setDetail(QnLegacyAuditRecord* record, bool showDetail);
+    static QString eventTypeToString(Qn::LegacyAuditRecordType recordType);
 
-    static QnVirtualCameraResourceList getCameras(const QnAuditRecord* record);
+    static QnVirtualCameraResourceList getCameras(const QnLegacyAuditRecord* record);
 
 public slots:
     void clear();
 
 protected:
-    QnAuditRecord* rawData(int row) const;
+    QnLegacyAuditRecord* rawData(int row) const;
 
 private:
     class DataIndex;
 
-    static QString getResourceNameById(const nx::Uuid &id);
-    QString htmlData(const Column& column,const QnAuditRecord* data, int row, bool hovered) const;
+    static QString getResourceNameById(const nx::Uuid& id);
+    QString htmlData(const Column& column,const QnLegacyAuditRecord* data, int row, bool hovered) const;
     QString formatDateTime(int timestampSecs, bool showDate = true, bool showTime = true) const;
     static QString formatDateTime(const QDateTime& dateTime, bool showDate = true, bool showTime = true);
     static QString formatDuration(int durationSecs);
-    QString eventDescriptionText(const QnAuditRecord* data) const;
-    QVariant colorForType(Qn::AuditRecordType actionType) const;
-    QString textData(const Column& column,const QnAuditRecord* action) const;
-    bool skipDate(const QnAuditRecord *record, int row) const;
+    QString eventDescriptionText(const QnLegacyAuditRecord* data) const;
+    QVariant colorForType(Qn::LegacyAuditRecordType actionType) const;
+    QString textData(const Column& column,const QnLegacyAuditRecord* action) const;
+    bool skipDate(const QnLegacyAuditRecord *record, int row) const;
     static QString getResourcesString(const std::vector<nx::Uuid>& resources);
     static QnVirtualCameraResourceList getCameras(const std::vector<nx::Uuid>& resources);
-    bool matches(const Column& column, const QnAuditRecord* data, const QString& keyword) const;
-    QString descriptionTooltip(const QnAuditRecord *record) const;
-    bool isDetailDataSupported(const QnAuditRecord *record) const;
+    bool matches(const Column& column, const QnLegacyAuditRecord* data, const QString& keyword) const;
+    QString descriptionTooltip(const QnLegacyAuditRecord *record) const;
+    bool isDetailDataSupported(const QnLegacyAuditRecord *record) const;
 
 protected:
     QScopedPointer<DataIndex> m_index;

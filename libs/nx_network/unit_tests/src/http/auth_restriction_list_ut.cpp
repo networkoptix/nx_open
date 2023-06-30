@@ -11,7 +11,7 @@ class AuthMethodRestrictionList:
 {
 public:
     AuthMethodRestrictionList():
-        m_restrictionList(AuthMethod::NotDefined)
+        m_restrictionList(AuthMethod::notDefined)
     {
     }
 

@@ -60,11 +60,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnCamRecordingStatsData, (ubjson)(xml)(json)(csv_record), QnCamRecordingStatsData_Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnAuditRecord, (ubjson)(xml)(json)(csv_record)(sql_record), QnAuditRecord_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnAuthSession, (ubjson)(xml)(json)(csv_record)(sql_record), QnAuthSession_Fields)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnBackupStatusData, (ubjson)(xml)(json)(csv_record), QnBackupStatusData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnVirtualCameraReply, (ubjson)(xml)(json)(csv_record), QnVirtualCameraReply_Fields)
