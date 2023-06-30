@@ -191,13 +191,13 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServicesLoaded)
 
     auto info = m_cloudeStorageHelper->allInfo();
     ASSERT_EQ(3, info.size());
-    
+
     // 5 Megapixels licenses.
     ASSERT_EQ(50, info[5].total);
-    
+
     //< 10 Megapixels licenses.
     ASSERT_EQ(100, info[10].total);
-    
+
     // Unlimited Megapixels licenses.
     ASSERT_EQ(150, info[SaasCloudStorageParameters::kUnlimitedResolution].total);
 }
@@ -207,7 +207,7 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServiceUsage)
     using namespace nx::vms::api;
 
     auto cameras1 = addCameras(/*size*/ 50, /* megapixels*/ 5, /*useBackup*/ true);
-    
+
     auto info = m_cloudeStorageHelper->allInfo();
     ASSERT_FALSE(m_cloudeStorageHelper->isOverflow());
     ASSERT_EQ(cameras1.size(), info[5].inUse); //< 5 Megapixels licenses.
@@ -278,7 +278,7 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasMapping)
     serviceUsages.clear();
     for (const auto& [cameraId, serviceId]: mapping)
         ++serviceUsages[serviceId];
-    
+
     ASSERT_EQ(100, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0de")]);
     ASSERT_EQ(100, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dd")]);
     ASSERT_EQ(150, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dc")]);
@@ -321,7 +321,7 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
     info = m_integrationsHelper->allInfo();
     ASSERT_TRUE(m_integrationsHelper->isOverflow());
     ASSERT_EQ(50, info.begin()->inUse);
-    
+
     std::vector<IntegrationServiceUsageHelper::Propose> propose;
     propose.push_back(IntegrationServiceUsageHelper::Propose{cameras[0]->getId(), QSet<QnUuid>()});
 

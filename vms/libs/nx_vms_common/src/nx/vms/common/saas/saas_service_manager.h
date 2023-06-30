@@ -24,7 +24,7 @@ public:
 
     bool loadSaasData(const std::string_view& saasData);
     bool loadServiceData(const std::string_view& serviceData);
-    
+
     /**
      *  Convert 'localRecording' saas services to the License object for
      *  backward compatibility.

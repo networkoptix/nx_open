@@ -22,8 +22,10 @@
 #include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_space_data.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
@@ -1200,6 +1202,93 @@ struct ModifyCameraAttributesAccess
                     "Set %1 `scheduleEnabled` to true is forbidden: no license to enable recording."),
                     param.cameraId));
             }
+        }
+
+        const auto enableBackupResult = checkIfCloudBackupMightBeEnabled(
+            param, camera, systemContext);
+        if (!enableBackupResult)
+            return enableBackupResult;
+
+        return Result();
+    }
+
+private:
+
+    Result checkIfCloudBackupMightBeEnabled(
+        const nx::vms::api::CameraAttributesData& param,
+        const QnVirtualCameraResourcePtr& camera,
+        SystemContext* systemContext) const
+    {
+        using namespace nx::vms::api;
+        const bool isBackupTurnedOff = !camera || !camera->isBackupEnabled();
+        const bool isParamEnablingBackupForDevice =
+            param.backupPolicy == BackupPolicy::on
+            || (param.backupPolicy == BackupPolicy::byDefault
+                && systemContext->globalSettings()->backupSettings().backupNewCameras);
+
+        const bool doesBackupGoFromOffToOn = isBackupTurnedOff && isParamEnablingBackupForDevice;
+        const auto storages = systemContext->resourcePool()->getResources<QnStorageResource>();
+        bool hasBackupCloudStorage = false;
+        for (const auto& s: storages)
+        {
+            if (s->isBackup() && s->getStorageType() == nx::vms::api::kCloudStorageType)
+            {
+                hasBackupCloudStorage = true;
+                break;
+            }
+        }
+
+        NX_DEBUG(this,
+            "%1: Checking if the backup status is going to be changed for the device "
+            "and if it's permitted to do so. "
+            "Backup turned off: %2. Backup is requested to be enabled: %3. "
+            "Backup goes from off to on: %4. "
+            "System has a backup cloud storage: %5",
+            __func__, isBackupTurnedOff, isParamEnablingBackupForDevice, doesBackupGoFromOffToOn,
+            hasBackupCloudStorage);
+
+        if (doesBackupGoFromOffToOn && hasBackupCloudStorage)
+        {
+            const auto saasData = systemContext->saasServiceManager()->data();
+            if (saasData.state != nx::vms::api::SaasState::active)
+            {
+                NX_DEBUG(
+                    this, "%1: Can't enable cloud backup because "
+                    "Saas service is not in the 'active' state", __func__);
+
+                return Result(
+                    ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                        "It is forbidden to enable cloud backup for %1 "
+                        "since SaaS service is not active."),
+                    param.cameraId));
+            }
+
+            NX_DEBUG(this, "%1: Saas service is active");
+
+            nx::vms::common::saas::CloudStorageServiceUsageHelper helper(systemContext);
+            helper.proposeChange(
+                /*devicesToAdd*/ {param.cameraId}, /*devicesToRemove*/ std::set<QnUuid>());
+            if (helper.isOverflow())
+            {
+                NX_DEBUG(
+                    this, "%1: Can't enable cloud backup because "
+                    "there is no appropriate saas service license for the device %2",
+                    __func__, param.cameraId);
+
+                return Result(
+                    ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                        "It is forbidden to enable cloud backup for %1 "
+                        "because there is no appropriate SaaS service license."),
+                    param.cameraId));
+            }
+
+            NX_DEBUG(
+                this, "%1: Cloud backup can be enabled for device %2",
+                __func__, param.cameraId);
+        }
+        else
+        {
+            NX_DEBUG(this, "%1: Saas check is not needed. Backup can be enabled");
         }
 
         return Result();
