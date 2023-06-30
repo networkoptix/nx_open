@@ -50,7 +50,7 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
     connect(ui->deleteSpotButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_deleteSpotButton_clicked);
 
-    ui->moveSpotUpButton->setIcon(qnSkin->icon("buttons/up.png"));
+    ui->moveSpotUpButton->setIcon(qnSkin->icon("buttons/arrow_up_20.svg", kIconSubstitutions));
     connect(ui->moveSpotUpButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_moveSpotUpButton_clicked);
 
