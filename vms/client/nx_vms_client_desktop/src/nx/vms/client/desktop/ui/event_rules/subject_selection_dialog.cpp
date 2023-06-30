@@ -259,7 +259,7 @@ void SubjectSelectionDialog::setOptions(const CustomizableOptions& options)
         [this, filter](int row, const QModelIndex& index) -> bool
         {
             auto user = m_users->sourceModel()->index(row, UserListModel::NameColumn, index)
-                .data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+                .data(core::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
 
             return user ? filter(*user) && m_users->baseFilterAcceptsRow(row, index) : false;
         };

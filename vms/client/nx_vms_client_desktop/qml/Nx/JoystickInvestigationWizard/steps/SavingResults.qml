@@ -5,7 +5,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt.labs.platform
 
-import Nx
 import Nx.Controls
 import Nx.Dialogs
 import Nx.JoystickInvestigationWizard

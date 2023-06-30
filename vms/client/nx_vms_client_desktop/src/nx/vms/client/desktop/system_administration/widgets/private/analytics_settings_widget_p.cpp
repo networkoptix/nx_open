@@ -10,8 +10,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/analytics/analytics_engines_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
-#include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/engine_license_summary_provider.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -28,7 +28,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-bool isEngineVisible(const AnalyticsEngineInfo& info)
+bool isEngineVisible(const core::AnalyticsEngineInfo& info)
 {
     // Device-dependent plugins without settings must be hidden.
     if (!info.isDeviceDependent)
@@ -43,7 +43,7 @@ bool isEngineVisible(const AnalyticsEngineInfo& info)
 AnalyticsSettingsWidget::Private::Private(AnalyticsSettingsWidget* q):
     q(q),
     view(new QQuickWidget(appContext()->qmlEngine(), q)),
-    enginesWatcher(new AnalyticsEnginesWatcher(this))
+    enginesWatcher(new core::AnalyticsEnginesWatcher(this))
 {
     view->setClearColor(q->palette().window().color());
     view->setResizeMode(QQuickWidget::SizeRootObjectToView);
@@ -65,16 +65,16 @@ AnalyticsSettingsWidget::Private::Private(AnalyticsSettingsWidget* q):
     view->rootObject()->setProperty(
         "saasServiceManager", QVariant::fromValue(systemContext()->saasServiceManager()));
 
-    connect(enginesWatcher.get(), &AnalyticsEnginesWatcher::engineAdded,
+    connect(enginesWatcher.get(), &core::AnalyticsEnginesWatcher::engineAdded,
         this, &Private::addEngine);
 
-    connect(enginesWatcher.get(), &AnalyticsEnginesWatcher::engineRemoved,
+    connect(enginesWatcher.get(), &core::AnalyticsEnginesWatcher::engineRemoved,
         this, &Private::removeEngine);
 
-    connect(enginesWatcher.get(), &AnalyticsEnginesWatcher::engineUpdated,
+    connect(enginesWatcher.get(), &core::AnalyticsEnginesWatcher::engineUpdated,
         this, &Private::updateEngine);
 
-    connect(enginesWatcher.get(), &AnalyticsEnginesWatcher::engineSettingsModelChanged, this,
+    connect(enginesWatcher.get(), &core::AnalyticsEnginesWatcher::engineSettingsModelChanged, this,
         [this](const QnUuid& engineId)
         {
             if (engineId == currentEngineId)
@@ -140,7 +140,7 @@ QJsonObject AnalyticsSettingsWidget::Private::settingsModel(const QnUuid& engine
 }
 
 void AnalyticsSettingsWidget::Private::addEngine(
-    const QnUuid& /*engineId*/, const AnalyticsEngineInfo& engineInfo)
+    const QnUuid& /*engineId*/, const core::AnalyticsEngineInfo& engineInfo)
 {
     // Hide device-dependent engines without settings on the model level.
     if (!isEngineVisible(engineInfo))

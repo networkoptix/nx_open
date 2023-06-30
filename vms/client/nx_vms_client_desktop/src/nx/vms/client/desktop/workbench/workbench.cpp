@@ -17,6 +17,7 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -26,7 +27,6 @@
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/showreel/showreel_actions_handler.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -249,7 +249,7 @@ Workbench::Workbench(WindowContext* windowContext, QObject* parent):
     d->stateDelegate = std::make_shared<StateDelegate>(this);
     appContext()->clientStateHandler()->registerDelegate(kWorkbenchDataKey, d->stateDelegate);
 
-    connect(appContext()->unifiedResourcePool(), &UnifiedResourcePool::resourcesRemoved, this,
+    connect(appContext()->unifiedResourcePool(), &core::UnifiedResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources) { d->handleResourcesRemoved(resources); });
 
     // Only currenly connected context resources are checked actually.
@@ -764,7 +764,7 @@ void Workbench::update(const WorkbenchState& state)
         const auto showreel = systemContext->showreelManager()->showreel(id);
         if (showreel.isValid())
         {
-            menu()->trigger(menu::ReviewShowreelAction, {Qn::UuidRole, id});
+            menu()->trigger(menu::ReviewShowreelAction, {core::UuidRole, id});
             continue;
         }
     }
@@ -861,7 +861,7 @@ void Workbench::update(const WorkbenchState& state)
 
     if (!state.runningTourId.isNull())
     {
-        menu()->trigger(menu::ToggleShowreelModeAction, {Qn::UuidRole, state.runningTourId});
+        menu()->trigger(menu::ToggleShowreelModeAction, {core::UuidRole, state.runningTourId});
     }
 }
 

@@ -743,7 +743,7 @@ QnVirtualCameraResourcePtr BackupSettingsDecoratorModel::cameraResource(
         return {};
 
     const auto resourceIndex = mapToSource(index).siblingAtColumn(ResourceColumn);
-    const auto resourceData = resourceIndex.data(Qn::ResourceRole);
+    const auto resourceData = resourceIndex.data(core::ResourceRole);
     if (resourceData.isNull())
         return {};
 

@@ -1300,7 +1300,7 @@ TEST_F(ResourceTreeModelTest, serverNodeProvidesResource)
     const auto serverIndex = uniqueMatchingIndex(kUniqueServerNameCondition);
 
     // And that node provides pointer to the server resource.
-    ASSERT_TRUE(dataMatch(Qn::ResourceRole, QVariant::fromValue<QnResourcePtr>(server))(
+    ASSERT_TRUE(dataMatch(core::ResourceRole, QVariant::fromValue<QnResourcePtr>(server))(
         serverIndex));
 }
 

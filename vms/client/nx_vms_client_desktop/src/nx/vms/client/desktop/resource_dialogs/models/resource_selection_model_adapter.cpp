@@ -297,7 +297,7 @@ QVariant ResourceSelectionModelAdapter::data(const QModelIndex& index, int role)
 
         case Qn::RawResourceRole:
         {
-            const auto resource = data(index, Qn::ResourceRole).value<QnResourcePtr>();
+            const auto resource = data(index, core::ResourceRole).value<QnResourcePtr>();
             if (!resource)
                 return {};
 

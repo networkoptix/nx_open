@@ -172,16 +172,16 @@ QModelIndex EntityItemModel::sibling(int row, int column, const QModelIndex& ind
 QHash<int, QByteArray> EntityItemModel::roleNames() const
 {
     auto roles = base_type::roleNames();
-    roles.insert(Qn::ResourceRole, "resourcePtr");
+    roles.insert(core::ResourceRole, "resourcePtr");
     roles.insert(Qn::ResourceFlagsRole, "flags");
     roles.insert(Qn::ItemUuidRole, "uuid");
-    roles.insert(Qn::ResourceStatusRole, "status");
+    roles.insert(core::ResourceStatusRole, "status");
     roles.insert(Qn::NodeTypeRole, "nodeType");
     roles.insert(Qn::ResourceIconKeyRole, "iconKey");
     roles.insert(Qn::ExtraInfoRole, "extraInfo");
     roles.insert(Qn::ForceExtraInfoRole, "forceExtraInfo");
     roles.insert(Qn::ResourceExtraStatusRole, "resourceExtraStatus");
-    roles.insert(Qn::DecorationPathRole, "decorationPath");
+    roles.insert(core::DecorationPathRole, "decorationPath");
     return roles;
 }
 

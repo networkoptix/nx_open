@@ -84,7 +84,7 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
         }
     }
 
-    if (role == Qn::ResourceRole && index.column() == TargetColumn && resource)
+    if (role == core::ResourceRole && index.column() == TargetColumn && resource)
         return QVariant::fromValue(resource);
 
     if (role == Qt::CheckStateRole && index.column() == PointedCheckBoxColumn)

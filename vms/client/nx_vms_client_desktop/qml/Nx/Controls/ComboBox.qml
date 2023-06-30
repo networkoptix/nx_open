@@ -3,7 +3,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-import Nx 1.0
 import Nx.Core 1.0
 import nx.client.desktop 1.0
 
@@ -162,7 +161,7 @@ ComboBox
             radius: 1
             anchors.verticalCenter: parent.verticalCenter
             visible: control.withColorSection
-            color: Utils.getValue(control.displayedColor, "transparent")
+            color: CoreUtils.getValue(control.displayedColor, "transparent")
             border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
         }
 
@@ -259,7 +258,7 @@ ComboBox
 
             text: control.textRole
                 ? popupItem.itemData[control.textRole]
-                : Utils.getValue(popupItem.itemData, "")
+                : CoreUtils.getValue(popupItem.itemData, "")
 
             Rectangle
             {
@@ -278,7 +277,7 @@ ComboBox
                         return "transparent"
 
                     const color = popupItem.itemData[control.valueRole]
-                    return Utils.getValue(color, "transparent")
+                    return CoreUtils.getValue(color, "transparent")
                 }
             }
         }

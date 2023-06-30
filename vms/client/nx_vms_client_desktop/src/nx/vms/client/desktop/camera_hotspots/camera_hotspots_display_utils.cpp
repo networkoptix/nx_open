@@ -14,6 +14,8 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {

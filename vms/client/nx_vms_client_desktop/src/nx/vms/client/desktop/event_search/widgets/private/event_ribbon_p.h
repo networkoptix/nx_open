@@ -21,7 +21,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/common/utils/volatile_unique_ptr.h>
+#include <nx/vms/client/core/common/utils/volatile_unique_ptr.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/notification_levels.h>
@@ -150,7 +150,7 @@ private:
     using Importance = QnNotificationLevel::Value;
     static constexpr int kApproximateTileHeight = 48;
 
-    using AnimationPtr = VolatileUniquePtr<QVariantAnimation>;
+    using AnimationPtr = core::VolatileUniquePtr<QVariantAnimation>;
 
     struct Tile
     {

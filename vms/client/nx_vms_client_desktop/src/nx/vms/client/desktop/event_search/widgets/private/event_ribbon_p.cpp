@@ -284,7 +284,7 @@ void EventRibbon::Private::updateTile(int index)
         ? EventTile::Style::informer
         : EventTile::Style::standard);
 
-    QString tileDescription = modelIndex.data(Qn::DescriptionTextRole).toString();
+    QString tileDescription = modelIndex.data(core::DescriptionTextRole).toString();
 
     // Limit the number of lines inside tile description.
     // Empty description should remain empty, without any invisible html.
@@ -314,7 +314,7 @@ void EventRibbon::Private::updateTile(int index)
             widget->setProgressTitle(modelIndex.data(Qt::DisplayRole).toString());
             widget->setProgressFormat(modelIndex.data(Qn::ProgressFormatRole).toString());
             widget->setDescription(tileDescription);
-            widget->setToolTip(modelIndex.data(Qn::DescriptionTextRole).toString());
+            widget->setToolTip(modelIndex.data(core::DescriptionTextRole).toString());
             widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
             return;
         }
@@ -329,11 +329,11 @@ void EventRibbon::Private::updateTile(int index)
     widget->setProgressBarVisible(false);
     widget->setTitle(title);
     widget->setIcon(modelIndex.data(Qt::DecorationRole).value<QPixmap>());
-    widget->setTimestamp(modelIndex.data(Qn::TimestampTextRole).toString());
+    widget->setTimestamp(modelIndex.data(core::TimestampTextRole).toString());
     widget->setDescription(tileDescription);
     widget->setFooterText(modelIndex.data(Qn::AdditionalTextRole).toString());
-    widget->setAttributeList(modelIndex.data(Qn::AnalyticsAttributesRole)
-        .value<analytics::AttributeList>());
+    widget->setAttributeList(modelIndex.data(core::AnalyticsAttributesRole)
+        .value<core::analytics::AttributeList>());
     widget->setToolTip(modelIndex.data(Qt::ToolTipRole).toString());
     widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());
@@ -344,7 +344,7 @@ void EventRibbon::Private::updateTile(int index)
 
     setHelpTopic(widget, modelIndex.data(Qn::HelpTopicIdRole).toInt());
 
-    const auto resourceList = modelIndex.data(Qn::DisplayedResourceListRole);
+    const auto resourceList = modelIndex.data(core::DisplayedResourceListRole);
     const auto cloudSystemId = modelIndex.data(Qn::CloudSystemIdRole).toString();
     if (resourceList.isValid())
     {
@@ -374,7 +374,7 @@ void EventRibbon::Private::updateTilePreview(int index)
 
     const auto modelIndex = m_model->index(index);
 
-    const auto previewResource = modelIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto previewResource = modelIndex.data(core::ResourceRole).value<QnResourcePtr>();
     const auto mediaResource = previewResource.dynamicCast<QnMediaResource>();
     if (!mediaResource)
         return;
@@ -395,7 +395,7 @@ void EventRibbon::Private::updateTilePreview(int index)
         : kAlternativeThumbnailWidth;
 
     const auto previewTimeMs = duration_cast<milliseconds>(
-        modelIndex.data(Qn::PreviewTimeRole).value<microseconds>());
+        modelIndex.data(core::PreviewTimeRole).value<microseconds>());
 
     const auto rotation = mediaResource->forcedRotation().value_or(0);
     const auto previewCropRect = nx::vms::client::core::Geometry::rotatedRelativeRectangle(
@@ -408,7 +408,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     const bool precisePreview = !previewCropRect.isEmpty()
         || modelIndex.data(Qn::ForcePrecisePreviewRole).toBool();
 
-    const auto objectTrackId = modelIndex.data(Qn::ObjectTrackIdRole).value<QnUuid>();
+    const auto objectTrackId = modelIndex.data(core::ObjectTrackIdRole).value<QnUuid>();
 
     nx::api::ResourceImageRequest request;
     request.resource = previewResource;
@@ -421,7 +421,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     request.roundMethod = precisePreview
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
-    request.streamSelectionMode = modelIndex.data(Qn::PreviewStreamSelectionRole)
+    request.streamSelectionMode = modelIndex.data(core::PreviewStreamSelectionRole)
         .value<nx::api::ImageRequest::StreamSelectionMode>();
     request.objectTrackId = objectTrackId;
 
@@ -447,7 +447,7 @@ void EventRibbon::Private::updateTilePreview(int index)
         previewProvider->setRequestData(request);
     }
     previewProvider->setProperty(kBypassVideoCachePropertyName,
-        modelIndex.data(Qn::HasExternalBestShotRole).toBool());
+        modelIndex.data(core::HasExternalBestShotRole).toBool());
 
     widget->setPlaceholder({});
     widget->setPreview(previewProvider.get(), forceUpdate);
@@ -1123,18 +1123,18 @@ void EventRibbon::Private::updateHighlightedTiles()
                 return false;
 
             const auto modelIndex = m_model->index(index);
-            const auto timestamp = modelIndex.data(Qn::TimestampRole).value<microseconds>();
+            const auto timestamp = modelIndex.data(core::TimestampRole).value<microseconds>();
             if (timestamp <= 0us)
                 return false;
 
-            const auto duration = modelIndex.data(Qn::DurationRole).value<microseconds>();
+            const auto duration = modelIndex.data(core::DurationRole).value<microseconds>();
             if (duration <= 0us)
                 return false;
 
             const auto isHighlightedResource =
                 [this](const QnResourcePtr& res) { return m_highlightedResources.contains(res); };
 
-            const auto resources = modelIndex.data(Qn::ResourceListRole).value<QnResourceList>();
+            const auto resources = modelIndex.data(core::ResourceListRole).value<QnResourceList>();
             if (std::none_of(resources.cbegin(), resources.cend(), isHighlightedResource))
                 return false;
 

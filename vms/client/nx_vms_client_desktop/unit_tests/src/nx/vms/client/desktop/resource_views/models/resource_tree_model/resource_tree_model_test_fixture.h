@@ -6,11 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include <core/resource/client_resource_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
 #include <nx/vms/api/data/showreel_data.h>
-#include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_composer.h>

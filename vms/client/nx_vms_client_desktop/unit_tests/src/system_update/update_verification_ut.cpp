@@ -5,6 +5,7 @@
 #include <nx/vms/client/desktop/system_update/multi_server_updates_widget.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "client_update_test_environment.h"
 

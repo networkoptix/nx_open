@@ -4,11 +4,11 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-import Nx 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 
+import nx.vms.client.core 1.0
 import nx.vms.client.desktop 1.0
 
 import "private"
@@ -354,7 +354,7 @@ Item
                 id: motionSearchPanel
                 objectName: "MotionPanel"
 
-                type: { return RightPanelModel.Type.motion }
+                type: { return EventSearch.SearchType.motion }
 
                 width: Metrics.kFixedSearchPanelWidth
                 height: pages.height
@@ -406,7 +406,7 @@ Item
                 id: bookmarkSearchPanel
                 objectName: "BookmarksPanel"
 
-                type: { return RightPanelModel.Type.bookmarks }
+                type: { return EventSearch.SearchType.bookmarks }
 
                 width: Metrics.kFixedSearchPanelWidth
                 height: pages.height

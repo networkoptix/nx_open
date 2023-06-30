@@ -4,6 +4,7 @@ import QtQuick 2.14
 
 import Nx.Controls 1.0
 
+import nx.vms.client.core 1.0
 import nx.vms.client.desktop 1.0
 
 SelectableTextButton
@@ -15,7 +16,7 @@ SelectableTextButton
 
     selectable: false
     deactivatable: !limitToCurrentCamera
-    accented: setup && setup.cameraSelection === RightPanel.CameraSelection.current
+    accented: setup && setup.cameraSelection === EventSearch.CameraSelection.current
     icon.source: "image://svg/skin/text_buttons/camera_20.svg"
 
     readonly property var actionNames:
@@ -23,16 +24,16 @@ SelectableTextButton
         const mixedDevices = setup && setup.mixedDevices
         let result = {}
 
-        result[RightPanel.CameraSelection.all] =
+        result[EventSearch.CameraSelection.all] =
             mixedDevices ? qsTr("Any device") : qsTr("Any camera")
 
-        result[RightPanel.CameraSelection.layout] =
+        result[EventSearch.CameraSelection.layout] =
             mixedDevices ? qsTr("Devices on layout") : qsTr("Cameras on layout")
 
-        result[RightPanel.CameraSelection.current] =
+        result[EventSearch.CameraSelection.current] =
             mixedDevices ? qsTr("Selected device") : qsTr("Selected camera")
 
-        result[RightPanel.CameraSelection.custom] =
+        result[EventSearch.CameraSelection.custom] =
             mixedDevices ? qsTr("Choose devices...") : qsTr("Choose cameras...")
 
         return result
@@ -52,7 +53,7 @@ SelectableTextButton
 
         switch (setup.cameraSelection)
         {
-            case RightPanel.CameraSelection.custom:
+            case EventSearch.CameraSelection.custom:
             {
                 if (setup.cameraCount > 1)
                 {
@@ -65,7 +66,7 @@ SelectableTextButton
                 return singleCameraText(base, setup.singleCamera)
             }
 
-            case RightPanel.CameraSelection.current:
+            case EventSearch.CameraSelection.current:
                 return singleCameraText(actionNames[setup.cameraSelection], setup.singleCamera)
 
             default:
@@ -76,7 +77,7 @@ SelectableTextButton
     function updateState()
     {
         cameraSelector.setState(
-            !setup || setup.cameraSelection === RightPanel.CameraSelection.all
+            !setup || setup.cameraSelection === EventSearch.CameraSelection.all
                 ? SelectableTextButton.State.Deactivated
                 : SelectableTextButton.State.Unselected)
     }
@@ -105,19 +106,19 @@ SelectableTextButton
 
         component MenuAction: Action { text: cameraSelector.actionNames[data] }
 
-        MenuAction { data: RightPanel.CameraSelection.layout }
-        MenuAction { data: RightPanel.CameraSelection.current }
-        MenuSeparator {}
-        MenuAction { data: RightPanel.CameraSelection.custom }
-        MenuSeparator {}
-        MenuAction { id: defaultAction; data: RightPanel.CameraSelection.all }
+        MenuAction { data: EventSearch.CameraSelection.layout }
+        MenuAction { data: EventSearch.CameraSelection.current }
+        PlatformMenuSeparator {}
+        MenuAction { data: EventSearch.CameraSelection.custom }
+        PlatformMenuSeparator {}
+        MenuAction { id: defaultAction; data: EventSearch.CameraSelection.all }
 
         onTriggered: (action) =>
         {
             if (!setup)
                 return
 
-            if (action.data === RightPanel.CameraSelection.custom)
+            if (action.data === EventSearch.CameraSelection.custom)
                 Qt.callLater(setup.chooseCustomCameras)
             else
                 setup.cameraSelection = action.data

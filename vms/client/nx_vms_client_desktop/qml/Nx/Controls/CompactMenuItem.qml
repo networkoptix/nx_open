@@ -2,7 +2,6 @@
 
 import QtQuick
 
-import Nx
 import Nx.Controls
 import Nx.Core
 import nx.vms.client.core

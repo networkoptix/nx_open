@@ -29,7 +29,7 @@
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_settings.h>
-#include <server/server_storage_manager.h>
+#include <storage/server_storage_manager.h>
 #include <ui/common/palette.h>
 
 namespace {

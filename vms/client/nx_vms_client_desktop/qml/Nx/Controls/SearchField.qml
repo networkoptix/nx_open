@@ -3,9 +3,9 @@
 import QtQuick
 import QtQuick.Controls
 
-import Nx
 import Nx.Core
 import Nx.Controls as Nx
+import Nx.Core.Controls as NxCore
 
 Nx.TextField
 {
@@ -53,7 +53,7 @@ Nx.TextField
 
         contentItem: Item
         {
-            Nx.IconImage
+            NxCore.IconImage
             {
                 id: image
 

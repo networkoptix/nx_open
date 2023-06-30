@@ -10,6 +10,8 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace nx::vms::client::core;
+
 struct ScheduleCellPainter::Private
 {
     ScheduleCellPainter* const q;

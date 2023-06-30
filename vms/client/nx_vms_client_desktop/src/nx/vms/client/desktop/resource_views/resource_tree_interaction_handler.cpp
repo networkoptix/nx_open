@@ -45,7 +45,7 @@ namespace {
 template<class ResourceType>
 QnSharedResourcePointer<ResourceType> getResource(const QModelIndex& index)
 {
-    return index.data(Qn::ResourceRole).value<QnResourcePtr>().objectCast<ResourceType>();
+    return index.data(core::ResourceRole).value<QnResourcePtr>().objectCast<ResourceType>();
 }
 
 QnResourceList selectedResources(const QModelIndexList& selection)
@@ -77,7 +77,7 @@ QnResourceList selectedResources(const QModelIndexList& selection)
                 for (int i = 0; i < model->rowCount(modelIndex); ++i)
                 {
                     const auto subIndex = model->index(i, 0, modelIndex);
-                    addResource(subIndex.data(Qn::ResourceRole).value<QnResourcePtr>());
+                    addResource(subIndex.data(core::ResourceRole).value<QnResourcePtr>());
                 }
 
                 break;
@@ -88,7 +88,7 @@ QnResourceList selectedResources(const QModelIndexList& selection)
             case ResourceTree::NodeType::sharedResource:
             case ResourceTree::NodeType::edge:
             case ResourceTree::NodeType::currentUser:
-                addResource(modelIndex.data(Qn::ResourceRole).value<QnResourcePtr>());
+                addResource(modelIndex.data(core::ResourceRole).value<QnResourcePtr>());
                 break;
 
             default:
@@ -126,7 +126,7 @@ QnResourceList childCamerasRecursive(const QModelIndex& index)
     QnResourceList result;
     for (const auto& child: children)
     {
-        const auto resourceData = child.data(Qn::ResourceRole);
+        const auto resourceData = child.data(core::ResourceRole);
         if (resourceData.isNull())
             continue;
 
@@ -274,7 +274,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
             case NodeType::otherSystemServer:
             {
                 const auto parameters = menu::Parameters()
-                    .withArgument(Qn::UuidRole, index.data(Qn::ItemUuidRole));
+                    .withArgument(core::UuidRole, index.data(Qn::ItemUuidRole));
                 return withNodeType(parameters);
             }
 
@@ -291,13 +291,13 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
         // We can select several layouts and some other resources in any part of tree -
         // in this case just do not set anything.
         QnUserResourcePtr user;
-        auto uuid = index.data(Qn::UuidRole).value<QnUuid>();
+        auto uuid = index.data(core::UuidRole).value<QnUuid>();
 
         switch (nodeType)
         {
             case NodeType::sharedLayouts:
                 user = getResource<QnUserResource>(parentIndex);
-                uuid = parentIndex.data(Qn::UuidRole).value<QnUuid>();
+                uuid = parentIndex.data(core::UuidRole).value<QnUuid>();
                 break;
 
             default:
@@ -313,7 +313,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
             case NodeType::sharedResources:
             case NodeType::sharedLayouts:
                 user = getResource<QnUserResource>(parentIndex.parent());
-                uuid = parentIndex.parent().data(Qn::UuidRole).value<QnUuid>();
+                uuid = parentIndex.parent().data(core::UuidRole).value<QnUuid>();
                 break;
 
             case NodeType::resource:
@@ -328,7 +328,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
             result.setArgument(Qn::UserResourceRole, user);
 
         if (!uuid.isNull())
-            result.setArgument(Qn::UuidRole, uuid);
+            result.setArgument(core::UuidRole, uuid);
 
         result.setArgument(Qn::NodeTypeRole, nodeType);
         result.setArgument(Qn::ParentNodeTypeRole, parentIndexNodeType);
@@ -495,7 +495,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
 {
     if (activationType == ResourceTree::ActivationType::middleClick)
     {
-        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
         menu()->trigger(menu::OpenInNewTabAction, resource);
         return;
     }
@@ -564,7 +564,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
         case ResourceTree::NodeType::videoWallItem:
         {
             const auto item =
-                resourcePool()->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
+                resourcePool()->getVideoWallItemByUuid(index.data(core::UuidRole).value<QnUuid>());
 
             menu()->triggerIfPossible(
                 menu::StartVideoWallControlAction, QnVideoWallItemIndexList() << item);
@@ -575,7 +575,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
         case ResourceTree::NodeType::showreel:
         {
             menu()->triggerIfPossible(menu::ReviewShowreelAction,
-                {Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>()});
+                {core::UuidRole, index.data(core::UuidRole).value<QnUuid>()});
             break;
         }
 
@@ -590,7 +590,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             const auto childLeafIndexes = item_model::getLeafIndexes(index.model(), index);
             for (const auto& childIndex: childLeafIndexes)
             {
-                if (const auto resource = childIndex.data(Qn::ResourceRole).value<QnResourcePtr>())
+                if (const auto resource = childIndex.data(core::ResourceRole).value<QnResourcePtr>())
                     resources.push_back(resource);
             }
 
@@ -600,7 +600,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
 
         default:
         {
-            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
             // Do not open users.
             if (!resource || resource->hasFlags(Qn::user))
                 break;
@@ -646,12 +646,12 @@ void ResourceTreeInteractionHandler::activateSearchResults(
         const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
         if (nodeType == ResourceTree::NodeType::showreel)
         {
-            const auto showreelId = index.data(Qn::UuidRole).value<QnUuid>();
+            const auto showreelId = index.data(core::UuidRole).value<QnUuid>();
             showreels.push_back(showreelId);
             continue;
         }
 
-        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
         if (!resource
             || processedResources.contains(resource)
             || !QnResourceAccessFilter::isDroppable(resource))
@@ -683,7 +683,7 @@ void ResourceTreeInteractionHandler::activateSearchResults(
         menu()->triggerIfPossible(menu::OpenVideoWallReviewAction, videowallResource);
 
     for (const auto& showreelId: showreels)
-        menu()->triggerIfPossible(menu::ReviewShowreelAction, {Qn::UuidRole, showreelId});
+        menu()->triggerIfPossible(menu::ReviewShowreelAction, {core::UuidRole, showreelId});
 }
 
 } // namespace nx::vms::client::desktop

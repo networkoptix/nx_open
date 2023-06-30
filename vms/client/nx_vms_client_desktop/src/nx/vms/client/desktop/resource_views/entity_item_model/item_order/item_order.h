@@ -28,7 +28,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ItemOrder
      * Data roles relevant to sorting. Default implementation doesn't depend on any stored
      * data. For any implementation which uses data acquired by certain role, that role
      * should be provided to trigger item order restore on data change notification. Please
-     * keep in mind, that providing Qn::ResourceRole isn't choice if you going compare
+     * keep in mind, that providing core::ResourceRole isn't choice if you going compare
      * resource properties, not pointers itself. Mutable sorting keys are quick way to end
      * with item lookup failure, and, as result, corrupted state of the storage.
      */

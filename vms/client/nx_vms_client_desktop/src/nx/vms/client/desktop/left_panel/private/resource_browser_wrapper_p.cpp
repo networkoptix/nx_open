@@ -247,14 +247,14 @@ void ResourceBrowserWrapper::handleNewResourceItemAction()
     int role = -1;
     QVariant value;
 
-    if (parameters.hasArgument(Qn::UuidRole))
+    if (parameters.hasArgument(UuidRole))
     {
-        role = Qn::UuidRole;
-        value = parameters.argument(Qn::UuidRole);
+        role = UuidRole;
+        value = parameters.argument(UuidRole);
     }
     else if (const auto resource = parameters.resource())
     {
-        role = Qn::ResourceRole;
+        role = ResourceRole;
         value = QVariant::fromValue(resource);
     }
     else
@@ -279,7 +279,7 @@ std::pair<QModelIndex, int /*depth*/> ResourceBrowserWrapper::findResourceIndex(
     int level = 0;
     QModelIndex index = parent;
 
-    while (index.isValid() && !index.data(Qn::ResourceRole).value<QnResourcePtr>())
+    while (index.isValid() && !index.data(ResourceRole).value<QnResourcePtr>())
     {
         index = index.model()->index(0, 0, index);
         ++level;
@@ -390,7 +390,7 @@ void ResourceBrowserWrapper::saveGroupExpandedState(const QModelIndexList& withi
     for (const auto groupIndex: expandedGroupIndexes)
     {
         const auto [resourceIndex, depth] = findResourceIndex(groupIndex);
-        const auto resource = resourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+        const auto resource = resourceIndex.data(ResourceRole).value<QnResourcePtr>();
         if (NX_ASSERT(resource && depth > 0))
             m_groupExpandedState[resource] = depth - 1;
     }
@@ -407,7 +407,7 @@ void ResourceBrowserWrapper::restoreGroupExpandedState(const QModelIndex& under)
         [this, &indexesToEnsureVisibility](
             auto processIndexRecursively, const QModelIndex& index) -> void
         {
-            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            const auto resource = index.data(ResourceRole).value<QnResourcePtr>();
             const int shift = m_groupExpandedState.value(resource, -1);
             if (shift >= 0)
             {

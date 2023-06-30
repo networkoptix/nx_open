@@ -101,7 +101,7 @@ struct UserGroupListModel::Private
                 emit q->dataChanged(
                     q->index(0, GroupWarningColumn),
                     q->index(q->rowCount() - 1, GroupWarningColumn),
-                    {Qn::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
+                    {core::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
             });
     }
 
@@ -344,7 +344,7 @@ struct UserGroupListModel::Private
                 emit q->dataChanged(
                     q->index(groupIndex, GroupWarningColumn),
                     q->index(groupIndex, GroupWarningColumn),
-                    {Qn::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
+                    {core::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
             }
         }
     }
@@ -385,7 +385,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
     const auto& group = d->orderedGroups[index.row()];
     switch (role)
     {
-        case Qn::UuidRole:
+        case core::UuidRole:
             return QVariant::fromValue(group.id);
 
         case Qt::DisplayRole:
@@ -460,7 +460,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             }
         }
 
-        case Qn::DecorationPathRole:
+        case core::DecorationPathRole:
         {
             switch (index.column())
             {
@@ -502,7 +502,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
 
         case Qt::DecorationRole:
         {
-            if (const auto path = data(index, Qn::DecorationPathRole).toString(); !path.isEmpty())
+            if (const auto path = data(index, core::DecorationPathRole).toString(); !path.isEmpty())
             {
                 core::SvgIconColorer::IconSubstitutions colorSubstitutions;
 

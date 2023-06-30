@@ -7,7 +7,6 @@
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
 #include <client/client_globals.h>
-#include <core/resource/bookmark_sort.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -18,11 +17,12 @@
 #include <nx/vms/client/desktop/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/bookmark/bookmark_helpers.h>
+#include <nx/vms/common/bookmark/bookmark_sort.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
 
 using std::chrono::milliseconds;
@@ -152,7 +152,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
 
             Q_Q(QnSearchBookmarksModel);
             q->beginRemoveRows(QModelIndex(), index, index);
-            m_bookmarks.removeAt(index);
+            m_bookmarks.erase(m_bookmarks.begin() + index);
             q->endRemoveRows();
         });
 
@@ -297,8 +297,10 @@ int QnSearchBookmarksModelPrivate::columnCount(const QModelIndex& /*parent*/) co
 
 QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int role) const
 {
+    using namespace nx::vms::client::core;
+
     static const QSet<int> kAcceptedRolesSet =
-        { Qt::DecorationRole, Qt::DisplayRole, Qt::ToolTipRole, Qn::CameraBookmarkRole };
+        { Qt::DecorationRole, Qt::DisplayRole, Qt::ToolTipRole, CameraBookmarkRole };
 
     const int row = index.row();
     if (row >= m_bookmarks.size() || !kAcceptedRolesSet.contains(role))
@@ -306,7 +308,7 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
 
     const QnCameraBookmark& bookmark = m_bookmarks.at(row);
 
-    if (role == Qn::CameraBookmarkRole)
+    if (role == CameraBookmarkRole)
         return QVariant::fromValue(bookmark);
 
 

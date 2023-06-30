@@ -32,8 +32,8 @@ ItemOrder numericOrder(
 
             if (collatorCompareResult == 0)
             {
-                const auto lResourceData = lhs->data(Qn::ResourceRole);
-                const auto rResourceData = rhs->data(Qn::ResourceRole);
+                const auto lResourceData = lhs->data(core::ResourceRole);
+                const auto rResourceData = rhs->data(core::ResourceRole);
                 if (!lResourceData.isNull() && !rResourceData.isNull())
                 {
                     const auto lResourceId = lResourceData.value<QnResourcePtr>()->getId();

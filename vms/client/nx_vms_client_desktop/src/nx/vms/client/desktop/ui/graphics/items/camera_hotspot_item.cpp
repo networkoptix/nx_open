@@ -283,7 +283,7 @@ void CameraHotspotItem::Private::openInNewTab()
 void CameraHotspotItem::Private::openItemInPlace()
 {
     auto parameters = menu::Parameters(mediaResourceWidget())
-        .withArgument(Qn::ResourceRole, hotspotCamera());
+        .withArgument(core::ResourceRole, hotspotCamera());
 
     if (!q->navigator()->syncEnabled()
         || q->workbench()->currentLayout()->items().size() == 1)

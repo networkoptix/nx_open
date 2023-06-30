@@ -274,7 +274,7 @@ protected slots:
     void at_timeScrollBar_sliderReleased();
 
 private:
-    void connectToContext(nx::vms::client::desktop::SystemContext* systemContext);
+    void connectToContext(nx::vms::client::core::SystemContext* systemContext);
 
     enum class UpdateSliderMode
     {

@@ -4,7 +4,7 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/client_resource_fwd.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {

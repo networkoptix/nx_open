@@ -440,7 +440,7 @@ void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
 
     const auto showreels = systemContext->showreelManager()->showreels(d->mimeData->entities());
     for (const auto& showreel: showreels)
-        menu()->trigger(menu::ReviewShowreelAction, {Qn::UuidRole, showreel.id});
+        menu()->trigger(menu::ReviewShowreelAction, {core::UuidRole, showreel.id});
 
     systemContext->resourcePool()->addNewResources(d->mimeData->resources());
 

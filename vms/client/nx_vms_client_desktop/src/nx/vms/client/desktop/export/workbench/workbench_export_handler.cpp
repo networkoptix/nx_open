@@ -70,9 +70,9 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
 {
     if (parameters.size() == 1)
     {
-        if (parameters.hasArgument(Qn::CameraBookmarkRole))
+        if (parameters.hasArgument(core::CameraBookmarkRole))
         {
-            if (const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+            if (const auto bookmark = parameters.argument<QnCameraBookmark>(core::CameraBookmarkRole);
                 bookmark.isValid())
             {
                 if (const auto activeWidget = display->activeWidget())
@@ -494,7 +494,7 @@ void WorkbenchExportHandler::handleExportVideoAction(const menu::Parameters& par
 
 void WorkbenchExportHandler::handleExportBookmarkAction(const menu::Parameters& parameters)
 {
-    const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+    const auto bookmark = parameters.argument<QnCameraBookmark>(core::CameraBookmarkRole);
     NX_ASSERT(bookmark.isValid());
     if (!bookmark.isValid())
         return;

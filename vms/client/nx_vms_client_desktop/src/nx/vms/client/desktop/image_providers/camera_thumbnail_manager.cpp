@@ -10,10 +10,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <nx/reflect/string_conversion.h>
+#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <utils/common/delayed.h>
 
@@ -47,7 +47,7 @@ CameraThumbnailManager::CameraThumbnailManager(QObject* parent) :
         &CameraThumbnailManager::forceRefreshThumbnails);
 
     connect(appContext()->unifiedResourcePool(),
-        &UnifiedResourcePool::resourcesRemoved,
+        &core::UnifiedResourcePool::resourcesRemoved,
         this,
         &CameraThumbnailManager::atResourcesRemoved);
 

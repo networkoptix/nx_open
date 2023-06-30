@@ -2,10 +2,17 @@
 
 #include "event_list_model.h"
 
+#include <QtCore/QDateTime>
+
+#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 
 #include "private/event_list_model_p.h"
+
+#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -17,7 +24,8 @@ QnUuid EventListModel::EventData::sourceId() const
 }
 
 EventListModel::EventListModel(WindowContext* context, QObject* parent):
-    base_type(context, parent),
+    base_type(context->system(), parent),
+    WindowContextAware(context),
     d(new Private(this))
 {
 }
@@ -45,13 +53,13 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qt::DecorationRole:
             return QVariant::fromValue(event.icon);
 
-        case Qn::UuidRole:
+        case core::UuidRole:
             return QVariant::fromValue(event.id);
 
-        case Qn::TimestampRole:
+        case core::TimestampRole:
             return QVariant::fromValue(event.timestamp);
 
-        case Qn::PreviewTimeRole:
+        case core::PreviewTimeRole:
             return QVariant::fromValue(event.previewTime);
 
         case Qn::ForcePrecisePreviewRole:
@@ -60,7 +68,7 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qt::ToolTipRole:
             return QVariant::fromValue(event.toolTip);
 
-        case Qn::DescriptionTextRole:
+        case core::DescriptionTextRole:
             return QVariant::fromValue(event.description);
 
         case Qn::NotificationLevelRole:
@@ -71,13 +79,13 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
                 ? QVariant::fromValue(event.titleColor)
                 : QVariant();
 
-        case Qn::ResourceRole:
+        case core::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(d->previewCamera(event));
 
-        case Qn::ResourceListRole:
+        case core::ResourceListRole:
             return QVariant::fromValue<QnResourceList>(d->accessibleCameras(event));
 
-        case Qn::DisplayedResourceListRole:
+        case core::DisplayedResourceListRole:
             if (event.source)
                 return QVariant::fromValue<QnResourceList>({event.source});
             else if (!event.sourceName.isEmpty())
@@ -94,10 +102,10 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::TimeoutRole:
             return event.removable ? QVariant::fromValue(event.lifetime) : QVariant();
 
-        case Qn::ObjectTrackIdRole:
+        case core::ObjectTrackIdRole:
             return QVariant::fromValue(event.objectTrackId);
 
-        case Qn::AnalyticsAttributesRole:
+        case core::AnalyticsAttributesRole:
             return QVariant::fromValue(event.attributes);
 
         case Qn::CloudSystemIdRole:

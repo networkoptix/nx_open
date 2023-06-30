@@ -27,7 +27,7 @@ namespace
 
 QnUuid showreelId(const Parameters& parameters)
 {
-    return parameters.argument(Qn::UuidRole).value<QnUuid>();
+    return parameters.argument(core::UuidRole).value<QnUuid>();
 }
 
 bool showreelIsRunning(WindowContext* context)

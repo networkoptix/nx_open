@@ -52,7 +52,7 @@ public:
 
     QModelIndex indexOf(const QnResourcePtr& resource) const
     {
-        return findIndexRecursively({}, Qn::ResourceRole, QVariant::fromValue(resource));
+        return findIndexRecursively({}, core::ResourceRole, QVariant::fromValue(resource));
     }
 
     QModelIndex indexOf(ResourceTree::NodeType nodeType) const

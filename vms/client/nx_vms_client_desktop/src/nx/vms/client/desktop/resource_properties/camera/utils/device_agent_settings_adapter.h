@@ -9,8 +9,10 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/desktop/analytics/analytics_settings_types.h>
+#include <nx/vms/client/core/analytics/analytics_settings_types.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
+
+class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
@@ -40,7 +42,7 @@ public:
     /**
      * Actual data for the currently selected camera.
      */
-    std::unordered_map<QnUuid, DeviceAgentData> dataByEngineId() const;
+    std::unordered_map<QnUuid, core::DeviceAgentData> dataByEngineId() const;
 
 private:
     class Private;

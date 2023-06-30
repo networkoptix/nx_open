@@ -10,6 +10,7 @@
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx;
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent) :
@@ -281,7 +282,7 @@ QnBusinessRuleViewModelPtr QnBusinessRulesViewModel::rule(const QModelIndex& ind
             : QnBusinessRuleViewModelPtr();
     }
 
-    return ruleModelById(index.data(Qn::UuidRole).value<QnUuid>());
+    return ruleModelById(index.data(UuidRole).value<QnUuid>());
 }
 
 void QnBusinessRulesViewModel::at_rule_dataChanged(const QnUuid &id, Fields fields)

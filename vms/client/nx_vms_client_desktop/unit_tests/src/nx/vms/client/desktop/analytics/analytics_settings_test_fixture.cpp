@@ -24,7 +24,7 @@ AnalyticsSettingsMockApiInterface::AnalyticsSettingsMockApiInterface()
 rest::Handle AnalyticsSettingsMockApiInterface::getSettings(
     const QnVirtualCameraResourcePtr& device,
     const AnalyticsEngineResourcePtr& engine,
-    AnalyticsSettingsCallback callback)
+    core::AnalyticsSettingsCallback callback)
 {
     return makeRequest(RequestInfo::Type::get, device, engine, callback).handle;
 }
@@ -34,7 +34,7 @@ rest::Handle AnalyticsSettingsMockApiInterface::applySettings(
     const AnalyticsEngineResourcePtr& engine,
     const QJsonObject& /*settings*/,
     const QnUuid& /*settingsModelId*/,
-    AnalyticsSettingsCallback callback)
+    core::AnalyticsSettingsCallback callback)
 {
     return makeRequest(RequestInfo::Type::apply, device, engine, callback).handle;
 }
@@ -46,19 +46,19 @@ rest::Handle AnalyticsSettingsMockApiInterface::activeSettingsChanged(
     const QJsonObject& settingsModel,
     const QJsonObject& settingsValues,
     const QJsonObject& paramValues,
-    AnalyticsActiveSettingsCallback callback)
+    core::AnalyticsActiveSettingsCallback callback)
 {
     return makeRequest(RequestInfo::Type::get, device, engine, callback).handle;
 }
 
-bool AnalyticsSettingsMockApiInterface::requestWasSent(const DeviceAgentId& agentId) const
+bool AnalyticsSettingsMockApiInterface::requestWasSent(const core::DeviceAgentId& agentId) const
 {
     return std::find_if(m_requests.cbegin(), m_requests.cend(),
         [&agentId](const auto& info) { return info.agentId == agentId; }) != m_requests.cend();
 }
 
 void AnalyticsSettingsMockApiInterface::sendReply(
-    const DeviceAgentId& agentId,
+    const core::DeviceAgentId& agentId,
     const DeviceAgentSettingsResponse& response,
     bool success)
 {
@@ -74,7 +74,7 @@ AnalyticsSettingsMockApiInterface::RequestInfo AnalyticsSettingsMockApiInterface
     RequestInfo::Type type,
     const QnVirtualCameraResourcePtr& device,
     const AnalyticsEngineResourcePtr& engine,
-    AnalyticsSettingsCallback callback)
+    core::AnalyticsSettingsCallback callback)
 {
     m_lastHandle++;
 
@@ -91,15 +91,15 @@ AnalyticsSettingsMockApiInterface::RequestInfo AnalyticsSettingsMockApiInterface
     RequestInfo::Type type,
     const QnVirtualCameraResourcePtr& device,
     const AnalyticsEngineResourcePtr& engine,
-    AnalyticsActiveSettingsCallback callback)
+    core::AnalyticsActiveSettingsCallback callback)
 {
     return {};
 }
 
-ListenerNotifier::ListenerNotifier(const AnalyticsSettingsListenerPtr& listener)
+ListenerNotifier::ListenerNotifier(const core::AnalyticsSettingsListenerPtr& listener)
 {
-    connect(listener.get(), &AnalyticsSettingsListener::dataChanged, this,
-        [this](const DeviceAgentData& data)
+    connect(listener.get(), &core::AnalyticsSettingsListener::dataChanged, this,
+        [this](const core::DeviceAgentData& data)
         {
             lastData = data;
             ++counter;
@@ -110,7 +110,7 @@ void AnalyticsSettingsTestFixture::SetUp()
 {
     m_serverInterfaceMock = std::make_shared<AnalyticsSettingsMockApiInterface>();
     createMessageProcessor();
-    m_manager.reset(new AnalyticsSettingsManager(systemContext()));
+    m_manager.reset(new core::AnalyticsSettingsManager(systemContext()));
     m_manager->setServerInterface(m_serverInterfaceMock);
 }
 
@@ -128,7 +128,7 @@ AnalyticsEngineResourcePtr AnalyticsSettingsTestFixture::addEngine()
     return engine;
 }
 
-AnalyticsSettingsManager* AnalyticsSettingsTestFixture::manager() const
+core::AnalyticsSettingsManager* AnalyticsSettingsTestFixture::manager() const
 {
     return m_manager.data();
 }

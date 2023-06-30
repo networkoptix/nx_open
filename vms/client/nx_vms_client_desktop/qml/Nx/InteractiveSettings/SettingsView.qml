@@ -3,7 +3,7 @@
 import QtQuick
 import QtQuick.Controls
 
-import Nx
+import Nx.Core 1.0
 
 import "settings.js" as Settings
 import "components"

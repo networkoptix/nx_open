@@ -32,7 +32,6 @@ DropdownMenu 1.0 DropdownMenu.qml
 EditContextMenu 1.0 EditContextMenu.qml
 Fader 1.0 Fader.qml
 GroupBox 1.0 GroupBox.qml
-IconImage 1.0 IconImage.qml
 ImageButton 1.0 ImageButton.qml
 Label 1.0 Label.qml
 LinearPaletteColorPicker 1.0 LinearPaletteColorPicker.qml

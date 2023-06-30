@@ -8,7 +8,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
-#include <nx/vms/client/desktop/analytics/analytics_data_helper.h>
+#include <nx/vms/client/core/analytics/analytics_data_helper.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 
@@ -26,7 +26,7 @@ class CameraSettingsAnalyticsEnginesWatcher::Private:
 public:
     Private(SystemContext* systemContext, CameraSettingsDialogStore* store);
 
-    QList<AnalyticsEngineInfo> engineInfoList() const;
+    QList<core::AnalyticsEngineInfo> engineInfoList() const;
 
     void setCamera(const QnVirtualCameraResourcePtr& camera);
     void updateStore();
@@ -42,7 +42,7 @@ public:
 public:
     const QPointer<CameraSettingsDialogStore> store;
     QnVirtualCameraResourcePtr camera;
-    QHash<QnUuid, AnalyticsEngineInfo> engines;
+    QHash<QnUuid, core::AnalyticsEngineInfo> engines;
     bool m_online = false;
 };
 
@@ -72,7 +72,7 @@ CameraSettingsAnalyticsEnginesWatcher::Private::Private(
         at_initialResourcesReceived();
 }
 
-QList<AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::Private::engineInfoList() const
+QList<core::AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::Private::engineInfoList() const
 {
     if (!camera)
         return {};
@@ -81,7 +81,7 @@ QList<AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::Private::engin
     const auto compatibleEngines = camera->compatibleAnalyticsEngines();
 
     const auto isIncompatibleEngine =
-        [compatibleEngines](const AnalyticsEngineInfo& engineInfo)
+        [compatibleEngines](const core::AnalyticsEngineInfo& engineInfo)
         {
             return !compatibleEngines.contains(engineInfo.id);
         };
@@ -184,7 +184,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
 
     if (const auto& engine = resource.objectCast<AnalyticsEngineResource>())
     {
-        const auto info = engineInfoFromResource(engine, SettingsModelSource::manifest);
+        const auto info = engineInfoFromResource(engine, core::SettingsModelSource::manifest);
         if (info.id.isNull())
             return;
 
@@ -255,7 +255,7 @@ void CameraSettingsAnalyticsEnginesWatcher::setCamera(const QnVirtualCameraResou
     d->setCamera(camera);
 }
 
-QList<AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::engineInfoList() const
+QList<core::AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::engineInfoList() const
 {
     return d->engineInfoList();
 }

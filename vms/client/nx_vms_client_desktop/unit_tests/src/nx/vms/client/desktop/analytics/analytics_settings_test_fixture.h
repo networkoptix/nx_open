@@ -6,14 +6,14 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
+#include <nx/vms/client/core/analytics/analytics_settings_manager.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
 
-class AnalyticsSettingsMockApiInterface: public AnalyticsSettingsServerInterface
+class AnalyticsSettingsMockApiInterface: public core::AnalyticsSettingsServerInterface
 {
 public:
     struct RequestInfo
@@ -21,8 +21,8 @@ public:
         enum class Type { get, apply };
         Type type = Type::get;
         rest::Handle handle = {};
-        DeviceAgentId agentId;
-        AnalyticsSettingsCallback callback;
+        core::DeviceAgentId agentId;
+        core::AnalyticsSettingsCallback callback;
     };
 
     AnalyticsSettingsMockApiInterface();
@@ -30,14 +30,14 @@ public:
     virtual rest::Handle getSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        AnalyticsSettingsCallback callback) override;
+        core::AnalyticsSettingsCallback callback) override;
 
     virtual rest::Handle applySettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
         const QnUuid& settingsModelId,
-        AnalyticsSettingsCallback callback) override;
+        core::AnalyticsSettingsCallback callback) override;
 
     virtual rest::Handle activeSettingsChanged(
         const QnVirtualCameraResourcePtr& device,
@@ -46,12 +46,12 @@ public:
         const QJsonObject& settingsModel,
         const QJsonObject& settingsValues,
         const QJsonObject& paramValues,
-        AnalyticsActiveSettingsCallback callback) override;
+        core::AnalyticsActiveSettingsCallback callback) override;
 
-    bool requestWasSent(const DeviceAgentId& agentId) const;
+    bool requestWasSent(const core::DeviceAgentId& agentId) const;
 
     void sendReply(
-        const DeviceAgentId& agentId,
+        const core::DeviceAgentId& agentId,
         const nx::vms::api::analytics::DeviceAgentSettingsResponse& response,
         bool success = true);
 
@@ -60,13 +60,13 @@ private:
         RequestInfo::Type type,
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        AnalyticsSettingsCallback callback);
+        core::AnalyticsSettingsCallback callback);
 
     RequestInfo makeRequest(
         RequestInfo::Type type,
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        AnalyticsActiveSettingsCallback callback);
+        core::AnalyticsActiveSettingsCallback callback);
 
     rest::Handle m_lastHandle = 0;
     std::deque<RequestInfo> m_requests;
@@ -79,9 +79,9 @@ using AnalyticsSettingsMockApiInterfacePtr = std::shared_ptr<AnalyticsSettingsMo
 class ListenerNotifier: public QObject
 {
 public:
-    ListenerNotifier(const AnalyticsSettingsListenerPtr& listener);
+    ListenerNotifier(const core::AnalyticsSettingsListenerPtr& listener);
 
-    DeviceAgentData lastData;
+    core::DeviceAgentData lastData;
     int counter = 0;
 };
 
@@ -96,11 +96,11 @@ protected:
 
     nx::vms::common::AnalyticsEngineResourcePtr addEngine();
 
-    AnalyticsSettingsManager* manager() const;
+    core::AnalyticsSettingsManager* manager() const;
 
     QnResourcePool* resourcePool() const;
 
-    QScopedPointer<AnalyticsSettingsManager> m_manager;
+    QScopedPointer<core::AnalyticsSettingsManager> m_manager;
     AnalyticsSettingsMockApiInterfacePtr m_serverInterfaceMock;
 };
 

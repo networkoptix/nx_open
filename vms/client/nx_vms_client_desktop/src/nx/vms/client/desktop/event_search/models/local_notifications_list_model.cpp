@@ -101,7 +101,7 @@ LocalNotificationsListModel::LocalNotificationsListModel(WindowContext* context,
     connect(manager, &workbench::LocalNotificationsManager::titleChanged,
         this, changed({Qt::DisplayRole}));
     connect(manager, &workbench::LocalNotificationsManager::descriptionChanged,
-        this, changed({Qn::DescriptionTextRole}));
+        this, changed({core::DescriptionTextRole}));
     connect(manager, &workbench::LocalNotificationsManager::iconChanged,
         this, changed({Qt::DecorationRole}));
     connect(manager, &workbench::LocalNotificationsManager::cancellableChanged,
@@ -149,7 +149,7 @@ QVariant LocalNotificationsListModel::data(const QModelIndex& index, int role) c
             return QVariant();
         }
 
-        case Qn::DescriptionTextRole:
+        case core::DescriptionTextRole:
             return manager->description(notificationId);
 
         case Qn::RemovableRole:
@@ -229,7 +229,7 @@ bool LocalNotificationsListModel::setData(const QModelIndex& index, const QVaria
 {
     if (!index.isValid() || index.model() != this || index.column() != 0
         || index.row() < 0 || index.row() >= rowCount()
-        || role != Qn::DefaultNotificationRole)
+        || role != core::DefaultNotificationRole)
     {
         return false;
     }

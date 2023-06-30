@@ -3,8 +3,8 @@
 import QtQuick
 import QtQuick.Controls
 
-import Nx
 import Nx.Core
+import Nx.Core.Controls
 
 /**
  * TabButton that shows icon and text when selected, and only icon when not selected.

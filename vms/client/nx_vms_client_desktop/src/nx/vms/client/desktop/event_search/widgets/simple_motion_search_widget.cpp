@@ -136,7 +136,7 @@ SimpleMotionSearchWidget::SimpleMotionSearchWidget(WindowContext* context, QWidg
     setRelevantControls(Control::timeSelector | Control::previewsToggler);
     setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/motion.svg"));
 
-    connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
+    connect(model(), &core::AbstractSearchListModel::isOnlineChanged, this,
         &SimpleMotionSearchWidget::updateAllowance);
 }
 

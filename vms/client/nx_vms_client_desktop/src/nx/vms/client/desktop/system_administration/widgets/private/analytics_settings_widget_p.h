@@ -12,9 +12,9 @@
 
 #include <api/server_rest_connection.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/analytics/analytics_engines_watcher.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
-#include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
 #include <nx/vms/client/desktop/system_administration/models/api_integration_requests_model.h>
 
 #include "../analytics_settings_widget.h"
@@ -80,7 +80,7 @@ public:
     AnalyticsSettingsWidget* const q = nullptr;
 
     const QScopedPointer<QQuickWidget> view;
-    const QScopedPointer<AnalyticsEnginesWatcher> enginesWatcher;
+    const QScopedPointer<core::AnalyticsEnginesWatcher> enginesWatcher;
     QVariantList engines;
     bool hasChanges = false;
     bool settingsLoading = false;
@@ -102,7 +102,7 @@ signals:
     void licenseSummariesChanged();
 
 private:
-    void addEngine(const QnUuid& engineId, const AnalyticsEngineInfo& engineInfo);
+    void addEngine(const QnUuid& engineId, const core::AnalyticsEngineInfo& engineInfo);
     void removeEngine(const QnUuid& engineId);
     void updateEngine(const QnUuid& engineId);
     void setErrors(const QnUuid& engineId, const QJsonObject& errors);

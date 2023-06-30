@@ -12,7 +12,6 @@
 #include <api/server_rest_connection.h>
 #include <common/common_globals.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/utils.h>
@@ -21,6 +20,8 @@
 #include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/core/resource/client_storage_resource.h>
+#include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -33,14 +34,13 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
-#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/time/formatter.h>
-#include <server/server_storage_manager.h>
+#include <storage/server_storage_manager.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/models/storage_list_model.h>
 #include <ui/models/storage_model_info.h>
@@ -357,7 +357,7 @@ public:
 
         connect(
             systemContext->serverRuntimeEventConnector(),
-            &ServerRuntimeEventConnector::analyticsStorageParametersChanged,
+            &nx::vms::client::core::ServerRuntimeEventConnector::analyticsStorageParametersChanged,
             this,
             [this](const QnUuid& serverId)
             {
@@ -621,13 +621,12 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     connect(ui->rebuildBackupWidget, &QnStorageRebuildWidget::cancelRequested, this,
         [this]{ cancelRebuild(false); });
 
-    connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildStatusChanged,
+    const auto storageManager = systemContext()->serverStorageManager();
+    connect(storageManager, &QnServerStorageManager::serverRebuildStatusChanged,
         this, &QnStorageConfigWidget::atServerRebuildStatusChanged);
-
-    connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished,
+    connect(storageManager, &QnServerStorageManager::serverRebuildArchiveFinished,
         this, &QnStorageConfigWidget::atServerRebuildArchiveFinished);
-
-    connect(qnServerStorageManager, &QnServerStorageManager::storageAdded, this,
+    connect(storageManager, &QnServerStorageManager::storageAdded, this,
         [this](const QnStorageResourcePtr& storage)
         {
             if (m_server && storage->getParentServer() == m_server)
@@ -637,14 +636,14 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
             }
         });
 
-    connect(qnServerStorageManager, &QnServerStorageManager::storageChanged, this,
+    connect(storageManager, &QnServerStorageManager::storageChanged, this,
         [this](const QnStorageResourcePtr& storage)
         {
             m_model->updateStorage(QnStorageModelInfo(storage));
             emit hasChangesChanged();
         });
 
-    connect(qnServerStorageManager, &QnServerStorageManager::storageRemoved, this,
+    connect(storageManager, &QnServerStorageManager::storageRemoved, this,
         [this](const QnStorageResourcePtr& storage)
         {
             m_model->removeStorage(QnStorageModelInfo(storage));
@@ -660,10 +659,10 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
 
     m_updateStatusTimer->setInterval(kUpdateStatusTimeoutMs);
     connect(m_updateStatusTimer, &QTimer::timeout, this,
-        [this]
+        [this, storageManager]
         {
             if (isVisible())
-                qnServerStorageManager->checkStoragesStatus(m_server);
+                storageManager->checkStoragesStatus(m_server);
         });
 
     /* By [Left] disable storage, by [Right] enable storage: */
@@ -727,7 +726,7 @@ void QnStorageConfigWidget::showEvent(QShowEvent* event)
 {
     base_type::showEvent(event);
     m_updateStatusTimer->start();
-    qnServerStorageManager->checkStoragesStatus(m_server);
+    systemContext()->serverStorageManager()->checkStoragesStatus(m_server);
 }
 
 void QnStorageConfigWidget::hideEvent(QHideEvent* event)
@@ -872,7 +871,7 @@ void QnStorageConfigWidget::atAddExtStorage(bool addToMain)
     if (!m_server || isReadOnly())
         return;
 
-    auto storageManager = qnServerStorageManager;
+    auto storageManager = systemContext()->serverStorageManager();
     QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, storageManager, this));
     QSet<QString> protocols;
     for (const auto& p: storageManager->protocols(m_server))
@@ -1136,7 +1135,8 @@ void QnStorageConfigWidget::updateRebuildInfo()
     for (int i = 0; i < static_cast<int>(QnServerStoragesPool::Count); ++i)
     {
         QnServerStoragesPool pool = static_cast<QnServerStoragesPool>(i);
-        updateRebuildUi(pool, qnServerStorageManager->rebuildStatus(m_server, pool));
+        const auto storageManager = systemContext()->serverStorageManager();
+        updateRebuildUi(pool, storageManager->rebuildStatus(m_server, pool));
     }
 }
 
@@ -1242,11 +1242,12 @@ void QnStorageConfigWidget::applyChanges()
     for (const auto& storage: storagesToUpdate)
         storage->savePropertiesAsync();
 
+    const auto storageManager = systemContext()->serverStorageManager();
     if (!storagesToUpdate.empty())
-        qnServerStorageManager->saveStorages(storagesToUpdate);
+        storageManager->saveStorages(storagesToUpdate);
 
     if (!storagesToRemove.empty())
-        qnServerStorageManager->deleteStorages(storagesToRemove);
+        storageManager->deleteStorages(storagesToRemove);
 
     updateWarnings();
     emit hasChangesChanged();
@@ -1277,7 +1278,7 @@ void QnStorageConfigWidget::startRebuid(bool isMain)
     if (warnResult != QDialogButtonBox::Ok)
         return;
 
-    if (!qnServerStorageManager->rebuildServerStorages(m_server,
+    if (!systemContext()->serverStorageManager()->rebuildServerStorages(m_server,
         isMain ? QnServerStoragesPool::Main : QnServerStoragesPool::Backup))
     {
         return;
@@ -1289,7 +1290,7 @@ void QnStorageConfigWidget::startRebuid(bool isMain)
 
 void QnStorageConfigWidget::cancelRebuild(bool isMain)
 {
-    if (!qnServerStorageManager->cancelServerStoragesRebuild(m_server,
+    if (!systemContext()->serverStorageManager()->cancelServerStoragesRebuild(m_server,
         isMain ? QnServerStoragesPool::Main : QnServerStoragesPool::Backup))
     {
         return;

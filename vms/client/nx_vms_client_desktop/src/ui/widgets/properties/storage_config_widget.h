@@ -13,7 +13,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/api/types/resource_types.h>
-#include <server/server_storage_manager_fwd.h>
+#include <storage/server_storage_manager_fwd.h>
 #include <ui/models/storage_model_info.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>

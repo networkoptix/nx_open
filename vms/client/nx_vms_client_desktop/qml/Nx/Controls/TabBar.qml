@@ -3,9 +3,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-import Nx 1.0
-import Nx.Controls 1.0
 import Nx.Core 1.0
+import Nx.Controls 1.0
 
 TabBar
 {

@@ -17,8 +17,8 @@
 #include <nx/analytics/metadata_log_parser.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/analytics/analytics_metadata_provider_factory.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
-#include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
@@ -29,7 +29,7 @@
 using nx::vms::api::StreamDataFilter;
 using nx::vms::api::StreamDataFilters;
 using namespace std::chrono;
-using namespace nx::vms::client::desktop::analytics;
+using namespace nx::vms::client::core::analytics;
 
 namespace nx::vms::client::desktop {
 

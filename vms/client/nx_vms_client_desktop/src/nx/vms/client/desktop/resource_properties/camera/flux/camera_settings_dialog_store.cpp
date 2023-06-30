@@ -724,7 +724,7 @@ QVariantList CameraSettingsDialogStore::analyticsEngines() const
     return result;
 }
 
-void CameraSettingsDialogStore::setAnalyticsEngines(const QList<AnalyticsEngineInfo>& value)
+void CameraSettingsDialogStore::setAnalyticsEngines(const QList<core::AnalyticsEngineInfo>& value)
 {
     d->executeAction(
         [&](State state) { return Reducer::setAnalyticsEngines(std::move(state), value); });
@@ -834,7 +834,7 @@ void CameraSettingsDialogStore::refreshDeviceAgentSettings(const QnUuid& engineI
 }
 
 void CameraSettingsDialogStore::resetDeviceAgentData(
-    const QnUuid& engineId, const DeviceAgentData& data, bool resetUser)
+    const QnUuid& engineId, const core::DeviceAgentData& data, bool resetUser)
 {
     d->executeAction(
         [&](State state)

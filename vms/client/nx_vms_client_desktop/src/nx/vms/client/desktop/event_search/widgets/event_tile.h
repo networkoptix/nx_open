@@ -8,7 +8,7 @@
 #include <analytics/common/object_metadata.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 
 namespace Ui { class EventTile; }
@@ -43,8 +43,8 @@ public:
     QString footerText() const;
     void setFooterText(const QString& value);
 
-    analytics::AttributeList attributeList() const;
-    void setAttributeList(const analytics::AttributeList& value);
+    core::analytics::AttributeList attributeList() const;
+    void setAttributeList(const core::analytics::AttributeList& value);
 
     QString timestamp() const;
     void setTimestamp(const QString& value);

@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 
+using namespace nx::vms::client;
 using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
 using ActionId = nx::vms::client::desktop::menu::IDType;
 using ActionParameters = nx::vms::client::desktop::menu::Parameters;
@@ -32,7 +33,7 @@ QnResourceList childIndexesResources(const QModelIndex& index, bool recursive)
 
     QnResourceList result;
     for (const auto& childResourceIndex: childResourceIndexes)
-        result.append(childResourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>());
+        result.append(childResourceIndex.data(core::ResourceRole).value<QnResourcePtr>());
 
     return result;
 }
@@ -75,7 +76,7 @@ ActionParameters getActionParameters(
         || nodeType == NodeType::sharedResource
         || nodeType == NodeType::sharedLayout)
     {
-        return ActionParameters(index.data(Qn::ResourceRole).value<QnResourcePtr>());
+        return ActionParameters(index.data(core::ResourceRole).value<QnResourcePtr>());
     }
 
     if (nodeType == NodeType::recorder)
@@ -87,24 +88,24 @@ ActionParameters getActionParameters(
 
     if (nodeType == NodeType::videoWallItem)
     {
-        const auto uuid = index.data(Qn::UuidRole).value<QnUuid>();
+        const auto uuid = index.data(core::UuidRole).value<QnUuid>();
         QnVideoWallItemIndex itemIndex = resourcePool->getVideoWallItemByUuid(uuid);
         if (!itemIndex.isNull())
         {
             ActionParameters parameters = {{itemIndex}};
-            parameters.setArgument(Qn::UuidRole, uuid);
+            parameters.setArgument(core::UuidRole, uuid);
             return parameters;
         }
     }
 
     if (nodeType == NodeType::videoWallMatrix)
     {
-        const auto uuid = index.data(Qn::UuidRole).value<QnUuid>();
+        const auto uuid = index.data(core::UuidRole).value<QnUuid>();
         QnVideoWallMatrixIndex matrixIndex = resourcePool->getVideoWallMatrixByUuid(uuid);
         if (!matrixIndex.isNull())
         {
             ActionParameters parameters = {{matrixIndex}};
-            parameters.setArgument(Qn::UuidRole, uuid);
+            parameters.setArgument(core::UuidRole, uuid);
             return parameters;
         }
     }
@@ -129,7 +130,7 @@ ActionParameters getActionParameters(
     }
 
     if (nodeType == NodeType::showreel)
-        return ActionParameters(Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>());
+        return ActionParameters(core::UuidRole, index.data(core::UuidRole).value<QnUuid>());
 
     return ActionParameters();
 }
@@ -166,7 +167,7 @@ bool ResourceTreeEditDelegate::operator()(const QModelIndex& index, const QVaria
         index,
         nodeType,
         system()->resourcePool());
-    parameters.setArgument(Qn::ResourceNameRole, stringValue);
+    parameters.setArgument(core::ResourceNameRole, stringValue);
     parameters.setArgument(Qn::NodeTypeRole, nodeType);
 
     // View state should be updated before triggering any actions if item editor was closed by

@@ -6,7 +6,6 @@ import QtQuick.Layouts
 import QtQuick.Window
 import QtQuick.Shapes
 
-import Nx
 import Nx.Core
 import Nx.Controls
 

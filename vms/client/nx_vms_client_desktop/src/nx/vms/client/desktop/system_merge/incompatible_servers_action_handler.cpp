@@ -59,7 +59,7 @@ void IncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered
     }
 
     const auto serverId =
-        menu()->currentParameters(sender()).argument(Qn::UuidRole).value<QnUuid>();
+        menu()->currentParameters(sender()).argument(core::UuidRole).value<QnUuid>();
 
     connectToCurrentSystem(serverId);
 }

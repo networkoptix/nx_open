@@ -32,6 +32,7 @@
 #include <ui/workbench/workbench_context.h>
 
 using namespace std::chrono;
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 struct QnCameraListDialog::Private
@@ -154,7 +155,7 @@ void QnCameraListDialog::updateWindowTitle()
         const auto index = d->resourceSearch->index(row, 0);
         if (!index.isValid())
             continue;
-        const auto camera = index.data(Qn::ResourceRole).value<QnResourcePtr>()
+        const auto camera = index.data(ResourceRole).value<QnResourcePtr>()
             .dynamicCast<QnVirtualCameraResource>();
         if (camera)
             cameras << camera;
@@ -203,7 +204,7 @@ void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex& index)
     if (!index.isValid())
         return;
 
-    if (const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>())
+    if (const auto resource = index.data(ResourceRole).value<QnResourcePtr>())
         menu()->trigger(menu::CameraSettingsAction, resource);
 }
 
@@ -212,7 +213,7 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint&
     QnResourceList resources;
     for (const auto& index: ui->camerasView->selectionModel()->selectedRows())
     {
-        if (const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>())
+        if (const auto resource = index.data(ResourceRole).value<QnResourcePtr>())
             resources.push_back(resource);
     }
 

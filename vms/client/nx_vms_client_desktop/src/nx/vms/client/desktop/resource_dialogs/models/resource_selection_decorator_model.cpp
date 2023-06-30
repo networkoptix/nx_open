@@ -22,7 +22,7 @@ QSet<QnResourcePtr> getResources(const QModelIndexList& indexes)
     QSet<QnResourcePtr> result;
     for (const auto& index: indexes)
     {
-        auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        auto resource = index.data(nx::vms::client::core::ResourceRole).value<QnResourcePtr>();
         if (!resource.isNull())
             result.insert(resource);
     }
@@ -46,7 +46,7 @@ ResourceSelectionDecoratorModel::ResourceSelectionDecoratorModel(
             const auto leafIndexes = item_model::getLeafIndexes(this, QModelIndex());
             for (const auto& leafIndex: leafIndexes)
             {
-                const auto resource = leafIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+                const auto resource = leafIndex.data(core::ResourceRole).value<QnResourcePtr>();
                 if (!resource.isNull())
                     m_resourceMapping.insert(resource, leafIndex);
             }
@@ -58,7 +58,7 @@ ResourceSelectionDecoratorModel::ResourceSelectionDecoratorModel(
             for (int row = first; row <= last; ++row)
             {
                 const auto rowIndex = index(row, 0, parent);
-                const auto resource = rowIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+                const auto resource = rowIndex.data(core::ResourceRole).value<QnResourcePtr>();
                 if (!resource.isNull())
                     m_resourceMapping.insert(resource, rowIndex);
             }
@@ -70,7 +70,7 @@ ResourceSelectionDecoratorModel::ResourceSelectionDecoratorModel(
             for (int row = first; row <= last; ++row)
             {
                 const auto rowIndex = index(row, 0, parent);
-                const auto resource = rowIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+                const auto resource = rowIndex.data(core::ResourceRole).value<QnResourcePtr>();
                 if (!resource.isNull())
                     m_resourceMapping.remove(resource);
             }
@@ -101,7 +101,7 @@ QVariant ResourceSelectionDecoratorModel::data(const QModelIndex& index, int rol
     const auto leafCheckState =
         [this](const QModelIndex& index) -> QVariant
         {
-            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
             if (resource.isNull())
                 return {};
 
@@ -206,7 +206,7 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
             const auto leafIndexes = item_model::getLeafIndexes(this, index);
             for (const auto& leafIndex: leafIndexes)
             {
-                const auto childResource = leafIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+                const auto childResource = leafIndex.data(core::ResourceRole).value<QnResourcePtr>();
                 if (childResource.isNull())
                     continue;
                 childResources.insert(childResource);
@@ -250,7 +250,7 @@ bool ResourceSelectionDecoratorModel::toggleSelection(const QModelIndex& index)
     const auto toggleLeafSelection =
         [this, &invalidateIndexAndParents](const QModelIndex& index)
         {
-            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
             if (resource.isNull())
                 return false;
 

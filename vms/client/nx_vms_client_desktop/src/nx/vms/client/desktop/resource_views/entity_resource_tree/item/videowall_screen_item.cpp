@@ -67,7 +67,7 @@ QVariant VideoWallScreenItem::data(int role) const
         case Qn::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::videoWallItem);
 
-        case Qn::UuidRole:
+        case core::UuidRole:
         case Qn::ItemUuidRole:
             return QVariant::fromValue(m_screen.uuid);
 

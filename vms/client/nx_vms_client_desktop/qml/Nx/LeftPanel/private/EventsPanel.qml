@@ -4,7 +4,6 @@ import QtQuick 2.14
 import QtQuick.Controls 2.14
 import QtQuick.Layouts 1.14
 
-import Nx 1.0
 import Nx.Core 1.0
 import Nx.Analytics 1.0
 import Nx.Controls 1.0
@@ -218,7 +217,7 @@ Item
                 id: eventModel
 
                 context: windowContext
-                type: { return RightPanelModel.Type.events }
+                type: { return EventSearch.SearchType.events }
                 previewsEnabled: eventsPanel.showThumbnails
 
                 Component.onCompleted:

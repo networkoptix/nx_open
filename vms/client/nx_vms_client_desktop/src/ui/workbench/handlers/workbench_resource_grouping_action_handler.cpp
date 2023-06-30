@@ -127,7 +127,7 @@ void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
     const auto groupCompositeIdDimension = compositeIdDimension(groupCompositeId);
     const auto changedSubIdOrder = groupCompositeIdDimension - 1;
 
-    const auto newGroupName = fixupSubId(parameters.argument(Qn::ResourceNameRole).toString());
+    const auto newGroupName = fixupSubId(parameters.argument(core::ResourceNameRole).toString());
     if (!isValidSubId(newGroupName) || !NX_ASSERT(!resources.empty()))
         return;
 

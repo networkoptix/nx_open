@@ -151,7 +151,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
     {
         switch (role)
         {
-            case Qn::ResourceRole:
+            case core::ResourceRole:
                 return QVariant::fromValue<QnResourcePtr>(server);
 
             case Qt::DecorationRole:

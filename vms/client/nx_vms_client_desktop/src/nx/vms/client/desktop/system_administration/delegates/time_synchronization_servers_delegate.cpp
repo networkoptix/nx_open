@@ -18,6 +18,8 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace nx::vms::client::core;
+
 using Model = TimeSynchronizationServersModel;
 
 namespace {

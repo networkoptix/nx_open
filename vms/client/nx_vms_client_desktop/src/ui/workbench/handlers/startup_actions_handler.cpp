@@ -317,7 +317,7 @@ void StartupActionsHandler::submitDelayedDrops()
     }
 
     for (const auto& showreel: showreels)
-        menu()->trigger(ReviewShowreelAction, {Qn::UuidRole, showreel.id});
+        menu()->trigger(ReviewShowreelAction, {core::UuidRole, showreel.id});
 }
 
 void StartupActionsHandler::handleStartupParameters()

@@ -3,6 +3,7 @@
 import QtQuick 2.6
 
 import Nx.Core 1.0
+import Nx.Core.Items 1.0
 import Nx.Items 1.0
 import Nx.Motion 1.0
 

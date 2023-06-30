@@ -9,6 +9,7 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <utils/common/checked_cast.h>
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 QnResourceListModel::QnResourceListModel(QObject *parent) :
@@ -238,11 +239,11 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
                     : Qt::Unchecked;
             break;
 
-        case Qn::ResourceRole:
+        case ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(resource);
         case Qn::ResourceFlagsRole:
             return static_cast<int>(resource->flags());
-        case Qn::ResourceStatusRole:
+        case ResourceStatusRole:
             return static_cast<int>(resource->getStatus());
         case Qn::NodeTypeRole:
             return m_options.testFlag(ServerAsHealthMonitorOption)

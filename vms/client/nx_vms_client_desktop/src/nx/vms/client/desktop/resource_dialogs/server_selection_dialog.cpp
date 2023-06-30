@@ -29,6 +29,7 @@
 
 namespace {
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::entity_item_model;
 
@@ -45,7 +46,7 @@ AbstractItemPtr createServerItem(const QnResourcePtr& serverResource)
     return entity_item_model::GenericItemBuilder()
         .withRole(Qt::DisplayRole, serverResource->getName())
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Server))
-        .withRole(Qn::ResourceRole, QVariant::fromValue(serverResource))
+        .withRole(ResourceRole, QVariant::fromValue(serverResource))
         .withRole(Qn::ExtraInfoRole, extraText)
         .withFlags({Qt::ItemNeverHasChildren, Qt::ItemIsEnabled});
 }
@@ -65,7 +66,7 @@ std::function<AbstractItemPtr(const QnResourcePtr&)> serverItemCreator()
 QnMediaServerResourceList getAccessibleServers(
     const QnUserResourcePtr& currentUser)
 {
-    const auto systemContext = SystemContext::fromResource(currentUser);
+    const auto systemContext = nx::vms::client::core::SystemContext::fromResource(currentUser);
     const auto accessManager = systemContext->resourceAccessManager();
 
     return systemContext->resourcePool()->servers().filtered(

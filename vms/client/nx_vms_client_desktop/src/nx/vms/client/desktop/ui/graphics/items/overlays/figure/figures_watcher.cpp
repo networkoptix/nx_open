@@ -11,8 +11,8 @@
 #include <QtCore/QJsonDocument>
 
 #include <client/client_module.h>
+#include <nx/vms/client/core/analytics/analytics_settings_multi_listener.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
 
 namespace {
 
@@ -145,14 +145,14 @@ struct RoiFiguresWatcher::Private
 {
     RoiFiguresWatcher* const q;
 
-    QScopedPointer<AnalyticsSettingsMultiListener> settingsListener;
+    QScopedPointer<core::AnalyticsSettingsMultiListener> settingsListener;
     FigureInfosByEngine figureInfosByEngine;
 
     Private(RoiFiguresWatcher* q);
 
     void handleEngineDataUpdated(
         const EngineId& engineId,
-        const DeviceAgentData& data);
+        const core::DeviceAgentData& data);
 };
 
 RoiFiguresWatcher::Private::Private(RoiFiguresWatcher* q):
@@ -162,7 +162,7 @@ RoiFiguresWatcher::Private::Private(RoiFiguresWatcher* q):
 
 void RoiFiguresWatcher::Private::handleEngineDataUpdated(
     const EngineId& engineId,
-    const DeviceAgentData& data)
+    const core::DeviceAgentData& data)
 {
     const auto settings = extractSettings(data.model);
 
@@ -228,13 +228,13 @@ RoiFiguresWatcher::RoiFiguresWatcher(
     if (!camera)
         return;
 
-    d->settingsListener.reset(new AnalyticsSettingsMultiListener(
+    d->settingsListener.reset(new core::AnalyticsSettingsMultiListener(
         qnClientModule->analyticsSettingsManager(),
         camera,
-        AnalyticsSettingsMultiListener::ListenPolicy::enabledEngines));
+        core::AnalyticsSettingsMultiListener::ListenPolicy::enabledEngines));
 
-    connect(d->settingsListener.get(), &AnalyticsSettingsMultiListener::dataChanged, this,
-        [this](const EngineId& engineId, const DeviceAgentData& data)
+    connect(d->settingsListener.get(), &core::AnalyticsSettingsMultiListener::dataChanged, this,
+        [this](const EngineId& engineId, const core::DeviceAgentData& data)
         {
             d->handleEngineDataUpdated(engineId, data);
         });
@@ -246,7 +246,7 @@ RoiFiguresWatcher::RoiFiguresWatcher(
             for (const auto& engineId: d->settingsListener->engineIds())
                 d->handleEngineDataUpdated(engineId, d->settingsListener->data(engineId));
         };
-    connect(d->settingsListener.get(), &AnalyticsSettingsMultiListener::enginesChanged,
+    connect(d->settingsListener.get(), &core::AnalyticsSettingsMultiListener::enginesChanged,
         this, handleEnginesChanged);
 
     handleEnginesChanged();

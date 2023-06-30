@@ -88,7 +88,7 @@ QVariant QnLicenseListModel::data(const QModelIndex& index, int role) const
         case LicenseRole:
             return QVariant::fromValue(license(index));
 
-        case Qn::ResourceRole:
+        case core::ResourceRole:
             if (index.column() == ServerColumn)
                 return QVariant::fromValue<QnResourcePtr>(serverByLicense(license(index)));
             break;
