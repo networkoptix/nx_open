@@ -507,7 +507,7 @@ function(nx_check_package_paths_changes package_type)
     endforeach()
 endfunction()
 
-# Check if we need newer libstdc++.
+# Check if we need a newer libstdc++.
 function(nx_detect_default_use_system_stdcpp_value developer_build)
     if(NOT DEFINED CACHE{useSystemStdcpp})
         set(useSystemStdcpp OFF)
