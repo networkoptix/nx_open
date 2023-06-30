@@ -19,18 +19,47 @@ bool mapButtonState(const QBitArray& state)
 
 namespace nx::vms::client::desktop::joystick {
 
+class DeviceHidStateListener: public OsHidDeviceSubscriber
+{
+public:
+    DeviceHidStateListener(DeviceHid* device): OsHidDeviceSubscriber(device), m_device(device) {}
+
+    virtual void onStateChanged(const QBitArray& newState) override
+    {
+        m_device->onStateChanged(newState);
+    }
+
+private:
+    DeviceHid* m_device;
+};
+
+struct DeviceHid::Private
+{
+    DeviceHid* const q;
+
+    DeviceHidStateListener* stateListener;
+
+    int bufferSize = 0;
+    QScopedArrayPointer<unsigned char> buffer;
+
+    int bitCount = 0;
+    std::vector<ParsedFieldLocation> axisLocations;
+    std::vector<ParsedFieldLocation> buttonLocations;
+};
+
 DeviceHid::DeviceHid(
     const JoystickDescriptor& modelInfo,
     const QString& path,
     QObject* parent)
     :
-    base_type(modelInfo, path, nullptr, parent)
+    base_type(modelInfo, path, nullptr, parent),
+    d(new Private{.q = this, .stateListener = new DeviceHidStateListener(this)})
 {
-    OsHidDriver::getDriver()->setupDeviceSubscriber(path, this);
+    OsHidDriver::getDriver()->setupDeviceSubscriber(path, d->stateListener);
 
-    m_bitCount = modelInfo.reportSize.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    m_bufferSize = (m_bitCount + 7) / 8;
-    m_buffer.reset(new unsigned char[m_bufferSize]);
+    d->bitCount = modelInfo.reportSize.toInt(/*ok*/ nullptr, kAutoDetectBase);
+    d->bufferSize = (d->bitCount + 7) / 8;
+    d->buffer.reset(new unsigned char[d->bufferSize]);
 
     for (int axisIndex = 0; axisIndex < Device::axisIndexCount; ++axisIndex)
         setAxisInitialized((Device::AxisIndexes)axisIndex, true);
@@ -38,18 +67,18 @@ DeviceHid::DeviceHid(
     setInitializedButtonsNumber(modelInfo.buttons.size());
 
     // Initialize stick axes (x, y, z).
-    m_axisLocations.push_back(parseLocation(modelInfo.xAxis.bits));
-    m_axisLocations.push_back(parseLocation(modelInfo.yAxis.bits));
-    m_axisLocations.push_back(parseLocation(modelInfo.zAxis.bits));
+    d->axisLocations.push_back(parseLocation(modelInfo.xAxis.bits));
+    d->axisLocations.push_back(parseLocation(modelInfo.yAxis.bits));
+    d->axisLocations.push_back(parseLocation(modelInfo.zAxis.bits));
     for (const auto& button: modelInfo.buttons)
-        m_buttonLocations.push_back(parseLocation(button.bits));
+        d->buttonLocations.push_back(parseLocation(button.bits));
 
     updateStickAxisLimits(modelInfo);
 }
 
 DeviceHid::~DeviceHid()
 {
-    OsHidDriver::getDriver()->removeDeviceSubscriber(this);
+    OsHidDriver::getDriver()->removeDeviceSubscriber(d->stateListener);
 }
 
 bool DeviceHid::isValid() const
@@ -146,9 +175,9 @@ Device::State DeviceHid::parseOsHidLevelState(const QBitArray& osHidLevelState)
 {
     StickPosition newStickPosition;
     newStickPosition.fill(0);
-    for (size_t i = 0; i < m_axisLocations.size() && i < newStickPosition.max_size(); ++i)
+    for (size_t i = 0; i < d->axisLocations.size() && i < newStickPosition.max_size(); ++i)
     {
-        const auto state = parseData(osHidLevelState, m_axisLocations[i]);
+        const auto state = parseData(osHidLevelState, d->axisLocations[i]);
 
         int rawValue = 0;
         for (int j = 0; j < state.size(); ++j)
@@ -161,7 +190,7 @@ Device::State DeviceHid::parseOsHidLevelState(const QBitArray& osHidLevelState)
     }
 
     ButtonStates newButtonStates;
-    for (const auto& location: m_buttonLocations)
+    for (const auto& location: d->buttonLocations)
         newButtonStates.push_back(mapButtonState(parseData(osHidLevelState, location)));
 
     return {newStickPosition, newButtonStates};

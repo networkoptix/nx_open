@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "os_hid_device_virtual.h"
+#include "os_hid_device_virtual_mac.h"
 
 #include <algorithm>
 

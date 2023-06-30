@@ -17,8 +17,12 @@ public:
     virtual ~OsHidDriverMac() override;
 
     virtual QList<OsHidDeviceInfo> deviceList() override;
-    virtual void setupDeviceSubscriber(const QString& path, QObject* subscriber) override;
-    virtual void removeDeviceSubscriber(QObject* subscriber) override;
+    virtual void setupDeviceSubscriber(const QString& path,
+        const OsHidDeviceSubscriber* subscriber) override;
+    virtual void removeDeviceSubscriber(const OsHidDeviceSubscriber* subscriber) override;
+
+    void attachVirtualDevice(OsHidDevice* device);
+    void detachVirtualDevice(OsHidDevice* device);
 
 private:
     virtual void enumerateDevices();
