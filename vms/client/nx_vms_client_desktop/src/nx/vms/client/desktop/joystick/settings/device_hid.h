@@ -6,6 +6,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include <nx/utils/impl_ptr.h>
+
 #include "descriptors.h"
 #include "device.h"
 
@@ -51,12 +53,8 @@ public:
     static ParsedFieldLocation parseLocation(const FieldLocation& location);
 
 private:
-    int m_bufferSize = 0;
-    QScopedArrayPointer<unsigned char> m_buffer;
-
-    int m_bitCount = 0;
-    std::vector<ParsedFieldLocation> m_axisLocations;
-    std::vector<ParsedFieldLocation> m_buttonLocations;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop::joystick

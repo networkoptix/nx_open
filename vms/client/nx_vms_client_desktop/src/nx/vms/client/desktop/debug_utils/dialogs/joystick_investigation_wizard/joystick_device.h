@@ -11,7 +11,7 @@ namespace nx::vms::client::desktop::joystick {
 
 class JoystickManager;
 
-class JoystickDevice: public QObject
+class JoystickDevice: public OsHidDeviceSubscriber
 {
     Q_OBJECT
 

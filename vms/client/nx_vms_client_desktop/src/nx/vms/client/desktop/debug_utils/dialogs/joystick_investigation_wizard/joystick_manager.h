@@ -25,7 +25,7 @@ public:
         const QString& path);
 
 public slots:
-    void onHidDeviceListChanged();
+    void updateHidDeviceList();
 
     static void registerQmlType();
 

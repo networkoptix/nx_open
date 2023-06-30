@@ -76,7 +76,7 @@ Dialog
         }
     }
 
-    StackView
+    contentItem: StackView
     {
         id: stepsStack
 

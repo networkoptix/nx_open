@@ -29,15 +29,8 @@ WizardStep
             id: joystickImage
 
             Layout.alignment: Qt.AlignHCenter
-            source: "image://svg/skin/joystick_settings/panAndTilt.svg"
+            source: "image://svg/skin/joystick_settings/pan.svg"
             sourceSize: Qt.size(120, 120)
-
-            transform: Rotation
-            {
-                angle: 90
-                origin.x: joystickImage.width / 2
-                origin.y: joystickImage.height / 2
-            }
         }
     }
 

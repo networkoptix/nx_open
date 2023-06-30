@@ -63,9 +63,7 @@ void JoystickInvestigationWizardDialog::registerAction()
         "Unknown joystick investigation dialog",
         [](QnWorkbenchContext* context)
         {
-            auto dialog = new JoystickInvestigationWizardDialog(
-                context->mainWindowWidget()
-            );
+            auto dialog = new JoystickInvestigationWizardDialog(context->mainWindowWidget());
 
             connect(dialog, &QmlDialogWrapper::done, dialog, &QObject::deleteLater);
 

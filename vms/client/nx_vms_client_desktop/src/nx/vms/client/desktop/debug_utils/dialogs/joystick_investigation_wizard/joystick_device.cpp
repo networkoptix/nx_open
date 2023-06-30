@@ -7,7 +7,7 @@
 namespace nx::vms::client::desktop::joystick {
 
 JoystickDevice::JoystickDevice(OsHidDeviceInfo deviceInfo, QObject* parent):
-    QObject(parent),
+    OsHidDeviceSubscriber(parent),
     m_deviceInfo(deviceInfo)
 {
     OsHidDriver::getDriver()->setupDeviceSubscriber(m_deviceInfo.path, this);
