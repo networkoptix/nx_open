@@ -444,7 +444,7 @@ void UserGroupsWidget::Private::setupUi()
             if (!selectionFlags.testFlag(QItemSelectionModel::Select))
                 return;
 
-            const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
+            const auto groupId = index.data(core::UuidRole).value<QnUuid>();
             if (groupId.isNull())
                 return;
 
@@ -531,7 +531,7 @@ void UserGroupsWidget::Private::setupUi()
             if (!index.isValid())
                 return;
 
-            const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
+            const auto groupId = index.data(core::UuidRole).value<QnUuid>();
             if (groupsModel->canDeleteGroup(groupId))
                 deleteGroups({groupId});
         });
@@ -653,7 +653,7 @@ void UserGroupsWidget::Private::handleSelectionChanged()
 
 void UserGroupsWidget::Private::handleCellTriggered(const QModelIndex& index)
 {
-    const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
+    const auto groupId = index.data(core::UuidRole).value<QnUuid>();
 
     if (index.column() == UserGroupListModel::CheckBoxColumn)
     {
@@ -745,7 +745,7 @@ QSet<QnUuid> UserGroupsWidget::Private::visibleGroupIds() const
     for (int row = 0; row < sortModel->rowCount(); ++row)
     {
         const auto index = sortModel->index(row, 0);
-        const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
+        const auto groupId = index.data(core::UuidRole).value<QnUuid>();
         if (NX_ASSERT(!groupId.isNull()))
             result.insert(groupId);
     }

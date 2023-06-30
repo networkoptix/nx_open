@@ -223,7 +223,7 @@ bool Skin::initSvgRenderer(const QString& name, QSvgRenderer& renderer) const
     QFile source(path(name));
     if (!source.open(QIODevice::ReadOnly))
     {
-        NX_ASSERT(false, "Cannot load svg");
+        NX_ASSERT(false, "Cannot load svg with name " + name);
         return false;
     }
 

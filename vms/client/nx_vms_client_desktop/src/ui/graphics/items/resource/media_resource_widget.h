@@ -14,7 +14,6 @@
 #include <client/client_globals.h>
 #include <core/ptz/ptz_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
-#include <core/resource/client_resource_fwd.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/core/watermark/watermark.h>
@@ -26,6 +25,7 @@
 #include <nx/vms/client/core/camera/iomodule/io_module_monitor.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/types.h>

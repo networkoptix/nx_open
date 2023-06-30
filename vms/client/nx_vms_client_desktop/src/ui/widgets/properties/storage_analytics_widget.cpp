@@ -28,7 +28,8 @@
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <server/server_storage_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <storage/server_storage_manager.h>
 #include <ui/delegates/recording_stats_item_delegate.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/models/recording_stats_adapter.h>
@@ -39,6 +40,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 using namespace nx::core;
 
@@ -154,8 +156,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     connect(m_selectAllAction, &QAction::triggered,
         this, [this]() { currentTable()->selectAll(); });
 
-    auto storageManager = qnServerStorageManager;
-    connect(storageManager, &QnServerStorageManager::storageSpaceRecieved,
+    connect(systemContext()->serverStorageManager(), &QnServerStorageManager::storageSpaceRecieved,
         this, &QnStorageAnalyticsWidget::atReceivedSpaceInfo);
 
     setHelpTopic(this, HelpTopic::Id::ServerSettings_StorageAnalitycs);
@@ -313,9 +314,8 @@ void QnStorageAnalyticsWidget::querySpaceFromServer()
     if (!m_server || m_server->getStatus() != nx::vms::api::ResourceStatus::online)
         return;
 
-    auto storageManager = qnServerStorageManager;
     // If next call fails, it will return 0 meaning "no request".
-    m_spaceRequestHandle = storageManager->requestStorageSpace(m_server);
+    m_spaceRequestHandle = systemContext()->serverStorageManager()->requestStorageSpace(m_server);
 }
 
 void QnStorageAnalyticsWidget::atReceivedSpaceInfo(QnMediaServerResourcePtr server,
@@ -344,7 +344,7 @@ void QnStorageAnalyticsWidget::queryStatsFromServer(qint64 bitrateAveragingPerio
     const auto index = bitrateAveragingPeriodMs == kDefaultBitrateAveragingPeriod ? 0 : 1;
     // If next call fails, it will return -1 meaning "no request".
     m_statsRequest[index].averagingPeriod = bitrateAveragingPeriodMs;
-    auto storageManager = qnServerStorageManager;
+    auto storageManager = systemContext()->serverStorageManager();
     m_statsRequest[index].handle = storageManager->requestRecordingStatistics(
         m_server, bitrateAveragingPeriodMs,
         [tool=QPointer(this)](bool success, int handle, const QnRecordingStatsReply& data)
@@ -414,7 +414,7 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
     {
         for (auto index: selectedIndexes)
         {
-            if (auto resource = table->model()->data(index, Qn::ResourceRole).value<QnResourcePtr>())
+            if (auto resource = table->model()->data(index, ResourceRole).value<QnResourcePtr>())
                 selectedResources.append(resource);
         }
     }

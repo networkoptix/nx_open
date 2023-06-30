@@ -141,7 +141,7 @@
 using namespace std::chrono;
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::analytics;
+using namespace nx::vms::client::core::analytics;
 using namespace nx::vms::api;
 
 namespace ptz = nx::vms::common::ptz;

@@ -3,7 +3,6 @@
 import QtQuick 2.14
 import QtQml 2.14
 
-import Nx 1.0
 import Nx.Core 1.0
 import Nx.Instruments 1.0
 import nx.client.core 1.0

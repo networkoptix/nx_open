@@ -15,7 +15,7 @@ namespace test {
 struct CameraSettingsAnalyticsEnginesWatcherStub:
     public CameraSettingsAnalyticsEnginesWatcherInterface
 {
-    virtual QList<AnalyticsEngineInfo> engineInfoList() const override
+    virtual QList<core::AnalyticsEngineInfo> engineInfoList() const override
     {
         return analyticsEngines;
     }
@@ -27,7 +27,7 @@ struct CameraSettingsAnalyticsEnginesWatcherStub:
     }
 
 public:
-    QList<AnalyticsEngineInfo> analyticsEngines;
+    QList<core::AnalyticsEngineInfo> analyticsEngines;
 };
 
 struct CameraSettingsTestFixture::Private

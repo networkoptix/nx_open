@@ -1046,7 +1046,8 @@ void initialize(Manager* manager, Action* root)
     /* Resource actions. */
     factory(OpenInLayoutAction)
         .flags(SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
-        .requiredTargetPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
+        .requiredTargetPermissions(core::LayoutResourceRole,
+            Qn::WritePermission | Qn::AddRemoveItemsPermission)
         .condition(new OpenInLayoutCondition());
 
     factory(OpenInCurrentLayoutAction)

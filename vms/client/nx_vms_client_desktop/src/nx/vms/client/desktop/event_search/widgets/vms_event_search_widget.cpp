@@ -17,10 +17,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/vms_event_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
@@ -128,12 +128,12 @@ VmsEventSearchWidget::Private::Private(VmsEventSearchWidget* q):
                 updateAnalyticsMenu();
         };
 
-    connect(m_eventModel, &AbstractSearchListModel::isOnlineChanged,
+    connect(m_eventModel, &core::AbstractSearchListModel::isOnlineChanged,
         this,
         updateAnalyticsMenuIfEventModelIsOnline);
 
     connect(q->system()->analyticsEventsSearchTreeBuilder(),
-        &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
+        &core::AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
         this,
         updateAnalyticsMenuIfEventModelIsOnline);
 
@@ -146,7 +146,7 @@ VmsEventSearchWidget::Private::Private(VmsEventSearchWidget* q):
             NX_ASSERT(m_serverEventsSubmenuAction);
 
             const bool serverEventsVisible =
-                this->q->commonSetup()->cameraSelection() == RightPanel::CameraSelection::all;
+                this->q->commonSetup()->cameraSelection() == core::EventSearch::CameraSelection::all;
 
             m_serverEventsSubmenuAction->setEnabled(serverEventsVisible);
 
@@ -160,7 +160,7 @@ VmsEventSearchWidget::Private::Private(VmsEventSearchWidget* q):
     connect(q->system()->accessController(), &AccessController::globalPermissionsChanged,
         q, &VmsEventSearchWidget::updateAllowance);
 
-    connect(q->model(), &AbstractSearchListModel::isOnlineChanged,
+    connect(q->model(), &core::AbstractSearchListModel::isOnlineChanged,
         q, &VmsEventSearchWidget::updateAllowance);
 }
 
@@ -315,7 +315,7 @@ void VmsEventSearchWidget::Private::updateAnalyticsMenu()
         [this, currentSelection, &currentSelectionStillAvailable]
         (auto addItemRecursive, auto parent, auto root) -> void
         {
-            using NodeType = AnalyticsEntitiesTreeBuilder::NodeType;
+            using NodeType = core::AnalyticsEntitiesTreeBuilder::NodeType;
 
             for (auto node: root->children)
             {

@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
+#include <nx/vms/client/core/analytics/analytics_settings_multi_listener.h>
 
 #include "analytics_settings_test_fixture.h"
 
@@ -17,7 +17,7 @@ class AnalyticsSettingsMultiListenerTest: public AnalyticsSettingsTestFixture
     using base_type = AnalyticsSettingsTestFixture;
 
 protected:
-    using ListenPolicy = AnalyticsSettingsMultiListener::ListenPolicy;
+    using ListenPolicy = core::AnalyticsSettingsMultiListener::ListenPolicy;
 
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp() override
@@ -32,7 +32,7 @@ protected:
         m_listener.reset();
     }
 
-    AnalyticsSettingsMultiListener* listener() const
+    core::AnalyticsSettingsMultiListener* listener() const
     {
         return m_listener.get();
     }
@@ -63,12 +63,12 @@ protected:
 
     void listenTo(ListenPolicy policy)
     {
-        m_listener.reset(new AnalyticsSettingsMultiListener(manager(), m_camera, policy));
+        m_listener.reset(new core::AnalyticsSettingsMultiListener(manager(), m_camera, policy));
     }
 
 private:
     nx::CameraResourceStubPtr m_camera;
-    QScopedPointer<AnalyticsSettingsMultiListener> m_listener;
+    QScopedPointer<core::AnalyticsSettingsMultiListener> m_listener;
 };
 
 /** Make sure listener correctly stops listening engine when device agent is switched off. */

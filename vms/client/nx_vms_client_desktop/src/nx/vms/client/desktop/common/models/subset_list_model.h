@@ -5,9 +5,11 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QScopedPointer>
 
+#include <nx/vms/client/core/common/models/abstract_mapping_model.h>
+#include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/scoped_model_operations.h>
-#include <nx/vms/client/desktop/common/models/abstract_mapping_model.h>
+#include <nx/vms/client/core/common/models/abstract_mapping_model.h>
 
 namespace nx::vms::client::desktop {
 
@@ -15,10 +17,10 @@ namespace nx::vms::client::desktop {
 // from a single root node of another item model.
 
 class SubsetListModel:
-    public ScopedModelOperations<AbstractMappingModel<QAbstractListModel>>
+    public ScopedModelOperations<core::AbstractMappingModel<QAbstractListModel>>
 {
     Q_OBJECT
-    using base_type = ScopedModelOperations<AbstractMappingModel<QAbstractListModel>>;
+    using base_type = ScopedModelOperations<core::AbstractMappingModel<QAbstractListModel>>;
 
 public:
     explicit SubsetListModel(QObject* parent = nullptr);

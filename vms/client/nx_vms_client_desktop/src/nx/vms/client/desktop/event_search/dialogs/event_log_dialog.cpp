@@ -21,9 +21,9 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
@@ -294,13 +294,14 @@ QStandardItem* EventLogDialog::createEventTree(const Group& group)
 
 void EventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
+    using AnalyticsTreeBuilder = core::AnalyticsEntitiesTreeBuilder;
     auto addItem =
-        [](QStandardItem* parent, AnalyticsEntitiesTreeBuilder::NodePtr node)
+        [](QStandardItem* parent, AnalyticsTreeBuilder::NodePtr node)
         {
             auto item = new QStandardItem(node->text);
             item->setData(kAnalyticsEventType, EventTypeRole);
             item->setData(QVariant::fromValue(node->entityId), AnalyticsEventTypeIdRole);
-            item->setSelectable(node->nodeType == AnalyticsEntitiesTreeBuilder::NodeType::eventType);
+            item->setSelectable(node->nodeType == AnalyticsTreeBuilder::NodeType::eventType);
 
             if (NX_ASSERT(parent))
                 parent->appendRow(item);
@@ -424,7 +425,7 @@ void EventLogDialog::initEventsModel()
     updateAnalyticsSubmenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
     connect(systemContext()->analyticsEventsSearchTreeBuilder(),
-        &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
+        &core::AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
         updateAnalyticsSubmenuOperation,
         &nx::utils::PendingOperation::requestOperation);
 }
@@ -754,7 +755,7 @@ void EventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid())
     {
-        QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr resource = m_model->data(idx, core::ResourceRole).value<QnResourcePtr>();
         auto manager = this->menu();
         if (resource && systemContext()->accessController()->hasPermissions(resource,
             Qn::ViewContentPermission))

@@ -6,11 +6,11 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
-#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
+
+namespace nx::vms::client::core { class AnalyticsEventsSearchTreeBuilder; }
 
 namespace nx::vms::client::desktop {
-
-class AnalyticsEventsSearchTreeBuilder;
 
 class AnalyticsEventModel: public ScopedModelOperations<QAbstractItemModel>
 {
@@ -25,7 +25,7 @@ public:
     };
 
 public:
-    AnalyticsEventModel(AnalyticsEventsSearchTreeBuilder* builder, QObject* parent = nullptr);
+    AnalyticsEventModel(core::AnalyticsEventsSearchTreeBuilder* builder, QObject* parent = nullptr);
     virtual ~AnalyticsEventModel() override;
 
     virtual QModelIndex index(int row, int column, const QModelIndex& parent) const override;

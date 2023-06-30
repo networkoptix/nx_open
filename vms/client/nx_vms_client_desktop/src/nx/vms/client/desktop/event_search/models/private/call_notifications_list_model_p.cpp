@@ -5,8 +5,8 @@
 #include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>

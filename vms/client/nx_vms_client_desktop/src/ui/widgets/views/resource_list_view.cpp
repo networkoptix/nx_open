@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -146,7 +147,7 @@ QnResourcePtr QnResourceListView::selectedResource() const
         return QnResourcePtr();
 
     auto index = selectionModel()->currentIndex();
-    return index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    return index.data(ResourceRole).value<QnResourcePtr>();
 }
 
 QnResourceListModel* QnResourceListView::model() const

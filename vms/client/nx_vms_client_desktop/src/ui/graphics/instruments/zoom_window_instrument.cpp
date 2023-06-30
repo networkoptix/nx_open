@@ -34,6 +34,7 @@
 #include "resizing_instrument.h"
 #include "selection_item.h"
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 using nx::vms::client::core::Geometry;
 

@@ -24,8 +24,9 @@
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/api/types/rtp_types.h>
+#include <nx/vms/client/core/analytics/analytics_engine_info.h>
+#include <nx/vms/client/core/analytics/analytics_settings_types.h>
 #include <nx/vms/client/core/utils/rotation.h>
-#include <nx/vms/client/desktop/analytics/analytics_settings_types.h>
 #include <nx/vms/client/desktop/common/flux/abstract_flux_state.h>
 #include <nx/vms/client/desktop/common/flux/flux_types.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -36,7 +37,6 @@
 #include <utils/common/aspect_ratio.h>
 
 #include "../camera_settings_tab.h"
-#include "../data/analytics_engine_info.h"
 #include "../data/recording_period.h"
 
 namespace nx::vms::client::desktop {
@@ -403,7 +403,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     struct AnalyticsSettings
     {
         // Engines, actual for the selected single camera.
-        QList<AnalyticsEngineInfo> engines;
+        QList<core::AnalyticsEngineInfo> engines;
 
         // Engines, which are enabled by the user.
         UserEditable<QSet<QnUuid>> userEnabledEngines;

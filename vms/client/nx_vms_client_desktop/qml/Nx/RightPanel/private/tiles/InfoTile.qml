@@ -3,8 +3,8 @@
 import QtQuick
 import QtQuick.Layouts
 
-import Nx
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 import Nx.Effects
 import Nx.Items
@@ -115,7 +115,7 @@ TileBase
                 visible: !!text && !(tile.isCloseable && tile.hovered)
                 font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
 
-                text: (model && model.timestamp) || ""
+                text: (model && model.textTimestamp) || ""
             }
         }
 

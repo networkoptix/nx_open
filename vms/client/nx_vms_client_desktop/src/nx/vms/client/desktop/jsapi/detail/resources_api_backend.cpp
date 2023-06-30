@@ -5,9 +5,9 @@
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -55,8 +55,8 @@ ResourcesApiBackend::ResourcesApiBackend(QObject* parent):
         };
 
     const auto pool = appContext()->unifiedResourcePool();
-    connect(pool, &UnifiedResourcePool::resourcesAdded, this, addResources);
-    connect(pool, &UnifiedResourcePool::resourcesRemoved, this, removeResources);
+    connect(pool, &core::UnifiedResourcePool::resourcesAdded, this, addResources);
+    connect(pool, &core::UnifiedResourcePool::resourcesRemoved, this, removeResources);
 }
 
 ResourcesApiBackend::~ResourcesApiBackend()

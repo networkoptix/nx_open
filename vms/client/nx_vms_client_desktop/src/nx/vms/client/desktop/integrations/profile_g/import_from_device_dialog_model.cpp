@@ -93,7 +93,7 @@ std::map<QnUuid, DeviceData>::const_iterator
     const auto sourceIndex = q->mapToSource(q->createIndex(index.row(), 0));
 
     const auto resource = qvariant_cast<QnResourcePtr>(
-        q->sourceModel()->data(sourceIndex, Qn::ResourceRole));
+        q->sourceModel()->data(sourceIndex, core::ResourceRole));
 
     if (!NX_ASSERT(resource))
         return deviceData.cend();
@@ -106,7 +106,7 @@ QString ImportFromDeviceDialogModel::Private::getNameText(const QModelIndex& ind
     const auto sourceIndex = q->mapToSource(index);
 
     const auto resource =
-        q->sourceModel()->data(sourceIndex, Qn::ResourceRole).value<QnResourcePtr>();
+        q->sourceModel()->data(sourceIndex, core::ResourceRole).value<QnResourcePtr>();
     if (!NX_ASSERT(resource))
         return {};
 

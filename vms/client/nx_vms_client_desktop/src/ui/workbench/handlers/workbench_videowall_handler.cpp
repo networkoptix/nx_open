@@ -1788,7 +1788,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
 
     const auto nodeType = parameters.argument<NodeType>(Qn::NodeTypeRole, NodeType::resource);
-    QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
+    QString name = parameters.argument<QString>(core::ResourceNameRole).trimmed();
 
     bool valid = false;
     switch (nodeType)

@@ -3,8 +3,7 @@
 #pragma once
 
 #include <QtCore/QString>
-
-#include <core/resource/client_resource_fwd.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop::layout {
 

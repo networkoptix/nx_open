@@ -24,7 +24,10 @@
 
 namespace {
 
-static const QString kPureTreeResourcesOnlyMimeType = "application/x-pure-tree-resources-only";
+using namespace nx::vms::client::core;
+
+static const QString kPureTreeResourcesOnlyMimeType =
+    "application/x-pure-tree-resources-only";
 
 bool mimeFormatsIntersects(const QStringList& firstMimeFormats,
     const QStringList& secondMimeFormats)
@@ -50,7 +53,7 @@ bool hasResourceFlags(const QModelIndex& index, Qn::ResourceFlags resourceFlags)
     if (!index.isValid())
         return false;
 
-    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto resource = index.data(ResourceRole).value<QnResourcePtr>();
     return resource && resource->hasFlags(resourceFlags);
 }
 
@@ -62,7 +65,7 @@ QnMediaServerResourcePtr parentServer(const QModelIndex& index)
     auto parent = index.parent();
     while (parent.isValid())
     {
-        if (auto server = parent.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnMediaServerResource>())
+        if (auto server = parent.data(ResourceRole).value<QnResourcePtr>().dynamicCast<QnMediaServerResource>())
             return server;
         parent = parent.parent();
     }
@@ -140,7 +143,7 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
         if (!index.isValid())
             continue;
 
-        if (auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>())
+        if (auto resource = index.data(core::ResourceRole).value<QnResourcePtr>())
             resources.insert(resource);
 
         QVariant nodeTypeData = index.data(Qn::NodeTypeRole);
@@ -156,7 +159,7 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
                 for (int row = 0; row < model->rowCount(index); ++row)
                 {
                     const auto childIndex = model->index(row, 0, index);
-                    if (auto resource = childIndex.data(Qn::ResourceRole).value<QnResourcePtr>())
+                    if (auto resource = childIndex.data(core::ResourceRole).value<QnResourcePtr>())
                         resources.insert(resource);
                 }
                 break;
@@ -178,14 +181,14 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
 
                 for (const auto& resourceIndex: childResourceIndexes)
                 {
-                    if (auto resource = resourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>())
+                    if (auto resource = resourceIndex.data(core::ResourceRole).value<QnResourcePtr>())
                         resources.insert(resource);
                 }
                 break;
             }
             case NodeType::videoWallItem:
             case NodeType::showreel:
-                entities.insert(index.data(Qn::UuidRole).value<QnUuid>());
+                entities.insert(index.data(core::UuidRole).value<QnUuid>());
                 break;
 
             case NodeType::layoutItem:
@@ -286,7 +289,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
             videoWallItems.empty() ? Parameters(data.resources()) : Parameters(videoWallItems);
 
         parameters.setArgument(Qn::VideoWallItemGuidRole,
-            index.data(Qn::UuidRole).value<QnUuid>());
+            index.data(core::UuidRole).value<QnUuid>());
 
         actionManager()->trigger(DropOnVideoWallItemAction, parameters);
 
@@ -358,7 +361,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
     // Add media resources to layout.
     if (hasResourceFlags(index, Qn::layout))
     {
-        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
         const auto layout = resource.staticCast<LayoutResource>();
 
         const auto droppable = data.resources()
@@ -376,7 +379,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
             return true;
 
         actionManager()->trigger(OpenInLayoutAction,
-            Parameters(droppable).withArgument(Qn::LayoutResourceRole, layout));
+            Parameters(droppable).withArgument(core::LayoutResourceRole, layout));
         actionManager()->trigger(SaveLayoutAction, layout);
 
         return true;
@@ -386,7 +389,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
     // between servers.
     if (hasResourceFlags(index, Qn::server))
     {
-        const auto server = index.data(Qn::ResourceRole).value<QnResourcePtr>()
+        const auto server = index.data(core::ResourceRole).value<QnResourcePtr>()
             .dynamicCast<QnMediaServerResource>();
 
         if (!NX_ASSERT(!server.isNull()))

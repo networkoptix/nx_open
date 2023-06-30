@@ -21,7 +21,7 @@ public:
     /**
      * Implements AbstractItem::data().
      * @param  role From set of roles: Qt::DisplayRole, Qt::ToolTipRole, Qt::EditRole,
-     *     Qn::ResourceIconKeyRole, Qn::NodeTypeRole, Qn::UuidRole.
+     *     Qn::ResourceIconKeyRole, Qn::NodeTypeRole, core::UuidRole.
      * @returns Data relevant to the one of the roles listed above, a null QVariant otherwise.
      */
     virtual QVariant data(int role) const override;

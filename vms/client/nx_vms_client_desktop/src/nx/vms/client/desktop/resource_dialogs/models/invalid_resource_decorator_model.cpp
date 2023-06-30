@@ -25,7 +25,7 @@ QVariant InvalidResourceDecoratorModel::data(const QModelIndex& index, int role)
         if (rowCount(index) > 0)
             return {};
 
-        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
 
         if (resource.isNull())
             return {};

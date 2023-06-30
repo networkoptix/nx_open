@@ -3,7 +3,6 @@
 import QtQuick
 import Qt5Compat.GraphicalEffects
 
-import Nx
 import Nx.Core
 import Nx.Controls
 

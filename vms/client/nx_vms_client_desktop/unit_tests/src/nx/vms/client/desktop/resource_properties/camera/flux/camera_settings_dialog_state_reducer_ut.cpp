@@ -80,9 +80,9 @@ void ensureScheduleFps(const CameraSettingsDialogState& state, int fps)
         ASSERT_EQ(task.fps, fps);
 }
 
-AnalyticsEngineInfo makeAnalyticsEngine(bool isLicenseRequired)
+core::AnalyticsEngineInfo makeAnalyticsEngine(bool isLicenseRequired)
 {
-    AnalyticsEngineInfo engineInfo;
+    core::AnalyticsEngineInfo engineInfo;
     engineInfo.id = QnUuid::createUuid();
     engineInfo.isLicenseRequired = isLicenseRequired;
     return engineInfo;
@@ -1022,7 +1022,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, enginelicenseChangesHandledProperly
     auto state = Reducer::loadCameras({}, {createCamera()});
     bool isChanged{};
 
-    QList<AnalyticsEngineInfo> engines;
+    QList<core::AnalyticsEngineInfo> engines;
     engines.push_back(makeAnalyticsEngine(/*isLicenseRequired*/ true));
     std::tie(isChanged, state) = Reducer::setAnalyticsEngines(std::move(state), engines);
 

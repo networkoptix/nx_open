@@ -371,7 +371,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCurrentUserItem(const QnUserResou
 
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
-        .withRole(Qn::ResourceRole, QVariant::fromValue(user.staticCast<QnResource>()))
+        .withRole(core::ResourceRole, QVariant::fromValue(user.staticCast<QnResource>()))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::userKey(user)))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::currentUser))
         .withRole(Qn::ExtraInfoRole, QnResourceDisplayInfo(user).extraInfo())
@@ -666,7 +666,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudLayoutItem(const QnLayoutRes
 
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
-        .withRole(Qn::ResourceRole, QVariant::fromValue(layout.staticCast<QnResource>()))
+        .withRole(core::ResourceRole, QVariant::fromValue(layout.staticCast<QnResource>()))
         .withRole(Qn::ResourceIconKeyRole, iconProvider, iconInvalidator)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::resource))
         .withFlags(flagsProvider);

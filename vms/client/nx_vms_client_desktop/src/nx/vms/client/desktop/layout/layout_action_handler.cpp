@@ -20,6 +20,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -41,7 +42,6 @@
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
-#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -214,7 +214,7 @@ LayoutActionHandler::LayoutActionHandler(WindowContext* windowContext, QObject* 
     connect(action(menu::OpenIntercomLayoutAction), &QAction::triggered, this,
         &LayoutActionHandler::at_openIntercomLayoutAction_triggered);
 
-    connect(appContext()->unifiedResourcePool(), &UnifiedResourcePool::resourcesRemoved, this,
+    connect(appContext()->unifiedResourcePool(), &core::UnifiedResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources)
         {
             auto layouts = resources.filtered<LayoutResource>();
@@ -328,7 +328,7 @@ void LayoutActionHandler::at_businessActionReceived(
 
             using namespace menu;
             menu()->triggerIfPossible(JumpToTimeAction,
-                Parameters().withArgument(Qn::TimestampRole, navigationTime));
+                Parameters().withArgument(core::TimestampRole, navigationTime));
         }
     }
 }
@@ -1082,7 +1082,7 @@ void LayoutActionHandler::onRenameResourceAction()
     if (const auto layout = parameters.resource().dynamicCast<LayoutResource>();
         layout && !layout->isFile())
     {
-        QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
+        QString name = parameters.argument<QString>(core::ResourceNameRole).trimmed();
         if (name == layout->getName())
             return;
 

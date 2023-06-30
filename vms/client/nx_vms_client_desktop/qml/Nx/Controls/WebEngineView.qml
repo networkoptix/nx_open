@@ -24,7 +24,7 @@ Item
             {
                 worldId: WebEngineScript.MainWorld,
                 injectionPoint: WebEngineScript.DocumentReady,
-                name: "NxObjectInjectorScript",
+                name: "ObjectInjectorScript",
                 sourceUrl: "qrc:///qml/Nx/Controls/web_engine_inject.js"
             },
             {

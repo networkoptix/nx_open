@@ -970,7 +970,7 @@ ActionVisibility AddBookmarkCondition::check(const Parameters& parameters, Windo
 
 ActionVisibility ModifyBookmarkCondition::check(const Parameters& parameters, WindowContext* /*context*/)
 {
-    if (!parameters.hasArgument(Qn::CameraBookmarkRole))
+    if (!parameters.hasArgument(core::CameraBookmarkRole))
         return InvisibleAction;
     return EnabledAction;
 }
@@ -980,7 +980,7 @@ ActionVisibility RemoveBookmarksCondition::check(const Parameters& parameters, W
     if (!parameters.hasArgument(Qn::CameraBookmarkListRole))
         return InvisibleAction;
 
-    if (parameters.argument(Qn::CameraBookmarkListRole).value<QnCameraBookmarkList>().isEmpty())
+    if (parameters.argument(Qn::CameraBookmarkListRole).value<QnCameraBookmarkList>().empty())
         return InvisibleAction;
 
     return EnabledAction;
@@ -1204,7 +1204,7 @@ ActionVisibility OpenInLayoutCondition::check(
     const Parameters& parameters,
     WindowContext* /*context*/)
 {
-    auto layout = parameters.argument<LayoutResourcePtr>(Qn::LayoutResourceRole);
+    auto layout = parameters.argument<LayoutResourcePtr>(core::LayoutResourceRole);
     if (!NX_ASSERT(layout))
         return InvisibleAction;
 
@@ -2179,10 +2179,10 @@ ConditionWrapper canExportBookmark()
     return new CustomBoolCondition(
         [](const Parameters& parameters, WindowContext* context)
         {
-            if (!parameters.hasArgument(Qn::CameraBookmarkRole))
+            if (!parameters.hasArgument(core::CameraBookmarkRole))
                 return false;
 
-            const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+            const auto bookmark = parameters.argument<QnCameraBookmark>(core::CameraBookmarkRole);
             return canExportBookmarkInternal(bookmark, context);
         });
 }
@@ -2211,10 +2211,10 @@ ConditionWrapper canCopyBookmarkToClipboard()
     return new CustomBoolCondition(
         [](const Parameters& parameters, WindowContext* context)
         {
-            if (!parameters.hasArgument(Qn::CameraBookmarkRole))
+            if (!parameters.hasArgument(core::CameraBookmarkRole))
                 return false;
 
-            const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+            const auto bookmark = parameters.argument<QnCameraBookmark>(core::CameraBookmarkRole);
             return canCopyBookmarkToClipboardInternal(bookmark, context);
         });
 }

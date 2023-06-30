@@ -453,7 +453,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
         case ResourceTree::NodeType::edge:
         case ResourceTree::NodeType::sharedResource:
         {
-            QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            QnResourcePtr resource = index.data(core::ResourceRole).value<QnResourcePtr>();
             NX_ASSERT(resource);
             if (!resource)
                 return ItemState::normal;
@@ -497,7 +497,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForMediaResou
         return ItemState::normal;
 
     const auto centralItem = workbench()->item(Qn::CentralRole);
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    QnResourcePtr resource = index.data(core::ResourceRole).value<QnResourcePtr>();
 
     if (centralItem && centralItem->resource() == resource)
         return ItemState::accented;
@@ -514,7 +514,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayout(
     /* Layouts are Selected when they are opened on the scene. */
 
     const auto currentLayout = workbench()->currentLayout()->resource();
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    QnResourcePtr resource = index.data(core::ResourceRole).value<QnResourcePtr>();
 
     if (currentLayout && currentLayout == resource)
         return ItemState::selected;
@@ -558,7 +558,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayoutItem
     if (!currentLayout)
         return ItemState::normal;
 
-    const auto owningLayout = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto owningLayout = index.parent().data(core::ResourceRole).value<QnResourcePtr>();
     if (!owningLayout || owningLayout != currentLayout)
         return ItemState::normal;
 
@@ -576,7 +576,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWall(
 {
     /* Videowall is Selected when we are in videowall review or control mode. */
 
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    QnResourcePtr resource = index.data(core::ResourceRole).value<QnResourcePtr>();
     const auto videowall = resource.dynamicCast<QnVideoWallResource>();
     NX_ASSERT(videowall);
     if (!videowall)
@@ -604,7 +604,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallI
      * Videowall items are Selected if we are in videowall review mode AND item belongs to current
      * videowall. Active - when chosen as current central item OR in videowall review mode.
      */
-    const auto owningVideoWall = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>()
+    const auto owningVideoWall = index.parent().data(core::ResourceRole).value<QnResourcePtr>()
         .dynamicCast<QnVideoWallResource>();
     NX_ASSERT(owningVideoWall);
     if (!owningVideoWall)
@@ -651,7 +651,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForShowreel(
     const QnUuid currentShowreelId = workbench()->currentLayout()->data(Qn::ShowreelUuidRole)
         .value<QnUuid>();
     if (!currentShowreelId.isNull()
-        && index.data(Qn::UuidRole).value<QnUuid>() == currentShowreelId)
+        && index.data(core::UuidRole).value<QnUuid>() == currentShowreelId)
     {
         return ItemState::selected;
     }
@@ -668,7 +668,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     if (infoLevel == Qn::RI_Invalid)
         infoLevel = appContext()->localSettings()->resourceInfoLevel();
 
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    QnResourcePtr resource = index.data(core::ResourceRole).value<QnResourcePtr>();
     if (resource && resource->hasFlags(Qn::virtual_camera))
         infoLevel = Qn::RI_FullInfo;
 
@@ -686,7 +686,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         auto firstChild = index.model()->index(0, 0, index);
         if (!firstChild.isValid()) /* This can happen in rows deleting */
             return;
-        QnResourcePtr resource = firstChild.data(Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr resource = firstChild.data(core::ResourceRole).value<QnResourcePtr>();
         extInfo = QnResourceDisplayInfo(resource).extraInfo();
     }
     else

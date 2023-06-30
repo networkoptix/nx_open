@@ -80,7 +80,7 @@ ShowreelReviewController::ShowreelReviewController(QObject* parent):
         [this]
         {
             for (const auto& id: m_saveShowreelsQueue)
-                menu()->trigger(menu::SaveShowreelAction, {Qn::UuidRole, id});
+                menu()->trigger(menu::SaveShowreelAction, {core::UuidRole, id});
             m_saveShowreelsQueue.clear();
         };
     m_saveShowreelsOperation =
@@ -549,7 +549,7 @@ void ShowreelReviewController::handleItemDataChanged(
 void ShowreelReviewController::at_reviewShowreelAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+    auto id = parameters.argument<QnUuid>(core::UuidRole);
     reviewShowreel(systemContext()->showreelManager()->showreel(id));
 }
 
@@ -574,7 +574,7 @@ void ShowreelReviewController::at_startCurrentShowreelAction_triggered()
     const auto startTourAction = action(menu::ToggleShowreelModeAction);
     NX_ASSERT(!startTourAction->isChecked());
     if (!startTourAction->isChecked())
-        menu()->trigger(menu::ToggleShowreelModeAction, {Qn::UuidRole, showreel.id});
+        menu()->trigger(menu::ToggleShowreelModeAction, {core::UuidRole, showreel.id});
 }
 
 void ShowreelReviewController::at_saveCurrentShowreelAction_triggered()
@@ -606,7 +606,7 @@ void ShowreelReviewController::at_saveCurrentShowreelAction_triggered()
 void ShowreelReviewController::at_removeCurrentShowreelAction_triggered()
 {
     NX_ASSERT_HEAVY_CONDITION(isShowreelReviewMode());
-    menu()->trigger(menu::RemoveShowreelAction, {Qn::UuidRole, currentShowreelId()});
+    menu()->trigger(menu::RemoveShowreelAction, {core::UuidRole, currentShowreelId()});
 }
 
 } // namespace nx::vms::client::desktop

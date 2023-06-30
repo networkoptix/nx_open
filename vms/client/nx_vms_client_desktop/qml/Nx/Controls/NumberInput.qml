@@ -3,7 +3,6 @@
 import QtQuick 2.14
 import QtQuick.Controls 2.14
 
-import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Core 1.0
 
@@ -206,9 +205,9 @@ FocusScope
 
             validator.locale = NxGlobals.numericInputLocale()
 
-            validator.bottom = Qt.binding(() => Utils.getValue(control.minimum, validator.lowest))
+            validator.bottom = Qt.binding(() => CoreUtils.getValue(control.minimum, validator.lowest))
 
-            validator.top = Qt.binding(() => Utils.getValue(control.maximum, validator.highest))
+            validator.top = Qt.binding(() => CoreUtils.getValue(control.maximum, validator.highest))
         }
     }
 

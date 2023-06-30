@@ -270,7 +270,7 @@ Factory::ActionList ShowreelSettingsFactory::newActions(
     auto actionGroup = new QActionGroup(parent);
     actionGroup->setExclusive(true);
 
-    auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+    auto id = parameters.argument<QnUuid>(core::UuidRole);
     const bool isCurrentShowreel = id.isNull();
     NX_ASSERT(!isCurrentShowreel || workbench()->currentLayout()->isShowreelReviewLayout());
 
@@ -300,7 +300,7 @@ Factory::ActionList ShowreelSettingsFactory::newActions(
 
                 showreel.settings.manual = manual;
                 showreelManager->addOrUpdateShowreel(showreel);
-                menu()->trigger(menu::SaveShowreelAction, {Qn::UuidRole, id});
+                menu()->trigger(menu::SaveShowreelAction, {core::UuidRole, id});
             });
         actionGroup->addAction(action);
     }

@@ -15,12 +15,14 @@ using namespace entity_item_model;
 
 ItemOrder serversOrder()
 {
+    using namespace nx::vms::client::core;
+
     return {
         [mainOrder = numericOrder()](const AbstractItem* lhs,
             const AbstractItem* rhs)
         {
-            const auto lhsStatus = lhs->data(Qn::ResourceStatusRole).value<nx::vms::api::ResourceStatus>();
-            const auto rhsStatus = rhs->data(Qn::ResourceStatusRole).value<nx::vms::api::ResourceStatus>();
+            const auto lhsStatus = lhs->data(ResourceStatusRole).value<nx::vms::api::ResourceStatus>();
+            const auto rhsStatus = rhs->data(ResourceStatusRole).value<nx::vms::api::ResourceStatus>();
 
             const bool lhsIncompatible = lhsStatus == nx::vms::api::ResourceStatus::incompatible;
             const bool rhsIncompatible = rhsStatus == nx::vms::api::ResourceStatus::incompatible;
@@ -30,7 +32,7 @@ ItemOrder serversOrder()
 
             return mainOrder.comp(lhs, rhs);
         },
-        {Qt::DisplayRole, Qn::ResourceStatusRole}
+        {Qt::DisplayRole, ResourceStatusRole}
     };
 }
 

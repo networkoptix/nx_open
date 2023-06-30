@@ -6,7 +6,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
-#include <nx/vms/client/desktop/common/models/abstract_mapping_model.h>
+#include <nx/vms/client/core/common/models/abstract_mapping_model.h>
 
 class QJSValue;
 
@@ -25,7 +25,7 @@ namespace nx::vms::client::desktop {
  * The first two are read-only, the last one can be used in setData to expand/collapse nodes.
  */
 class NX_VMS_CLIENT_DESKTOP_API LinearizationListModel:
-    public ScopedModelOperations<AbstractMappingModel<QAbstractListModel>>
+    public ScopedModelOperations<core::AbstractMappingModel<QAbstractListModel>>
 {
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel* sourceModel READ sourceModel WRITE setSourceModel
@@ -34,7 +34,7 @@ class NX_VMS_CLIENT_DESKTOP_API LinearizationListModel:
     Q_PROPERTY(QString autoExpandRoleName READ autoExpandRoleName WRITE setAutoExpandRoleName
         NOTIFY autoExpandRoleNameChanged)
 
-    using base_type = ScopedModelOperations<AbstractMappingModel<QAbstractListModel>>;
+    using base_type = ScopedModelOperations<core::AbstractMappingModel<QAbstractListModel>>;
 
 public:
     LinearizationListModel(QObject* parent = nullptr);

@@ -3,7 +3,6 @@
 import QtQuick
 import QtQuick.Controls
 
-import Nx
 import Nx.Core
 
 import nx.client.desktop

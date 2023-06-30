@@ -23,10 +23,10 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/event_search/models/abstract_attributed_event_model.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 
 namespace nx::vms::client::desktop {
 
@@ -166,7 +166,7 @@ private:
         renderControl(new RenderControl()),
         quickWindow(new QQuickWindow(renderControl.get())),
         rootComponent(new QQmlComponent(appContext()->qmlEngine(),
-            QUrl("Nx/Items/NameValueTable.qml"),
+            QUrl("Nx/Core/Controls/NameValueTable.qml"),
             QQmlComponent::CompilationMode::PreferSynchronous)),
         rootItem(qobject_cast<QQuickItem*>(rootComponent->create()))
     {
@@ -272,7 +272,7 @@ struct NameValueTable::Private
             return;
 
         content = value;
-        flatItems = RightPanelModelsAdapter::flattenAttributeList(content);
+        flatItems = AbstractAttributedEventModel::flattenAttributeList(content);
         updateImage();
     }
 

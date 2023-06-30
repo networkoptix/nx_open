@@ -36,7 +36,7 @@ void QnLicenseListItemDelegate::initStyleOption(QStyleOptionViewItem* option, co
     if (!index.isValid())
         return;
 
-    if (index.data(Qn::ResourceRole).value<QnResourcePtr>())
+    if (index.data(nx::vms::client::core::ResourceRole).value<QnResourcePtr>())
         option->font.setWeight(QFont::Normal);
 
     if (index.column() == QnLicenseListModel::LicenseKeyColumn)

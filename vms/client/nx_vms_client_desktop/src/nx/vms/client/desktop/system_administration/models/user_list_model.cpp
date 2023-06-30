@@ -205,7 +205,7 @@ public:
                 emit q->dataChanged(
                     q->index(0, UserWarningColumn),
                     q->index(q->rowCount() - 1, UserWarningColumn),
-                    {Qn::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
+                    {core::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
             });
 
         connect(systemContext()->nonEditableUsersAndGroups(),
@@ -479,7 +479,7 @@ void UserListModel::Private::updateLdapUsersNotFound()
             emit model->dataChanged(
                 model->index(userIndex, UserWarningColumn),
                 model->index(userIndex, UserWarningColumn),
-                {Qn::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
+                {core::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
         }
     }
 }
@@ -630,7 +630,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
             break;
         }
 
-        case Qn::DecorationPathRole:
+        case core::DecorationPathRole:
         {
             switch (index.column())
             {
@@ -686,7 +686,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
 
         case Qt::DecorationRole:
         {
-            if (const auto path = data(index, Qn::DecorationPathRole).toString(); !path.isEmpty())
+            if (const auto path = data(index, core::DecorationPathRole).toString(); !path.isEmpty())
             {
                 core::SvgIconColorer::ThemeSubstitutions colorSubstitutions;
 
@@ -785,7 +785,7 @@ QHash<int, QByteArray> UserListModel::roleNames() const
 {
     auto roleNames = base_type::roleNames();
     roleNames[Qt::CheckStateRole] = "checkState";
-    roleNames[Qn::DecorationPathRole] = "decorationPath";
+    roleNames[core::DecorationPathRole] = "decorationPath";
     return roleNames;
 }
 

@@ -460,7 +460,7 @@ TEST_F(ResourceTreeModelTest, videoWallNodeProvidesResource)
     const auto videoWallIndex = uniqueMatchingIndex(kUniqueVideoWallNameCondition);
 
     // And that node provides pointer to the video wall.
-    ASSERT_TRUE(dataMatch(Qn::ResourceRole, QVariant::fromValue<QnResourcePtr>(videoWall))(
+    ASSERT_TRUE(dataMatch(core::ResourceRole, QVariant::fromValue<QnResourcePtr>(videoWall))(
         videoWallIndex));
 }
 
@@ -479,8 +479,8 @@ TEST_F(ResourceTreeModelTest, videoWallScreenNodeProvidesUuid)
     const auto videoWallScreenIndex = uniqueMatchingIndex(kUniqueVideoWallScreenNameCondition);
 
     // TODO: #vbreus Remove redundant data role.
-    // And that node provides video wall Item UUID by both Qn::UuidRole and ItemUuidRole roles.
-    ASSERT_TRUE(dataMatch(Qn::UuidRole, QVariant::fromValue<QnUuid>(videoWallScreen.uuid))(
+    // And that node provides video wall Item UUID by both core::UuidRole and ItemUuidRole roles.
+    ASSERT_TRUE(dataMatch(core::UuidRole, QVariant::fromValue<QnUuid>(videoWallScreen.uuid))(
         videoWallScreenIndex));
     ASSERT_TRUE(dataMatch(Qn::ItemUuidRole, QVariant::fromValue<QnUuid>(videoWallScreen.uuid))(
         videoWallScreenIndex));
@@ -501,8 +501,8 @@ TEST_F(ResourceTreeModelTest, videoWallMatrixNodeProvidesUuid)
     const auto videoWallMatrixIndex = uniqueMatchingIndex(kUniqueVideoWallMatrixNameCondition);
 
     // TODO: #vbreus Remove redundant data role.
-    // And that node provides video wall Matrix UUID by both Qn::UuidRole and ItemUuidRole roles.
-    ASSERT_TRUE(dataMatch(Qn::UuidRole, QVariant::fromValue<QnUuid>(videoWallMatrix.uuid))(
+    // And that node provides video wall Matrix UUID by both core::UuidRole and ItemUuidRole roles.
+    ASSERT_TRUE(dataMatch(core::UuidRole, QVariant::fromValue<QnUuid>(videoWallMatrix.uuid))(
         videoWallMatrixIndex));
     ASSERT_TRUE(dataMatch(Qn::ItemUuidRole, QVariant::fromValue<QnUuid>(videoWallMatrix.uuid))(
         videoWallMatrixIndex));

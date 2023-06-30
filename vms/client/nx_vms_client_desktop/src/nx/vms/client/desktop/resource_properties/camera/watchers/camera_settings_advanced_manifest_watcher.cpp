@@ -7,7 +7,7 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 #include "../camera_advanced_parameters_manifest_manager.h"
@@ -50,7 +50,7 @@ struct CameraSettingsAdvancedManifestWatcher::Private
 
 CameraSettingsAdvancedManifestWatcher::CameraSettingsAdvancedManifestWatcher(
     CameraAdvancedParametersManifestManager* manager,
-    ServerRuntimeEventConnector* serverRuntimeEventConnector,
+    core::ServerRuntimeEventConnector* serverRuntimeEventConnector,
     CameraSettingsDialogStore* store,
     QObject* parent)
     :
@@ -97,7 +97,7 @@ CameraSettingsAdvancedManifestWatcher::CameraSettingsAdvancedManifestWatcher(
 
     connect(
         serverRuntimeEventConnector,
-        &ServerRuntimeEventConnector::deviceAdvancedSettingsManifestChanged,
+        &core::ServerRuntimeEventConnector::deviceAdvancedSettingsManifestChanged,
         this,
         [this](const std::set<QnUuid>& deviceIds)
         {

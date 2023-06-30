@@ -22,8 +22,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
-#include <nx/vms/client/desktop/analytics/object_display_settings.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -212,7 +212,7 @@ struct Track
     }
 };
 
-QString objectDescription(const analytics::AttributeList& attributes)
+QString objectDescription(const core::analytics::AttributeList& attributes)
 {
     QString result;
 
@@ -336,7 +336,7 @@ ObjectInfo& WidgetAnalyticsController::Private::addOrUpdateObject(
 
     const auto visibleAttributes = settings->visibleAttributes(objectMetadata);
     const Attributes sortedAttributes(visibleAttributes.cbegin(), visibleAttributes.cend());
-    const QString description = objectDescription(qnClientModule->analyticsAttributeHelper()->
+    const QString description = objectDescription(systemContext()->analyticsAttributeHelper()->
         preprocessAttributes(objectMetadata.typeId, sortedAttributes));
 
     objectInfo.description = title;

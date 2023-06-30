@@ -14,11 +14,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <server/server_storage_manager.h>
+#include <storage/server_storage_manager.h>
 
 using namespace std::chrono;
 using namespace nx::vms::client;
@@ -94,7 +94,7 @@ QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* 
     if (auto serverRuntimeEventConnector = systemContext->serverRuntimeEventConnector())
     {
         connect(serverRuntimeEventConnector,
-            &ServerRuntimeEventConnector::deviceFootageChanged,
+            &core::ServerRuntimeEventConnector::deviceFootageChanged,
             this,
             [this](const std::vector<QnUuid>& deviceIds)
             {

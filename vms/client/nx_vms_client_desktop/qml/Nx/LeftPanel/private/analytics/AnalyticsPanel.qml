@@ -4,15 +4,14 @@ import QtQuick 2.14
 import QtQuick.Controls 2.14
 import QtQuick.Layouts 1.14
 
-import Nx 1.0
-import Nx.Core 1.0
 import Nx.Analytics 1.0
 import Nx.Controls 1.0
+import Nx.Core 1.0
 import Nx.RightPanel 1.0
 
 import nx.vms.client.core 1.0
 import nx.vms.client.desktop 1.0
-import nx.vms.client.desktop.analytics 1.0 as Analytics
+import nx.vms.client.core.analytics 1.0 as Analytics
 
 import ".."
 
@@ -259,7 +258,7 @@ Item
                 id: eventModel
 
                 context: windowContext
-                type: { return RightPanelModel.Type.analytics }
+                type: { return EventSearch.SearchType.analytics }
                 previewsEnabled: analyticsPanel.showThumbnails
 
                 Component.onCompleted:

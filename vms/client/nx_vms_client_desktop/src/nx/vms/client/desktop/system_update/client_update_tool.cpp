@@ -66,7 +66,7 @@ bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
     return false;
 }
 
-ClientUpdateTool::ClientUpdateTool(SystemContext* systemContext, QObject *parent):
+ClientUpdateTool::ClientUpdateTool(core::SystemContext* systemContext, QObject *parent):
     base_type(parent),
     SystemContextAware(systemContext),
     m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client")),

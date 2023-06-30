@@ -7,9 +7,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/types/motion_types.h>
+#include <nx/vms/client/core/analytics/analytics_engine_info.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-#include "../data/analytics_engine_info.h"
 
 namespace nx::vms::client::desktop {
 
@@ -20,7 +19,7 @@ class CameraSettingsAnalyticsEnginesWatcherInterface
 public:
     virtual ~CameraSettingsAnalyticsEnginesWatcherInterface() = default;
 
-    virtual QList<AnalyticsEngineInfo> engineInfoList() const = 0;
+    virtual QList<core::AnalyticsEngineInfo> engineInfoList() const = 0;
     virtual nx::vms::api::StreamIndex analyzedStreamIndex(const QnUuid& engineId) const = 0;
 };
 
@@ -39,7 +38,7 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
-    virtual QList<AnalyticsEngineInfo> engineInfoList() const override;
+    virtual QList<core::AnalyticsEngineInfo> engineInfoList() const override;
     virtual nx::vms::api::StreamIndex analyzedStreamIndex(const QnUuid& engineId) const override;
 
 private:

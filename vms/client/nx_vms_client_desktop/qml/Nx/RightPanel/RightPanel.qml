@@ -4,6 +4,7 @@ import QtQuick 2.6
 
 import Nx.Controls 1.0
 
+import nx.vms.client.core 1.0
 import nx.vms.client.desktop 1.0
 
 TabControl
@@ -33,7 +34,7 @@ TabControl
                 model: RightPanelModel
                 {
                     context: windowContext
-                    type: { return RightPanelModel.Type.notifications }
+                    type: { return EventSearch.SearchType.notifications }
                 }
             }
         }
@@ -63,7 +64,7 @@ TabControl
                 model: RightPanelModel
                 {
                     context: windowContext
-                    type: { return RightPanelModel.Type.motion }
+                    type: { return EventSearch.SearchType.motion }
                 }
             }
         }
@@ -92,7 +93,7 @@ TabControl
                 model: RightPanelModel
                 {
                     context: windowContext
-                    type: { return RightPanelModel.Type.bookmarks }
+                    type: { return EventSearch.SearchType.bookmarks }
                 }
             }
         }
@@ -121,7 +122,7 @@ TabControl
                 model: RightPanelModel
                 {
                     context: windowContext
-                    type: { return RightPanelModel.Type.events }
+                    type: { return EventSearch.SearchType.events }
                 }
             }
         }
@@ -150,7 +151,7 @@ TabControl
                 model: RightPanelModel
                 {
                     context: windowContext
-                    type: { return RightPanelModel.Type.analytics }
+                    type: { return EventSearch.SearchType.analytics }
                 }
             }
         }

@@ -4,7 +4,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQml
 
-import Nx
 import Nx.Controls
 import Nx.Dialogs
 import Nx.JoystickInvestigationWizard

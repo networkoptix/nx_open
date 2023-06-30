@@ -132,7 +132,7 @@ void WorkbenchActionExecutor::execute(const ActionPtr& action)
                 menu()->triggerIfPossible(
                     menu::JumpToTimeAction,
                     menu::Parameters().withArgument(
-                        Qn::TimestampRole, navigationTime));
+                        core::TimestampRole, navigationTime));
             }
         }
     }
@@ -193,7 +193,7 @@ void WorkbenchActionExecutor::execute(const ActionPtr& action)
                 - layoutAction->playbackTime();
 
             menu()->triggerIfPossible(menu::JumpToTimeAction,
-                menu::Parameters().withArgument(Qn::TimestampRole, navigationTime));
+                menu::Parameters().withArgument(core::TimestampRole, navigationTime));
         }
     }
     else

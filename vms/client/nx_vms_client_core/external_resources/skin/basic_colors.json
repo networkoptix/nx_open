@@ -92,6 +92,9 @@
 
     "pink_core":    "#f38282",
 
+    "windowBackground": "dark5",
+    "backgroundDimColor": "dark5.setAlpha(100)",
+
     "dialog": {
         "alertBar": "#61282b",
         "infoBar": "brand_d5"

@@ -6,7 +6,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
@@ -41,7 +41,7 @@ void AnalyticsSdkEventModel::loadFromCameras(
         QString eventTypeId)
 {
     auto addItem =
-        [this](QStandardItem* parent, AnalyticsEntitiesTreeBuilder::NodePtr node)
+        [this](QStandardItem* parent, core::AnalyticsEntitiesTreeBuilder::NodePtr node)
         {
             const bool isValidEventType = !node->entityId.isEmpty();
 
@@ -69,7 +69,7 @@ void AnalyticsSdkEventModel::loadFromCameras(
         });
 
 
-    const auto root = AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
+    const auto root = core::AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
         systemContext(),
         cameras,
         {

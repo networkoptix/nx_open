@@ -38,7 +38,7 @@ void defaultDetailsPanelUpdateFunction(
     const auto resourceIndex = index.siblingAtColumn(kResourceColumn);
     detailsWidget->setCaption(resourceIndex.data(Qt::DisplayRole).toString());
     detailsWidget->setThumbnailCameraResource(
-        resourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>());
+        resourceIndex.data(core::ResourceRole).value<QnResourcePtr>());
 }
 
 bool isIndexWithinRange(
@@ -186,7 +186,7 @@ int DetailedResourceTreeWidget::resourceCount()
     resourcesSet.reserve(leafIndexes.size());
     for (const auto& leafIndex: leafIndexes)
     {
-        const auto resourceData = leafIndex.data(Qn::ResourceRole);
+        const auto resourceData = leafIndex.data(core::ResourceRole);
         if (resourceData.isNull())
             continue;
 

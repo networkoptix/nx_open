@@ -9,6 +9,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/event_search/models/abstract_attributed_event_model.h>
 #include <nx/vms/client/core/thumbnails/generic_image_store.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
@@ -92,29 +93,29 @@ struct ThumbnailTooltip::Private
         thumbnailHighlightRect = forceNoHighlight ? QRectF() : desiredHighlightRect;
     }
 
-    RightPanel::PreviewState calculatePreviewState() const
+    EventSearch::PreviewState calculatePreviewState() const
     {
         if (!imageProvider)
-            return RightPanel::PreviewState::initial;
+            return EventSearch::PreviewState::initial;
 
         switch (imageProvider->status())
         {
             case Qn::ThumbnailStatus::Invalid:
-                return RightPanel::PreviewState::initial;
+                return EventSearch::PreviewState::initial;
 
             case Qn::ThumbnailStatus::Loading:
             case Qn::ThumbnailStatus::Refreshing:
-                return RightPanel::PreviewState::busy;
+                return EventSearch::PreviewState::busy;
 
             case Qn::ThumbnailStatus::Loaded:
-                return RightPanel::PreviewState::ready;
+                return EventSearch::PreviewState::ready;
 
             case Qn::ThumbnailStatus::NoData:
-                return RightPanel::PreviewState::missing;
+                return EventSearch::PreviewState::missing;
         }
 
         NX_ASSERT(false, "Should never get here");
-        return RightPanel::PreviewState::initial;
+        return EventSearch::PreviewState::initial;
     }
 
     GenericImageStore* imageStore()
@@ -213,7 +214,7 @@ void ThumbnailTooltip::setAttributes(const analytics::AttributeList& value)
         return;
 
     d->sourceAttributes = value;
-    d->attributes = RightPanelModelsAdapter::flattenAttributeList(d->sourceAttributes);
+    d->attributes = AbstractAttributedEventModel::flattenAttributeList(d->sourceAttributes);
 }
 
 } // namespace nx::vms::client::desktop

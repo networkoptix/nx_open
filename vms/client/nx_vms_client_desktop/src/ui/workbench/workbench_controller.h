@@ -11,7 +11,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/common/utils/volatile_unique_ptr.h>
+#include <nx/vms/client/core/common/utils/volatile_unique_ptr.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/graphics/instruments/click_info.h>
@@ -267,7 +267,7 @@ private:
 
     bool m_menuEnabled;
 
-    nx::vms::client::desktop::VolatileUniquePtr<QObject> m_cameraSwitchKeysMessageBox;
+    nx::vms::client::core::VolatileUniquePtr<QObject> m_cameraSwitchKeysMessageBox;
 
     enum class ShiftDirection
     {

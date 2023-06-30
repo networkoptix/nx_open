@@ -4,7 +4,6 @@ import QtQuick 2.6
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.4
 
-import Nx 1.0
 import Nx.Core 1.0
 import Nx.Utils 1.0
 import Nx.Items 1.0
