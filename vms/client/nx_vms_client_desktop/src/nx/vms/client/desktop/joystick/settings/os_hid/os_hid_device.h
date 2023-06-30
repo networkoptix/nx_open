@@ -23,6 +23,11 @@ class OsHidDevice: public QObject
 public:
     virtual OsHidDeviceInfo info() const = 0;
 
+    virtual bool isOpened() const = 0;
+    virtual bool open() = 0;
+
+    virtual void stall() = 0;
+
 protected:
     virtual int read(unsigned char* buffer, int bufferSize) = 0;
 

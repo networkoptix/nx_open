@@ -30,7 +30,7 @@ void ManagerHid::onHidDeviceListChanged()
         foundDevices << deviceInfo.path;
 
         if (m_devices.contains(deviceInfo.path))
-            return;
+            continue;
 
         NX_DEBUG(this,
             "A new Joystick has been found. "
@@ -43,7 +43,7 @@ void ManagerHid::onHidDeviceListChanged()
             NX_VERBOSE(this, "Unsupported device. Model: %1, path: %2", deviceInfo.modelName,
                 deviceInfo.path);
 
-            return;
+            continue;
         }
 
         auto device = new DeviceHid(config, deviceInfo.path, pollTimer());

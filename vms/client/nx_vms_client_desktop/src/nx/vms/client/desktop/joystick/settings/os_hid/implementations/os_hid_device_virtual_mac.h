@@ -18,6 +18,11 @@ public:
 
     virtual int read(unsigned char* buffer, int bufferSize) override;
 
+    virtual bool isOpened() const override { return true; }
+    virtual bool open() override { return true; }
+
+    virtual void stall() override { }
+
     QBitArray state() const { return m_state; }
     void setState(const QBitArray& newState);
 

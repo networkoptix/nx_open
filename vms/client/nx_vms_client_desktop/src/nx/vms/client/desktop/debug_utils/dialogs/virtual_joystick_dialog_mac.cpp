@@ -1,19 +1,21 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "virtual_joystick_dialog.h"
-#include "ui_virtual_joystick_dialog.h"
+#include "ui_virtual_joystick_dialog_mac.h"
 
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
 
 #include <client_core/client_core_module.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/joystick/settings/device_hid.h>
-#include <nx/vms/client/desktop/joystick/settings/manager.h>
-#include <nx/vms/client/desktop/joystick/settings/os_hid/implementations/os_hid_driver_virtual.h>
+#include <nx/vms/client/desktop/joystick/settings/os_hid/implementations/os_hid_device_virtual_mac.h>
+#include <nx/vms/client/desktop/joystick/settings/os_hid/implementations/os_hid_driver_mac.h>
+#include <nx/vms/client/desktop/joystick/settings/os_hid/os_hid_driver.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../utils/debug_custom_actions.h"
+#include "virtual_joystick_dialog_mac.h"
 
 namespace {
 
@@ -23,6 +25,8 @@ constexpr int kVirtualJoystickReportMaxSize = 512;
 } // namespace
 
 namespace nx::vms::client::desktop {
+
+joystick::OsHidDeviceVirtual* VirtualJoystickDialog::m_virtualJoystickDevice = nullptr;
 
 VirtualJoystickDialog::VirtualJoystickDialog(QWidget* parent):
     base_type(parent),
@@ -51,15 +55,15 @@ VirtualJoystickDialog::VirtualJoystickDialog(QWidget* parent):
     connect(rootObject, SIGNAL(buttonPressed(int)), this, SLOT(onButtonPressed(int)));
     connect(rootObject, SIGNAL(buttonReleased(int)), this, SLOT(onButtonReleased(int)));
 
-    joystick::OsHidDriverVirtual::attachVirtualJoystick();
+    attachVirtualJoystick();
 
     m_joystickControlsState = QBitArray(
-        joystick::OsHidDriverVirtual::virtualJoystickConfig()->reportSize.toInt());
+        joystick::OsHidDeviceVirtual::joystickConfig()->reportSize.toInt());
 }
 
 VirtualJoystickDialog::~VirtualJoystickDialog()
 {
-    joystick::OsHidDriverVirtual::detachVirtualJoystick();
+    detachVirtualJoystick();
 }
 
 void VirtualJoystickDialog::registerAction()
@@ -79,7 +83,7 @@ void VirtualJoystickDialog::onHorizontalStickMoved(qreal value)
     NX_ASSERT(value >= -0.5 && value <= 0.5);
 
     const auto bitLocations = joystick::DeviceHid::parseLocation(
-        joystick::OsHidDriverVirtual::virtualJoystickConfig()->xAxis.bits
+        joystick::OsHidDeviceVirtual::joystickConfig()->xAxis.bits
     );
 
     NX_ASSERT(bitLocations.intervals.size() == 1);
@@ -91,9 +95,9 @@ void VirtualJoystickDialog::onHorizontalStickMoved(qreal value)
     const std::bitset<kVirtualJoystickReportMaxSize> valueBits(decimalValue);
 
     for (int i = 0; i < bitLocations.size; ++i)
-        m_joystickControlsState.setBit(i + bitLocation.first, valueBits[i + bitLocation.first]);
+        m_joystickControlsState.setBit(i + bitLocation.first, valueBits[i]);
 
-    joystick::OsHidDriverVirtual::setVirtualJoystickState(m_joystickControlsState);
+    setVirtualJoystickState(m_joystickControlsState);
 }
 
 void VirtualJoystickDialog::onVerticalStickMoved(qreal value)
@@ -101,7 +105,7 @@ void VirtualJoystickDialog::onVerticalStickMoved(qreal value)
     NX_ASSERT(value >= -0.5 && value <= 0.5);
 
     const auto bitLocations = joystick::DeviceHid::parseLocation(
-        joystick::OsHidDriverVirtual::virtualJoystickConfig()->yAxis.bits
+        joystick::OsHidDeviceVirtual::joystickConfig()->yAxis.bits
     );
 
     NX_ASSERT(bitLocations.intervals.size() == 1);
@@ -113,9 +117,9 @@ void VirtualJoystickDialog::onVerticalStickMoved(qreal value)
     const std::bitset<kVirtualJoystickReportMaxSize> valueBits(decimalValue);
 
     for (int i = 0; i < bitLocations.size; ++i)
-        m_joystickControlsState.setBit(i + bitLocation.first, valueBits[i + bitLocation.first]);
+        m_joystickControlsState.setBit(i + bitLocation.first, valueBits[i]);
 
-    joystick::OsHidDriverVirtual::setVirtualJoystickState(m_joystickControlsState);
+    setVirtualJoystickState(m_joystickControlsState);
 }
 
 void VirtualJoystickDialog::onButtonPressed(int buttonIndex)
@@ -125,7 +129,7 @@ void VirtualJoystickDialog::onButtonPressed(int buttonIndex)
     NX_ASSERT(buttonShift != -1);
 
     m_joystickControlsState.setBit(buttonShift, true);
-    joystick::OsHidDriverVirtual::setVirtualJoystickState(m_joystickControlsState);
+    setVirtualJoystickState(m_joystickControlsState);
 }
 
 void VirtualJoystickDialog::onButtonReleased(int buttonIndex)
@@ -135,29 +139,55 @@ void VirtualJoystickDialog::onButtonReleased(int buttonIndex)
     NX_ASSERT(buttonShift != -1);
 
     m_joystickControlsState.setBit(buttonShift, false);
-    joystick::OsHidDriverVirtual::setVirtualJoystickState(m_joystickControlsState);
+    setVirtualJoystickState(m_joystickControlsState);
 }
 
 int VirtualJoystickDialog::buttonShiftFromName(const QString& name) const
 {
-    int buttonShift = -1;
-
-    const auto buttons = joystick::OsHidDriverVirtual::virtualJoystickConfig()->buttons;
+    const auto buttons = joystick::OsHidDeviceVirtual::joystickConfig()->buttons;
 
     for (const auto& button: buttons)
     {
-        if (button.name == name)
-        {
-            const auto bitLocations = joystick::DeviceHid::parseLocation(button.bits);
-            NX_ASSERT(bitLocations.size == 1);
-            NX_ASSERT(bitLocations.intervals.size() == 1);
-            NX_ASSERT(bitLocations.intervals[0].first == bitLocations.intervals[0].second);
+        if (button.name != name)
+            continue;
 
-            buttonShift = bitLocations.intervals[0].first;
-        }
+        const auto bitLocations = joystick::DeviceHid::parseLocation(button.bits);
+        NX_ASSERT(bitLocations.size == 1);
+        NX_ASSERT(bitLocations.intervals.size() == 1);
+        NX_ASSERT(bitLocations.intervals[0].first == bitLocations.intervals[0].second);
+
+        return bitLocations.intervals[0].first;
     }
 
-    return buttonShift;
+    return -1;
+}
+
+void VirtualJoystickDialog::attachVirtualJoystick()
+{
+    auto driver = dynamic_cast<joystick::OsHidDriverMac*>(joystick::OsHidDriver::getDriver());
+
+    if (!NX_ASSERT(driver))
+        return;
+
+    if (!m_virtualJoystickDevice)
+        m_virtualJoystickDevice = new joystick::OsHidDeviceVirtual();
+
+    driver->attachVirtualDevice(m_virtualJoystickDevice);
+}
+
+void VirtualJoystickDialog::detachVirtualJoystick()
+{
+    auto driver = dynamic_cast<joystick::OsHidDriverMac*>(joystick::OsHidDriver::getDriver());
+
+    if (!NX_ASSERT(driver) || !NX_ASSERT(m_virtualJoystickDevice))
+        return;
+
+    driver->detachVirtualDevice(m_virtualJoystickDevice);
+}
+
+void VirtualJoystickDialog::setVirtualJoystickState(const QBitArray& newState)
+{
+    m_virtualJoystickDevice->setState(newState);
 }
 
 } // namespace nx::vms::client::desktop
