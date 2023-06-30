@@ -21,7 +21,7 @@ const ItemDescriptor& SpeakAction::manifest()
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At Device")),
             utils::makeTargetUserFieldDescriptor(tr("To users")),
             makeFieldDescriptor<VolumeField>("volume", tr("Volume"), {}, {}, {utils::kTextFieldName}),
-            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
+            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         }
     };
     return kDescriptor;

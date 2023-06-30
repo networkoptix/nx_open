@@ -28,11 +28,11 @@ const ItemDescriptor& SendEmailAction::manifest()
                 utils::UserFieldPreset::Power,
                 /*visible*/ true,
                 {utils::kEmailsFieldName}),
-            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
             makeFieldDescriptor<ActionTextField>(
                 utils::kEmailsFieldName, tr("Additional Recipients")),
             makeFieldDescriptor<EmailMessageField>(
-                "message", tr("Email Message"), {}, {{ "visible", false }})
+                "message", tr("Email Message"), {}, {{ "visible", false }}),
+            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         }
     };
     return kDescriptor;

@@ -42,9 +42,13 @@ void OptionalDurationPicker::onDescriptorSet()
     TitledFieldPickerWidget<vms::rules::OptionalTimeField>::onDescriptorSet();
 
     if (m_fieldDescriptor->fieldName == vms::rules::utils::kDurationFieldName)
-        m_label->setText(tr("Value"));
+        m_label->setText(tr(""));
+    else if (m_fieldDescriptor->fieldName == vms::rules::utils::kIntervalFieldName)
+        m_label->setText(tr("Once in"));
+    else if (m_fieldDescriptor->fieldName == vms::rules::utils::kPlaybackTimeFieldName)
+        m_label->setText(tr("For"));
     else
-        m_label->setText(tr("Timeout"));
+        m_label->setText(tr("Value"));
 
     m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
     m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);

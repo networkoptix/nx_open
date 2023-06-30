@@ -28,7 +28,7 @@ const ItemDescriptor& PushNotificationAction::manifest()
                     { "text", "{@EventDescription}" }
                 }),
             makeFieldDescriptor<ActionFlagField>("addSource", tr("Add Source Device name to Body")),
-            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
+            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
 
             makeFieldDescriptor<EventDevicesField>(utils::kDeviceIdsFieldName, "Event devices"),
             utils::makeExtractDetailFieldDescriptor("level", utils::kLevelDetailName),
