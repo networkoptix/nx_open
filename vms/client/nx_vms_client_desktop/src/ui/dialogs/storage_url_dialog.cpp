@@ -93,6 +93,11 @@ QnStorageModelInfo QnStorageUrlDialog::storage() const
     return m_storage;
 }
 
+nx::vms::api::Credentials QnStorageUrlDialog::credentials() const
+{
+    return nx::vms::api::Credentials(ui->loginLineEdit->text(), ui->passwordLineEdit->text());
+}
+
 QString QnStorageUrlDialog::normalizePath(QString path)
 {
     QString separator = lit("/");

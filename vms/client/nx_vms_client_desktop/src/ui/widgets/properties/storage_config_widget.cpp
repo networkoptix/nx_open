@@ -660,6 +660,14 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
     if (item.id.isNull())
     {
         // New storages has tested and ready to add
+        const auto credentials = dialog->credentials();
+        QUrl url(item.url);
+        if (!url.scheme().isEmpty() && !credentials.isEmpty())
+        {
+            url.setUserName(credentials.user);
+            url.setPassword(credentials.password);
+            item.url = url.toString();
+        }
         item.id = QnStorageResource::fillID(m_server->getId(), item.url);
         item.isBackup = !addToMain;
         item.isUsed = true;
