@@ -41,8 +41,9 @@ namespace {
 
 static const QColor kBasicColor = "#FFFFFF";
 static const QColor kLight10Color = "#A5B7C0";
+static const QColor kLight4Color = "#E1E7EA";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kBasicColor, "light1"}, {kLight10Color, "light10"}}},
+    {QnIcon::Normal, {{kBasicColor, "light1"}, {kLight10Color, "light10"}, {kLight4Color, "light4"}}},
 };
 
 } // namespace
@@ -159,7 +160,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     connect(ui->addTourButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_addTourButton_clicked);
 
-    ui->startTourButton->setIcon(qnSkin->icon("buttons/play.png"));
+    ui->startTourButton->setIcon(qnSkin->icon("buttons/play_20.svg", kIconSubstitutions));
     connect(ui->startTourButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_startTourButton_clicked);
 
