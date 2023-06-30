@@ -13,6 +13,14 @@
 
 #include <utils/common/event_processors.h>
 
+namespace {
+
+static const QColor kBasicColor = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QnIcon::Normal, {{kBasicColor, "light10"}}},
+};
+
+} // namespace
 
 QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
     QWidget(parent),
@@ -46,7 +54,7 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
     connect(ui->moveSpotUpButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_moveSpotUpButton_clicked);
 
-    ui->moveSpotDownButton->setIcon(qnSkin->icon("buttons/down.png"));
+    ui->moveSpotDownButton->setIcon(qnSkin->icon("buttons/arrow_down_20.svg", kIconSubstitutions));
     connect(ui->moveSpotDownButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_moveSpotDownButton_clicked);
 }
