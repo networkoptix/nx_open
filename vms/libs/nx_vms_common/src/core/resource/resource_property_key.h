@@ -295,6 +295,9 @@ NX_VMS_COMMON_API extern const QString kOnvifRemoteArchiveDisableFastDownload;
 // Additional flags that can be passed to gSOAP library.
 NX_VMS_COMMON_API extern const QString kGsoapAdditionalFlags;
 
+// Force disable ONVIF PullPoint Notification timestamp validation.
+NX_VMS_COMMON_API extern const QString kOnvifIgnoreOutdatedNotifications;
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------

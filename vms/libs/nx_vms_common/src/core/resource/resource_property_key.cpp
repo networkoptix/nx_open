@@ -224,6 +224,8 @@ const QString kOnvifRemoteArchiveDisableFastDownload("onvifRemoteArchiveDisableF
 
 const QString kGsoapAdditionalFlags("gsoapAdditionalFlags");
 
+const QString kOnvifIgnoreOutdatedNotifications("onvifIgnoreOutdatedNotifications");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
