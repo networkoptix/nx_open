@@ -15,10 +15,10 @@
         <Variable Name="InstallClientOnly" Type="numeric" Value="1" />
 
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
-            <Payload SourceFile="${customization.dir}/license.html" />
-            <Payload SourceFile="${customization.dir}/icons/windows/installer_bg.png" />
-            <Payload SourceFile="${customization.dir}/icons/windows/logo-102x102.png" />
-            <Payload SourceFile="${customization.dir}/icons/windows/logo-64x64.png" />
+            <Payload SourceFile="${customization_dir}/license.html" />
+            <Payload SourceFile="${customization_dir}/icons/windows/installer_bg.png" />
+            <Payload SourceFile="${customization_dir}/icons/windows/logo-102x102.png" />
+            <Payload SourceFile="${customization_dir}/icons/windows/logo-64x64.png" />
 
             <bal:WixStandardBootstrapperApplication
                 SuppressOptionsUI="yes"

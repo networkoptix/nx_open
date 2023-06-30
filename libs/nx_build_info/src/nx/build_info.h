@@ -56,9 +56,6 @@ NX_BUILD_INFO_API QString applicationPlatform();
 NX_BUILD_INFO_API QString applicationPlatformNew();
 NX_BUILD_INFO_API QString applicationPlatformModification();
 
-NX_BUILD_INFO_API QString ffmpegVersion();
-NX_BUILD_INFO_API QString boostVersion();
-
 /** Addition to the version string for MetaVMS, or an empty string for non-MetaVMS builds. */
 NX_BUILD_INFO_API QString usedMetaVersion();
 

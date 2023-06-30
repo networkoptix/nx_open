@@ -6,7 +6,7 @@
             contain 'DiskId="2"' descriptor, so bundle will strip duplicated copies.
          -->
         <ComponentGroup Id="CommonQtLibrariesComponentGroup"
-                Source="${qt.dir}/bin"
+                Source="${QT_DIR}/bin"
                 Directory="InstallDirRoot">
             <Component><File Name="Qt6Core.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="Qt6Gui.dll" KeyPath="yes" DiskId="2"/></Component>

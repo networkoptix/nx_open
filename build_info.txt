@@ -1,4 +1,4 @@
-version=@parsedVersion.majorVersion@.@parsedVersion.minorVersion@.@parsedVersion.incrementalVersion@.@buildNumber@
+version=@releaseVersion.full@
 fullVersion=@releaseVersion@.@buildNumber@-@changeSet@-@customization@@publication_type_suffix@
 productType=@productType@
 publicationType=@publicationType@
@@ -15,5 +15,5 @@ currentRefs=@currentRefs@
 brand=@customization.brand@
 protoVersion=@vmsProtocolVersion@
 metaVersion=@usedMetaVersion@
-vmsVersion=@releaseVersion@.@buildNumber@
+vmsVersion=@releaseVersion.full@
 mobileClientVersion=@mobileClientVersion.full@

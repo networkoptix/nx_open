@@ -21,7 +21,7 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>@release.version@</string>
+    <string>@releaseVersion@</string>
     <key>CFBundleVersion</key>
     <string>@buildNumber@</string>
     <key>LSMinimumSystemVersion</key>

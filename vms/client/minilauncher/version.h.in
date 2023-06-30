@@ -7,7 +7,7 @@
 #define QN_CUSTOMIZATION_NAME         L"${customization}"
 #define QN_APPLAUNCHER_VERSION_FILE   L"${launcher.version.file}"
 
-#define QN_APP_VERSION_MAJOR          ${parsedVersion.majorVersion}
-#define QN_APP_VERSION_MINOR          ${parsedVersion.minorVersion}
-#define QN_APP_VERSION_INCREMENTAL    ${parsedVersion.incrementalVersion}
+#define QN_APP_VERSION_MAJOR          ${PROJECT_VERSION_MAJOR}
+#define QN_APP_VERSION_MINOR          ${PROJECT_VERSION_MINOR}
+#define QN_APP_VERSION_INCREMENTAL    ${PROJECT_VERSION_PATCH}
 #define QN_APP_VERSION_BUILD_NUMBER   ${buildNumber}

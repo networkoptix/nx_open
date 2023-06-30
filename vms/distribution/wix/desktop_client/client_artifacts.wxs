@@ -16,7 +16,7 @@
 
         <ComponentGroup
                 Id="client_qt_libraries"
-                Source="${qt.dir}/bin"
+                Source="${QT_DIR}/bin"
                 Directory="InstallDirRoot">
             <Component><File Name="Qt6OpenGL.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6OpenGLWidgets.dll" KeyPath="yes" DiskId="3"/></Component>
@@ -46,7 +46,7 @@
 
         <ComponentGroup
                 Id="client_qt_imageformats"
-                Source="${qt.dir}/plugins/imageformats"
+                Source="${QT_DIR}/plugins/imageformats"
                 Directory="imageformats">
             <Component><File Name="qgif.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="qjpeg.dll" KeyPath="yes" DiskId="3"/></Component>
@@ -55,14 +55,14 @@
 
         <ComponentGroup
                 Id="client_qt_tls"
-                Source="${qt.dir}/plugins/tls"
+                Source="${QT_DIR}/plugins/tls"
                 Directory="tls">
             <Component><File Name="qopensslbackend.dll" KeyPath="yes" DiskId="3"/></Component>
         </ComponentGroup>
 
         <ComponentGroup
                 Id="client_qt_multimedia"
-                Source="${qt.dir}/plugins/multimedia"
+                Source="${QT_DIR}/plugins/multimedia"
                 Directory="multimedia">
             <Component><File Name="windowsmediaplugin.dll" KeyPath="yes" DiskId="3"/></Component>
         </ComponentGroup>

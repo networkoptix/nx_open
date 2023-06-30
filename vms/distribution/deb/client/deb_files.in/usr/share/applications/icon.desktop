@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=@customization.vmsName@
 Comment=@clientDisplayName@
-Exec=/opt/@customization.companyId@/client/@release.version@.@buildNumber@/bin/applauncher
+Exec=/opt/@customization.companyId@/client/@releaseVersion.full@/bin/applauncher
 Icon=vmsclient-@customization@.png
 Terminal=false
 Type=Application

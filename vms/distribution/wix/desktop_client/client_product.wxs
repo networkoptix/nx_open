@@ -35,7 +35,7 @@
             <![CDATA[ $(var.msiFirstTimeInstall) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
         </SetProperty>
 
-        <Icon Id="application_icon" SourceFile="${customization.dir}/icons/all/favicon.ico"/>
+        <Icon Id="application_icon" SourceFile="${customization_dir}/icons/all/favicon.ico"/>
 
         <Binary Id="CustomActions.dll" SourceFile="${bin_source_dir}/wix_custom_actions.dll" />
 

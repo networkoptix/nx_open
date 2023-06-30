@@ -6,7 +6,7 @@
             contain 'DiskId="2"' descriptor, so bundle will strip duplicated copies.
          -->
         <ComponentGroup Id="CommonQtPlatformsComponentGroup"
-                Source="${qt.dir}/plugins/platforms"
+                Source="${QT_DIR}/plugins/platforms"
                 Directory="QtPlatformsDirectory">
             <Component><File Name="qwindows.dll" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>
