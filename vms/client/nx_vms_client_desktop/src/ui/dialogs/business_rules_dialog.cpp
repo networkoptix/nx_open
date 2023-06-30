@@ -27,6 +27,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/random.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>

@@ -15,6 +15,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/ptz/helpers.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
@@ -39,11 +40,11 @@ using namespace nx::vms::common::ptz;
 
 namespace {
 
-static const QColor kBasicColor = "#FFFFFF";
+static const QColor kLight1Color = "#FFFFFF";
 static const QColor kLight10Color = "#A5B7C0";
 static const QColor kLight4Color = "#E1E7EA";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kBasicColor, "light1"}, {kLight10Color, "light10"}, {kLight4Color, "light4"}}},
+    {QnIcon::Normal, {{kLight1Color, "light1"}, {kLight10Color, "light10"}, {kLight4Color, "light4"}}},
 };
 
 } // namespace
@@ -152,7 +153,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     connect(ui->savePositionButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_savePositionButton_clicked);
 
-    ui->goToPositionButton->setIcon(qnSkin->icon("buttons/to_position.png"));
+    ui->goToPositionButton->setIcon(qnSkin->icon("buttons/to_position_20.svg", kIconSubstitutions));
     connect(ui->goToPositionButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_goToPositionButton_clicked);
 
