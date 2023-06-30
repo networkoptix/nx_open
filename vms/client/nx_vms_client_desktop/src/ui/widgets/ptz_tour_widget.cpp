@@ -4,13 +4,11 @@
 #include "ui_ptz_tour_widget.h"
 
 #include <client/client_globals.h>
-
 #include <core/ptz/ptz_tour.h>
-
-#include <ui/models/ptz_tour_spots_model.h>
-#include <ui/delegates/ptz_tour_item_delegate.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-
+#include <ui/delegates/ptz_tour_item_delegate.h>
+#include <ui/models/ptz_tour_spots_model.h>
 #include <utils/common/event_processors.h>
 
 namespace {
