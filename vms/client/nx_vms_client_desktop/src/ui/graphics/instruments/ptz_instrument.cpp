@@ -25,9 +25,9 @@
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
+#include <nx/vms/client/desktop/ui/common/keyboard_modifiers_watcher.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/ptz_promo_overlay.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
-#include <nx/vms/client/desktop/workbench/watchers/keyboard_modifiers_watcher.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/animation_event.h>
 #include <ui/animation/opacity_animator.h>
@@ -57,8 +57,6 @@ namespace {
 static const QVector3D kKeyboardPtzSensitivity(/*pan*/ 0.5, /*tilt*/ 0.5, /*zoom*/ 1.0);
 
 static const qreal kWheelFisheyeZoomSensitivity = 4.0;
-
-static constexpr int kKeyboardModifierPollingIntervalMs = 100;
 
 const qreal instantSpeedUpdateThreshold = 0.1;
 const qreal speedUpdateThreshold = 0.001;
@@ -345,9 +343,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
         this,
         updatePromoOnWidgets);
 
-    connect(context()->instance<KeyboardModifiersWatcher>(),
-        &KeyboardModifiersWatcher::modifiersChanged,
-        this,
+    connect(KeyboardModifiersWatcher::instance(), &KeyboardModifiersWatcher::modifiersChanged, this,
         [this](Qt::KeyboardModifiers changedModifiers)
         {
             if (!changedModifiers.testFlag(Qt::ShiftModifier))
@@ -808,7 +804,7 @@ void PtzInstrument::updateOverlayCursor(QnMediaResourceWidget* widget)
     const bool showManipulator = canMove && appContext()->localSettings()->ptzAimOverlayEnabled();
 
     const bool advancedPtzDragEnabled = appContext()->localSettings()->ptzAimOverlayEnabled()
-        || context()->instance<KeyboardModifiersWatcher>()->modifiers().testFlag(Qt::ShiftModifier);
+        || KeyboardModifiersWatcher::instance()->modifiers().testFlag(Qt::ShiftModifier);
 
     if (data.isFisheye() && !appContext()->localSettings()->ptzAimOverlayEnabled())
         data.cursorOverlay->setCursor(Qt::OpenHandCursor);

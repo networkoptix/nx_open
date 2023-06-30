@@ -79,6 +79,8 @@ public:
     Q_INVOKABLE QString escapeRegExp(const QString& value) const;
 
     Q_INVOKABLE void invokeMethod(QObject* obj, const QString& methodName);
+
+    Q_INVOKABLE QString modifierName(const Qt::KeyboardModifier modifier) const;
 };
 
 } // namespace nx::vms::client::core

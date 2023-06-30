@@ -180,17 +180,12 @@ Item
             selectionMode: tree.selectionMode
             showResourceStatus: tree.showResourceStatus
             columnWidth: control.kColumnWidth
+            implicitHeight: control.kRowHeight
             editingEnabled: control.editingEnabled
             automaticDependencies: automaticDependenciesSwitch.checked
-
             accessRightsList: control.availableAccessRights
-
             highlightRegExp: tree.currentSearchRegExp
-
-            implicitHeight: control.kRowHeight
-
-            frameSelectionActive: frameSelector.dragging
-            frameSelectionValue: frameSelector.selectionValue
+            frameSelectionMode: frameSelector.currentMode
 
             frameSelectionRect:
             {
@@ -207,6 +202,12 @@ Item
                     tree.hoveredRow = rowAccess
                 else if (tree.hoveredRow == rowAccess)
                     tree.hoveredRow = null
+            }
+
+            onFrameInitializationResponse: (desiredMode) =>
+            {
+                if (frameSelector.currentMode == ResourceAccessDelegate.FrameInitialization)
+                    frameSelector.currentMode = desiredMode
             }
 
             Connections
@@ -260,27 +261,44 @@ Item
                 item: selectionArea
                 enabled: control.editingEnabled
 
-                property bool selectionValue: true //< Select or unselect.
+                readonly property bool selectionControlledByCtrl:
+                    LocalSettings.iniConfigValue("permissionFrameSelectionControlledByCtrl")
+
+                readonly property bool ctrlPressed: KeyboardModifiers.ctrlPressed
+
+                property int currentMode: ResourceAccessDelegate.NoFrameOperation
 
                 onStarted:
                 {
+                    if (selectionControlledByCtrl)
+                    {
+                        currentMode = Qt.binding(() => frameSelector.ctrlPressed
+                            ? ResourceAccessDelegate.FrameUnselection
+                            : ResourceAccessDelegate.FrameSelection)
+                    }
+                    else
+                    {
+                        currentMode = ResourceAccessDelegate.FrameInitialization
+                    }
+
                     selectionArea.start = Qt.point(
                         pressPosition.x,
                         pressPosition.y - tree.contentItem.y)
-
-                    selectionValue = !(tree.hoveredCell
-                        && tree.hoveredRow.resource
-                        && tree.hoveredCell.isToggledOn())
                 }
 
                 onFinished:
                 {
                     if (!control.editingContext
+                        || currentMode == ResourceAccessDelegate.FrameInitialization
                         || selectionArea.frameRect.width === 0
                         || selectionArea.frameRect.height === 0)
                     {
+                        currentMode = ResourceAccessDelegate.NoFrameOperation
                         return
                     }
+
+                    const nextCheckValue = currentMode == ResourceAccessDelegate.FrameSelection
+                    currentMode = ResourceAccessDelegate.NoFrameOperation
 
                     const rect = Qt.rect(
                         selectionArea.frameRect.left,
@@ -302,11 +320,14 @@ Item
                         .filter(resource => !!resource)
 
                     control.editingContext.modifyAccessRights(resources, accessRights,
-                        selectionValue, automaticDependenciesSwitch.checked)
+                        nextCheckValue, automaticDependenciesSwitch.checked)
                 }
 
                 onCanceled:
+                {
+                    currentMode = ResourceAccessDelegate.NoFrameOperation
                     tree.hoveredRow = null
+                }
             }
 
             Binding
@@ -329,12 +350,12 @@ Item
             {
                 id: selectionFrame
 
-                visible: frameSelector.dragging
+                visible: frameSelector.currentMode != ResourceAccessDelegate.NoFrameOperation
                 z: 2
 
                 color: ColorTheme.transparent(border.color, 0.2)
 
-                border.color: frameSelector.selectionValue
+                border.color: frameSelector.currentMode != ResourceAccessDelegate.FrameUnselection
                     ? ColorTheme.colors.brand_core
                     : ColorTheme.colors.light16
 
@@ -342,6 +363,38 @@ Item
                 y: selectionArea.frameRect.top
                 width: selectionArea.frameRect.width
                 height: selectionArea.frameRect.height
+            }
+
+            Popup
+            {
+                id: frameHint
+
+                visible: frameSelector.currentMode != ResourceAccessDelegate.NoFrameOperation
+                    && frameSelector.selectionControlledByCtrl
+
+                x: Math.min(selectionFrame.x, selectionArea.width - width)
+                y: selectionFrame.y - height
+
+                background: null
+                padding: 0
+
+                contentItem: Text
+                {
+                    font.pixelSize: 10
+                    font.weight: Font.Light
+
+                    color: selectionFrame.border.color
+
+                    text:
+                    {
+                        if (frameSelector.currentMode == ResourceAccessDelegate.FrameUnselection)
+                            return qsTr("Drag to uncheck")
+
+                        return qsTr("Drag to check, with %1 to uncheck",
+                            "%1 will be substituted with a name of a key").arg(
+                                NxGlobals.modifierName(Qt.ControlModifier))
+                    }
+                }
             }
         }
     }

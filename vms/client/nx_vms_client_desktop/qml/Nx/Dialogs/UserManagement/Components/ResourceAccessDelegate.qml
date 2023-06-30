@@ -31,8 +31,15 @@ Item
 
     property bool automaticDependencies: false
 
-    property bool frameSelectionActive: false
-    property bool frameSelectionValue: true //< Select or unselect.
+    enum FrameSelectionMode
+    {
+        NoFrameOperation,
+        FrameInitialization,
+        FrameSelection,
+        FrameUnselection
+    }
+
+    property int frameSelectionMode: ResourceAccessDelegate.NoFrameOperation
     property rect frameSelectionRect
 
     property var hoveredCell: null
@@ -40,10 +47,12 @@ Item
     readonly property var resource: (model && model.resource) || null
     readonly property var nodeType: (model && model.nodeType) || -1
 
+    signal frameInitializationResponse(int /*FrameSelectionMode*/ desiredMode)
+
     implicitWidth: mainDelegate.implicitWidth
     implicitHeight: 28
 
-    enabled: editingEnabled && !frameSelectionActive
+    enabled: editingEnabled && frameSelectionMode == ResourceAccessDelegate.NoFrameOperation
 
     ResourceSelectionDelegate
     {
@@ -53,7 +62,7 @@ Item
         height: delegateRoot.height
 
         highlighted: delegateRoot.enabled
-            && !delegateRoot.frameSelectionActive
+            && frameSelectionMode == ResourceAccessDelegate.NoFrameOperation
             && delegateRoot.hoveredCell
 
         customSelectionIndicator: true
@@ -97,7 +106,9 @@ Item
                     hoverEnabled: true
                     acceptedButtons: cell.toggleable ? Qt.LeftButton : Qt.NoButton
 
-                    GlobalToolTip.enabled: !delegateRoot.frameSelectionActive
+                    GlobalToolTip.enabled:
+                        frameSelectionMode == ResourceAccessDelegate.NoFrameOperation
+
                     GlobalToolTip.text: model.toolTip
 
                     readonly property int accessRight: model.accessRight
@@ -130,17 +141,22 @@ Item
 
                         const toggledOn = isToggledOn()
 
+                        // Temporarily treat frame initialization as frame selection.
+                        const nextCheckValue =
+                            frameSelectionMode != ResourceAccessDelegate.FrameUnselection
+
                         // Highlight frame-selected cell.
-                        if (frameSelected && frameSelectionValue != toggledOn)
+                        if (frameSelected && nextCheckValue != toggledOn)
                             return true
 
                         if (!delegateRoot.automaticDependencies)
                             return false
 
                         // Highlight access rights dependency for current frame selection.
-                        if (frameSelectionActive && frameSelectionValue != toggledOn)
+                        if (frameSelectionMode != ResourceAccessDelegate.NoFrameOperation
+                            && nextCheckValue != toggledOn)
                         {
-                            return frameSelectionValue
+                            return nextCheckValue
                                 ? context.isRequiredFor(accessRight, cellsRow.frameAccessRights)
                                 : context.isDependingOn(accessRight, cellsRow.frameAccessRights)
                         }
@@ -227,6 +243,17 @@ Item
                     onClicked:
                     {
                         accessRightsModel.toggle(index, delegateRoot.automaticDependencies)
+                    }
+
+                    onFrameSelectedChanged:
+                    {
+                        if (frameSelected && delegateRoot.frameSelectionMode
+                            == ResourceAccessDelegate.FrameInitialization)
+                        {
+                            delegateRoot.frameInitializationResponse(isToggledOn()
+                                ? ResourceAccessDelegate.FrameUnselection
+                                : ResourceAccessDelegate.FrameSelection)
+                        }
                     }
 
                     Item
