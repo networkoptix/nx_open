@@ -65,8 +65,7 @@ TEST(IOPortTypes, serialization)
 TEST(QnAuditRecord, serialization)
 {
     QnAuditRecord record;
-    record.addParam("name", "value");
-    record.resources.push_back(nx::Uuid());
+    record.details = ResourceDetails{{{nx::Uuid()}}, {"detailed description"}};
     nx::network::rest::JsonReflectResult<QnAuditRecordList> result;
     result.reply.push_back(record);
     const std::string expected = /*suppress newline*/ 1 + R"json(
@@ -75,19 +74,19 @@ TEST(QnAuditRecord, serialization)
     "errorString": "",
     "reply": [
         {
-            "createdTimeSec": 0,
-            "rangeStartSec": 0,
-            "rangeEndSec": 0,
-            "eventType": "AR_NotDefined",
-            "resources": [
-                "{00000000-0000-0000-0000-000000000000}"
-            ],
-            "params": "name=value",
+            "eventType": "notDefined",
+            "createdTimeS": "0",
             "authSession": {
                 "id": "{00000000-0000-0000-0000-000000000000}",
                 "userName": "",
                 "userHost": "",
                 "userAgent": ""
+            },
+            "details": {
+                "ids": [
+                    "{00000000-0000-0000-0000-000000000000}"
+                ],
+                "description": "detailed description"
             }
         }
     ]

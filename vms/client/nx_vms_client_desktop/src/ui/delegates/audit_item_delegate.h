@@ -6,7 +6,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-struct QnAuditRecord;
+struct QnLegacyAuditRecord;
 
 class QnAuditItemDelegate : public QStyledItemDelegate, public QnWorkbenchContextAware
 {
@@ -27,7 +27,7 @@ signals:
 
 private:
     void paintDateTime(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, int dateTimeSecs) const;
-    void paintDescription(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index, const QnAuditRecord* record) const;
+    void paintDescription(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index, const QnLegacyAuditRecord* record) const;
     void paintUserActivity(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
     void paintFocusRect(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option) const;
 
