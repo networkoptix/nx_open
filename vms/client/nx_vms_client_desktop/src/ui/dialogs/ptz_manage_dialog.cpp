@@ -37,6 +37,15 @@ using namespace nx::vms::client::desktop::ui;
 using namespace nx::core;
 using namespace nx::vms::common::ptz;
 
+namespace {
+
+static const QColor kBasicColor = "#FFFFFF";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QnIcon::Normal, {{kBasicColor, "light1"}}},
+};
+
+} // namespace
+
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate
 {
     typedef QStyledItemDelegate base_type;
@@ -153,7 +162,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     connect(ui->startTourButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_startTourButton_clicked);
 
-    ui->deleteButton->setIcon(qnSkin->icon("buttons/delete.png"));
+    ui->deleteButton->setIcon(qnSkin->icon("buttons/delete_20.svg", kIconSubstitutions));
     connect(ui->deleteButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_deleteButton_clicked);
 
