@@ -394,11 +394,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
         &QnBusinessRulesDialog::saveAll);
 
-    ui->addRuleButton->setIcon(qnSkin->icon("buttons/plus_20.svg", kButtonsIconSubstitutions));
+    ui->addRuleButton->setIcon(qnSkin->icon("buttons/plus_20.svg", kButtonsIconSubstitutions)); 
     connect(ui->addRuleButton, &QPushButton::clicked, this,
         &QnBusinessRulesDialog::at_newRuleButton_clicked);
 
-    ui->deleteRuleButton->setIcon(qnSkin->icon("buttons/minus.png"));
+    ui->deleteRuleButton->setIcon(qnSkin->icon("buttons/minus_20.svg", kButtonsIconSubstitutions));
     connect(ui->deleteRuleButton, &QPushButton::clicked, this,
         &QnBusinessRulesDialog::at_deleteButton_clicked);
 

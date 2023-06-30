@@ -46,7 +46,7 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
     connect(ui->addSpotButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_addSpotButton_clicked);
 
-    ui->deleteSpotButton->setIcon(qnSkin->icon("buttons/minus.png"));
+    ui->deleteSpotButton->setIcon(qnSkin->icon("buttons/minus_20.svg", kIconSubstitutions));
     connect(ui->deleteSpotButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_deleteSpotButton_clicked);
 
