@@ -31,30 +31,34 @@
 namespace nx::vms::client::desktop::ui::action {
 
 static const QColor kBasePrimaryColor = "#a5b7c0"; //< Value of light10 in default customization.
-static const QColor kBaseSecondaryColor = "#e1e7ea"; //< Value of light4 in default customization.
+static const QColor kLight4Color = "#E1E7EA";
 static const QColor kBaseWindowTextColor = "#698796"; //< Value of light16 ('windowText').
 
 const core::SvgIconColorer::IconSubstitutions kTitleBarIconSubstitutions = {
     { QnIcon::Disabled, {
         { kBasePrimaryColor, "dark14" },
-        { kBaseSecondaryColor, "dark17" },
+        { kLight4Color, "dark17" },
         { kBaseWindowTextColor, "light16" },
     }},
     { QnIcon::Selected, {
         { kBasePrimaryColor, "light4" },
-        { kBaseSecondaryColor, "light1" },
+        { kLight4Color, "light1" },
         { kBaseWindowTextColor, "light10" },
     }},
     { QnIcon::Active, {  //< Hovered
         { kBasePrimaryColor, "light4" },
-        { kBaseSecondaryColor, "light3" },
+        { kLight4Color, "light3" },
         { kBaseWindowTextColor, "light14" },
     }},
     { QnIcon::Error, {
         { kBasePrimaryColor, "red_l2" },
-        { kBaseSecondaryColor, "red_l3" },
+        { kLight4Color, "red_l3" },
         { kBaseWindowTextColor, "light16" },
     }},
+};
+
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kButtonsIconSubstitutions = {
+    {QnIcon::Normal, {{kLight4Color, "light4"}}},
 };
 
 class ContextMenu
@@ -1857,7 +1861,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(ShowreelTextFactory::tr("Start Showreel")) //< To be displayed on the button
         .accent(Qn::ButtonAccent::Standard)
-        .icon(qnSkin->icon("buttons/play.png"))
+        .icon(qnSkin->icon("buttons/play_20.svg", kButtonsIconSubstitutions))
         .condition(
             condition::isShowreelReviewMode()
             && ConditionWrapper(new StartCurrentShowreelCondition())
