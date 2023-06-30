@@ -70,7 +70,7 @@ Item
 
             text: deleteButtonCaption || qsTr("Delete")
             visible: visibleItemsCount > 1
-            iconUrl: "qrc:///skin/buttons/minus.png"
+            iconUrl: "image://svg/skin/buttons/minus_20.svg"
 
             onClicked:
             {
