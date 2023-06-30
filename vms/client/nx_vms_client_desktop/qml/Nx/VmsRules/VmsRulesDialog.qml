@@ -20,6 +20,16 @@ Dialog
     property alias errorString: alertBar.label.text
     property var dialog: null
 
+    function deleteSelectedRule()
+    {
+        if (!selectionModel.hasSelection)
+            return
+
+        dialog.deleteRule(rulesSortFilterModel.sourceModel.data(
+            rulesSortFilterModel.mapToSource(selectionModel.selectedIndexes[0]),
+            RulesTableModel.RuleIdRole))
+    }
+
     title: qsTr("Vms Rules")
 
     width: 1177
@@ -73,9 +83,7 @@ Dialog
 
                 onClicked:
                 {
-                    root.dialog.deleteRule(rulesSortFilterModel.sourceModel.data(
-                        rulesSortFilterModel.mapToSource(selectionModel.selectedIndexes[0]),
-                        RulesTableModel.RuleIdRole))
+                    root.deleteSelectedRule()
                 }
             }
 
@@ -176,12 +184,25 @@ Dialog
                         selectionModel.select(
                             tableView.index(row, column),
                             ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows)
+                        tableView.focus = true
                     }
 
                     onDoubleClicked:
                     {
                         root.dialog.editRule(ruleId)
                     }
+                }
+            }
+
+            Keys.onPressed: (event)=> {
+                if (!selectionModel.hasSelection)
+                    return
+
+                if (event.key == Qt.Key_Delete
+                    || (Qt.platform.os === "osx" && event.key == Qt.Key_Backspace))
+                {
+                    root.deleteSelectedRule()
+                    event.accepted = true;
                 }
             }
         }
