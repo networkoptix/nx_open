@@ -2,6 +2,12 @@
 
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+# This script compares the version of the bundled libstdc++ with the version of the libstdc++
+# installed in the OS, and reports the path of the bundled one if it is newer.
+#
+# We need this because if some OS component (like a video driver) uses a newer libstdc++, the
+# component will fail to load with an older bundled library.
+
 function get_glibcxx_version
 {
     local -r FILE="$1"
@@ -32,7 +38,7 @@ then
     exit 1
 fi
 
-SYSTEM_STDCPP="$(ldconfig -p | grep libstdc++.so.6 | head -n 1 | sed 's/.*=> //')"
+SYSTEM_STDCPP="$(/sbin/ldconfig -p | grep libstdc++.so.6 | head -n 1 | sed 's/.*=> //')"
 if [ -z "$SYSTEM_STDCPP" ]
 then
     echo "$LOCAL_STDCPP"
