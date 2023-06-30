@@ -214,10 +214,6 @@ def zip_all_files(zip, directory):
     zip_files_to(zip, find_all_files(directory), directory)
 
 
-def zip_rdep_package_to(zip, package_directory):
-    zip_all_files(zip, os.path.join(package_directory, 'bin'))
-
-
 def shell_like_parse(infile):
     result = {}
 
