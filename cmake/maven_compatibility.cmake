@@ -14,8 +14,6 @@ set(qt.dir ${QT_DIR})
 set(qt.version ${qt_version})
 set(customization.dir ${customization_dir})
 
-set(rdep.target ${rdep_target})
-set(packages.dir ${PACKAGES_DIR})
 set(libdir ${CMAKE_CURRENT_BINARY_DIR})
 set(ClientVoxSourceDir "${CMAKE_CURRENT_BINARY_DIR}/bin/vox")
 

@@ -78,7 +78,7 @@ list(APPEND CMAKE_MODULE_PATH
 include(target_detection)
 include(cmake/open_source/vms_parts.cmake)
 include(output_directories)
-include(cmake/open_source/dependencies.cmake)
+include(cmake/dependencies.cmake)
 
 find_package(Boost REQUIRED COMPONENTS headers)
 find_package(ffmpeg REQUIRED)
