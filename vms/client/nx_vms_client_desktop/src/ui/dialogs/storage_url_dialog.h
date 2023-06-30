@@ -8,6 +8,7 @@
 
 #include <api/model/storage_status_reply.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/data/credentials.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/models/storage_model_info.h>
 
@@ -42,6 +43,7 @@ public:
     void setCurrentServerStorages(const QnStorageModelInfoList &storages);
 
     QnStorageModelInfo storage() const;
+    nx::vms::api::Credentials credentials() const;
 
 protected:
     virtual void accept() override;
