@@ -33,11 +33,7 @@ QString revision()
 
 QString vmsVersion()
 {
-    return
-        "${parsedVersion.majorVersion}"
-        ".${parsedVersion.minorVersion}"
-        ".${parsedVersion.incrementalVersion}"
-        ".${buildNumber}";
+    return "${releaseVersion.full}";
 }
 
 QString mobileClientVersion()
@@ -81,16 +77,6 @@ QString applicationPlatformNew()
 QString applicationPlatformModification()
  {
     return "${modification}";
-}
-
-QString ffmpegVersion()
- {
-    return "${ffmpeg.version}";
-}
-
-QString boostVersion()
-{
-    return "${boost.version}";
 }
 
 QString usedMetaVersion()

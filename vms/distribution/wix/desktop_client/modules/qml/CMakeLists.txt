@@ -10,7 +10,7 @@ execute_process(
     WORKING_DIRECTORY ${open_source_root}/build_utils
     COMMAND ${PYTHON_EXECUTABLE} qmldeploy.py
         "--qml-root" ${desktop_client_qml_root}
-        "--qt-root" ${qt.dir}
+        "--qt-root" ${QT_DIR}
         "--qt-host-root" ${QT_HOST_PATH}
         "--output" ${client_qml_directory}
         "--prefer-compiled"

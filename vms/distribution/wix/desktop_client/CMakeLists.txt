@@ -13,12 +13,12 @@ set(signed_distribution_path "${distribution_output_dir}/${client_distribution_n
 
 
 nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_webengine_resources.wixobj
-    SOURCE_DIR ${qt.dir}/resources
+    SOURCE_DIR ${QT_DIR}/resources
     TARGET_DIR_ALIAS WebEngineResourcesDirectoryReference
     COMPONENT_GROUP WebEngineResourcesComponentGroup)
 
 nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_webengine_locales.wixobj
-    SOURCE_DIR ${qt.dir}/translations/qtwebengine_locales
+    SOURCE_DIR ${QT_DIR}/translations/qtwebengine_locales
     TARGET_DIR_ALIAS WebEngineLocalesDirectoryReference
     COMPONENT_GROUP WebEngineLocalesComponentGroup)
 

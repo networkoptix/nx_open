@@ -1,5 +1,5 @@
 {
-    "version" : "${release.version}.${buildNumber}",
+    "version" : "${releaseVersion.full}",
     "platform" : "${platform}",
     "arch" : "${arch}",
     "modification" : "${modification}",

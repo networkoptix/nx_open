@@ -1,5 +1,5 @@
 {
-    "version": "@releaseVersion@.@buildNumber@",
+    "version": "@releaseVersion.full@",
     "fullVersion": "@releaseVersion@.@buildNumber@-@changeSet@-@customization@@publication_type_suffix@",
     "productType": "@productType@",
     "publicationType": "@publicationType@",
@@ -16,6 +16,6 @@
     "brand": "@customization.brand@",
     "protoVersion": @vmsProtocolVersion@,
     "metaVersion": "@usedMetaVersion@",
-    "vmsVersion": "@releaseVersion@.@buildNumber@",
+    "vmsVersion": "@releaseVersion.full@",
     "mobileClientVersion": "@mobileClientVersion.full@"
 }
