@@ -61,6 +61,11 @@ int pixelRatio()
         : qApp->devicePixelRatio();
 }
 
+static const QColor kBasicColor = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QnIcon::Normal, {{kBasicColor, "light10"}}},
+};
+
 } // namespace
 
 /************************************************************************/
@@ -361,7 +366,9 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(
         return;
     base_type::paint(painter, process);
     if (!process.isRunning())
-        paintPixmap(painter, bodyRect(), qnSkin->pixmap("buttons/plus.png"));
+        paintPixmap(painter,
+            bodyRect(),
+            qnSkin->icon("buttons/plus_20.svg", kIconSubstitutions).pixmap(QSize(20, 20)));
 }
 
 QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const

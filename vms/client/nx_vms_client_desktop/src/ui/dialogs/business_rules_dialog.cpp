@@ -58,6 +58,11 @@ using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
+static const QColor kBasicColor = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kButtonsIconSubstitutions = {
+    {QnIcon::Normal, {{kBasicColor, "light10"}}},
+};
+
     class SortRulesProxyModel:
         public QSortFilterProxyModel,
         public nx::vms::client::core::CommonModuleAware
@@ -389,7 +394,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
         &QnBusinessRulesDialog::saveAll);
 
-    ui->addRuleButton->setIcon(qnSkin->icon("buttons/plus.png"));
+    ui->addRuleButton->setIcon(qnSkin->icon("buttons/plus_20.svg", kButtonsIconSubstitutions));
     connect(ui->addRuleButton, &QPushButton::clicked, this,
         &QnBusinessRulesDialog::at_newRuleButton_clicked);
 

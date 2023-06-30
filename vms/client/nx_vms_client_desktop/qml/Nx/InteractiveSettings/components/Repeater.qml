@@ -55,7 +55,7 @@ Item
 
             text: addButtonCaption || qsTr("Add")
             visible: visibleItemsCount < column.layoutItems.length
-            iconUrl: "qrc:///skin/buttons/plus.png"
+            iconUrl: "image://svg/skin/buttons/plus_20.svg"
 
             onClicked:
             {

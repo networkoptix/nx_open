@@ -54,7 +54,7 @@ Dialog
             Button
             {
                 text: qsTr("Add Rule")
-                iconUrl: "qrc:///skin/buttons/plus.png"
+                iconUrl: "image://svg/skin/buttons/plus_20.svg"
                 onClicked:
                 {
                     root.dialog.addRule()
