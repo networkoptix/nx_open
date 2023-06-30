@@ -2,6 +2,7 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 import QtQml.Models 2.15
 import Qt.labs.qmlmodels 1.0
 
@@ -24,87 +25,88 @@ WizardStep
             ButtonsStepUtils.getButtonsCollectedData.bind(buttonsStep)()
     }
 
-    Column
+    ColumnLayout
     {
         anchors.fill: parent
         anchors.margins: 20
-        spacing: 5
+        spacing: 25
 
         Label
         {
-            width: parent.width
+            Layout.fillWidth: true
 
             wrapMode: Text.WordWrap
             text: qsTr("Press each button several times and write the names of these buttons "
                 + "in the table below.")
         }
 
-        TableView
+        ScrollView
         {
-            width: parent.width
-            height: 250
-            topMargin: 20
-            clip: true
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
-            model: TableModel
+            TableView
             {
-                TableModelColumn { display: "bitNumber" }
-                TableModelColumn { display: "name" }
-                TableModelColumn { display: "value" }
-
-                rows: buttonRows
-            }
-
-            delegate: DelegateChooser
-            {
-                DelegateChoice
+                model: TableModel
                 {
-                    column: 0
-                    ItemDelegate
-                    {
-                        implicitWidth: 50
-                        implicitHeight: 30
+                    TableModelColumn { display: "bitNumber" }
+                    TableModelColumn { display: "name" }
+                    TableModelColumn { display: "value" }
 
-                        Label
-                        {
-                            text: model.display
-                            anchors.centerIn: parent
-                        }
-                    }
+                    rows: buttonRows
                 }
 
-                DelegateChoice
+                delegate: DelegateChooser
                 {
-                    column: 1
-                    ItemDelegate
+                    DelegateChoice
                     {
-                        implicitWidth: 250
-                        implicitHeight: 30
-
-                        TextField
+                        column: 0
+                        ItemDelegate
                         {
-                            id: textField
+                            implicitWidth: 50
+                            implicitHeight: 30
 
-                            text: model.display
-                            anchors.centerIn: parent
-
-                            onEditingFinished: buttonRows[model.row].name = textField.text
+                            Label
+                            {
+                                text: model.display
+                                anchors.centerIn: parent
+                            }
                         }
                     }
-                }
 
-                DelegateChoice
-                {
-                    column: 2
-                    ItemDelegate
+                    DelegateChoice
                     {
-                        implicitWidth: 50
-                        implicitHeight: 30
-
-                        Label
+                        column: 1
+                        ItemDelegate
                         {
-                            text: model.display
-                            anchors.centerIn: parent
+                            implicitWidth: 250
+                            implicitHeight: 30
+
+                            TextField
+                            {
+                                id: textField
+
+                                text: model.display
+                                anchors.centerIn: parent
+
+                                onEditingFinished: buttonRows[model.row].name = textField.text
+                            }
+                        }
+                    }
+
+                    DelegateChoice
+                    {
+                        column: 2
+                        ItemDelegate
+                        {
+                            implicitWidth: 50
+                            implicitHeight: 30
+
+                            Label
+                            {
+                                text: model.display
+                                anchors.centerIn: parent
+                            }
                         }
                     }
                 }

@@ -36,12 +36,15 @@
 #include "../dialogs/palette_dialog.h"
 #include "../dialogs/qml_test_dialog.h"
 #include "../dialogs/resource_pool_dialog.h"
-#include "../dialogs/virtual_joystick_dialog.h"
 #include "../dialogs/web_engine_dialog.h"
 #include "../utils/cameras_actions.h"
 #include "../utils/client_webserver.h"
 #include "../utils/debug_custom_actions.h"
 #include "../utils/welcome_screen_test.h"
+
+#if defined Q_OS_MAC
+    #include "../dialogs/virtual_joystick_dialog_mac.h"
+#endif
 
 namespace {
 
@@ -144,14 +147,13 @@ DebugActionsHandler::DebugActionsHandler(QObject *parent):
     WelcomeScreenTest::registerAction();
     testkit::TestKit::registerAction();
 
-    if (nx::build_info::isMacOsX())
-    {
-        if (ini().virtualJoystick)
-            VirtualJoystickDialog::registerAction();
+#ifdef Q_OS_MAC
+    if (ini().virtualJoystick)
+        VirtualJoystickDialog::registerAction();
 
-        if (ini().joystickInvestigationWizard)
-            JoystickInvestigationWizardDialog::registerAction();
-    }
+    if (ini().joystickInvestigationWizard)
+        JoystickInvestigationWizardDialog::registerAction();
+#endif
 }
 
 void DebugActionsHandler::registerDebugCounterActions()

@@ -3,6 +3,7 @@
 #include "os_hid_driver_mac.h"
 
 #include <QtCore/QMap>
+#include <QtCore/QQueue>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSet>
 #include <QtCore/QTimer>
@@ -24,8 +25,6 @@ constexpr uint16_t kGenericDesktopPage = 0x01;
 
 constexpr milliseconds kEnumerationInterval = 2500ms;
 
-constexpr int kMaxHidReportSize = 1024;
-
 } // namespace
 
 namespace nx::vms::client::desktop::joystick {
@@ -45,13 +44,16 @@ static OsHidDeviceInfo loadDeviceInfo(hid_device_info* dev)
 struct OsHidDriverMac::Private
 {
     QTimer* pollingTimer = nullptr;
-    QMap<QString, OsHidDeviceMac*> devices;
+    QMap<QString, OsHidDevice*> devices;
     QMap<QString, OsHidDeviceInfo> deviceInfos;
+    QSet<QString> virtualDevices;
+    QQueue<OsHidDevice*> attachingVirtualDevices;
+    QQueue<QString> detachingVirtualDevicePaths;
 
     struct Subscription
     {
-        QObject* subscriber;
-        bool isConnected = false;
+        const OsHidDeviceSubscriber* subscriber;
+        QMetaObject::Connection connection;
     };
 
     QMap<QString, QList<Subscription>> deviceSubscribers;
@@ -62,6 +64,87 @@ struct OsHidDriverMac::Private
     {
         auto keys = devices.keys();
         return QSet<QString>(keys.begin(), keys.end());
+    }
+
+    void processRealDeviceDetection(const OsHidDeviceInfo& deviceInfo, bool& devicesChanged)
+    {
+        OsHidDevice* hidDevice;
+        auto hidDeviceIt = devices.find(deviceInfo.path);
+
+        if (hidDeviceIt == devices.end())
+        {
+            NX_DEBUG(this, "New HID device detected: %1 %2 (%3)", deviceInfo.manufacturerName,
+                deviceInfo.modelName, deviceInfo.path);
+
+            hidDevice = new OsHidDeviceMac(deviceInfo);
+
+            deviceInfos[deviceInfo.path] = deviceInfo;
+            devices[deviceInfo.path] = hidDevice;
+
+            devicesChanged = true;
+        }
+        else
+        {
+            hidDevice = *hidDeviceIt;
+        }
+
+        if (deviceSubscribers.contains(deviceInfo.path))
+            updateDeviceSubscriptions(hidDevice);
+    }
+
+    void processVirtualDeviceDetection(const OsHidDeviceInfo& deviceInfo)
+    {
+        OsHidDevice* hidDevice;
+        auto hidDeviceIt = devices.find(deviceInfo.path);
+
+        if (hidDeviceIt == devices.end())
+            return;
+
+        hidDevice = *hidDeviceIt;
+
+        if (deviceSubscribers.contains(deviceInfo.path))
+            updateDeviceSubscriptions(hidDevice);
+    }
+
+    void addVirtualDevice(OsHidDevice* device)
+    {
+        const auto& deviceInfo = device->info();
+
+        NX_DEBUG(this, "New virtual HID device detected: %1 %2 (%3)", deviceInfo.manufacturerName,
+            deviceInfo.modelName, deviceInfo.path);
+
+        deviceInfos[deviceInfo.path] = deviceInfo;
+        devices[deviceInfo.path] = device;
+        virtualDevices.insert(deviceInfo.path);
+
+        if (deviceSubscribers.contains(deviceInfo.path))
+            updateDeviceSubscriptions(device);
+    }
+
+    void updateDeviceSubscriptions(OsHidDevice* device)
+    {
+        const auto& deviceInfo = device->info();
+
+        for (auto& subscription: deviceSubscribers[deviceInfo.path])
+        {
+            if (subscription.connection)
+                continue;
+
+            if (!device->isOpened())
+            {
+                if (!device->open())
+                {
+                    NX_DEBUG(this, "Failed to open HID device: %1 %2 (%3), ignoring.",
+                        deviceInfo.manufacturerName,
+                        deviceInfo.modelName,
+                        deviceInfo.path);
+                    continue;
+                }
+            }
+
+            subscription.connection = connect(device, &OsHidDevice::stateChanged,
+                subscription.subscriber, &OsHidDeviceSubscriber::onStateChanged);
+        }
     }
 };
 
@@ -87,8 +170,8 @@ OsHidDriverMac::~OsHidDriverMac()
         {
             for (const auto& subscription: d->deviceSubscribers[path])
             {
-                disconnect(device, SIGNAL(stateChanged(QBitArray)), subscription.subscriber,
-                    SLOT(onStateChanged(QBitArray)));
+                if (subscription.connection)
+                    disconnect(subscription.connection);
             }
         }
 
@@ -124,7 +207,7 @@ void OsHidDriverMac::enumerateDevices()
         osLevelDeviceInfo;
         osLevelDeviceInfo = osLevelDeviceInfo->next)
     {
-        OsHidDeviceInfo deviceInfo = loadDeviceInfo(osLevelDeviceInfo);
+        const OsHidDeviceInfo deviceInfo = loadDeviceInfo(osLevelDeviceInfo);
 
         if (osLevelDeviceInfo->usage_page != kGenericDesktopPage
             || kJoystickUsages.contains(osLevelDeviceInfo->usage))
@@ -134,71 +217,72 @@ void OsHidDriverMac::enumerateDevices()
 
         actualDevicePaths.insert(deviceInfo.path);
 
-        OsHidDeviceMac* hidDevice;
-        auto hidDeviceIt = d->devices.find(deviceInfo.path);
-
-        if (hidDeviceIt == d->devices.end())
-        {
-            NX_DEBUG(this, "New HID device detected: %1 %2 (%3)", deviceInfo.manufacturerName,
-                deviceInfo.modelName, deviceInfo.path);
-
-            hidDevice = new OsHidDeviceMac(deviceInfo);
-
-            d->deviceInfos[deviceInfo.path] = OsHidDeviceInfo{deviceInfo.id, deviceInfo.path,
-                deviceInfo.modelName, deviceInfo.manufacturerName};
-            d->deviceInfos[deviceInfo.path] = deviceInfo;
-
-            d->devices[deviceInfo.path] = hidDevice;
-
-            devicesChanged = true;
-        }
-        else
-        {
-            hidDevice = *hidDeviceIt;
-        }
-
-        if (d->deviceSubscribers.contains(deviceInfo.path))
-        {
-            for (auto& subscription: d->deviceSubscribers[deviceInfo.path])
-            {
-                if (subscription.isConnected)
-                    continue;
-
-                if (!hidDevice->isOpened())
-                {
-                    if (!hidDevice->open())
-                    {
-                        NX_DEBUG(this, "Failed to open HID device: %1 %2 (%3), ignoring.",
-                            deviceInfo.manufacturerName,
-                            deviceInfo.modelName,
-                            deviceInfo.path);
-                        continue;
-                    }
-                }
-
-                connect(hidDevice, SIGNAL(stateChanged(QBitArray)),
-                    subscription.subscriber, SLOT(onStateChanged(QBitArray)));
-
-                subscription.isConnected = true;
-            }
-        }
+        d->processRealDeviceDetection(deviceInfo, devicesChanged);
     }
 
-    for (const auto& devicePath: previousDevicePaths - actualDevicePaths)
+    for (const auto& devicePath: d->virtualDevices)
     {
-        OsHidDeviceMac* device = d->devices.take(devicePath);
+        const OsHidDeviceInfo deviceInfo = d->deviceInfos[devicePath];
+
+        actualDevicePaths.insert(deviceInfo.path);
+
+        d->processVirtualDeviceDetection(deviceInfo);
+    }
+
+    while (!d->attachingVirtualDevices.isEmpty())
+    {
+        const auto device = d->attachingVirtualDevices.dequeue();
+
+        actualDevicePaths.insert(device->info().path);
+
+        d->addVirtualDevice(device);
+
+        devicesChanged = true;
+    }
+
+    auto disappearedDevicePaths = previousDevicePaths - actualDevicePaths;
+
+    while (!d->detachingVirtualDevicePaths.isEmpty())
+    {
+        const auto devicePath = d->detachingVirtualDevicePaths.dequeue();
+        disappearedDevicePaths.insert(devicePath);
+    }
+
+    for (const auto& devicePath: disappearedDevicePaths)
+    {
+        const bool isDeviceVirtual = d->virtualDevices.contains(devicePath);
+        OsHidDevice* device = d->devices.take(devicePath);
 
         if (d->deviceSubscribers.contains(devicePath))
-            d->deviceSubscribers.remove(devicePath);
+        {
+            if (isDeviceVirtual)
+            {
+                for (auto& subscription: d->deviceSubscribers[devicePath])
+                {
+                    if (subscription.connection)
+                        disconnect(subscription.connection);
+                }
+            }
+            else
+            {
+                d->deviceSubscribers.remove(devicePath);
+            }
+        }
 
         d->deviceInfos.remove(devicePath);
         d->devices.remove(devicePath);
 
+        if (isDeviceVirtual)
+            d->virtualDevices.remove(devicePath);
+
         NX_DEBUG(this, "HID device disappeared: %1 %2 (%3)", device->info().manufacturerName,
             device->info().modelName, device->info().path);
 
-        device->stall();
-        device->deleteLater();
+        if (!isDeviceVirtual)
+        {
+            device->stall();
+            device->deleteLater();
+        }
 
         devicesChanged = true;
     }
@@ -212,7 +296,8 @@ QList<OsHidDeviceInfo> OsHidDriverMac::deviceList()
     return d->deviceInfos.values();
 }
 
-void OsHidDriverMac::setupDeviceSubscriber(const QString& path, QObject* subscriber)
+void OsHidDriverMac::setupDeviceSubscriber(const QString& path,
+    const OsHidDeviceSubscriber* subscriber)
 {
     if (!d->deviceSubscribers.contains(path))
     {
@@ -233,7 +318,7 @@ void OsHidDriverMac::setupDeviceSubscriber(const QString& path, QObject* subscri
     }
 }
 
-void OsHidDriverMac::removeDeviceSubscriber(QObject* subscriber)
+void OsHidDriverMac::removeDeviceSubscriber(const OsHidDeviceSubscriber* subscriber)
 {
     for (auto& subscribers: d->deviceSubscribers)
     {
@@ -246,6 +331,22 @@ void OsHidDriverMac::removeDeviceSubscriber(QObject* subscriber)
         if (it != subscribers.end())
             subscribers.erase(it);
     }
+}
+
+void OsHidDriverMac::attachVirtualDevice(OsHidDevice* device)
+{
+    const auto devicePath = device->info().path;
+
+    NX_ASSERT(!d->attachingVirtualDevices.contains(device));
+    d->attachingVirtualDevices.enqueue(device);
+}
+
+void OsHidDriverMac::detachVirtualDevice(OsHidDevice* device)
+{
+    const auto devicePath = device->info().path;
+
+    NX_ASSERT(!d->detachingVirtualDevicePaths.contains(devicePath));
+    d->detachingVirtualDevicePaths.enqueue(devicePath);
 }
 
 } // namespace nx::vms::client::desktop::joystick

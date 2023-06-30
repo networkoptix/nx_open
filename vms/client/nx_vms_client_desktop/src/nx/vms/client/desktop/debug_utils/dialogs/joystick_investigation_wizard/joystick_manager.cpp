@@ -45,7 +45,8 @@ JoystickManager::JoystickManager():
     d(new Private())
 {
     connect(OsHidDriver::getDriver(), &OsHidDriver::deviceListChanged,
-        this, &JoystickManager::onHidDeviceListChanged);
+        this, &JoystickManager::updateHidDeviceList);
+    updateHidDeviceList();
 }
 
 JoystickDevice* JoystickManager::createDevice(const QString& path)
@@ -60,7 +61,7 @@ JoystickManager::~JoystickManager()
 {
 }
 
-void JoystickManager::onHidDeviceListChanged()
+void JoystickManager::updateHidDeviceList()
 {
     const QSet<QString> previousDeviceKeys = d->devicePaths();
     QSet<QString> detectedDeviceKeys;
@@ -70,7 +71,7 @@ void JoystickManager::onHidDeviceListChanged()
         detectedDeviceKeys.insert(deviceInfo.path);
 
         if (d->joysticks.contains(deviceInfo.path))
-            return;
+            continue;
 
         NX_DEBUG(this, "Detected device: %1 %2 (%3)", deviceInfo.manufacturerName,
             deviceInfo.modelName, deviceInfo.id);

@@ -16,10 +16,10 @@ public:
 
     virtual OsHidDeviceInfo info() const override;
 
-    bool isOpened() const;
-    bool open();
+    virtual bool isOpened() const override;
+    virtual bool open() override;
 
-    void stall();
+    virtual void stall() override;
 
 protected:
     void poll();

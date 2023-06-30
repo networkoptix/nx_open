@@ -12,7 +12,12 @@ namespace Ui { class VirtualJoystickDialog; }
 
 namespace nx::vms::client::desktop {
 
-namespace joystick { class Manager; }
+namespace joystick {
+
+class Manager;
+class OsHidDeviceVirtual;
+
+} // namespace joystick
 
 // TODO: Rework to use QmlDialogWrapper.
 class VirtualJoystickDialog: public QnDialog
@@ -35,9 +40,15 @@ public slots:
 private:
     int buttonShiftFromName(const QString& name) const;
 
+    void attachVirtualJoystick();
+    void detachVirtualJoystick();
+    void setVirtualJoystickState(const QBitArray& newState);
+
     QScopedPointer<Ui::VirtualJoystickDialog> ui;
     QQuickWidget* m_virtualJoystickWidget = nullptr;
     QBitArray m_joystickControlsState;
+
+    static joystick::OsHidDeviceVirtual* m_virtualJoystickDevice;
 };
 
 } // namespace nx::vms::client::desktop
