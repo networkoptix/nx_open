@@ -33,7 +33,7 @@ const ItemDescriptor& HttpAction::manifest()
             makeFieldDescriptor<PasswordField>("password", tr("Password")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kIntervalFieldName,
-                tr("Action throttling"),
+                tr("Interval of Action"),
                 {},
                 {.initialValue = 0s, .defaultValue = 1s, .maximumValue = std::chrono::days(24855), .minimumValue = 1s})
         }

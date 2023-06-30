@@ -23,7 +23,7 @@ const ItemDescriptor& TextOverlayAction::manifest()
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, tr("At")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kDurationFieldName,
-                tr("Action Throttling"),
+                tr("Fixed Duration"),
                 {},
                 {.initialValue = 5s, .maximumValue = 30s, .minimumValue = 5s}),
             makeFieldDescriptor<TextWithFields>("text", tr("Custom Text")),

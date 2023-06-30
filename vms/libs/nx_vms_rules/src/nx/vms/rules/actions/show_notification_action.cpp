@@ -23,7 +23,7 @@ const ItemDescriptor& NotificationAction::manifest()
             makeFieldDescriptor<EventIdField>("id", "Event ID"),
             utils::makeTargetUserFieldDescriptor(tr("To")),
             makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName, tr("Force Acknowledgement")),
-            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
+            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
 
             makeFieldDescriptor<TextWithFields>("caption", tr("Caption"), QString(),
                 {

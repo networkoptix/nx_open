@@ -20,10 +20,10 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(utils::kDeviceIdsFieldName, {}),
             utils::makeTargetUserFieldDescriptor(tr("To")),
-            utils::makePlaybackFieldDescriptor(tr("Playback Time")),
+            utils::makePlaybackFieldDescriptor(tr("Rewind")),
             utils::makeActionFlagFieldDescriptor(
                 "forceOpen", tr("Force Alarm Layout Opening"), {}, /*defaultValue*/ true),
-            utils::makeIntervalFieldDescriptor("Action Throttling"),
+            utils::makeIntervalFieldDescriptor("Interval of Action"),
 
             makeFieldDescriptor<EventIdField>("id", "Event ID"),
             makeFieldDescriptor<EventDevicesField>("eventDeviceIds", "Event devices"),

@@ -17,8 +17,8 @@ const ItemDescriptor& OpenLayoutAction::manifest()
         .fields = {
             makeFieldDescriptor<LayoutField>("layoutId", {}),
             utils::makeTargetUserFieldDescriptor(tr("To"), {}, utils::UserFieldPreset::None),
-            utils::makePlaybackFieldDescriptor(tr("Playback Time")),
-            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
+            utils::makePlaybackFieldDescriptor(tr("Rewind")),
+            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         },
         .permissions = {.resourcePermissions = {{"layoutId", Qn::ReadPermission}}},
     };

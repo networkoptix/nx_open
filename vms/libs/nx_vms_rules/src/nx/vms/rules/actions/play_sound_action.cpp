@@ -22,7 +22,7 @@ const ItemDescriptor& PlaySoundAction::manifest()
             utils::makeTargetUserFieldDescriptor(tr("To Users")),
             makeFieldDescriptor<VolumeField>(
                 "volume", tr("Volume"), {}, {}, {utils::kSoundFieldName}),
-            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
+            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
         }
     };
     return kDescriptor;

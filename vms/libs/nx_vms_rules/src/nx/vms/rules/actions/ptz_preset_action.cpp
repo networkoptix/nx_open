@@ -18,7 +18,7 @@ const ItemDescriptor& PtzPresetAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetSingleDeviceField>(utils::kCameraIdFieldName, tr("At")),
             makeFieldDescriptor<PtzPresetField>("presetId", tr("PTZ Preset")),
-            utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
+            utils::makeIntervalFieldDescriptor(tr("Interval of Action")),
             utils::makeTargetUserFieldDescriptor(
                 tr("Execute to users"), {}, utils::UserFieldPreset::All, /*visible*/ false),
         }

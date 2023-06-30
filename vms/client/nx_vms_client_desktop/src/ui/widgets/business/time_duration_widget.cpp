@@ -67,7 +67,7 @@ void TimeDurationWidget::setMaximum(int secs)
     const auto periodsCount = ui->periodComboBox->count();
     for (auto i = periodsCount - 1; i > 0; --i)
     {
-        if (ui->periodComboBox->itemData(i).toInt() > m_max)
+        if (ui->periodComboBox->itemData(i).toInt() < m_max)
             break;
 
         ui->periodComboBox->removeItem(i);

@@ -21,7 +21,7 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
             makeFieldDescriptor<TargetLayoutField>(utils::kLayoutIdsFieldName, tr("On Layout")),
             utils::makeTargetUserFieldDescriptor(
                 tr("Set for"), {}, utils::UserFieldPreset::All, /*visible*/ false),
-            utils::makePlaybackFieldDescriptor(tr("Playback Time")),
+            utils::makePlaybackFieldDescriptor(tr("Rewind")),
         }
     };
     return kDescriptor;
