@@ -40,8 +40,9 @@ using namespace nx::vms::common::ptz;
 namespace {
 
 static const QColor kBasicColor = "#FFFFFF";
+static const QColor kLight10Color = "#A5B7C0";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kBasicColor, "light1"}}},
+    {QnIcon::Normal, {{kBasicColor, "light1"}, {kLight10Color, "light10"}}},
 };
 
 } // namespace
@@ -154,7 +155,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     connect(ui->goToPositionButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_goToPositionButton_clicked);
 
-    ui->addTourButton->setIcon(qnSkin->icon("buttons/plus.png"));
+    ui->addTourButton->setIcon(qnSkin->icon("buttons/plus_20.svg", kIconSubstitutions));
     connect(ui->addTourButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_addTourButton_clicked);
 

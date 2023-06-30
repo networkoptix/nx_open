@@ -42,7 +42,7 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
 
     connect(m_model, &QnPtzTourSpotsModel::spotsChanged, this, &QnPtzTourWidget::tourSpotsChanged);
 
-    ui->addSpotButton->setIcon(qnSkin->icon("buttons/plus.png"));
+    ui->addSpotButton->setIcon(qnSkin->icon("buttons/plus_20.svg", kIconSubstitutions));
     connect(ui->addSpotButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_addSpotButton_clicked);
 
