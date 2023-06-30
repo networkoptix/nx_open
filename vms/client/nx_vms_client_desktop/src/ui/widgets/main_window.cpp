@@ -51,7 +51,6 @@
 #include <nx/vms/client/desktop/workbench/handlers/alarm_layout_handler.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
 #include <nx/vms/client/desktop/workbench/handlers/workbench_action_executor.h>
-#include <nx/vms/client/desktop/workbench/watchers/keyboard_modifiers_watcher.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/workbench/workbench_ui.h>
@@ -307,7 +306,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
-    context->instance<KeyboardModifiersWatcher>();
 
     const auto updateTimeMode =
         []()

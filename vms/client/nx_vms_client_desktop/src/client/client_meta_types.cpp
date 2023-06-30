@@ -77,6 +77,7 @@
 #include <nx/vms/client/desktop/ui/common/focus_frame_item.h>
 #include <nx/vms/client/desktop/ui/common/global_tool_tip.h>
 #include <nx/vms/client/desktop/ui/common/item_grabber.h>
+#include <nx/vms/client/desktop/ui/common/keyboard_modifiers.h>
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/common/whats_this.h>
 #include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
@@ -274,6 +275,7 @@ void QnClientMetaTypes::registerQmlTypes()
     joystick::JoystickManager::registerQmlType();
     TimeDurationSuffixModel::registerQmlType();
     SessionAware::registerQmlType();
+    KeyboardModifiers::registerQmlType();
 
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");

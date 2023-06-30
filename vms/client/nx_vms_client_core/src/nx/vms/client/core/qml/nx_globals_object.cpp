@@ -9,6 +9,7 @@
 #include <QtQuick/private/qquickflickable_p.h>
 #include <QtQuick/private/qquickitem_p.h>
 
+#include <nx/build_info.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/common/html/html.h>
 
@@ -260,6 +261,48 @@ QString NxGlobalsObject::escapeRegExp(const QString& value) const
 void NxGlobalsObject::invokeMethod(QObject* obj, const QString& methodName)
 {
     QMetaObject::invokeMethod(obj, methodName.toLatin1().constData(), Qt::DirectConnection);
+}
+
+QString NxGlobalsObject::modifierName(const Qt::KeyboardModifier modifier) const
+{
+    if (nx::build_info::isMacOsX())
+    {
+        switch (modifier)
+        {
+            case Qt::ShiftModifier:
+                return QChar(0x21E7);
+
+            case Qt::AltModifier:
+                return QChar(0x2325);
+
+            case Qt::ControlModifier:
+                return QChar(0x2318);
+
+            case Qt::MetaModifier:
+                return QChar(0x2303);
+
+            default:
+                return "";
+        }
+    }
+
+    switch (modifier)
+    {
+        case Qt::ShiftModifier:
+            return "Shift";
+
+        case Qt::AltModifier:
+            return "Alt";
+
+        case Qt::ControlModifier:
+            return "Ctrl";
+
+        case Qt::MetaModifier:
+            return nx::build_info::isWindows() ? "Win" : "Meta";
+
+        default:
+            return "";
+    }
 }
 
 } // namespace nx::vms::client::core

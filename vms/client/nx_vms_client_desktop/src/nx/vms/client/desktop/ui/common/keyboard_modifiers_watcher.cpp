@@ -19,8 +19,7 @@ static constexpr auto kModifierMask = Qt::ShiftModifier | Qt::ControlModifier | 
 
 } // namespace
 
-KeyboardModifiersWatcher::KeyboardModifiersWatcher(QObject* parent):
-    base_type(parent)
+KeyboardModifiersWatcher::KeyboardModifiersWatcher()
 {
     if (!NX_ASSERT(qApp, "Application instance must be created"))
         return;
@@ -60,6 +59,12 @@ KeyboardModifiersWatcher::KeyboardModifiersWatcher(QObject* parent):
 
     m_modifiers = qApp->queryKeyboardModifiers() & kModifierMask;
     NX_VERBOSE(this, "Initial keyboard modifier state: %1", m_modifiers);
+}
+
+KeyboardModifiersWatcher* KeyboardModifiersWatcher::instance()
+{
+    static KeyboardModifiersWatcher instance;
+    return &instance;
 }
 
 Qt::KeyboardModifiers KeyboardModifiersWatcher::modifiers() const

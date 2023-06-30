@@ -15,9 +15,10 @@ class KeyboardModifiersWatcher: public QObject
     Q_OBJECT
     using base_type = QObject;
 
-public:
-    explicit KeyboardModifiersWatcher(QObject* parent = nullptr);
+    explicit KeyboardModifiersWatcher();
 
+public:
+    static KeyboardModifiersWatcher* instance();
     Qt::KeyboardModifiers modifiers() const;
 
 signals:
