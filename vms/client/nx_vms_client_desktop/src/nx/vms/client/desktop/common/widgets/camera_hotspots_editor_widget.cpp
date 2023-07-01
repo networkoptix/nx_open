@@ -525,6 +525,8 @@ void CameraHotspotsEditorWidget::mousePressEvent(QMouseEvent* event)
     if (event->buttons() != Qt::LeftButton)
         return;
 
+    d->setHoveredHotspotIndex(d->hotspotIndexAtPos(event->pos()));
+
     if (d->hoveredHotspotIndex)
     {
         d->setSelectedHotspotIndex(d->hoveredHotspotIndex);
