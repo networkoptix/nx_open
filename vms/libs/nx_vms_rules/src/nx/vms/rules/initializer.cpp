@@ -78,6 +78,7 @@ void Initializer::registerFields() const
     m_engine->registerEventField(
         fieldMetatype<AnalyticsObjectTypeField>(),
         [this] { return new AnalyticsObjectTypeField(this->m_context); });
+    registerEventField<CustomizableFlagField>();
     registerEventField<CustomizableIconField>();
     registerEventField<CustomizableTextField>();
     registerEventField<DummyField>();

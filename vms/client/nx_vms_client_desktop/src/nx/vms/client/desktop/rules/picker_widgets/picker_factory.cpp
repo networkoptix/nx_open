@@ -140,6 +140,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new AnalyticsObjectAttributesPicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::AnalyticsObjectTypeField>())
         pickerWidget = new AnalyticsObjectTypePicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::CustomizableFlagField>())
+        pickerWidget = new FlagPicker<nx::vms::rules::CustomizableFlagField>(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::CustomizableTextField>())
         pickerWidget = new CustomizableTextPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::CustomizableIconField>())
