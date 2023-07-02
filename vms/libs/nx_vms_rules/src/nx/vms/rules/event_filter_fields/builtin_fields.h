@@ -7,6 +7,7 @@
 #include "analytics_event_type_field.h"
 #include "analytics_object_attributes_field.h"
 #include "analytics_object_type_field.h"
+#include "customizable_flag_field.h"
 #include "customizable_icon_field.h"
 #include "customizable_text_field.h"
 #include "dummy_field.h"

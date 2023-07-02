@@ -228,6 +228,7 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventFieldRegistration<AnalyticsEventTypeField>(systemContext());
     testEventFieldRegistration<AnalyticsObjectAttributesField>();
     testEventFieldRegistration<AnalyticsObjectTypeField>(systemContext());
+    testEventFieldRegistration<CustomizableFlagField>();
     testEventFieldRegistration<CustomizableIconField>();
     testEventFieldRegistration<CustomizableTextField>();
     testEventFieldRegistration<DummyField>();

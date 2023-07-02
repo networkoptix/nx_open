@@ -2,27 +2,12 @@
 
 #pragma once
 
+#include <nx/utils/uuid.h>
+
+#include "../rules_fwd.h"
 #include "field.h"
 
 namespace nx::vms::rules::utils {
-
-/** Returns whether logging is omitted for the given descriptor and corresponding item. */
-template<typename ItemPtr>
-bool isLoggingAllowed(const ItemDescriptor& descriptor, const ItemPtr& item)
-{
-    static_assert(
-        std::is_same<EventPtr, ItemPtr>::value || std::is_same<ActionPtr, ItemPtr>::value,
-        "ItemPtr must be EventPtr or ActionPtr");
-
-    if (descriptor.flags.testFlag(ItemFlag::omitLogging))
-        return false;
-
-    const auto property = item->property(utils::kOmitLoggingFieldName);
-    if (property.isValid())
-        return !property.template value<bool>();
-
-    return true;
-}
 
 inline bool aggregateByType(
     const ItemDescriptor& eventDescriptor,
@@ -32,4 +17,7 @@ inline bool aggregateByType(
         && eventDescriptor.flags.testFlag(ItemFlag::aggregationByTypeSupported);
 }
 
-} // namespace nx::vms::rules::utils
+/** Returns whether logging is allowed for the given rule. */
+NX_VMS_RULES_API bool isLoggingAllowed(const Engine* engine, QnUuid ruleId);
+
+} // namespace nx::vms::rules
