@@ -61,14 +61,13 @@ class NxOpenConan(ConanFile):
     }
 
     ffmpeg_version_and_revision = "4.4#3798b16fa0e0317daf710c96f2c794c3"
-    help_version_and_revision = "6.0.0" "#ac442e0324a16bb0da08d608c6449eb3"
     requires = (
         f"ffmpeg/{ffmpeg_version_and_revision}",
         "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
         "qt/6.5.0" "#ec3a31b2a11a399dc4aa641c1ea9c399",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
-        f"vms_help/{help_version_and_revision}",
-        f"quick_start_guide/{help_version_and_revision}",
+        "vms_help/6.0.0",
+        "quick_start_guide/6.0.0",
     )
 
     def configure(self):
