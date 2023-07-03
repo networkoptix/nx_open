@@ -18,6 +18,16 @@ namespace nx::vms::client::desktop {
 
 using Geometry = nx::vms::client::core::Geometry;
 
+namespace {
+
+using namespace nx::vms::client::desktop;
+
+static constexpr auto kHotspotsDisplaySizeThreshold = QSizeF(
+    camera_hotspots::kHotspotRadius * 8,
+    camera_hotspots::kHotspotRadius * 8);
+
+} // namespace
+
 //-------------------------------------------------------------------------------------------------
 // CameraHotspotsOverlayWidget::Private declaration.
 
@@ -100,8 +110,11 @@ void CameraHotspotsOverlayWidget::Private::initHotspotItems()
 
 void CameraHotspotsOverlayWidget::Private::updateHotspotItem(CameraHotspotItem* hotspotItem) const
 {
-    if (q->rect().isNull())
+    if (!Geometry::contains(q->rect().size(), kHotspotsDisplaySizeThreshold))
+    {
+        hotspotItem->setVisible(false);
         return;
+    }
 
     const auto unitRect = QRectF(0.0, 0.0, 1.0, 1.0);
     auto relativePos = hotspotItem->hotspotData().pos;

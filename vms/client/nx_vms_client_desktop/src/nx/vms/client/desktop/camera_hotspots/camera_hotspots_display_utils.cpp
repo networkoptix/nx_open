@@ -42,8 +42,7 @@ using CameraHotspotData = nx::vms::common::CameraHotspotData;
 
 QPointF hotspotOrigin(const CameraHotspotData& hotspot, const QRectF& rect)
 {
-    const auto origin = Geometry::subPoint(rect, hotspot.pos);
-    return Geometry::bounded(origin, Geometry::eroded(rect, kHotspotRadius + kHotspotBoundsOffset));
+    return hotspotOrigin(hotspot.pos, rect);
 }
 
 QPointF hotspotOrigin(const QPointF& hotspotRelativePos, const QRectF& rect)
