@@ -1928,6 +1928,14 @@ Handle ServerConnection::modifyLdapSettingsAsync(
     return handle;
 }
 
+Handle ServerConnection::loginInfoAsync(
+    const QString& login,
+    Result<ErrorOrData<nx::vms::api::LoginUser>>::type&& callback,
+    QThread* targetThread)
+{
+    return executeGet("/rest/v3/login/users/" + login, {}, callback, targetThread);
+}
+
 Handle ServerConnection::getLdapSettingsAsync(
     Result<ErrorOrData<nx::vms::api::LdapSettings>>::type&& callback,
     QThread* targetThread)

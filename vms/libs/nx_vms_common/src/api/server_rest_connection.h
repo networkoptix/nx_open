@@ -725,6 +725,11 @@ public:
         LdapAuthenticateCallback&& callback,
         QThread* targetThread = nullptr);
 
+    Handle loginInfoAsync(
+        const QString& login,
+        Result<ErrorOrData<nx::vms::api::LoginUser>>::type&& callback,
+        QThread* targetThread = nullptr);
+
     /**
      * Tests connection with the LDAP Server using settings provided. Returns first user DNs found
      * per each filter from `filters` into the callback.
