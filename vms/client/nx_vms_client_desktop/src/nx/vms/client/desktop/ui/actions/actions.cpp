@@ -1433,6 +1433,10 @@ void initialize(Manager* manager, Action* root)
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
         .condition(new LayoutItemRemovalCondition());
 
+    factory(ReplaceLayoutItemAction)
+        .mode(DesktopMode)
+        .flags(SingleTarget | WidgetTarget);
+
     factory(RemoveLayoutItemFromSceneAction)
         .flags(Scene | SingleTarget | MultiTarget | LayoutItemTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Remove from Layout"))

@@ -3,6 +3,7 @@
 #include "workbench_action_handler.h"
 
 #include <QtCore/QProcess>
+#include <QtCore/QScopeGuard>
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QAction>
 #include <QtGui/QDesktopServices>
@@ -427,6 +428,9 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(action(action::OpenImportFromDevices), &QAction::triggered,
         this, &ActionHandler::at_openImportFromDevicesDialog_triggered);
+
+    connect(action(action::ReplaceLayoutItemAction), &QAction::triggered,
+        this, &ActionHandler::replaceLayoutItemActionTriggered);
 }
 
 ActionHandler::~ActionHandler()
@@ -525,10 +529,19 @@ void ActionHandler::addToLayout(
     if (!params.zoomWindowRectangleVisible)
         layout->setItemData(data.uuid, Qn::ItemZoomWindowRectangleVisibleRole, false);
 
-    if (params.usePosition)
-        data.combinedGeometry = QRectF(params.position, params.position); /* Desired position is encoded into a valid rect. */
+    if (params.position)
+    {
+        // Top left of a null size rect will be used as desired position, geometry will be
+        // adjusted to grid, valid rect will be set as is.
+        const auto size = params.size.value_or(QSizeF());
+        data.combinedGeometry = QRectF(params.position.value(), size);
+        data.combinedGeometry.translate(-Geometry::toPoint(size) / 2.0);
+    }
     else
-        data.combinedGeometry = QRectF(QPointF(0.5, 0.5), QPointF(-0.5, -0.5)); /* The fact that any position is OK is encoded into an invalid rect. */
+    {
+        // Negative size rect means that any suitable geometry may be applied.
+        data.combinedGeometry = QRectF(QPointF(0.5, 0.5), QPointF(-0.5, -0.5));
+    }
 
     data.transient = true;
     layout->addItem(data);
@@ -960,8 +973,8 @@ void ActionHandler::at_openInLayoutAction_triggered()
     else if (!resources.isEmpty())
     {
         AddToLayoutParams addParams;
-        addParams.usePosition = !position.isNull();
-        addParams.position = position;
+        if (!position.isNull())
+            addParams.position = position;
         addParams.timelineWindow =
             parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
         addParams.timelineSelection =
@@ -1055,6 +1068,45 @@ void ActionHandler::at_openInLayoutAction_triggered()
             layout->setCellAspectRatio(QnLayoutResource::kDefaultCellAspectRatio);
         }
     }
+}
+
+void ActionHandler::replaceLayoutItemActionTriggered()
+{
+    using namespace std::chrono;
+
+    const auto actionParams = menu()->currentParameters(sender());
+
+    const auto layoutItemIndex = action::ParameterTypes::layoutItem(actionParams.widget());
+    if (layoutItemIndex.isNull())
+        return;
+
+    const auto camera = actionParams.argument(Qn::ResourceRole).value<QnVirtualCameraResourcePtr>();
+    if (!camera)
+        return;
+
+    const auto layout = layoutItemIndex.layout();
+    const auto replacedItemData = layout->getItem(layoutItemIndex.uuid());
+
+    AddToLayoutParams replacementParams;
+    replacementParams.position = replacedItemData.combinedGeometry.center();
+    replacementParams.size = replacedItemData.combinedGeometry.size();
+
+    if (actionParams.hasArgument(Qn::ItemTimeRole))
+        replacementParams.time = milliseconds(actionParams.argument<qint64>(Qn::ItemTimeRole));
+
+    if (actionParams.hasArgument(Qn::ItemSpeedRole))
+        replacementParams.speed = actionParams.argument<qreal>(Qn::ItemSpeedRole);
+
+    if (actionParams.hasArgument(Qn::ItemPausedRole))
+        replacementParams.paused = actionParams.argument<bool>(Qn::ItemPausedRole);
+
+    const auto display = context()->display();
+    const auto forceNoAnimationGuard = qScopeGuard(
+        [display, val = display->forceNoAnimation()] { display->setForceNoAnimation(val); });
+    context()->display()->setForceNoAnimation(true);
+
+    layout->removeItem(layoutItemIndex.uuid());
+    addToLayout(layout, camera, replacementParams);
 }
 
 void ActionHandler::at_openInCurrentLayoutAction_triggered()
@@ -2661,7 +2713,6 @@ void ActionHandler::at_createZoomWindowAction_triggered() {
 
     QRectF rect = params.argument<QRectF>(Qn::ItemZoomRectRole, QRectF(0.25, 0.25, 0.5, 0.5));
     AddToLayoutParams addParams;
-    addParams.usePosition = true;
     addParams.position = widget->item()->combinedGeometry().center();
     addParams.zoomWindow = rect;
     addParams.dewarpingParams.enabled = widget->resource()->getDewarpingParams().enabled;  // zoom items on fisheye cameras must always be dewarped

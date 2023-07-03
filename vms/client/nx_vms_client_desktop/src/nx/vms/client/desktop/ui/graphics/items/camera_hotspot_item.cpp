@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/workbench/widgets/thumbnail_tooltip.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
@@ -201,7 +202,16 @@ void CameraHotspotItem::Private::opemItemInNewLayout()
 
 void CameraHotspotItem::Private::openItemInPlace()
 {
-    // TODO: #vbreus VMS-38379, implementation is pending.
+    auto parameters = ui::action::Parameters(mediaResourceWidget())
+        .withArgument(Qn::ResourceRole, hotspotCamera());
+
+    if (!context->navigator()->syncEnabled()
+        || context->workbench()->currentLayout()->items().size() == 1)
+    {
+        parameters.setArguments(itemPlaybackParameters());
+    }
+
+    context->menu()->trigger(ui::action::ReplaceLayoutItemAction, parameters);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -220,11 +230,14 @@ CameraHotspotItem::CameraHotspotItem(
 
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
+    setProperty(Qn::BlockMotionSelection, true);
     setProperty(Qn::NoHandScrollOver, true);
 }
 
 CameraHotspotItem::~CameraHotspotItem()
 {
+    if (d->tooltip)
+        d->tooltip->deleteLater();
 }
 
 QRectF CameraHotspotItem::boundingRect() const
