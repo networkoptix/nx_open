@@ -133,7 +133,15 @@ Dialog
             TextFieldWithValidator
             {
                 id: adminDnTextField
+
                 width: parent.width
+
+                validateFunc: (text) =>
+                {
+                    return text
+                        ? ""
+                        : qsTr("Login DN cannot be empty.")
+                }
             }
         }
 
@@ -292,7 +300,9 @@ Dialog
 
     function validate()
     {
-        return ldapUri.validate() && passwordTextField.validate()
+        return ldapUri.validate()
+            && adminDnTextField.validate()
+            && passwordTextField.validate()
     }
 
     function accept()
