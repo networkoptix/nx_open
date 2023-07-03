@@ -31,10 +31,11 @@ Dialog
     onUriChanged: ldapUri.text = uri
 
     property alias adminDn: adminDnTextField.text
+    property string originalAdminDn: ""
     property alias password: passwordTextField.text
     property alias useStarTls: starTlsCheckbox.checked
     property alias ignoreCertErrors: ignoreCertErrorsCheckbox.checked
-    property alias showFakePassword: passwordTextField.showFakePassword
+    property bool showFakePassword: false
 
     property var self
     property var testState: LdapSettings.TestState.initial
@@ -155,6 +156,9 @@ Dialog
             PasswordFieldWithWarning
             {
                 id: passwordTextField
+
+                showFakePassword: dialog.showFakePassword
+                    && dialog.originalAdminDn == dialog.adminDn
 
                 showStrength: false
                 width: parent.width
