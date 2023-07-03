@@ -149,7 +149,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
 
     //connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnPtzManageDialog::updateHotkeys);
 
-    ui->savePositionButton->setIcon(qnSkin->icon("buttons/ok.png"));
+    ui->savePositionButton->setIcon(qnSkin->icon("buttons/ok_20.svg", kIconSubstitutions));
     connect(ui->savePositionButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_savePositionButton_clicked);
 

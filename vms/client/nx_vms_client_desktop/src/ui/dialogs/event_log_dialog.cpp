@@ -23,6 +23,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/application_context.h>
