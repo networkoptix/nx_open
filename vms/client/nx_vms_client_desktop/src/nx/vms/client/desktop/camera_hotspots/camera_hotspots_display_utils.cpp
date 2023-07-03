@@ -17,8 +17,10 @@
 
 namespace {
 
+using namespace nx::vms::client::desktop;
+
 static constexpr auto kHotspotPointerAngle = 90.0;
-static constexpr auto kHotspotBoundsOffset = 4;
+static constexpr auto kHotspotBoundsOffset = camera_hotspots::kHotspotRadius / 2;
 static constexpr auto kSelectedHotspotOutlineWidth = 2.0;
 
 static constexpr QSize kHotspotItemIconSize =
