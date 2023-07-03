@@ -34,9 +34,9 @@ public:
         QWidget* widget = nullptr) override;
 
 protected:
-    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
