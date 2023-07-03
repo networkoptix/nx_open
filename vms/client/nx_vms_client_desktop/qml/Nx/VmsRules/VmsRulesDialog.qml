@@ -241,16 +241,13 @@ Dialog
             TextButton
             {
                 text: qsTr("Event Log...")
-                icon.source: "qrc:///skin/buttons/event_log.png"
-                onClicked:
-                {
-                    root.dialog.openEventLogDialog()
-                }
+                icon.source: "image://svg/skin/buttons/event_log_20.svg"
             }
 
             TextButton
             {
                 text: qsTr("Reset To Defaults...")
+                
                 icon.source: "qrc:///skin/text_buttons/refresh.png"
                 onClicked:
                 {

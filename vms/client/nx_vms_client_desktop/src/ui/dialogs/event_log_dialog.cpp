@@ -63,6 +63,11 @@ namespace {
 
 constexpr int kUpdateDelayMs = 1000;
 
+static const QColor kLight12Color = "#91A7B2";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QnIcon::Normal, {{kLight12Color, "light12"}}},
+};
+
 enum EventListRoles
 {
     EventTypeRole = Qt::UserRole + 1,
@@ -183,7 +188,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
         &QnEventLogDialog::reset);
 
     ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
-    ui->eventRulesButton->setIcon(qnSkin->icon("buttons/event_rules.png"));
+    ui->eventRulesButton->setIcon(qnSkin->icon("buttons/event_rules_20.svg", kIconSubstitutions));
 
     SnappedScrollBar *scrollBar = new SnappedScrollBar(this);
     ui->gridEvents->setVerticalScrollBar(scrollBar->proxyScrollBar());
