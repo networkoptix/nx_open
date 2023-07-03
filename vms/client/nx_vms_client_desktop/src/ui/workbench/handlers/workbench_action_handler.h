@@ -3,6 +3,7 @@
 #pragma once
 
 #include <atomic>
+#include <optional>
 
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
@@ -85,9 +86,10 @@ public:
         MoveResourcesResultFunc resultCallback);
 
 protected:
-    struct AddToLayoutParams {
-        bool usePosition = false;
-        QPointF position;
+    struct AddToLayoutParams
+    {
+        std::optional<QPointF> position;
+        std::optional<QSizeF> size;
         QRectF zoomWindow;
         QnUuid zoomUuid;
         std::chrono::milliseconds time = -1ms;
@@ -243,6 +245,8 @@ protected slots:
     void at_openImportFromDevicesDialog_triggered();
 
     void handleBetaUpdateWarning();
+
+    void replaceLayoutItemActionTriggered();
 
 private:
     void showSingleCameraErrorMessage(const QString& explanation = QString());

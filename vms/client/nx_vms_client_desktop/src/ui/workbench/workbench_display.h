@@ -269,6 +269,9 @@ public:
 
     bool animationAllowed() const;
 
+    bool forceNoAnimation() const;
+    void setForceNoAnimation(bool noAnimation);
+
     QTimer* playbackPositionBlinkTimer() const;
 
 public slots:
@@ -453,4 +456,6 @@ private:
     QnCurtainAnimator *m_curtainAnimator;
 
     QTimer* m_playbackPositionBlinkTimer = nullptr;
+
+    bool m_forceNoAnimation = false;
 };
