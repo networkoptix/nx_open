@@ -447,6 +447,7 @@ Rectangle
                             control.testState = LdapSettings.TestState.initial
                             connectionSettingsDialog.uri = control.uri
                             connectionSettingsDialog.adminDn = control.adminDn
+                            connectionSettingsDialog.originalAdminDn = control.adminDn
                             connectionSettingsDialog.password = control.password
                             connectionSettingsDialog.showFakePassword = control.hasConfig
                             connectionSettingsDialog.show()
