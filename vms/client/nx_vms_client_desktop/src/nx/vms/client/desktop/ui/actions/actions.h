@@ -966,6 +966,11 @@ enum IDType
     RemoveLayoutItemFromSceneAction,
 
     /**
+     * Replaces layout item seamlessly with another one.
+     */
+    ReplaceLayoutItemAction,
+
+    /**
      * Removes a resource from Server.
      */
     RemoveFromServerAction,

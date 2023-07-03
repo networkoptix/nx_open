@@ -497,7 +497,17 @@ void QnWorkbenchDisplay::setDraggedItems(const QSet<QnWorkbenchItem*>& value, bo
 
 bool QnWorkbenchDisplay::animationAllowed() const
 {
-    return !qnRuntime->lightMode().testFlag(Qn::LightModeNoAnimation);
+    return !qnRuntime->lightMode().testFlag(Qn::LightModeNoAnimation) && !forceNoAnimation();
+}
+
+bool QnWorkbenchDisplay::forceNoAnimation() const
+{
+    return m_forceNoAnimation;
+}
+
+void QnWorkbenchDisplay::setForceNoAnimation(bool noAnimation)
+{
+    m_forceNoAnimation = noAnimation;
 }
 
 // ------------------------------------------------------------------------------------------------
