@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/workbench/widgets/thumbnail_tooltip.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -47,43 +48,92 @@ struct CameraHotspotItem::Private
     nx::vms::common::CameraHotspotData hotspotData;
     QnWorkbenchContext* context;
 
-    QString tooltipText;
     QPointer<QMenu> contextMenu;
-    std::unique_ptr<ThumbnailTooltip> tooltip;
-    std::unique_ptr<CameraThumbnailProvider> thumbnailProvider;
+    QPointer<ThumbnailTooltip> tooltip;
 
-    void initTooltip();
-    QnVirtualCameraResourcePtr cameraResource() const;
+    QnVirtualCameraResourcePtr hotspotCamera() const;
+
+    QnMediaResourceWidget* mediaResourceWidget() const;
+
+    nx::api::CameraImageRequest tooltipImageRequest() const;
+    QString tooltipText() const;
+    QPoint tooltipGlobalPos() const;
+    ThumbnailTooltip* createTooltip() const;
 
     void openItem();
     void opemItemInNewLayout();
     void openItemInPlace();
 };
 
-void CameraHotspotItem::Private::initTooltip()
+//-------------------------------------------------------------------------------------------------
+// CameraHotspotItem::Private definition.
+
+QnVirtualCameraResourcePtr CameraHotspotItem::Private::hotspotCamera() const
 {
-    if (tooltip)
-        return;
-
-    const auto camera = cameraResource();
-
-    tooltip = std::make_unique<ThumbnailTooltip>(context);
-    tooltipText = camera->getName();
-
-    nx::api::CameraImageRequest request;
-    request.camera = camera;
-    request.format = nx::api::ImageRequest::ThumbnailFormat::jpg;
-    request.aspectRatio = nx::api::ImageRequest::AspectRatio::auto_;
-    request.timestampMs = nx::api::ImageRequest::kLatestThumbnail;
-    request.roundMethod = nx::api::ImageRequest::RoundMethod::precise;
-
-    thumbnailProvider = std::make_unique<CameraThumbnailProvider>(request);
-    tooltip->setImageProvider(thumbnailProvider.get());
+    const auto resourcePool = context->resourcePool();
+    const auto camera =
+        resourcePool->getResourceById<QnVirtualCameraResource>(hotspotData.cameraId);
+    NX_ASSERT(camera, "Hotspot refers to a nonexistent camera");
+    return camera;
 }
 
-QnVirtualCameraResourcePtr CameraHotspotItem::Private::cameraResource() const
+QnMediaResourceWidget* CameraHotspotItem::Private::mediaResourceWidget() const
 {
-    return context->resourcePool()->getResourceById<QnVirtualCameraResource>(hotspotData.cameraId);
+    const auto hotspotsOverlayWidget = q->parentItem();
+    return dynamic_cast<QnMediaResourceWidget*>(hotspotsOverlayWidget->parentItem());
+}
+
+nx::api::CameraImageRequest CameraHotspotItem::Private::tooltipImageRequest() const
+{
+    const auto resourceWidget = mediaResourceWidget();
+
+    nx::api::CameraImageRequest request;
+    request.camera = hotspotCamera();
+    request.format = nx::api::ImageRequest::ThumbnailFormat::jpg;
+    request.aspectRatio = nx::api::ImageRequest::AspectRatio::auto_;
+
+    request.timestampMs = resourceWidget->isPlayingLive()
+        ? nx::api::ImageRequest::kLatestThumbnail
+        : resourceWidget->position();
+
+    request.roundMethod = nx::api::ImageRequest::RoundMethod::precise;
+    request.tolerant = true;
+
+    return request;
+}
+
+QString CameraHotspotItem::Private::tooltipText() const
+{
+    const auto camera = hotspotCamera();
+    return camera ? camera->getName() : QString();
+}
+
+QPoint CameraHotspotItem::Private::tooltipGlobalPos() const
+{
+    const auto* graphicsView = q->scene()->views().first();
+    const auto tooltipScenePos = q->mapToScene(q->boundingRect().center());
+    const auto tooltipViewPos = graphicsView->mapFromScene(tooltipScenePos);
+    const auto tooltipGlobalPos = graphicsView->mapToGlobal(tooltipViewPos);
+    return tooltipGlobalPos;
+}
+
+ThumbnailTooltip* CameraHotspotItem::Private::createTooltip() const
+{
+    const auto imageRequest = tooltipImageRequest();
+    if (!imageRequest.camera)
+        return nullptr;
+
+    const auto tooltip = new ThumbnailTooltip(context);
+    tooltip->setTooltipOffset(kTooltipOffset);
+    tooltip->setEnclosingRect(q->scene()->views().first()->window()->geometry());
+    tooltip->setText(tooltipText());
+    tooltip->setTarget(tooltipGlobalPos());
+
+    const auto thumbnailProvider = new CameraThumbnailProvider(imageRequest, tooltip);
+    tooltip->setImageProvider(thumbnailProvider);
+    thumbnailProvider->loadAsync();
+
+    return tooltip;
 }
 
 void CameraHotspotItem::Private::openItem()
@@ -109,12 +159,12 @@ void CameraHotspotItem::Private::openItem()
         }
     }
 
-    actionManager->trigger(ui::action::OpenInCurrentLayoutAction, cameraResource());
+    actionManager->trigger(ui::action::OpenInCurrentLayoutAction, hotspotCamera());
 }
 
 void CameraHotspotItem::Private::opemItemInNewLayout()
 {
-    context->menu()->trigger(ui::action::OpenInNewTabAction, cameraResource());
+    context->menu()->trigger(ui::action::OpenInNewTabAction, hotspotCamera());
 }
 
 void CameraHotspotItem::Private::openItemInPlace()
@@ -140,8 +190,6 @@ CameraHotspotItem::CameraHotspotItem(
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
     setProperty(Qn::NoHandScrollOver, true);
-
-    d->initTooltip();
 }
 
 CameraHotspotItem::~CameraHotspotItem()
@@ -174,7 +222,7 @@ void CameraHotspotItem::paint(
         hotspotOption.state = camera_hotspots::CameraHotspotDisplayOption::State::hovered;
 
     hotspotOption.cameraState = CameraHotspotDisplayOption::CameraState::valid;
-    hotspotOption.decoration = qnResIconCache->icon(d->cameraResource());
+    hotspotOption.decoration = qnResIconCache->icon(d->hotspotCamera());
 
     auto paintedHotspotData = d->hotspotData;
     if (paintedHotspotData.hasDirection())
@@ -213,19 +261,20 @@ void CameraHotspotItem::paint(
 
 void CameraHotspotItem::hoverEnterEvent(QGraphicsSceneHoverEvent*)
 {
+    if (NX_ASSERT(d->tooltip))
+        return;
+
+    d->tooltip = d->createTooltip();
     if (!d->tooltip)
         return;
 
-    const auto tooltipScenePos = mapToScene(boundingRect().center());
+    connect(d->tooltip, &ThumbnailTooltip::stateChanged,
+        [tooltip = d->tooltip](ThumbnailTooltip::State state)
+        {
+            if (state == ThumbnailTooltip::State::hidden)
+                tooltip->deleteLater();
+        });
 
-    const QGraphicsView* view = scene()->views().first();
-    const auto tooltipGlobalPos = view->mapToGlobal(view->mapFromScene(tooltipScenePos));
-
-    d->thumbnailProvider->loadAsync();
-    d->tooltip->setTooltipOffset(kTooltipOffset);
-    d->tooltip->setEnclosingRect(view->window()->geometry());
-    d->tooltip->setTarget(tooltipGlobalPos);
-    d->tooltip->setText(d->tooltipText);
     d->tooltip->show();
 }
 
