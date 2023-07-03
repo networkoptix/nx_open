@@ -30,7 +30,8 @@
 
 namespace {
 
-static const auto kMaximumHotspotEditorHeight = 480;
+static const auto kMaximumHotspotEditorHeight = 448;
+static constexpr auto kMinimumTableEditorHeight = 112;
 
 } // namespace
 
@@ -76,7 +77,9 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
 {
     ui->setupUi(q);
 
-    ui->widgetLayout->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
+    auto contentMargins(nx::style::Metrics::kDefaultTopLevelMargins);
+    contentMargins.setBottom(0);
+    ui->widgetLayout->setContentsMargins(contentMargins);
 
     ui->enableHotspotsCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->enableHotspotsCheckBox->setForegroundRole(QPalette::ButtonText);
@@ -88,8 +91,10 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
     const auto hotspotsItemViewhoverTracker = new ItemViewHoverTracker(ui->hotspotsItemView);
     hotspotsDelegate->setItemViewHoverTracker(hotspotsItemViewhoverTracker);
 
+    ui->hotspotsItemView->setMinimumHeight(kMinimumTableEditorHeight);
     ui->hotspotsItemView->setItemDelegate(hotspotsDelegate.get());
     ui->hotspotsItemView->setModel(hotspotsModel.get());
+    ui->hotspotsItemView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     ui->hotspotsItemView->setEditTriggers(
         QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
 
