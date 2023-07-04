@@ -22,6 +22,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -587,8 +588,7 @@ QString AbstractSearchWidget::Private::currentDeviceText() const
 QString AbstractSearchWidget::Private::singleDeviceText(
     const QString& baseText, const QnVirtualCameraResourcePtr& device) const
 {
-    static const auto kTemplate = QString::fromWCharArray(L"%1 \x2013 %2");
-    return kTemplate.arg(baseText, device
+    return QString("%1 %2 %3").arg(baseText, nx::UnicodeChars::kEnDash, device
         ? device->getName()
         : tr("none", "No currently selected camera"));
 };

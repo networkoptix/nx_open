@@ -8,6 +8,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
@@ -81,7 +82,7 @@ QString UserPickerHelper::text() const
     {
         const auto groupText = QString("%1 %2 %3")
             .arg(tr("Group"))
-            .arg(QChar(0x2013)) //< En-dash.
+            .arg(nx::UnicodeChars::kEnDash)
             .arg(m_groups.front().name);
         return makeText(groupText, additional);
     }

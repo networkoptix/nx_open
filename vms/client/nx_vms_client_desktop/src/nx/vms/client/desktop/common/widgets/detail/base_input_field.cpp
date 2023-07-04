@@ -14,12 +14,7 @@
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scope_guard.h>
-
-namespace {
-
-static const QString kMDash = QString::fromWCharArray(L"\x2014");
-
-} // namespace
+#include <nx/utils/unicode_chars.h>
 
 namespace nx::vms::client::desktop {
 namespace detail {
@@ -111,7 +106,7 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
     useWarningStyleForControl(useWarningStyleForControl),
     validationBehavior(validationBehavior),
     optionalTextPlaceholder(QStringLiteral("%1%1 %2 %1%1").arg(
-        kMDash, BaseInputField::tr("multiple values"))),
+        nx::UnicodeChars::kEmDash, BaseInputField::tr("multiple values"))),
     textAccessor(textAccessor),
     readOnlyAccessor(readOnlyAccessor),
     placeholderAccessor(placeholderAccessor),

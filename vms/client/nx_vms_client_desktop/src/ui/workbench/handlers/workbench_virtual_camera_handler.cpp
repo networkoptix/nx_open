@@ -15,6 +15,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/string.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
@@ -608,8 +609,8 @@ QnSecurityCamResourcePtr QnWorkbenchVirtualCameraHandler::cameraByProgressId(
 
 QString QnWorkbenchVirtualCameraHandler::calculateExtendedErrorMessage(const VirtualCameraPayload& upload)
 {
-    static const auto kNDash = QString::fromWCharArray(L"\x2013");
-    const QString fileName = QFileInfo(upload.path).fileName() + lit(" ") + kNDash;
+    const QString fileName =
+        QFileInfo(upload.path).fileName() + lit(" ") + nx::UnicodeChars::kEnDash;
 
     switch (upload.status)
     {

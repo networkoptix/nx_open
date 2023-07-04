@@ -13,6 +13,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
@@ -39,7 +40,6 @@ using namespace nx::vms::client::desktop;
 static constexpr int kDialogFixedWidth = 640;
 static constexpr int kHeaderCaptionTextPixelSize = 24;
 static constexpr auto kHeaderCaptionTextWeight = QFont::ExtraLight;
-static constexpr auto kEmDashChar = QChar(0x2014);
 
 bool showServersInTree(const QnWorkbenchContext* context)
 {
@@ -495,7 +495,8 @@ void CameraReplacementDialog::updateDataTransferReportPage()
 
         // Description messages from the report item are perpended with the dash prefix.
         for (auto& descriptionLine: descriptionLines)
-            descriptionLine = QStringList({{kEmDashChar}, descriptionLine}).join(QChar::Space);
+            descriptionLine = QStringList(
+                {{nx::UnicodeChars::kEmDash}, descriptionLine}).join(QChar::Space);
 
         // Additional sub caption message is added for detailed warning and error report items.
         if (!descriptionLines.empty())

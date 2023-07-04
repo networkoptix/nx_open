@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/utils/string.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/system_settings.h>
@@ -134,7 +135,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
                         return QString(tr("Client"));
                 case VersionColumn:
                     if (item->offline)
-                        return QString("–");
+                        return nx::UnicodeChars::kEnDash;
                     return item->version.toString();
                 case StatusMessageColumn:
                     return item->statusMessage;

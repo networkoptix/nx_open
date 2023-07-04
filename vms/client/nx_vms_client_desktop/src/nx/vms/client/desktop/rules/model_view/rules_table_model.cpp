@@ -12,6 +12,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -522,7 +523,7 @@ QVariant RulesTableModel::targetUserData(const vms::rules::ActionBuilder* action
             {
                 return QString{"%1 %2 %3"}
                     .arg(tr("Group"))
-                    .arg(QChar(0x2013)) //< En-dash.
+                    .arg(nx::UnicodeChars::kEnDash)
                     .arg(groups.front().name);
             }
 

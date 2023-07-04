@@ -19,6 +19,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
@@ -363,9 +364,6 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
     {
         case Qn::ExtraInfoRole:
         {
-            static const QString kCustomExtInfoTemplate = //< "- %1" with en-dash
-                QString::fromWCharArray(L"\x2013 %1");
-
             const auto resource = base_type::data(index, Qn::ResourceRole).value<QnResourcePtr>();
             const auto resourceFlags = resource ? resource->flags() : Qn::ResourceFlags{};
             const auto nodeType = base_type::data(
@@ -375,7 +373,7 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
                 || nodeType == ResourceTree::NodeType::sharedResource)
                 && resourceFlags.testFlag(Qn::server) && !resourceFlags.testFlag(Qn::fake))
             {
-                return kCustomExtInfoTemplate.arg(tr("Health Monitor"));
+                return QString("%1 %2").arg(nx::UnicodeChars::kEnDash, tr("Health Monitor"));
             }
 
             const auto extraInfo = base_type::data(index, role).toString();
@@ -383,7 +381,7 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
                 return {};
 
             if (resourceFlags.testFlag(Qn::user))
-                return kCustomExtInfoTemplate.arg(extraInfo);
+                return QString("%1 %2").arg(nx::UnicodeChars::kEnDash, extraInfo);
 
             if (resourceFlags.testFlag(Qn::virtual_camera))
             {
@@ -391,7 +389,8 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
                 auto systemContext = SystemContext::fromResource(camera);
                 const auto state = systemContext->virtualCameraManager()->state(camera);
                 if (state.isRunning())
-                    return kCustomExtInfoTemplate.arg(QString::number(state.progress()) + lit("%"));
+                    return QString("%1 %2").arg(
+                        nx::UnicodeChars::kEnDash, QString::number(state.progress()) + lit("%"));
             }
 
             return extraInfo;

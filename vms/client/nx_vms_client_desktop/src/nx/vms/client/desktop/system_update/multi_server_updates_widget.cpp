@@ -19,6 +19,7 @@
 #include <network/system_helpers.h>
 #include <nx/branding.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -82,7 +83,7 @@ const auto kPeriodForCheckingInstallStatus = std::chrono::seconds(10);
 const int kLinkCopiedMessageTimeoutMs = 2000;
 
 /* N-dash 5 times: */
-const QString kNoVersionNumberText = QString::fromWCharArray(L"\x2013\x2013\x2013\x2013\x2013");
+const QString kNoVersionNumberText = QString(5, nx::UnicodeChars::kEnDash);
 
 constexpr int kVersionSelectionBlockHeight = 20;
 constexpr int kVersionInformationBlockMinHeight = 48;
