@@ -15,6 +15,7 @@
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <utils/common/checked_cast.h>
 
 namespace nx::vms::client::desktop {
@@ -83,6 +84,14 @@ ContextCurrentUserWatcher::ContextCurrentUserWatcher(QObject *parent):
             if (updateCombinedAccessRights())
                 reconnect();
         });
+
+    connect(systemContext()->userGroupManager(),
+        &nx::vms::common::UserGroupManager::addedOrUpdated, this,
+        [this](const nx::vms::api::UserGroupData&)
+        {
+            if (updateCombinedAccessRights())
+                reconnect();
+        });
 }
 
 ContextCurrentUserWatcher::~ContextCurrentUserWatcher()
@@ -120,7 +129,7 @@ size_t ContextCurrentUserWatcher::combinedAccessRightsHash() const
             accessMap[resourceId] |= accessRights;
     }
 
-    return qHash(accessMap);
+    return qHashMulti(0, accessMap, parentIds);
 }
 
 void ContextCurrentUserWatcher::setCurrentUser(const QnUserResourcePtr &user)

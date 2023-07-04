@@ -263,6 +263,9 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
             systemContext()->runtimeInfoManager()->updateLocalItem(localInfo);
         });
 
+    // The watcher should be created here so it can monitor all permission changes.
+    context()->instance<ContextCurrentUserWatcher>();
+
     connect(action(ui::action::ConnectAction), &QAction::triggered, this,
         &ConnectActionsHandler::at_connectAction_triggered);
 
