@@ -123,7 +123,11 @@ std::function<bool(const QnUuid&, const QnUuid&)> MembersCache::lessFunc() const
 
             // "LDAP Default" goes in front of all LDAP groups.
             if (l == nx::vms::api::kDefaultLdapGroupId || r == nx::vms::api::kDefaultLdapGroupId)
-                return l == nx::vms::api::kDefaultLdapGroupId;
+            {
+                // When doing a search, both l and r can be kDefaultLdapGroupId.
+                return l == nx::vms::api::kDefaultLdapGroupId
+                    && r != nx::vms::api::kDefaultLdapGroupId;
+            }
 
             // Case Insensitive sort.
             const int ret = nx::utils::naturalStringCompare(
