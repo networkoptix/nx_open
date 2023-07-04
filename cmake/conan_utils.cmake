@@ -2,7 +2,10 @@
 
 include_guard(GLOBAL)
 
+include(${CMAKE_CURRENT_LIST_DIR}/output_directories.cmake)
+
 option(runConanAutomatically "Run Conan automatically when configuring the project." ON)
+set(conanLockFile "" CACHE STRING "Install Conan packages using specified lock file.")
 set(extraConanArgs "" CACHE STRING "Extra command line arguments for Conan.")
 set(customConanHome "" CACHE STRING "Custom Conan home directory.")
 
@@ -92,15 +95,24 @@ function(nx_run_conan)
         endif()
     endif()
 
-    if(CONAN_BUILD_TYPE)
-        list(APPEND flags "-s build_type=${CONAN_BUILD_TYPE}")
+    if("${conanLockFile}" STREQUAL "")
+        if(CONAN_BUILD_TYPE)
+            list(APPEND flags "-s build_type=${CONAN_BUILD_TYPE}")
+        endif()
+
+        if(CONAN_PROFILE)
+            list(APPEND flags "--profile:build=default" "--profile:host=${CONAN_PROFILE}")
+        endif()
+
+        list(APPEND flags ${CONAN_FLAGS})
+    else()
+        if(NOT EXISTS ${conanLockFile})
+            message(FATAL_ERROR "Custom Conan lock file \"${conanLockFile}\" does not exist.")
+        endif()
+        list(APPEND flags "--lockfile \"${conanLockFile}\"")
+        list(APPEND flags "--lockfile-out \"${CMAKE_BINARY_DIR}/conan.lock\"")
     endif()
 
-    if(CONAN_PROFILE)
-        list(APPEND flags "--profile:build=default" "--profile:host=${CONAN_PROFILE}")
-    endif()
-
-    list(APPEND flags ${CONAN_FLAGS})
     list(APPEND flags ${extraConanArgs})
 
     list(TRANSFORM flags PREPEND "        " OUTPUT_VARIABLE flags)
@@ -119,6 +131,7 @@ function(nx_run_conan)
         "if(NOT result EQUAL 0)"
         "    message(FATAL_ERROR \"Conan failed to install the dependencies.\")"
         "endif()"
+        "file(COPY \"${CMAKE_BINARY_DIR}/conan.lock\" DESTINATION \"${distribution_output_dir}/\")"
         ""
     )
     string(JOIN "\n" run_conan_script_contents ${run_conan_script_contents})
