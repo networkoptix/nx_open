@@ -646,11 +646,14 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
             if (left.type != right.type)
                 return left.type < right.type;
 
+            NX_ASSERT(left.id != right.id, "Duplicated group %1 (%2)", left.id, left.name);
+
             // "LDAP Default" goes in front of all LDAP groups.
             if (left.id == nx::vms::api::kDefaultLdapGroupId
                 || right.id == nx::vms::api::kDefaultLdapGroupId)
             {
-                return left.id == nx::vms::api::kDefaultLdapGroupId;
+                return left.id == nx::vms::api::kDefaultLdapGroupId
+                    && right.id != nx::vms::api::kDefaultLdapGroupId;
             }
 
             // Sort identical names by UUID.
