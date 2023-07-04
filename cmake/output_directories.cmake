@@ -1,5 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+include_guard(GLOBAL)
+
 function(set_output_directories)
     cmake_parse_arguments(DIR "" "RUNTIME;LIBRARY;AFFECTED_VARIABLES_RESULT" "" ${ARGN})
 
