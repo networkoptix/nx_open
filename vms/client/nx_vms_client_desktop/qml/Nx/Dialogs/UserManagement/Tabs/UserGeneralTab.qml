@@ -423,6 +423,10 @@ Item
 
                             nextCheckState: () =>
                             {
+                                // Enabling digest for LDAP user does not require password reset.
+                                if (control.userType == UserSettingsGlobal.LdapUser)
+                                    return checkState === Qt.Unchecked ? Qt.Checked : Qt.Unchecked
+
                                 if (checkState === Qt.Unchecked)
                                     changePasswordDigestDialog.createObject(control).openNew()
 
