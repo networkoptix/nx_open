@@ -168,7 +168,7 @@ python -m pip install pyaml conan==1.46.2 dmgbuild==1.3.2
 ---------------------------------------------------------------------------------------------------
 ## Using CMake
 
-We recommend doing out-of-source builds with CMake – the source code folder (VCS folder) remains
+We recommend doing out-of-source builds with CMake - the source code folder (VCS folder) remains
 intact, and all build results go into a dedicated folder. E.g. sources are in `nx_open/`, the build
 goes to `nx_open-build/`.
 
