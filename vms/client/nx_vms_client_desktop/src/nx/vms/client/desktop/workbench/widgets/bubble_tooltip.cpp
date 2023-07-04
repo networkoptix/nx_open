@@ -34,6 +34,7 @@ struct BubbleToolTip::Private
     QRectF enclosingRect;
     Qt::Orientation orientation = Qt::Horizontal;
     bool suppressedOnMouseClick = true;
+    int tooltipOffset = 0;
 
     const QmlProperty<bool> visible{widget.get(), "visible"};
     const QmlProperty<int> pointerEdge{widget.get(), "pointerEdge"};
@@ -169,6 +170,20 @@ void BubbleToolTip::setSuppressedOnMouseClick(bool value)
     d->suppressedOnMouseClick = value;
 }
 
+int BubbleToolTip::tooltipOffset() const
+{
+    return d->tooltipOffset;
+}
+
+void BubbleToolTip::setTooltipOffset(int offset)
+{
+    if (d->tooltipOffset == offset)
+        return;
+
+    d->tooltipOffset = offset;
+    d->updatePosition();
+}
+
 void BubbleToolTip::setTarget(const QRect& targetRect)
 {
     if (d->targetRect == targetRect)
@@ -239,9 +254,28 @@ void BubbleToolTip::Private::updatePosition()
     const auto x = params.property("x").toNumber();
     const auto y = params.property("y").toNumber();
 
-    const auto pos = widget->parentWidget()
+    auto pos = widget->parentWidget()
         ? widget->parentWidget()->mapFromGlobal(QPoint(x, y))
         : QPoint(x, y);
+
+    switch (pointerEdge)
+    {
+        case Qt::TopEdge:
+            pos.ry() += tooltipOffset;
+            break;
+
+        case Qt::LeftEdge:
+            pos.rx() += tooltipOffset;
+            break;
+
+        case Qt::RightEdge:
+            pos.rx() -= tooltipOffset;
+            break;
+
+        case Qt::BottomEdge:
+            pos.ry() -= tooltipOffset;
+            break;
+    }
 
     widget->move(pos);
 }

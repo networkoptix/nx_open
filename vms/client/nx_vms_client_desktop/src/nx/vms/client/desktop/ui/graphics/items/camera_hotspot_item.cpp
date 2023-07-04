@@ -5,7 +5,6 @@
 #include <optional>
 
 #include <QtCore/QPointer>
-#include <QtGui/QTransform>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QGraphicsView>
@@ -30,13 +29,13 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
+namespace nx::vms::client::desktop {
+
 namespace {
 
-static constexpr auto kTooltipOffset = 8;
+static constexpr auto kTooltipOffset = camera_hotspots::kHotspotRadius + 8;
 
 } // namespace
-
-namespace nx::vms::client::desktop {
 
 //-------------------------------------------------------------------------------------------------
 // CameraHotspotItem::Private declaration.
@@ -239,19 +238,14 @@ void CameraHotspotItem::hoverEnterEvent(QGraphicsSceneHoverEvent*)
     if (!d->tooltip)
         return;
 
-    const auto hotspotsOverlayWidget = parentItem();
-    const auto mediaResourceWidget = hotspotsOverlayWidget->parentItem();
-
-    QTransform rotationMatrix;
-    rotationMatrix.rotate(-mediaResourceWidget->rotation());
-
-    const auto tooltipScenePos = mapToScene(boundingRect().center()
-        + rotationMatrix.map(QPointF(boundingRect().width() / 2 + kTooltipOffset, 0)));
+    const auto tooltipScenePos = mapToScene(boundingRect().center());
 
     const QGraphicsView* view = scene()->views().first();
     const auto tooltipGlobalPos = view->mapToGlobal(view->mapFromScene(tooltipScenePos));
 
     d->thumbnailProvider->loadAsync();
+    d->tooltip->setTooltipOffset(kTooltipOffset);
+    d->tooltip->setEnclosingRect(view->window()->geometry());
     d->tooltip->setTarget(tooltipGlobalPos);
     d->tooltip->setText(d->tooltipText);
     d->tooltip->show();
