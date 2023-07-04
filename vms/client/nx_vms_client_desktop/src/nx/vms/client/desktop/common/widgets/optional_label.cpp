@@ -2,6 +2,7 @@
 
 #include "optional_label.h"
 
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 
 namespace nx::vms::client::desktop {
@@ -11,7 +12,7 @@ OptionalLabel::OptionalLabel(QWidget* parent):
     m_placeholderLabel(new QLabel(this))
 {
     anchorWidgetToParent(m_placeholderLabel);
-    m_placeholderLabel->setText(QString::fromWCharArray(L"\x2013\x2013\x2013\x2013"));
+    m_placeholderLabel->setText(QString(4, nx::UnicodeChars::kEnDash));
     m_placeholderLabel->setForegroundRole(QPalette::WindowText);
 }
 

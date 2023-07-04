@@ -12,6 +12,7 @@
 #include <QtGui/QWheelEvent>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/unicode_chars.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -22,7 +23,7 @@ namespace {
 
 static constexpr const char* kDefaultValuePropertyName = "__qn_spinBoxDefaultValue";
 
-static const auto kDashDash = QString::fromWCharArray(L"\x2013\x2013");
+static const QString kDashDash = QString(2, nx::UnicodeChars::kEnDash);
 
 template<class SpinBox>
 using ValueType = std::decay_t<decltype(((SpinBox*)0)->value())>;

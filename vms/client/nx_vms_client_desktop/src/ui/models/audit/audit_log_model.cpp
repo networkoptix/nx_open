@@ -17,6 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/utils/math/math.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -529,7 +530,9 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
                     {
                         bool isRecordExist = archiveData.size() > index && archiveData[index] == '1';
                         index++;
-                        QChar circleSymbol = isRecordExist ? QChar(0x25CF) : QChar(0x25CB);
+                        QChar circleSymbol = isRecordExist
+                            ? nx::UnicodeChars::kBlackCircle
+                            : nx::UnicodeChars::kWhiteCircle;
                         if (isRecordExist)
                             result += QString("<font size=5 color=red>%1</font>").arg(circleSymbol);
                         else

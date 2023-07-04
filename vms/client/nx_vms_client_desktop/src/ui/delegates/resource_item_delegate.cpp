@@ -17,6 +17,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -660,9 +661,6 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     baseName = index.data(Qt::DisplayRole).toString();
     extInfo = QString();
 
-    static const QString kCustomExtInfoTemplate = //< "- %1" with en-dash
-        QString::fromWCharArray(L"\x2013 %1");
-
     /* Two-component text from resource information: */
     auto infoLevel = m_customInfoLevel;
     if (infoLevel == Qn::RI_Invalid)
@@ -699,7 +697,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
             && resource->hasFlags(Qn::server)
             && !resource->hasFlags(Qn::fake))
         {
-            extInfo = kCustomExtInfoTemplate.arg(tr("Health Monitor"));
+            extInfo = QString("%1 %2").arg(nx::UnicodeChars::kEnDash, tr("Health Monitor"));
         }
         else
         {
@@ -708,7 +706,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         }
 
         if (resource->hasFlags(Qn::user) && !extInfo.isEmpty())
-            extInfo = kCustomExtInfoTemplate.arg(extInfo);
+            extInfo = QString("%1 %2").arg(nx::UnicodeChars::kEnDash, extInfo);
 
         if (resource->hasFlags(Qn::virtual_camera))
         {
@@ -717,7 +715,10 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
 
             VirtualCameraState state = systemContext->virtualCameraManager()->state(camera);
             if (state.isRunning())
-                extInfo = kCustomExtInfoTemplate.arg(QString::number(state.progress()) + lit("%"));
+                extInfo = QString("%1 %2").arg(
+                    "%1 %2",
+                    nx::UnicodeChars::kEnDash,
+                    QString::number(state.progress()) + lit("%"));
         }
     }
 }

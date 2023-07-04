@@ -10,6 +10,8 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/common/read_only.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -74,8 +76,6 @@ public:
 private:
     void updateResourceButton()
     {
-        static const auto kTemplate = QString::fromWCharArray(L"%1 \x2013 %2");
-
         const auto resource = q->navigator()->currentResource();
         const bool isMedia = (bool) resource.dynamicCast<QnMediaResource>();
 
@@ -96,16 +96,20 @@ private:
                     QnCameraDeviceStringSet(tr("Selected device"), tr("Selected camera")),
                     camera);
 
-                m_resourceButton->setText(kTemplate.arg(baseText, name));
+                m_resourceButton->setText(
+                    QString("%1 %2 %3").arg(baseText, nx::UnicodeChars::kEnDash, name));
             }
             else
             {
-                m_resourceButton->setText(kTemplate.arg(tr("Selected media"), name));
+                m_resourceButton->setText(
+                    QString("%1 %2 %3").arg(tr("Selected media"), nx::UnicodeChars::kEnDash, name));
             }
         }
         else
         {
-            m_resourceButton->setText(kTemplate.arg(tr("Selected camera"),
+            m_resourceButton->setText(QString("%1 %2 %3").arg(
+                tr("Selected camera"),
+                nx::UnicodeChars::kEnDash,
                 tr("none", "No currently selected camera")));
         }
     }

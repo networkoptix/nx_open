@@ -9,6 +9,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -398,11 +399,10 @@ void GroupListDelegate::initStyleOption(QStyleOptionViewItem* option,
 void GroupListDelegate::getDisplayInfo(const QModelIndex& index,
     QString& baseName, QString& extInfo) const
 {
-    static const auto kExtraInfoTemplate = QString::fromWCharArray(L"\x2013 %1"); //< "- %1"
     const auto roleId = index.data(Qn::UuidRole).value<QnUuid>();
     const int usersInRole = countEnabledUsers(accessSubjectHierarchy()->usersInGroups({roleId}));
     baseName = userGroupManager()->find(roleId).value_or(api::UserGroupData{}).name;
-    extInfo = kExtraInfoTemplate.arg(tr("%n Users", "", usersInRole));
+    extInfo = QString("%1 %2").arg(nx::UnicodeChars::kEnDash, tr("%n Users", "", usersInRole));
 }
 
 //-------------------------------------------------------------------------------------------------

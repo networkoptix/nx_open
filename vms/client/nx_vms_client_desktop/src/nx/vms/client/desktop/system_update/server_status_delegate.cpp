@@ -11,6 +11,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/literal.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 
@@ -128,7 +129,7 @@ public:
                     break;
                 case StatusCode::offline:
                     // TODO: Some servers that are installing updates can also be offline. But it is different state
-                    m_left->setText("–");
+                    m_left->setText(nx::UnicodeChars::kEnDash);
                     m_left->setIcon(QIcon());
                     leftHidden = false;
                     break;

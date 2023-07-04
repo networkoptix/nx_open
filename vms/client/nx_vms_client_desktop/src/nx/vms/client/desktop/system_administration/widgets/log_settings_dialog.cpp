@@ -5,6 +5,7 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -19,8 +20,6 @@
 namespace nx::vms::client::desktop {
 
 namespace {
-
-const auto kDash = QString::fromWCharArray(L"\x2013");
 
 const unsigned long long kMegabyte = 1024 * 1024;
 const unsigned long long kGigabyte = 1024 * 1024 * 1024;
@@ -123,9 +122,9 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
     aligner->addWidgets({
         ui->loggingLevelLabel, ui->maxVolumeLabel, ui->splitBySizeLabel, ui->splitByTimeLabel});
 
-    ui->maxVolumeValue->setSpecialValueText(kDash);
-    ui->splitBySizeValue->setSpecialValueText(kDash);
-    ui->splitByTimeValue->setSpecialValueText(kDash);
+    ui->maxVolumeValue->setSpecialValueText(nx::UnicodeChars::kEnDash);
+    ui->splitBySizeValue->setSpecialValueText(nx::UnicodeChars::kEnDash);
+    ui->splitByTimeValue->setSpecialValueText(nx::UnicodeChars::kEnDash);
 
     using namespace nx::vms::text;
 

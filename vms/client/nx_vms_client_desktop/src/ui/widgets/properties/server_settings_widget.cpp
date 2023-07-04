@@ -25,6 +25,7 @@
 #include <nx/network/ssl/certificate.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/network/helpers.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -443,7 +444,7 @@ void QnServerSettingsWidget::updateWebCamerasDiscoveryEnabled()
 
 void QnServerSettingsWidget::updateCertificatesInfo()
 {
-    static const auto kDashes = QString::fromWCharArray(L"\x2013\x2013\x2013\x2013");
+    static const auto kDashes = QString(4, nx::UnicodeChars::kEnDash);
 
     int certificateCount = updateCertificatesLabels();
 

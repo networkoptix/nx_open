@@ -9,6 +9,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/storage_forecast/storage_forecaster.h>
+#include <nx/utils/unicode_chars.h>
 
 namespace {
 class Translate
@@ -108,16 +109,15 @@ QnCameraStatsData QnRecordingStats::transformStatsToModelData(const QnRecordingS
         if (const auto& camera = resourcePool->getResourceByPhysicalId<QnVirtualCameraResource>(cameraData.physicalId))
             cameras << camera;
 
-    static const auto kNDash = QString::fromWCharArray(L"\x2013");
     data.totals.physicalId = QnDeviceDependentStrings::getNameFromSet(
         resourcePool,
         QnCameraDeviceStringSet(
             Translate::tr("Total %1 %n devices", "%1 is long dash, do not replace",
-                cameras.size()).arg(kNDash),
+                cameras.size()).arg(nx::UnicodeChars::kEnDash),
             Translate::tr("Total %1 %n cameras", "%1 is long dash, do not replace",
-                cameras.size()).arg(kNDash),
+                cameras.size()).arg(nx::UnicodeChars::kEnDash),
             Translate::tr("Total %1 %n I/O modules", "%1 is long dash, do not replace",
-                cameras.size()).arg(kNDash)),
+                cameras.size()).arg(nx::UnicodeChars::kEnDash)),
         cameras);  //< Use Id for pseudo-camera name.
 
     return data;

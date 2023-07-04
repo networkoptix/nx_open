@@ -14,6 +14,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 #include <nx/utils/string.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
@@ -223,7 +224,8 @@ void ShowreelItemWidget::initOverlay()
             QColor textColor = palette().color(QPalette::Dark);
             QString text = isManual
                 ? tr("Switch by", "Arrows will follow")
-                    + QString::fromWCharArray(L" \x2190 \x2192") //< Arrows.
+                    + QString(" %1 %2").arg(
+                        nx::UnicodeChars::kLeftwardsArrow, nx::UnicodeChars::kRightwardsArrow)
                 : tr("Display for", "Time selector will follow");
 
             if (!isManual)

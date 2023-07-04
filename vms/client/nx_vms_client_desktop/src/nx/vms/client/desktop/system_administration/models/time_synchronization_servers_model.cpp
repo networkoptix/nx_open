@@ -10,6 +10,7 @@
 
 #include <nx/vms/text/human_readable.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/unicode_chars.h>
 
 #include <nx/vms/time/formatter.h>
 
@@ -112,7 +113,7 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
                 case OsTimeColumn:
                 case VmsTimeColumn:
                 {
-                    static const QString kPlaceholder = QString::fromWCharArray(L"\x2014\x2014\x2014\x2014");
+                    static const QString kPlaceholder = QString(4, nx::UnicodeChars::kEmDash);
                     if (!server.online)
                         return kPlaceholder;
 

@@ -11,6 +11,7 @@
 
 #include <nx/build_info.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/utils/unicode_chars.h>
 #include <nx/vms/common/html/html.h>
 
 namespace nx::vms::client::core {
@@ -270,16 +271,16 @@ QString NxGlobalsObject::modifierName(const Qt::KeyboardModifier modifier) const
         switch (modifier)
         {
             case Qt::ShiftModifier:
-                return QChar(0x21E7);
+                return nx::UnicodeChars::kUpwardsWhiteArrow;
 
             case Qt::AltModifier:
-                return QChar(0x2325);
+                return nx::UnicodeChars::kOptionKey;
 
             case Qt::ControlModifier:
-                return QChar(0x2318);
+                return nx::UnicodeChars::kCommandKey;
 
             case Qt::MetaModifier:
-                return QChar(0x2303);
+                return nx::UnicodeChars::kUpArrowhead;
 
             default:
                 return "";
