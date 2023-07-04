@@ -4,18 +4,41 @@
 
 #include <QtQml/QtQml>
 
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/search_helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/ini.h>
 
 #include "rules_table_model.h"
 
 namespace nx::vms::client::desktop::rules {
 
+namespace {
+
+/** Returns whether any of the given camera resources match the given pattern. */
+bool matches(const QString& pattern, const QnUuidSet& ids)
+{
+    const auto resources = appContext()->currentSystemContext()->resourcePool()
+        ->getResourcesByIds<QnVirtualCameraResource>(ids);
+
+    return std::any_of(
+        resources.cbegin(),
+        resources.cend(),
+        [&pattern](const QnResourcePtr& resource)
+        {
+            return resources::search_helper::matches(pattern, resource);
+        });
+}
+
+} // namespace
+
 RulesSortFilterProxyModel::RulesSortFilterProxyModel(QObject* parent):
     QSortFilterProxyModel{parent},
     m_rulesTableModel{new RulesTableModel{this}}
 {
     setSourceModel(m_rulesTableModel);
-    setFilterRole(RulesTableModel::FilterRole);
     setDynamicSortFilter(true);
     setFilterCaseSensitivity(Qt::CaseInsensitive);
 }
@@ -33,13 +56,24 @@ bool RulesSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelInde
     if (filterRegExp.pattern().isEmpty())
         return true;
 
-    const auto actionColumnIndex =
-        sourceModel()->index(sourceRow, RulesTableModel::ActionColumn, sourceParent);
     const auto eventColumnIndex =
         sourceModel()->index(sourceRow, RulesTableModel::EventColumn, sourceParent);
+    const auto sourceColumnIndex =
+        sourceModel()->index(sourceRow, RulesTableModel::SourceColumn, sourceParent);
+    const auto actionColumnIndex =
+        sourceModel()->index(sourceRow, RulesTableModel::ActionColumn, sourceParent);
+    const auto targetColumnIndex =
+        sourceModel()->index(sourceRow, RulesTableModel::TargetColumn, sourceParent);
+    const auto commentColumnIndex =
+        sourceModel()->index(sourceRow, RulesTableModel::CommentColumn, sourceParent);
 
     return actionColumnIndex.data().toString().contains(filterRegExp)
-        || eventColumnIndex.data().toString().contains(filterRegExp);
+        || eventColumnIndex.data().toString().contains(filterRegExp)
+        || commentColumnIndex.data().toString().contains(filterRegExp)
+        || matches(filterRegExp.pattern(),
+            sourceColumnIndex.data(RulesTableModel::ResourceIdsRole).value<QnUuidSet>())
+        || matches(filterRegExp.pattern(),
+            targetColumnIndex.data(RulesTableModel::ResourceIdsRole).value<QnUuidSet>());
 }
 
 void RulesSortFilterProxyModel::registerQmlType()

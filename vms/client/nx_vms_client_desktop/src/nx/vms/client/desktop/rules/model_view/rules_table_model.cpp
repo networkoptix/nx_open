@@ -308,6 +308,9 @@ QVariant RulesTableModel::sourceCameraData(const vms::rules::EventFilter* eventF
         return iconPath(QnResourceIconCache::Camera);
     }
 
+    if (role == ResourceIdsRole)
+        return QVariant::fromValue(nx::utils::toQSet(resources.ids()));
+
     return {};
 }
 
@@ -353,6 +356,9 @@ QVariant RulesTableModel::sourceServerData(const vms::rules::EventFilter* eventF
 
         return iconPath(QnResourceIconCache::Server);
     }
+
+    if (role == ResourceIdsRole)
+        return QVariant::fromValue(nx::utils::toQSet(resources.ids()));
 
     return {};
 }
@@ -449,6 +455,9 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
             : iconPath(QnResourceIconCache::Camera);
     }
 
+    if (role == ResourceIdsRole)
+        return QVariant::fromValue(nx::utils::toQSet(resources.ids()));
+
     return {};
 }
 
@@ -477,6 +486,9 @@ QVariant RulesTableModel::targetLayoutData(const vms::rules::ActionBuilder* acti
                 ? iconPath(QnResourceIconCache::Layouts)
                 : iconPath(QnResourceIconCache::Layout);
         }
+
+        if (role == ResourceIdsRole)
+            return QVariant::fromValue(nx::utils::toQSet(layouts.ids()));
     }
 
     return {};
@@ -536,6 +548,9 @@ QVariant RulesTableModel::targetUserData(const vms::rules::ActionBuilder* action
                 ? iconPath(QnResourceIconCache::Users)
                 : iconPath(QnResourceIconCache::User);
         }
+
+        if (role == ResourceIdsRole)
+            return QVariant::fromValue(nx::utils::toQSet(users.ids()));
     }
 
     return {};

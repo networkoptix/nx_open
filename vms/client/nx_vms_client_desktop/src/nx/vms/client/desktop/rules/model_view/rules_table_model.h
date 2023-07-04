@@ -34,7 +34,7 @@ public:
     enum Roles
     {
         RuleIdRole = Qt::UserRole,
-        FilterRole,
+        ResourceIdsRole,
         FieldRole,
         IsSystemRuleRole
     };
