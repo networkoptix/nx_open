@@ -44,6 +44,19 @@ public:
     bool suppressedOnMouseClick() const; //< Default true.
     void setSuppressedOnMouseClick(bool value);
 
+    /**
+     * @return Distance between target point and the tip of tooltip pointer in device independent
+     *     pixels. Tooltip offset is zero by default.
+     */
+    int tooltipOffset() const;
+
+    /**
+     * Sets distance between target point and the tip of the tooltip pointer. Offset may be applied
+     * to avoid overlapping between tooltip and GUI controls.
+     * @param offset Distance in device independent pixels.
+     */
+    void setTooltipOffset(int offset);
+
     // Target and enclosing rect are specified in global coordinates.
     void setTarget(const QRect& targetRect);
     void setTarget(const QPoint& targetPoint);
