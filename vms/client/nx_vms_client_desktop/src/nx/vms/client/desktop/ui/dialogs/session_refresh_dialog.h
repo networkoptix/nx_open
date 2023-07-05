@@ -23,6 +23,7 @@ public:
     {
         nx::network::http::AuthToken token;
         std::chrono::microseconds tokenExpirationTime;
+        QString password;
     };
 
 public:
