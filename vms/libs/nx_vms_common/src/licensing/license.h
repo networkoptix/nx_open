@@ -40,11 +40,6 @@ class NX_VMS_COMMON_API QnLicense
 
 public:
 
-    static const QString kLocalRecordingServiceName;
-    static const QString kcloudStorageServiceName;
-    static const QString kAnalyticIntegrationServiceName;
-
-
     struct NX_VMS_COMMON_API RegionalSupport
     {
         /**

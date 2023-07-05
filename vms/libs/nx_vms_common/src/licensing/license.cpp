@@ -119,10 +119,6 @@ static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
 //-------------------------------------------------------------------------------------------------
 // QnLicense
 
-const QString QnLicense::kLocalRecordingServiceName("localRecording");
-const QString QnLicense::kcloudStorageServiceName("cloudStorage");
-const QString QnLicense::kAnalyticIntegrationServiceName("analyticIntegration");
-
 bool QnLicense::RegionalSupport::isValid() const
 {
     return !company.isEmpty();

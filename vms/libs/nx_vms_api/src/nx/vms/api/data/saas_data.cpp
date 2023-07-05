@@ -58,9 +58,9 @@ SaasLocalRecordingParameters SaasLocalRecordingParameters::fromParams(const Saas
     return result;
 }
 
-SaasAnalyticsParamters SaasAnalyticsParamters::fromParams(const SaasServiceParameters& parameters)
+SaasAnalyticsParameters SaasAnalyticsParameters::fromParams(const SaasServiceParameters& parameters)
 {
-    SaasAnalyticsParamters result;
+    SaasAnalyticsParameters result;
     fieldFromMap(result, parameters, totalChannelNumber);
     fieldFromMap(result, parameters, integrationId);
     return result;

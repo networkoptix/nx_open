@@ -111,25 +111,24 @@ QnLicensePtr ServiceManager::localRecordingLicenseV1()  const
     return license;
 }
 
-std::map<QnUuid, nx::vms::api::SaasAnalyticsParamters> ServiceManager::analyticsIntegrations() const
+template <typename ServiceParamsType>
+std::map<QnUuid, ServiceParamsType> ServiceManager::purchasedServices(const QString& serviceType) const
 {
-    using namespace nx::vms::api;
-
-    std::map<QnUuid, nx::vms::api::SaasAnalyticsParamters> result;
+    std::map<QnUuid, ServiceParamsType> result;
 
     for (const auto& [serviceId, purshase]: m_data.services)
     {
         if (auto it = m_services.find(serviceId); it != m_services.end())
         {
-            const SaasService& service = it->second;
-            if (service.type != SaasService::kAnalyticsIntegrationServiceType)
+            const auto& service = it->second;
+            if (service.type != serviceType)
                 continue;
 
-            auto params = SaasAnalyticsParamters::fromParams(service.parameters);
+            ServiceParamsType params = ServiceParamsType::fromParams(service.parameters);
             params.totalChannelNumber *= purshase.quantity;
-            const auto itResult = result.find(params.integrationId);
+            const auto itResult = result.find(serviceId);
             if (itResult == result.end())
-                result.emplace(params.integrationId, params);
+                result.emplace(serviceId, params);
             else
                 itResult->second.totalChannelNumber += params.totalChannelNumber;
         }
@@ -137,26 +136,22 @@ std::map<QnUuid, nx::vms::api::SaasAnalyticsParamters> ServiceManager::analytics
     return result;
 }
 
+std::map<QnUuid, nx::vms::api::SaasAnalyticsParameters> ServiceManager::analyticsIntegrations() const
+{
+    using namespace nx::vms::api;
+    return purchasedServices<SaasAnalyticsParameters>(SaasService::kAnalyticsIntegrationServiceType);
+}
+
+std::map<QnUuid, nx::vms::api::SaasLocalRecordingParameters> ServiceManager::localRecording() const
+{
+    using namespace nx::vms::api;
+    return purchasedServices<SaasLocalRecordingParameters>(SaasService::kLocalRecordingServiceType);
+}
+
 std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> ServiceManager::cloudStorageData() const
 {
     using namespace nx::vms::api;
-
-    std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> result;
-
-    for (const auto& [serviceId, purshase] : m_data.services)
-    {
-        if (auto it = m_services.find(serviceId); it != m_services.end())
-        {
-            const SaasService& service = it->second;
-            if (service.type != SaasService::kCloudRecordingType)
-                continue;
-
-            auto params = SaasCloudStorageParameters::fromParams(service.parameters);
-            params.totalChannelNumber *= purshase.quantity;
-            result.emplace(serviceId,  params);
-        }
-    }
-    return result;
+    return purchasedServices<SaasCloudStorageParameters>(SaasService::kCloudRecordingType);
 }
 
 nx::vms::api::SaasData ServiceManager::data() const

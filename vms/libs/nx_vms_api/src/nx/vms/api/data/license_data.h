@@ -136,12 +136,6 @@ struct NX_VMS_API LicenseSummaryData
     bool operator==(const LicenseSummaryData& other) const = default;
 };
 
-struct NX_VMS_API LicenseSummaryDataEx: public LicenseSummaryData
-{
-    /**%apidoc There are not enough licenses for these devices. */
-    std::set<QnUuid> excessDevices;
-};
-
 #define DetailedLicenseData_Fields \
     (key)(name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)(signature)\
     (orderType)(company)(support)(deactivations)

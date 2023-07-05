@@ -29,6 +29,7 @@ public:
 
 protected:
     QnVirtualCameraResourceList getAllCameras() const;
+    static void sortCameras(QnVirtualCameraResourceList* inOutCameras);
 };
 
  /*
@@ -45,15 +46,23 @@ public:
      *  @param id Integration id.
      *  @return Information about available licenses per integration.
      */
-    nx::vms::api::LicenseSummaryDataEx info(const QnUuid& id);
+    nx::vms::api::LicenseSummaryData info(const QnUuid& id);
 
-    QMap<QnUuid, nx::vms::api::LicenseSummaryDataEx> allInfo() const;
+    QMap<QnUuid, nx::vms::api::LicenseSummaryData> allInfo() const;
 
     /*
      *  @return true if there are not enough licenses for any integration.
      */
     bool isOverflow() const;
 
+    std::set<QnUuid> usedDevices() const;
+
+    /*
+     * @return Information about cameras which consumes SAAS services.
+     * key - cameraId, value - serviceId. If there is not enough services for some camera
+     * then the service value is an empty UUID.
+     */
+    std::map<QnUuid, std::set<QnUuid>> camerasByService() const;
 
     struct Propose
     {
@@ -75,7 +84,7 @@ private:
     void updateCacheUnsafe() const;
 private:
     //Summary by integrationId.
-    mutable std::optional<QMap<QnUuid, nx::vms::api::LicenseSummaryDataEx>> m_cache;
+    mutable std::optional<QMap<QnUuid, nx::vms::api::LicenseSummaryData>> m_cache;
     mutable nx::Mutex m_mutex;
 };
 
@@ -97,7 +106,7 @@ public:
     /*
      *  @return Information about available license usages per megapixels.
      */
-    std::map<int, nx::vms::api::LicenseSummaryDataEx> allInfo() const;
+    std::map<int, nx::vms::api::LicenseSummaryData> allInfo() const;
 
     /*
      * @return Information about cameras which consumes SAAS services.
@@ -111,6 +120,14 @@ public:
      */
     void setUsedDevices(const QSet<QnUuid>& devices);
 
+    /* Propose change that resources are used for cloud storage. Contains delta only.
+     *  @param devicesToAdd New devices to  add to the list.
+     *  @param devicesToRemove Devices to  remove from the list.
+     */
+    void proposeChange(
+        const std::set<QnUuid>& devicesToAdd,
+        const std::set<QnUuid>& devicesToRemove);
+
     void invalidateCache();
 
 private:
@@ -118,10 +135,30 @@ private:
     void updateCacheUnsafe() const;
     void borrowUsages() const;
     void calculateAvailableUnsafe() const;
+    void processUsedDevicesUnsafe(const QnVirtualCameraResourceList& cameras) const;
 private:
     //Summary by megapixels.
-    mutable std::optional<std::map<int, nx::vms::api::LicenseSummaryDataEx>> m_cache;
+    mutable std::optional<std::map<int, nx::vms::api::LicenseSummaryData>> m_cache;
     mutable nx::Mutex m_mutex;
+};
+
+/*
+  *  Helper class to calculate local recording usages.
+  */
+class NX_VMS_COMMON_API LocalRecordingUsageHelper: public CloudServiceUsageHelper
+{
+public:
+    LocalRecordingUsageHelper(
+        SystemContext* context,
+        QObject* parent = nullptr);
+
+    /*
+     * @return Information about cameras which consumes SAAS services.
+     * key - cameraId, value - serviceId. If there is not enough services for some camera
+     * then the service value is an empty UUID.
+     */
+    std::map<QnUuid, std::set<QnUuid>> camerasByService() const;
+
 };
 
 } // nx::vms::common::saas
