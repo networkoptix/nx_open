@@ -147,6 +147,7 @@ public slots:
 protected:
     virtual UserSettingsDialogState createState(const QnUserResourcePtr& user) override;
     virtual void saveState(const UserSettingsDialogState& state) override;
+    void refreshToken(const QString& password);
 
 private:
     struct Private;

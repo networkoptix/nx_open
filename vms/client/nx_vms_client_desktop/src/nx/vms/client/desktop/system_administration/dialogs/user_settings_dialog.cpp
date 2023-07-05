@@ -10,6 +10,7 @@
 
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
+#include <client/client_message_processor.h>
 #include <client_core/client_core_module.h>
 #include <common/common_globals.h>
 #include <common/common_module.h>
@@ -23,6 +24,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/network/credentials_manager.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -874,10 +877,68 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                     // Update access rights locally.
                     systemContext()->accessRightsManager()->setOwnResourceAccessMap(data->id,
                         {data->resourceAccessRights.begin(), data->resourceAccessRights.end()});
+
+                    if (state.isSelf && !state.password.isEmpty())
+                        refreshToken(state.password);
                 }
 
                 saveStateComplete(state);
             }), thread());
+}
+
+void UserSettingsDialog::refreshToken(const QString& password)
+{
+    NX_ASSERT(!password.isEmpty());
+
+    nx::vms::api::LoginSessionRequest loginRequest;
+    loginRequest.username = QString::fromStdString(
+        systemContext()->connectionCredentials().username);
+    loginRequest.password = password;
+
+    auto callback = nx::utils::guarded(
+        this,
+        [this](
+            bool /*success*/,
+            int handle,
+            rest::ErrorOrData<nx::vms::api::LoginSession> errorOrData)
+        {
+            if (NX_ASSERT(handle == d->m_currentRequest))
+                d->m_currentRequest = -1;
+
+            if (auto session = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
+            {
+                NX_DEBUG(this, "Received token with length: %1", session->token.length());
+
+                if (NX_ASSERT(!session->token.empty()))
+                {
+                    auto credentials = connection()->credentials();
+                    credentials.authToken = nx::network::http::BearerAuthToken(session->token);
+
+                    auto tokenExpirationTime =
+                        qnSyncTime->currentTimePoint() + session->expiresInS;
+
+                    clientMessageProcessor()->holdConnection(
+                        QnClientMessageProcessor::HoldConnectionPolicy::reauth);
+
+                    connection()->updateCredentials(
+                        credentials,
+                        tokenExpirationTime);
+
+                    const auto localSystemId = connection()->moduleInformation().localSystemId;
+                    nx::vms::client::core::CredentialsManager::storeCredentials(
+                        localSystemId,
+                        credentials);
+                }
+            }
+            else
+            {
+                auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
+                NX_INFO(this, "Can't receive token: %1", QJson::serialized(*error));
+            }
+        });
+
+    if (auto api = connectedServerApi(); NX_ASSERT(api, "No Server connection"))
+        d->m_currentRequest = api->loginAsync(loginRequest, std::move(callback), thread());
 }
 
 void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
