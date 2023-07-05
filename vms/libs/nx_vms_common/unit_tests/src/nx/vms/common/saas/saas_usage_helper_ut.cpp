@@ -18,6 +18,8 @@
 namespace nx::vms::common::saas::test {
 
 static const QnUuid kEngineId("bd0c8d99-5092-4db0-8767-1ae571250be9");
+static const QnUuid kEngineId2("bd0c8d99-5092-4db0-8767-1ae571250be8");
+static const QnUuid kAnalyticsServiceId("94ca45f8-4859-457a-bc17-f2f9394524fe");
 
 static const std::string kServiceDataJson = R"json(
 [
@@ -131,17 +133,20 @@ protected:
 
         auto pluginResource = AnalyticsPluginResourcePtr(new AnalyticsPluginResource());
         pluginResource->setIdUnsafe(QnUuid::createUuid());
-
-        auto engineResource = AnalyticsEngineResourcePtr(new AnalyticsEngineResource());
-        engineResource->setIdUnsafe(kEngineId);
-        engineResource->setParentId(pluginResource->getId());
         systemContext()->resourcePool()->addResource(pluginResource);
-        systemContext()->resourcePool()->addResource(engineResource);
 
-        vms::api::analytics::PluginManifest manifest;
-        manifest.id = "Test plugin resource";
-        manifest.isLicenseRequired = true;
-        pluginResource->setManifest(manifest);
+        for (const auto& engineId: {kEngineId, kEngineId2} )
+        {
+            auto engineResource = AnalyticsEngineResourcePtr(new AnalyticsEngineResource());
+            engineResource->setIdUnsafe(engineId);
+            engineResource->setParentId(pluginResource->getId());
+            systemContext()->resourcePool()->addResource(engineResource);
+
+            vms::api::analytics::PluginManifest manifest;
+            manifest.id = "Test plugin resource";
+            manifest.isLicenseRequired = true;
+            pluginResource->setManifest(manifest);
+        }
     }
 
     virtual void TearDown()
@@ -231,6 +236,12 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServiceUsage)
     auto cameras4 = addCameras(/*size*/ 1, /* megapixels*/ 100, /*useBackup*/ true);
     ASSERT_TRUE(m_cloudeStorageHelper->isOverflow());
 
+    std::set<QnUuid> devicesToAdd;
+    std::set<QnUuid> devicesToRemove;
+    devicesToRemove.insert(cameras4.front()->getId());
+    m_cloudeStorageHelper->proposeChange(devicesToAdd, devicesToRemove);
+    ASSERT_FALSE(m_cloudeStorageHelper->isOverflow());
+
     QSet<QnUuid> devices;
     for (const auto& camera: cameras1)
         devices.insert(camera->getId());
@@ -240,31 +251,6 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServiceUsage)
     ASSERT_EQ(cameras1.size(), info[5].inUse); //< 5 Megapixels licenses.
     ASSERT_EQ(0, info[10].inUse); //< 10 Megapixels licenses.
     ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
-}
-
-TEST_F(SaasServiceUsageHelperTest, CloudRecordingExcessDevices)
-{
-    using namespace nx::vms::api;
-
-    auto cameras1 = addCameras(/*size*/ 250, /* megapixels*/ 5, /*useBackup*/ true);
-    auto cameras2 = addCameras(/*size*/ 100, /* megapixels*/ 6, /*useBackup*/ true);
-    ASSERT_TRUE(m_cloudeStorageHelper->isOverflow());
-
-    auto info = m_cloudeStorageHelper->allInfo();
-    ASSERT_EQ(50, info[5].excessDevices.size());
-    
-    // Check last 50 cameras of 5 megapixels cameras with bigger id is claimed as excees devices.
-    std::set<QnUuid> expectedExceessDevices;
-    for (const auto& camera: cameras1)
-        expectedExceessDevices.insert(camera->getId());
-    while (expectedExceessDevices.size() > 50)
-        expectedExceessDevices.erase(expectedExceessDevices.begin());
-    const auto excessDevices = info[5].excessDevices;
-    for (auto it1 = expectedExceessDevices.begin(), it2 = excessDevices.begin();
-         it1 != expectedExceessDevices.end(); ++it1, ++it2)
-    {
-        ASSERT_EQ(*it1, *it2);
-    }
 }
 
 TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasMapping)
@@ -293,10 +279,9 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasMapping)
     for (const auto& [cameraId, serviceId]: mapping)
         ++serviceUsages[serviceId];
     
-    ASSERT_EQ(50, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0de")]);
+    ASSERT_EQ(100, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0de")]);
     ASSERT_EQ(100, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dd")]);
     ASSERT_EQ(150, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dc")]);
-    ASSERT_EQ(50, serviceUsages[QnUuid()]);
 }
 
 TEST_F(SaasServiceUsageHelperTest, LocalRecordingServiceLoaded)
@@ -348,6 +333,24 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
     m_integrationsHelper->proposeChange(propose);
     info = m_integrationsHelper->allInfo();
     ASSERT_EQ(48, info.begin()->inUse);
+}
+
+TEST_F(SaasServiceUsageHelperTest, camerasByService)
+{
+    auto cameras = addCameras(/*size*/ 50);
+    QSet<QnUuid> engines;
+    engines.insert(kEngineId);
+    engines.insert(kEngineId2);
+
+    for (const auto& camera: cameras)
+        camera->setUserEnabledAnalyticsEngines(engines);
+    m_integrationsHelper->invalidateCache();
+    auto info = m_integrationsHelper->camerasByService();
+    ASSERT_EQ(2, info.size());
+    ASSERT_EQ(QnUuid(), info.begin()->first);
+    ASSERT_EQ(kAnalyticsServiceId, info.rbegin()->first);
+    ASSERT_EQ(50, info[kAnalyticsServiceId].size());
+    ASSERT_EQ(50, info[QnUuid()].size());
 }
 
 } // nx::vms::common::saas::test

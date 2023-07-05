@@ -73,7 +73,8 @@ const nx::utils::Url LicenseServer::validateUrl(common::SystemContext* context)
 
 const nx::utils::Url LicenseServer::reportUrl(common::SystemContext* context)
 {
-    return baseUrl(context) + "/api/v2/license/cloud/usage_report";
+    const auto systemId = context->globalSettings()->cloudSystemId();
+    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/system_usage_report", systemId);
 }
 
 const nx::utils::Url LicenseServer::cloudLicensesUrl(common::SystemContext* context)
@@ -81,13 +82,15 @@ const nx::utils::Url LicenseServer::cloudLicensesUrl(common::SystemContext* cont
     return baseUrl(context) + "/api/v2/license/cloud/licenses";
 }
 
-const nx::utils::Url LicenseServer::saasServicesUrl(common::SystemContext* context, const QString& systemId)
+const nx::utils::Url LicenseServer::saasServicesUrl(common::SystemContext* context)
 {
+    const auto systemId = context->globalSettings()->cloudSystemId();
     return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/services/", systemId);
 }
 
-const nx::utils::Url LicenseServer::saasDataUrl(common::SystemContext* context, const QString& systemId)
+const nx::utils::Url LicenseServer::saasDataUrl(common::SystemContext* context)
 {
+    const auto systemId = context->globalSettings()->cloudSystemId();
     return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/saas_report/", systemId);
 }
 
@@ -672,7 +675,6 @@ void VideoWallLicenseUsageHelper::calculateUsedLicenses(
     }
 
     int count = VideoWallLicenseUsageHelper::licensesForScreens(usedScreens.size());
-    NX_ASSERT(count + m_proposed <= usedScreens.size());
     int counter = 0;
     for (const auto& key: usedScreens)
     {

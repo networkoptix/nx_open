@@ -33,9 +33,15 @@ public:
 
     /**
      *  @return map of analytics integration and their parameters.
-     *  key - integration Id, value - parameters.
+     *  key - serviceId, value - analytics integration parameters.
      */
-    std::map<QnUuid, nx::vms::api::SaasAnalyticsParamters> analyticsIntegrations() const;
+    std::map<QnUuid, nx::vms::api::SaasAnalyticsParameters> analyticsIntegrations() const;
+
+    /**
+     *  @return map of analytics integration and their parameters.
+     *  key - serviceId, value - local recording parameters.
+     */
+    std::map<QnUuid, nx::vms::api::SaasLocalRecordingParameters> localRecording() const;
 
     /**
      *  @return data about existing cloud storage services. key - serviceId, value - parameters.
@@ -47,6 +53,9 @@ signals:
 
 private:
     void onDataChanged();
+
+    template <typename ServiceParamsType>
+    std::map<QnUuid, ServiceParamsType>  purchasedServices(const QString& serviceType) const;
 
 private:
     nx::vms::api::SaasData m_data;

@@ -69,7 +69,7 @@ struct NX_VMS_API SaasCloudStorageParameters
 NX_REFLECTION_INSTRUMENT(SaasCloudStorageParameters, SaasCloudStorageParameters_fields)
 
 /**%apidoc Saas service parameters for 'analytics' service type */
-struct NX_VMS_API SaasAnalyticsParamters
+struct NX_VMS_API SaasAnalyticsParameters
 {
     /**%apidoc Amount of channels */
     int totalChannelNumber = 0;
@@ -77,10 +77,10 @@ struct NX_VMS_API SaasAnalyticsParamters
     /**%apidoc Guid of analytics engine Id */
     QnUuid integrationId;
 
-    static SaasAnalyticsParamters fromParams(const SaasServiceParameters& parameters);
+    static SaasAnalyticsParameters fromParams(const SaasServiceParameters& parameters);
 };
-#define SaasAnalyticsParamters_fields (totalChannelNumber)(integrationId)
-NX_REFLECTION_INSTRUMENT(SaasAnalyticsParamters, SaasAnalyticsParamters_fields)
+#define SaasAnalyticsParameters_fields (totalChannelNumber)(integrationId)
+NX_REFLECTION_INSTRUMENT(SaasAnalyticsParameters, SaasAnalyticsParameters_fields)
 
 /**%apidoc SaasService */
 struct NX_VMS_API SaasService
