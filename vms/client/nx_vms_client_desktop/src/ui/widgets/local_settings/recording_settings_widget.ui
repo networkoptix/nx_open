@@ -117,16 +117,6 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QCheckBox" name="disableAeroCheckBox">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Disable Aero</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="captureCursorCheckBox">
         <property name="text">
          <string>Capture Cursor</string>

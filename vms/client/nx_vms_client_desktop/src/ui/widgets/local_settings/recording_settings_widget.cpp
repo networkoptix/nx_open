@@ -33,19 +33,12 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent):
     setWarningStyle(ui->recordingWarningLabel);
     setHelpTopic(this, Qn::SystemSettings_ScreenRecording_Help);
 
-    connect(ui->disableAeroCheckBox, &QCheckBox::toggled, this,
-        &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->captureCursorCheckBox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->browseRecordingFolderButton, &QPushButton::clicked, this,
         &RecordingSettingsWidget::at_browseRecordingFolderButton_clicked);
 
-    connect(m_dwm, &QnDwm::compositionChanged, this,
-        &RecordingSettingsWidget::at_dwm_compositionChanged);
-
-    at_dwm_compositionChanged();
-    updateDisableAeroCheckbox();
     updateRecordingWarning();
 }
 
@@ -55,7 +48,6 @@ RecordingSettingsWidget::~RecordingSettingsWidget()
 
 void RecordingSettingsWidget::loadDataToUi()
 {
-    setCaptureMode(screenRecordingSettings()->captureMode());
     setQuality(screenRecordingSettings()->quality());
     setResolution(screenRecordingSettings()->resolution());
     setScreen(screenRecordingSettings()->screen());
@@ -156,8 +148,6 @@ void RecordingSettingsWidget::initScreenComboBox()
     ui->screenLabel->setVisible(screenSelectorVisible);
 
     connect(ui->screenComboBox, QnComboboxCurrentIndexChanged, this,
-        &RecordingSettingsWidget::updateDisableAeroCheckbox);
-    connect(ui->screenComboBox, QnComboboxCurrentIndexChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
@@ -198,23 +188,7 @@ bool RecordingSettingsWidget::isPrimaryScreenSelected() const
 
 CaptureMode RecordingSettingsWidget::captureMode() const
 {
-    if (!m_dwm->isSupported() || !m_dwm->isCompositionEnabled())
-        return CaptureMode::fullScreen; //< No need to disable Aero if DWM is disabled.
-
-    if (!isPrimaryScreenSelected())
-    {
-        // Recording from a secondary screen without Aero is not supported.
-        return CaptureMode::fullScreen;
-    }
-
-    return ui->disableAeroCheckBox->isChecked()
-        ? CaptureMode::fullScreenNoAero
-        : CaptureMode::fullScreen;
-}
-
-void RecordingSettingsWidget::setCaptureMode(CaptureMode captureMode)
-{
-    ui->disableAeroCheckBox->setChecked(captureMode == CaptureMode::fullScreenNoAero);
+    return CaptureMode::fullScreen;
 }
 
 Quality RecordingSettingsWidget::quality() const
@@ -255,19 +229,6 @@ void RecordingSettingsWidget::updateRecordingWarning()
         && (resolution() == Resolution::_1920x1080 || resolution() == Resolution::native));
 }
 
-void RecordingSettingsWidget::updateDisableAeroCheckbox()
-{
-    // without Aero only recording from primary screen is supported
-
-    const bool isPrimary = isPrimaryScreenSelected();
-    ui->disableAeroCheckBox->setEnabled(isPrimary);
-    if (!isPrimary)
-        ui->disableAeroCheckBox->setChecked(false);
-
-    emit hasChangesChanged();
-}
-
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -281,12 +242,6 @@ void RecordingSettingsWidget::at_browseRecordingFolderButton_clicked()
         return;
     ui->recordingFolderLineEdit->setText(dirName);
     emit hasChangesChanged();
-}
-
-void RecordingSettingsWidget::at_dwm_compositionChanged()
-{
-    /* Aero is already disabled if dwm is not enabled or not supported. */
-    ui->disableAeroCheckBox->setVisible(m_dwm->isSupported() && m_dwm->isCompositionEnabled());
 }
 
 } // namespace nx::vms::client::desktop

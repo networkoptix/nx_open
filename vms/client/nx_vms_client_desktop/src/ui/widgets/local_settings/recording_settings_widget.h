@@ -36,7 +36,6 @@ private:
     void initResolutionCombobox();
 
     screen_recording::CaptureMode captureMode() const;
-    void setCaptureMode(screen_recording::CaptureMode c);
 
     screen_recording::Quality quality() const;
     void setQuality(screen_recording::Quality q);
@@ -51,10 +50,8 @@ private:
 
 private:
     void updateRecordingWarning();
-    void updateDisableAeroCheckbox();
 
     void at_browseRecordingFolderButton_clicked();
-    void at_dwm_compositionChanged();
 
 private:
     QScopedPointer<Ui::RecordingSettingsWidget> ui;
