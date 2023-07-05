@@ -6,15 +6,14 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 
-#include <nx/vms/client/desktop/style/custom_style.h>
-#include <ui/widgets/word_wrapped_label.h>
-#include <utils/common/delayed.h>
-
-#include <nx/vms/client/desktop/common/utils/accessor.h>
-#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/unicode_chars.h>
+#include <nx/vms/client/desktop/common/utils/accessor.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <ui/widgets/word_wrapped_label.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 namespace detail {

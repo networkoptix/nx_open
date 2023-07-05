@@ -3,17 +3,16 @@
 #include "spin_box_utils.h"
 
 #include <QtCore/QSharedPointer>
-#include <QtWidgets/QSpinBox>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QStyle>
-#include <QtWidgets/QStyleOptionSpinBox>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QWheelEvent>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QStyleOptionSpinBox>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/unicode_chars.h>
-
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx::vms::client::desktop {

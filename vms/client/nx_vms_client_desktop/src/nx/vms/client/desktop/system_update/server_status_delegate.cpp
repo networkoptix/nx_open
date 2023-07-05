@@ -1,19 +1,21 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "server_status_delegate.h"
-#include "server_updates_model.h"
+
+#include <QHBoxLayout>
+#include <QPainter>
+#include <QProgressBar>
+#include <QPushButton>
 
 #include <QtWidgets/QStyleOptionProgressBar>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QProgressBar>
-#include <QPainter>
 
-#include <nx/utils/log/assert.h>
 #include <nx/utils/literal.h>
+#include <nx/utils/log/assert.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+
+#include "server_updates_model.h"
 
 namespace nx::vms::client::desktop {
 
