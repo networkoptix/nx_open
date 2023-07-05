@@ -70,6 +70,8 @@ common::SessionTokenHelperPtr FreshSessionTokenHelper::makeHelper(
 
 std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToken()
 {
+    m_password = {};
+
     if (!NX_ASSERT(QThread::currentThread() == qApp->thread()))
         return {};
 
@@ -94,7 +96,7 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
     }
     else
     {
-        token = SessionRefreshDialog::refreshSession(
+        const auto result = SessionRefreshDialog::refreshSession(
             m_parent,
             m_title,
             m_mainText,
@@ -103,7 +105,11 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
             info(m_actionType).isImportant,
             /*passwordValidationMode*/ false,
             Qt::WindowStaysOnTopHint
-        ).token;
+        );
+
+        token = result.token;
+        if (!token.empty())
+            m_password = result.password;
     }
     NX_ASSERT(token.empty() || token.isBearerToken());
 
@@ -111,6 +117,11 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
         return {};
 
     return token;
+}
+
+QString FreshSessionTokenHelper::password() const
+{
+    return m_password;
 }
 
 } // namespace nx::vms::client::desktop

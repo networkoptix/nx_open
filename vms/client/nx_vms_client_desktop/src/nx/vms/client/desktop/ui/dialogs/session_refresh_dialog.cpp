@@ -138,6 +138,7 @@ void SessionRefreshDialog::refreshSession(const nx::vms::api::LoginSessionReques
                     m_refreshResult.token = nx::network::http::BearerAuthToken(session->token);
                     m_refreshResult.tokenExpirationTime =
                         qnSyncTime->currentTimePoint() + session->expiresInS;
+                    m_refreshResult.password = m_passwordField->text();
                 }
                 else
                 {
