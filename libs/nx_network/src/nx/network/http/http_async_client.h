@@ -344,6 +344,8 @@ public:
     ssl::AdapterFunc setAdapterFunc(ssl::AdapterFunc adapterFunc);
     const ssl::AdapterFunc& adapterFunc() const;
 
+    static void setForceTrafficLogging(bool value);
+
 private:
     enum class State
     {
