@@ -23,7 +23,7 @@ public:
         int displayNumber = D3DADAPTER_DEFAULT,
         int queueSize = DEFAULT_QUEUE_SIZE,
         int frameRate = DEFAULT_FRAME_RATE,
-        screen_recording::CaptureMode mode = screen_recording::CaptureMode::fullScreenNoAero,
+        screen_recording::CaptureMode mode = screen_recording::CaptureMode::fullScreen,
         bool captureCursor = true,
         const QSize& captureResolution = QSize(0, 0),
         QWidget* widget = nullptr);
@@ -54,8 +54,6 @@ private:
     QVector<AVFrame*> m_frames;
     int m_frameIndex;
     int m_currentFrameNum;
-    static nx::Mutex m_instanceMutex;
-    static int m_aeroInstanceCounter;
     QElapsedTimer* m_timer = nullptr;
 };
 

@@ -16,29 +16,11 @@ namespace {
     typedef DECLSPEC_IMPORT HRESULT (STDAPICALLTYPE *fn_DwmEnableComposition) (UINT uCompositionAction);
     static fn_DwmEnableComposition DwmEnableComposition = 0;
     static const int LOGO_CORNER_OFFSET = 8;
-
-    static void toggleAero(bool enable)
-    {
-        static bool resolved = false;
-        if (!resolved) {
-            QLibrary lib(QLatin1String("Dwmapi"));
-            if (lib.load())
-                DwmEnableComposition = (fn_DwmEnableComposition)lib.resolve("DwmEnableComposition");
-            resolved = true;
-        }
-
-        if (DwmEnableComposition)
-            DwmEnableComposition(enable ? DWM_EC_ENABLECOMPOSITION : DWM_EC_DISABLECOMPOSITION);
-    }
-
     static const int MAX_JITTER = 60;
 
 } //namespace
 
 namespace nx::vms::client::desktop {
-
-nx::Mutex BufferedScreenGrabber::m_instanceMutex;
-int BufferedScreenGrabber::m_aeroInstanceCounter;
 
 BufferedScreenGrabber::BufferedScreenGrabber(
     int displayNumber,
@@ -81,13 +63,6 @@ void BufferedScreenGrabber::pleaseStop()
 
 void BufferedScreenGrabber::run()
 {
-    if (m_grabber.getMode() == screen_recording::CaptureMode::fullScreenNoAero)
-    {
-        NX_MUTEX_LOCKER locker( &m_instanceMutex );
-        if (++m_aeroInstanceCounter == 1)
-            toggleAero(false);
-    }
-
     m_grabber.restart();
     while (!needToStop())
     {
@@ -113,13 +88,6 @@ void BufferedScreenGrabber::run()
         {
             m_currentFrameNum = currentTime() * m_frameRate / 1000.0;
         }
-    }
-
-    if (m_grabber.getMode() == screen_recording::CaptureMode::fullScreenNoAero)
-    {
-        NX_MUTEX_LOCKER locker( &m_instanceMutex );
-        if (--m_aeroInstanceCounter == 0)
-            toggleAero(true);
     }
 }
 

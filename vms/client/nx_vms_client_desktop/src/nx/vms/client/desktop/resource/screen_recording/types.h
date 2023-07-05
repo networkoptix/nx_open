@@ -8,7 +8,6 @@ namespace nx::vms::client::desktop::screen_recording {
 
 NX_REFLECTION_ENUM_CLASS(CaptureMode,
     fullScreen,
-    fullScreenNoAero,
     window
 )
 
