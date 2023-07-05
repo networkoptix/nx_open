@@ -65,7 +65,7 @@ struct CameraHotspotsSettingsWidget::Private
     CameraSelectionDialog::ResourceFilter hotspotCameraSelectionResourceFilter(
         int hotspotIndex) const;
 
-    void selectCameraForHotspot(int index);
+    void selectCameraForHotspot(int index) const;
 
     void selectHotspotsViewRow(std::optional<int> row);
 };
@@ -89,14 +89,17 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
     ui->hotspotsEditorWidget->setMaximumHeight(kMaximumHotspotEditorHeight);
 
     const auto hotspotsItemViewhoverTracker = new ItemViewHoverTracker(ui->hotspotsItemView);
+    hotspotsItemViewhoverTracker->setMouseCursorRole(Qn::ItemMouseCursorRole);
     hotspotsDelegate->setItemViewHoverTracker(hotspotsItemViewhoverTracker);
 
     ui->hotspotsItemView->setMinimumHeight(kMinimumTableEditorHeight);
     ui->hotspotsItemView->setItemDelegate(hotspotsDelegate.get());
     ui->hotspotsItemView->setModel(hotspotsModel.get());
     ui->hotspotsItemView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-    ui->hotspotsItemView->setEditTriggers(
-        QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
+    ui->hotspotsItemView->setEditTriggers(QAbstractItemView::SelectedClicked);
+
+    q->connect(ui->hotspotsItemView, &QAbstractItemView::doubleClicked,
+        [this](const QModelIndex& index) { selectCameraForHotspot(index.row()); });
 
     auto header = ui->hotspotsItemView->header();
     header->setSectionResizeMode(
@@ -157,7 +160,7 @@ CameraSelectionDialog::ResourceFilter
         };
 }
 
-void CameraHotspotsSettingsWidget::Private::selectCameraForHotspot(int hotspotIndex)
+void CameraHotspotsSettingsWidget::Private::selectCameraForHotspot(int hotspotIndex) const
 {
     const auto cameraSelectionDialog = createHotspotCameraSelectionDialog(hotspotIndex);
     if (cameraSelectionDialog->exec() != QDialog::Accepted)
