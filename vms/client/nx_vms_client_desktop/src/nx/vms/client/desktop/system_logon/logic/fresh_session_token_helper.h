@@ -43,6 +43,8 @@ public:
 
     std::optional<nx::network::http::AuthToken> refreshToken() override;
 
+    virtual QString password() const override;
+
 private:
 
     QPointer<QWidget> m_parent = nullptr;
@@ -50,6 +52,7 @@ private:
     QString m_mainText;
     QString m_actionText;
     ActionType m_actionType = ActionType::updateSettings;
+    QString m_password;
 };
 
 } // namespace nx::vms::client::desktop
