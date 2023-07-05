@@ -3,23 +3,21 @@
 #include "simple_motion_search_widget.h"
 
 #include <QtCore/QList>
-#include <QtGui/QRegion>
 #include <QtGui/QAction>
+#include <QtGui/QRegion>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
-#include <ui/common/read_only.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_navigator.h>
-
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/simple_motion_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
-#include <nx/utils/log/assert.h>
+#include <ui/common/read_only.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_navigator.h>
 
 using nx::vms::client::core::MotionSelection;
 

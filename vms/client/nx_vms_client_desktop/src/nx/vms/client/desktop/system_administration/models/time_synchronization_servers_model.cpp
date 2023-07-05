@@ -4,14 +4,11 @@
 
 #include <algorithm>
 
-#include <nx/vms/text/time_strings.h>
-#include <nx/vms/time/formatter.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-
-#include <nx/vms/text/human_readable.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/unicode_chars.h>
-
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/text/human_readable.h>
+#include <nx/vms/text/time_strings.h>
 #include <nx/vms/time/formatter.h>
 
 namespace {
