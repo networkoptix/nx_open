@@ -96,8 +96,11 @@ bool NvidiaVideoDecoder::isAvailable()
 }
 
 bool NvidiaVideoDecoder::isCompatible(
-    const QnConstCompressedVideoDataPtr& /*frame*/, AVCodecID /*codec*/, int /*width*/, int /*height*/)
+    const QnConstCompressedVideoDataPtr& /*frame*/, AVCodecID codec, int /*width*/, int /*height*/)
 {
+    if (FFmpeg2NvCodecId(codec) == cudaVideoCodec_NumCodecs) //< Codec is not supported.
+        return false;
+
     if (!NvidiaDriverApiProxy::instance().load())
         return false;
 
