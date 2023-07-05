@@ -4,6 +4,7 @@
 
 #include <QtCore/QAbstractItemModel>
 
+#include <client/client_globals.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
 
 class QnResourcePool;
@@ -29,7 +30,7 @@ public:
 
     enum Role
     {
-        HotspotCameraIdRole = Qt::UserRole + 1,
+        HotspotCameraIdRole = Qn::ItemDataRoleCount + 1,
         HotspotColorRole,
     };
 

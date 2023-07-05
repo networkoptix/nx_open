@@ -89,6 +89,9 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
     if (role == HotspotColorRole && index.column() == ColorPaletteColumn)
         return QColor(hotspotData.accentColorName);
 
+    if (role == Qn::ItemMouseCursorRole && index.column() == CameraColumn)
+        return static_cast<int>(Qt::PointingHandCursor);
+
     return {};
 }
 
