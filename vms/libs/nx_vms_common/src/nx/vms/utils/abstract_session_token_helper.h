@@ -18,6 +18,7 @@ public:
     virtual ~AbstractSessionTokenHelper();
 
     virtual std::optional<nx::network::http::AuthToken> refreshToken() = 0;
+    virtual QString password() const = 0;
 };
 
 using SessionTokenHelperPtr = std::shared_ptr<AbstractSessionTokenHelper>;

@@ -817,7 +817,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         userData,
         sessionTokenHelper,
         nx::utils::guarded(this,
-            [this, state, actualPassword](
+            [this, state, actualPassword, sessionTokenHelper](
                 bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
             {
                 if (NX_ASSERT(handle == d->m_currentRequest))
@@ -878,8 +878,21 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                     systemContext()->accessRightsManager()->setOwnResourceAccessMap(data->id,
                         {data->resourceAccessRights.begin(), data->resourceAccessRights.end()});
 
-                    if (state.isSelf && !state.password.isEmpty())
-                        refreshToken(state.password);
+                    // Changing password or disabling digest auth leads to reconnect,
+                    // make sure the new token is issued for reconnect to succeed.
+                    if (state.isSelf)
+                    {
+                        if (!state.password.isEmpty())
+                        {
+                            refreshToken(state.password);
+                        }
+                        else if (originalState().allowInsecure && !state.allowInsecure)
+                        {
+                            const auto password = sessionTokenHelper->password();
+                            if (NX_ASSERT(!password.isEmpty()))
+                                refreshToken(password);
+                        }
+                    }
                 }
 
                 saveStateComplete(state);
