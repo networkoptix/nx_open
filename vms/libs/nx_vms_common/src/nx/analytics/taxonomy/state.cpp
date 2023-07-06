@@ -236,4 +236,9 @@ Descriptors State::serialize() const
     return result;
 }
 
+AbstractResourceSupportProxy* State::resourceSupportProxy() const
+{
+    return m_resourceSupportProxy.get();
+}
+
 } // namespace nx::analytics::taxonomy

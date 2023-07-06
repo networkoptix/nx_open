@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QObject>
 #include <QtCore/QString>
 
 #include <nx/analytics/taxonomy/entity_type.h>
@@ -9,8 +10,9 @@
 
 namespace nx::analytics::taxonomy {
 
-class NX_VMS_COMMON_API AbstractResourceSupportProxy
+class NX_VMS_COMMON_API AbstractResourceSupportProxy: public QObject
 {
+    Q_OBJECT
 public:
     virtual ~AbstractResourceSupportProxy() = default;
 
@@ -26,6 +28,9 @@ public:
         const QString& fullAttributeName,
         QnUuid deviceId,
         QnUuid engineId) const = 0;
+
+signals:
+    void manifestsMaybeUpdated();
 };
 
 } // namespace nx::analytics::taxonomy
