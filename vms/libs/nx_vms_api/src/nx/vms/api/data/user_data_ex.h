@@ -4,9 +4,8 @@
 
 #include <QtCore/QString>
 
-#include <nx/vms/api/data/user_data.h>
-
 #include "resource_data.h"
+#include "user_data.h"
 
 namespace nx::vms::api {
 

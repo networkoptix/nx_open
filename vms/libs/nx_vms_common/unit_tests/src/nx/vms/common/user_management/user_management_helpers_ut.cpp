@@ -23,11 +23,11 @@ class UserManagementHelpersTest: public ContextBasedTest
         d.powerUser = addUser(kPowerUsersGroupId, "power user");
         d.viewer = addUser(kViewersGroupId, "viewer");
 
-        d.specialWorkers = createUserGroup(NoGroup, "Special Workers");
-        d.specialPowerUsers = createUserGroup(
-            {d.specialWorkers.id, kPowerUsersGroupId}, "Special Power Users");
-        d.specialViewers = createUserGroup(
-            {d.specialWorkers.id, kViewersGroupId}, "Special Viewers");
+        d.specialWorkers = createUserGroup("Special Workers");
+        d.specialPowerUsers =
+            createUserGroup("Special Power Users", {d.specialWorkers.id, kPowerUsersGroupId});
+        d.specialViewers =
+            createUserGroup("Special Viewers", {d.specialWorkers.id, kViewersGroupId});
 
         d.specialPowerUser = addUser(d.specialPowerUsers.id, "special power user");
         d.specialViewer = addUser(d.specialViewers.id, "special viewer");
@@ -127,11 +127,11 @@ TEST_F(UserManagementHelpersTest, groupsWithParents)
          Group 4  Group 5
     */
 
-    const auto group1 = createUserGroup(NoGroup, "Group 1");
-    const auto group2 = createUserGroup(group1.id, "Group 2");
-    const auto group3 = createUserGroup(group1.id, "Group 3");
-    const auto group4 = createUserGroup({group2.id, group3.id}, "Group 4");
-    const auto group5 = createUserGroup(group3.id, "Group 5");
+    const auto group1 = createUserGroup("Group 1");
+    const auto group2 = createUserGroup("Group 2", group1.id);
+    const auto group3 = createUserGroup("Group 3", group1.id);
+    const auto group4 = createUserGroup("Group 4", {group2.id, group3.id});
+    const auto group5 = createUserGroup("Group 5", group3.id);
 
     EXPECT_EQ(userGroupsWithParents(systemContext(),
         std::initializer_list<QnUuid>({group4.id, d.specialPowerUsers.id})),

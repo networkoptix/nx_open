@@ -35,7 +35,7 @@ TEST_F(QnCachedPermissionsPerformanceTest, createUsers)
 
 TEST_F(QnCachedPermissionsPerformanceTest, createUsersInRole)
 {
-    const auto g = createUserGroup(NoGroup);
+    const auto g = createUserGroup("test group");
     run(
         [&]
         {
@@ -49,7 +49,7 @@ TEST_F(QnCachedPermissionsPerformanceTest, createUsersInRoles)
     run(
         [&]
         {
-            const auto g = createUserGroup(NoGroup);
+            const auto g = createUserGroup("test group");
             const auto u = addUser(NoGroup);
             u->setGroupIds({g.id});
         });

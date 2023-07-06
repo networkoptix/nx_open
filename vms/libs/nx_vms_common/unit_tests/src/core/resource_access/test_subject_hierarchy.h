@@ -20,6 +20,8 @@ class TestSubjectHierarchy:
 public:
     explicit TestSubjectHierarchy(QObject* parent = nullptr);
 
+    using base_type::addOrUpdate;
+
     void addOrUpdate(const QString& subject, const Names& parents);
     void addOrUpdate(const QString& subject, const Names& parents, const Names& members);
     void remove(const Names& subjects);

@@ -387,8 +387,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.sharedResources = systemContext()->accessRightsManager()->ownResourceAccessMap(
         user->getId());
 
-    state.globalPermissions =
-        user->getRawPermissions() & nx::vms::api::kNonDeprecatedGlobalPermissions;
+    state.globalPermissions = user->getRawPermissions();
 
     state.permissionsEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
 

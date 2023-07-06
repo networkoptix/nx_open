@@ -186,12 +186,6 @@ public:
 protected:
     std::unique_ptr<Rule> mockRule;
 
-    void setOwnAccessRights(
-        const QnUuid& subjectId, const nx::core::access::ResourceAccessMap accessRights)
-    {
-        systemContext()->accessRightsManager()->setOwnResourceAccessMap(subjectId, accessRights);
-    }
-
 private:
     QnSyncTime syncTime;
 };
@@ -357,13 +351,19 @@ TEST_F(ActionBuilderTest, builderWithTargetUsersProducedActionsOnlyForUsersWithA
 
 TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
 {
-    auto user1 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
     auto cameraOfUser1 = addCamera();
-    setOwnAccessRights(user1->getId(), {{cameraOfUser1->getId(), AccessRight::view}});
+    auto user1 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::viewLogs,
+        {{cameraOfUser1->getId(), AccessRight::view}});
 
-    auto user2 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
     auto cameraOfUser2 = addCamera();
-    setOwnAccessRights(user2->getId(), {{cameraOfUser2->getId(), AccessRight::view}});
+    auto user2 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::viewLogs,
+        {{cameraOfUser2->getId(), AccessRight::view}});
 
     EXPECT_TRUE(resourceAccessManager()->hasPermission(user1, cameraOfUser1, Qn::ViewContentPermission));
     EXPECT_FALSE(resourceAccessManager()->hasPermission(user1, cameraOfUser2, Qn::ViewContentPermission));
@@ -406,13 +406,19 @@ TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
 
 TEST_F(ActionBuilderTest, eventDevicesAreFiltered)
 {
-    auto user1 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
     auto cameraOfUser1 = addCamera();
-    setOwnAccessRights(user1->getId(), {{cameraOfUser1->getId(), AccessRight::view}});
+    auto user1 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::viewLogs,
+        {{cameraOfUser1->getId(), AccessRight::view}});
 
-    auto user2 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
     auto cameraOfUser2 = addCamera();
-    setOwnAccessRights(user2->getId(), {{cameraOfUser2->getId(), AccessRight::view}});
+    auto user2 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::viewLogs,
+        {{cameraOfUser2->getId(), AccessRight::view}});
 
     UuidSelection selection{
         .ids = {user1->getId(), user2->getId()},
@@ -506,8 +512,11 @@ TEST_F(ActionBuilderTest, userEventFilterPropertyWorks)
 
 TEST_F(ActionBuilderTest, actionPermissionGlobal)
 {
-    auto user1 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewArchive);
-    auto user2 = addUser(NoGroup, kTestUserName, UserType::local);
+    auto user1 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::generateEvents,
+        {{kAllDevicesGroupId, AccessRight::viewArchive}});
 
     UuidSelection selection{ .all = true };
     auto builder = makeBuilderWithPermissions(selection);
@@ -526,10 +535,12 @@ TEST_F(ActionBuilderTest, actionPermissionGlobal)
 
 TEST_F(ActionBuilderTest, actionPermissionSingleResource)
 {
-    auto user1 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewArchive);
-    auto user2 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewArchive);
     auto cameraOfUser1 = addCamera();
-    setOwnAccessRights(user1->getId(), {{cameraOfUser1->getId(), AccessRight::edit}});
+    auto user1 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::generateEvents,
+        {{cameraOfUser1->getId(), AccessRight::edit}});
 
     UuidSelection selection{ .all = true };
     auto builder = makeBuilderWithPermissions(selection);
@@ -549,15 +560,18 @@ TEST_F(ActionBuilderTest, actionPermissionSingleResource)
 
 TEST_F(ActionBuilderTest, actionPermissionResourceFiltration)
 {
-    auto user1 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewArchive);
-    auto user2 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewArchive);
     auto cameraA = addCamera();
     auto cameraB = addCamera();
     auto cameraC = addCamera();
-
-    setOwnAccessRights(user1->getId(),
+    auto user1 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::generateEvents,
         {{cameraA->getId(), AccessRight::edit}, {cameraB->getId(), AccessRight::edit}});
-    setOwnAccessRights(user2->getId(),
+    auto user2 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::generateEvents,
         {{cameraB->getId(), AccessRight::edit}, {cameraC->getId(), AccessRight::edit}});
 
     UuidSelection selection{ .all = true };
@@ -576,19 +590,28 @@ TEST_F(ActionBuilderTest, actionPermissionResourceFiltration)
 
 TEST_F(ActionBuilderTest, actionPermissionUserGrouping)
 {
-    auto user1 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewArchive);
-    auto user2 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewArchive);
-    auto user3 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewArchive);
-    auto user4 = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewArchive);
     auto cameraA = addCamera();
     auto cameraB = addCamera();
-
-    setOwnAccessRights(user1->getId(), {{cameraA->getId(), AccessRight::edit}});
-    setOwnAccessRights(user2->getId(), {{cameraA->getId(), AccessRight::edit}});
-    setOwnAccessRights(user3->getId(), {{cameraB->getId(), AccessRight::edit}});
-    setOwnAccessRights(user4->getId(),
+    auto user1 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::generateEvents,
+        {{cameraA->getId(), AccessRight::edit}});
+    auto user2 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::generateEvents,
+        {{cameraA->getId(), AccessRight::edit}});
+    auto user3 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::generateEvents,
+        {{cameraB->getId(), AccessRight::edit}});
+    auto user4 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::generateEvents,
         {{cameraA->getId(), AccessRight::edit}, {cameraB->getId(), AccessRight::edit}});
-
 
     UuidSelection selection{ .all = true };
     auto builder = makeBuilderWithPermissions(selection, {cameraA->getId(), cameraB->getId()});

@@ -136,6 +136,8 @@ public:
     std::vector<QnUuid> groupIds() const;
     void setGroupIds(const std::vector<QnUuid>& value);
 
+    void setResourceAccessRights(const std::map<QnUuid, nx::vms::api::AccessRights>& value);
+
     bool isEnabled() const;
     void setEnabled(bool isEnabled);
 
@@ -182,6 +184,7 @@ signals:
     void attributesChanged(const QnResourcePtr& user);
 
 protected:
+    virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
 
 private:

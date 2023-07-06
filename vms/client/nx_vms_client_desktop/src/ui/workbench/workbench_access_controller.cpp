@@ -394,16 +394,9 @@ Qn::Permissions QnWorkbenchAccessController::calculateFileLayoutPermissions(
 
 GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() const
 {
-    if (qnRuntime->isVideoWallMode())
-        return GlobalPermission::videowallModePermissions;
-
-    if (qnRuntime->isAcsMode())
-        return GlobalPermission::acsModePermissions;
-
-    if (!m_user)
-        return {};
-
-    return systemContext()->resourceAccessManager()->globalPermissions(m_user);
+    return m_user
+        ? systemContext()->resourceAccessManager()->globalPermissions(m_user)
+        : GlobalPermissions{};
 }
 
 void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr& resource)

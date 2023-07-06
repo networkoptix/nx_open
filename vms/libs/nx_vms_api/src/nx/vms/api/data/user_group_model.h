@@ -34,7 +34,7 @@ struct NX_VMS_API UserGroupModel
     std::optional<UserExternalId> externalId;
 
     /**%apidoc[opt] */
-    GlobalPermissions permissions;
+    GlobalPermissions permissions = GlobalPermission::none;
 
     /**%apidoc[opt] List of User Groups to inherit permissions. */
     std::vector<QnUuid> parentGroupIds;

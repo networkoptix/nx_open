@@ -16,22 +16,6 @@ namespace nx::core::access {
 using namespace nx::vms::api;
 using namespace nx::vms::common;
 
-namespace {
-
-GlobalPermissions filterDependentPermissions(GlobalPermissions source)
-{
-    GlobalPermissions result = source;
-    if (!result.testFlag(GlobalPermission::viewArchive))
-        result &= ~(GlobalPermission::viewBookmarks | GlobalPermission::exportArchive);
-
-    if (!result.testFlag(GlobalPermission::viewBookmarks))
-        result &= ~GlobalPermissions(GlobalPermission::manageBookmarks);
-
-    return result;
-}
-
-} // namespace
-
 // ------------------------------------------------------------------------------------------------
 // GlobalPermissionsWatcher::Private
 
@@ -149,8 +133,6 @@ public:
 
     void handleSubjectChanged(const QnUuid& subjectId, GlobalPermissions permissions)
     {
-        permissions = filterDependentPermissions(permissions);
-
         NX_MUTEX_LOCKER lk(&mutex);
         if (permissions == globalPermissions.value(subjectId))
             return;

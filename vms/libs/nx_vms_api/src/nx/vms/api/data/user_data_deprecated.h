@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "global_permission_deprecated.h"
 #include "user_data.h"
 
 namespace nx::vms::api {
@@ -25,7 +26,7 @@ struct NX_VMS_API UserDataDeprecated: ResourceData
     UserData toUserData() const;
 
     bool isAdmin = false;
-    GlobalPermissions permissions = GlobalPermission::none;
+    GlobalPermissionsDeprecated permissions = GlobalPermissionDeprecated::none;
     QnUuid userRoleId;
     std::vector<QnUuid> userRoleIds;
     QString email;
@@ -38,8 +39,8 @@ struct NX_VMS_API UserDataDeprecated: ResourceData
     bool isCloud = false;
     QString fullName;
 
-    static std::optional<QnUuid> permissionPresetToGroupId(GlobalPermissions preset);
-    static GlobalPermissions groupIdToPermissionPreset(const QnUuid& id);
+    static std::optional<QnUuid> permissionPresetToGroupId(GlobalPermissionsDeprecated preset);
+    static GlobalPermissionsDeprecated groupIdToPermissionPreset(const QnUuid& id);
 };
 #define UserDataDeprecated_Fields \
     ResourceData_Fields \

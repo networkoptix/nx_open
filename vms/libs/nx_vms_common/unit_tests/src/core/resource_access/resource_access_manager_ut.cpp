@@ -160,22 +160,6 @@ protected:
         checkCanModifyUserDigestAuthorizationEnabled(source, m_currentUser, allowed);
     }
 
-    void checkCanGrantPowerUserPermissions(
-        const QnUserResourcePtr& source, QnUserResourcePtr target, bool allowed)
-    {
-        UserData data;
-        ec2::fromResourceToApi(target, data);
-        data.permissions = target->getRawPermissions() | GlobalPermission::powerUser;
-
-        auto info = nx::format("check: %1 -> %2 (direct)", source->getName(), target->getName())
-            .toStdString();
-
-        if (allowed)
-            ASSERT_TRUE(resourceAccessManager()->canModifyUser(source, target, data)) << info;
-        else
-            ASSERT_FALSE(resourceAccessManager()->canModifyUser(source, target, data)) << info;
-    }
-
     void checkCanGrantPowerUserPermissionsViaInheritance(const QnUserResourcePtr& source,
         QnUserResourcePtr target, const QnUuid& powerUserGroupId, bool allowed)
     {
@@ -460,10 +444,9 @@ TEST_F(ResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
 // Locked layouts on videowall still can be removed if the user has control permissions.
 TEST_F(ResourceAccessManagerTest, checkVideowallLockedLayout)
 {
-    const auto group = createUserGroup(NoGroup);
+    const auto group =
+        createUserGroup("Videowall group", NoGroup, {{kAllVideoWallsGroupId, AccessRight::edit}});
     loginAs(group.id);
-
-    setOwnAccessRights(group.id, {{kAllVideoWallsGroupId, AccessRight::edit}});
 
     const auto videowall = addVideoWall();
     const auto layout = createLayout(Qn::remote, true, videowall->getId());
@@ -829,7 +812,8 @@ TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabled)
     const auto cloudAdministrator =
         addUser(kAdministratorsGroupId, "cloud administrator", UserType::cloud);
     const auto powerUser = addUser(kPowerUsersGroupId, "powerUser");
-    const auto ldap = addUser(NoGroup, "ldap", UserType::ldap, GlobalPermission::none, "cn=ldap");
+    const auto ldap =
+        addUser(NoGroup, "ldap", UserType::ldap, GlobalPermission::none, {}, "cn=ldap");
     const auto other = addUser(NoGroup, "other");
 
     QnUserResourceList users = {administrator, cloudAdministrator, powerUser, cloud, ldap, other};
@@ -858,7 +842,7 @@ TEST_F(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabled)
 TEST_F(ResourceAccessManagerTest, checkCanGrantPowerUserPermissions)
 {
     const auto powerUsers = kPowerUsersGroupId;
-    const auto powerUsersToo = createUserGroup(kPowerUsersGroupId);
+    const auto powerUsersToo = createUserGroup("Power User Group", kPowerUsersGroupId);
     const auto administrator = addUser(kAdministratorsGroupId, "administrator");
     const auto cloud = addUser(NoGroup, "cloud", UserType::cloud);
     const auto cloudAdministrator = addUser(
@@ -866,41 +850,21 @@ TEST_F(ResourceAccessManagerTest, checkCanGrantPowerUserPermissions)
     const auto powerUser = addUser(kPowerUsersGroupId, "power user");
     const auto transitivelyInheritedPowerUser = addUser(
         powerUsersToo.id, "transitively inherited power user");
-    const auto ldap = addUser(NoGroup, "ldap", UserType::ldap, GlobalPermission::none, "cn=ldap");
+    const auto ldap =
+        addUser(NoGroup, "ldap", UserType::ldap, GlobalPermission::none, {}, "cn=ldap");
     const auto other = addUser(NoGroup, "other");
 
-    // Compatibility direct power user.
-    const auto directPowerUser = addUser(
-        NoGroup, "direct power user", UserType::local, GlobalPermission::powerUser);
-
     const QnUserResourceList users = {administrator, cloudAdministrator, powerUser,
-        transitivelyInheritedPowerUser, directPowerUser, cloud, ldap, other};
-
-    const QVector<std::pair<QnUserResourcePtr, QnUserResourcePtr>> allowedScenarios = {
-        {directPowerUser, directPowerUser}, //< No change, considered allowed.
-        {administrator, powerUser},
-        {administrator, directPowerUser},
-        {administrator, transitivelyInheritedPowerUser},
-        {administrator, ldap},
-        {administrator, other},
-        {administrator, cloud},
-        {cloudAdministrator, powerUser},
-        {cloudAdministrator, directPowerUser},
-        {cloudAdministrator, transitivelyInheritedPowerUser},
-        {cloudAdministrator, cloud},
-        {cloudAdministrator, ldap},
-        {cloudAdministrator, other}};
+        transitivelyInheritedPowerUser, cloud, ldap, other};
 
     const QVector<std::pair<QnUserResourcePtr, QnUserResourcePtr>> allowedScenariosViaInheritance = {
         {powerUser, powerUser}, //< No change, considered allowed.
         {administrator, powerUser},
-        {administrator, directPowerUser},
         {administrator, transitivelyInheritedPowerUser},
         {administrator, ldap},
         {administrator, other},
         {administrator, cloud},
         {cloudAdministrator, powerUser},
-        {cloudAdministrator, directPowerUser},
         {cloudAdministrator, transitivelyInheritedPowerUser},
         {cloudAdministrator, cloud},
         {cloudAdministrator, ldap},
@@ -912,10 +876,6 @@ TEST_F(ResourceAccessManagerTest, checkCanGrantPowerUserPermissions)
         {
             checkCanGrantPowerUserPermissionsViaInheritance(editor, editee, powerUsers,
                 allowedScenariosViaInheritance.contains({editor, editee}));
-
-            // GlobalPermission::powerUser is still directly assignable for backward compatibility.
-            checkCanGrantPowerUserPermissions(editor, editee,
-                allowedScenarios.contains({editor, editee}));
         }
     }
 }
@@ -974,12 +934,13 @@ TEST_F(ResourceAccessManagerTest, checkWhatUsersCanAdministratorCreate)
     ASSERT_TRUE(resourceAccessManager()->canCreateUser(
         m_currentUser, GlobalPermission::none, {kViewersGroupId}));
 
-    // Can create power users. Direct permissions are allowed for backward compatibility.
-    ASSERT_TRUE(resourceAccessManager()->canCreateUser(
-        m_currentUser, GlobalPermission::powerUser, {}));
-
+    // Can create power users.
     ASSERT_TRUE(resourceAccessManager()->canCreateUser(
         m_currentUser, GlobalPermission::none, {kPowerUsersGroupId}));
+
+    // Cannot create power users directly.
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, GlobalPermission::powerUser, {}));
 
     // Cannot create administrators.
     ASSERT_FALSE(resourceAccessManager()->canCreateUser(
@@ -994,7 +955,7 @@ TEST_F(ResourceAccessManagerTest, checkParentGroupsValidity)
     loginAsAdministrator();
 
     const auto predefinedId = kViewersGroupId;
-    const auto customId = createUserGroup(kAdvancedViewersGroupId).id;
+    const auto customId = createUserGroup("Advanced viewer group", kAdvancedViewersGroupId).id;
 
     const auto zeroId = QnUuid{};
     const auto unknownId = QnUuid::createUuid();
@@ -1037,8 +998,8 @@ TEST_F(ResourceAccessManagerTest, checkAdministratorAccessToGroups)
 {
     loginAsAdministrator();
 
-    const auto powerUsersGroup = createUserGroup(kPowerUsersGroupId);
-    const auto nonPowerUsersGroup = createUserGroup(kViewersGroupId);
+    const auto powerUsersGroup = createUserGroup("Power user group", kPowerUsersGroupId);
+    const auto nonPowerUsersGroup = createUserGroup("Viewer group", kViewersGroupId);
 
     ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, powerUsersGroup),
         kFullGroupPermissions);
@@ -1051,8 +1012,8 @@ TEST_F(ResourceAccessManagerTest, checkPowerUserAccessToGroups)
 {
     loginAs(kPowerUsersGroupId);
 
-    const auto powerUsersGroup = createUserGroup(kPowerUsersGroupId);
-    const auto nonPowerUsersGroup = createUserGroup(kViewersGroupId);
+    const auto powerUsersGroup = createUserGroup("Power user group", kPowerUsersGroupId);
+    const auto nonPowerUsersGroup = createUserGroup("Viewer group", kViewersGroupId);
 
     ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, powerUsersGroup),
         kReadGroupPermissions);
@@ -1066,8 +1027,8 @@ TEST_F(ResourceAccessManagerTest, checkNonPowerUserAccessToGroups)
 {
     loginAs(kAdvancedViewersGroupId);
 
-    const auto powerUsersGroup = createUserGroup(kPowerUsersGroupId);
-    const auto nonPowerUsersGroup = createUserGroup(kViewersGroupId);
+    const auto powerUsersGroup = createUserGroup("Power user group", kPowerUsersGroupId);
+    const auto nonPowerUsersGroup = createUserGroup("Viewer group", kViewersGroupId);
 
     ASSERT_EQ(resourceAccessManager()->permissions(m_currentUser, powerUsersGroup),
         Qn::Permissions());
@@ -1237,7 +1198,7 @@ TEST_F(ResourceAccessManagerTest, checkRoleAccessChange)
     const auto target = addCamera();
 
     const auto user = addUser(NoGroup);
-    auto group = createUserGroup(NoGroup);
+    auto group = createUserGroup("test group");
 
     user->setGroupIds({group.id});
     ASSERT_FALSE(hasPermissions(user, target, Qn::ReadPermission));
@@ -1255,8 +1216,8 @@ TEST_F(ResourceAccessManagerTest, checkInheritedGroupAccessChange)
     const auto target = addCamera();
 
     const auto user = addUser(NoGroup);
-    auto parentGroup = createUserGroup(NoGroup);
-    auto inheritedGroup = createUserGroup(parentGroup.id);
+    auto parentGroup = createUserGroup("Parent group");
+    auto inheritedGroup = createUserGroup("Inherited group", parentGroup.id);
 
     user->setGroupIds({inheritedGroup.id});
     ASSERT_FALSE(hasPermissions(user, target, Qn::ReadPermission));
@@ -1289,24 +1250,25 @@ TEST_F(ResourceAccessManagerTest, checkUserAndRolesCombinedPermissions)
     const auto cameraOfUser = addCamera();
     const auto cameraOfNoOne = addCamera();
 
-    const auto parentGroup1 = createUserGroup(NoGroup);
-    setOwnAccessRights(parentGroup1.id, {{cameraOfParentGroup1->getId(), AccessRight::view}});
+    const auto parentGroup1 = createUserGroup(
+        "Parent group 1", NoGroup, {{cameraOfParentGroup1->getId(), AccessRight::view}});
     EXPECT_FALSE(hasPermissions(parentGroup1, cameraOfUser, Qn::ReadPermission));
     EXPECT_TRUE(hasPermissions(parentGroup1, cameraOfParentGroup1, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(parentGroup1, cameraOfParentGroup2, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(parentGroup1, cameraOfInheritedGroup, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(parentGroup1, cameraOfNoOne, Qn::ReadPermission));
 
-    const auto parentGroup2 = createUserGroup(NoGroup);
-    setOwnAccessRights(parentGroup2.id, {{cameraOfParentGroup2->getId(), AccessRight::view}});
+    const auto parentGroup2 = createUserGroup(
+        "Parent group 2", NoGroup, {{cameraOfParentGroup2->getId(), AccessRight::view}});
     EXPECT_FALSE(hasPermissions(parentGroup2, cameraOfUser, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(parentGroup2, cameraOfParentGroup1, Qn::ReadPermission));
     EXPECT_TRUE(hasPermissions(parentGroup2, cameraOfParentGroup2, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(parentGroup2, cameraOfInheritedGroup, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(parentGroup2, cameraOfNoOne, Qn::ReadPermission));
 
-    auto inheritedGroup = createUserGroup({parentGroup1.id, parentGroup2.id});
-    setOwnAccessRights(inheritedGroup.id, {{cameraOfInheritedGroup->getId(), AccessRight::view}});
+    auto inheritedGroup = createUserGroup("Inherited group",
+        {parentGroup1.id, parentGroup2.id},
+        {{cameraOfInheritedGroup->getId(), AccessRight::view}});
     EXPECT_FALSE(hasPermissions(inheritedGroup, cameraOfUser, Qn::ReadPermission));
     EXPECT_TRUE(hasPermissions(inheritedGroup, cameraOfParentGroup1, Qn::ReadPermission));
     EXPECT_TRUE(hasPermissions(inheritedGroup, cameraOfParentGroup2, Qn::ReadPermission));
@@ -1380,7 +1342,7 @@ TEST_F(ResourceAccessManagerTest, checkRoleRemoved)
     const auto target = addCamera();
 
     const auto user = addUser(NoGroup);
-    const auto group = createUserGroup(kLiveViewersGroupId);
+    const auto group = createUserGroup("Live viewer group", kLiveViewersGroupId);
 
     user->setGroupIds({group.id});
     ASSERT_TRUE(hasPermissions(user, target, Qn::ReadPermission));
@@ -1419,16 +1381,16 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToRole)
 
     const auto target = addCamera();
 
-    // Create role without access
-    const auto group = createUserGroup(NoGroup);
-
-    // Create user in role
-    const auto user = addUser(NoGroup, kTestUserName2);
-    user->setGroupIds({group.id});
-
     // Create own layout
     const auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
+
+    // Create role
+    const auto group =
+        createUserGroup("Layout group", NoGroup, {{layout->getId(), AccessRight::view}});
+
+    // Create user in role
+    const auto user = addUser(group.id, kTestUserName2);
 
     // Place a camera on it
     LayoutItemData item;
@@ -1437,7 +1399,6 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToRole)
 
     // Share layout to `role`
     layout->setParentId(QnUuid());
-    setOwnAccessRights(group.id, {{layout->getId(), AccessRight::view}});
 
     // Make sure user got permissions
     ASSERT_TRUE(hasPermissions(user, target, Qn::ReadPermission));
@@ -1449,17 +1410,17 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToParentRole)
 
     const auto target = addCamera();
 
-    // Create roles without access
-    const auto parentGroup = createUserGroup(NoGroup);
-    const auto inheritedGroup = createUserGroup(parentGroup.id);
-
-    // Create user in role
-    const auto user = addUser(NoGroup, kTestUserName2);
-    user->setGroupIds({inheritedGroup.id});
-
     // Create own layout
     const auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
+
+    // Create roles
+    const auto parentGroup =
+        createUserGroup("Parent group", NoGroup, {{layout->getId(), AccessRight::view}});
+    const auto inheritedGroup = createUserGroup("Inherited group", parentGroup.id);
+
+    // Create user in role
+    const auto user = addUser(inheritedGroup.id, kTestUserName2);
 
     // Place a camera on it
     LayoutItemData item;
@@ -1468,7 +1429,6 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToParentRole)
 
     // Share layout to `parentGroup`
     layout->setParentId(QnUuid());
-    setOwnAccessRights(parentGroup.id, {{layout->getId(), AccessRight::view}});
 
     // Make sure user got permissions
     ASSERT_TRUE(hasPermissions(user, target, Qn::ReadPermission));
@@ -1697,7 +1657,7 @@ TEST_F(ResourceAccessManagerTest, checkPermissionsById)
     const auto camera = addCamera();
     const auto server = addServer();
     const auto user = addUser(kViewersGroupId);
-    const auto group = createUserGroup(kViewersGroupId);
+    const auto group = createUserGroup("Viewer group", kViewersGroupId);
 
     ASSERT_EQ(
         resourceAccessManager()->permissions(m_currentUser, camera),

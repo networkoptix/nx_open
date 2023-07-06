@@ -53,12 +53,10 @@ class EventFieldContextTest: public nx::vms::common::test::ContextBasedTest
 
 TEST_F(EventFieldContextTest, SourceUserField)
 {
-    const auto permission = nx::vms::api::GlobalPermission::userInput;
-    const auto user = addUser(NoGroup, kTestUserName, api::UserType::local, permission);
+    const auto group = createUserGroup(
+        "User input group", NoGroup, {{api::kAllDevicesGroupId, api::AccessRight::userInput}});
+    const auto user = addUser({group.id});
     const auto userIdValue = QVariant::fromValue(user->getId());
-    const auto group = createUserGroup(permission);
-
-    user->setGroupIds({group.id});
 
     auto field = SourceUserField(systemContext());
 

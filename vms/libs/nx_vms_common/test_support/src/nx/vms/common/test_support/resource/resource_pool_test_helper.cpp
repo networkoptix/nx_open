@@ -7,6 +7,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/user_group_data.h>
@@ -23,6 +24,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(
     const QString& name,
     UserType userType,
     GlobalPermissions globalPermissions,
+    const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights,
     const QString& ldapDn)
 {
     QnUserResourcePtr user(new QnUserResource(userType, ldapDn));
@@ -31,6 +33,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(
     user->setPasswordAndGenerateHash(name);
     user->setGroupIds(parentGroupIds.data);
     user->setRawPermissions(globalPermissions);
+    user->setResourceAccessRights(resourceAccessRights);
     user->addFlags(Qn::remote);
     return user;
 }
@@ -40,9 +43,11 @@ QnUserResourcePtr QnResourcePoolTestHelper::addUser(
     const QString& name,
     UserType userType,
     GlobalPermissions globalPermissions,
+    const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights,
     const QString& ldapDn)
 {
-    const auto user = createUser(parentGroupIds, name, userType, globalPermissions, ldapDn);
+    const auto user = createUser(
+        parentGroupIds, name, userType, globalPermissions, resourceAccessRights, ldapDn);
     resourcePool()->addResource(user);
     return user;
 }
@@ -218,25 +223,14 @@ QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerRes
     return storage;
 }
 
-UserGroupData QnResourcePoolTestHelper::createUserGroup(Ids parentGroupIds, QString name)
+UserGroupData QnResourcePoolTestHelper::createUserGroup(
+    QString name,
+    Ids parentGroupIds,
+    const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights,
+    GlobalPermissions permissions)
 {
-    if (name.isNull())
-    {
-        name = NX_FMT("Group inherited from `%1`", nx::vms::common::userGroupNames(
-            systemContext(), parentGroupIds.data).join("', '"));
-    }
-
-    UserGroupData group{QnUuid::createUuid(), name, GlobalPermission::none, parentGroupIds.data};
-    systemContext()->userGroupManager()->addOrUpdate(group);
-    return group;
-}
-
-UserGroupData QnResourcePoolTestHelper::createUserGroup(GlobalPermissions permissions, QString name)
-{
-    if (name.isNull())
-        name = NX_FMT("Role for %1", nx::reflect::json::serialize(permissions));
-
-    UserGroupData group{QnUuid::createUuid(), name, permissions, {}};
+    UserGroupData group{QnUuid::createUuid(), name, permissions, parentGroupIds.data};
+    group.resourceAccessRights = resourceAccessRights;
     addOrUpdateUserGroup(group);
     return group;
 }
@@ -244,6 +238,8 @@ UserGroupData QnResourcePoolTestHelper::createUserGroup(GlobalPermissions permis
 void QnResourcePoolTestHelper::addOrUpdateUserGroup(const UserGroupData& group)
 {
     systemContext()->userGroupManager()->addOrUpdate(group);
+    systemContext()->accessRightsManager()->setOwnResourceAccessMap(
+        group.id, {group.resourceAccessRights.begin(), group.resourceAccessRights.end()});
 }
 
 void QnResourcePoolTestHelper::removeUserGroup(const QnUuid& groupId)

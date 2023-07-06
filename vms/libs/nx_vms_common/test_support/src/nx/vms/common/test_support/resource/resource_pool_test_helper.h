@@ -36,6 +36,7 @@ public:
         const QString& name = kTestUserName,
         nx::vms::api::UserType userType = nx::vms::api::UserType::local,
         GlobalPermissions globalPermissions = GlobalPermission::none,
+        const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
         const QString& ldapDn = "");
 
     QnUserResourcePtr addUser(
@@ -43,6 +44,7 @@ public:
         const QString& name = kTestUserName,
         nx::vms::api::UserType userType = nx::vms::api::UserType::local,
         GlobalPermissions globalPermissions = GlobalPermission::none,
+        const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
         const QString& ldapDn = "");
 
     QnLayoutResourcePtr createLayout();
@@ -74,10 +76,10 @@ public:
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 
     nx::vms::api::UserGroupData createUserGroup(
-        Ids parentGroupIds, QString name = QString{});
-
-    nx::vms::api::UserGroupData createUserGroup(
-        GlobalPermissions permissions, QString name = QString{});
+        QString name,
+        Ids parentGroupIds = NoGroup,
+        const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
+        GlobalPermissions permissions = GlobalPermission::none);
 
     void addOrUpdateUserGroup(const nx::vms::api::UserGroupData& group);
     void removeUserGroup(const QnUuid& groupId);
