@@ -41,6 +41,11 @@ static constexpr int kDialogFixedWidth = 640;
 static constexpr int kHeaderCaptionTextPixelSize = 24;
 static constexpr auto kHeaderCaptionTextWeight = QFont::ExtraLight;
 
+static const QColor kLight4Color = "#E1E7EA";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIconSubstitutions = {
+    {QIcon::Normal, {{kLight4Color, "light4"}}},
+};
+
 bool showServersInTree(const QnWorkbenchContext* context)
 {
     // No other checks, the dialog is accessible for power users only.
@@ -467,7 +472,9 @@ void CameraReplacementDialog::setupUiContols()
     setPaletteColor(ui->headerContentsWidget, QPalette::Window, kHeaderBackgroundColor);
     ui->headerContentsWidget->setAutoFillBackground(true);
 
-    ui->headerCheckmarkLabel->setPixmap(qnSkin->pixmap("system_settings/update_checkmark.png"));
+    ui->headerCheckmarkLabel->setPixmap(
+        qnSkin->icon("system_settings/update_checkmark_40.svg", kNormalIconSubstitutions)
+            .pixmap(QSize(40, 40)));
 
     QFont headerCaptionFont;
     headerCaptionFont.setPixelSize(kHeaderCaptionTextPixelSize);
