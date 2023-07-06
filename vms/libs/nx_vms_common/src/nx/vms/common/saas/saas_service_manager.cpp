@@ -20,7 +20,7 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
     SystemContextAware(context)
 {
         connect(
-            context->resourcePropertyDictionary(), 
+            context->resourcePropertyDictionary(),
             &QnResourcePropertyDictionary::propertyChanged,
             [this](const QnUuid& resourceId, const QString& key)
             {
@@ -55,6 +55,16 @@ bool ServiceManager::loadSaasData(const std::string_view& data)
         }
     }
     return result;
+}
+
+void ServiceManager::setDisabled()
+{
+    m_disabled = true;
+}
+
+bool ServiceManager::isEnabled() const
+{
+    return !m_disabled;
 }
 
 bool ServiceManager::loadServiceData(const std::string_view& data)
@@ -96,7 +106,7 @@ QnLicensePtr ServiceManager::localRecordingLicenseV1()  const
     for (const auto& [serviceId, purshase]: m_data.services)
     {
         if (auto it = m_services.find(serviceId); it != m_services.end())
-        { 
+        {
             const SaasService& service = it->second;
             if (service.type != SaasService::kLocalRecordingServiceType)
                 continue;
