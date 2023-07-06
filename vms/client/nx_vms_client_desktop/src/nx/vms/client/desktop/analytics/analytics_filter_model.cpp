@@ -5,6 +5,8 @@
 #include <QtQml/QQmlEngine>
 
 #include <core/resource/camera_resource.h>
+#include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
+#include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/utils/range_adapters.h>
 
 #include "analytics_taxonomy_manager.h"
@@ -124,6 +126,17 @@ AnalyticsFilterModel::AnalyticsFilterModel(TaxonomyManager* taxonomyManager, QOb
             {
                 if (m_isActive)
                     rebuild();
+
+                const auto taxonomy = m_taxonomyManager->currentTaxonomy();
+                connect(
+                    taxonomy->resourceSupportProxy(),
+                    &nx::analytics::taxonomy::AbstractResourceSupportProxy::manifestsMaybeUpdated,
+                    this,
+                    [this]
+                    {
+                        if (m_isActive)
+                            rebuild();
+                    });
             });
 
         rebuild();

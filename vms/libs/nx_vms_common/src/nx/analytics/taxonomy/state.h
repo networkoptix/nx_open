@@ -4,7 +4,6 @@
 
 #include <map>
 
-#include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/internal_state.h>
 #include <nx/utils/thread/mutex.h>
@@ -54,6 +53,8 @@ public:
     virtual AbstractColorType* colorTypeById(const QString& colorTypeId) const override;
 
     virtual nx::vms::api::analytics::Descriptors serialize() const override;
+
+    AbstractResourceSupportProxy* resourceSupportProxy() const override;
 
 private:
     void refillCache() const;
