@@ -3,16 +3,22 @@
 #include "performance_info.h"
 
 #include <chrono>
+#include <list>
 #include <thread>
 
 #include <QtCore/QJsonObject>
+#include <QtCore/QTimer>
 
 #include <nx/build_info.h>
+#include <nx/metrics/application_metrics_storage.h>
+#include <nx/utils/log/format.h>
 #include <nx/utils/trace/trace.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/text/human_readable.h>
 
@@ -24,6 +30,7 @@ namespace nx::vms::client::desktop {
 namespace {
 
 static constexpr int kMaxThreadCount = 250; //< More is considered as suspicious.
+static constexpr auto kRequestCountUpdateInterval = 1s;
 
 } // namespace
 
@@ -34,6 +41,20 @@ public:
 
     quint32 frameCount = 0;
     QElapsedTimer fpsTimer;
+    std::list<qint64> requestCountLastMinute = std::list<qint64>(60, 0);
+    QTimer requestsCountUpdateTimer;
+    
+    Private()
+    {
+        requestsCountUpdateTimer.setInterval(kRequestCountUpdateInterval);
+        requestsCountUpdateTimer.callOnTimeout(
+            [this]()
+            {
+                requestCountLastMinute.push_back(appContext()->metrics()->totalServerRequests());
+                requestCountLastMinute.pop_front();
+            });
+        requestsCountUpdateTimer.start();
+    }
 
     std::tuple<qreal, milliseconds> calculateFpsValues()
     {
@@ -118,6 +139,16 @@ void PerformanceInfo::setPerformanceValues(const QVariantMap& values)
     if (appContext()->performanceMonitor()->isDebugInfoVisible())
         counters << DebugInfoStorage::instance()->debugInfo();
 
+    auto metrics = appContext()->metrics();
+    qint64 requestsCount = metrics->totalServerRequests();
+    auto requestsPerMin = requestsCount - d->requestCountLastMinute.front();
+    QString requestInfo = nx::format("Requests per min: %1 (total: %2)")
+        .args(requestsPerMin, requestsCount);
+    
+    if (requestsPerMin > ini().maxSeverRequestCountPerMinunte)
+        requestInfo = setWarningStyleHtml(requestInfo);
+
+    counters << requestInfo;
     d->text = html::document(counters.join(html::kLineBreak));
 
     emit textChanged(d->text);

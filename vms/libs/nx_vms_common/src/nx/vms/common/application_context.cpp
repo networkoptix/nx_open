@@ -9,6 +9,7 @@
 #include <network/cloud/cloud_media_server_endpoint_verificator.h>
 #include <nx/branding.h>
 #include <nx/media/ffmpeg_helper.h>
+#include <nx/metrics/application_metrics_storage.h>
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/thread/long_runnable.h>
@@ -27,6 +28,7 @@ static void initializeResources()
 namespace nx::vms::common {
 
 using namespace nx::network;
+using namespace nx::metrics;
 
 static ApplicationContext* s_instance = nullptr;
 
@@ -46,6 +48,7 @@ struct ApplicationContext::Private
     std::unique_ptr<QnSyncTime> syncTime;
     std::unique_ptr<QnStoragePluginFactory> storagePluginFactory;
     std::unique_ptr<nx::utils::TimerManager> timerManager;
+    std::unique_ptr<ApplicationMetricsStorage> metricsStorage;
 };
 
 ApplicationContext::ApplicationContext(
@@ -75,6 +78,7 @@ ApplicationContext::ApplicationContext(
     d->syncTime = std::make_unique<QnSyncTime>();
     d->storagePluginFactory = std::make_unique<QnStoragePluginFactory>();
     d->timerManager = std::make_unique<nx::utils::TimerManager>("CommonTimerManager");
+    d->metricsStorage = std::make_unique<ApplicationMetricsStorage>();
 }
 
 ApplicationContext::~ApplicationContext()
@@ -165,6 +169,11 @@ QnStoragePluginFactory* ApplicationContext::storagePluginFactory() const
 QnLongRunableCleanup* ApplicationContext::longRunableCleanup() const
 {
     return d->longRunableCleanup.get();
+}
+
+ApplicationMetricsStorage* ApplicationContext::metrics() const
+{
+    return d->metricsStorage.get();
 }
 
 } // namespace nx::vms::common

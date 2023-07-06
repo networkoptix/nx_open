@@ -153,6 +153,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, virtualJoystick,
         "[Dev] Enables joystick emulator (works only on MacOS).");
 
+    NX_INI_INT(200, maxSeverRequestCountPerMinunte,
+        "[Dev] The maximum number of requests to the server per minute, after which it is\n"
+        "considered that there are too many requests.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.

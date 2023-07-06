@@ -11,7 +11,7 @@
 class QnLongRunableCleanup;
 class QnStoragePluginFactory;
 
-namespace nx::utils { class TimerManager; }
+namespace nx::metrics { struct ApplicationMetricsStorage; }
 
 namespace nx::vms::common {
 
@@ -57,6 +57,7 @@ public:
 
     QnStoragePluginFactory* storagePluginFactory() const;
     QnLongRunableCleanup* longRunableCleanup() const;
+    nx::metrics::ApplicationMetricsStorage* metrics() const;
 
 private:
     struct Private;
