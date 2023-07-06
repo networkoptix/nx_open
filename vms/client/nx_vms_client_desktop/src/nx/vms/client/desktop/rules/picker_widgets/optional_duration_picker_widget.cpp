@@ -5,6 +5,7 @@
 #include <QtWidgets/QHBoxLayout>
 
 #include <nx/vms/rules/utils/field.h>
+#include <ui/common/read_only.h>
 
 namespace nx::vms::client::desktop::rules {
 
@@ -72,6 +73,8 @@ void OptionalDurationPicker::updateUi()
     {
         const bool isProlonged =
             parentParamsWidget()->eventDescriptor()->flags.testFlag(vms::rules::ItemFlag::prolonged);
+
+        ::setReadOnly(m_enabledSwitch, !isProlonged);
 
         if (!isProlonged && field->value() == vms::rules::OptionalTimeField::value_type::zero())
         {

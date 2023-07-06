@@ -75,7 +75,7 @@ bool TitledPickerWidget::isChecked() const
 
 void TitledPickerWidget::setReadOnly(bool value)
 {
-    m_contentWidget->setEnabled(!value);
+    setEnabled(!value);
 }
 
 void TitledPickerWidget::onEnabledChanged(bool isEnabled)
