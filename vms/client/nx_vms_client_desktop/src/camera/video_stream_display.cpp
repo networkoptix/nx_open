@@ -398,28 +398,70 @@ MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding
     return MultiThreadDecodePolicy::autoDetect;
 }
 
+#ifdef __QSV_SUPPORTED__
+
+bool canAddIntel(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
+{
+    return appContext()->localSettings()->hardwareDecodingEnabled()
+        && isIntel()
+        && !reverseMode
+        && QuickSyncVideoDecoderOldPlayer::instanceCount()
+            < appContext()->localSettings()->maxHardwareDecoders()
+        && QuickSyncVideoDecoderOldPlayer::isSupported(data);
+}
+
+bool canAddNvidia(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
+{
+    return appContext()->localSettings()->hardwareDecodingEnabled()
+        && isNvidia()
+        && !reverseMode
+        && NvidiaVideoDecoderOldPlayer::instanceCount()
+            < appContext()->localSettings()->maxHardwareDecoders()
+        && NvidiaVideoDecoderOldPlayer::isSupported(data);
+    return false;
+}
+
+bool QnVideoStreamDisplay::shouldUpdateDecoder(
+    const QnConstCompressedVideoDataPtr& data, bool reverseMode)
+{
+    if (!m_decoderData.decoder)
+        return false;
+
+    if (m_decoderData.decoder->hardwareDecoder())
+    {
+        if (!appContext()->localSettings()->hardwareDecodingEnabled())
+            return true; // Decoder should be changed to software
+    }
+    else
+    {
+        if (canAddIntel(data, reverseMode) || canAddNvidia(data, reverseMode))
+            return true; // Decoder should be changed to hardware
+    }
+
+    return false;
+}
+
+#else // __QSV_SUPPORTED__
+
+bool canAddIntel(QnConstCompressedVideoDataPtr&, bool) { return false; }
+bool canAddNvidia(QnConstCompressedVideoDataPtr&, bool) { return false; }
+bool QnVideoStreamDisplay::shouldUpdateDecoder(const QnConstCompressedVideoDataPtr&, bool) { return false; }
+
+#endif // __QSV_SUPPORTED__
+
 QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
-    QnCompressedVideoDataPtr data, bool mtDecoding) const
+    const QnConstCompressedVideoDataPtr& data, bool mtDecoding) const
 {
     QnAbstractVideoDecoder* decoder = nullptr;
 
 #ifdef __QSV_SUPPORTED__
-    if (appContext()->localSettings()->hardwareDecodingEnabled() && !m_reverseMode)
+    if (canAddIntel(data, m_reverseMode))
     {
-        if (QuickSyncVideoDecoderOldPlayer::instanceCount()
-                < appContext()->localSettings()->maxHardwareDecoders()
-            && QuickSyncVideoDecoderOldPlayer::isSupported(data)
-            && isIntel())
-        {
-            decoder = new QuickSyncVideoDecoderOldPlayer();
-        }
-        else if (NvidiaVideoDecoderOldPlayer::instanceCount()
-                < appContext()->localSettings()->maxHardwareDecoders()
-            && NvidiaVideoDecoderOldPlayer::isSupported(data)
-            && isNvidia())
-        {
-            decoder = new NvidiaVideoDecoderOldPlayer();
-        }
+        decoder = new QuickSyncVideoDecoderOldPlayer();
+    }
+    else if (canAddNvidia(data, m_reverseMode))
+    {
+        decoder = new NvidiaVideoDecoderOldPlayer();
     }
 #endif // __QSV_SUPPORTED__
     if (!decoder)
@@ -536,6 +578,14 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     QnAbstractVideoDecoder* dec = nullptr;
     {
         NX_MUTEX_LOCKER lock(&m_mtx);
+
+        // Check can we use one more HW decoder or HW accelersation is disabled.
+        if (data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+        {
+            if (shouldUpdateDecoder(data, m_reverseMode))
+                m_decoderData.decoder.reset();
+        }
+
         dec = m_decoderData.decoder.get();
         auto frameResolution = data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey)
             ? nx::media::getFrameSize(data.get())

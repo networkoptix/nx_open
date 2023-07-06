@@ -43,7 +43,7 @@ public:
     virtual void setLightCpuMode(DecodeMode val) override;
 
     AVCodecContext* getContext() const;
-    MemoryType targetMemoryType() const override;
+    bool hardwareDecoder() const override;
     virtual int getWidth() const override { return m_context->width;  }
     virtual int getHeight() const override { return m_context->height; }
     double getSampleAspectRatio() const override;

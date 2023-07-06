@@ -101,9 +101,9 @@ int NvidiaVideoDecoderOldPlayer::getHeight() const
     return m_resolution.height();
 }
 
-MemoryType NvidiaVideoDecoderOldPlayer::targetMemoryType() const
+bool NvidiaVideoDecoderOldPlayer::hardwareDecoder() const
 {
-    return MemoryType::VideoMemory;
+    return true;
 }
 
 double NvidiaVideoDecoderOldPlayer::getSampleAspectRatio() const

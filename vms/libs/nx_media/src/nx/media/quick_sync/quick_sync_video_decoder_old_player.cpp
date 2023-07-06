@@ -116,9 +116,9 @@ int QuickSyncVideoDecoderOldPlayer::getHeight() const
     return m_resolution.height();
 }
 
-MemoryType QuickSyncVideoDecoderOldPlayer::targetMemoryType() const
+bool QuickSyncVideoDecoderOldPlayer::hardwareDecoder() const
 {
-    return MemoryType::VideoMemory;
+    return true;
 }
 
 double QuickSyncVideoDecoderOldPlayer::getSampleAspectRatio() const

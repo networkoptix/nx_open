@@ -70,8 +70,6 @@ public:
 public: // used only by QnCamDisplay
     void waitForFramesDisplayed();
     QSize getMaxScreenSizeUnsafe() const;
-    QnAbstractVideoDecoder* createVideoDecoder(
-        QnCompressedVideoDataPtr data, bool mtDecoding) const;
 
     QnVideoStreamDisplay::FrameDisplayStatus flushFrame(
         int channel, QnFrameScaler::DownscaleFactor force_factor);
@@ -152,6 +150,11 @@ private:
     bool rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
     void flushReverseBlock(
         QnAbstractVideoDecoder* dec, QnCompressedVideoDataPtr data, QnFrameScaler::DownscaleFactor forceScaleFactor);
+    bool shouldUpdateDecoder(
+        const QnConstCompressedVideoDataPtr& data, bool reverseMode);
+
+    QnAbstractVideoDecoder* createVideoDecoder(
+        const QnConstCompressedVideoDataPtr& data, bool mtDecoding) const;
 
     QnFrameScaler::DownscaleFactor determineScaleFactor(
         std::set<QnResourceWidgetRenderer*> renderList,
