@@ -26,11 +26,14 @@
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_layout.h>
@@ -494,6 +497,27 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
     const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
     switch (nodeType)
     {
+        case ResourceTree::NodeType::currentSystem:
+        {
+            if (activationType != ResourceTree::ActivationType::doubleClick)
+                return;
+
+            // System Administration window opens on double-click if current user is a member of
+            // Administrator or Power Users group.
+            menu()->trigger(ui::action::SystemAdministrationAction);
+            break;
+        }
+
+        case ResourceTree::NodeType::currentUser:
+        {
+            if (activationType != ResourceTree::ActivationType::doubleClick)
+                return;
+
+            // Opens User Settings window for current user.
+            menu()->trigger(ui::action::UserSettingsAction, {context()->user()});
+            break;
+        }
+
         case ResourceTree::NodeType::cloudSystem:
         {
             const auto callback =
