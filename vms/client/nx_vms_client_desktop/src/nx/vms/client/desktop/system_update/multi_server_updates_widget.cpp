@@ -89,6 +89,11 @@ constexpr int kVersionSelectionBlockHeight = 20;
 constexpr int kVersionInformationBlockMinHeight = 48;
 constexpr int kPreloaderHeight = 32;
 
+static const QColor kLight4Color = "#E1E7EA";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIconSubstitutions = {
+    {QIcon::Normal, {{kLight4Color, "light4"}}},
+};
+
 // Adds resource list to message box
 QTableView* injectResourceList(
     QnMessageBox& messageBox, const QnResourceList& resources)
@@ -209,7 +214,9 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     ui->latestVersionBannerLabel->setFont(latestVersionBannerFont);
     ui->latestVersionBannerLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->latestVersionBannerLabel->setForegroundRole(QPalette::Text);
-    ui->latestVersionIconLabel->setPixmap(qnSkin->pixmap("system_settings/update_checkmark.png"));
+    ui->latestVersionIconLabel->setPixmap(
+        qnSkin->icon("system_settings/update_checkmark_40.svg", kNormalIconSubstitutions)
+            .pixmap(QSize(40, 40)));
     ui->linkCopiedIconLabel->setPixmap(qnSkin->pixmap("text_buttons/ok.png"));
     ui->linkCopiedWidget->hide();
 
