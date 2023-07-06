@@ -126,9 +126,12 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     m_buttons[kBusinessRulesButton]->setIcon(qnSkin->icon("system_settings/event_rules.png"));
     m_buttons[kEventLogButton     ]->setIcon(qnSkin->icon("system_settings/event_log.png"));
-    m_buttons[kCameraListButton   ]->setIcon(qnSkin->icon("system_settings/cameras_list.png"));
-    m_buttons[kAuditLogButton     ]->setIcon(qnSkin->icon("system_settings/audit_trail_56.svg", kNormalIconSubstitutions));
-    m_buttons[kBookmarksButton    ]->setIcon(qnSkin->icon("system_settings/bookmarks_56.svg", kNormalIconSubstitutions));
+    m_buttons[kCameraListButton   ]->setIcon(
+        qnSkin->icon("system_settings/cameras_list_56.svg", kNormalIconSubstitutions));
+    m_buttons[kAuditLogButton     ]->setIcon(
+        qnSkin->icon("system_settings/audit_trail_56.svg", kNormalIconSubstitutions));
+    m_buttons[kBookmarksButton    ]->setIcon(
+        qnSkin->icon("system_settings/bookmarks_56.svg", kNormalIconSubstitutions));
 
     retranslateUi();
 
