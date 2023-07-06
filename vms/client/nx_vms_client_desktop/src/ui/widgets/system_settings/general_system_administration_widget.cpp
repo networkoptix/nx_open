@@ -128,7 +128,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     m_buttons[kEventLogButton     ]->setIcon(qnSkin->icon("system_settings/event_log.png"));
     m_buttons[kCameraListButton   ]->setIcon(qnSkin->icon("system_settings/cameras_list.png"));
     m_buttons[kAuditLogButton     ]->setIcon(qnSkin->icon("system_settings/audit_trail_56.svg", kNormalIconSubstitutions));
-    m_buttons[kBookmarksButton    ]->setIcon(qnSkin->icon("system_settings/bookmarks.png"));
+    m_buttons[kBookmarksButton    ]->setIcon(qnSkin->icon("system_settings/bookmarks_56.svg", kNormalIconSubstitutions));
 
     retranslateUi();
 
