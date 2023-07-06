@@ -3,19 +3,19 @@
 #pragma once
 
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
-#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/rules/rules_fwd.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop::rules {
 
 class RulesTableModel;
 
-class VmsRulesDialog: public QmlDialogWrapper, public SystemContextAware
+class VmsRulesDialog: public QmlDialogWrapper, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
 public:
-    explicit VmsRulesDialog(SystemContext* systemContext, QWidget* parent);
+    explicit VmsRulesDialog(QWidget* parent);
     ~VmsRulesDialog() override;
 
     void setError(const QString& error);
@@ -25,6 +25,7 @@ public:
     Q_INVOKABLE void editRule(QnUuid id);
     Q_INVOKABLE void deleteRule(QnUuid id);
     Q_INVOKABLE void resetToDefaults();
+    Q_INVOKABLE void openEventLogDialog();
 
 private:
     QWidget* m_parentWidget{nullptr};

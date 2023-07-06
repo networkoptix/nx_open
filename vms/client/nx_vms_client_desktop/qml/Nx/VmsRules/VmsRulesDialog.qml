@@ -229,6 +229,10 @@ Dialog
             {
                 text: qsTr("Event Log...")
                 icon.source: "qrc:///skin/buttons/event_log.png"
+                onClicked:
+                {
+                    root.dialog.openEventLogDialog()
+                }
             }
 
             TextButton

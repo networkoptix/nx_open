@@ -98,9 +98,7 @@ VmsRulesActionHandler::VmsRulesActionHandler(QObject* parent):
         [this](QnWorkbenchContext* context)
         {
             appContext()->qmlEngine()->clearComponentCache();
-            auto dialog = std::make_unique<rules::VmsRulesDialog>(
-                context->systemContext(),
-                context->mainWindowWidget());
+            auto dialog = std::make_unique<rules::VmsRulesDialog>(context->mainWindowWidget());
 
             QFileSystemWatcher watcher;
             watcher.addPath(
@@ -120,7 +118,7 @@ VmsRulesActionHandler::VmsRulesActionHandler(QObject* parent):
                         this);
                 });
 
-            dialog->exec(Qt::ApplicationModal);
+            dialog->exec(Qt::NonModal);
         });
 
     connect(action(ui::action::OpenVmsRulesDialogAction), &QAction::triggered,
@@ -137,11 +135,11 @@ VmsRulesActionHandler::~VmsRulesActionHandler()
 
 void VmsRulesActionHandler::openVmsRulesDialog()
 {
-    d->rulesDialog = std::make_unique<VmsRulesDialog>(systemContext(), mainWindowWidget());
+    d->rulesDialog = std::make_unique<VmsRulesDialog>(mainWindowWidget());
 
     d->initialiseLookupLists();
 
-    d->rulesDialog->exec(Qt::ApplicationModal);
+    d->rulesDialog->exec(Qt::NonModal);
     d->rulesDialog.reset();
 }
 
