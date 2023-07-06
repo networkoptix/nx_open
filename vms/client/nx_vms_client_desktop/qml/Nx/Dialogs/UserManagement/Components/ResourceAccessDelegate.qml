@@ -47,7 +47,7 @@ Item
     readonly property var resource: (model && model.resource) || null
     readonly property var nodeType: (model && model.nodeType) || -1
 
-    signal frameInitializationResponse(int /*FrameSelectionMode*/ desiredMode)
+    signal frameInitializationResponse(var cell)
 
     implicitWidth: mainDelegate.implicitWidth
     implicitHeight: 28
@@ -241,18 +241,14 @@ Item
                     }
 
                     onClicked:
-                    {
                         accessRightsModel.toggle(index, delegateRoot.automaticDependencies)
-                    }
 
                     onFrameSelectedChanged:
                     {
                         if (frameSelected && delegateRoot.frameSelectionMode
                             == ResourceAccessDelegate.FrameInitialization)
                         {
-                            delegateRoot.frameInitializationResponse(isToggledOn()
-                                ? ResourceAccessDelegate.FrameUnselection
-                                : ResourceAccessDelegate.FrameSelection)
+                            delegateRoot.frameInitializationResponse(cell)
                         }
                     }
 
