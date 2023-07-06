@@ -47,12 +47,6 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIco
     {QIcon::Normal, {{kLight4Color, "light4"}}},
 };
 
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight4Color, "light4"}}},
-    {QIcon::Active, {{kLight4Color, "light5"}}},
-    {QIcon::Selected, {{kLight4Color, "light3"}}},
-};
-
 } // namespace
 
 QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget* parent /* = nullptr*/):

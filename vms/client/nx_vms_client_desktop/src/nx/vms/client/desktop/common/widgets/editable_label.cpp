@@ -9,6 +9,7 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QToolButton>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/widgets/common/elided_label.h>
@@ -18,6 +19,13 @@ namespace {
 
 static constexpr int kDefaultFontSizePixels = 24;
 static constexpr auto kDefaultFontWeight = QFont::DemiBold;
+
+static const QColor kLight4Color = "#E1E7EA";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight4Color, "light4"}}},
+    {QIcon::Active, {{kLight4Color, "light5"}}},
+    {QIcon::Selected, {{kLight4Color, "light3"}}},
+};
 
 } // namespace
 
@@ -286,7 +294,7 @@ EditableLabel::EditableLabel(QWidget* parent):
     font.setPixelSize(kDefaultFontSizePixels);
     font.setWeight(kDefaultFontWeight);
     setFont(font);
-    setButtonIcon(qnSkin->icon("system_settings/edit.png"));
+    setButtonIcon(qnSkin->icon("system_settings/edit_28.svg", kIconSubstitutions));
     setValidator([](const QString& text) { return !text.isEmpty(); });
 }
 
