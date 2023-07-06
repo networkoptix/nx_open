@@ -14,6 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/format.h>
@@ -698,7 +699,12 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
 
     if (accessInfo.providedVia == ResourceAccessInfo::ProvidedVia::own)
     {
-        descriptions << tr("Access granted by custom permissions");
+        const auto currentUser = context->systemContext()->resourcePool()->
+            getResourceById<QnUserResource>(context->currentSubjectId());
+
+        descriptions << (currentUser
+            ? tr("User's custom permissions")
+            : tr("Group's custom permissions"));
     }
     else if (auto nodeName = resourceGroupName(accessInfo.parentResourceGroupId))
     {
