@@ -180,7 +180,6 @@ Dialog
                     anchors.fill: parent
                     onClicked:
                     {
-                        selectionModel.clearSelection()
                         selectionModel.select(
                             tableView.index(row, column),
                             ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows)
@@ -194,7 +193,8 @@ Dialog
                 }
             }
 
-            Keys.onPressed: (event)=> {
+            Keys.onPressed: (event) =>
+            {
                 if (!selectionModel.hasSelection)
                     return
 
@@ -202,6 +202,19 @@ Dialog
                     || (Qt.platform.os === "osx" && event.key == Qt.Key_Backspace))
                 {
                     root.deleteSelectedRule()
+                    event.accepted = true;
+                }
+                else if ((event.key == Qt.Key_Down || event.key == Qt.Key_Up)
+                    && selectionModel.hasSelection)
+                {
+                    const rowToSelect = MathUtils.bound(
+                        0,
+                        selectionModel.selectedIndexes[0].row + (event.key == Qt.Key_Down ? 1 : -1),
+                        tableView.rows - 1)
+                    selectionModel.select(
+                        tableView.index(rowToSelect, 0),
+                        ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows)
+
                     event.accepted = true;
                 }
             }
