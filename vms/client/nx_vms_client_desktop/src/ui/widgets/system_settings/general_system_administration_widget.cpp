@@ -14,6 +14,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/system_settings.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
@@ -40,6 +41,17 @@ static const int kMaxSystemNameLength = 64;
 
 static const int kPreferencesButtonSize = 104;
 static const QMargins kPreferencesButtonMargins(8, 4, 8, 4);
+
+static const QColor kLight4Color = "#E1E7EA";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIconSubstitutions = {
+    {QIcon::Normal, {{kLight4Color, "light4"}}},
+};
+
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight4Color, "light4"}}},
+    {QIcon::Active, {{kLight4Color, "light5"}}},
+    {QIcon::Selected, {{kLight4Color, "light3"}}},
+};
 
 } // namespace
 
@@ -115,7 +127,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     m_buttons[kBusinessRulesButton]->setIcon(qnSkin->icon("system_settings/event_rules.png"));
     m_buttons[kEventLogButton     ]->setIcon(qnSkin->icon("system_settings/event_log.png"));
     m_buttons[kCameraListButton   ]->setIcon(qnSkin->icon("system_settings/cameras_list.png"));
-    m_buttons[kAuditLogButton     ]->setIcon(qnSkin->icon("system_settings/audit_trail.png"));
+    m_buttons[kAuditLogButton     ]->setIcon(qnSkin->icon("system_settings/audit_trail_56.svg", kNormalIconSubstitutions));
     m_buttons[kBookmarksButton    ]->setIcon(qnSkin->icon("system_settings/bookmarks.png"));
 
     retranslateUi();
