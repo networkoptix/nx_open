@@ -13,6 +13,7 @@
 #include <nx/analytics/taxonomy/abstract_group.h>
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_plugin.h>
+#include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx::analytics::taxonomy {
@@ -63,6 +64,8 @@ public:
     virtual AbstractColorType* colorTypeById(const QString& colorTypeId) const = 0;
 
     virtual nx::vms::api::analytics::Descriptors serialize() const = 0;
+
+    virtual AbstractResourceSupportProxy* resourceSupportProxy() const = 0;
 };
 
 } // namespace nx::analytics::taxonomy
