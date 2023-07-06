@@ -40,7 +40,8 @@ QJsonDocument convertHttpToJsonRequest(const QtHttpRequest& request)
         result.insert(item.first, item.second);
 
     auto path = request.getUrl().path();
-    const auto pathCommand = path.remove('/'); //< Strip leading or trailing "/".
+    // Strip leading or trailing "/".
+    const auto pathCommand = path.remove(QRegularExpression("^\\/|\\/$"));
     // We give priority to "command" parameter vs. URL path parameter.
     if (!result.contains("command") && !pathCommand.isEmpty())
         result.insert("command", pathCommand);

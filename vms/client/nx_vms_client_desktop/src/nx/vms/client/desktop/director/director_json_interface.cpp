@@ -8,9 +8,11 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
+#include <nx/metrics/application_metrics_storage.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
+#include <nx/vms/common/application_context.h>
 
 using std::pair;
 
@@ -113,6 +115,15 @@ QJsonDocument executeGetFrameTimePoints(QJsonObject request)
     return QJsonDocument(response);
 }
 
+QJsonDocument getServerRequestStatistics(QJsonObject request)
+{
+    auto metrics = nx::vms::common::appContext()->metrics();
+    auto response = formResponseBase(DirectorJsonInterface::Ok);
+    response.insert(
+        metrics->totalServerRequests.name(), static_cast<qint64>(metrics->totalServerRequests()));
+    return QJsonDocument(response);
+}
+
 QJsonDocument execute(QJsonObject request)
 {
     if (!request.contains("source"))
@@ -155,6 +166,8 @@ QJsonDocument DirectorJsonInterface::process(const QJsonDocument& jsonRequest)
         return executeGetFrameTimePoints(jsonObject);
     if (command == "execute")
         return execute(jsonObject);
+    if (command == "statistics/requests")
+        return getServerRequestStatistics(jsonObject);
 
     return QJsonDocument(formResponseBase(BadCommand));
 }

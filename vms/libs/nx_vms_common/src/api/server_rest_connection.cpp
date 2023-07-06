@@ -26,6 +26,7 @@
 #include <nx/build_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/compressed_time_functions.h>
+#include <nx/metrics/application_metrics_storage.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/ssl/helpers.h>
@@ -2963,13 +2964,7 @@ Handle ServerConnection::sendRequest(
     context->timeouts = timeouts;
     context->setTargetThread(thread);
 
-    Handle requestId = d->httpClientPool->sendRequest(context);
-
-    // Request can be complete just inside `sendRequest`, so requestId is already invalid.
-    if (!requestId || context->isFinished())
-        return 0;
-
-    return requestId;
+    return sendRequest(context);
 }
 
 Handle ServerConnection::sendRequest(
@@ -2993,17 +2988,15 @@ Handle ServerConnection::sendRequest(
     context->timeouts = timeouts;
     context->setTargetThread(this->thread());
 
-    Handle requestId = d->httpClientPool->sendRequest(context);
-
-    // Request can be complete just inside `sendRequest`, so requestId is already invalid.
-    if (!requestId || context->isFinished())
-        return 0;
-
-    return requestId;
+    return sendRequest(context);
 }
 
 Handle ServerConnection::sendRequest(const ContextPtr& context)
 {
+    auto metrics = nx::vms::common::appContext()->metrics();
+    metrics->totalServerRequests()++;
+    NX_VERBOSE(
+        d->logTag, "%1: %2", metrics->totalServerRequests.name(), metrics->totalServerRequests());
     Handle requestId = d->httpClientPool->sendRequest(context);
 
     // Request can be complete just inside `sendRequest`, so requestId is already invalid.
