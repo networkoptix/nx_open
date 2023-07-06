@@ -250,6 +250,9 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     connect(analyticsSetup(), &AnalyticsSearchSetup::attributeFiltersChanged,
         this, &Private::updateTypeButton);
 
+    connect(m_filterModel, &AnalyticsFilterModel::objectTypesChanged,
+        this, &Private::updateTypeButton);
+
     connect(analyticsSetup(), &AnalyticsSearchSetup::ensureVisibleRequested,
         this, &Private::ensureVisibleAndFetchIfNeeded);
 

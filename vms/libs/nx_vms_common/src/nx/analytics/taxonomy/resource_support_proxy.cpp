@@ -68,11 +68,13 @@ struct ResourceSupportProxy::Private:
     public Qn::EnableSafeDirectConnection,
     public SystemContextAware
 {
+    ResourceSupportProxy* q = nullptr;
     mutable std::map<QnUuid, std::map<QnUuid, SupportInfo>> supportInfoCache;
     mutable nx::Mutex mutex;
 
-    Private(SystemContext* systemContext):
-        SystemContextAware(systemContext)
+    Private(ResourceSupportProxy* q, SystemContext* systemContext):
+        SystemContextAware(systemContext),
+        q(q)
     {
         directConnect(this->systemContext()->resourcePropertyDictionary(),
             &QnResourcePropertyDictionary::propertyChanged,
@@ -91,11 +93,14 @@ struct ResourceSupportProxy::Private:
 
     void manifestsMaybeUpdated(const QnUuid& resourceId, const QString& key)
     {
-        NX_MUTEX_LOCKER lock(&mutex);
-        if (key != QnVirtualCameraResource::kDeviceAgentManifestsProperty)
-            return;
+        {
+            NX_MUTEX_LOCKER lock(&mutex);
+            if (key != QnVirtualCameraResource::kDeviceAgentManifestsProperty)
+                return;
 
-        supportInfoCache.erase(resourceId);
+            supportInfoCache.erase(resourceId);
+        }
+        emit q->manifestsMaybeUpdated();
     }
 
     void fillCacheIfNeeded(QnUuid deviceId) const
@@ -205,7 +210,7 @@ struct ResourceSupportProxy::Private:
 };
 
 ResourceSupportProxy::ResourceSupportProxy(SystemContext* systemContext):
-    d(new Private(systemContext))
+    d(new Private(this, systemContext))
 {
 }
 
