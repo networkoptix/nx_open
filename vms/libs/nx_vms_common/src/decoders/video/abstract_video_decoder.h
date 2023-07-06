@@ -39,8 +39,8 @@ public:
     };
 
     virtual ~QnAbstractVideoDecoder() {}
-    //!Returns memory type to which decoder places decoded frames (system memory or opengl)
-    virtual MemoryType targetMemoryType() const = 0;
+    //!Returns video decoder type, GPU or CPU.
+    virtual bool hardwareDecoder() const = 0;
 
     /**
       * Decode video frame.

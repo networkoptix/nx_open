@@ -467,9 +467,9 @@ double QnFfmpegVideoDecoder::getSampleAspectRatio() const
     return m_prevSampleAspectRatio;
 }
 
-MemoryType QnFfmpegVideoDecoder::targetMemoryType() const
+bool QnFfmpegVideoDecoder::hardwareDecoder() const
 {
-    return MemoryType::SystemMemory;
+    return false;
 }
 
 void QnFfmpegVideoDecoder::setLightCpuMode(QnAbstractVideoDecoder::DecodeMode val)
