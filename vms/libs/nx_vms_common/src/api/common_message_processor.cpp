@@ -32,7 +32,6 @@
 #include <nx/vms/api/data/access_rights_data_deprecated.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/hardware_id_mapping.h>
-#include <nx/vms/api/data/permission_converter.h>
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
@@ -40,6 +39,7 @@
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
@@ -703,14 +703,59 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(
     }
 }
 
-void QnCommonMessageProcessor::on_accessRightsChanged(const AccessRightsDataDeprecated& accessRights)
+void QnCommonMessageProcessor::on_accessRightsChanged(
+    const AccessRightsDataDeprecated& accessRightsDeprecated)
 {
-    nx::vms::api::GlobalPermissions permissions = nx::vms::api::GlobalPermission::none;
-    if (auto user = resourcePool()->getResourceById<QnUserResource>(accessRights.userId))
-        permissions = user->getRawPermissions();
-    auto converted = nx::vms::api::migrateAccessRights(&permissions, accessRights.resourceIds);
-    m_context->accessRightsManager()->setOwnResourceAccessMap(
-        accessRights.userId, {converted.begin(), converted.end()});
+    using namespace nx::vms::api;
+    static constexpr AccessRights kViewerAccessRights = AccessRight::view
+        | AccessRight::viewArchive | AccessRight::exportArchive | AccessRight::viewBookmarks;
+    static constexpr AccessRights kAdvancedViewerAccessRights =
+        kViewerAccessRights | AccessRight::manageBookmarks | AccessRight::userInput;
+
+    std::map<QnUuid, AccessRights> resourceAccessRights;
+    std::optional<UserGroupData> group;
+    auto user =
+        m_context->resourcePool()->getResourceById<QnUserResource>(accessRightsDeprecated.userId);
+    if (user)
+    {
+        resourceAccessRights = user->ownResourceAccessRights();
+    }
+    else
+    {
+        group = m_context->userGroupManager()->find(accessRightsDeprecated.userId);
+        if (!group)
+        {
+            NX_DEBUG(this, "No user or group %1 found", accessRightsDeprecated.userId);
+            return;
+        }
+
+        resourceAccessRights = group->resourceAccessRights;
+    }
+    AccessRights accessRights{};
+    for (auto it = resourceAccessRights.begin(); it != resourceAccessRights.end();)
+    {
+        auto groupId = it->first;
+        it = PredefinedUserGroups::contains(groupId) ? std::next(it) : resourceAccessRights.erase(it);
+        if (groupId == kAdministratorsGroupId || groupId == kPowerUsersGroupId)
+            accessRights = kFullAccessRights;
+        else if (groupId == kAdvancedViewersGroupId)
+            accessRights = kAdvancedViewerAccessRights;
+        else if (groupId == kViewersGroupId)
+            accessRights = kViewerAccessRights;
+        else if (groupId == kLiveViewersGroupId)
+            accessRights = AccessRight::view;
+    }
+    for (const auto& r: accessRightsDeprecated.resourceIds)
+        resourceAccessRights[r] = accessRights;
+    if (user)
+    {
+        user->setResourceAccessRights(resourceAccessRights);
+    }
+    else
+    {
+        group->resourceAccessRights = std::move(resourceAccessRights);
+        on_userGroupChanged(*group);
+    }
 }
 
 void QnCommonMessageProcessor::on_userGroupChanged(const UserGroupData& userGroup)
@@ -1051,8 +1096,6 @@ void QnCommonMessageProcessor::updateResource(
 {
     QnUserResourcePtr qnUser(ec2::fromApiToResource(user));
     updateResource(qnUser, source);
-    m_context->accessRightsManager()->setOwnResourceAccessMap(
-        user.id, {user.resourceAccessRights.begin(), user.resourceAccessRights.end()});
 }
 
 void QnCommonMessageProcessor::updateResource(

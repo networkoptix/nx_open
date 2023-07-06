@@ -427,10 +427,6 @@ struct CloudCrossSystemContext::Private
         const auto modelData = std::move(model).toDbTypes();
         user = ec2::fromApiToResource(std::get<0>(modelData));
 
-        // Avoid resources access recalculation. Inaccessible resources are filtered on a server
-        // side.
-        user->setRawPermissions(modelPermissions | nx::vms::api::GlobalPermission::accessAllMedia);
-
         auto resourcePool = systemContext->resourcePool();
         resourcePool->addResource(user);
         systemContext->accessController()->setUser(user);

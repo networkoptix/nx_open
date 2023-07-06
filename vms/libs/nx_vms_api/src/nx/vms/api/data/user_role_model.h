@@ -8,6 +8,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
+#include "global_permission_deprecated.h"
 #include "user_group_data.h"
 
 namespace nx::vms::api {
@@ -26,7 +27,7 @@ struct NX_VMS_API UserRoleModel
     QString description;
 
     /**%apidoc[opt] */
-    GlobalPermissions permissions;
+    GlobalPermissionsDeprecated permissions;
 
     /**%apidoc[opt] List of accessible resource ids for this User Group. */
     std::optional<std::vector<QnUuid>> accessibleResources;

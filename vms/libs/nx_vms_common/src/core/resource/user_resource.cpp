@@ -399,6 +399,25 @@ void QnUserResource::setGroupIds(const std::vector<QnUuid>& value)
     emit userGroupsChanged(::toSharedPointer(this), previousValue);
 }
 
+void QnUserResource::setResourceAccessRights(
+    const std::map<QnUuid, nx::vms::api::AccessRights>& value)
+{
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        if (m_resourceAccessRights == value)
+            return;
+
+        m_resourceAccessRights = value;
+    }
+
+    auto systemContext = this->systemContext();
+    if (!systemContext)
+        return;
+
+    systemContext->accessRightsManager()->setOwnResourceAccessMap(
+        getId(), {value.begin(), value.end()});
+}
+
 bool QnUserResource::isEnabled() const
 {
     return m_isEnabled;
@@ -524,6 +543,13 @@ std::map<QnUuid, nx::vms::api::AccessRights> QnUserResource::ownResourceAccessRi
     return m_resourceAccessRights;
 }
 
+void QnUserResource::setSystemContext(nx::vms::common::SystemContext* systemContext)
+{
+    base_type::setSystemContext(systemContext);
+    systemContext->accessRightsManager()->setOwnResourceAccessMap(
+        getId(), {m_resourceAccessRights.begin(), m_resourceAccessRights.end()});
+}
+
 void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)
 {
     base_type::updateInternal(source, notifiers);
@@ -622,10 +648,14 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         if (m_resourceAccessRights != localOther->m_resourceAccessRights)
         {
             m_resourceAccessRights = localOther->m_resourceAccessRights;
-            auto manager = systemContext()->accessRightsManager();
-            nx::core::access::ResourceAccessMap map{
-                m_resourceAccessRights.begin(), m_resourceAccessRights.end()};
-            notifiers << [id = getId(), map, manager] { manager->setOwnResourceAccessMap(id, map); };
+            if (auto systemContext = this->systemContext())
+            {
+                auto manager = systemContext->accessRightsManager();
+                nx::core::access::ResourceAccessMap map{
+                    m_resourceAccessRights.begin(), m_resourceAccessRights.end()};
+                notifiers <<
+                    [id = getId(), map, manager] { manager->setOwnResourceAccessMap(id, map); };
+            }
         }
     }
 }

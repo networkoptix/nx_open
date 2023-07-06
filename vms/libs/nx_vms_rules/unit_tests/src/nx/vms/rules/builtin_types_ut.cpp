@@ -94,14 +94,6 @@ public:
         const auto& manifest = T::manifest();
         const auto& meta = T::staticMetaObject;
 
-        // Check if global permissions are actual.
-        const auto globalPermission = manifest.permissions.globalPermission;
-        const auto deprecatedPermissions =
-            nx::vms::api::kDeprecatedGlobalPermissions & globalPermission;
-        ASSERT_FALSE(deprecatedPermissions)
-            << nx::format("Deprecated permissions %1 in manifest for %2",
-                deprecatedPermissions, manifest.id).toStdString();
-
         // Check all permission fields correspond to properties with the same name.
         for (const auto& [fieldName, permissions]: manifest.permissions.resourcePermissions)
         {

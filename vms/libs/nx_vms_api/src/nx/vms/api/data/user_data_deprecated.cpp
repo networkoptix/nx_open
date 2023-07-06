@@ -5,7 +5,6 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/algorithm.h>
 
-#include "permission_converter.h"
 #include "user_group_data.h"
 
 namespace nx::vms::api {
@@ -32,19 +31,6 @@ UserData UserDataDeprecated::toUserData() const
     static_cast<nx::vms::api::ResourceData&>(newUserData) =
         static_cast<const nx::vms::api::ResourceData&>(*this);
 
-    if (this->isAdmin)
-    {
-        newUserData.attributes = nx::vms::api::UserAttribute::readonly;
-        newUserData.groupIds.push_back(nx::vms::api::kAdministratorsGroupId);
-    }
-    if (const auto& id = permissionPresetToGroupId(this->permissions))
-        newUserData.groupIds.push_back(*id);
-    else
-        newUserData.permissions = this->permissions;
-    if (!this->userRoleId.isNull())
-        newUserData.groupIds.push_back(this->userRoleId);
-    for (const auto& id: this->userRoleIds)
-        newUserData.groupIds.push_back(id);
     newUserData.email = this->email;
     newUserData.digest = this->digest;
     newUserData.hash = this->hash;
@@ -57,31 +43,54 @@ UserData UserDataDeprecated::toUserData() const
     else
         newUserData.type = nx::vms::api::UserType::local;
     newUserData.fullName = this->fullName;
-    newUserData.resourceAccessRights =
-        migrateAccessRights(&newUserData.permissions, /*accessibleResources*/ {});
+    std::tie(newUserData.permissions, newUserData.groupIds, newUserData.resourceAccessRights) =
+        migrateAccessRights(this->permissions, /*accessibleResources*/ {}, isAdmin);
+
+    if (this->isAdmin)
+        newUserData.attributes = nx::vms::api::UserAttribute::readonly;
+    if (!this->userRoleId.isNull())
+        newUserData.groupIds.push_back(this->userRoleId);
+    for (const auto& id: this->userRoleIds)
+        newUserData.groupIds.push_back(id);
 
     return {std::move(newUserData)};
 }
 
-std::optional<QnUuid> UserDataDeprecated::permissionPresetToGroupId(GlobalPermissions preset)
+std::optional<QnUuid> UserDataDeprecated::permissionPresetToGroupId(GlobalPermissionsDeprecated preset)
 {
-    switch (static_cast<GlobalPermission>(preset.toInt()))
+    if (preset == GlobalPermissionDeprecated::admin
+        || preset == GlobalPermissionDeprecated::adminPermissions)
     {
-        case GlobalPermission::powerUserPermissions: return kPowerUsersGroupId;
-        case GlobalPermission::advancedViewerPermissions: return kAdvancedViewersGroupId;
-        case GlobalPermission::viewerPermissions: return kViewersGroupId;
-        case GlobalPermission::liveViewerPermissions: return kLiveViewersGroupId;
-        default: return std::nullopt;
+        return kPowerUsersGroupId;
     }
+
+    if (preset == GlobalPermissionDeprecated::advancedViewerPermissions)
+        return kAdvancedViewersGroupId;
+
+    if (preset == GlobalPermissionDeprecated::viewerPermissions)
+        return kViewersGroupId;
+
+    if (preset == GlobalPermissionDeprecated::liveViewerPermissions)
+        return kLiveViewersGroupId;
+
+    return std::nullopt;
 }
 
-GlobalPermissions UserDataDeprecated::groupIdToPermissionPreset(const QnUuid& id)
+GlobalPermissionsDeprecated UserDataDeprecated::groupIdToPermissionPreset(const QnUuid& id)
 {
-    if (id == kPowerUsersGroupId) return GlobalPermission::powerUserPermissions;
-    if (id == kAdvancedViewersGroupId) return GlobalPermission::advancedViewerPermissions;
-    if (id == kViewersGroupId) return GlobalPermission::viewerPermissions;
-    if (id == kLiveViewersGroupId) return GlobalPermission::liveViewerPermissions;
-    return GlobalPermission::none;
+    if (id == kPowerUsersGroupId)
+        return GlobalPermissionDeprecated::adminPermissions;
+
+    if (id == kAdvancedViewersGroupId)
+        return GlobalPermissionDeprecated::advancedViewerPermissions;
+
+    if (id == kViewersGroupId)
+        return GlobalPermissionDeprecated::viewerPermissions;
+
+    if (id == kLiveViewersGroupId)
+        return GlobalPermissionDeprecated::liveViewerPermissions;
+
+    return GlobalPermissionDeprecated::none;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

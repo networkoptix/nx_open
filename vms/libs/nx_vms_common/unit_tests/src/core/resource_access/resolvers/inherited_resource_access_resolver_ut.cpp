@@ -426,8 +426,9 @@ TEST_F(InheritedResourceAccessResolverTest, inheritedDesktopCameraAccessViaVideo
 
 TEST_F(InheritedResourceAccessResolverTest, inheritedAdminAccessRights)
 {
-    auto group = createUserGroup(GlobalPermission::powerUser);
+    auto group = createUserGroup("Power User Group", kPowerUsersGroupId);
     subjects->setId("Power User Group", group.id);
+    subjects->addOrUpdate(group.id, {kPowerUsersGroupId});
     subjects->addOrUpdate("Group 2", {"Group 1", "Power User Group"});
 
     ASSERT_FALSE(resolver->hasFullAccessRights(subjects->id("Group 1")));

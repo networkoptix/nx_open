@@ -9,6 +9,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
+#include "global_permission_deprecated.h"
 #include "resource_data.h"
 #include "type_traits.h"
 #include "user_data_ex.h"
@@ -36,9 +37,6 @@ struct NX_VMS_API UserModelBase
 
     /**%apidoc[opt] Full name. */
     QString fullName;
-
-    /**%apidoc[opt] */
-    GlobalPermissions permissions = GlobalPermission::none;
 
     /**%apidoc[opt] Disabled users can not login. */
     bool isEnabled = true;
@@ -77,7 +75,6 @@ struct NX_VMS_API UserModelBase
     (type) \
     (fullName) \
     (email) \
-    (permissions) \
     (isEnabled) \
     (isHttpDigestEnabled) \
     (externalId) \
@@ -102,6 +99,9 @@ struct NX_VMS_API UserModelV1: public UserModelBase
      */
     bool isOwner = false;
 
+    /**%apidoc[opt] */
+    GlobalPermissionsDeprecated permissions = GlobalPermissionDeprecated::none;
+
     /**%apidoc[opt] User Role id, can be obtained from `GET /rest/v{1-}/userRoles`. */
     QnUuid userRoleId;
 
@@ -123,7 +123,7 @@ struct NX_VMS_API UserModelV1: public UserModelBase
     static_assert(isCreateModelV<UserModelV1>);
     static_assert(isUpdateModelV<UserModelV1>);
 };
-#define UserModelV1_Fields UserModelBase_Fields(isOwner)(userRoleId)(accessibleResources)
+#define UserModelV1_Fields UserModelBase_Fields(isOwner)(permissions)(userRoleId)(accessibleResources)
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
 // -------------------------------------------------------------------------------------------------
@@ -134,6 +134,9 @@ struct NX_VMS_API UserModelV3: public UserModelBase
 {
     /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/userGroups`. */
     std::vector<QnUuid> groupIds;
+
+    /**%apidoc[opt] */
+    GlobalPermissions permissions = GlobalPermission::none;
 
     /**%apidoc[opt]
      * Access rights per Resource (can be obtained from `/rest/v{3-}/devices`,
@@ -154,7 +157,7 @@ struct NX_VMS_API UserModelV3: public UserModelBase
     static_assert(isCreateModelV<UserModelV3>);
     static_assert(isUpdateModelV<UserModelV3>);
 };
-#define UserModelV3_Fields UserModelBase_Fields(groupIds)(resourceAccessRights)
+#define UserModelV3_Fields UserModelBase_Fields(groupIds)(permissions)(resourceAccessRights)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)

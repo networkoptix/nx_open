@@ -973,9 +973,8 @@ bool QnResourceAccessManager::canCreateUser(
     if (!subject.isValid())
         return false;
 
-    // For backward compatibility we still allow assigning of deprecated global permissions.
-    //if ((newPermissions & ~kAssignableGlobalPermissions) != 0)
-    //    return false;
+    if ((newPermissions & ~kAssignableGlobalPermissions) != 0)
+        return false;
 
     if (!nx::vms::common::allUserGroupsExist(systemContext(), targetGroups))
         return false;
@@ -1002,9 +1001,8 @@ bool QnResourceAccessManager::canModifyUser(
     if (!nx::vms::common::allUserGroupsExist(systemContext(), update.groupIds))
         return false;
 
-    // For backward compatibility we still allow assigning of deprecated global permissions.
-    //if ((update.permissions & ~kAssignableGlobalPermissions) != 0)
-    //    return false;
+    if ((update.permissions & ~kAssignableGlobalPermissions) != 0)
+        return false;
 
     auto userResource = target.dynamicCast<QnUserResource>();
     if (!subject.isValid() || !NX_ASSERT(userResource))

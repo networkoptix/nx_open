@@ -13,6 +13,7 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/api/data/global_permission_deprecated.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
@@ -36,20 +37,27 @@ protected:
 
     QnResourcePool* resourcePool() const { return systemContext()->resourcePool(); }
 
-    QnUserResourcePtr addUser(const QString& name, GlobalPermissions globalPermissions)
+    QnUserResourcePtr addUser(
+        const QString& name, api::GlobalPermissionsDeprecated globalPermissions)
     {
         QnUserResourcePtr user(
             new QnUserResource(nx::vms::api::UserType::local, /*externalId*/ {}));
         user->setIdUnsafe(QnUuid::createUuid());
         user->setName(name);
-        user->setRawPermissions(globalPermissions);
+        auto [permissions, groups, resourceAccessRights] =
+            api::migrateAccessRights(globalPermissions, {});
+        user->setRawPermissions(permissions);
+        if (!groups.empty())
+            user->setGroupIds(groups);
+        if (!resourceAccessRights.empty())
+            user->setResourceAccessRights(resourceAccessRights);
         user->addFlags(Qn::remote);
         resourcePool()->addResource(user);
 
         return user;
     }
 
-    QnLayoutResourcePtr createLayout(Qn::ResourceFlags flags, bool locked = false, const QnUuid &parentId = QnUuid())
+    QnLayoutResourcePtr createLayout(Qn::ResourceFlags flags, bool locked = false, const QnUuid& parentId = QnUuid())
     {
         QnLayoutResourcePtr layout;
         if (flags.testFlag(Qn::exported_layout))
@@ -84,7 +92,7 @@ protected:
         systemContext()->accessController()->setUser(m_currentUser);
     }
 
-    void loginAs(GlobalPermissions globalPermissions)
+    void loginAs(api::GlobalPermissionsDeprecated globalPermissions)
     {
         logout();
         auto user = addUser(userName1, globalPermissions);
@@ -93,7 +101,7 @@ protected:
         systemContext()->accessController()->setUser(m_currentUser);
     }
 
-    void checkPermissions(const QnResourcePtr &resource, Qn::Permissions desired, Qn::Permissions forbidden) const
+    void checkPermissions(const QnResourcePtr& resource, Qn::Permissions desired, Qn::Permissions forbidden) const
     {
         Qn::Permissions actual = systemContext()->accessController()->permissions(resource);
         ASSERT_EQ(desired, actual);
@@ -133,7 +141,7 @@ TEST_F(WorkbenchAccessControllerTest, checkExportedLayouts)
     checkPermissions(layout, desired, forbidden);
 
     // Result is the same even for live users.
-    loginAs(GlobalPermission::liveViewerPermissions);
+    loginAs(api::GlobalPermissionDeprecated::liveViewerPermissions);
     checkPermissions(layout, desired, forbidden);
 }
 
@@ -154,7 +162,7 @@ TEST_F(WorkbenchAccessControllerTest, checkEncryptedExportedLayouts)
     checkPermissions(layout, desired, forbidden);
 
     // Result is the same even for live users.
-    loginAs(GlobalPermission::liveViewerPermissions);
+    loginAs(api::GlobalPermissionDeprecated::liveViewerPermissions);
     checkPermissions(layout, desired, forbidden);
 }
 
@@ -176,7 +184,7 @@ TEST_F(WorkbenchAccessControllerTest, checkExportedLayoutsLocked)
     checkPermissions(layout, desired, forbidden);
 
     // Result is the same even for live users.
-    loginAs(GlobalPermission::liveViewerPermissions);
+    loginAs(api::GlobalPermissionDeprecated::liveViewerPermissions);
     checkPermissions(layout, desired, forbidden);
 }
 
@@ -206,7 +214,7 @@ TEST_F(WorkbenchAccessControllerTest, checkLocalLayoutsUnlogged)
 /** Check permissions for unsaved layouts when the user is logged in. */
 TEST_F(WorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
 {
-    loginAs(GlobalPermission::liveViewerPermissions);
+    loginAs(api::GlobalPermissionDeprecated::liveViewerPermissions);
 
     auto layout = createLayout(Qn::local);
     resourcePool()->addResource(layout);
@@ -225,7 +233,7 @@ TEST_F(WorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
 /** Check permissions for locked unsaved layouts when the user is logged in. */
 TEST_F(WorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
 {
-    loginAs(GlobalPermission::liveViewerPermissions);
+    loginAs(api::GlobalPermissionDeprecated::liveViewerPermissions);
 
     auto layout = createLayout(Qn::local, true);
     resourcePool()->addResource(layout);
@@ -245,7 +253,7 @@ TEST_F(WorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
 /** Check Qn::WriteDigestPermission permission for a new cloud user (should be missing). */
 TEST_F(WorkbenchAccessControllerTest, checkPermissionForNewCloudUser)
 {
-    loginAs(GlobalPermission::powerUserPermissions);
+    loginAs(api::GlobalPermissionDeprecated::adminPermissions);
 
     QnUserResourcePtr newCloudUser(
         new QnUserResource(nx::vms::api::UserType::cloud, /*externalId*/ {}));

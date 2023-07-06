@@ -317,9 +317,7 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
         state.name = groupData->name;
         state.groupId = groupId;
         state.description = groupData->description;
-
-        state.globalPermissions =
-            groupData->permissions & nx::vms::api::kNonDeprecatedGlobalPermissions;
+        state.globalPermissions = groupData->permissions;
 
         state.sharedResources = systemContext()->accessRightsManager()->ownResourceAccessMap(
             groupId);
