@@ -23,13 +23,13 @@
 
 namespace nx::vms::client::desktop::rules {
 
-VmsRulesDialog::VmsRulesDialog(SystemContext* systemContext, QWidget* parent):
+VmsRulesDialog::VmsRulesDialog(QWidget* parent):
     QmlDialogWrapper(
         appContext()->qmlEngine(),
         QUrl("Nx/VmsRules/VmsRulesDialog.qml"),
         /*initialProperties*/ {},
         parent),
-    SystemContextAware(systemContext),
+    QnWorkbenchContextAware(parent),
     m_parentWidget{parent},
     m_rulesTableModel{QmlProperty<RulesTableModel*>(rootObjectHolder(), "rulesTableModel")}
 {
@@ -129,6 +129,11 @@ void VmsRulesDialog::resetToDefaults()
 {
     if (ConfirmationDialogs::confirmReset(m_parentWidget))
         resetToDefaultsImpl();
+}
+
+void VmsRulesDialog::openEventLogDialog()
+{
+    action(ui::action::OpenEventLogAction)->trigger();
 }
 
 void VmsRulesDialog::deleteRuleImpl(QnUuid id)
