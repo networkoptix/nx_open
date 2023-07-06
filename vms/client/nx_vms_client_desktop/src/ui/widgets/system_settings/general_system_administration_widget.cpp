@@ -124,7 +124,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     ui->buttonWidget->setFocusPolicy(Qt::NoFocus);
 
-    m_buttons[kBusinessRulesButton]->setIcon(qnSkin->icon("system_settings/event_rules.png"));
+    m_buttons[kBusinessRulesButton]->setIcon(
+        qnSkin->icon("system_settings/event_rules_56.svg", kNormalIconSubstitutions));
     m_buttons[kEventLogButton     ]->setIcon(
         qnSkin->icon("system_settings/event_log_56.svg", kNormalIconSubstitutions));
     m_buttons[kCameraListButton   ]->setIcon(
