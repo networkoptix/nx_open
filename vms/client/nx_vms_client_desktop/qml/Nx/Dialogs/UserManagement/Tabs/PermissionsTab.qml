@@ -38,8 +38,6 @@ Item
     readonly property var availableAccessRights:
         Array.prototype.map.call(availableAccessRightDescriptors, item => item.accessRight)
 
-    enabled: editingEnabled
-
     Item
     {
         id: accessRightsHeader
@@ -50,13 +48,10 @@ Item
         height: 64
         width: control.columnCount * control.kColumnWidth
 
-        property var hoveredHeader: null
+        property int hoveredAccessRight: tree.hoveredCell
+            ? tree.hoveredCell.accessRight
+            : 0
 
-        property int hoveredAccessRight: hoveredHeader
-            ? hoveredHeader.accessRight
-            : tree.hoveredCell
-                ? tree.hoveredCell.accessRight
-                : 0
         Row
         {
             Repeater
@@ -81,14 +76,6 @@ Item
 
                     readonly property int index: Positioner.index
                     readonly property int accessRight: modelData.accessRight
-
-                    onHoveredChanged:
-                    {
-                        if (hovered)
-                            accessRightsHeader.hoveredHeader = accessRightItem
-                        else if (accessRightsHeader.hoveredHeader == accessRightItem)
-                            accessRightsHeader.hoveredHeader = null
-                    }
                 }
             }
         }
@@ -204,10 +191,10 @@ Item
                     tree.hoveredRow = null
             }
 
-            onFrameInitializationResponse: (desiredMode) =>
+            onFrameInitializationResponse: (cell) =>
             {
                 if (frameSelector.currentMode == ResourceAccessDelegate.FrameInitialization)
-                    frameSelector.currentMode = desiredMode
+                    frameSelector.currentMode = frameSelector.modeFromCell(cell)
             }
 
             Connections
@@ -268,6 +255,13 @@ Item
 
                 property int currentMode: ResourceAccessDelegate.NoFrameOperation
 
+                function modeFromCell(cell)
+                {
+                    return cell.isToggledOn()
+                        ? ResourceAccessDelegate.FrameUnselection
+                        : ResourceAccessDelegate.FrameSelection
+                }
+
                 onStarted:
                 {
                     if (selectionControlledByCtrl)
@@ -278,7 +272,9 @@ Item
                     }
                     else
                     {
-                        currentMode = ResourceAccessDelegate.FrameInitialization
+                        currentMode = tree.hoveredCell && tree.hoveredCell.frameSelected
+                            ? modeFromCell(tree.hoveredCell)
+                            : ResourceAccessDelegate.FrameInitialization
                     }
 
                     selectionArea.start = Qt.point(
