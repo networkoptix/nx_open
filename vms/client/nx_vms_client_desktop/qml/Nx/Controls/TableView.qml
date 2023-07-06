@@ -142,9 +142,8 @@ TableView
                         onDataChanged: updateCheckState()
                     }
 
-                    width: (index) =>
+                    width:
                     {
-                        console.log("Recualculating width of " + index)
                         const w = control.columnWidthProvider(index)
                         return w >= 0 ? w : 124
                     }
