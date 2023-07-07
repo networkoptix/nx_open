@@ -76,7 +76,7 @@ bool ServiceManager::loadServiceData(const std::string_view& data)
         for (const auto& service: services)
             m_services.emplace(service.id, service);
 
-        systemContext()->licensePool()->addLicense(localRecordingLicenseV1());
+        updateLicenseV1();
 
         auto propertyDict = systemContext()->resourcePropertyDictionary();
         if (propertyDict->setValue(QnUuid(), kSaasServicesPropertyKey, QString::fromUtf8(data)))
@@ -90,8 +90,18 @@ bool ServiceManager::loadServiceData(const std::string_view& data)
 
 void ServiceManager::onDataChanged()
 {
-    systemContext()->licensePool()->addLicense(localRecordingLicenseV1());
+    updateLicenseV1();
     dataChanged();
+}
+
+void ServiceManager::updateLicenseV1()
+{
+    using namespace nx::vms::api;
+    const auto license = localRecordingLicenseV1();
+    if (m_data.state != SaasState::uninitialized)
+        systemContext()->licensePool()->addLicense(license);
+    else
+        systemContext()->licensePool()->removeLicense(license);
 }
 
 QnLicensePtr ServiceManager::localRecordingLicenseV1()  const

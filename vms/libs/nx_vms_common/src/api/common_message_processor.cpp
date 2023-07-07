@@ -38,6 +38,7 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -918,6 +919,7 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
 void QnCommonMessageProcessor::resetLicenses(const LicenseDataList& licenses)
 {
     m_context->licensePool()->replaceLicenses(licenses);
+    m_context->saasServiceManager()->updateLicenseV1();
 }
 
 void QnCommonMessageProcessor::resetCamerasWithArchiveList(

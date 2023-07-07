@@ -551,7 +551,8 @@ QnLicensePtr QnLicense::createSaasLocalRecordingLicense()
     result->m_key = kSaasLocalRecordingKey;
     result->m_version = "2.0";
     result->m_brand = nx::branding::vmsName();
-
+    // SaaS licenses don't use V1 signature.
+    result->m_isValid1 = true;
     return result;
 }
 

@@ -51,6 +51,8 @@ public:
     // Set `disabled` flag. It is needed for debugging via ini config.
     void setDisabled();
     bool isEnabled() const;
+    
+    void updateLicenseV1();
 
 signals:
     void dataChanged();
