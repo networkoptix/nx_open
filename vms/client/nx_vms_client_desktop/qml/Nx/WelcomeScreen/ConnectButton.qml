@@ -1,13 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.9
-import QtQuick.Controls 2.4
-import Qt5Compat.GraphicalEffects
-import QtQuick.Controls.impl 2.14
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
-import nx.client.desktop 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+
+import nx.client.desktop
 
 Button
 {

@@ -1,12 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import Qt5Compat.GraphicalEffects
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 Item
 {
@@ -63,7 +63,7 @@ Item
             width: kCopyWidth
             height: parent.height
 
-            Image
+            IconImage
             {
                 id: icon
 
@@ -72,26 +72,19 @@ Item
 
                 anchors.centerIn: parent
 
-                property color color: ColorTheme.windowText
-                property color hoveredColor: ColorTheme.lighter(color, 2)
-                property color pressedColor: color
+                property color mainColor: ColorTheme.windowText
+                property color hoveredColor: ColorTheme.lighter(mainColor, 2)
+                property color pressedColor: mainColor
 
-                property bool hovered:
-                    gridMouseArea.containsMouse && gridMouseArea.mouseX > gridMouseArea.width - kCopyWidth
-                property bool pressed:
-                    gridMouseArea.containsPress && gridMouseArea.mouseX > gridMouseArea.width - kCopyWidth
+                property bool hovered: gridMouseArea.containsMouse
+                    && gridMouseArea.mouseX > gridMouseArea.width - kCopyWidth
 
+                property bool pressed: gridMouseArea.containsPress
+                    && gridMouseArea.mouseX > gridMouseArea.width - kCopyWidth
+
+                color: pressed ? pressedColor : (hovered ? hoveredColor : mainColor)
                 source: "image://svg/skin/advanced_search_dialog/tosearch.svg"
                 sourceSize: Qt.size(width, height)
-
-                ColorOverlay
-                {
-                    anchors.fill: parent
-                    source: parent
-                    color: icon.pressed
-                        ? icon.pressedColor
-                        : icon.hovered ? icon.hoveredColor : icon.color
-                }
             }
         }
     }

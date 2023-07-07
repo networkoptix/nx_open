@@ -1,11 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import Qt5Compat.GraphicalEffects
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
 
 RadioButton
 {
@@ -38,7 +37,7 @@ RadioButton
     {
         anchors.left: parent.left
 
-        Image
+        IconImage
         {
             id: icon
 
@@ -49,13 +48,7 @@ RadioButton
             visible: !!source
 
             source: control.iconSource
-
-            ColorOverlay
-            {
-                anchors.fill: parent
-                source: parent
-                color: control.currentColor
-            }
+            color: control.currentColor
         }
 
         Text
