@@ -86,6 +86,13 @@ FocusScope
 
                 Image
                 {
+                    visible: extras.flags & ResourceTree.ResourceExtraStatusFlag.buggy
+                    source: "image://svg/skin/tree/warning_yellow.svg"
+                    sourceSize: Qt.size(20, 20)
+                }
+
+                Image
+                {
                     id: recordingIcon
 
                     source:
