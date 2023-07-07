@@ -1,14 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
-import QtQuick.Controls.impl 2.4
-import QtQuick.Layouts 1.11
+import QtQuick
+import QtQuick.Layouts
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Effects 1.0
-import Nx.Items 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+import Nx.Effects
+import Nx.Items
 
 import ".."
 import "../../globals.js" as RightPanelGlobals

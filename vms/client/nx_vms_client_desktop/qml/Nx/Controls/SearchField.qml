@@ -1,12 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import QtQuick.Controls 2.4
-import QtQuick.Controls.impl 2.4 as T
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0 as Nx
+import Nx
+import Nx.Core
+import Nx.Controls as Nx
 
 Nx.TextField
 {
@@ -53,7 +52,7 @@ Nx.TextField
 
         contentItem: Item
         {
-            T.IconImage
+            Nx.IconImage
             {
                 id: image
 

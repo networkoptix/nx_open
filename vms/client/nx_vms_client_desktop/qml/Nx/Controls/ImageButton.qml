@@ -1,11 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import QtQuick.Controls 2.4
-import QtQuick.Controls.impl 2.4 as T
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
 
 AbstractButton
 {
@@ -42,7 +41,7 @@ AbstractButton
         color: down || checked ? palette.window : (hovered ? palette.light : palette.button)
     }
 
-    contentItem: T.IconImage
+    contentItem: IconImage
     {
         id: image
 

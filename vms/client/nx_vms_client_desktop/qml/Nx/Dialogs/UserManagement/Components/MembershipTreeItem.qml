@@ -1,15 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Layouts
 
-import Qt5Compat.GraphicalEffects
+import Nx
+import Nx.Core
+import Nx.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 Item
 {
@@ -82,7 +80,7 @@ Item
                 width: groupImage.width
                 height: groupImage.height
 
-                Image
+                IconImage
                 {
                     id: groupImage
                     width: 20
@@ -90,12 +88,7 @@ Item
 
                     source: treeItem.iconSource
                     sourceSize: Qt.size(width, height)
-                }
 
-                ColorOverlay
-                {
-                    anchors.fill: groupImage
-                    source: groupImage
                     color: treeItem.textColor
                 }
             }

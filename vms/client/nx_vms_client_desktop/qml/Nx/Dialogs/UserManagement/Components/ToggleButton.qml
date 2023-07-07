@@ -1,14 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Controls.impl 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 AbstractButton
 {
