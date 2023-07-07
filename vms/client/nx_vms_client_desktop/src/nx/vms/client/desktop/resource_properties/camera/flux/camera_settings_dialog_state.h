@@ -106,6 +106,7 @@ struct CombinedProperties
     CombinedValue hasCustomMediaPort = CombinedValue::None;
     CombinedValue supportsSchedule = CombinedValue::None;
     CombinedValue isUdpMulticastTransportAllowed = CombinedValue::None;
+    CombinedValue streamCapabilitiesInitialized = CombinedValue::None;
 
     int maxFps = 0;
 };
@@ -115,7 +116,8 @@ NX_REFLECTION_INSTRUMENT(CombinedProperties,
     (isAudioForced)(supportsAudioOutput)(hasMotion)(hasObjectDetection)(hasDualStreamingCapability)
     (hasRemoteArchiveCapability)(canSwitchPtzPresetTypes)(canForcePanTiltCapabilities)
     (canForceZoomCapability)(canAdjustPtzSensitivity)(hasCustomMediaPortCapability)
-    (hasCustomMediaPort)(supportsSchedule)(isUdpMulticastTransportAllowed)(maxFps))
+    (hasCustomMediaPort)(supportsSchedule)(isUdpMulticastTransportAllowed)
+    (streamCapabilitiesInitialized)(maxFps))
 
 struct MotionConstraints
 {
@@ -470,6 +472,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     bool canShowWebPage() const;
     bool canAdjustPtzSensitivity() const;
     bool cameraControlEnabled() const;
+    bool canShowHotspotsPage() const;
 
     /**
      * Advanced settings should be displayed for a single camera when manifest is already loaded and
