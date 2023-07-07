@@ -82,6 +82,7 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(ItemDisplayAnalyticsObjectsRole),
         IDR_ITEM(ItemDisplayRoiRole),
         IDR_ITEM(ItemPlaceholderRole),
+        IDR_ITEM(ItemDisplayHotspotsRole),
 
         IDR_ITEM(ItemTimeRole),
         IDR_ITEM(ItemPausedRole),

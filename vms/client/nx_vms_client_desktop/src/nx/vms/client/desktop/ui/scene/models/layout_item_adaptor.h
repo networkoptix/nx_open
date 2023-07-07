@@ -36,6 +36,8 @@ class LayoutItemAdaptor: public QObject
         WRITE setDisplayAnalyticsObjects
         NOTIFY displayAnalyticsObjectsChanged)
     Q_PROPERTY(bool displayRoi READ displayRoi WRITE setDisplayRoi NOTIFY displayRoiChanged)
+    Q_PROPERTY(bool displayHotspots
+        READ displayHotspots WRITE setDisplayHotspots NOTIFY displayHotspotsChanged)
 
 public:
     LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const QnUuid& itemId);
@@ -83,6 +85,9 @@ public:
     nx::vms::api::dewarping::ViewData dewarpingParams() const;
     void setDewarpingParams(const nx::vms::api::dewarping::ViewData& params);
 
+    bool displayHotspots() const;
+    void setDisplayHotspots(bool displayHotspots);
+
 signals:
     void flagsChanged();
     void geometryChanged();
@@ -95,6 +100,7 @@ signals:
     void displayRoiChanged();
     void imageCorrectionParamsChanged();
     void dewarpingParamsChanged();
+    void displayHotspotsChanged();
 
 private:
     class Private;

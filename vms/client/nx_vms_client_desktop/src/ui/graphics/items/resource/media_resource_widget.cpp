@@ -477,6 +477,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
     setAnalyticsObjectsVisible(item->displayAnalyticsObjects(), false);
     setRoiVisible(item->displayRoi(), false);
+    setHotspotsVisible(item->displayHotspots());
     updateButtonsVisibility();
 
     const auto triggerActionHandler =
@@ -731,6 +732,7 @@ void QnMediaResourceWidget::initCameraHotspotsOverlay()
 
     m_cameraHotspotsOverlayWidget = new CameraHotspotsOverlayWidget(this);
     m_cameraHotspotsOverlayWidget->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    m_cameraHotspotsOverlayWidget->setVisible(item()->displayHotspots());
 
     addOverlayWidget(m_cameraHotspotsOverlayWidget, {UserVisible, OverlayFlag::none, InfoLayer});
 }
@@ -922,7 +924,7 @@ void QnMediaResourceWidget::createButtons()
 
     createActionAndButton(
         "item/hotspots.svg",
-        /* checked */ true,
+        item()->displayHotspots(),
         QKeySequence::fromString("H"),
         tr("Hotspots"),
         Qn::Empty_Help,
@@ -2145,6 +2147,9 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
     if (changedFlags.testFlag(DisplayRoi))
         setRoiVisible(options().testFlag(DisplayRoi), false);
 
+    if (changedFlags.testFlag(DisplayHotspots))
+        setHotspotsVisible(options().testFlag(DisplayHotspots));
+
     base_type::optionsChangedNotify(changedFlags);
 }
 
@@ -2704,7 +2709,8 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
 
 void QnMediaResourceWidget::atHotspotsButtonToggled(bool checked)
 {
-    m_cameraHotspotsOverlayWidget->setVisible(checked);
+    item()->setDisplayHotspots(checked);
+    m_cameraHotspotsOverlayWidget->setVisible(item()->displayHotspots());
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked()
@@ -3155,15 +3161,20 @@ bool QnMediaResourceWidget::hotspotsVisible() const
 {
     return canDisplayHotspots()
         && d->camera->cameraHotspotsEnabled()
-        && titleBar()->rightButtonsBar()->button(Qn::HotspotsButton)->isChecked();
+        && options().testFlag(DisplayHotspots);
 }
 
 void QnMediaResourceWidget::setHotspotsVisible(bool visible)
 {
+    if (hotspotsVisible() == visible)
+        return;
+
     if (!NX_ASSERT(canDisplayHotspots() && d->camera->cameraHotspotsEnabled()))
         return;
 
-    titleBar()->rightButtonsBar()->button(Qn::HotspotsButton)->setChecked(visible);
+    setOption(DisplayHotspots, visible);
+    item()->setDisplayHotspots(visible);
+    m_cameraHotspotsOverlayWidget->setVisible(item()->displayHotspots());
 }
 
 void QnMediaResourceWidget::setAnalyticsModeEnabled(bool enabled, bool animate)

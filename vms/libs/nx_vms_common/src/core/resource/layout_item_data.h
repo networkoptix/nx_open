@@ -31,9 +31,9 @@ struct NX_VMS_COMMON_API LayoutItemData
     bool displayAnalyticsObjects = false;
     bool displayRoi = true;
     QColor frameDistinctionColor;
-
     nx::vms::api::ImageCorrectionData contrastParams;
     nx::vms::api::dewarping::ViewData dewarpingParams;
+    bool displayHotspots = false;
 
     // This convenience flag is set to true on the client for new items on an unsaved layout.
     // It is checked by the layout item resolver. Layout access rights are not passed for
@@ -57,7 +57,8 @@ NX_REFLECTION_INSTRUMENT(LayoutItemData,
     (displayRoi)
     (frameDistinctionColor)
     (contrastParams)
-    (dewarpingParams))
+    (dewarpingParams)
+    (displayHotspots))
 
 using LayoutItemDataList = QList<LayoutItemData>;
 using LayoutItemDataMap = QHash<QnUuid, LayoutItemData>;

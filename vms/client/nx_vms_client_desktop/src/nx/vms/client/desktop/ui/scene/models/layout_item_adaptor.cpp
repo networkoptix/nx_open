@@ -71,6 +71,9 @@ LayoutItemAdaptor::LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const Qn
             if (d->itemData.dewarpingParams != itemData.dewarpingParams)
                 notifiers.append(&LayoutItemAdaptor::dewarpingParamsChanged);
 
+            if (d->itemData.displayHotspots != itemData.displayHotspots)
+                notifiers.append(&LayoutItemAdaptor::displayHotspotsChanged);
+
             d->itemData = itemData;
 
             for (const auto& notifier: notifiers)
@@ -254,6 +257,22 @@ void LayoutItemAdaptor::setDisplayRoi(bool displayRoi)
     d->layout->updateItem(d->itemData);
 
     emit displayRoiChanged();
+}
+
+bool LayoutItemAdaptor::displayHotspots() const
+{
+    return d->itemData.displayHotspots;
+}
+
+void LayoutItemAdaptor::setDisplayHotspots(bool displayHotspots)
+{
+    if (d->itemData.displayHotspots == displayHotspots)
+        return;
+
+    d->itemData.displayHotspots = displayHotspots;
+    d->layout->updateItem(d->itemData);
+
+    emit displayHotspotsChanged();
 }
 
 nx::vms::api::ImageCorrectionData LayoutItemAdaptor::imageCorrectionParams() const
