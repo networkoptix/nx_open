@@ -1221,6 +1221,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
                 nx::vms::api::DeviceCapability::multicastStreaming);
         });
 
+    state.devicesDescription.streamCapabilitiesInitialized = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return !camera->getProperty(ResourcePropertyKey::kMediaCapabilities).isEmpty();
+        });
+
     state.devicesDescription.hasRemoteArchiveCapability = combinedValue(cameras,
         [](const Camera& camera)
         {
