@@ -127,6 +127,7 @@
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/utils/camera_hotspots_support.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <platform/environment.h>
@@ -479,6 +480,11 @@ void ActionHandler::addToLayout(
 
     data.displayRoi = params.displayRoi;
     data.displayAnalyticsObjects = params.displayAnalyticsObjects;
+    data.displayHotspots =
+        params.displayHotspots
+        && camera_hotspots::supportsCameraHotspots(resource)
+        && resource.dynamicCast<QnVirtualCameraResource>()->cameraHotspotsEnabled();
+
     if (!qFuzzyIsNull(params.rotation))
     {
         data.rotation = params.rotation;
@@ -2663,6 +2669,7 @@ void ActionHandler::at_createZoomWindowAction_triggered() {
     addParams.rotation = widget->item()->rotation();
     addParams.displayRoi = widget->item()->displayRoi();
     addParams.displayAnalyticsObjects = widget->item()->displayAnalyticsObjects();
+    addParams.displayHotspots = widget->item()->displayHotspots();
     addToLayout(
         workbench()->currentLayoutResource(),
         widget->resource()->toResourcePtr(),

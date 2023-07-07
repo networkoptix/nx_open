@@ -98,11 +98,15 @@ struct NX_VMS_API LayoutItemData: IdData
     /**%apidoc [opt] Should the regions of interest be displayed on the item.*/
     bool displayRoi = true;
 
+    /**%apidoc [opt] Whether camera hotspots are enabled on the item.*/
+    bool displayHotspots = false;
+
     bool operator==(const LayoutItemData& other) const;
 };
 #define LayoutItemData_Fields IdData_Fields (flags)(left)(top)(right)(bottom)(rotation) \
     (resourceId)(resourcePath)(zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetId) \
-    (contrastParams)(dewarpingParams)(displayInfo)(displayAnalyticsObjects)(displayRoi)(controlPtz)
+    (contrastParams)(dewarpingParams)(displayInfo)(displayAnalyticsObjects)(displayRoi) \
+    (controlPtz)(displayHotspots)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(LayoutItemData)
 NX_REFLECTION_INSTRUMENT(LayoutItemData, LayoutItemData_Fields)
 

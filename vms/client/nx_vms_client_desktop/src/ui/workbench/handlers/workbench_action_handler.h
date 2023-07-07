@@ -104,6 +104,7 @@ protected:
         QRectF analyticsSelection;
         bool displayRoi = true;
         bool displayAnalyticsObjects = false;
+        bool displayHotspots = true;
     };
 
     void addToLayout(

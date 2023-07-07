@@ -56,6 +56,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource,
     setDisplayAnalyticsObjects(data.displayAnalyticsObjects);
     setDisplayRoi(data.displayRoi);
     setFrameDistinctionColor(data.frameDistinctionColor);
+    setDisplayHotspots(data.displayHotspots);
 }
 
 QnWorkbenchItem::~QnWorkbenchItem()
@@ -115,6 +116,7 @@ bool QnWorkbenchItem::update(const nx::vms::common::LayoutItemData& data)
     setDisplayAnalyticsObjects(data.displayAnalyticsObjects);
     setDisplayRoi(data.displayRoi);
     setFrameDistinctionColor(data.frameDistinctionColor);
+    setDisplayHotspots(data.displayHotspots);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
     return result;
@@ -139,6 +141,7 @@ void QnWorkbenchItem::submit(nx::vms::common::LayoutItemData& data) const
     data.displayAnalyticsObjects = displayAnalyticsObjects();
     data.displayRoi = displayRoi();
     data.frameDistinctionColor = frameDistinctionColor();
+    data.displayHotspots = displayHotspots();
 }
 
 QnResourcePtr QnWorkbenchItem::resource() const
@@ -392,6 +395,21 @@ void QnWorkbenchItem::setFrameDistinctionColor(const QColor& value)
 
     m_frameDistinctionColor = value;
     emit dataChanged(Qn::ItemFrameDistinctionColorRole);
+}
+
+bool QnWorkbenchItem::displayHotspots() const
+{
+    return m_displayHotspots;
+}
+
+void QnWorkbenchItem::setDisplayHotspots(bool value)
+{
+    if (m_displayHotspots == value)
+        return;
+
+    m_displayHotspots = value;
+    emit displayHotspotsChanged();
+    emit dataChanged(Qn::ItemDisplayHotspotsRole);
 }
 
 QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const

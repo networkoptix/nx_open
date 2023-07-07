@@ -285,6 +285,9 @@ public:
     QColor frameDistinctionColor() const;
     void setFrameDistinctionColor(const QColor &value);
 
+    bool displayHotspots() const;
+    void setDisplayHotspots(bool value);
+
     /**
      * \param role                      Role to get data for.
      * \returns                         Data for the given role.
@@ -337,6 +340,7 @@ signals:
     void controlPtzChanged();
     void displayAnalyticsObjectsChanged();
     void displayRoiChanged();
+    void displayHotspotsChanged();
     void dataChanged(Qn::ItemDataRole role);
 
 protected:
@@ -378,12 +382,19 @@ private:
 
     /** Should the info be always displayed on the item. */
     bool m_displayInfo = false;
+
     /** Whether PTZ control is enabled. */
     bool m_controlPtz = false;
+
     /** Should the detected analytics objects be always displayed on the item. */
     bool m_displayAnalyticsObjects = false;
+
     /** Should the regions of interest be always displayed on the item. */
     bool m_displayRoi = true;
+
     /** Base frame color */
     QColor m_frameDistinctionColor;
+
+    /** Whether camera hotspots are enabled on the item. */
+    bool m_displayHotspots = true;
 };

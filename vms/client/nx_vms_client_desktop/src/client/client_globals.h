@@ -117,6 +117,7 @@ namespace Qn
         ItemDisplayAnalyticsObjectsRole,            /**< Role for item display analytics objects state. Value of type bool. */
         ItemDisplayRoiRole,                         /**< Role for item display ROI state. Value of type bool. */
         ItemPlaceholderRole,                        /**< Role for item's placeholder pixmap. Value of type QPixmap. */
+        ItemDisplayHotspotsRole,                    /**< Role for item's camera hotspots display state. Value of type bool. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */

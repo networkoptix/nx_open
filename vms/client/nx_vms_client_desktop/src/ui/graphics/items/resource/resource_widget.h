@@ -96,7 +96,10 @@ public:
 
         AlwaysShowName = 1 << 12,
         InfoOverlaysForbidden = 1 << 13,
-        AllowFocus = 1 << 14
+        AllowFocus = 1 << 14,
+
+        /** Whether camera hotspots are displayed. */
+        DisplayHotspots = 1 << 15,
     };
 
     Q_DECLARE_FLAGS(Options, Option)

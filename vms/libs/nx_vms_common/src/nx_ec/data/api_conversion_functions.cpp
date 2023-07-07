@@ -261,6 +261,7 @@ void fromApiToResource(const LayoutItemData& src, nx::vms::common::LayoutItemDat
     dst.controlPtz = src.controlPtz;
     dst.displayAnalyticsObjects = src.displayAnalyticsObjects;
     dst.displayRoi = src.displayRoi;
+    dst.displayHotspots = src.displayHotspots;
 }
 
 void fromResourceToApi(const nx::vms::common::LayoutItemData& src, LayoutItemData& dst)
@@ -285,6 +286,7 @@ void fromResourceToApi(const nx::vms::common::LayoutItemData& src, LayoutItemDat
     dst.controlPtz = src.controlPtz;
     dst.displayAnalyticsObjects = src.displayAnalyticsObjects;
     dst.displayRoi = src.displayRoi;
+    dst.displayHotspots = src.displayHotspots;
 }
 
 void fromApiToResource(const LayoutData& src, QnLayoutResourcePtr& dst)
