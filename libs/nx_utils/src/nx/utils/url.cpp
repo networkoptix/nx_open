@@ -423,11 +423,6 @@ bool Url::operator==(const Url &url) const
     return m_url == url.m_url;
 }
 
-bool Url::operator!=(const Url &url) const
-{
-    return !operator==(url);
-}
-
 bool Url::matches(const Url& url, QUrl::FormattingOptions options) const
 {
     return m_url.matches(url.m_url, options);
