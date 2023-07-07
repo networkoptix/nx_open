@@ -59,10 +59,13 @@ TableView
 
     delegate: BasicTableCellDelegate {}
 
-    onWidthChanged:
+    onLayoutChanged:
     {
-        console.log("Width changed")
-        control.forceLayout()
+        for (let columnIndex = 0; columnIndex < repeater.count; ++columnIndex)
+        {
+            let headerItem = repeater.itemAt(columnIndex)
+            headerItem.width = headerItem.calculateWidth(control.columnWidthProvider(columnIndex))
+        }
     }
 
     Rectangle
@@ -91,6 +94,16 @@ TableView
                 HeaderButton
                 {
                     id: headerButton
+
+                    function calculateWidth(desiredWidth)
+                    {
+                        if (desiredWidth >= 0)
+                            return desiredWidth
+
+                        const maxImplicitWidth = Math.max(implicitWidth, implicitColumnWidth(index))
+
+                        return maxImplicitWidth < control.width ? maxImplicitWidth : control.width
+                    }
 
                     property var headerDataAccessor: ModelDataAccessor
                     {
@@ -142,12 +155,10 @@ TableView
                         onDataChanged: updateCheckState()
                     }
 
-                    width:
-                    {
-                        const w = control.columnWidthProvider(index)
-                        return w >= 0 ? w : 124
-                    }
+                    width: calculateWidth(control.columnWidthProvider(index))
                     height: columnsHeader.buttonHeight
+
+                    visible: width > 0
 
                     text: control.model
                         ? control.model.headerData(index, Qt.Horizontal)
@@ -186,6 +197,7 @@ TableView
                             : Qt.DescendingOrder
 
                         control.model.sort(index, modelSortOrder)
+                        control.forceLayout()
                     }
                 }
             }
