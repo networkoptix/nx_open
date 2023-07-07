@@ -126,6 +126,15 @@ bool CameraSettingsDialogState::cameraControlEnabled() const
     return settingsOptimizationEnabled && !expert.cameraControlDisabled.valueOr(true);
 }
 
+bool CameraSettingsDialogState::canShowHotspotsPage() const
+{
+    return isSingleCamera()
+        && singleCameraProperties.supportsCameraHotspots
+        && devicesDescription.streamCapabilitiesInitialized == CombinedValue::All
+        && hasEditAccessRightsForAllCameras
+        && ini().enableCameraHotspotsFeature;
+}
+
 bool CameraSettingsDialogState::canShowAdvancedPage() const
 {
     const auto& manifest = singleCameraProperties.advancedSettingsManifest;
@@ -157,10 +166,7 @@ bool CameraSettingsDialogState::isPageVisible(CameraSettingsTab page) const
             return isSingleCamera() && singleCameraProperties.hasVideo;
 
         case CameraSettingsTab::hotspots:
-            return isSingleCamera()
-                && singleCameraProperties.supportsCameraHotspots
-                && hasEditAccessRightsForAllCameras
-                && ini().enableCameraHotspotsFeature;
+            return canShowHotspotsPage();
 
         case CameraSettingsTab::advanced:
             return canShowAdvancedPage();
