@@ -115,6 +115,9 @@ NX_REFLECTION_INSTRUMENT(SaasService, SaasService_fields)
 
 /**%apidoc SaasState */
 NX_REFLECTION_ENUM_CLASS(SaasState,
+    /**%apidoc Saas services is not loaded */
+    uninitialized,
+
     /**%apidoc Saas services is active */
     active,
 
@@ -168,7 +171,7 @@ struct NX_VMS_API SaasData
     QnUuid cloudSystemId;
 
     /**%apidoc Saas state */
-    SaasState state = SaasState::active;
+    SaasState state = SaasState::uninitialized;
 
     /**%apidoc The list of purchased services */
     std::map<QnUuid, SaasPurshase> services;
