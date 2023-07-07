@@ -154,7 +154,6 @@ public:
 
     bool operator <(const Url &url) const;
     bool operator ==(const Url &url) const;
-    bool operator !=(const Url &url) const;
 
     Q_INVOKABLE bool matches(const Url &url, QUrl::FormattingOptions options) const;
 
@@ -240,7 +239,6 @@ NX_UTILS_API QString hidePassword(nx::utils::Url url);
 NX_UTILS_API QString toString(const nx::utils::Url& value);
 
 } // namespace nx::utils
-
 
 class QnJsonContext;
 class QJsonValue;
