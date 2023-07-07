@@ -114,6 +114,15 @@ Button
                     anchors.verticalCenter: parent.verticalCenter
 
                     source: control.icon.source
+
+                    onSourceChanged:
+                    {
+                        // It is needed for correct implicitWidth recalculation.
+                        label.elide = Text.ElideNone
+                        width = Math.min(implicitWidth, parent.width - iconItem.width - 4)
+                        label.elide = Text.ElideRight
+                    }
+
                     visible: !!source && width > 0 && height > 0
 
                     width: source != "" ? control.icon.width : 0

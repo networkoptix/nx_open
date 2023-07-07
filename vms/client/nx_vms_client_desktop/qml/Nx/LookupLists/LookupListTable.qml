@@ -26,7 +26,7 @@ TableView
         if (w >= 0)
             return w
 
-        return implicitColumnWidth(columnIndex)
+        return -1
     }
 
     columnSpacing: 0
