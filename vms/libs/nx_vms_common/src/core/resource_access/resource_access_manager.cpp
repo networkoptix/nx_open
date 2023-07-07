@@ -1160,19 +1160,25 @@ bool QnResourceAccessManager::canCreateWebPage(const QnResourceAccessSubject& su
 }
 
 bool QnResourceAccessManager::hasAccessToAllCameras(
-    const Qn::UserAccessData& userAccessData,
-    nx::vms::api::AccessRights accessRights,
-    QnResourcePool* resourcePool) const
+    const QnUuid& userId,
+    nx::vms::api::AccessRights accessRights) const
 {
-    auto user =
-        resourcePool->getResourceById<QnUserResource>(userAccessData.userId);
+    const auto user = resourcePool()->getResourceById<QnUserResource>(userId);
     if (!user)
         return false;
 
     if (user->isAdministrator())
         return true;
 
-    return hasAccessRights(user,
+    return hasAccessRights(
+        user,
         nx::vms::api::kAllDevicesGroupId,
         accessRights | nx::vms::api::AccessRight::view);
+}
+
+bool QnResourceAccessManager::hasAccessToAllCameras(
+    const Qn::UserAccessData& userAccessData,
+    nx::vms::api::AccessRights accessRights) const
+{
+    return hasAccessToAllCameras(userAccessData.userId, accessRights);
 }

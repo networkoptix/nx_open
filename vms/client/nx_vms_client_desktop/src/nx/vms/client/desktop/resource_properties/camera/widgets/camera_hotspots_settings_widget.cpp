@@ -212,11 +212,11 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
 
             d->ui->enableHotspotsCheckBox->setChecked(hotspotsEnabled);
             d->ui->hotspotsEditorWidget->setHotspots(state.isSingleCamera()
-                ? state.singleCameraSettings.cameraHotspots
+                ? state.singleCameraSettings.cameraHotspots.get()
                 : nx::vms::common::CameraHotspotDataList());
 
             d->hotspotsModel->setHotspots(state.isSingleCamera()
-                ? state.singleCameraSettings.cameraHotspots
+                ? state.singleCameraSettings.cameraHotspots.get()
                 : nx::vms::common::CameraHotspotDataList());
 
             d->cameraId = state.singleCameraId();

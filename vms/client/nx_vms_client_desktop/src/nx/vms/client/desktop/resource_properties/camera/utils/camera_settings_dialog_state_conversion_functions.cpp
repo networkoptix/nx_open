@@ -600,7 +600,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
                 camera->setCameraHotspotsEnabled(
                     state.singleCameraSettings.cameraHotspotsEnabled());
             }
-            setCameraHotspots(state.singleCameraSettings.cameraHotspots, camera);
+
+            if (state.singleCameraSettings.cameraHotspots.hasUser())
+                setCameraHotspots(state.singleCameraSettings.cameraHotspots.get(), camera);
         }
     }
 

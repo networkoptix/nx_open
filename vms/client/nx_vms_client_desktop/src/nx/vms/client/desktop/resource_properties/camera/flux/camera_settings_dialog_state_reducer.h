@@ -77,6 +77,7 @@ public:
     static State setReadOnly(State state, bool value);
     static State setSettingsOptimizationEnabled(State state, bool value);
     static State setHasPowerUserPermissions(State state, bool value);
+    static State setHasEditAccessRightsForAllCameras(State state, bool value);
     static State setSingleVirtualCameraState(State state, const VirtualCameraState& value);
 
     static State setSingleCameraUserName(State state, const QString& text);

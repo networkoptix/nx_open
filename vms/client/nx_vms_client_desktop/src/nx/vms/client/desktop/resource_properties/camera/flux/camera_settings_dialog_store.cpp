@@ -192,6 +192,15 @@ void CameraSettingsDialogStore::setHasPowerUserPermissions(bool value)
         [&](State state) { return Reducer::setHasPowerUserPermissions(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setHasEditAccessRightsForAllCameras(bool value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setHasEditAccessRightsForAllCameras(std::move(state), value);
+        });
+}
+
 void CameraSettingsDialogStore::setSingleVirtualCameraState(const VirtualCameraState& value)
 {
     d->executeAction(

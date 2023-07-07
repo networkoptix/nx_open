@@ -208,9 +208,12 @@ public:
     }
 
     bool hasAccessToAllCameras(
+        const QnUuid& userId,
+        nx::vms::api::AccessRights accessRights) const;
+
+    bool hasAccessToAllCameras(
         const Qn::UserAccessData& userAccessData,
-        nx::vms::api::AccessRights accessRights,
-        QnResourcePool* resourcePool) const;
+        nx::vms::api::AccessRights) const;
 
 //-------------------------------------------------------------------------------------------------
 // Layout

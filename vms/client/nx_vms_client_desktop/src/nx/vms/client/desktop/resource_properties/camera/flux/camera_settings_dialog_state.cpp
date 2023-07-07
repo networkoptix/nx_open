@@ -159,6 +159,7 @@ bool CameraSettingsDialogState::isPageVisible(CameraSettingsTab page) const
         case CameraSettingsTab::hotspots:
             return isSingleCamera()
                 && singleCameraProperties.supportsCameraHotspots
+                && hasEditAccessRightsForAllCameras
                 && ini().enableCameraHotspotsFeature;
 
         case CameraSettingsTab::advanced:

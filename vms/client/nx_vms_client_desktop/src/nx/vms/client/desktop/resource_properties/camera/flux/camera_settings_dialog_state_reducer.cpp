@@ -935,7 +935,7 @@ State loadSingleCameraProperties(
     {
         state.singleCameraSettings.cameraHotspotsEnabled.setBase(
             singleCamera->cameraHotspotsEnabled());
-        state.singleCameraSettings.cameraHotspots = singleCamera->cameraHotspots();
+        state.singleCameraSettings.cameraHotspots.setBase(singleCamera->cameraHotspots());
     }
 
     return state;
@@ -976,6 +976,23 @@ State CameraSettingsDialogStateReducer::setHasPowerUserPermissions(
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
     state.hasPowerUserPermissions = value;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setHasEditAccessRightsForAllCameras(
+    State state,
+    bool value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    state.hasEditAccessRightsForAllCameras = value;
+
+    if (!state.hasEditAccessRightsForAllCameras)
+    {
+        state.singleCameraSettings.cameraHotspotsEnabled.resetUser();
+        state.singleCameraSettings.cameraHotspots.resetUser();
+    }
+
     return state;
 }
 
@@ -2117,10 +2134,10 @@ State CameraSettingsDialogStateReducer::setCameraHotspotsData(
     if (!state.isSingleCamera())
         return state;
 
-    if (state.singleCameraSettings.cameraHotspots == cameraHotspots)
+    if (state.singleCameraSettings.cameraHotspots.get() == cameraHotspots)
         return state;
 
-    state.singleCameraSettings.cameraHotspots = cameraHotspots;
+    state.singleCameraSettings.cameraHotspots.setUser(cameraHotspots);
     state.hasChanges = true;
     return state;
 }
