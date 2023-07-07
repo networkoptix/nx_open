@@ -53,6 +53,7 @@
 #include "watchers/camera_settings_ptz_capabilities_watcher.h"
 #include "watchers/camera_settings_readonly_watcher.h"
 #include "watchers/camera_settings_remote_changes_watcher.h"
+#include "watchers/camera_settings_resource_access_watcher.h"
 #include "watchers/virtual_camera_settings_state_watcher.h"
 #include "widgets/camera_analytics_settings_widget.h"
 #include "widgets/camera_dewarping_settings_widget.h"
@@ -304,6 +305,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     new CameraSettingsGlobalSettingsWatcher(d->store, this);
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
+    new CameraSettingsResourceAccessWatcher(d->store, systemContext(), this);
 
     auto generalTab = new CameraSettingsGeneralTabWidget(
         d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);

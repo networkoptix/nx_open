@@ -222,6 +222,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     bool readOnly = true;
     bool settingsOptimizationEnabled = false;
     bool hasPowerUserPermissions = false;
+    bool hasEditAccessRightsForAllCameras = false;
     CameraSettingsTab selectedTab = CameraSettingsTab::general;
 
     // Generic cameras info.
@@ -248,7 +249,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         QnUuid audioOutputDeviceId;
 
         UserEditable<bool> cameraHotspotsEnabled;
-        nx::vms::common::CameraHotspotDataList cameraHotspots;
+        UserEditable<nx::vms::common::CameraHotspotDataList> cameraHotspots;
 
         QStringList sameLogicalIdCameraNames; //< Read-only informational value.
     };
