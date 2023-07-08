@@ -56,8 +56,10 @@ public:
 
         // Page with label and button.
         auto labelPageLayout = new QHBoxLayout(labelPage);
-        const int margin = style::Metrics::kStandardPadding;
-        labelPageLayout->setContentsMargins(margin, 0, margin, 0);
+        const int sideMargin = style::Metrics::kStandardPadding;
+        const int lineEditFrameWidth = 1;
+        labelPageLayout->setContentsMargins(
+            sideMargin, lineEditFrameWidth, sideMargin, lineEditFrameWidth);
         labelPageLayout->addWidget(label);
         labelPageLayout->addWidget(button);
         labelPageLayout->addStretch();
@@ -67,13 +69,11 @@ public:
         label->setForegroundRole(QPalette::Text);
         label->setProperty(style::Properties::kDontPolishFontProperty, true);
         label->setFont(q->font());
-
-        updateCursor();
+        button->setFocusPolicy(Qt::NoFocus);
 
         installEventHandler(label, QEvent::MouseButtonPress, q,
-            [this](QObject* sender, QEvent* event)
+            [this](QObject*, QEvent* event)
             {
-                Q_UNUSED(sender);
                 if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
                     beginEditing();
             });
@@ -95,6 +95,25 @@ public:
 
         // Event filter to handle global mouse clicks and intercept Esc and Enter keys.
         qApp->installEventFilter(this);
+    }
+
+    bool shouldDisplayPlaceholder() const
+    {
+        return !editing() && text().isEmpty() && !placeholderText.isEmpty();
+    }
+
+    void setDisplayPlaceholder(bool displayPlaceholder)
+    {
+        if (!NX_ASSERT(!editing()))
+            return;
+
+        label->setText(displayPlaceholder
+            ? placeholderText
+            : text());
+
+        label->setForegroundRole(displayPlaceholder
+            ? QPalette::PlaceholderText
+            : QPalette::Text);
     }
 
     QString text() const
@@ -119,6 +138,7 @@ public:
             // If editing is off, emit textChanged.
             label->setText(value);
             emit q->textChanged(value);
+            setDisplayPlaceholder(shouldDisplayPlaceholder());
         }
     }
 
@@ -131,6 +151,8 @@ public:
     {
         if (editing() || readOnly())
             return;
+
+        setDisplayPlaceholder(false);
 
         pages->setCurrentWidget(editPage);
         edit->setFocus();
@@ -156,7 +178,7 @@ public:
         }
 
         pages->setCurrentWidget(labelPage);
-        button->setFocus();
+        edit->clearFocus();
 
         emit q->editingFinished();
 
@@ -167,11 +189,13 @@ public:
     void commit()
     {
         endEditing(true);
+        setDisplayPlaceholder(shouldDisplayPlaceholder());
     }
 
     void revert()
     {
         endEditing(false);
+        setDisplayPlaceholder(shouldDisplayPlaceholder());
     }
 
     bool validate()
@@ -201,15 +225,6 @@ public:
             revert();
 
         button->setHidden(readOnly);
-        updateCursor();
-    }
-
-    void updateCursor()
-    {
-        if (readOnly())
-            label->unsetCursor();
-        else
-            label->setCursor(Qt::IBeamCursor);
     }
 
     // Event filter to handle global mouse clicks and intercept Esc and Enter keys.
@@ -281,6 +296,7 @@ public:
     QToolButton* const button = nullptr;
     QLineEdit* const edit = nullptr;
     EditableLabel::Validator validator;
+    QString placeholderText;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -310,6 +326,17 @@ QString EditableLabel::text() const
 void EditableLabel::setText(const QString& text)
 {
     d->setText(text);
+}
+
+QString EditableLabel::placeholderText()
+{
+    return d->placeholderText;
+}
+
+void EditableLabel::setPlaceholderText(const QString& placeholderText)
+{
+    d->placeholderText = placeholderText;
+    d->setDisplayPlaceholder(d->shouldDisplayPlaceholder());
 }
 
 bool EditableLabel::editing() const
@@ -352,17 +379,6 @@ void EditableLabel::setReadOnly(bool readOnly)
 void EditableLabel::setValidator(Validator validator)
 {
     d->validator = validator;
-}
-
-void EditableLabel::changeEvent(QEvent* event)
-{
-    if (event->type() == QEvent::FontChange)
-    {
-        d->label->setFont(font());
-        d->edit->setFont(font());
-    }
-
-    base_type::changeEvent(event);
 }
 
 } // namespace nx::vms::client::desktop
