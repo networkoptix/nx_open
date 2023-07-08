@@ -27,6 +27,9 @@ public:
     QString text() const;
     void setText(const QString& text);
 
+    QString placeholderText();
+    void setPlaceholderText(const QString& placeholderText);
+
     bool editing() const;
     void setEditing(bool editing, bool applyChanges = true);
 
@@ -59,9 +62,6 @@ signals:
      * by user input or programmatically.
      */
     void textChanging(const QString& text);
-
-protected:
-    virtual void changeEvent(QEvent* event) override;
 
 private:
     class Private;
