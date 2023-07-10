@@ -49,7 +49,7 @@ Dialog
 
         Image
         {
-            source: "qrc:///skin/standard_icons/sp_message_box_information.png"
+            source: "image://svg/skin/standard_icons/sp_message_box_information_64.svg"
             Layout.alignment: Qt.AlignTop
         }
 

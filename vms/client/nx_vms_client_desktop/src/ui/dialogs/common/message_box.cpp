@@ -11,6 +11,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
@@ -503,7 +504,15 @@ QPixmap QnMessageBox::getPixmapByIconId(Icon icon)
         case Icon::Question:
             return standardPixmap(QStyle::SP_MessageBoxQuestion);
         case Icon::Success:
-            return qnSkin->pixmap("standard_icons/message_box_success.png");
+        {
+            const QColor kAttentionGreen = "#3A911E";
+            const nx::vms::client::core::SvgIconColorer::IconSubstitutions
+                kIconSubstitutionsGreen = {
+                    {QIcon::Normal, {{kAttentionGreen, "green_attention"}}}};
+            return qnSkin
+                ->icon("standard_icons/sp_message_box_success_64.svg", kIconSubstitutionsGreen)
+                .pixmap(QSize(64, 64));
+        }
         default:
             return QPixmap();
     }

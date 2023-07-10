@@ -43,6 +43,7 @@
     "blue13":       "#117297",
     "blue14":       "#076281",
 
+    "green_attention": "#3a911e",
     "green_l4":     "#56e829",
     "green_l3":     "#51d22a",
     "green_l2":     "#4cbc28",
@@ -52,6 +53,7 @@
     "green_d2":     "#2a551e",
     "green_d3":     "#22391e",
 
+    "yellow_attention" : "#fbbc05",
     "yellow_core":  "#fbbc05",
     "yellow_d1":    "#e1a700",
     "yellow_d2":    "#c79200",
@@ -60,6 +62,7 @@
     "red_l2":       "#f02c2c",
     "red_l1":       "#d92a2a",
     "red_core":     "#c22626",
+    "red_attention" : "#c22626",
     "red_d1":       "#aa1e1e",
     "red_d2":       "#8e1717",
     "red_d3":       "#741414",
