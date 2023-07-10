@@ -1,0 +1,15 @@
+openapi: 3.0.2
+info:
+  title: Transaction Bus
+  version: 0.0.0
+
+tags:
+  - name: Transaction Bus transactions
+    description: Experimental documentation for Transaction Bus. Represented in the form of an
+      HTTP API for technical reasons.
+
+# This section is required by Swagger codegen CLI.
+paths:
+  # At least one path is required, but as it is empty the `paths` section in the result Open API
+  # JSON file is empty.
+  /dummy:
