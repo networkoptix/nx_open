@@ -111,8 +111,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         auto eventFrameLayout = new QVBoxLayout{eventFrame};
         eventFrameLayout->setSpacing(0);
-        m_eventTypePicker = new EventTypePickerWidget;
-        m_eventTypePicker->init(systemContext()->vmsRulesEngine());
+        m_eventTypePicker = new EventTypePickerWidget{systemContext()};
         connect(
             m_eventTypePicker,
             &EventTypePickerWidget::eventTypePicked,
@@ -155,8 +154,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         auto actionFrameLayout = new QVBoxLayout{actionFrame};
         actionFrameLayout->setSpacing(0);
-        m_actionTypePicker = new ActionTypePickerWidget;
-        m_actionTypePicker->init(systemContext()->vmsRulesEngine());
+        m_actionTypePicker = new ActionTypePickerWidget{systemContext()};
         connect(
             m_actionTypePicker,
             &ActionTypePickerWidget::actionTypePicked,

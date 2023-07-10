@@ -13,6 +13,7 @@
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/api/types/resource_types.h>
 
 namespace nx::vms::rules {
 
@@ -107,9 +108,15 @@ struct ItemDescriptor
 
     /**%apidoc Path to the mustache template file used to generate email. */
     QString emailTemplatePath; // TODO: #mmalofeev split ItemDescriptor to EventDescriptior and ActionDescriptor.
+
+    /**%apidoc[opt]
+     * Required Server flags on at least one Server in the System to be able
+     * to deal with such an event or action.
+     */
+    vms::api::ServerFlags serverFlags;
 };
 #define nx_vms_rules_ItemDescriptor_Fields \
-    (id)(groupId)(displayName)(description)(flags)(fields)(permissions)(emailTemplatePath)
+    (id)(groupId)(displayName)(description)(flags)(fields)(permissions)(emailTemplatePath)(serverFlags)
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const ItemDescriptor& value, QJsonValue* target);
 

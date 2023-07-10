@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 
+#include "../manifest.h"
 #include "../rules_fwd.h"
-#include "field.h"
 
 namespace nx::vms::rules::utils {
 
@@ -20,4 +21,8 @@ inline bool aggregateByType(
 /** Returns whether logging is allowed for the given rule. */
 NX_VMS_RULES_API bool isLoggingAllowed(const Engine* engine, QnUuid ruleId);
 
-} // namespace nx::vms::rules
+/** Returns whether any of the given servers support given event or action. */
+NX_VMS_RULES_API bool hasItemSupportedServer(
+    const QnMediaServerResourceList& servers, const ItemDescriptor& itemDescriptor);
+
+} // namespace nx::vms::rules::utils

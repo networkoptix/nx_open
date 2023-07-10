@@ -2,6 +2,8 @@
 
 #include "common.h"
 
+#include <core/resource/media_server_resource.h>
+
 #include "../action_builder.h"
 #include "../engine.h"
 #include "../event_filter.h"
@@ -47,6 +49,19 @@ bool isLoggingAllowed(const Engine* engine, QnUuid ruleId)
         return false;
 
     return true;
+}
+
+bool hasItemSupportedServer(
+    const QnMediaServerResourceList& servers, const ItemDescriptor& itemDescriptor)
+{
+    if (itemDescriptor.serverFlags == 0)
+        return true;
+
+    return std::any_of(servers.cbegin(), servers.cend(),
+        [&itemDescriptor](const QnMediaServerResourcePtr& server)
+        {
+            return server->getServerFlags().testFlags(itemDescriptor.serverFlags);
+        });
 }
 
 } // namespace nx::vms::rules::utils
