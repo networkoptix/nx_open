@@ -104,7 +104,8 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
             makeFieldDescriptor<SourceServerField>(utils::kServerIdFieldName, tr("Server")),
         },
         .permissions = {.globalPermission = GlobalPermission::powerUser},
-        .emailTemplatePath = ":/email_templates/poe_over_budget.mustache"
+        .emailTemplatePath = ":/email_templates/poe_over_budget.mustache",
+        .serverFlags = {api::ServerFlag::SF_HasPoeManagementCapability}
     };
     return kDescriptor;
 }

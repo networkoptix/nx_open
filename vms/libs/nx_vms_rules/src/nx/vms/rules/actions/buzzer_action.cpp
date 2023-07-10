@@ -25,7 +25,8 @@ const ItemDescriptor& BuzzerAction::manifest()
                 {},
                 {.initialValue = 1s, .defaultValue = 1s, .maximumValue = 24h, .minimumValue = 1s}),
             utils::makeIntervalFieldDescriptor(tr("Action Throttling")),
-        }
+        },
+        .serverFlags = {api::ServerFlag::SF_HasBuzzer}
     };
     return kDescriptor;
 }

@@ -5,21 +5,21 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <nx/vms/client/desktop/system_context_aware.h>
+
 namespace Ui { class ActionTypePickerWidget; }
 
 namespace nx::vms::rules { class Engine; }
 
 namespace nx::vms::client::desktop::rules {
 
-class ActionTypePickerWidget: public QWidget
+class ActionTypePickerWidget: public QWidget, public SystemContextAware
 {
     Q_OBJECT
 
 public:
-    ActionTypePickerWidget(QWidget* parent = nullptr);
+    explicit ActionTypePickerWidget(SystemContext* context, QWidget* parent = nullptr);
     virtual ~ActionTypePickerWidget() override;
-
-    void init(const nx::vms::rules::Engine* engine);
 
     QString actionType() const;
     void setActionType(const QString& actionType);

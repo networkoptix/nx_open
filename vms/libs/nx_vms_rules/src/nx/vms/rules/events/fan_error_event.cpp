@@ -50,7 +50,8 @@ const ItemDescriptor& FanErrorEvent::manifest()
             makeFieldDescriptor<SourceServerField>(utils::kServerIdFieldName, tr("At")),
         },
         .permissions = {.globalPermission = GlobalPermission::powerUser},
-        .emailTemplatePath = ":/email_templates/fan_error.mustache"
+        .emailTemplatePath = ":/email_templates/fan_error.mustache",
+        .serverFlags = {api::ServerFlag::SF_HasFanMonitoringCapability}
     };
     return kDescriptor;
 }
