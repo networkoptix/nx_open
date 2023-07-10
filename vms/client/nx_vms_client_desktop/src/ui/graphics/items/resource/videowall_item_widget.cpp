@@ -172,7 +172,7 @@ void QnVideowallItemWidget::initInfoOverlay()
     font.setPixelSize(20);
     setFont(font);
     setPaletteColor(this, QPalette::WindowText,
-        nx::vms::client::core::colorTheme()->color("videowall.overlayText"));
+        nx::vms::client::core::colorTheme()->color("videoWall.overlayText"));
 
     /* Header overlay. */
     m_headerLabel = new GraphicsLabel();
@@ -190,7 +190,7 @@ void QnVideowallItemWidget::initInfoOverlay()
     m_headerWidget->setAcceptedMouseButtons(Qt::NoButton);
     m_headerWidget->setAutoFillBackground(true);
     setPaletteColor(m_headerWidget, QPalette::Window,
-        nx::vms::client::core::colorTheme()->color("videowall.overlayBackground"));
+        nx::vms::client::core::colorTheme()->color("videoWall.overlayBackground"));
 
     QGraphicsLinearLayout *headerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
     headerOverlayLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
