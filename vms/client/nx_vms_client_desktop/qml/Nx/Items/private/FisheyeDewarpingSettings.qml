@@ -376,7 +376,7 @@ Item
                 Layout.alignment: Qt.AlignTop
 
                 Label { text: qsTr("Size"); Layout.alignment: Qt.AlignRight }
-                Image { source: "qrc:/skin/fisheye/circle_small.png" }
+                Image { source: "image://svg/skin/fisheye/circle_small_24.svg" }
 
                 Slider
                 {
@@ -404,10 +404,10 @@ Item
                     }
                 }
 
-                Image { source: "qrc:/skin/fisheye/circle_big.png" }
+                Image { source: "image://svg/skin/fisheye/circle_big_24.svg" }
 
                 Label { text: qsTr("X Offset"); Layout.alignment: Qt.AlignRight }
-                Image { source: "qrc:/skin/fisheye/arrow_left.png" }
+                Image { source: "image://svg/skin/fisheye/arrow_left_24.svg" }
 
                 Slider
                 {
@@ -435,10 +435,10 @@ Item
                     }
                 }
 
-                Image { source: "qrc:/skin/fisheye/arrow_right.png" }
+                Image { source: "image://svg/skin/fisheye/arrow_right_24.svg" }
 
                 Label { text: qsTr("Y Offset"); Layout.alignment: Qt.AlignRight }
-                Image { source: "qrc:/skin/fisheye/arrow_down.png" }
+                Image { source: "image://svg/skin/fisheye/arrow_down_24.svg" }
 
                 Slider
                 {
@@ -466,10 +466,10 @@ Item
                     }
                 }
 
-                Image { source: "qrc:/skin/fisheye/arrow_up.png" }
+                Image { source: "image://svg/skin/fisheye/arrow_up_24.svg" }
 
                 Label { text: qsTr("Ellipticity"); Layout.alignment: Qt.AlignRight }
-                Image { source: "qrc:/skin/fisheye/ellipse_vertical.png" }
+                Image { source: "image://svg/skin/fisheye/ellipse_vertical_24.svg" }
 
                 Slider
                 {
@@ -503,7 +503,7 @@ Item
                     }
                 }
 
-                Image { source: "qrc:/skin/fisheye/ellipse_horizontal.png" }
+                Image { source: "image://svg/skin/fisheye/ellipse_horizontal_24.svg" }
             }
         }
     }
