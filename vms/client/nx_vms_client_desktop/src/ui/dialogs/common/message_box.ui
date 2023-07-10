@@ -43,6 +43,20 @@
      <property name="bottomMargin">
       <number>16</number>
      </property>
+     <!--Icon -->
+     <item>
+        <spacer name="verticalSpacerLeftIcon">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>11</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+     </item>
      <item alignment="Qt::AlignTop">
       <widget class="QLabel" name="iconLabel">
        <property name="sizePolicy">
@@ -57,6 +71,20 @@
       </widget>
      </item>
      <item>
+        <spacer name="verticalSpacerRightIcon">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>11</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+     </item>
+    <item>
+     <!--Header and text-->
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
         <number>8</number>

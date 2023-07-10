@@ -119,7 +119,18 @@ const char* kCalendarDelegateCompanion = "calendarDelegateReplacement";
 const int kQtHeaderIconMargin = 2; // a margin between item view header's icon and label used by Qt
 
 const int kCompactTabFocusMargin = 2;
-const int kRectangularTabTextMargin = 8;
+
+const QColor kLight10 = "#A5B7C0";
+const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsGray = {
+    {QIcon::Normal, {{kLight10, "light10"}}}};
+
+const QColor kAttentionRed = "#C22626";
+const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsRed = {
+    {QIcon::Normal, {{kAttentionRed, "red_attention"}}}};
+
+const QColor kAttentionYellow = "#FBBC05";
+const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsYellow = {
+    {QIcon::Normal, {{kAttentionYellow, "yellow_attention"}}}};
 
 void drawArrow(Direction direction,
     QPainter* painter,
@@ -4026,13 +4037,14 @@ QIcon Style::standardIcon(
         case SP_FileDialogNewFolder:
             return qnSkin->icon("standard_icons/add_folder_2px_24.svg");
         case SP_MessageBoxInformation:
-            return qnSkin->icon("standard_icons/sp_message_box_information.png");
+            return qnSkin->icon(
+                "standard_icons/sp_message_box_information_64.svg", kIconSubstitutionsGray);
         case SP_MessageBoxQuestion:
-            return qnSkin->icon("standard_icons/sp_message_box_question.png");
+            return qnSkin->icon("standard_icons/sp_message_box_question_64.svg", kIconSubstitutionsGray);
         case SP_MessageBoxWarning:
-            return qnSkin->icon("standard_icons/sp_message_box_warning.png");
+            return qnSkin->icon("standard_icons/sp_message_box_warning_64.svg", kIconSubstitutionsYellow);
         case SP_MessageBoxCritical:
-            return qnSkin->icon("standard_icons/sp_message_box_critical.png");
+            return qnSkin->icon("standard_icons/sp_message_box_critical_64.svg",kIconSubstitutionsRed);
 
         default:
             auto baseIcon = base_type::standardIcon(iconId, option, widget);
