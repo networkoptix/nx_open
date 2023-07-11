@@ -5,6 +5,8 @@
 
 #include <cmath>
 
+#include <QtWidgets/QLineEdit>
+
 #include <core/ptz/ptz_constants.h>
 #include <nx/network/http/http_types.h>
 #include <nx/vms/api/types/motion_types.h>
@@ -112,6 +114,14 @@ void fillProfiles(
 
 } // namespace
 
+// TODO @pprivalov It clears QSpinBox selection for now, but better to find more generic way.
+void CameraExpertSettingsWidget::clearSpinBoxSelection()
+{
+    ui->customMediaPortSpinBox->findChild<QLineEdit*>()->deselect();
+    ui->customWebPagePortSpinBox->findChild<QLineEdit*>()->deselect();
+    ui->logicalIdSpinBox->findChild<QLineEdit*>()->deselect();
+}
+
 CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     CameraSettingsDialogStore* store,
     QWidget* parent)
@@ -204,6 +214,9 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     connect(ui->customMediaPortSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setCustomMediaPort);
 
+    connect(ui->customMediaPortSpinBox, QnSpinboxIntValueChanged, this, 
+        &CameraExpertSettingsWidget::clearSpinBoxSelection, Qt::QueuedConnection);
+
     connect(ui->useAutoWebPagePortCheckBox, &QCheckBox::clicked, this,
         [this, store](bool checked)
         {
@@ -212,6 +225,8 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     connect(ui->customWebPagePortSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setCustomWebPagePort);
+    connect(ui->customWebPagePortSpinBox, QnSpinboxIntValueChanged, this, 
+        &CameraExpertSettingsWidget::clearSpinBoxSelection, Qt::QueuedConnection);
 
     connect(ui->trustCameraTimeCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setTrustCameraTime);
@@ -230,6 +245,8 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setLogicalId);
+    connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged, this, 
+        &CameraExpertSettingsWidget::clearSpinBoxSelection, Qt::QueuedConnection);
 
     connect(ui->generateLogicalIdButton, &QPushButton::clicked,
         store, &CameraSettingsDialogStore::generateLogicalId);
@@ -571,6 +588,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     {
         ui->customMediaPortSpinBox->setValue(ui->customMediaPortSpinBox->minimum());
     }
+    clearSpinBoxSelection();
 
     if (state.devicesDescription.hasCustomMediaPort == CombinedValue::Some)
     {
