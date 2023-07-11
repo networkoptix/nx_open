@@ -334,10 +334,10 @@
                    <item row="2" column="2">
                     <widget class="QSpinBox" name="customMediaPortSpinBox">
                      <property name="specialValueText">
-                      <string notr="true">––</string>
+                      <string notr="true"></string>
                      </property>
                      <property name="minimum">
-                      <number>0</number>
+                      <number>1</number>
                      </property>
                      <property name="maximum">
                       <number>65535</number>
