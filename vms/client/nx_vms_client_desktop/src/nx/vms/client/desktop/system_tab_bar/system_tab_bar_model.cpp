@@ -57,6 +57,9 @@ QVariant SystemTabBarModel::headerData(int, Qt::Orientation, int) const
 void SystemTabBarModel::addSystem(const QnSystemDescriptionPtr& systemDescription,
     const LogonData& logonData)
 {
+    if (!systemDescription)
+        return;
+
     SystemData value({.systemDescription = systemDescription, .logonData = std::move(logonData)});
     for (auto it = m_systems.cbegin(); it != m_systems.cend(); ++it)
     {

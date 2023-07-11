@@ -479,7 +479,8 @@ void Workbench::addSystem(QnUuid systemId, const LogonData& logonData)
     if (systemDescription.isNull())
         systemDescription = qnSystemsFinder->getSystem(systemId.toSimpleString());
 
-    NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId);
+    if (!NX_ASSERT(systemDescription, "Can't find description for system: %1", systemId))
+        return;
 
     windowContext()->systemTabBarModel()->addSystem(systemDescription, logonData);
     emit currentSystemChanged(systemDescription);
