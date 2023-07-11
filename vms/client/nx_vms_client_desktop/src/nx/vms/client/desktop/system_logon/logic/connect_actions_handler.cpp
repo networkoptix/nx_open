@@ -959,11 +959,11 @@ void ConnectActionsHandler::at_connectAction_triggered()
         if (storePasswordForTile)
             options.setFlag(StorePassword);
 
-        establishConnection(connection);
         storeConnectionRecord(
             connection->connectionInfo(),
             connection->moduleInformation(),
             options);
+        establishConnection(connection);
     }
 }
 
