@@ -11,11 +11,20 @@
 
 namespace nx::vms::client::desktop {
 
+namespace {
+
+// The default QImageReader allocation limit is 128 MB, which is not enough in practice. Introduce
+// a new allocation limit that is three times bigger than the default one.
+const auto kImageAllocationLimit = 384;
+
+} // namespace
+
 ThreadedImageLoaderPrivate::ThreadedImageLoaderPrivate(QObject* parent):
     QObject(parent),
     m_transformationMode(Qt::SmoothTransformation),
     m_flags(ThreadedImageLoader::DownscaleOnly | ThreadedImageLoader::CropToTargetAspectRatio)
 {
+    QImageReader::setAllocationLimit(kImageAllocationLimit);
 }
 
 ThreadedImageLoaderPrivate::~ThreadedImageLoaderPrivate()
