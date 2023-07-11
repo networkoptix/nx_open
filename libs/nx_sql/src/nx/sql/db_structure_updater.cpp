@@ -30,6 +30,31 @@ DROP TABLE db_schema_applied_scripts_old;
 
 )sql";
 
+// CB-2010.
+static constexpr char kAddMissingPrimaryKeys_mysql[] = R"sql(
+
+ALTER TABLE db_schema_applied_scripts ADD PRIMARY KEY (schema_name, script_name);
+
+)sql";
+
+// CB-2010.
+static constexpr char kAddMissingPrimaryKeys_sqlite[] = R"sql(
+
+ALTER TABLE db_schema_applied_scripts RENAME TO db_schema_applied_scripts_bak;
+
+CREATE TABLE db_schema_applied_scripts(
+    schema_name VARCHAR(64),
+    script_name VARCHAR(64),
+    PRIMARY KEY(schema_name, script_name)
+);
+
+INSERT INTO db_schema_applied_scripts
+SELECT * FROM db_schema_applied_scripts_bak;
+
+DROP TABLE db_schema_applied_scripts_bak;
+
+)sql";
+
 //-------------------------------------------------------------------------------------------------
 
 DbStructureUpdater::DbStructureUpdater(
@@ -193,7 +218,7 @@ void DbStructureUpdater::createAppliedScriptsTable(QueryContext* queryContext)
             script_name VARCHAR(64),
             CONSTRAINT UC_script UNIQUE (schema_name, script_name)
         )
-)sql");
+    )sql");
     query->exec();
 }
 
@@ -203,6 +228,10 @@ void DbStructureUpdater::updateMaintenanceDbScheme(QueryContext* queryContext)
         "maintenance_C5DB4205-00E8-4BB0-8DEC-E982C7C9AFEF");
 
     schemaUpdater.addUpdateScript("kMakeSchemaNameColumnLonger", kMakeSchemaNameColumnLonger);
+    schemaUpdater.addUpdateScript("kAddMissingPrimaryKeys", {
+        {nx::sql::RdbmsDriverType::sqlite, std::string(kAddMissingPrimaryKeys_sqlite)},
+        {nx::sql::RdbmsDriverType::unknown, std::string(kAddMissingPrimaryKeys_mysql)} //< default.
+    });
 
     schemaUpdater.updateStruct(queryContext);
 }
