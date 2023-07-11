@@ -18,6 +18,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/progress_state.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
@@ -44,6 +45,12 @@
 #include <ui/dialogs/system_administration_dialog.h>
 
 namespace nx::vms::client::desktop {
+
+static const QColor kLight12Color = "#91A7B2";
+static const QColor kLight10Color = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QnIcon::Normal, {{kLight12Color, "light12"}, {kLight10Color, "light10"}}},
+};
 
 using namespace ui;
 
@@ -314,9 +321,9 @@ QString SystemHealthListModel::Private::toolTip(int index) const
             appContext()->localSettings()->resourceInfoLevel()));
 }
 
-QString SystemHealthListModel::Private::decorationPath(int index) const
+QIcon SystemHealthListModel::Private::decorationIcon(int index) const
 {
-    return decorationPath(m_items[index].message);
+    return decorationIcon(m_items[index].message);
 }
 
 QColor SystemHealthListModel::Private::color(int index) const
@@ -701,18 +708,18 @@ int SystemHealthListModel::Private::priority(MessageType message)
     }
 }
 
-QString SystemHealthListModel::Private::decorationPath(MessageType message)
+QIcon SystemHealthListModel::Private::decorationIcon(MessageType message)
 {
     switch (QnNotificationLevel::valueOf(message))
     {
         case QnNotificationLevel::Value::CriticalNotification:
-            return "events/alert_red.png";
+            return qnSkin->icon("events/alert_red.png");
 
         case QnNotificationLevel::Value::ImportantNotification:
-            return "events/alert_yellow.png";
+            return qnSkin->icon("events/alert_yellow.png");
 
         case QnNotificationLevel::Value::SuccessNotification:
-            return "events/success_mark.png";
+            return qnSkin->icon("events/success_mark.png");
 
         default:
             break;
@@ -724,23 +731,23 @@ QString SystemHealthListModel::Private::decorationPath(MessageType message)
         case MessageType::emailIsEmpty:
         case MessageType::usersEmailIsEmpty:
         case MessageType::emailSendError:
-            return "events/email.png";
+            return qnSkin->icon("events/email_20.svg", kIconSubstitutions);
 
         case MessageType::noLicenses:
-            return "events/license.png";
+            return qnSkin->icon("events/license_20.svg", kIconSubstitutions);
 
         case MessageType::backupStoragesNotConfigured:
         case MessageType::storagesNotConfigured:
         case MessageType::archiveRebuildFinished:
         case MessageType::archiveRebuildCanceled:
         case MessageType::metadataOnSystemStorage: //< TODO: #vbreus Probably should be changed to the 'analytics' icon.
-            return "events/storage.png";
+            return qnSkin->icon("events/storage_20.svg", kIconSubstitutions);
 
         case MessageType::cloudPromo:
-            return "cloud/cloud_20.png";
+            return qnSkin->icon("cloud/cloud_20.png");
 
         default:
-            return QString();
+            return {};
     }
 }
 

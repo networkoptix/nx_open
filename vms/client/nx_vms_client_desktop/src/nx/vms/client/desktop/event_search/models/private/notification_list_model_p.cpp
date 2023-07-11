@@ -60,6 +60,12 @@ namespace {
 
 static const auto kDisplayTimeout = std::chrono::milliseconds(12500);
 
+static const QColor kLight12Color = "#91A7B2";
+static const QColor kLight10Color = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QnIcon::Normal, {{kLight12Color, "light12"}, {kLight10Color, "light10"}}},
+};
+
 QPixmap toPixmap(const QIcon& icon)
 {
     return core::Skin::maximumSizePixmap(icon);
@@ -381,7 +387,8 @@ void NotificationListModel::Private::onRepeatSoundAction(
     {
         EventData eventData;
         eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::common);
-        eventData.icon = qnSkin->pixmap("events/sound.png");
+        eventData.icon =
+            qnSkin->icon("events/sound_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
         eventData.sourceName = action->sourceName();
         fillEventData(action.get(), eventData);
 
@@ -417,7 +424,7 @@ void NotificationListModel::Private::onAlarmLayoutAction(
     EventData eventData;
     eventData.lifetime = kDisplayTimeout;
     eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::critical);
-    eventData.icon = qnSkin->pixmap("events/alarm.png");
+    eventData.icon = qnSkin->icon("events/alarm_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
     eventData.sourceName = action->sourceName();
     eventData.previewCamera =
         resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->eventDeviceIds())
@@ -881,10 +888,10 @@ QPixmap NotificationListModel::Private::pixmapForAction(
     }
 
     if (action->actionType() == ActionType::playSoundAction)
-        return qnSkin->pixmap("events/sound.png");
+        return qnSkin->icon("events/sound_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
 
     if (action->actionType() == ActionType::showOnAlarmLayoutAction)
-        return qnSkin->pixmap("events/alarm.png");
+        return qnSkin->icon("events/alarm_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
 
     const auto& params = action->getRuntimeParams();
 
@@ -894,7 +901,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
             resourcePool(),
             params.metadata.cameraRefs);
         return camList.isEmpty()
-            ? qnSkin->pixmap("events/alert.png")
+            ? qnSkin->icon("events/alert_20.svg", kIconSubstitutions).pixmap(QSize(20, 20))
             : toPixmap(qnResIconCache->icon(QnResourceIconCache::Camera));
     }
 
@@ -922,24 +929,27 @@ QPixmap NotificationListModel::Private::pixmapForAction(
             return qnSkin->pixmap("events/motion.svg");
 
         case EventType::storageFailureEvent:
-            return qnSkin->pixmap("events/storage.png");
+            return qnSkin->icon("events/storage_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
 
         case EventType::cameraDisconnectEvent:
         case EventType::networkIssueEvent:
-            return qnSkin->pixmap("events/connection.png");
+        {
+            return qnSkin->icon("events/connection_20.svg", kIconSubstitutions)
+                .pixmap(QSize(20, 20));
+        }
 
         case EventType::serverStartEvent:
         case EventType::serverFailureEvent:
         case EventType::serverConflictEvent:
         case EventType::backupFinishedEvent:
         case EventType::serverCertificateError:
-            return qnSkin->pixmap("events/server.png");
+            return qnSkin->icon("events/server_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
 
         case EventType::licenseIssueEvent:
-            return qnSkin->pixmap("events/license.png");
+            return qnSkin->icon("events/license_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
 
         case EventType::pluginDiagnosticEvent:
-            return qnSkin->pixmap("events/alert.png");
+            return qnSkin->icon("events/alert_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
 
         default:
             return QPixmap();

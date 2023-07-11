@@ -5,6 +5,7 @@
 #include <QtGui/QPalette>
 
 #include <core/resource/camera_resource.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
@@ -16,6 +17,12 @@ using nx::vms::event::Level;
 using nx::vms::rules::Icon;
 
 namespace {
+
+static const QColor kLight12Color = "#91A7B2";
+static const QColor kLight10Color = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QnIcon::Normal, {{kLight12Color, "light12"}, {kLight10Color, "light10"}}},
+};
 
 struct IconInfo
 {
@@ -29,21 +36,21 @@ struct IconInfo
 };
 
 static const QMap<Icon, IconInfo> kIconByLevel = {
-    {Icon::alert, {"events/alert.png", {
+    {Icon::alert, {"events/alert_20.svg", {
         {Level::critical, "events/alert_red.png"},
         {Level::important, "events/alert_yellow.png"},
     }}},
     {Icon::motion, {"events/motion.svg", {}}},
     {Icon::license, {"events/license_red.png", {}}},
-    {Icon::connection, {"events/connection.png", {
+    {Icon::connection, {"events/connection_20.svg", {
         {Level::critical, "events/connection_red.png"},
         {Level::important, "events/connection_yellow.png"},
     }}},
-    {Icon::storage, {"events/storage.png", {
+    {Icon::storage, {"events/storage_20.svg", {
         {Level::success, "events/storage_green.png"},
         {Level::critical, "events/storage_red.png"},
     }}},
-    {Icon::server, {"events/server.png", {
+    {Icon::server, {"events/server_20.svg", {
         {Level::critical, "events/server_red.png"},
         {Level::important, "events/server_yellow.png"},
     }}},
@@ -89,6 +96,8 @@ QPixmap eventIcon(
                 NX_ASSERT(!path.isEmpty(), "Unhandled icon: %1, level: %2, devices: %3",
                     icon, level, devices))
             {
+                if (path.endsWith(".svg"))
+                    return qnSkin->icon(path, kIconSubstitutions).pixmap(QSize(20, 20));
                 return qnSkin->pixmap(path);
             }
 

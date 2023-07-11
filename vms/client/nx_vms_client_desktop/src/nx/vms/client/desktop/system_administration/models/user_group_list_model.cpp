@@ -260,22 +260,22 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                 case GroupWarningColumn:
                     return group.externalId.isEmpty() || group.externalId.synced
                         ? QVariant{}
-                        : QVariant("user_settings/user_alert.svg");
+                        : QVariant(qnSkin->icon("user_settings/user_alert.svg"));
 
                 case GroupTypeColumn:
                 {
                     if (group.type == nx::vms::api::UserType::ldap)
-                        return QString("user_settings/group_ldap.svg");
+                        return qnSkin->icon("user_settings/group_ldap.svg");
 
                     return Private::isBuiltIn(group)
-                        ? QString("user_settings/group_built_in.svg")
-                        : QString("user_settings/group_custom.svg");
+                        ? qnSkin->icon("user_settings/group_built_in.svg")
+                        : qnSkin->icon("user_settings/group_custom.svg");
                 }
 
                 case PermissionsColumn:
                 {
                     if (d->hasOwnPermissions(group))
-                        return QString("text_buttons/ok.svg");
+                        return qnSkin->icon("text_buttons/ok.svg");
 
                     return {};
                 }
@@ -287,8 +287,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
 
         case Qt::DecorationRole:
         {
-            const auto path = data(index, Qn::DecorationPathRole).toString();
-            return path.isEmpty() ? QVariant() : QVariant::fromValue(qnSkin->icon(path));
+            return data(index, Qn::DecorationPathRole);
         }
 
         case Qt::CheckStateRole:
