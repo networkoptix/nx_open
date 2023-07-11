@@ -54,6 +54,13 @@ namespace {
 
 static constexpr int kMaximumColumnWidth = 200;
 
+static const QColor klight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight16Color, "light16"}}},
+    {QIcon::Active, {{klight16Color, "light17"}}},
+    {QIcon::Selected, {{klight16Color, "light15"}}},
+};
+
 } // namespace
 
 // -----------------------------------------------------------------------------------------------
@@ -169,8 +176,10 @@ public:
 
     QPushButton* const enableSelectedButton{new QPushButton(tr("Enable"), selectionControls)};
     QPushButton* const disableSelectedButton{new QPushButton(tr("Disable"), selectionControls)};
-    QPushButton* const deleteSelectedButton{new QPushButton(
-        qnSkin->icon("text_buttons/trash.png"), tr("Delete"), selectionControls)};
+    QPushButton* const deleteSelectedButton{
+        new QPushButton(qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions),
+            tr("Delete"),
+            selectionControls)};
     QPushButton* const forceSecureAuthButton{new QPushButton(tr("Force Secure Authentication"),
         selectionControls)};
 

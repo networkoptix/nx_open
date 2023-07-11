@@ -7,13 +7,12 @@
 #include <QtGui/QPalette>
 
 #include <client/client_globals.h>
-#include <core/resource/storage_resource.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
-
+#include <core/resource/storage_resource.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/algorithm/index_of.h>
-
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 
 namespace
@@ -21,6 +20,14 @@ namespace
     // TODO: #sivanov #vkutin Refactor to use HumanReadable helper class.
     const qreal kBytesInGB = 1024.0 * 1024.0 * 1024.0;
     const qreal kBytesInTb = 1024.0 * kBytesInGB;
+
+    static const QColor klight16Color = "#698796";
+    static const QColor klight10Color = "#A5B7C0";
+    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+        {QIcon::Normal, {{klight16Color, "light16"}, {klight10Color, "light10"}}},
+        {QIcon::Active, {{klight16Color, "light17"}, {klight10Color, "light11"}}},
+        {QIcon::Selected, {{klight16Color, "light15"}, {klight10Color, "light9"}}},
+    };
 
     int storageIndex(const QnStorageModelInfoList& list, const QnStorageModelInfo& storage)
     {
@@ -335,13 +342,20 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
                 const auto& storage = m_storages.at(index.row());
 
                 if (storage.id == m_metadataStorageId)
-                    return qnSkin->pixmap("text_buttons/analytics.png");
+                {
+                    return qnSkin->icon("text_buttons/analytics_20.svg", kIconSubstitutions)
+                        .pixmap(QSize(20, 20));
+                }
 
                 if (canRemoveStorage(storage))
-                    return qnSkin->pixmap("text_buttons/trash.png");
+                    return qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions)
+                        .pixmap(QSize(20, 20));
 
                 if (couldStoreAnalytics(storage))
-                    return qnSkin->pixmap("text_buttons/analytics.png");
+                {
+                    return qnSkin->icon("text_buttons/analytics_20.svg", kIconSubstitutions)
+                        .pixmap(QSize(20, 20));
+                }
             }
 
             return QVariant();

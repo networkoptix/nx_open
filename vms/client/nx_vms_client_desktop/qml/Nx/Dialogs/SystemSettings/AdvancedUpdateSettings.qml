@@ -164,7 +164,8 @@ Dialog
                 TextButton
                 {
                     text: qsTr("Check for updates")
-                    icon.source: "qrc:/skin/text_buttons/refresh.png"
+                    icon.source: "image://svg/skin/text_buttons/reload_20.svg"
+                    icon.sourceSize: Qt.size(20, 20)
                     visible: !!clientUpdatesPanel.uiState.checkUpdatesButton
                     onClicked:
                     {

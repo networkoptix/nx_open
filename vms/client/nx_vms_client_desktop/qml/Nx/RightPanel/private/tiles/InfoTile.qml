@@ -224,7 +224,8 @@ TileBase
         anchors.top: parent.top
         anchors.topMargin: 6
 
-        icon.source: "qrc:/skin/text_buttons/selectable_button_close.png"
+        icon.source: "image://svg/skin/text_buttons/cross_close_20.svg"
+        icon.sourceSize: Qt.size(20, 20)
         radius: 2
 
         onClicked:

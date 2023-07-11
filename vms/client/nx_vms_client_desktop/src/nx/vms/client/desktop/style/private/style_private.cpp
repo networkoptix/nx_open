@@ -29,6 +29,12 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
+static const QColor kLight10Color = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}}},
+};
+
 void paintLabelIcon(QRect* labelRect,
     QPainter* painter,
     const QIcon& icon,
@@ -460,8 +466,8 @@ void StylePrivate::drawTextButton(QPainter* painter,
     if (hasMenu)
     {
         const auto icon = pressed
-            ? qnSkin->icon("text_buttons/collapse.png")
-            : qnSkin->icon("text_buttons/expand.png");
+            ? qnSkin->icon("text_buttons/arrow_up_20.svg", kIconSubstitutions)
+            : qnSkin->icon("text_buttons/arrow_down_20.svg", kIconSubstitutions);
 
         paintLabelIcon(&textRect,
             painter,

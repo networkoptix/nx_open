@@ -15,6 +15,14 @@ namespace {
 const QString kNormalLogLevelColor = "light16";
 const QString kWarningLogLevelColor = "yellow_d2";
 
+static const QColor kLight10Color = "#A5B7C0";
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}}},
+};
+
 QIcon icon(LogsManagementUnitPtr unit)
 {
     return unit->server()
@@ -29,10 +37,10 @@ QIcon statusIcon(LogsManagementUnitPtr unit)
     {
         case State::pending:
         case State::loading:
-            return qnSkin->icon("text_buttons/rapid_review.png"); //< FIXME: #spanasenko Use a separate icon.
+            return qnSkin->icon("text_buttons/rapid_review_20.svg", kIconSubstitutions); //< FIXME: #spanasenko Use a separate icon.
 
         case State::complete:
-            return qnSkin->icon("text_buttons/ok.png");
+            return qnSkin->icon("text_buttons/ok_20.svg", kIconSubstitutions);
 
         case State::error:
             return qnSkin->icon("text_buttons/error.svg");

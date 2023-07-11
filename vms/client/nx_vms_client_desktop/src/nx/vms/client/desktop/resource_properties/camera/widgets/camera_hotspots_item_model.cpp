@@ -11,6 +11,13 @@
 
 namespace nx::vms::client::desktop {
 
+static const QColor klight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight16Color, "light16"}}},
+    {QIcon::Active, {{klight16Color, "light17"}}},
+    {QIcon::Selected, {{klight16Color, "light15"}}},
+};
+
 CameraHotspotsItemModel::CameraHotspotsItemModel(QnResourcePool* resourcePool, QObject* parent):
     base_type(parent),
     m_resourcePool(resourcePool)
@@ -73,7 +80,7 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
                     : qnResIconCache->icon(QnResourceIconCache::Cameras);
 
             case DeleteButtonColumn:
-                return qnSkin->icon("text_buttons/trash.png");
+                return qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions);
         }
     }
 

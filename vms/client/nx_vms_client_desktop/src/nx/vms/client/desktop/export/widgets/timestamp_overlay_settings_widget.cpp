@@ -3,6 +3,7 @@
 #include "timestamp_overlay_settings_widget.h"
 #include "ui_timestamp_overlay_settings_widget.h"
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -14,6 +15,13 @@ namespace nx::vms::client::desktop {
 namespace {
 
 static constexpr int kMaximumFontSize = 400;
+
+static const QColor klight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight16Color, "light16"}}},
+    {QIcon::Active, {{klight16Color, "light17"}}},
+    {QIcon::Selected, {{klight16Color, "light15"}}},
+};
 
 } // namespace
 
@@ -54,7 +62,7 @@ TimestampOverlaySettingsWidget::TimestampOverlaySettingsWidget(QWidget* parent):
             emit formatChanged(format);
         });
 
-    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/trash.png"));
+    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions));
 
     connect(ui->deleteButton, &QPushButton::clicked,
         this, &TimestampOverlaySettingsWidget::deleteClicked);

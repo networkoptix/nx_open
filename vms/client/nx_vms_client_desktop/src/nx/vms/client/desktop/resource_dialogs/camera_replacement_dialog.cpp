@@ -37,9 +37,15 @@ namespace {
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
-static constexpr int kDialogFixedWidth = 640;
-static constexpr int kHeaderCaptionTextPixelSize = 24;
-static constexpr auto kHeaderCaptionTextWeight = QFont::ExtraLight;
+constexpr int kDialogFixedWidth = 640;
+constexpr int kHeaderCaptionTextPixelSize = 24;
+constexpr auto kHeaderCaptionTextWeight = QFont::ExtraLight;
+
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}}},
+};
 
 static const QColor kLight4Color = "#E1E7EA";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIconSubstitutions = {
@@ -251,7 +257,7 @@ CameraReplacementDialog::CameraReplacementDialog(
     d->resourceSelectionWidget->setTreeEntityFactoryFunction(
         treeEntityCreationFunction(cameraToBeReplaced, showServersInTree(context())));
 
-    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
 
     setupUiContols();
     resize(minimumSizeHint());

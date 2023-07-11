@@ -7,6 +7,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -17,6 +18,15 @@
 namespace nx::vms::client::desktop {
 
 namespace {
+
+static const QColor kLight16Color = "#698796";
+static const QColor kLight10Color = "#A5B7C0";
+static const QColor kLight12Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}, {kLight12Color, "light12"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}, {kLight12Color, "light13"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}, {kLight12Color, "light11"}}},
+};
 
 int rowOf(QGridLayout* layout, QWidget* widget)
 {
@@ -34,9 +44,9 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
     ui->setupUi(this);
 
     ui->multipleNameLabel->setReadOnly(true);
-    ui->showOnLayoutButton->setIcon(qnSkin->icon("text_buttons/video.png"));
-    ui->eventLogButton->setIcon(qnSkin->icon("text_buttons/text.png"));
-    ui->cameraRulesButton->setIcon(qnSkin->icon("text_buttons/event_rules.png"));
+    ui->showOnLayoutButton->setIcon(qnSkin->icon("text_buttons/play_20.svg", kIconSubstitutions));
+    ui->eventLogButton->setIcon(qnSkin->icon("text_buttons/event_log_20.svg", kIconSubstitutions));
+    ui->cameraRulesButton->setIcon(qnSkin->icon("text_buttons/event_rules_20.svg", kIconSubstitutions));
 
     autoResizePagesToContents(ui->stackedWidget,
         {QSizePolicy::Preferred, QSizePolicy::Fixed},
@@ -236,12 +246,14 @@ void CameraInfoWidget::updatePageSwitcher()
     if (ui->stackedWidget->currentWidget() == ui->lessInfoPage)
     {
         ui->toggleInfoButton->setText(tr("More Info"));
-        ui->toggleInfoButton->setIcon(qnSkin->icon("text_buttons/expand.png"));
+        ui->toggleInfoButton->setIcon(
+            qnSkin->icon("text_buttons/arrow_down_20.svg", kIconSubstitutions));
     }
     else
     {
         ui->toggleInfoButton->setText(tr("Less Info"));
-        ui->toggleInfoButton->setIcon(qnSkin->icon("text_buttons/collapse.png"));
+        ui->toggleInfoButton->setIcon(
+            qnSkin->icon("text_buttons/arrow_up_20.svg", kIconSubstitutions));
     }
 }
 

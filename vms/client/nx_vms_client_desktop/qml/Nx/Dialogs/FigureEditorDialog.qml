@@ -189,7 +189,8 @@ Window
             TextButton
             {
                 text: qsTr("Clear")
-                icon.source: "qrc:/skin/text_buttons/refresh.png"
+                icon.source: "image://svg/skin/text_buttons/reload_20.svg"
+                icon.sourceSize: Qt.size(20, 20)
                 anchors.verticalCenter: parent.verticalCenter
                 visible: dialog.showClearButton
                 onClicked: editor.clear()

@@ -41,7 +41,8 @@ SwipeView
             width: 24
             height: 24
 
-            icon.source: "qrc:///skin/text_buttons/clear.png"
+            icon.source: "image://svg/skin/text_buttons/cross_close_20.svg"
+            icon.sourceSize: Qt.size(20, 20)
             color: pressed || hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light9
 
             onClicked: control.closeRequested()

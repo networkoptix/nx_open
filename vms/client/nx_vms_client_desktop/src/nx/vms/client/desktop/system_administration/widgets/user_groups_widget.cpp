@@ -43,9 +43,16 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static constexpr int kMaximumColumnWidth = 200;
-static constexpr int kMaximumInteractiveColumnWidth = 600;
-static constexpr int kDefaultInteractiveColumnWidth = 200;
+constexpr int kMaximumColumnWidth = 200;
+constexpr int kMaximumInteractiveColumnWidth = 600;
+constexpr int kDefaultInteractiveColumnWidth = 200;
+
+static const QColor klight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight16Color, "light16"}}},
+    {QIcon::Active, {{klight16Color, "light17"}}},
+    {QIcon::Selected, {{klight16Color, "light15"}}},
+};
 
 } // namespace
 
@@ -170,8 +177,10 @@ public:
 
     ControlBar* const selectionControls{new ControlBar(q)};
 
-    QPushButton* const deleteSelectedButton{new QPushButton(
-        qnSkin->icon("text_buttons/trash.png"), tr("Delete"), selectionControls)};
+    QPushButton* const deleteSelectedButton{
+        new QPushButton(qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions),
+            tr("Delete"),
+            selectionControls)};
 
 public:
     explicit Private(UserGroupsWidget* q, UserGroupManager* manager);

@@ -152,7 +152,7 @@ Window
                         width: Math.min(implicitWidth, header.filtersColumn.width)
 
                         selectable: false
-                        icon.source: "qrc:///skin/text_buttons/area.png"
+                        icon.source: "image://svg/skin/text_buttons/frame_20.svg"
                         accented: eventModel.analyticsSetup
                             && eventModel.analyticsSetup.areaSelectionActive
 

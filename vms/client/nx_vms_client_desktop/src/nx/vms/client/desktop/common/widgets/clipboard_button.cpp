@@ -7,12 +7,21 @@
 #include <QtWidgets/QLineEdit>
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/line_edit_controls.h>
 
 namespace nx::vms::client::desktop {
 
 namespace {
+
+static const QColor kLight10Color = "#A5B7C0";
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}}},
+};
 
 QString typicalText(ClipboardButton::StandardType type)
 {
@@ -72,9 +81,9 @@ ClipboardButton::ClipboardButton(
     QWidget* parent)
     :
     base_type(
-        qnSkin->icon("text_buttons/copy.png"),
+        qnSkin->icon("text_buttons/copy_20.svg", kIconSubstitutions),
         text,
-        qnSkin->icon("text_buttons/ok.png"),
+        qnSkin->icon("text_buttons/ok_20.svg", kIconSubstitutions),
         confirmationText,
         parent)
 {

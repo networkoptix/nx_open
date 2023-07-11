@@ -40,6 +40,14 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
+static const QColor klight10Color = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight10Color, "light10"}}},
+    {QIcon::Active, {{klight10Color, "light11"}}},
+    {QIcon::Selected, {{klight10Color, "light9"}}},
+    {QnIcon::Error, {{klight10Color, "red_l2"}}},
+};
+
 class MouseEaterWidget: public QGraphicsWidget
 {
 public:
@@ -170,7 +178,7 @@ void ShowreelItemWidget::initOverlay()
     connect(resource().get(), &QnResource::nameChanged, this, updateTitle);
 
     auto closeButton = new QnImageButtonWidget();
-    const auto closeButtonIcon = qnSkin->icon(lit("text_buttons/clear.png"));
+    const auto closeButtonIcon = qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutions);
     const auto closeButtonSize = core::Skin::maximumSize(closeButtonIcon);
     closeButton->setIcon(closeButtonIcon);
     closeButton->setFixedSize(closeButtonSize);

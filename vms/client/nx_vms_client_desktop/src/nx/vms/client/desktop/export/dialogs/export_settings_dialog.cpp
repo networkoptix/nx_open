@@ -15,6 +15,7 @@
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -50,6 +51,30 @@ static const QSize kPreviewSize(512, 288);
 static constexpr int kBusyIndicatorDotRadius = 8;
 static constexpr int kNoDataDefaultFontSize = 18;
 static const char* kTabTitlePropertyName = "tabTitle";
+
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions =
+{
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}}},
+};
+
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsSettings =
+{
+    {QIcon::Normal, {{kLight16Color, "light17"}}},
+};
+
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions
+    kCheckedIconSubstitutionsSettings = 
+{
+        {QIcon::Normal, {{kLight16Color, "light15"}}},
+};
+
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kDisabledIconSubstitutions =
+{
+    {QIcon::Normal, {{kLight16Color, "dark7"}}},
+};
 
 template<class Widget>
 void setMaxOverlayWidth(Widget* settingsWidget, int width)
@@ -252,27 +277,26 @@ void ExportSettingsDialog::setupSettingsButtons()
     static const auto kOverlayPropertyName = "_qn_ExportSettingsOverlay";
 
     ui->cameraExportSettingsButton->setText(tr("Export Settings"));
-    ui->cameraExportSettingsButton->setIcon(qnSkin->icon(
-        lit("text_buttons/settings_hovered.png"),
-        lit("text_buttons/settings_selected.png")));
+    ui->cameraExportSettingsButton->setIcon(qnSkin->icon("text_buttons/settings_20.svg",
+        kIconSubstitutionsSettings,
+        kCheckedIconSubstitutionsSettings));
     ui->cameraExportSettingsButton->setState(SelectableTextButton::State::selected);
     ui->cameraExportSettingsButton->setProperty(kPagePropertyName,
         QVariant::fromValue(ui->exportMediaSettingsPage));
 
     ui->layoutExportSettingsButton->setText(tr("Export Settings"));
-    ui->layoutExportSettingsButton->setIcon(qnSkin->icon(
-        lit("text_buttons/settings_hovered.png"),
-        lit("text_buttons/settings_selected.png")));
+    ui->layoutExportSettingsButton->setIcon(qnSkin->icon("text_buttons/settings_20.svg",
+        kIconSubstitutionsSettings,
+        kCheckedIconSubstitutionsSettings));
     ui->layoutExportSettingsButton->setState(SelectableTextButton::State::selected);
 
     ui->timestampButton->setDeactivatable(true);
     ui->timestampButton->setDeactivatedText(tr("Add Timestamp"));
     ui->timestampButton->setDeactivationToolTip(tr("Delete Timestamp"));
     ui->timestampButton->setText(tr("Timestamp"));
-    ui->timestampButton->setDeactivatedIcon(qnSkin->icon(lit("text_buttons/timestamp.png")));
-    ui->timestampButton->setIcon(qnSkin->icon(
-        lit("text_buttons/timestamp_hovered.png"),
-        lit("text_buttons/timestamp_selected.png")));
+    ui->timestampButton->setDeactivatedIcon(
+        qnSkin->icon("text_buttons/clock_20.svg", kDisabledIconSubstitutions));
+    ui->timestampButton->setIcon(qnSkin->icon("text_buttons/clock_20.svg", kIconSubstitutions));
     ui->timestampButton->setProperty(kPagePropertyName,
         QVariant::fromValue(ui->timestampSettingsPage));
     ui->timestampButton->setProperty(kOverlayPropertyName,
@@ -282,10 +306,9 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->imageButton->setDeactivatedText(tr("Add Image"));
     ui->imageButton->setDeactivationToolTip(tr("Delete Image"));
     ui->imageButton->setText(tr("Image"));
-    ui->imageButton->setDeactivatedIcon(qnSkin->icon(lit("text_buttons/image.png")));
-    ui->imageButton->setIcon(qnSkin->icon(
-        lit("text_buttons/image_hovered.png"),
-        lit("text_buttons/image_selected.png")));
+    ui->imageButton->setDeactivatedIcon(
+        qnSkin->icon("text_buttons/image_20.svg", kDisabledIconSubstitutions));
+    ui->imageButton->setIcon(qnSkin->icon("text_buttons/image_20.svg", kIconSubstitutions));
     ui->imageButton->setProperty(kPagePropertyName,
         QVariant::fromValue(ui->imageSettingsPage));
     ui->imageButton->setProperty(kOverlayPropertyName,
@@ -295,10 +318,9 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->textButton->setDeactivatedText(tr("Add Text"));
     ui->textButton->setDeactivationToolTip(tr("Delete Text"));
     ui->textButton->setText(tr("Text"));
-    ui->textButton->setDeactivatedIcon(qnSkin->icon(lit("text_buttons/text.png")));
-    ui->textButton->setIcon(qnSkin->icon(
-        lit("text_buttons/text_hovered.png"),
-        lit("text_buttons/text_selected.png")));
+    ui->textButton->setDeactivatedIcon(
+        qnSkin->icon("text_buttons/event_log_20.svg", kDisabledIconSubstitutions));
+    ui->textButton->setIcon(qnSkin->icon("text_buttons/event_log_20.svg", kIconSubstitutions));
     ui->textButton->setProperty(kPagePropertyName,
         QVariant::fromValue(ui->textSettingsPage));
     ui->textButton->setProperty(kOverlayPropertyName,
@@ -320,10 +342,10 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->speedButton->setDeactivatable(true);
     ui->speedButton->setDeactivatedText(tr("Rapid Review"));
     ui->speedButton->setDeactivationToolTip(tr("Reset Speed"));
-    ui->speedButton->setDeactivatedIcon(qnSkin->icon(lit("text_buttons/rapid_review.png")));
-    ui->speedButton->setIcon(qnSkin->icon(
-        lit("text_buttons/rapid_review_hovered.png"),
-        lit("text_buttons/rapid_review_selected.png")));
+    ui->speedButton->setDeactivatedIcon(qnSkin->icon("text_buttons/rapid_review_20.svg", kIconSubstitutions));
+    ui->speedButton->setIcon(qnSkin->icon("text_buttons/rapid_review_20.svg",
+        kIconSubstitutionsSettings,
+        kCheckedIconSubstitutionsSettings));
     ui->speedButton->setProperty(kPagePropertyName,
         QVariant::fromValue(ui->rapidReviewSettingsPage));
     connect(ui->speedButton, &SelectableTextButton::stateChanged, this,
@@ -355,10 +377,9 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->bookmarkButton->setDeactivatedText(tr("Add Bookmark Info"));
     ui->bookmarkButton->setDeactivationToolTip(tr("Delete Bookmark Info"));
     ui->bookmarkButton->setText(tr("Bookmark Info"));
-    ui->bookmarkButton->setDeactivatedIcon(qnSkin->icon(lit("text_buttons/bookmark.png")));
-    ui->bookmarkButton->setIcon(qnSkin->icon(
-        lit("text_buttons/bookmark_hovered.png"),
-        lit("text_buttons/bookmark_selected.png")));
+    ui->bookmarkButton->setDeactivatedIcon(
+        qnSkin->icon("text_buttons/bookmark_20.svg", kDisabledIconSubstitutions));
+    ui->bookmarkButton->setIcon(qnSkin->icon("text_buttons/bookmark_20.svg", kIconSubstitutions));
     ui->bookmarkButton->setProperty(kPagePropertyName,
         QVariant::fromValue(ui->bookmarkSettingsPage));
     ui->bookmarkButton->setProperty(kOverlayPropertyName,

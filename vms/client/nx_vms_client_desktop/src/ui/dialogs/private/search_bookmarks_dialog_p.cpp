@@ -14,6 +14,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
@@ -43,6 +44,15 @@ constexpr int kTagColumnWidth = 240;
 const QMap<int, std::pair<int, int>> kColumnsWidthLimit{
     {QnSearchBookmarksModel::kName, {80, 400}},
     {QnSearchBookmarksModel::kTags, {80, 320}}};
+
+static const QColor kLight10Color = "#A5B7C0";
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}}},
+    {QIcon::Selected, {{kLight10Color, "light9"}}},
+    {QnIcon::Error, {{kLight10Color, "red_l2"}}},
+};
 
 } // namespace
 
@@ -77,8 +87,9 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(
     utcRangeEndMs(utcFinishTimeMs)
 {
     ui->setupUi(m_owner);
-    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
-    ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/clear.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
+    ui->clearFilterButton->setIcon(
+        qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutions));
 
     ui->gridBookmarks->setModel(m_model);
 

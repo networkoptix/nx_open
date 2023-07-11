@@ -6,6 +6,7 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/utils/unicode_chars.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
@@ -29,6 +30,12 @@ const std::chrono::seconds kHour = std::chrono::hours(1);
 const std::chrono::seconds kDay = std::chrono::days(1);
 
 const std::chrono::seconds kDontSplitByTime{0};
+
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}}},
+};
 
 bool setValueToGuiElements(unsigned long long value, QSpinBox* spin, QComboBox* combo)
 {
@@ -159,7 +166,7 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
         "the Logging Level to its default setting after you have collected enough logs."));
 
     auto resetButton = ui->buttonBox->button(QDialogButtonBox::Reset);
-    resetButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    resetButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
     resetButton->setFlat(true);
     resetButton->setText(tr("Reset to Default"));
 

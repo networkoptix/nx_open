@@ -3,32 +3,37 @@
 #include "camera_advanced_param_widget_factory.h"
 
 #include <QtCore/QObject>
-
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QFrame>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
+#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QWidget>
-#include <qcoreapplication.h>   // for Q_DECLARE_TR_FUNCTIONS
-
-#include <ui/common/read_only.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
-#include <ui/dialogs/common/message_box.h>
-#include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/utils/math/fuzzy.h>
-#include <nx/vms/client/desktop/common/widgets/lens_ptz_control.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/button_slider.h>
 #include <nx/vms/client/desktop/common/widgets/hover_button.h>
+#include <nx/vms/client/desktop/common/widgets/lens_ptz_control.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <ui/common/read_only.h>
+#include <ui/dialogs/common/message_box.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace nx::vms::client::desktop {
+
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}}},
+};
 
 AbstractCameraAdvancedParamWidget::AbstractCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent) :
     QWidget(parent),
@@ -401,19 +406,16 @@ public:
         AbstractCameraAdvancedParamWidget(parameter, parent),
         m_ptrWidget(new LensPtzControl(this))
     {
-        const QString kIconCw("text_buttons/rotate_cw.png");
-        const QString kIconCwHovered("text_buttons/rotate_cw_hovered.png");
-        const QString kIconCcw("text_buttons/rotate_ccw.png");
-        const QString kIconCcwHovered("text_buttons/rotate_ccw_hovered.png");
-
         // Central widget is here.
         const auto ptzrContainer = new QVBoxLayout();
         ptzrContainer->addWidget(m_ptrWidget);
 
         const auto ptzrInfoContainer = new QHBoxLayout();
 
-        m_rotationCw = new nx::vms::client::desktop::HoverButton(kIconCw, kIconCwHovered, this);
-        m_rotationCcw = new nx::vms::client::desktop::HoverButton(kIconCcw, kIconCcwHovered, this);
+        m_rotationCw = new nx::vms::client::desktop::HoverButton(
+            qnSkin->icon("text_buttons/rotate_cw_20.svg", kIconSubstitutions), this);
+        m_rotationCcw = new nx::vms::client::desktop::HoverButton(
+            qnSkin->icon("text_buttons/rotate_ccw_20.svg", kIconSubstitutions), this);
         m_rotationLabel = new QLabel();
         m_rotationLabel->setText(rotationText(0));
         ptzrInfoContainer->addWidget(m_rotationCcw);

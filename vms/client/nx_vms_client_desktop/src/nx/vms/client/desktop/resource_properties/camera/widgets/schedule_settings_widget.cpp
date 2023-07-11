@@ -9,6 +9,7 @@
 
 #include <core/resource/device_dependent_strings.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
@@ -33,6 +34,14 @@ namespace {
 static constexpr int kRecordingTypeLabelFontSize = 12;
 static constexpr auto kRecordingTypeLabelFontWeight = QFont::DemiBold;
 static constexpr int kCustomQualityOffset = 7;
+
+static const QColor kLight10Color = "#A5B7C0";
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}}},
+};
 
 template<class InputWidget>
 float normalizedValue(const InputWidget* widget)
@@ -369,16 +378,16 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
             ? tr("Less Settings")
             : tr("More Settings");
 
-        const auto buttonIcon = qnSkin->icon(recording.customBitrateVisible
-            ? "text_buttons/collapse.png"
-            : "text_buttons/expand.png");
+        const auto buttonIcon = recording.customBitrateVisible 
+            ? qnSkin->icon("text_buttons/arrow_up_20.svg", kIconSubstitutions)
+            : qnSkin->icon("text_buttons/arrow_down_20.svg", kIconSubstitutions);
 
         ui->advancedSettingsButton->setText(buttonText);
         ui->advancedSettingsButton->setIcon(buttonIcon);
     }
 
-    const auto eyeIcon = qnSkin->icon("text_buttons/eye.png");
-    const auto closedEyeIcon = qnSkin->icon("text_buttons/eye_closed.png");
+    const auto eyeIcon = qnSkin->icon("text_buttons/eye_open_20.svg", kIconSubstitutions);
+    const auto closedEyeIcon = qnSkin->icon("text_buttons/eye_closed_20.svg", kIconSubstitutions);
 
     ui->displayQualityButton->setIcon(recording.showQuality && cameraControlEnabled
         ? eyeIcon

@@ -19,6 +19,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
@@ -35,6 +36,17 @@
 #include <ui/workbench/workbench_context.h>
 
 using namespace std::chrono;
+
+namespace {
+
+static const QColor kLight12Color = "#91A7B2";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight12Color, "light12"}}},
+    {QIcon::Active, {{kLight12Color, "light13"}}},
+    {QIcon::Selected, {{kLight12Color, "light11"}}},
+};
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -166,7 +178,8 @@ void EventSearchWidget::Private::setupTypeSelection()
 {
     using namespace nx::vms::event;
 
-    m_typeSelectionButton->setIcon(qnSkin->icon("text_buttons/event_rules.png"));
+    m_typeSelectionButton->setIcon(
+        qnSkin->icon("text_buttons/event_rules_20.svg", kIconSubstitutions));
 
     auto eventFilterMenu = q->createDropdownMenu();
     auto analyticsEventsMenu = q->createDropdownMenu();

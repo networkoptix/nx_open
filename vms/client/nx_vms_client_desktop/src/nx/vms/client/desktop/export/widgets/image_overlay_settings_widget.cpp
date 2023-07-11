@@ -8,12 +8,24 @@
 #include <QtGui/QImageReader>
 #include <QtWidgets/QApplication>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+
+namespace {
+
+static const QColor klight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight16Color, "light16"}}},
+    {QIcon::Active, {{klight16Color, "light17"}}},
+    {QIcon::Selected, {{klight16Color, "light15"}}},
+};
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -58,7 +70,7 @@ ImageOverlaySettingsWidget::ImageOverlaySettingsWidget(QWidget* parent):
             emit dataChanged(m_data);
         });
 
-    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/trash.png"));
+    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20.svg"));
 
     connect(ui->deleteButton, &QPushButton::clicked,
         this, &ImageOverlaySettingsWidget::deleteClicked);
