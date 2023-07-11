@@ -72,7 +72,8 @@ LabeledItem
 
             TextButton
             {
-                icon.source: "qrc:/skin/text_buttons/trash.png"
+                icon.source: "image://svg/skin/text_buttons/delete_20.svg"
+                icon.sourceSize: Qt.size(20, 20)
                 visible: figureView.hasFigure
 
                 onClicked:

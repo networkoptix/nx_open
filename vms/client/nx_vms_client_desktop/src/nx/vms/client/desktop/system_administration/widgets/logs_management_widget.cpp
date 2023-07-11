@@ -8,6 +8,7 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QFileDialog>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -18,6 +19,17 @@
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 
 namespace nx::vms::client::desktop {
+
+namespace {
+
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}}},
+};
+
+} // namespace
 
 LogsManagementWidget::LogsManagementWidget(
     SystemContext* context,
@@ -111,9 +123,9 @@ void LogsManagementWidget::setupUi()
     header->setSectionResizeMode(
         LogsManagementModel::Columns::StatusColumn, QHeaderView::ResizeToContents);
 
-    ui->downloadButton->setIcon(qnSkin->icon("text_buttons/download.png"));
-    ui->settingsButton->setIcon(qnSkin->icon("text_buttons/settings.png"));
-    ui->resetButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    ui->downloadButton->setIcon(qnSkin->icon("text_buttons/download_20.svg", kIconSubstitutions));
+    ui->settingsButton->setIcon(qnSkin->icon("text_buttons/settings_20.svg", kIconSubstitutions));
+    ui->resetButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
     ui->openFolderButton->setIcon(qnSkin->icon("text_buttons/newfolder.svg"));
 
     ui->resetButton->setFlat(true);

@@ -20,6 +20,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/rules/event_log.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -63,6 +64,15 @@ constexpr auto kUpdateDelayMs = 1000;
 constexpr auto kQueryTimeout = 15s;
 
 const auto kAnalyticsEventType = rules::utils::type<AnalyticsEvent>();
+
+static const QColor klight10Color = "#A5B7C0";
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight10Color, "light10"}, {kLight16Color, "light16"}}},
+    {QIcon::Active, {{klight10Color, "light11"}, {kLight16Color, "light17"}}},
+    {QIcon::Selected, {{klight10Color, "light9"}}},
+    {QnIcon::Error, {{klight10Color, "red_l2"}}},
+};
 
 enum EventListRoles
 {
@@ -176,10 +186,11 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     ui->gridEvents->addAction(m_filterAction);
     ui->gridEvents->addAction(m_resetFilterAction);
 
-    ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/clear.png"));
+    ui->clearFilterButton->setIcon(
+        qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutions));
     connect(ui->clearFilterButton, &QPushButton::clicked, this, &EventLogDialog::reset);
 
-    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
     ui->eventRulesButton->setIcon(qnSkin->icon("buttons/event_rules.png"));
 
     auto scrollBar = new SnappedScrollBar(this);

@@ -292,7 +292,7 @@ Dialog
             {
                 enabled: !!currentList
                 text: qsTr("Settings")
-                icon.source: "qrc:///skin/text_buttons/settings.png"
+                icon.source: "image://svg/skin/text_buttons/settings_20.svg"
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: editCurrentList()
             }

@@ -15,6 +15,9 @@ class HoverButton: public QAbstractButton
     using base_type = QAbstractButton;
 
 public:
+    // Use this one if you want to reuse svg coloring.
+    HoverButton(const QIcon& icon, QWidget* parent = nullptr);
+
     // Use this one if you do NOT want the pressed state.
     HoverButton(const QString& normalPixmap, const QString& hoveredPixmap, QWidget* parent = nullptr);
 

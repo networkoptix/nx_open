@@ -27,6 +27,17 @@
 #include "params_widgets/editor_factory.h"
 #include "utils/confirmation_dialogs.h"
 
+namespace {
+
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}}},
+};
+
+} // namespace
+
 namespace nx::vms::client::desktop::rules {
 
 EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
@@ -65,7 +76,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         auto scheduleButton = new QPushButton;
         scheduleButton->setText(tr("Schedule"));
-        scheduleButton->setIcon(qnSkin->pixmap("text_buttons/calendar.png"));
+        scheduleButton->setIcon(qnSkin->icon("text_buttons/calendar_20.svg", kIconSubstitutions));
         scheduleButton->setFlat(true);
         connect(
             scheduleButton,
@@ -76,7 +87,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         m_deleteButton = new QPushButton;
         m_deleteButton->setText(tr("Delete"));
-        m_deleteButton->setIcon(qnSkin->pixmap("text_buttons/trash.png"));
+        m_deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions));
         m_deleteButton->setFlat(true);
         connect(
             m_deleteButton,

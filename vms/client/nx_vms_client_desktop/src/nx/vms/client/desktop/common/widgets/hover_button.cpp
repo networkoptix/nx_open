@@ -2,12 +2,25 @@
 
 #include "hover_button.h"
 
+#include <QtCore/QString>
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyle>
+#include <QtWidgets/QWidget>
 
 #include <nx/vms/client/core/skin/skin.h>
 
 namespace nx::vms::client::desktop {
+
+HoverButton::HoverButton(const QIcon& icon, QWidget* parent):
+    base_type(parent),
+    m_normal(icon.pixmap(QSize(20, 20))),
+    m_hovered(icon.pixmap(QSize(20, 20), QnIcon::Active)),
+    m_pressed(icon.pixmap(QSize(20, 20), QnIcon::Selected))
+{
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setMouseTracking(true);
+    setAttribute(Qt::WA_Hover);
+}
 
 HoverButton::HoverButton(const QString& normalPixmap, const QString& hoveredPixmap, QWidget* parent):
     HoverButton(normalPixmap, hoveredPixmap, QString(), parent)

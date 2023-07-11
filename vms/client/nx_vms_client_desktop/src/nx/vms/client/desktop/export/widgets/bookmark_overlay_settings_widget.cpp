@@ -4,6 +4,8 @@
 #include "ui_bookmark_overlay_settings_widget.h"
 
 #include <limits>
+
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -16,6 +18,13 @@ namespace {
 static constexpr int kMinimumWidth = 60;
 
 static constexpr int kMaximumFontSize = 400;
+
+static const QColor klight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight16Color, "light16"}}},
+    {QIcon::Active, {{klight16Color, "light17"}}},
+    {QIcon::Selected, {{klight16Color, "light15"}}},
+};
 
 } // namespace
 
@@ -64,7 +73,7 @@ BookmarkOverlaySettingsWidget::BookmarkOverlaySettingsWidget(QWidget* parent):
             emit dataChanged(m_data);
         });
 
-    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/trash.png"));
+    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions));
 
     connect(ui->deleteButton, &QPushButton::clicked,
         this, &BookmarkOverlaySettingsWidget::deleteClicked);

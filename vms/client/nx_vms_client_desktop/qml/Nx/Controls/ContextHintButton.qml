@@ -24,13 +24,10 @@ Control
         width: 16
         height: 16
 
-        property color mainColor: ColorTheme.dark15
-        property color hoveredColor: ColorTheme.dark14
-        
         color: hasHelpTopic && hovered && !mouseArea.containsPress
-            ? hoveredColor
-            : mainColor
-        
+            ? ColorTheme.colors.dark14
+            : ColorTheme.colors.dark15
+
         source: "image://svg/skin/buttons/context_info_16.svg"
 
         baselineOffset: 12.5

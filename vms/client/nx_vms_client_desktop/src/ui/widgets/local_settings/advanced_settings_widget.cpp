@@ -49,6 +49,17 @@
 
 using namespace nx::vms::client::desktop;
 
+namespace {
+
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}}},
+};
+
+} // namespace
+
 struct QnAdvancedSettingsWidget::Private
 {
     std::unique_ptr<ClientLogCollector> logsCollector;
@@ -104,8 +115,10 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     combobox->addItem(tr("Strict"),
         QVariant::fromValue(ServerCertificateValidationLevel::strict));
 
-    ui->downloadLogsButton->setIcon(qnSkin->icon("text_buttons/download.png"));
-    ui->logsSettingsButton->setIcon(qnSkin->icon("text_buttons/settings.png"));
+    ui->downloadLogsButton->setIcon(
+        qnSkin->icon("text_buttons/download_20.svg", kIconSubstitutions));
+    ui->logsSettingsButton->setIcon(
+        qnSkin->icon("text_buttons/settings_20.svg", kIconSubstitutions));
     ui->openLogsFolderButton->setIcon(qnSkin->icon("text_buttons/newfolder.svg"));
     ui->openLogsFolderButton->setFlat(true);
 

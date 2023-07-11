@@ -12,10 +12,21 @@
 #include <nx/utils/literal.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/unicode_chars.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 
 #include "server_updates_model.h"
+
+namespace {
+
+static const QColor kLight10Color = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}}},
+};
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -49,6 +60,8 @@ public:
         bool progressHidden = true;
         bool leftHidden = true;
 
+        static const auto okIcon = qnSkin->icon("text_buttons/ok_20.svg", kIconSubstitutions);
+
         m_animated = false;
         if (m_owner->isVerificationErrorVisible() && !data->verificationMessage.isEmpty())
         {
@@ -60,7 +73,7 @@ public:
         else if (data->skipped)
         {
             m_left->setText(tr("Skipped"));
-            m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
+            m_left->setIcon(okIcon);
             leftHidden = false;
         }
         else if (data->statusUnknown)
@@ -73,7 +86,7 @@ public:
         else if (data->installed)
         {
             m_left->setText(tr("Installed"));
-            m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
+            m_left->setIcon(okIcon);
             leftHidden = false;
         }
         else if (data->installing)
@@ -110,7 +123,7 @@ public:
                 case StatusCode::readyToInstall:
                     // TODO: We should get proper server version here
                     m_left->setText(tr("Downloaded"));
-                    m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
+                    m_left->setIcon(okIcon);
                     leftHidden = false;
                     break;
                 case StatusCode::error:
@@ -121,7 +134,7 @@ public:
                     break;
                 case StatusCode::latestUpdateInstalled:
                     m_left->setText(tr("Installed"));
-                    m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
+                    m_left->setIcon(okIcon);
                     leftHidden = false;
                     break;
                 case StatusCode::idle:

@@ -6,18 +6,23 @@
 #include "button_slider.h"
 #include "hover_button.h"
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 
 namespace {
-    const QString kIconPlus("text_buttons/arythmetic_plus.png");
-    const QString kIconPlusHovered("text_buttons/arythmetic_plus_hovered.png");
-    const QString kIconMinus("text_buttons/arythmetic_minus.png");
-    const QString kIconMinusHovered("text_buttons/arythmetic_minus_hovered.png");
-    const QSize kButtonSize(20, 20);
-    const int kSliderHeight = 120;
-    const int kControlBtn = Qt::LeftButton;
+
+static const QColor kLight10Color = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}}},
+};
+
+const QSize kButtonSize(20, 20);
+const int kSliderHeight = 120;
+const int kControlBtn = Qt::LeftButton;
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -26,7 +31,7 @@ VButtonSlider::VButtonSlider(QWidget* parent):
     QWidget(parent)
 {
     const auto container = new QVBoxLayout(this);
-    m_add = new HoverButton(kIconPlus, kIconPlusHovered, this);
+    m_add = new HoverButton(qnSkin->icon("text_buttons/plus_20.svg", kIconSubstitutions), this);
     m_add->setMinimumSize(kButtonSize);
     m_slider = new QSlider(this);
     m_slider->setOrientation(Qt::Orientation::Vertical);
@@ -34,7 +39,7 @@ VButtonSlider::VButtonSlider(QWidget* parent):
     // We do not want this style right now.
     //m_slider->setProperty(style::Properties::kSliderFeatures,
     //    static_cast<int>(style::SliderFeature::FillingUp));
-    m_dec = new HoverButton(kIconMinus, kIconMinusHovered, this);
+    m_dec = new HoverButton(qnSkin->icon("text_buttons/minus_20.svg", kIconSubstitutions), this);
     m_dec->setMinimumSize(kButtonSize);
     m_label = new QLabel();
     container->setContentsMargins(8, 8, 8, 8);

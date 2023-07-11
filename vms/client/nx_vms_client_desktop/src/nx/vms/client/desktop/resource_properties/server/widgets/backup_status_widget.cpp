@@ -30,6 +30,12 @@ using namespace std::chrono;
 
 namespace {
 
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}}},
+};
+
 nx::vms::api::BackupPosition backupPositionFromCurrentTime()
 {
     const auto currentTimePointMs = system_clock::time_point(qnSyncTime->value());
@@ -88,8 +94,10 @@ BackupStatusWidget::BackupStatusWidget(QWidget* parent):
     setPaletteColor(ui->backupCamerasCountLabel, QPalette::WindowText, lightAccentColor);
     setWarningStyle(ui->storageIssueLabel);
 
-    ui->refreshStatusButton1->setIcon(qnSkin->icon(lit("text_buttons/refresh.png")));
-    ui->refreshStatusButton2->setIcon(qnSkin->icon(lit("text_buttons/refresh.png")));
+    ui->refreshStatusButton1->setIcon(
+        qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
+    ui->refreshStatusButton2->setIcon(
+        qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
     connect(ui->refreshStatusButton1, &QPushButton::clicked,
         this, &BackupStatusWidget::updateBackupStatus);
     connect(ui->refreshStatusButton2, &QPushButton::clicked,

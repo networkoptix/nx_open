@@ -15,6 +15,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/dropdown_button.h>
@@ -59,6 +60,12 @@ const qint64 kBytesInTB = 1024ll * kBytesInGB;
 const int kTableRowHeight = 24;
 const int kMinimumColumnWidth = 110;
 
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}}},
+};
+
 // TODO: #rvasilenko refactor all algorithms working with kExtraDataBase to STL
 const std::array<qint64, 5> kExtraDataBase =
 {
@@ -95,7 +102,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     auto refreshButton = new QPushButton(ui->tabWidget);
     refreshButton->setFlat(true);
     refreshButton->setText(tr("Refresh"));
-    refreshButton->setIcon(qnSkin->icon(lit("text_buttons/refresh.png")));
+    refreshButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
     refreshButton->resize(refreshButton->sizeHint());
 
     anchorWidgetToParent(refreshButton, Qt::RightEdge | Qt::TopEdge);

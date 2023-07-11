@@ -5,11 +5,18 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QPushButton>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/private/found_devices_model.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 
 namespace {
+
+static const QColor kLight10Color = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}}},
+};
 
 using namespace nx::vms::client::desktop;
 
@@ -51,7 +58,7 @@ void CellWidget::setState(FoundDevicesModel::PresentedState value)
 
     if (addedState)
     {
-        button->setIcon(qnSkin->icon("text_buttons/ok.png"));
+        button->setIcon(qnSkin->icon("text_buttons/ok_20.svg", kIconSubstitutions));
         return;
     }
 

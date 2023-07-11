@@ -48,6 +48,12 @@ static constexpr auto kStatusHintLabelFontWeight = QFont::Normal;
 
 static constexpr auto kSmtpTestingTimeout = 5s;
 
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}}},
+};
+
 const bool isValidPort(int port) { return port >= 1 && port <= 65535; };
 
 void setupFocusRedirect(QLabel* label, InputField* inputField)
@@ -186,7 +192,8 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
 
     m_testSmtpConfigurationButton->setText(tr("Check"));
     m_testSmtpConfigurationButton->setFlat(true);
-    m_testSmtpConfigurationButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    m_testSmtpConfigurationButton->setIcon(
+        qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
     m_testSmtpConfigurationButton->resize(m_testSmtpConfigurationButton->minimumSizeHint());
     m_testSmtpConfigurationButton->setFocusPolicy(Qt::ClickFocus);
     static constexpr QMargins kCheckButtonMargins = {0, -4, 0, 0};

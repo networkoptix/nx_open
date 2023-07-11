@@ -2,23 +2,32 @@
 
 #include "rapid_review_settings_widget.h"
 #include "ui_rapid_review_settings_widget.h"
-#include "private/rapid_review_settings_widget_p.h"
 
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QStandardItemModel>
 
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <ui/workaround/widgets_signals_workaround.h>
-#include <nx/utils/log/log.h>
 #include <nx/vms/text/human_readable.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/workaround/widgets_signals_workaround.h>
+
+#include "private/rapid_review_settings_widget_p.h"
 
 namespace nx::vms::client::desktop {
 
 namespace {
+
+static const QColor klight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight16Color, "light16"}}},
+    {QIcon::Active, {{klight16Color, "light17"}}},
+    {QIcon::Selected, {{klight16Color, "light15"}}},
+};
 
 /* Font size for info labels. */
 const int kInfoFontPixelSize = 16;
@@ -109,7 +118,7 @@ RapidReviewSettingsWidget::RapidReviewSettingsWidget(QWidget* parent):
 
     setSourcePeriodLengthMs(minimalSourcePeriodLengthMs());
 
-    ui->deleteButton->setIcon(qnSkin->icon(lit("text_buttons/trash.png")));
+    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions));
 
     connect(ui->deleteButton, &QPushButton::clicked,
         this, &RapidReviewSettingsWidget::deleteClicked);

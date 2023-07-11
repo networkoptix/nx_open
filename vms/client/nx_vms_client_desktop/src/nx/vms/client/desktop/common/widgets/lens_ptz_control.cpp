@@ -3,6 +3,8 @@
 #include "lens_ptz_control.h"
 
 #include <QtCore/QEvent>
+#include <QtCore/QSize>
+#include <QtGui/QColor>
 #include <QtGui/QPainter>
 #include <QtGui/QVector2D>
 #include <QtWidgets/QStylePainter>
@@ -17,50 +19,50 @@
 #include <utils/math/color_transformations.h>
 
 namespace {
-    // Main width for all lines.
-    const int kLineWidth = 2;
-    const int kLineBorderWidth = 1;
-    const int kHandlerDiameter = 16;
-    const int kDotWidth = kLineWidth * 2;
-    const int kButtonSize = 20;
-    // Offset from center of the circle to center of directional button.
-    const int kButtonOffset = 10 + kButtonSize;
 
-    // Return time in milliseconds. This time is needed to
-    // auto-return the handler to its initial position.
-    const int kReturnTime = 500;
+// Main width for all lines.
+constexpr int  kLineWidth = 2;
+constexpr int  kLineBorderWidth = 1;
+constexpr int  kHandlerDiameter = 16;
+constexpr int  kDotWidth = kLineWidth * 2;
+constexpr int  kButtonSize = 20;
+// Offset from center of the circle to center of directional button.
+constexpr int  kButtonOffset = 10 + kButtonSize;
 
-    const qreal kSensitivity = 0.02;
-    // Minimal size for joystick circle.
-    const int kMinCircleSize = 176;
+// Return time in milliseconds. This time is needed to
+// auto-return the handler to its initial position.
+constexpr int  kReturnTime = 500;
 
-    // Time period to read updates for ptzr control.
-    const int kUpdatePeriod = 33;
+const qreal kSensitivity = 0.02;
+// Minimal size for joystick circle.
+constexpr int  kMinCircleSize = 176;
 
-    // Increments to be applied when we press appropriate button.
-    const float kPanTiltIncrement = 1.0;
-    const float kRotationIncrement = 90;
+// Time period to read updates for ptzr control.
+constexpr int  kUpdatePeriod = 33;
 
-    const QString kNormalIcons[] =
-    {
-        "text_buttons/arrow_left.png",
-        "text_buttons/arrow_right.png",
-        "text_buttons/arrow_up.png",
-        "text_buttons/arrow_down.png",
-    };
+// Increments to be applied when we press appropriate button.
+constexpr float kPanTiltIncrement = 1.0;
+constexpr float kRotationIncrement = 90;
 
-    const QString kHoveredIcons[] =
-    {
-        "text_buttons/arrow_left_hovered.png",
-        "text_buttons/arrow_right_hovered.png",
-        "text_buttons/arrow_up_hovered.png",
-        "text_buttons/arrow_down_hovered.png",
-    };
+static const QString kNormalIcons[] =
+{
+    "text_buttons/arrow_left_20.svg",
+    "text_buttons/arrow_right_20.svg",
+    "text_buttons/arrow_up_20.svg",
+    "text_buttons/arrow_down_20.svg",
+};
 
-    inline qreal length(const QPointF& point)
-    {
-        return qSqrt(QPointF::dotProduct(point, point));
-    }
+static const QColor kLight10Color = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}}},
+};
+
+inline qreal length(const QPointF& point)
+{
+    return qSqrt(QPointF::dotProduct(point, point));
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -70,8 +72,10 @@ LensPtzControl::LensPtzControl(QWidget* parent):
 {
     for (size_t i = 0; i < m_buttons.size(); ++i)
     {
-        m_buttons[i].normal = qnSkin->pixmap(kNormalIcons[i], true);
-        m_buttons[i].hover = qnSkin->pixmap(kHoveredIcons[i], true);
+        m_buttons[i].normal = qnSkin->icon(kNormalIcons[i], kIconSubstitutions)
+            .pixmap(QSize(20, 20));
+        m_buttons[i].hover = qnSkin->icon(kNormalIcons[i], kIconSubstitutions)
+            .pixmap(QSize(20, 20), QnIcon::Active);
     }
 
     m_rotationHandler.radius = kHandlerDiameter / 2;

@@ -275,7 +275,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                 case PermissionsColumn:
                 {
                     if (d->hasOwnPermissions(group))
-                        return qnSkin->icon("text_buttons/ok.svg");
+                        return QString("text_buttons/ok_20.svg");
 
                     return {};
                 }

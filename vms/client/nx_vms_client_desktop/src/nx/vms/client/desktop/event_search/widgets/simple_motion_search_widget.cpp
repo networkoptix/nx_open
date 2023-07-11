@@ -11,6 +11,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/unicode_chars.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/simple_motion_search_list_model.h>
@@ -22,6 +23,13 @@
 using nx::vms::client::core::MotionSelection;
 
 namespace nx::vms::client::desktop {
+
+static const QColor klight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight16Color, "light16"}}},
+    {QIcon::Active, {{klight16Color, "light17"}}},
+    {QIcon::Selected, {{klight16Color, "light15"}}},
+};
 
 class SimpleMotionSearchWidget::Private: public QObject
 {
@@ -46,7 +54,7 @@ public:
         m_areaButton->setAccented(true);
         m_areaButton->setDeactivatedText(tr("Select area on the video to filter results"));
         m_areaButton->setText(tr("In selected area"));
-        m_areaButton->setIcon(qnSkin->icon("text_buttons/area.png"));
+        m_areaButton->setIcon(qnSkin->icon("text_buttons/frame_20.svg", kIconSubstitutions));
 
         connect(m_areaButton, &SelectableTextButton::stateChanged, this,
             [this](SelectableTextButton::State state)
@@ -81,8 +89,8 @@ private:
         const bool isCamera = camera || !isMedia;
 
         m_resourceButton->setIcon(isCamera
-            ? qnSkin->icon("text_buttons/camera.png")
-            : qnSkin->icon("text_buttons/video.png"));
+            ? qnSkin->icon("text_buttons/camera_20.svg", kIconSubstitutions)
+            : qnSkin->icon("text_buttons/play_20.svg", kIconSubstitutions));
 
         // TODO: #vkutin Think how to avoid code duplication with AbstractSearchWidget::Private.
         if (resource)

@@ -41,6 +41,7 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
@@ -62,6 +63,14 @@
 #include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop {
+
+static const QColor klight16Color = "#698796";
+static const QColor klight10Color = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight16Color, "light16"}, {klight10Color, "light10"}}},
+    {QIcon::Active, {{klight16Color, "light17"}, {klight10Color, "light11"}}},
+    {QIcon::Selected, {{klight16Color, "light15"}, {klight10Color, "light9"}}},
+};
 
 using namespace std::chrono;
 using namespace nx::analytics::taxonomy;
@@ -302,7 +311,8 @@ void AnalyticsSearchWidget::Private::setupEngineSelection()
 void AnalyticsSearchWidget::Private::setupTypeSelection()
 {
     m_typeSelectionButton->setDeactivatedText(tr("Any type"));
-    m_typeSelectionButton->setIcon(qnSkin->icon("text_buttons/analytics.png"));
+    m_typeSelectionButton->setIcon(
+        qnSkin->icon("text_buttons/analytics_20.svg", kIconSubstitutions));
 
     m_typeSelectionButton->setMenu(m_objectTypeMenu);
 
@@ -351,7 +361,8 @@ void AnalyticsSearchWidget::Private::updateTypeButton()
     }
     else
     {
-        m_typeSelectionButton->setIcon(qnSkin->icon("text_buttons/analytics.png"));
+        m_typeSelectionButton->setIcon(
+            qnSkin->icon("text_buttons/analytics_20.svg", kIconSubstitutions));
         m_typeSelectionButton->deactivate();
     }
 }
@@ -411,7 +422,7 @@ void AnalyticsSearchWidget::Private::setupAreaSelection()
 {
     m_areaSelectionButton->setAccented(true);
     m_areaSelectionButton->setDeactivatedText(tr("Select area"));
-    m_areaSelectionButton->setIcon(qnSkin->icon("text_buttons/area.png"));
+    m_areaSelectionButton->setIcon(qnSkin->icon("text_buttons/frame_20.svg", kIconSubstitutions));
 
     connect(m_areaSelectionButton, &SelectableTextButton::stateChanged,
         [this](SelectableTextButton::State state)

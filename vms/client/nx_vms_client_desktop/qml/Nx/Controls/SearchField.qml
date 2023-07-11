@@ -95,7 +95,7 @@ Nx.TextField
         anchors.verticalCenter: parent.verticalCenter
         padding: 0
         focusPolicy: Qt.NoFocus
-        icon.source: "qrc:///skin/text_buttons/clear.png"
+        icon.source: "image://svg/skin/text_buttons/cross_close_20.svg"
         icon.color: searchField.color
 
         enabled: searchField.text

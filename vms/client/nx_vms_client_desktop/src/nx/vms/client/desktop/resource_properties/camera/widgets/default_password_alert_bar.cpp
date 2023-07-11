@@ -5,10 +5,22 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QHBoxLayout>
 
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/workbench/workbench_access_controller.h>
+
+namespace {
+
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}}},
+};
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -18,7 +30,7 @@ DefaultPasswordAlertBar::DefaultPasswordAlertBar(QWidget* parent):
     m_setPasswordButton(new QPushButton(this))
 {
     m_setPasswordButton->setFlat(true);
-    m_setPasswordButton->setIcon(qnSkin->icon(lit("text_buttons/password.png")));
+    m_setPasswordButton->setIcon(qnSkin->icon("text_buttons/password_20.svg", kIconSubstitutions));
 
     overlayLayout()->setContentsMargins(0, 0, style::Metrics::kDefaultTopLevelMargin, 0);
     overlayLayout()->addWidget(m_setPasswordButton, 0, Qt::AlignRight);

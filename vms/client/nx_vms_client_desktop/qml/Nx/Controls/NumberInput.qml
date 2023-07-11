@@ -117,8 +117,9 @@ FocusScope
 
             contentItem: Image
             {
-                source: "qrc:///skin/text_buttons/clear.png"
+                source: "image://svg/skin/text_buttons/cross_close_20.svg"
                 fillMode: Image.Pad
+                sourceSize: Qt.size(20, 20)
             }
 
             background: Rectangle

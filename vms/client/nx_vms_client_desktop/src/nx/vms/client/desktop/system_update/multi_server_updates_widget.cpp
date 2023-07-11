@@ -94,6 +94,14 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIco
     {QIcon::Normal, {{kLight4Color, "light4"}}},
 };
 
+static const QColor kLight10Color = "#A5B7C0";
+static const QColor kLight16Color = "#698796";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}, {kLight16Color, "light16"}}},
+    {QIcon::Active, {{kLight10Color, "light11"}, {kLight16Color, "light17"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}}},
+};
+
 // Adds resource list to message box
 QTableView* injectResourceList(
     QnMessageBox& messageBox, const QnResourceList& resources)
@@ -217,7 +225,8 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     ui->latestVersionIconLabel->setPixmap(
         qnSkin->icon("system_settings/update_checkmark_40.svg", kNormalIconSubstitutions)
             .pixmap(QSize(40, 40)));
-    ui->linkCopiedIconLabel->setPixmap(qnSkin->pixmap("text_buttons/ok.png"));
+    ui->linkCopiedIconLabel->setPixmap(
+        qnSkin->icon("text_buttons/ok_20.svg", kIconSubstitutions).pixmap(QSize(20, 20)));
     ui->linkCopiedWidget->hide();
 
     setHelpTopic(this, Qn::Administration_Update_Help);
@@ -295,7 +304,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             loadDataToUi();
         });
 
-    ui->advancedUpdateSettings->setIcon(qnSkin->icon("text_buttons/collapse.png"));
+    ui->advancedUpdateSettings->setIcon(qnSkin->icon("text_buttons/arrow_up_20.svg", kIconSubstitutions));
 
     setAccentStyle(ui->downloadButton);
     // This button is hidden for now. We will implement it in future.
@@ -429,18 +438,20 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         ui->longUpdateWarning, &QLabel::show);
 
     ui->manualDownloadButton->hide();
-    ui->manualDownloadButton->setIcon(qnSkin->icon("text_buttons/download.png"));
+    ui->manualDownloadButton->setIcon(
+        qnSkin->icon("text_buttons/download_20.svg", kIconSubstitutions));
     ui->manualDownloadButton->setForegroundRole(QPalette::WindowText);
 
     ui->checkAgainButton->hide();
-    ui->checkAgainButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    ui->checkAgainButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
     ui->checkAgainButton->setForegroundRole(QPalette::WindowText);
 
     ui->tryAgainButton->hide();
-    ui->tryAgainButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    ui->tryAgainButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
     ui->tryAgainButton->setForegroundRole(QPalette::WindowText);
 
-    ui->advancedSettingsButton->setIcon(qnSkin->icon("text_buttons/settings.png"));
+    ui->advancedSettingsButton->setIcon(
+        qnSkin->icon("text_buttons/settings_20.svg", kIconSubstitutions));
     ui->advancedSettingsButton->setForegroundRole(QPalette::WindowText);
     connect(ui->advancedSettingsButton,
         &QPushButton::clicked,
@@ -2698,9 +2709,9 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
 
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, !m_showStorageSettings);
     QString icon = m_showStorageSettings
-        ? QString("text_buttons/expand.png")
-        : QString("text_buttons/collapse.png");
-    ui->advancedUpdateSettings->setIcon(qnSkin->icon(icon));
+        ? QString("text_buttons/arrow_down_20.svg")
+        : QString("text_buttons/arrow_up_20.svg");
+    ui->advancedUpdateSettings->setIcon(qnSkin->icon(icon, kIconSubstitutions));
     if (m_showStorageSettings)
         ui->tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     else

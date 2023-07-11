@@ -230,7 +230,7 @@ Item
                 id: resetButton
 
                 text: qsTr("Reset")
-                icon.source: "qrc:/skin/text_buttons/refresh.png"
+                icon.source: "image://svg/skin/text_buttons/reload_20.svg"
                 enabled: settings.betaDegrees || settings.alphaDegrees
 
                 Layout.alignment: Qt.AlignTop
