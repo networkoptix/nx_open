@@ -31,6 +31,14 @@ public:
         return files.first();
     }
 
+    QUrl selectedUrl() const
+    {
+        const auto urls = selectedUrls();
+        if (urls.empty())
+            return {};
+        return urls.first();
+    }
+
     static Options fileDialogOptions()
     {
         return DontUseNativeDialog;
