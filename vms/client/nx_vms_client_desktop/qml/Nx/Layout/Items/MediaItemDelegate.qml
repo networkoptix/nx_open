@@ -72,7 +72,7 @@ ResourceItemDelegate
     [
         TitleBarButton
         {
-            iconUrl: "qrc:/skin/item/image_enhancement.png"
+            iconUrl: "image://svg/skin/item/image_enhancement_24.svg"
             checkable: true
         },
 
