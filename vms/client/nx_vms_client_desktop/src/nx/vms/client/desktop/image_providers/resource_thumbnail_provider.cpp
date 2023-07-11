@@ -6,25 +6,31 @@
 #include <limits>
 
 #include <QtCore/QCache>
+#include <QtCore/QSize>
 #include <QtCore/QString>
+#include <QtGui/QIcon>
 #include <QtGui/QPainter>
 
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/camera_resource.h>
 #include <core/resource/avi/avi_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/desktop/image_providers/ffmpeg_image_provider.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <utils/common/aspect_ratio.h>
 
-#include <nx/vms/client/core/utils/geometry.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
-#include <nx/vms/client/desktop/image_providers/ffmpeg_image_provider.h>
-
 namespace nx::vms::client::desktop {
+
+static const QColor kDark8Color = "#263137";
+static const core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kDark8Color, "dark8"}}},
+};
 
 namespace {
 
@@ -91,10 +97,11 @@ struct ResourceThumbnailProvider::Private
         const auto flags = resource->flags();
 
         if (flags.testFlag(Qn::server))
-            return {ProviderType::image, "item_placeholders/videowall_server_placeholder.png"};
+            return {ProviderType::image, "item_placeholders/videowall_server_placeholder_400.svg"};
 
         if (flags.testFlag(Qn::web_page))
-            return {ProviderType::image, "item_placeholders/videowall_webpage_placeholder.png"};
+            return {
+                ProviderType::image, "item_placeholders/videowall_webpage_placeholder_400.svg"};
 
         // Some cameras are actually provide only sound stream. So we draw sound icon for this.
         const auto mediaResource = resource.dynamicCast<QnMediaResource>();
@@ -192,7 +199,7 @@ struct ResourceThumbnailProvider::Private
 
     static QImage createPlaceholder(const QString& path, const QSize& size)
     {
-        const auto pixmap = qnSkin->pixmap(path, true);
+        const auto pixmap = qnSkin->icon(path, kIconSubstitutions).pixmap(size);
         const auto pixelRatio = pixmap.devicePixelRatio();
 
         QPixmap destination(size * pixelRatio);
