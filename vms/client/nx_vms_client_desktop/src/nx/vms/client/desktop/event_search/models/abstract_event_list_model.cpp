@@ -49,10 +49,7 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
             return index.data(Qn::DescriptionTextRole);
 
         case Qt::DecorationRole:
-        {
-            const auto path = index.data(Qn::DecorationPathRole).toString();
-            return path.isEmpty() ? QPixmap() : qnSkin->pixmap(path);
-        }
+            return index.data(Qn::DecorationPathRole).value<QIcon>().pixmap(QSize(20, 20));
 
         default:
             return QVariant();

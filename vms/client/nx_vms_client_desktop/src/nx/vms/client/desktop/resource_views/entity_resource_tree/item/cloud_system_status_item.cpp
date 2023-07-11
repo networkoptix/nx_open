@@ -53,7 +53,7 @@ public:
         return ini().crossSystemLayoutsExtendedDebug;
     }
 
-    QString customIcon() const
+    QIcon customIcon() const
     {
         if (!crossSystemContext)
             return {};
@@ -61,11 +61,11 @@ public:
         switch (crossSystemContext->status())
         {
             case CloudCrossSystemContext::Status::uninitialized:
-                return "events/alert_red.png";
+                return qnSkin->icon("events/alert_red.png");
             case CloudCrossSystemContext::Status::connecting:
-                return "legacy/loading.gif";
+                return qnSkin->icon("legacy/loading.gif");
             case CloudCrossSystemContext::Status::connectionFailure:
-                return "events/alert_yellow.png";
+                return qnSkin->icon("events/alert_yellow.png");
             default:
                 break;
         }

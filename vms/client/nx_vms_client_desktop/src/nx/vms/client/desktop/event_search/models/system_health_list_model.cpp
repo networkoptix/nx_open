@@ -54,7 +54,7 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
             return d->timestamp(index.row());
 
         case Qn::DecorationPathRole:
-            return d->decorationPath(index.row());
+            return d->decorationIcon(index.row());
 
         case Qn::ResourceListRole:
             return QVariant::fromValue(d->displayedResourceList(index.row()));
