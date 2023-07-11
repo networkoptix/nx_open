@@ -465,12 +465,6 @@ void ActionHandler::addToLayout(
         return;
     }
 
-    if (!menu()->canTrigger(action::OpenInLayoutAction, action::Parameters(resource)
-        .withArgument(Qn::LayoutResourceRole, layout)))
-    {
-        return;
-    }
-
     // Force cloud resource descriptor for cloud layouts.
     LayoutItemData data = layoutItemFromResource(resource,
         /*forceCloud*/ layout->hasFlags(Qn::cross_system));
