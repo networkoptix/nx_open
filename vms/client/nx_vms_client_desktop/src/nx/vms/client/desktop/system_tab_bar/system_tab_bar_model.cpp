@@ -89,6 +89,9 @@ QModelIndex SystemTabBarModel::findSystem(const QString& systemId) const
 void SystemTabBarModel::addSystem(const QnSystemDescriptionPtr& systemDescription,
     const LogonData& logonData)
 {
+    if (!systemDescription)
+        return;
+
     SystemData value({.systemDescription = systemDescription, .logonData = std::move(logonData)});
     if (findSystem(systemDescription->id()).isValid())
         return;
