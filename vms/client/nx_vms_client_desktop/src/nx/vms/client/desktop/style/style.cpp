@@ -120,6 +120,10 @@ const int kQtHeaderIconMargin = 2; // a margin between item view header's icon a
 
 const int kCompactTabFocusMargin = 2;
 
+const QColor kLight1 = "#FFFFFF";
+const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsWhite = {
+    {QIcon::Normal, {{kLight1, "light1"}}}};
+
 const QColor kLight10 = "#A5B7C0";
 const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsGray = {
     {QIcon::Normal, {{kLight10, "light10"}}}};
@@ -4021,30 +4025,35 @@ QIcon Style::standardIcon(
     switch (iconId)
     {
         case SP_LineEditClearButton:
-            return qnSkin->icon("standard_icons/sp_line_edit_clear_button.png");
+            return qnSkin->icon("standard_icons/close_16.svg", kIconSubstitutionsWhite);
         case SP_ArrowLeft:
         case SP_ArrowBack:
-            return qnSkin->icon("standard_icons/arrow_left_2px_24.svg");
+            return qnSkin->icon("standard_icons/arrow_left_2px_24.svg", kIconSubstitutionsWhite);
         case SP_ArrowRight:
         case SP_ArrowForward:
-            return qnSkin->icon("standard_icons/arrow_right_2px_24.svg");
+            return qnSkin->icon("standard_icons/arrow_right_2px_24.svg", kIconSubstitutionsWhite);
         case SP_FileDialogToParent:
-            return qnSkin->icon("standard_icons/arrow_up_2px_24.svg");
+            return qnSkin->icon("standard_icons/arrow_up_2px_24.svg", kIconSubstitutionsWhite);
         case SP_FileDialogListView:
-            return qnSkin->icon("standard_icons/hamburger_menu_2px_24.svg");
+            return qnSkin->icon(
+                "standard_icons/hamburger_menu_2px_24.svg", kIconSubstitutionsWhite);
         case SP_FileDialogDetailedView:
-            return qnSkin->icon("standard_icons/sp_file_dialog_detailed_view_24.svg");
+            return qnSkin->icon(
+                "standard_icons/sp_file_dialog_detailed_view_24.svg", kIconSubstitutionsWhite);
         case SP_FileDialogNewFolder:
-            return qnSkin->icon("standard_icons/add_folder_2px_24.svg");
+            return qnSkin->icon("standard_icons/add_folder_2px_24.svg", kIconSubstitutionsWhite);
         case SP_MessageBoxInformation:
             return qnSkin->icon(
                 "standard_icons/sp_message_box_information_64.svg", kIconSubstitutionsGray);
         case SP_MessageBoxQuestion:
-            return qnSkin->icon("standard_icons/sp_message_box_question_64.svg", kIconSubstitutionsGray);
+            return qnSkin->icon(
+                "standard_icons/sp_message_box_question_64.svg", kIconSubstitutionsGray);
         case SP_MessageBoxWarning:
-            return qnSkin->icon("standard_icons/sp_message_box_warning_64.svg", kIconSubstitutionsYellow);
+            return qnSkin->icon(
+                "standard_icons/sp_message_box_warning_64.svg", kIconSubstitutionsYellow);
         case SP_MessageBoxCritical:
-            return qnSkin->icon("standard_icons/sp_message_box_critical_64.svg",kIconSubstitutionsRed);
+            return qnSkin->icon(
+                "standard_icons/sp_message_box_critical_64.svg", kIconSubstitutionsRed);
 
         default:
             auto baseIcon = base_type::standardIcon(iconId, option, widget);
