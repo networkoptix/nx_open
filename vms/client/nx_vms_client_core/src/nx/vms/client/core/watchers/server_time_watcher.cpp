@@ -94,12 +94,6 @@ qint64 ServerTimeWatcher::utcOffset(
             : result;
     }
 
-    if (auto virtualCamera = resource.dynamicCast<QnVirtualCameraResource>();
-        virtualCamera && virtualCamera->virtualCameraIgnoreTimeZone())
-    {
-        return 0;
-    }
-
     if (auto server = resource->toResource()->getParentResource().dynamicCast<ServerResource>())
     {
         NX_ASSERT(resource->toResourcePtr()->hasFlags(Qn::utc),
