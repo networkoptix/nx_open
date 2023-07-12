@@ -148,7 +148,7 @@ QString StringHelper::urlForCamera(
         if (newServer)
             server = newServer;
 
-        nx::utils::Url serverUrl = server->getApiUrl();
+        nx::utils::Url serverUrl = server->getRemoteUrl();
         if (usePublicIp)
         {
             const auto publicIp = server->getProperty(ResourcePropertyKey::Server::kPublicIp);

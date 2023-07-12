@@ -64,6 +64,9 @@ public:
     quint16 getPort() const;
     virtual nx::utils::Url getApiUrl() const;
 
+    // This getter should be used on when we need remote address of the server even on the current server.
+    virtual nx::utils::Url getRemoteUrl() const;
+
     nx::network::SocketAddress getPrimaryAddress() const;
     void setPrimaryAddress(const nx::network::SocketAddress& getPrimaryAddress);
 
