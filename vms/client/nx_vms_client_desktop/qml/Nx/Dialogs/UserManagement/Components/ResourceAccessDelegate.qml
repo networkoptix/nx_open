@@ -33,7 +33,6 @@ Item
     enum FrameSelectionMode
     {
         NoFrameOperation,
-        FrameInitialization,
         FrameSelection,
         FrameUnselection
     }
@@ -45,8 +44,6 @@ Item
 
     readonly property var resource: (model && model.resource) || null
     readonly property var nodeType: (model && model.nodeType) || -1
-
-    signal frameInitializationResponse(var cell)
 
     implicitWidth: mainDelegate.implicitWidth
     implicitHeight: 28
@@ -241,15 +238,6 @@ Item
 
                     onClicked:
                         accessRightsModel.toggle(index, delegateRoot.automaticDependencies)
-
-                    onFrameSelectedChanged:
-                    {
-                        if (frameSelected && delegateRoot.frameSelectionMode
-                            == ResourceAccessDelegate.FrameInitialization)
-                        {
-                            delegateRoot.frameInitializationResponse(cell)
-                        }
-                    }
 
                     Item
                     {
