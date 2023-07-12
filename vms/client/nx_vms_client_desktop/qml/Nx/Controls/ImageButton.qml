@@ -21,6 +21,10 @@ AbstractButton
 
     property bool useInheritedPalette: false //< Use inherited palette instead of color properties.
 
+    // The most common defaults.
+    icon.width: 20
+    icon.height: 20
+
     palette
     {
         button: useInheritedPalette ? undefined : normalBackground

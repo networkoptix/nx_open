@@ -211,6 +211,7 @@ Dialog
                 background: Rectangle { color: ColorTheme.colors.dark7 }
                 width: parent.width
                 padding: 16
+
                 contentItem: RowLayout
                 {
                     spacing: 8
@@ -224,15 +225,11 @@ Dialog
                     {
                         text: qsTr("Import")
                         icon.source: "image://svg/skin/text_buttons/import.svg"
-                        icon.width: 20
-                        icon.height: 20
                     }
                     TextButton
                     {
                         text: qsTr("Export")
                         icon.source: "image://svg/skin/text_buttons/export.svg"
-                        icon.width: 20
-                        icon.height: 20
                     }
                     Item { Layout.fillWidth: true }
                     SearchField { }

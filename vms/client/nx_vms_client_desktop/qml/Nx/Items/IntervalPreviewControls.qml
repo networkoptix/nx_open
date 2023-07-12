@@ -183,8 +183,6 @@ Item
             height: 32
             radius: 2
 
-            icon.width: 20
-            icon.height: 20
             icon.color: "transparent"
 
             normalBackground: ColorTheme.colors.dark8

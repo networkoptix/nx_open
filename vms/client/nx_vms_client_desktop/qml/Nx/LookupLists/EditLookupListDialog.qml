@@ -244,8 +244,7 @@ ModalDialog
         text: qsTr("Delete")
         DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
         icon.source: "image://svg/skin/text_buttons/trash.svg"
-        icon.width: 20
-        icon.height: 20
+
         onClicked:
         {
             dialog.deleteRequested()

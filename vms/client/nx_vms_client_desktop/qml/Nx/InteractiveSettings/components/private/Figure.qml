@@ -73,9 +73,6 @@ LabeledItem
             TextButton
             {
                 icon.source: "image://svg/skin/text_buttons/delete_20.svg"
-                icon.width: 20
-                icon.height: 20
-
                 visible: figureView.hasFigure
 
                 onClicked:

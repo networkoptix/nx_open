@@ -90,8 +90,6 @@ TextFieldWithValidator
         icon.source: control.showPassword
             ? "image://svg/skin/text_buttons/eye_open.svg"
             : "image://svg/skin/text_buttons/eye_close.svg"
-        icon.width: 20
-        icon.height: 20
 
         onClicked: control.showPassword = !control.showPassword
     }
