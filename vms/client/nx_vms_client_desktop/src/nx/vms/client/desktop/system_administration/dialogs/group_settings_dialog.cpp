@@ -160,8 +160,6 @@ GroupSettingsDialog::GroupSettingsDialog(
             }
         });
 
-    connect(this, &QmlDialogWrapper::rejected, [this] { setGroup({}); });
-
     connect(
         systemContext->accessRightsManager(),
         &nx::core::access::AbstractAccessRightsManager::ownAccessRightsChanged,
@@ -172,16 +170,16 @@ GroupSettingsDialog::GroupSettingsDialog(
                 updateStateFrom(d->groupId);
         });
 
-    const auto resetEditingContext =
+    // This is needed only at apply, because reject and accept clear current group.
+    connect(this, &QmlDialogWrapper::applied, this,
         [this]()
         {
             if (d->editingContext)
                 d->editingContext.value()->revert();
-        };
+        });
 
-    connect(this, &QmlDialogWrapper::applied, this, resetEditingContext);
-    connect(this, &QmlDialogWrapper::accepted, this, resetEditingContext);
-    connect(this, &QmlDialogWrapper::rejected, this, resetEditingContext);
+    connect(this, &QmlDialogWrapper::rejected, this, [this]() { setGroup({}); });
+    connect(this, &QmlDialogWrapper::accepted, this, [this]() { setGroup({}); });
 }
 
 GroupSettingsDialog::~GroupSettingsDialog()
@@ -287,7 +285,10 @@ void GroupSettingsDialog::setGroup(const QnUuid& groupId)
     }
 
     d->groupId = groupId;
-    d->tabIndex = 0;
+
+    if (groupId.isNull())
+        d->tabIndex = 0;
+
     d->isSaving = false;
     createStateFrom(groupId);
 }

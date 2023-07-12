@@ -122,8 +122,6 @@ UserSettingsDialog::UserSettingsDialog(
             });
     }
 
-    connect(this, &QmlDialogWrapper::rejected, [this] { setUser({}); });
-
     if (dialogType == EditUser)
     {
         // It is important to make the connections queued so we would not block inside QML code.
@@ -166,16 +164,16 @@ UserSettingsDialog::UserSettingsDialog(
                 updateStateFrom(d->user);
         });
 
-    const auto resetEditingContext =
+    // This is needed only at apply, because reject and accept clear current user.
+    connect(this, &QmlDialogWrapper::applied, this,
         [this]()
         {
             if (d->editingContext)
                 d->editingContext.value()->revert();
-        };
+        });
 
-    connect(this, &QmlDialogWrapper::applied, this, resetEditingContext);
-    connect(this, &QmlDialogWrapper::accepted, this, resetEditingContext);
-    connect(this, &QmlDialogWrapper::rejected, this, resetEditingContext);
+    connect(this, &QmlDialogWrapper::rejected, this, [this]() { setUser({}); });
+    connect(this, &QmlDialogWrapper::accepted, this, [this]() { setUser({}); });
 }
 
 UserSettingsDialog::~UserSettingsDialog()
@@ -541,8 +539,6 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
         }
     }
 
-    d->tabIndex = 0;
-
     if (d->user)
         d->user->disconnect(this);
 
@@ -560,6 +556,10 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
         connect(user.get(), &QnUserResource::permissionsChanged, this, updateState);
         connect(user.get(), &QnUserResource::enabledChanged, this, updateState);
         connect(user.get(), &QnUserResource::attributesChanged, this, updateState);
+    }
+    else
+    {
+        d->tabIndex = 0;
     }
 
     d->isSaving = false;
