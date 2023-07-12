@@ -255,7 +255,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
     {
         { Qn::NoDataOverlay, tr("NO DATA") },
         { Qn::UnauthorizedOverlay, tr("UNAUTHORIZED") },
-        { Qn::AccessDeniedOverlay, tr("ACCESS DENIED") },
+        { Qn::AccessDeniedOverlay, tr("NO ACCESS") },
         { Qn::OfflineOverlay, tr("OFFLINE") },
         { Qn::AnalogWithoutLicenseOverlay, kNotEnoughLicenses },
         { Qn::VideowallWithoutLicenseOverlay, kNotEnoughLicenses },
@@ -307,7 +307,7 @@ QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay over
     static const IntStringHash kIconPaths
     {
         { Qn::UnauthorizedOverlay, "item_placeholders/unauthorized.png" },
-        { Qn::AccessDeniedOverlay, "item_placeholders/access_denied.png" },
+        { Qn::AccessDeniedOverlay, "item_placeholders/no_access_240x240.svg" },
         { Qn::OfflineOverlay, "item_placeholders/offline.svg" },
         { Qn::AnalogWithoutLicenseOverlay, kLicenceIconPath },
         { Qn::VideowallWithoutLicenseOverlay, kLicenceIconPath },

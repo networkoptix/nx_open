@@ -2437,6 +2437,24 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (!d->hasAccess())
         return Qn::AccessDeniedOverlay;
 
+    if (d->camera)
+    {
+        const auto requiredPermissions =
+            [this]() -> Qn::Permissions
+            {
+                if (d->isPlayingLive())
+                    return Qn::ViewLivePermission;
+
+                const auto screenRecordingAction = action(ui::action::ToggleScreenRecordingAction);
+                return screenRecordingAction->isChecked()
+                    ? (Qn::ViewFootagePermission | Qn::ExportPermission)
+                    : Qn::ViewFootagePermission;
+            }();
+
+        if (!d->accessController()->hasPermissions(d->camera, requiredPermissions))
+            return Qn::AccessDeniedOverlay;
+    }
+
     // TODO: #sivanov This requires a lot of refactoring
     // for live video make a quick check: status has higher priority than EOF.
     if (d->isPlayingLive() && d->camera && d->camera->hasFlags(Qn::virtual_camera))

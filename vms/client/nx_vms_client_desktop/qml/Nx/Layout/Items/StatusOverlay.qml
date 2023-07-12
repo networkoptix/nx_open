@@ -355,8 +355,8 @@ Item
                         qsTr("Please check authentication information"))
 
                 case StatusOverlay.AccessDenied:
-                    return makeErrorOverlayData(qsTr("Access denied"),
-                        "qrc:///skin/item_placeholders/access_denied.png")
+                    return makeErrorOverlayData(qsTr("No access"),
+                        "image://svg/skin/item_placeholders/no_access_240x240.svg")
 
                 case StatusOverlay.OfflineOverlay:
                     return makeErrorOverlayData(qsTr("No signal"),

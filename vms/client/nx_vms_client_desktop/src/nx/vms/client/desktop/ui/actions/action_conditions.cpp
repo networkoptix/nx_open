@@ -2424,23 +2424,6 @@ ConditionWrapper userHasCamerasWithEditableSettings()
     );
 }
 
-ConditionWrapper allOpenedCamerasAllowExport()
-{
-    return new CustomBoolCondition(
-        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
-        {
-            const auto currentLayout = context->workbench()->currentLayout();
-            const auto cameras = currentLayout->itemResources().filtered<QnVirtualCameraResource>();
-
-            return std::all_of(cameras.begin(), cameras.end(),
-                [](auto camera)
-                {
-                    return ResourceAccessManager::hasPermissions(camera, Qn::ExportPermission);
-                });
-        }
-    );
-}
-
 ConditionWrapper hasPermissionsForResources(Qn::Permissions permissions)
 {
     return new ResourcesCondition(
