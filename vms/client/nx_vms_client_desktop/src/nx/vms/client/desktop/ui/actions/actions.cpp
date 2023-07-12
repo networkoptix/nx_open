@@ -537,9 +537,7 @@ void initialize(Manager* manager, Action* root)
             .toggledText(ContextMenu::tr("Stop Screen Recording"))
             .shortcut("Alt+R")
             .shortcut(Qt::Key_MediaRecord)
-            .shortcutContext(Qt::ApplicationShortcut)
-            .condition(!condition::isLoggedIn()
-                || condition::allOpenedCamerasAllowExport());
+            .shortcutContext(Qt::ApplicationShortcut);
 
         factory()
             .flags(Main)
