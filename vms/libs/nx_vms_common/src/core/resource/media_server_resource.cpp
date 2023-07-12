@@ -312,18 +312,33 @@ void QnMediaServerResource::setUrl(const QString& url)
     emit apiUrlChanged(toSharedPointer(this));
 }
 
-nx::utils::Url QnMediaServerResource::getApiUrl() const
+static nx::utils::Url makeUrl(const nx::network::SocketAddress& endpoint)
 {
     return nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
-        .setEndpoint(getPrimaryAddress()).toUrl();
+        .setEndpoint(endpoint).toUrl();
+}
+
+nx::utils::Url QnMediaServerResource::getApiUrl() const
+{
+    return makeUrl(getPrimaryAddress());
+}
+
+nx::utils::Url QnMediaServerResource::getRemoteUrl() const
+{
+    auto address = getPrimaryAddress();
+    if (address.address == nx::network::HostAddress::localhost && !m_netAddrList.isEmpty())
+    {
+        const auto ifAddress = m_netAddrList.front();
+        address = nx::network::SocketAddress(
+            ifAddress.address, ifAddress.port ? ifAddress.port : address.port);
+    }
+    return makeUrl(address);
 }
 
 QString QnMediaServerResource::getUrl() const
 {
-    return nx::network::url::Builder()
-        .setScheme(nx::network::http::kSecureUrlSchemeName)
-        .setEndpoint(getPrimaryAddress()).toUrl().toString();
+    return makeUrl(getPrimaryAddress()).toString();
 }
 
 bool QnMediaServerResource::isGuidConflictDetected() const
