@@ -7,7 +7,10 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
+#include <QtCore/QMap>
 #include <QtCore/QPluginLoader>
+#include <QtCore/QString>
+#include <QtGui/QIcon>
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmapCache>
@@ -18,6 +21,7 @@
 #include <nx/utils/log/log.h>
 
 #include "icon_loader.h"
+#include "svg_icon_colorer.h"
 
 namespace nx::vms::client::core {
 
@@ -123,9 +127,15 @@ QIcon Skin::icon(const QString& name,
     const QString& checkedName,
     const QnIcon::Suffixes* suffixes,
     const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
-    const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions)
+    const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions,
+    const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& svgThemeSubstitutions)
 {
-    return m_iconLoader->load(name, checkedName, suffixes, svgColorSubstitutions, svgCheckedColorSubstitutions);
+    return m_iconLoader->load(name,
+        checkedName,
+        svgThemeSubstitutions,
+        suffixes,
+        svgColorSubstitutions,
+        svgCheckedColorSubstitutions);
 }
 
 QIcon Skin::icon(const char* name, const char* checkedName)
@@ -142,8 +152,12 @@ QIcon Skin::icon(const QString& name,
     const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
     const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions)
 {
-    return m_iconLoader->load(
-        name, QString(), nullptr, svgColorSubstitutions, svgCheckedColorSubstitutions);
+    return m_iconLoader->load(name,
+        QString(),
+        {},
+        nullptr,
+        svgColorSubstitutions,
+        svgCheckedColorSubstitutions);
 }
 
 QIcon Skin::icon(const QString& name,
@@ -151,8 +165,12 @@ QIcon Skin::icon(const QString& name,
     const QString& checkedName,
     const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions)
 {
-    return m_iconLoader->load(
-        name, checkedName, nullptr, svgColorSubstitutions, svgCheckedColorSubstitutions);
+    return m_iconLoader->load(name,
+        checkedName,
+        {},
+        nullptr,
+        svgColorSubstitutions,
+        svgCheckedColorSubstitutions);
 }
 
 QPixmap Skin::pixmap(const QString& name, bool correctDevicePixelRatio, const QSize& desiredSize)

@@ -4,6 +4,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSet>
+#include <QtCore/QMap>
 #include <QtGui/QIcon>
 
 #include "icon.h"
@@ -26,6 +27,7 @@ public:
     QIcon load(
         const QString& name,
         const QString& checkedName = QString(),
+        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions = {},
         const QnIcon::Suffixes* suffixes = nullptr,
         const SvgIconColorer::IconSubstitutions& svgColorSubstitutions =
             SvgIconColorer::kDefaultIconSubstitutions,
@@ -45,7 +47,9 @@ private:
         const QString& name,
         const QString& checkedName,
         const SvgIconColorer::IconSubstitutions& substitutions,
-        const SvgIconColorer::IconSubstitutions& checkedSubstitutions);
+
+        const SvgIconColorer::IconSubstitutions& checkedSubstitutions,
+        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions);
 
 private:
     QHash<QString, QIcon> m_iconByKey;
