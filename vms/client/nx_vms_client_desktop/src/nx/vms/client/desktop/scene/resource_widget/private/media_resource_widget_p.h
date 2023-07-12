@@ -76,6 +76,8 @@ public:
     QnResourceDisplayPtr display() const;
     void setDisplay(const QnResourceDisplayPtr& display);
 
+    QnWorkbenchAccessController* accessController() const;
+
     bool isPlayingLive() const;
     bool isOffline() const;
     bool isUnauthorized() const;
