@@ -20,6 +20,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/switch.h>
+#include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>

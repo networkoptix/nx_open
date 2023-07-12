@@ -551,6 +551,7 @@ void fromApiToResource(const UserData& src, const QnUserResourcePtr& dst, bool s
     dst->setFullName(src.fullName);
     dst->setRawPermissions(src.permissions);
     dst->setAttributes(src.attributes);
+    dst->setExternalId(src.externalId);
 
     if (setPasswordHashes)
     {

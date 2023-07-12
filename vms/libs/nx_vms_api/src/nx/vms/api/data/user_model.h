@@ -51,7 +51,7 @@ struct NX_VMS_API UserModelBase
     std::optional<QString> password;
 
     /**%apidoc[readonly] External identification data (currently used for LDAP only). */
-    std::optional<UserExternalId> externalId;
+    std::optional<UserExternalIdModel> externalId;
 
     /**%apidoc[readonly] */
     UserAttributes attributes{};
@@ -83,7 +83,7 @@ struct NX_VMS_API UserModelBase
     (digest) \
     (hash) \
     (cryptSha512Hash)
-QN_FUSION_DECLARE_FUNCTIONS(UserModelBase, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(UserModelBase, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelBase, UserModelBase_Fields)
 
 // -------------------------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ struct NX_VMS_API UserModelV1: public UserModelBase
     static_assert(isUpdateModelV<UserModelV1>);
 };
 #define UserModelV1_Fields UserModelBase_Fields(isOwner)(permissions)(userRoleId)(accessibleResources)
-QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (json), NX_VMS_API)
 
 // -------------------------------------------------------------------------------------------------
 
@@ -159,7 +159,7 @@ struct NX_VMS_API UserModelV3: public UserModelBase
 };
 #define UserModelV3_Fields UserModelBase_Fields(groupIds)(permissions)(resourceAccessRights)
 
-QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)
 
 using UserModel = UserModelV3;

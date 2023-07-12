@@ -31,7 +31,7 @@ struct NX_VMS_API UserGroupModel
     UserType type = UserType::local;
 
     /**%apidoc[readonly] External identification data (currently used for LDAP only). */
-    std::optional<UserExternalId> externalId;
+    std::optional<UserExternalIdModel> externalId;
 
     /**%apidoc[opt] */
     GlobalPermissions permissions = GlobalPermission::none;
@@ -74,7 +74,7 @@ struct NX_VMS_API UserGroupModel
     (resourceAccessRights) \
     (attributes) \
     (externalId)
-QN_FUSION_DECLARE_FUNCTIONS(UserGroupModel, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(UserGroupModel, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserGroupModel, UserGroupModel_Fields)
 
 } // namespace nx::vms::api

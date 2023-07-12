@@ -71,7 +71,7 @@ class SortedUserListModel: public QSortFilterProxyModel
     using base_type = QSortFilterProxyModel;
 
 public:
-    explicit SortedUserListModel(QObject* parent = nullptr);
+    explicit SortedUserListModel(const QString& syncId, QObject* parent = nullptr);
 
     void setDigestFilter(std::optional<bool> value);
 
@@ -81,6 +81,7 @@ protected:
 
 private:
     std::optional<bool> m_digestFilter;
+    const QString m_syncId;
 };
 
 } // namespace nx::vms::client::desktop

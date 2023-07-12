@@ -31,6 +31,9 @@ public:
     std::unordered_map<QnUuid, nx::vms::api::UserGroupData> customGroups(
         std::function<bool(const nx::vms::api::UserGroupData&)> predicate) const;
 
+    std::vector<QnUuid> customGroupIds(
+        std::function<bool(const nx::vms::api::UserGroupData&)> predicate) const;
+
     /** Returns list of all user groups of specified types. */
     nx::vms::api::UserGroupDataList groups(Selection types = Selection::all) const;
 

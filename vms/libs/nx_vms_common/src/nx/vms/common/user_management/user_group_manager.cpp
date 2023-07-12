@@ -42,6 +42,20 @@ std::unordered_map<QnUuid, UserGroupData> UserGroupManager::customGroups(
     return result;
 }
 
+std::vector<QnUuid> UserGroupManager::customGroupIds(
+    std::function<bool(const nx::vms::api::UserGroupData&)> predicate) const
+{
+    std::vector<QnUuid> result;
+    NX_MUTEX_LOCKER lk(&d->mutex);
+    result.reserve(d->customGroups.size());
+    for (const auto& [id, data]: d->customGroups)
+    {
+        if (predicate(data))
+            result.push_back(id);
+    }
+    return result;
+}
+
 UserGroupDataList UserGroupManager::groups(Selection types) const
 {
     UserGroupDataList result;

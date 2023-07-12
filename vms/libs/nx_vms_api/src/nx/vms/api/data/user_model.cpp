@@ -11,7 +11,7 @@
 namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT(UserModelBase, UserModelBase_Fields)
-QN_FUSION_DEFINE_FUNCTIONS(UserModelBase, (csv_record)(json)(ubjson)(xml))
+QN_FUSION_DEFINE_FUNCTIONS(UserModelBase, (json))
 
 UserDataEx UserModelBase::toUserData() &&
 {
@@ -58,7 +58,7 @@ UserModelBase UserModelBase::fromUserData(UserData&& baseData)
     model.email = std::move(baseData.email);
     model.isHttpDigestEnabled = (baseData.digest != UserData::kHttpIsDisabledStub);
     model.isEnabled = std::move(baseData.isEnabled);
-    if (!baseData.externalId.isEmpty())
+    if (!baseData.externalId.dn.isEmpty())
         model.externalId = std::move(baseData.externalId);
     model.attributes = std::move(baseData.attributes);
     model.digest = std::move(baseData.digest);
@@ -68,7 +68,7 @@ UserModelBase UserModelBase::fromUserData(UserData&& baseData)
 }
 
 QN_FUSION_ADAPT_STRUCT(UserModelV1, UserModelV1_Fields)
-QN_FUSION_DEFINE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml))
+QN_FUSION_DEFINE_FUNCTIONS(UserModelV1, (json))
 
 UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
 {
@@ -112,7 +112,7 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
 }
 
 QN_FUSION_ADAPT_STRUCT(UserModelV3, UserModelV3_Fields)
-QN_FUSION_DEFINE_FUNCTIONS(UserModelV3, (csv_record)(json)(ubjson)(xml))
+QN_FUSION_DEFINE_FUNCTIONS(UserModelV3, (json))
 
 UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
 {

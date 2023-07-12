@@ -709,10 +709,10 @@ struct SaveUserAccess
                     "Change of the User with readonly attribute is forbidden for VMS."));
             }
 
-            if (!param.externalId.isEmpty())
+            if (!param.externalId.dn.isEmpty())
             {
                 const auto existingExternalId = existingUser->externalId();
-                if (!existingExternalId.isEmpty() && existingExternalId != param.externalId)
+                if (!existingExternalId.dn.isEmpty() && existingExternalId != param.externalId)
                 {
                     return Result(ErrorCode::forbidden, ServerApiErrors::tr(
                         "Change of `externalId` is forbidden."));
@@ -1517,10 +1517,10 @@ struct SaveUserRoleAccess
 
         if (!hasSystemAccess(accessData))
         {
-            if (!param.externalId.isEmpty())
+            if (!param.externalId.dn.isEmpty())
             {
                 const auto group = systemContext->userGroupManager()->find(param.id);
-                if (group && !group->externalId.isEmpty() && group->externalId != param.externalId)
+                if (group && !group->externalId.dn.isEmpty() && group->externalId != param.externalId)
                 {
                     return Result(ErrorCode::forbidden, ServerApiErrors::tr(
                         "Change of `externalId` is forbidden."));

@@ -67,7 +67,8 @@ namespace nx::vms::client::desktop {
 
 struct UserSettingsDialog::Private
 {
-    UserSettingsDialog* q;
+    UserSettingsDialog* const q;
+    const QString syncId;
     QWidget* parentWidget = nullptr;
     QPointer<SessionNotifier> sessionNotifier;
     DialogType dialogType;
@@ -81,6 +82,7 @@ struct UserSettingsDialog::Private
 
     Private(UserSettingsDialog* parent, DialogType dialogType):
         q(parent),
+        syncId(parent->globalSettings()->ldap().syncId()),
         dialogType(dialogType),
         tabIndex(q->rootObjectHolder(), "tabIndex"),
         isSaving(q->rootObjectHolder(), "isSaving"),
@@ -389,7 +391,8 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
     state.permissionsEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
 
-    d->ldapError = user->isLdap() && !user->externalId().isEmpty() && !user->externalId().synced;
+    d->ldapError =
+        user->isLdap() && !user->externalId().dn.isEmpty() && user->externalId().syncId != d->syncId;
 
     return state;
 }
