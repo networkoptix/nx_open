@@ -207,10 +207,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, roundDpiScaling,
         "[Design] Whether a DPI scaling factor should be rounded to an integer value.");
 
-    NX_INI_FLAG(false, permissionFrameSelectionControlledByCtrl,
-        "[Design] Whether permission frame selection vs. unselection in Resources tab of\n"
-        "User Settings and Group Settings dialogs is toggled by Ctrl key.");
-
     // ---------------------------------------------------------------------------------------------
     // Features section
     // Flags here can be removed when QA approves the feature to be definitely present in the

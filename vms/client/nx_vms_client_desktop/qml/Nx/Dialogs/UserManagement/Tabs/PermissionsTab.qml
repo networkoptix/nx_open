@@ -190,12 +190,6 @@ Item
                     tree.hoveredRow = null
             }
 
-            onFrameInitializationResponse: (cell) =>
-            {
-                if (frameSelector.currentMode == ResourceAccessDelegate.FrameInitialization)
-                    frameSelector.currentMode = frameSelector.modeFromCell(cell)
-            }
-
             Connections
             {
                 target: frameSelector
@@ -247,44 +241,22 @@ Item
                 item: selectionArea
                 enabled: control.editingEnabled
 
-                readonly property bool selectionControlledByCtrl:
-                    LocalSettings.iniConfigValue("permissionFrameSelectionControlledByCtrl")
-
-                readonly property bool ctrlPressed: KeyboardModifiers.ctrlPressed
-
                 property int currentMode: ResourceAccessDelegate.NoFrameOperation
-
-                function modeFromCell(cell)
-                {
-                    return cell.isToggledOn()
-                        ? ResourceAccessDelegate.FrameUnselection
-                        : ResourceAccessDelegate.FrameSelection
-                }
 
                 onStarted:
                 {
-                    if (selectionControlledByCtrl)
-                    {
-                        currentMode = Qt.binding(() => frameSelector.ctrlPressed
-                            ? ResourceAccessDelegate.FrameUnselection
-                            : ResourceAccessDelegate.FrameSelection)
-                    }
-                    else
-                    {
-                        currentMode = tree.hoveredCell && tree.hoveredCell.frameSelected
-                            ? modeFromCell(tree.hoveredCell)
-                            : ResourceAccessDelegate.FrameInitialization
-                    }
-
                     selectionArea.start = Qt.point(
                         pressPosition.x,
                         pressPosition.y - tree.contentItem.y)
+
+                    currentMode = Qt.binding(() => KeyboardModifiers.shiftPressed
+                        ? ResourceAccessDelegate.FrameUnselection
+                        : ResourceAccessDelegate.FrameSelection)
                 }
 
                 onFinished:
                 {
                     if (!control.editingContext
-                        || currentMode == ResourceAccessDelegate.FrameInitialization
                         || selectionArea.frameRect.width === 0
                         || selectionArea.frameRect.height === 0)
                     {
@@ -358,38 +330,6 @@ Item
                 y: selectionArea.frameRect.top
                 width: selectionArea.frameRect.width
                 height: selectionArea.frameRect.height
-            }
-
-            Popup
-            {
-                id: frameHint
-
-                visible: frameSelector.currentMode != ResourceAccessDelegate.NoFrameOperation
-                    && frameSelector.selectionControlledByCtrl
-
-                x: Math.min(selectionFrame.x, selectionArea.width - width)
-                y: selectionFrame.y - height
-
-                background: null
-                padding: 0
-
-                contentItem: Text
-                {
-                    font.pixelSize: 10
-                    font.weight: Font.Light
-
-                    color: selectionFrame.border.color
-
-                    text:
-                    {
-                        if (frameSelector.currentMode == ResourceAccessDelegate.FrameUnselection)
-                            return qsTr("Drag to uncheck")
-
-                        return qsTr("Drag to check, with %1 to uncheck",
-                            "%1 will be substituted with a name of a key").arg(
-                                NxGlobals.modifierName(Qt.ControlModifier))
-                    }
-                }
             }
         }
     }
