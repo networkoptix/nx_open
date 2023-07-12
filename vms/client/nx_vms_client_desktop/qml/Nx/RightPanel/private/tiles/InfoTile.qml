@@ -225,7 +225,9 @@ TileBase
         anchors.topMargin: 6
 
         icon.source: "image://svg/skin/text_buttons/cross_close_20.svg"
-        icon.sourceSize: Qt.size(20, 20)
+        icon.width: 20
+        icon.height: 20
+
         radius: 2
 
         onClicked:

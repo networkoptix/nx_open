@@ -55,7 +55,7 @@ Button
 
     property bool showBackground: true
 
-    property Menu menu: null
+    property var menu: null
 
     leftPadding: icon.source.toString() ? 4 : 16
     rightPadding: 16
@@ -138,7 +138,9 @@ Button
 
     onClicked:
     {
-        if (menu)
+        if (menu instanceof Menu)
             menu.popup(this, menuXOffset, height)
+        else if (menu instanceof PlatformMenu)
+            menu.open(this)
     }
 }
