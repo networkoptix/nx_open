@@ -15,7 +15,7 @@ struct NX_VMS_API UserExternalId
     /**%apidoc Distinguished Name (e.g. LDAP DN). */
     QString dn;
 
-    /**%apidoc Id of synchronization when dn was fetched. */
+    /**%apidoc[proprietary] Id of synchronization when dn was fetched. */
     QString syncId;
 
     bool operator==(const UserExternalId& other) const = default;
@@ -27,9 +27,6 @@ NX_REFLECTION_INSTRUMENT(UserExternalId, UserExternalId_Fields)
 void serialize_field(const UserExternalId& from, QVariant* to);
 void deserialize_field(const QVariant& from, UserExternalId* to);
 
-/**%apidoc
- * %param[unused] syncId
- */
 struct NX_VMS_API UserExternalIdModel: UserExternalId
 {
     /**%apidoc[readonly] Is in sync with source server (e.g. LDAP). */
