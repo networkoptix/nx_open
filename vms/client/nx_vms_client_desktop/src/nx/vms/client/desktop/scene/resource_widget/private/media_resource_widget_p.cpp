@@ -265,6 +265,11 @@ bool MediaResourceWidgetPrivate::hasAccess() const
     return m_hasAccess;
 }
 
+QnWorkbenchAccessController* MediaResourceWidgetPrivate::accessController() const
+{
+    return m_accessController;
+}
+
 bool MediaResourceWidgetPrivate::supportsBasicPtz() const
 {
     return supportsPtzCapabilities(Ptz::ContinuousPtzCapabilities | Ptz::ViewportPtzCapability);

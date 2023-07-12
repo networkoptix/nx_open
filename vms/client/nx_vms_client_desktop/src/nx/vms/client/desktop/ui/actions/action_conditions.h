@@ -732,9 +732,6 @@ ConditionWrapper canSaveLayoutAs();
 /** Checks if the user has cameras with editable settings. */
 ConditionWrapper userHasCamerasWithEditableSettings();
 
-/** Checks if all opened cameras allow archive export. */
-ConditionWrapper allOpenedCamerasAllowExport();
-
 /**
  * Checks if all resources have the permissions. If no resources are provided then if any
  * resource in resource pool has the permissions.
