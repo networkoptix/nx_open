@@ -1395,7 +1395,7 @@ void QnMediaResourceWidget::setupHud()
     const auto updateTriggersMinHeight =
         [content, triggersContainer, rewindContent]()
         {
-            if (!content || !triggersContainer)
+            if (!content || !triggersContainer || !rewindContent)
                 return;
 
             // Calculate minimum height for downscale no more than kMaxDownscaleFactor times.
