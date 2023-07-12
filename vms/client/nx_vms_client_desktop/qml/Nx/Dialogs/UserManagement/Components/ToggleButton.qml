@@ -20,6 +20,9 @@ AbstractButton
 
     height: 28
 
+    icon.width: 20
+    icon.height: 20
+
     onClicked: if (!checked) checked = true
 
     GlobalToolTip.text: buttonText.truncated ? buttonText.text : ""

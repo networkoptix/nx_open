@@ -193,9 +193,8 @@ Button
                     focusPolicy: Qt.NoFocus
                     hoverEnabled: true
                     radius: 2
+
                     icon.source: "image://svg/skin/text_buttons/cross_close_20.svg"
-                    icon.width: 20
-                    icon.height: 20
                     icon.color: text.color
 
                     visible: button.state != SelectableTextButton.State.Deactivated

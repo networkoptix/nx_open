@@ -140,8 +140,6 @@ Rectangle
             Layout.alignment: Qt.AlignTop | Qt.AlignRight
 
             icon.source: "image://svg/skin/banners/close.svg"
-            icon.width: 20
-            icon.height: 20
             icon.color: ColorTheme.colors.light4
 
             onClicked: control.closeClicked()

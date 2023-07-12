@@ -114,6 +114,7 @@ Button
                     anchors.verticalCenter: parent.verticalCenter
 
                     source: control.icon.source
+                    sourceSize: Qt.size(control.icon.width, control.icon.height)
 
                     onSourceChanged:
                     {

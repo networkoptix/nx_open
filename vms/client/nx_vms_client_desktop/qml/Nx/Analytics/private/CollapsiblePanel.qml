@@ -70,8 +70,6 @@ Column
                 GlobalToolTip.text: truncated ? text : ""
 
                 icon.source: "image://svg/skin/text_buttons/dropdown_arrow.svg"
-                icon.width: 20
-                icon.height: 20
 
                 iconRotation: panel.collapsed ? -90 : 0
                 Behavior on iconRotation { NumberAnimation { duration: panel.animationDuration }}
@@ -110,8 +108,7 @@ Column
                 icon.source: "image://svg/skin/text_buttons/cross_close_20.svg"
                 color: hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light16
                 visible: !!panel.value
-                icon.width: 20
-                icon.height: 20
+
                 Layout.alignment: Qt.AlignRight
 
                 background: Rectangle
