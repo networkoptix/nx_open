@@ -65,6 +65,8 @@ Dialog
             {
                 text: qsTr("Duplicate")
                 icon.source: "image://svg/skin/text_buttons/copy_20.svg"
+                icon.width: 20
+                icon.height: 20
                 visible: selectionModel.hasSelection
 
                 onClicked:
@@ -79,7 +81,8 @@ Dialog
             {
                 text: qsTr("Delete")
                 icon.source: "image://svg/skin/text_buttons/delete_20.svg"
-                icon.sourceSize: Qt.size(20, 20)
+                icon.width: 20
+                icon.height: 20
                 visible: selectionModel.hasSelection
 
                 onClicked:
@@ -243,13 +246,16 @@ Dialog
             {
                 text: qsTr("Event Log...")
                 icon.source: "image://svg/skin/buttons/event_log_20.svg"
+                icon.width: 20
+                icon.height: 20
             }
 
             TextButton
             {
                 text: qsTr("Reset To Defaults...")
                 icon.source: "image://svg/skin/text_buttons/reload_20.svg"
-                icon.sourceSize: Qt.size(20, 20)
+                icon.width: 20
+                icon.height: 20
                 onClicked:
                 {
                     root.dialog.resetToDefaults()
