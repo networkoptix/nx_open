@@ -13,10 +13,12 @@
 #include <nx/branding.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/string.h>
+#include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -46,6 +48,7 @@ class UserListModel::Private:
     UserListModel* const model;
 
 public:
+    const QString syncId;
     boost::container::flat_set<QnUserResourcePtr> users;
     QHash<QString, QSet<QnUuid>> sameNameUsers; //< Used for detection of non-unique user names.
     QHash<QnUuid, QString> prevName; //< Cache for user names before change.
@@ -55,7 +58,8 @@ public:
 
     Private(UserListModel* q):
         SystemContextAware(q->systemContext()),
-        model(q)
+        model(q),
+        syncId(globalSettings()->ldap().syncId())
     {
         connect(resourcePool(), &QnResourcePool::resourceAdded, this,
             [this](const QnResourcePtr& resource)
@@ -388,7 +392,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
             {
                 case UserWarningColumn:
                 {
-                    return user->externalId().isEmpty() || user->externalId().synced
+                    return user->externalId().dn.isEmpty() || user->externalId().syncId == d->syncId
                         ? QVariant{}
                         : QVariant(qnSkin->icon("user_settings/user_alert.svg"));
                 }
@@ -624,7 +628,8 @@ bool UserListModel::isInteractiveColumn(int column)
     return column == CheckBoxColumn;
 }
 
-SortedUserListModel::SortedUserListModel(QObject *parent) : base_type(parent)
+SortedUserListModel::SortedUserListModel(const QString& syncId, QObject* parent):
+    base_type(parent), m_syncId(syncId)
 {
 }
 
@@ -649,8 +654,10 @@ bool SortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& r
     {
         case UserListModel::UserWarningColumn:
         {
-            const bool l = leftUser->externalId().isEmpty() || leftUser->externalId().synced;
-            const bool r = rightUser->externalId().isEmpty() || rightUser->externalId().synced;
+            const bool l =
+                leftUser->externalId().dn.isEmpty() || leftUser->externalId().syncId == m_syncId;
+            const bool r =
+                rightUser->externalId().dn.isEmpty() || rightUser->externalId().syncId == m_syncId;
             if (l != r)
                 return r;
 

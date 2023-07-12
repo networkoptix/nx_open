@@ -8,7 +8,7 @@
 namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT(UserGroupModel, UserGroupModel_Fields)
-QN_FUSION_DEFINE_FUNCTIONS(UserGroupModel, (csv_record)(json)(ubjson)(xml))
+QN_FUSION_DEFINE_FUNCTIONS(UserGroupModel, (json))
 
 UserGroupModel::DbUpdateTypes UserGroupModel::toDbTypes() &&
 {
@@ -38,7 +38,7 @@ std::vector<UserGroupModel> UserGroupModel::fromDbTypes(DbListTypes all)
         model.name = std::move(baseData.name);
         model.description = std::move(baseData.description);
         model.type = baseData.type;
-        if (!baseData.externalId.isEmpty())
+        if (!baseData.externalId.dn.isEmpty())
             model.externalId = std::move(baseData.externalId);
         model.permissions = std::move(baseData.permissions);
         model.attributes = std::move(baseData.attributes);

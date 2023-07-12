@@ -27,7 +27,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(
     const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights,
     const QString& ldapDn)
 {
-    QnUserResourcePtr user(new QnUserResource(userType, ldapDn));
+    QnUserResourcePtr user(new QnUserResource(userType, {ldapDn}));
     user->setIdUnsafe(QnUuid::createUuid());
     user->setName(name);
     user->setPasswordAndGenerateHash(name);

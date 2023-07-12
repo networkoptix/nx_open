@@ -18,6 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/api/data/ldap.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -33,6 +34,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/force_secure_auth_dialog.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
@@ -168,7 +170,8 @@ class UserListWidget::Private: public QObject
 
 public:
     UserListModel* const usersModel{new UserListModel(q)};
-    SortedUserListModel* const sortModel{new SortedUserListModel(q)};
+    SortedUserListModel* const sortModel{
+        new SortedUserListModel(q->globalSettings()->ldap().syncId(), q)};
     CheckableHeaderView* const header{new CheckableHeaderView(UserListModel::CheckBoxColumn, q)};
     QAction* filterDigestAction = nullptr;
 

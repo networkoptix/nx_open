@@ -29,6 +29,25 @@ LdapSettingsDeprecated::LdapSettingsDeprecated(LdapSettings settings)
     }
 }
 
+QString LdapSettings::syncId() const
+{
+    if (!isValid(/*checkPassword*/ false))
+        return QString();
+
+    QString data = uri.toString()
+        + adminDn
+        + adminPassword.value_or(QString())
+        + loginAttribute.value_or(QString())
+        + groupObjectClass.value_or(QString())
+        + memberAttribute.value_or(QString());
+    std::set<QString> uniqueFilters;
+    for (auto filter: filters)
+        uniqueFilters.insert(filter.base + filter.filter);
+    for (auto filter: uniqueFilters)
+        data += filter;
+    return QnUuid::fromArbitraryData(data.toUtf8()).toSimpleString();
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingsDeprecated, (json), LdapSettingsDeprecated_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingSearchFilter, (json), LdapSettingSearchFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettings, (json), LdapSettings_Fields)

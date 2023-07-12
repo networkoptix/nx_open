@@ -11,8 +11,10 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
+#include <nx/vms/api/data/ldap.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 
@@ -24,9 +26,12 @@ namespace nx::vms::client::desktop {
 struct UserGroupListModel::Private
 {
     UserGroupListModel* const q;
+    const QString syncId;
 
     UserGroupDataList orderedGroups;
     QSet<QnUuid> checkedGroupIds;
+
+    Private(UserGroupListModel* q): q(q), syncId(q->globalSettings()->ldap().syncId()) {}
 
     QStringList getParentGroupNames(const UserGroupData& group) const
     {
@@ -86,7 +91,7 @@ struct UserGroupListModel::Private
                     return QString();
 
                 const auto& externalId = orderedGroups[index.row()].externalId;
-                return (externalId.isEmpty() || externalId.synced) ? "0" : "1";
+                return (externalId.dn.isEmpty() || externalId.syncId == syncId) ? "0" : "1";
             }
 
             case GroupTypeColumn:
@@ -186,7 +191,7 @@ struct UserGroupListModel::Private
 UserGroupListModel::UserGroupListModel(SystemContext* systemContext, QObject* parent):
     base_type(parent),
     SystemContextAware(systemContext),
-    d(new Private{.q = this})
+    d(new Private(this))
 {
 }
 
@@ -258,7 +263,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             switch (index.column())
             {
                 case GroupWarningColumn:
-                    return group.externalId.isEmpty() || group.externalId.synced
+                    return group.externalId.dn.isEmpty() || group.externalId.syncId == d->syncId
                         ? QVariant{}
                         : QVariant(qnSkin->icon("user_settings/user_alert.svg"));
 

@@ -8,10 +8,11 @@ namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     UserExternalId, (ubjson)(xml)(json)(sql_record)(csv_record), UserExternalId_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(UserExternalIdModel, (json), UserExternalIdModel_Fields)
 
 void serialize_field(const UserExternalId& from, QVariant* to)
 {
-    *to = from.isEmpty() ? QString() : QString(QJson::serialized(from));
+    *to = from.dn.isEmpty() ? QString() : QString(QJson::serialized(from));
 }
 
 void deserialize_field(const QVariant& from, UserExternalId* to)
@@ -20,4 +21,3 @@ void deserialize_field(const QVariant& from, UserExternalId* to)
 }
 
 } // namespace nx::vms::api
-

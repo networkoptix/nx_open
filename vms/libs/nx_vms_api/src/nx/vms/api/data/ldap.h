@@ -137,6 +137,7 @@ struct NX_VMS_API LdapSettings: LdapSettingsBase
 
     bool operator==(const LdapSettings&) const = default;
     Void getId() const { return Void(); }
+    QString syncId() const;
 };
 #define LdapSettings_Fields LdapSettingsBase_Fields \
     (filters) \
