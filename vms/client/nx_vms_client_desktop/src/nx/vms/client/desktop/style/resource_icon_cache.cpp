@@ -2,6 +2,9 @@
 
 #include "resource_icon_cache.h"
 
+#include <QtCore/QMap>
+#include <QtCore/QString>
+#include <QtGui/QIcon>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 
@@ -16,6 +19,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -34,6 +38,15 @@ using namespace nx::vms::client::desktop;
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
 namespace {
+
+static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
+    kTreeThemeSubstitutions = {
+        {QnIcon::Disabled, {.primary = "dark14"}},
+        {QnIcon::Selected, {.primary = "light4"}},
+        {QnIcon::Active, {.primary = "brand_core"}},
+        {QnIcon::Normal, {.primary = "light10"}},
+        {QnIcon::Error, {.primary = "red_l2"}},
+        {QnIcon::Pressed, {.primary = "light4"}}};
 
 bool isCurrentlyConnectedServer(const QnResourcePtr& resource)
 {
@@ -54,7 +67,7 @@ bool isCompatibleServer(const QnResourcePtr& resource)
     return NX_ASSERT(server) && server->isCompatible();
 }
 
-QIcon loadIcon(const QString& name)
+QIcon loadIcon(const QString& name, const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions = {})
 {
     static const QnIcon::Suffixes kResourceIconSuffixes({
         {QnIcon::Active,   "accented"},
@@ -62,7 +75,7 @@ QIcon loadIcon(const QString& name)
         {QnIcon::Selected, "selected"},
     });
 
-    return qnSkin->icon(name, QString(), &kResourceIconSuffixes);
+    return qnSkin->icon(name, QString(), &kResourceIconSuffixes, nx::vms::client::core::SvgIconColorer::kDefaultIconSubstitutions, {}, themeSubstitutions);
 }
 
 using Key = QnResourceIconCache::Key;
@@ -153,7 +166,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Camera | Offline, loadIcon("tree/camera_offline.svg"));
     m_cache.insert(Camera | Unauthorized, loadIcon("tree/camera_unauthorized.svg"));
     m_cache.insert(Camera | Incompatible, loadIcon("tree/camera_alert.svg"));
-    m_cache.insert(VirtualCamera, loadIcon("tree/virtual_camera.svg"));
+    m_cache.insert(VirtualCamera, loadIcon("tree/virtual_camera.svg", kTreeThemeSubstitutions));
     m_cache.insert(CrossSystemStatus | Unauthorized, loadIcon("events/alert_yellow.png"));
     m_cache.insert(CrossSystemStatus | Control, loadIcon("legacy/loading.gif")); //< The Control uses to describe loading state.
     m_cache.insert(CrossSystemStatus | Offline, loadIcon("cloud/cloud_20_disabled.png"));

@@ -11,9 +11,35 @@
 
 namespace nx::vms::client::core {
 
+static const QString kInvalidColor = "invalidColor";
+
 class NX_VMS_CLIENT_CORE_API SvgIconColorer
 {
 public:
+
+    struct ThemeColorsRemapData
+    {
+        QString primary = kInvalidColor;
+        QString secondary = kInvalidColor;
+        QString tertiary = kInvalidColor;
+
+        bool contains(QString name) const
+        {
+            return name == "primary" || name == "secondary" || name == "tertiary";
+        }
+
+        const QString operator[](QString name) const
+        {
+            if (name == "primary")
+                return primary;
+            if (name == "secondary")
+                return secondary;
+            if (name == "tertiary")
+                return tertiary;
+            return kInvalidColor;
+        }
+    };
+
     using Substitutions = QMap<QColor, QString>;
 
     class IconSubstitutions: public QMap<QIcon::Mode, Substitutions>
@@ -33,14 +59,18 @@ public:
     /**
      * @param sourceIconData Original icon SVG file content.
      * @param iconName Icon file name.
-     * @param substitutions Per-mode map of color substitutions required to make icons for modes
+     * @param substitutions // TODO @pprivalov Should be removed when all icons transformed to use new notation
+     *     Per-mode map of color substitutions required to make icons for modes
      *     other than QIcon::Normal. Substitutions::T values (QString) must be names of
      *     color theme colors (i.e. "#xxxxxx" form is not allowed).
+     * @param themeSubstitutions Per-mode map of color substitutions required to make icons.
+     *     Substitutions::T values (QString) must be names of
+     *     color theme colors (i.e. "#xxxxxx" form is not allowed).
      */
-    SvgIconColorer(
-        const QByteArray& sourceIconData,
+    SvgIconColorer(const QByteArray& sourceIconData,
         const QString& iconName,
-        const IconSubstitutions& substitutions = kDefaultIconSubstitutions);
+        const IconSubstitutions& substitutions = kDefaultIconSubstitutions,
+        const QMap<QIcon::Mode, ThemeColorsRemapData>& themeSubstitutions = {});
 
     /**
      * If mode is QIcon::Normal, then applies color theme color substitutions. Otherwise applies
@@ -62,6 +92,7 @@ private:
     const QByteArray m_sourceIconData;
     QString m_iconName;
     const IconSubstitutions m_substitutions;
+    const QMap<QIcon::Mode, ThemeColorsRemapData> m_themeSubstitutions;
 };
 
 } // namespace nx::vms::client::core

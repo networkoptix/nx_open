@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QHash>
+#include <QtCore/QString>
 #include <QtGui/QIcon>
 #include <QtGui/QMovie>
 #include <QtGui/QPixmap>
@@ -36,13 +37,13 @@ public:
     bool hasFile(const QString& name) const;
     bool hasFile(const char* name) const;
 
-
     QIcon icon(const QString& name,
         const QString& checkedName = QString(),
         const QnIcon::Suffixes* suffixes = nullptr,
         const SvgIconColorer::IconSubstitutions& svgColorSubstitutions =
             SvgIconColorer::kDefaultIconSubstitutions,
-        const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {});
+        const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {},
+        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& svgThemeSubstitutions = {});
     QIcon icon(const char* name, const char* checkedName = nullptr);
     QIcon icon(const QIcon& icon);
     QIcon icon(const QString& name,

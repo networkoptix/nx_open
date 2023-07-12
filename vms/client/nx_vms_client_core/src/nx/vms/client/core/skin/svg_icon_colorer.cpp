@@ -4,6 +4,12 @@
 
 #include <QFileInfo>
 
+#include <QtCore/QMap>
+#include <QtCore/QString>
+#include <QtXml/QDomElement>
+
+#include <nx/build_info.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/skin/color_substitutions.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -46,7 +52,8 @@ ColorSubstitutions colorMapFromStringMap(const SvgIconColorer::Substitutions& st
 
 QByteArray substituteColors(
     const QByteArray& data,
-    const ColorSubstitutions& colorSubstitutions)
+    const ColorSubstitutions& colorSubstitutions,
+    const SvgIconColorer::ThemeColorsRemapData& themeSubstitutions)
 {
     QByteArray result = data;
 
@@ -70,11 +77,43 @@ QByteArray substituteColors(
             pos += kColorValueStringLength;
         }
     }
+    QDomDocument doc;
+    if (auto res = doc.setContent(result); !res)
+    {
+        NX_ASSERT(false, "Cannot parse svg icon: %1", res.errorMessage);
+        return data;
+    }
+    auto paths = doc.elementsByTagName("path");
+    for (int i = 0; i < paths.size(); ++i)
+    {
+        auto element = paths.at(i).toElement();
+        if (auto _class = element.attribute("class", "");
+            themeSubstitutions.contains(_class))
+        {
+            QColor value;
+            if (NX_ASSERT(themeSubstitutions[_class] != kInvalidColor,
+                "Color theme is missing for icon, %1 is not specified", _class))
+            {
+                value = colorTheme()->color(themeSubstitutions[_class]);
+            }
+            else
+            {
+                // Use special value to make invalid icons noticeable in the dev builds.
+                value = build_info::publicationType() == build_info::PublicationType::release
+                    ? Qt::transparent
+                    : Qt::magenta;
 
-    return result;
+            }
+            element.setAttribute("fill", value.name().toLatin1());
+        }
+    }
+
+    return doc.toByteArray();
 }
 
 } // namespace
+
+static const SvgIconColorer::ThemeColorsRemapData kUnspecified;
 
 const SvgIconColorer::IconSubstitutions SvgIconColorer::kTreeIconSubstitutions = {
     { QnIcon::Disabled, {
@@ -105,10 +144,12 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitution
 SvgIconColorer::SvgIconColorer(
     const QByteArray& sourceIconData,
     const QString& iconName,
-    const IconSubstitutions& substitutions /*= kDefaultIconSubstitutions*/):
+    const IconSubstitutions& substitutions, /*= kDefaultIconSubstitutions*/
+    const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions):
     m_sourceIconData(sourceIconData),
     m_iconName(iconName),
-    m_substitutions(substitutions)
+    m_substitutions(substitutions),
+    m_themeSubstitutions(themeSubstitutions)
 {
     initializeDump();
     dumpIconIfNeeded(sourceIconData);
@@ -116,7 +157,7 @@ SvgIconColorer::SvgIconColorer(
 
 QByteArray SvgIconColorer::colorized(const QByteArray& source)
 {
-    return substituteColors(source, colorTheme()->getColorSubstitutions());
+    return substituteColors(source, colorTheme()->getColorSubstitutions(), {});
 }
 
 void SvgIconColorer::initializeDump()
@@ -154,12 +195,15 @@ QByteArray SvgIconColorer::makeIcon(QIcon::Mode mode) const
         (mode == QnIcon::Normal && !m_substitutions.contains(mode))
             ? colorTheme()->getColorSubstitutions()
             : colorMapFromStringMap(m_substitutions.value(mode));
+    
+    const ThemeColorsRemapData themeSubstitutions = m_themeSubstitutions.value(mode, kUnspecified);
 
     const QString suffix = (mode == QnIcon::Normal)
         ? ""
         : ("_" + IconLoader::kDefaultSuffixes.value(mode));
 
-    QByteArray result = substituteColors(m_sourceIconData, substitutions);
+    QByteArray result = substituteColors(m_sourceIconData, substitutions, themeSubstitutions);
+
     dumpIconIfNeeded(result, suffix);
 
     return result;
