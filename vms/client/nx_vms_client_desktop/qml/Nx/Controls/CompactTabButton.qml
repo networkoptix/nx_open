@@ -83,6 +83,7 @@ TabButton
                 id: image
 
                 source: tabButton.icon.source
+                sourceSize: Qt.size(tabButton.icon.width, tabButton.icon.height)
                 color: tabButton.color
                 name: tabButton.icon.name
                 anchors.verticalCenter: parent.verticalCenter

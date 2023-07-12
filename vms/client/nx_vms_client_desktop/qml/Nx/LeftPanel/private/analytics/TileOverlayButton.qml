@@ -13,8 +13,6 @@ ImageButton
 {
     property bool accent: false
 
-    icon.width: 20
-    icon.height: 20
     icon.color: "transparent"
 
     width: 24

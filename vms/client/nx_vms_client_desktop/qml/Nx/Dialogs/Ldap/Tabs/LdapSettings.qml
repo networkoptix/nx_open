@@ -459,13 +459,9 @@ Rectangle
                         Layout.alignment: Qt.AlignVCenter
 
                         text: qsTr("Advanced Settings")
-
                         font: Qt.font({pixelSize: 14, weight: Font.Normal})
                         color: ColorTheme.colors.light16
-
                         icon.source: "image://svg/skin/user_settings/ldap_advanced_settings.svg"
-                        icon.width: 20
-                        icon.height: 20
 
                         onClicked:
                         {
@@ -495,13 +491,9 @@ Rectangle
                         Layout.alignment: Qt.AlignVCenter
 
                         text: qsTr("Disconnect")
-
                         font: Qt.font({pixelSize: 14, weight: Font.Normal})
                         color: ColorTheme.colors.light16
-
                         icon.source: "image://svg/skin/user_settings/disconnect.svg"
-                        icon.width: 20
-                        icon.height: 20
 
                         onClicked: self.resetLdap()
                     }

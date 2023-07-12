@@ -26,6 +26,9 @@ AbstractButton
 
     baselineOffset: contentItem.y + buttonText.y + buttonText.baselineOffset
 
+    icon.width: 20
+    icon.height: 20
+
     contentItem: Item
     {
         id: content

@@ -165,9 +165,8 @@ Dialog
                 {
                     text: qsTr("Check for updates")
                     icon.source: "image://svg/skin/text_buttons/reload_20.svg"
-                    icon.width: 20
-                    icon.height: 20
                     visible: !!clientUpdatesPanel.uiState.checkUpdatesButton
+
                     onClicked:
                     {
                         if (clientUpdateManager)
@@ -179,9 +178,8 @@ Dialog
                 {
                     text: qsTr("Speed up this update")
                     icon.source: "image://svg/skin/text_buttons/shopping_cart.svg"
-                    icon.width: 20
-                    icon.height: 20
                     visible: advancedMode && !!clientUpdatesPanel.uiState.speedUpButton
+
                     onClicked:
                     {
                         if (clientUpdateManager)
