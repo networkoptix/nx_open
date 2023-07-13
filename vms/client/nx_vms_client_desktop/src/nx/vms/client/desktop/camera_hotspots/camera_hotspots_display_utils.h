@@ -5,6 +5,7 @@
 #include <QtCore/QPointF>
 #include <QtCore/QVariant>
 #include <QtGui/QPainterPath>
+#include <QtGui/QPixmap>
 
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
@@ -49,6 +50,16 @@ struct CameraHotspotDisplayOption
     };
     CameraState cameraState = CameraState::noCamera;
 
+    enum class Component
+    {
+        none = 0x0,
+        body = 0x1,
+        decoration = 0x2,
+        all = body | decoration
+    };
+    Q_DECLARE_FLAGS(Components, Component);
+    Components displayedComponents = Component::all;
+
     /**
      * Decoration element painted in the center of the hotspot mark. Expected data types are QIcon
      * or any type that can be converted to string. Due to the compact size of the hotspot mark, it
@@ -63,6 +74,11 @@ void paintHotspot(
     const nx::vms::common::CameraHotspotData& hotspot,
     const QPointF& origin,
     const CameraHotspotDisplayOption& option);
+
+QPixmap paintHotspotPixmap(
+    const nx::vms::common::CameraHotspotData& hotspot,
+    const CameraHotspotDisplayOption& option,
+    qreal devicePixelRatio);
 
 } // namespace camera_hotspots
 } // namespace nx::vms::client::desktop
