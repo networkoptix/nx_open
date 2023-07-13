@@ -197,9 +197,9 @@ public:
     void setItem(Qn::ItemRole role, QnWorkbenchItem* item);
 
     void update(const WorkbenchState& state);
-    void submit(WorkbenchState& state);
-
+    void submit(WorkbenchState& state, bool forceIncludeEmptyLayouts = false);
     void applyLoadedState();
+    void saveStateInCache();
 
     bool isInLayoutChangeProcess() const;
     bool isInSessionRestoreProcess() const;

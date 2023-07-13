@@ -32,20 +32,38 @@ QVariant SystemTabBarModel::data(const QModelIndex& index, int role) const
 {
     NX_ASSERT(index.isValid() && index.model() == this && index.row() < m_systems.count());
 
-    auto value = m_systems[index.row()];
+    auto item = m_systems[index.row()];
     switch (role)
     {
         case Qt::DisplayRole:
-            return QVariant::fromValue(value.systemDescription->name());
+            return QVariant::fromValue(item.systemDescription->name());
 
         case Qn::LogonDataRole:
-            return QVariant::fromValue(value.logonData);
+            return QVariant::fromValue(item.logonData);
 
         case Qn::SystemDescriptionRole:
-            return QVariant::fromValue(value.systemDescription);
+            return QVariant::fromValue(item.systemDescription);
+
+        case Qn::WorkbenchStateRole:
+            return QVariant::fromValue(item.workbenchState);
 
         default:
             return {};
+    }
+}
+
+bool SystemTabBarModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+    NX_ASSERT(index.isValid() && index.model() == this && index.row() < m_systems.count());
+    auto& item = m_systems[index.row()];
+    switch (role)
+    {
+        case Qn::WorkbenchStateRole:
+            item.workbenchState = value.value<WorkbenchState>();
+            return true;
+
+        default:
+            return base_type::setData(index, value, role);
     }
 }
 
@@ -54,15 +72,27 @@ QVariant SystemTabBarModel::headerData(int, Qt::Orientation, int) const
     return {};
 }
 
+QModelIndex SystemTabBarModel::findSystem(const QString& systemId) const
+{
+    auto it = std::find_if(m_systems.cbegin(), m_systems.cend(),
+        [systemId](const auto value)
+        {
+            return value.systemDescription->id() == systemId;
+        });
+
+    if (it == m_systems.cend())
+        return {};
+
+    return index(std::distance(m_systems.cbegin(), it));
+}
+
 void SystemTabBarModel::addSystem(const QnSystemDescriptionPtr& systemDescription,
     const LogonData& logonData)
 {
     SystemData value({.systemDescription = systemDescription, .logonData = std::move(logonData)});
-    for (auto it = m_systems.cbegin(); it != m_systems.cend(); ++it)
-    {
-        if (it->systemDescription->id() == systemDescription->id())
-            return;
-    }
+    if (findSystem(systemDescription->id()).isValid())
+        return;
+
     const auto count = m_systems.count();
     beginInsertRows(QModelIndex(), count, count);
     m_systems.append(value);
@@ -78,20 +108,22 @@ void SystemTabBarModel::removeSystem(const QnSystemDescriptionPtr& systemDescrip
 
 void SystemTabBarModel::removeSystem(const QString& systemId)
 {
-    auto it = std::find_if(m_systems.cbegin(), m_systems.cend(),
-        [systemId](const auto value)
-        {
-            return value.systemDescription->id() == systemId;
-        });
-
-    if (it != m_systems.cend())
+    auto modelIndex = findSystem(systemId);
+    if (modelIndex.isValid())
     {
-        const int i = std::distance(m_systems.cbegin(), it);
+        const int i = modelIndex.row();
         beginRemoveRows(QModelIndex(), i, i);
         m_systems.removeAt(i);
         endRemoveRows();
-        emit dataChanged(index(i), index(m_systems.count() - 1));
+        emit dataChanged(modelIndex, index(m_systems.count() - 1));
     }
+}
+
+void SystemTabBarModel::setSystemState(const QString& systemId, WorkbenchState state)
+{
+    const auto index = findSystem(systemId);
+    if (NX_ASSERT(index.isValid()))
+        m_systems[index.row()].workbenchState = std::move(state);
 }
 
 } // namespace nx::vms::client::desktop

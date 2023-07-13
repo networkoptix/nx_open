@@ -6,6 +6,7 @@
 
 #include <finders/abstract_systems_finder.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
+#include <nx/vms/client/desktop/workbench/state/workbench_state.h>
 
 namespace nx::vms::client::desktop {
 
@@ -19,6 +20,7 @@ public:
     {
         QnSystemDescriptionPtr systemDescription;
         LogonData logonData;
+        WorkbenchState workbenchState;
     };
 
     SystemTabBarModel(QObject* parent = nullptr);
@@ -27,11 +29,14 @@ public:
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+    QModelIndex findSystem(const QString& systemId) const;
     void addSystem(const QnSystemDescriptionPtr& systemDescription, const LogonData& logonData);
     void removeSystem(const QnSystemDescriptionPtr& systemDescription);
     void removeSystem(const QString& systemId);
+    void setSystemState(const QString& systemId, WorkbenchState state);
 
 private:
     QList<SystemData> m_systems;

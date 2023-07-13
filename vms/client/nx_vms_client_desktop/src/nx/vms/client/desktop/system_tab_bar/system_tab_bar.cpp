@@ -182,13 +182,19 @@ void SystemTabBar::at_currentTabChanged(int index)
         if (currentIndex() != m_lastTabIndex)
         {
             QScopedValueRollback<bool> guard(m_updating, true);
+            auto model = workbench()->windowContext()->systemTabBarModel();
+            auto modelIndex = model->index(m_lastTabIndex);
+            if (modelIndex.isValid())
+            {
+                WorkbenchState workbenchState;
+                workbench()->submit(workbenchState, /*forceIncludeEmptyLayouts*/ true);
+                model->setData(
+                    modelIndex, QVariant::fromValue(workbenchState), Qn::WorkbenchStateRole);
+            }
             m_lastTabIndex = index;
-
-            auto modelIndex = workbench()->windowContext()->systemTabBarModel()->index(index);
+            modelIndex = model->index(index);
             auto logonData = modelIndex.data(Qn::LogonDataRole).value<LogonData>();
             logonData.storePassword = true;
-
-            appContext()->clientStateHandler()->saveWindowsConfiguration();
             menu()->trigger(ui::action::ConnectAction,
                 ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));
         }

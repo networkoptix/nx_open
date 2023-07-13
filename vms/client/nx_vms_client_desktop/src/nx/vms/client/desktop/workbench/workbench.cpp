@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -120,7 +121,6 @@ public:
     }
 
     virtual void forceLoad() override { updateWorkbench(); }
-
     void updateWorkbench() { m_workbench->update(m_state); }
 
 private:
@@ -799,7 +799,7 @@ void Workbench::update(const WorkbenchState& state)
             if (QnWorkbenchLayout* layout = this->layout(layoutResource))
                 layout->update(layoutResource);
             else
-                layout = addLayout(layoutResource);
+                addLayout(layoutResource);
         }
     }
 
@@ -839,7 +839,7 @@ void Workbench::update(const WorkbenchState& state)
     }
 }
 
-void Workbench::submit(WorkbenchState& state)
+void Workbench::submit(WorkbenchState& state, bool forceIncludeEmptyLayouts)
 {
     auto isLayoutSupported = [](const LayoutResourcePtr& layout, bool allowLocals)
     {
@@ -887,7 +887,8 @@ void Workbench::submit(WorkbenchState& state)
             if (isLayoutSupported(resource, /*allowLocals*/ false))
                 state.layoutUuids.push_back(sourceId(resource));
 
-            if (resource->hasFlags(Qn::local) && !resource->getItems().empty())
+            if (resource->hasFlags(Qn::local) &&
+                (!resource->getItems().empty() || forceIncludeEmptyLayouts))
             {
                 WorkbenchState::UnsavedLayout unsavedLayout;
                 unsavedLayout.id = resource->getId();
@@ -914,7 +915,29 @@ void Workbench::submit(WorkbenchState& state)
 
 void Workbench::applyLoadedState()
 {
+    auto model = windowContext()->systemTabBarModel();
+    auto modelIndex = model->findSystem(
+        systemContext()->globalSettings()->localSystemId().toSimpleString());
+    if (modelIndex.isValid())
+    {
+        const auto workbenchState =
+            model->data(modelIndex, Qn::WorkbenchStateRole).value<WorkbenchState>();
+        if (!workbenchState.layoutUuids.empty() || !workbenchState.unsavedLayouts.empty())
+        {
+            update(workbenchState);
+            return;
+        }
+    }
     d->stateDelegate->updateWorkbench();
+}
+
+void Workbench::saveStateInCache()
+{
+    WorkbenchState workbenchState;
+    submit(workbenchState, /*forceIncludeEmptyLayouts*/ true);
+    windowContext()->systemTabBarModel()->setSystemState(
+        systemContext()->globalSettings()->localSystemId().toSimpleString(),
+        std::move(workbenchState));
 }
 
 // -------------------------------------------------------------------------- //

@@ -317,6 +317,7 @@ namespace Qn
          * See FlatteningGroupEntity for the details.
          */
         FlattenedRole,
+        WorkbenchStateRole,
 
         ItemDataRoleCount,
     };
