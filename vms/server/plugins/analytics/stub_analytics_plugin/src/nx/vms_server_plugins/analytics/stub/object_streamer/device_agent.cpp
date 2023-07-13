@@ -48,29 +48,36 @@ std::string DeviceAgent::manifestString() const
 
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPacket)
 {
+    // If we received at least one frame previously.
     if (m_lastFrameTimestampUs >= 0)
     {
-        for (auto& metdataPacket: generateMetadata(
-            m_frameNumber == 0 ? m_maxFrameNumber : m_frameNumber - 1,
-            m_lastFrameTimestampUs,
-            std::max(videoPacket->timestampUs() - m_lastFrameTimestampUs, (int64_t) 0)))
+        // Generate metadata for the previous frame.
+        const int previousFrameNumber = (m_frameNumber == 0) ? m_maxFrameNumber : (m_frameNumber - 1);
+        const int64_t previousFrameTimestampUs = m_lastFrameTimestampUs;
+        const int64_t previousFrameDurationUs = std::max(videoPacket->timestampUs() - previousFrameTimestampUs, (int64_t) 0);
+
+        for (auto& metadataPacket: generateMetadata(previousFrameNumber, previousFrameTimestampUs, previousFrameDurationUs))
         {
-            pushMetadataPacket(metdataPacket.releasePtr());
+            pushMetadataPacket(metadataPacket.releasePtr());
+        }
+
+        // On wraparound, remove per-stream-cycle track ids.
+        if (m_frameNumber == 0)
+        {
+            for (auto it = m_trackIdByRef.begin(); it != m_trackIdByRef.end();)
+            {
+                if (startsWith(it->first, kAutoTrackIdPerStreamCyclePrefix))
+                    it = m_trackIdByRef.erase(it);
+                else
+                    ++it;
+            }
         }
     }
 
     ++m_frameNumber;
+
     if (m_frameNumber > m_maxFrameNumber)
-    {
         m_frameNumber = 0;
-        for (auto it = m_trackIdByRef.begin(); it != m_trackIdByRef.end();)
-        {
-            if (startsWith(it->first, kAutoTrackIdPerStreamCyclePrefix))
-                it = m_trackIdByRef.erase(it);
-            else
-                ++it;
-        }
-    }
 
     m_lastFrameTimestampUs = videoPacket->timestampUs();
 
