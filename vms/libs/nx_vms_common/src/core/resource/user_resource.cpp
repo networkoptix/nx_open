@@ -8,6 +8,7 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_properties.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/app_info.h>
 #include <nx/reflect/json/deserializer.h>
@@ -16,6 +17,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/random.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/switch.h>
 #include <nx/vms/api/data/ldap.h>
@@ -38,6 +40,8 @@ QByteArray QnUserHash::toString(const Type& type)
         case Type::md5: return "md5";
         case Type::ldapPassword: return "LDAP";
         case Type::scrypt: return "scrypt";
+        case Type::temporary:
+            return QByteArray::fromStdString(nx::vms::api::TemporaryToken::prefix());
     };
 
     NX_ASSERT(false, "Unexpected value: %1", static_cast<int>(type));
@@ -46,6 +50,17 @@ QByteArray QnUserHash::toString(const Type& type)
 
 QnUserHash::QnUserHash(const QByteArray& data)
 {
+    bool isTemporaryUser = false;
+    const auto temporaryToken = QJson::deserialized<nx::vms::api::TemporaryToken>(
+        data, nx::vms::api::TemporaryToken(), &isTemporaryUser);
+    if (isTemporaryUser)
+    {
+        this->temporaryToken = temporaryToken;
+        type = Type::temporary;
+        hash = data;
+        return;
+    }
+
     if (data == nx::vms::api::UserData::kCloudPasswordStub)
     {
         type = Type::cloud;
@@ -111,6 +126,9 @@ QByteArray QnUserHash::toString() const
 
             return NX_FMT("%1$%2$%3$%4$%5$%6", toString(type), salt,
                 options->r, options->N, options->p, hash).toUtf8();
+
+        case Type::temporary:
+            return QByteArray::fromStdString(temporaryToken->token);
     };
 
     NX_ASSERT(false, "Unexpected value: %1", static_cast<int>(type));
@@ -161,6 +179,10 @@ QByteArray QnUserHash::hashPassword(const QString& password) const
                 NX_DEBUG(this, "Unable to SCrypt password: %1", e);
                 return "";
             }
+
+        case Type::temporary:
+            NX_ASSERT(false, "Temporary users won't use passswords");
+            return "";
     };
 
     NX_ASSERT(false, "Unexpected value: %1", static_cast<int>(type));
@@ -333,6 +355,7 @@ void QnUserResource::setPasswordHashesInternal(const PasswordHashes& hashes, boo
         UserType::local, [type = m_hash.type] { return type != QnUserHash::Type::scrypt; },
         UserType::ldap, [type = m_hash.type] { return type != QnUserHash::Type::ldapPassword; },
         UserType::cloud, [type = m_hash.type]{ return type != QnUserHash::Type::cloud; },
+        UserType::temporaryLocal, [type = m_hash.type]{ return type != QnUserHash::Type::temporary; },
         nx::utils::default_, [this] { NX_ASSERT(false, this); return false; });
     if (isNewHash)
         m_hash = QnUserHash(hashes.passwordHash);
