@@ -112,90 +112,125 @@ void paintHotspot(
 
     static const auto kInvalidColor = colorTheme()->color("camera.hotspots.invalid");
 
-    // Paint hotspot body.
-    const auto hotspotOutline = makeHotspotOutline(origin, hotspot.direction);
-
-    const QBrush brush(
-        option.cameraState == CameraHotspotDisplayOption::CameraState::invalid
-            ? kInvalidColor
-            : QColor(hotspot.accentColorName));
-
-    double hotspotBodyOpacity = 0.0;
-    switch (option.state)
+    if (option.displayedComponents.testFlag(CameraHotspotDisplayOption::Component::body))
     {
-        case CameraHotspotDisplayOption::State::none:
-            hotspotBodyOpacity = kHotspotBodyOpacity;
-            break;
+        // Paint hotspot body.
+        const auto hotspotOutline = makeHotspotOutline(origin, hotspot.direction);
 
-        case CameraHotspotDisplayOption::State::hovered:
-        case CameraHotspotDisplayOption::State::selected:
-            hotspotBodyOpacity = kHoveredHotspotBodyOpacity;
-            break;
+        const QBrush brush(
+            option.cameraState == CameraHotspotDisplayOption::CameraState::invalid
+                ? kInvalidColor
+                : QColor(hotspot.accentColorName));
 
-        case CameraHotspotDisplayOption::State::disabled:
-            hotspotBodyOpacity = kHotspotBodyOpacity * nx::style::Hints::kDisabledItemOpacity;
-            break;
+        double hotspotBodyOpacity = 0.0;
+        switch (option.state)
+        {
+            case CameraHotspotDisplayOption::State::none:
+                hotspotBodyOpacity = kHotspotBodyOpacity;
+                break;
 
-        default:
-            NX_ASSERT(false, "Unexpected hotspot display state");
-            break;
+            case CameraHotspotDisplayOption::State::hovered:
+            case CameraHotspotDisplayOption::State::selected:
+                hotspotBodyOpacity = kHoveredHotspotBodyOpacity;
+                break;
+
+            case CameraHotspotDisplayOption::State::disabled:
+                hotspotBodyOpacity = kHotspotBodyOpacity * nx::style::Hints::kDisabledItemOpacity;
+                break;
+
+            default:
+                NX_ASSERT(false, "Unexpected hotspot display state");
+                break;
+        }
+
+        {
+            QnScopedPainterOpacityRollback opacityRollback(painter, hotspotBodyOpacity);
+            painter->fillPath(hotspotOutline, brush);
+        }
+
+        // Paint selected item outline.
+        if (option.state == CameraHotspotDisplayOption::State::selected)
+        {
+            QPen selectedOutlinePen(brush, kSelectedHotspotOutlineWidth);
+            painter->strokePath(hotspotOutline, selectedOutlinePen);
+        }
     }
 
+    if (option.displayedComponents.testFlag(CameraHotspotDisplayOption::Component::decoration)
+        && !option.decoration.isNull())
     {
-        QnScopedPainterOpacityRollback opacityRollback(painter, hotspotBodyOpacity);
-        painter->fillPath(hotspotOutline, brush);
+        // Paint decoration which is icon or text.
+        if (option.decoration.canConvert<QString>())
+        {
+            static const auto kTextColor = colorTheme()->color("camera.hotspots.text");
+
+            double textOpacity = 1.0;
+            if (option.state == CameraHotspotDisplayOption::State::disabled)
+                textOpacity = nx::style::Hints::kDisabledItemOpacity;
+
+            QnScopedPainterOpacityRollback opacityRollback(painter, textOpacity);
+
+            QFont font;
+            font.setPixelSize(kHotspotFontSize);
+            QnScopedPainterFontRollback fontRollback(painter, font);
+            QnScopedPainterPenRollback penRollback(painter, kTextColor);
+
+            QSize size(kHotspotRadius * 2, kHotspotRadius * 2);
+            QRect rect(origin.toPoint() - QPoint(kHotspotRadius, kHotspotRadius), size);
+
+            QTextOption textOption;
+            textOption.setAlignment(Qt::AlignCenter);
+            painter->drawText(rect, option.decoration.toString(), textOption);
+        }
+        else if (option.decoration.typeId() == QMetaType::QIcon)
+        {
+            double iconOpacity = 1.0;
+            if (option.cameraState == CameraHotspotDisplayOption::CameraState::noCamera)
+                iconOpacity = kNoCameraIconOpacity;
+
+            if (option.state == CameraHotspotDisplayOption::State::disabled)
+                iconOpacity *= nx::style::Hints::kDisabledItemOpacity;
+
+            QnScopedPainterOpacityRollback opacityRollback(painter, iconOpacity);
+
+            const auto icon = option.decoration.value<QIcon>();
+            QPixmap pixmap = icon.pixmap(nx::style::Metrics::kDefaultIconSize, QIcon::Selected);
+
+            if (option.cameraState == CameraHotspotDisplayOption::CameraState::invalid)
+                pixmap = qnSkin->colorize(pixmap, kInvalidColor);
+
+            const auto iconOffset = -Geometry::toPoint(kHotspotItemIconSize) / 2.0 - QPoint(0, -1);
+            painter->drawPixmap(origin + iconOffset, pixmap);
+        }
     }
+}
 
-    // Paint selected item outline.
-    if (option.state == CameraHotspotDisplayOption::State::selected)
-    {
-        QPen selectedOutlinePen(brush, kSelectedHotspotOutlineWidth);
-        painter->strokePath(hotspotOutline, selectedOutlinePen);
-    }
+QPixmap paintHotspotPixmap(
+    const common::CameraHotspotData& hotspotData,
+    const CameraHotspotDisplayOption& hotspotOption,
+    qreal devicePixelRatio)
+{
+    static constexpr QSize kRegularHotspotSize(kHotspotRadius * 2, kHotspotRadius * 2);
+    static constexpr QSize kDirectionalHotspotSize(kHotspotRadius * 3, kHotspotRadius * 3);
 
-    // Paint decoration which is icon or text.
-    if (option.decoration.canConvert<QString>())
-    {
-        static const auto kTextColor = colorTheme()->color("camera.hotspots.text");
+    const auto hotspotPixmapSize(hotspotData.hasDirection()
+        ? kDirectionalHotspotSize
+        : kRegularHotspotSize);
 
-        double textOpacity = 1.0;
-        if (option.state == CameraHotspotDisplayOption::State::disabled)
-            textOpacity = nx::style::Hints::kDisabledItemOpacity;
+    QPixmap hotspotPixmap(hotspotPixmapSize * devicePixelRatio);
+    hotspotPixmap.setDevicePixelRatio(devicePixelRatio);
+    hotspotPixmap.fill(Qt::transparent);
 
-        QnScopedPainterOpacityRollback opacityRollback(painter, textOpacity);
+    QPainter hotspotPixmapPaiter(&hotspotPixmap);
+    hotspotPixmapPaiter.setRenderHint(QPainter::Antialiasing);
 
-        QFont font;
-        font.setPixelSize(kHotspotFontSize);
-        QnScopedPainterFontRollback fontRollback(painter, font);
-        QnScopedPainterPenRollback penRollback(painter, kTextColor);
+    paintHotspot(
+        &hotspotPixmapPaiter,
+        hotspotData,
+        QRectF({}, hotspotPixmapSize).center(),
+        hotspotOption);
 
-        QSize size(kHotspotRadius * 2, kHotspotRadius * 2);
-        QRect rect(origin.toPoint() - QPoint(kHotspotRadius, kHotspotRadius), size);
-
-        QTextOption textOption;
-        textOption.setAlignment(Qt::AlignCenter);
-        painter->drawText(rect, option.decoration.toString(), textOption);
-    }
-    else if (option.decoration.typeId() == QMetaType::QIcon)
-    {
-        double iconOpacity = 1.0;
-        if (option.cameraState == CameraHotspotDisplayOption::CameraState::noCamera)
-            iconOpacity = kNoCameraIconOpacity;
-
-        if (option.state == CameraHotspotDisplayOption::State::disabled)
-            iconOpacity *= nx::style::Hints::kDisabledItemOpacity;
-
-        QnScopedPainterOpacityRollback opacityRollback(painter, iconOpacity);
-
-        const auto icon = option.decoration.value<QIcon>();
-        QPixmap pixmap = icon.pixmap(nx::style::Metrics::kDefaultIconSize, QIcon::Selected);
-
-        if (option.cameraState == CameraHotspotDisplayOption::CameraState::invalid)
-            pixmap = qnSkin->colorize(pixmap, kInvalidColor);
-
-        const auto iconOffset = -Geometry::toPoint(kHotspotItemIconSize) / 2.0 - QPoint(0, -1);
-        painter->drawPixmap(origin + iconOffset, pixmap);
-    }
+    return hotspotPixmap;
 }
 
 } // namespace camera_hotspots
