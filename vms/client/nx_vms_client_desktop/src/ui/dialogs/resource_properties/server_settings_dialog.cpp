@@ -230,6 +230,11 @@ void QnServerSettingsDialog::retranslateUi()
     }
 }
 
+bool QnServerSettingsDialog::confirmChangesOnExit()
+{
+    return true;
+}
+
 void QnServerSettingsDialog::showEvent(QShowEvent* event)
 {
     loadDataToUi();

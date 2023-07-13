@@ -4,6 +4,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/common/dialogs/generic_tabbed_dialog.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>
 
@@ -36,6 +37,7 @@ public:
 protected:
     virtual void showEvent(QShowEvent* event) override;
     virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
+    virtual void reject() override;
 
 private:
     QDialogButtonBox::StandardButton showConfirmationDialog();

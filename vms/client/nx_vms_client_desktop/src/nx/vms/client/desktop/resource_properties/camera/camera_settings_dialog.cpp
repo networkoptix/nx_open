@@ -93,6 +93,7 @@ struct CameraSettingsDialog::Private: public QObject
     QPointer<QPushButton> fixupScheduleButton;
     std::unique_ptr<CameraAdvancedParametersManifestManager> advancedParametersManifestManager;
     std::unique_ptr<CameraSettingsAdvancedManifestWatcher> advancedParametersManifestWatcher;
+    QSharedPointer<QnMessageBox> confirmationMessageBox;
 
     const QSharedPointer<LiveCameraThumbnail> cameraPreview{new LiveCameraThumbnail()};
     bool isPreviewRefreshRequired = true;
@@ -461,6 +462,11 @@ bool CameraSettingsDialog::tryClose(bool force)
     return result;
 }
 
+void CameraSettingsDialog::reject()
+{
+    tryClose(false);
+}
+
 void CameraSettingsDialog::forcedUpdate()
 {
 }
@@ -491,6 +497,11 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
                 /* Cancel changes. */
                 return false;
         }
+    }
+    else if (!askConfirmation && d->confirmationMessageBox)
+    {
+        d->confirmationMessageBox->setEscapeButton(QDialogButtonBox::Cancel);
+        d->confirmationMessageBox->close();
     }
 
     const auto singleCamera = cameras.size() == 1 ? cameras.first() : QnVirtualCameraResourcePtr();
@@ -582,16 +593,19 @@ QDialogButtonBox::StandardButton CameraSettingsDialog::showConfirmationDialog()
         ),
         d->cameras);
 
-    QnMessageBox messageBox(
-        QnMessageBoxIcon::Question,
-        tr("Apply changes before switching to another camera?"),
-        extras,
-        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Apply,
-        this);
+    d->confirmationMessageBox =
+        QSharedPointer<QnMessageBox>(new QnMessageBox(QnMessageBoxIcon::Question,
+            tr("Apply changes before switching to another camera?"),
+            extras,
+            QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Apply,
+            this));
 
-    messageBox.addCustomWidget(new QnResourceListView(d->cameras, &messageBox));
-    return QDialogButtonBox::StandardButton(messageBox.exec());
+    d->confirmationMessageBox->addCustomWidget(
+        new QnResourceListView(d->cameras, d->confirmationMessageBox.get()));
+    const auto result = QDialogButtonBox::StandardButton(d->confirmationMessageBox->exec());
+    d->confirmationMessageBox.reset();
+    return result;
 }
 
 void CameraSettingsDialog::updateButtonsAvailability(const CameraSettingsDialogState& state)

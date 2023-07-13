@@ -47,6 +47,8 @@ protected:
     virtual void updateButtonBox() override;
 
     virtual void accept() override;
+    virtual bool confirmChangesOnExit() override;
+
 private:
     bool isRestartRequired() const;
 

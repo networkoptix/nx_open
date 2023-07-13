@@ -55,6 +55,15 @@ bool QnSessionAwareTabbedDialog::tryClose(bool force)
     return true;
 }
 
+QDialogButtonBox::StandardButton QnSessionAwareTabbedDialog::getConfirmationResult()
+{
+    return QnSessionAwareMessageBox::question(this,
+        tr("Apply changes before exit?"),
+        QString(),
+        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Apply);
+}
+
 bool QnSessionAwareTabbedDialog::tryToApplyOrDiscardChanges()
 {
     if (!canDiscardChanges())

@@ -4,12 +4,14 @@
 
 #include <algorithm>
 
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QTabBar>
 #include <QtWidgets/QTabWidget>
-#include <QtWidgets/QPushButton>
 
 #include <nx/utils/log/assert.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/widgets/common/dialog_button_box.h>
 
 namespace
 {
@@ -79,11 +81,30 @@ void QnGenericTabbedDialog::setCurrentPage(int key, bool adjust, const QUrl& url
         m_tabWidget->setCurrentWidget(nearestPage->widget);
 }
 
+bool QnGenericTabbedDialog::confirmChangesOnExit()
+{
+    return false;
+}
+
 void QnGenericTabbedDialog::reject()
 {
     /* Very rare outcome. */
     if (!canDiscardChanges())
         return;
+
+    if (confirmChangesOnExit() && hasChanges())
+    {
+        switch (getConfirmationResult())
+        {
+            case QDialogButtonBox::Apply:
+                return accept();
+            case QnDialogButtonBox::Cancel:
+                return;
+            // Default behaviour is Discarding
+            default:
+                break;
+        }
+    }
 
     hide();
     discardChanges();
@@ -176,6 +197,14 @@ void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, 
     connect(page, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnGenericTabbedDialog::updateButtonBox);
 }
 
+QDialogButtonBox::StandardButton QnGenericTabbedDialog::getConfirmationResult()
+{
+    return QnMessageBox::question(this,
+        tr("Apply changes before exit?"),
+        QString(),
+        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Apply);
+}
 
 bool QnGenericTabbedDialog::isPageVisible(int key) const
 {
