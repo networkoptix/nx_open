@@ -19,6 +19,9 @@ NX_REFLECTION_ENUM_CLASS(UserType,
     /**%apidoc This User is managed by VMS. */
     local = 0,
 
+    /**%apidoc This User is managed by VMS and has a time limited access by the session token. */
+    temporaryLocal = 3,
+
     /**%apidoc This User is imported from LDAP Server. */
     ldap = 1,
 

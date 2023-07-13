@@ -54,6 +54,7 @@ NX_VMS_COMMON_API extern const QString kPtzCapabilities;
 NX_VMS_COMMON_API extern const QString kPtzTargetId;
 NX_VMS_COMMON_API extern const QString kUserPreferredPtzPresetType;
 NX_VMS_COMMON_API extern const QString kDefaultPreferredPtzPresetType;
+NX_VMS_COMMON_API extern const QString kTemporaryUserFirstLoginTime;
 
 NX_VMS_COMMON_API extern const QString kPtzCapabilitiesUserIsAllowedToModify;
 NX_VMS_COMMON_API extern const QString kPtzCapabilitiesAddedByUser;

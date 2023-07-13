@@ -3,12 +3,16 @@
 #include "user_model.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/algorithm.h>
 
 #include "user_data_deprecated.h"
 #include "user_group_data.h"
 
 namespace nx::vms::api {
+
+QN_FUSION_ADAPT_STRUCT(TemporaryToken, TemporaryToken_Fields)
+QN_FUSION_DEFINE_FUNCTIONS(TemporaryToken, (json))
 
 QN_FUSION_ADAPT_STRUCT(UserModelBase, UserModelBase_Fields)
 QN_FUSION_DEFINE_FUNCTIONS(UserModelBase, (json))
@@ -120,6 +124,9 @@ UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
     user.groupIds = std::move(groupIds);
     user.permissions = std::move(permissions);
     user.resourceAccessRights = std::move(resourceAccessRights);
+    if (user.type == UserType::temporaryLocal && NX_ASSERT(temporaryToken))
+        user.hash = QJson::serialized(*temporaryToken);
+
     return {std::move(user)};
 }
 
@@ -139,9 +146,29 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
         if (!baseData.resourceAccessRights.empty())
             model.resourceAccessRights = std::move(baseData.resourceAccessRights);
 
+        if (model.hash)
+            model.temporaryToken = QJson::deserialized<TemporaryToken>(*model.hash);
+
         result.push_back(std::move(model));
     }
+
     return result;
+}
+
+std::string TemporaryToken::prefix()
+{
+    return "vmsTmp-";
+}
+
+void TemporaryToken::generateToken()
+{
+    token = prefix() + nx::utils::random::generateName(10);
+}
+
+bool TemporaryToken::isValid() const
+{
+    using namespace std::chrono;
+    return endS > 0s && !token.empty();
 }
 
 } // namespace nx::vms::api
