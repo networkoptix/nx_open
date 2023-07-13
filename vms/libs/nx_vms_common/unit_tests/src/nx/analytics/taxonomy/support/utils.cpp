@@ -1,10 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "utils.h"
+#include <qjsonobject.h>
 
 #include <QtCore/QFile>
-
-#include <nx/fusion/model_functions.h>
 
 namespace nx::analytics::taxonomy {
 
@@ -14,19 +13,28 @@ bool loadDescriptorsTestData(const QString& filePath, TestData* outTestData)
     if (!file.open(QFile::ReadOnly))
         return false;
 
-    if (!QJson::deserialize(file.readAll(), &outTestData->fullData))
+    const QByteArray data = file.readAll();
+
+    auto [fullData, jsonResult] = 
+        nx::reflect::json::deserialize<QJsonObject>(data.toStdString());
+
+    outTestData->fullData = fullData;
+
+    if (!jsonResult.success)
         return false;
 
-    if (!QJson::deserialize(
-        outTestData->fullData.contains("descriptors")
+    const QJsonObject maybeDescriptors = outTestData->fullData.contains("descriptors")
             ? outTestData->fullData["descriptors"].toObject()
-            : outTestData->fullData,
-        &outTestData->descriptors))
-    {
-        return false;
-    }
+            : outTestData->fullData;
+    
+    const QByteArray maybeDescriptorsAsBytes = QJsonDocument(maybeDescriptors).toJson();
 
-    return true;
+    auto [deserializedDescriptors, result] = 
+        nx::reflect::json::deserialize<nx::vms::api::analytics::Descriptors>(maybeDescriptorsAsBytes.toStdString());
+
+    outTestData->descriptors = deserializedDescriptors;
+
+    return result.success;
 }
 
 } // namespace nx::analytics::taxonomy

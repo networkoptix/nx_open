@@ -575,7 +575,7 @@ std::tuple<Data, DeserializationResult> deserialize(
 {
     Data data;
     auto result = deserialize<Data>(json, &data, skipErrors);
-    return std::make_tuple(std::move(data), std::move(result));
+    return std::make_tuple(std::move(result.success ? data : Data()), std::move(result));
 }
 
 } // namespace json

@@ -10,11 +10,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx/vms/api/analytics/engine_manifest.h>
-
-#include <nx/fusion/model_functions.h>
-
 #include <nx/analytics/utils.h>
+#include <nx/reflect/json/deserializer.h>
+#include <nx/reflect/json/serializer.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 namespace nx::vms::common {
 
@@ -49,7 +48,7 @@ EngineManifest AnalyticsEngineResource::manifest() const
 
 void AnalyticsEngineResource::setManifest(const EngineManifest& manifest)
 {
-    setProperty(kEngineManifestProperty, QString::fromUtf8(QJson::serialized(manifest)));
+    setProperty(kEngineManifestProperty, QString::fromUtf8(nx::reflect::json::serialize(manifest)));
 }
 
 QString AnalyticsEngineResource::idForToStringFromPtr() const
@@ -101,7 +100,15 @@ bool AnalyticsEngineResource::isEnabledForDevice(const QnVirtualCameraResourcePt
 
 EngineManifest AnalyticsEngineResource::fetchManifest() const
 {
-    return QJson::deserialized<EngineManifest>(getProperty(kEngineManifestProperty).toUtf8());
+    auto [deserializedManifest, result] = 
+        nx::reflect::json::deserialize<EngineManifest>(getProperty(kEngineManifestProperty).toUtf8().toStdString());
+
+    if (!result.success)
+    {
+        NX_WARNING(this, "Failed to deserialize manifest: %1", result.toString());
+    }
+
+    return deserializedManifest;
 }
 
 nx::vms::api::analytics::IntegrationType AnalyticsEngineResource::integrationType() const

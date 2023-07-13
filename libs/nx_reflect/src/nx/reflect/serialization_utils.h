@@ -32,6 +32,8 @@ struct NX_REFLECT_API DeserializationResult
         std::optional<std::string> notDeserializedField = std::nullopt);
 
     operator bool() const noexcept;
+
+    std::string toString() const;
 };
 
 } // namespace nx::reflect

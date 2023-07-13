@@ -9,7 +9,7 @@
 #include <nx/analytics/taxonomy/state_compiler.h>
 #include <nx/analytics/taxonomy/helpers.h>
 
-#include <nx/fusion/model_functions.h>
+#include <nx/reflect/json/deserializer.h>
 
 using namespace nx::vms::api::analytics;
 
@@ -30,8 +30,7 @@ struct InheritanceTestExpectedData
     (derivedTypes) \
     (directDerivedTypes)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(InheritanceTestExpectedData, (json),
-    InheritanceTestExpectedData_Fields, (brief, true));
+NX_REFLECTION_INSTRUMENT(InheritanceTestExpectedData, InheritanceTestExpectedData_Fields);
 
 struct ScopeInfo
 {
@@ -58,8 +57,7 @@ bool operator<(const ScopeInfo& lhs, const ScopeInfo& rhs)
     return lhs.groupId < rhs.groupId;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ScopeInfo, (json),
-    ScopeInfo_Fields, (brief, true));
+NX_REFLECTION_INSTRUMENT(ScopeInfo, ScopeInfo_Fields);
 
 struct ScopeTestExpectedData
 {
@@ -72,8 +70,7 @@ struct ScopeTestExpectedData
     (name) \
     (scopeInfo)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ScopeTestExpectedData, (json),
-    ScopeTestExpectedData_Fields, (brief, true));
+NX_REFLECTION_INSTRUMENT(ScopeTestExpectedData, ScopeTestExpectedData_Fields);
 
 struct FlagTestExpectedData
 {
@@ -88,8 +85,7 @@ struct FlagTestExpectedData
     (liveOnly) \
     (nonIndexable)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FlagTestExpectedData, (json),
-    FlagTestExpectedData_Fields, (brief, true));
+NX_REFLECTION_INSTRUMENT(FlagTestExpectedData, FlagTestExpectedData_Fields);
 
 class ObjectTypeTest: public ::testing::Test
 {
@@ -122,14 +118,34 @@ protected:
     void makeSureReachableTypesAreCorrect()
     {
         std::set<QString> expectedResult;
-        ASSERT_TRUE(QJson::deserialize(m_testData.fullData["nonReachableTypes"], &expectedResult));
+
+        const QJsonArray array = m_testData.fullData["nonReachableTypes"].toArray();
+        const QByteArray arrayAsBytes = QJsonDocument(array).toJson();
+
+        auto [deserializationResult, result] = 
+            nx::reflect::json::deserialize<std::set<QString>>(arrayAsBytes.toStdString());
+        
+        expectedResult = deserializationResult;
+        
+        ASSERT_TRUE(result.success);
+
         ASSERT_EQ(nonReachableTypeIds(m_result.state), expectedResult);
     }
 
     void makeSureInheritanceIsCorrect()
     {
         std::map<QString, InheritanceTestExpectedData> expectedData;
-        ASSERT_TRUE(QJson::deserialize(m_testData.fullData["result"].toObject(), &expectedData));
+
+        const QJsonObject object = m_testData.fullData["result"].toObject();
+        const QByteArray obectAsBytes = QJsonDocument(object).toJson();
+
+        auto [deserializationResult, result] = 
+            nx::reflect::json::deserialize<std::map<QString, InheritanceTestExpectedData>>(obectAsBytes.toStdString());
+        
+        expectedData = deserializationResult;
+        
+        ASSERT_TRUE(result.success);
+
         ASSERT_FALSE(expectedData.empty());
 
         const std::vector<AbstractObjectType*> objectTypes = m_result.state->objectTypes();
@@ -164,7 +180,17 @@ protected:
     void makeSureScopesAreCorrect()
     {
         std::map<QString, ScopeTestExpectedData> expectedData;
-        ASSERT_TRUE(QJson::deserialize(m_testData.fullData["result"].toObject(), &expectedData));
+
+        const QJsonObject object = m_testData.fullData["result"].toObject();
+        const QByteArray obectAsBytes = QJsonDocument(object).toJson();
+
+        auto [deserializationResult, result] = 
+            nx::reflect::json::deserialize<std::map<QString, ScopeTestExpectedData>>(obectAsBytes.toStdString());
+        
+        expectedData = deserializationResult;
+        
+        ASSERT_TRUE(result.success);
+
         ASSERT_FALSE(expectedData.empty());
 
         const std::vector<AbstractObjectType*> objectTypes = m_result.state->objectTypes();
@@ -223,7 +249,17 @@ protected:
     void makeSureFlagsAreCorrect()
     {
         std::map<QString, FlagTestExpectedData> expectedData;
-        ASSERT_TRUE(QJson::deserialize(m_testData.fullData["result"].toObject(), &expectedData));
+
+        const QJsonObject object = m_testData.fullData["result"].toObject();
+        const QByteArray obectAsBytes = QJsonDocument(object).toJson();
+
+        auto [deserializationResult, result] = 
+            nx::reflect::json::deserialize<std::map<QString, FlagTestExpectedData>>(obectAsBytes.toStdString());
+        
+        expectedData = deserializationResult;
+        
+        ASSERT_TRUE(result.success);
+
         ASSERT_FALSE(expectedData.empty());
 
         const std::vector<AbstractObjectType*> objectTypes = m_result.state->objectTypes();

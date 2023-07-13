@@ -29,6 +29,8 @@ struct NX_VMS_API TypeLibrary
     (extendedEventTypes) \
     (attributeLists)
 
+NX_REFLECTION_INSTRUMENT(TypeLibrary, TypeLibrary_Fields);
+
 QN_FUSION_DECLARE_FUNCTIONS(TypeLibrary, (json), NX_VMS_API)
 
 } // namespace nx::vms::api::analytics

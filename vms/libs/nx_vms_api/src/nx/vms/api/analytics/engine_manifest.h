@@ -7,6 +7,8 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
+#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/analytics/manifest_error.h>
 #include <nx/vms/api/analytics/manifest_items.h>
@@ -111,10 +113,11 @@ struct NX_VMS_API EngineManifest
     (groups) \
     (typeLibrary)
 
-QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json), NX_VMS_API)
-Q_DECLARE_OPERATORS_FOR_FLAGS(EngineManifest::Capabilities)
-Q_DECLARE_OPERATORS_FOR_FLAGS(EngineManifest::ObjectAction::Capabilities)
-QN_FUSION_DECLARE_FUNCTIONS(EngineManifest::ObjectAction, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(EngineManifest::ObjectAction::Requirements, nx_vms_api_analytics_Engine_ObjectAction_Requirements_Fields);
+NX_REFLECTION_INSTRUMENT(EngineManifest::ObjectAction, ObjectAction_Fields);
+NX_REFLECTION_INSTRUMENT(EngineManifest, EngineManifest_Fields);
+
+// Needed for struct ActionTypeDescriptor
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest::ObjectAction::Requirements, (json), NX_VMS_API)
 
 NX_VMS_API std::vector<ManifestError> validate(const EngineManifest& manifest);
