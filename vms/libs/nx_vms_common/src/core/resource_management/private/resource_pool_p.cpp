@@ -118,9 +118,11 @@ static size_t userPriorityGroup(const QnUserResourcePtr& user)
         // Users managed by VMS administrators should always be prioritized over external users.
         case nx::vms::api::UserType::local: return 2;
 
+        case nx::vms::api::UserType::temporaryLocal: return 3;
+
         // Users managed by LDAP should be fixed on LDAP by it's admin.
-        case nx::vms::api::UserType::ldap: return 3;
-    };
+        case nx::vms::api::UserType::ldap: return 4;
+     };
 
     NX_ASSERT(false, "Unexpected type %1 of %2", static_cast<int>(t), user);
     return 4;

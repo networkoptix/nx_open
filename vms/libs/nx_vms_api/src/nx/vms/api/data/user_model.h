@@ -47,7 +47,7 @@ struct NX_VMS_API UserModelBase
      */
     bool isHttpDigestEnabled = false;
 
-    /**%apidoc The password for authorization. */
+    /**%apidoc The password for authorization. It's used only for `local` users. */
     std::optional<QString> password;
 
     /**%apidoc[readonly] External identification data (currently used for LDAP only). */
@@ -128,6 +128,48 @@ QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (json), NX_VMS_API)
 
 // -------------------------------------------------------------------------------------------------
 
+/**%apidoc[opt]
+ * A token to authenticate temporary users.
+ */
+struct NX_VMS_API TemporaryToken
+{
+    /**%apidoc[opt] Temporary user validity period start timestamp from Epoch in seconds.
+     * If it's not set (the value is less than zero), the current moment is implied.
+     * %example 1689273703
+     */
+    std::chrono::seconds startS{-1};
+
+    /**%apidoc Temporary user validity period end timestamp from Epoch in seconds.
+     * %example 1689273704
+     */
+    std::chrono::seconds endS{-1};
+
+    /**%apidoc[opt]
+     * Temporary user validity expiration period after the first login.
+     * The user becomes invalid after this period is over or if the `endS` has been reached
+     * whichever happens first.
+     * Value less than zero is treated as 'not set'.
+     * %example 10000
+     */
+    std::chrono::seconds expiresAfterLoginS{-1};
+
+    /**%apidoc[readonly]
+     * Authentication token. It is filled by the Server in the response. This token may be
+     * further used in the `rest/v{3-}/login/temporaryToken` request.
+     */
+    std::string token;
+
+    void generateToken();
+    bool isValid() const;
+    static std::string prefix();
+    bool operator==(const TemporaryToken& other) const = default;
+};
+#define TemporaryToken_Fields (startS)(endS)(expiresAfterLoginS)(token)
+QN_FUSION_DECLARE_FUNCTIONS(TemporaryToken, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(TemporaryToken, TemporaryToken_Fields)
+
+using TemporaryTokenList = std::vector<TemporaryToken>;
+
 /**%apidoc User information object
  */
 struct NX_VMS_API UserModelV3: public UserModelBase
@@ -145,6 +187,11 @@ struct NX_VMS_API UserModelV3: public UserModelBase
      */
     std::map<QnUuid, AccessRights> resourceAccessRights;
 
+    /**%apidoc
+     * This token should be used only when the user type is `temporaryLocal`.
+     */
+    std::optional<TemporaryToken> temporaryToken;
+
     bool operator==(const UserModelV3& other) const = default;
 
     using DbReadTypes = std::tuple<UserData>;
@@ -157,7 +204,8 @@ struct NX_VMS_API UserModelV3: public UserModelBase
     static_assert(isCreateModelV<UserModelV3>);
     static_assert(isUpdateModelV<UserModelV3>);
 };
-#define UserModelV3_Fields UserModelBase_Fields(groupIds)(permissions)(resourceAccessRights)
+#define UserModelV3_Fields UserModelBase_Fields(groupIds)(permissions)(resourceAccessRights) \
+    (temporaryToken)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)

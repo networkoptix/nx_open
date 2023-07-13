@@ -26,6 +26,12 @@ inline Result fixRequestDataIfNeeded(RequestData* /*requestData*/)
 
 Result fixRequestDataIfNeeded(nx::vms::api::UserDataEx* userDataEx)
 {
+    if (userDataEx->type == nx::vms::api::UserType::temporaryLocal)
+    {
+        NX_ASSERT(!userDataEx->hash.isEmpty());
+        return Result(); //< Everything should be filled already.
+    }
+
     if (!userDataEx->password.isEmpty())
     {
         const auto hashes = PasswordData::calculateHashes(
@@ -46,6 +52,7 @@ Result fixRequestDataIfNeeded(nx::vms::api::UserDataEx* userDataEx)
         if (userDataEx->digest.isEmpty())
             userDataEx->digest = nx::vms::api::UserData::kCloudPasswordStub;
     }
+
     return Result();
 }
 
@@ -53,6 +60,7 @@ Result fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* paramData)
 {
     if (kResourceParamToAmend.contains(paramData->name))
         paramData->value = nx::crypt::encodeHexStringFromStringAES128CBC(paramData->value);
+
     return Result();
 }
 
