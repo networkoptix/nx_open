@@ -93,6 +93,14 @@ TEST(Url, parseUrlFields)
     ASSERT_EQ(url::parseUrlFields("invalid+hostname").path(), "invalid+hostname");
     ASSERT_FALSE(url::parseUrlFields("http://invalid+hostname:666").isValid());
     ASSERT_FALSE(url::parseUrlFields("h*ttp://60/path").isValid());
+
+    ASSERT_TRUE(url::parseUrlFields("abcd.efg-hik.net/").isValid());
+    ASSERT_EQ(url::parseUrlFields("abcd.efg-hik.net/").host(), "abcd.efg-hik.net");
+    ASSERT_TRUE(url::parseUrlFields("abcd.efg-hik.net/").path().isEmpty());
+
+    ASSERT_TRUE(url::parseUrlFields("http://1.2.3.4/path1/").isValid());
+    ASSERT_EQ(url::parseUrlFields("http://1.2.3.4/path1/").host(), "1.2.3.4");
+    ASSERT_EQ(url::parseUrlFields("http://1.2.3.4/path1/").path(), "/path1/");
 }
 
 TEST(Url, toWebClientStandardViolatingUrl)
@@ -148,6 +156,11 @@ TEST(Url, fromUserInput)
     expectEq("example.com", "http://example.com");
     expectEq("example.com:8080", "http://example.com:8080");
     expectEq("example.com/index.html", "http://example.com/index.html");
+
+    expectEq("abcd.efg-hik.net/", "http://abcd.efg-hik.net/");
+    ASSERT_TRUE(Url::fromUserInput("abcd.efg-hik.net/").isValid());
+    ASSERT_EQ(Url::fromUserInput("abcd.efg-hik.net/").host(), "abcd.efg-hik.net");
+    ASSERT_EQ(Url::fromUserInput("abcd.efg-hik.net/").path(), "/");
 }
 
 TEST(Url, hidePassword)

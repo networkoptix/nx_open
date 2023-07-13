@@ -492,6 +492,15 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
         result.setScheme(std::move(scheme));
         return result;
     }
+    else if (urlStr.endsWith('/'))
+    {
+        result.setHost(urlStr.chopped(1), QUrl::StrictMode);
+        if (result.isValid())
+        {
+            result.setScheme(std::move(scheme));
+            return result;
+        }
+    }
 
     // Checking if it is just an authority.
     result.setAuthority(urlStr, QUrl::StrictMode);
