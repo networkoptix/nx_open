@@ -34,6 +34,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
@@ -209,7 +210,8 @@ void NotificationListWidget::Private::setupFilterSystemsButton()
 void NotificationListWidget::Private::changeFilterVisibilityIfNeeded()
 {
     if (auto user = context()->user();
-        user && user->isCloud() && qnCloudStatusWatcher->cloudSystems().size() > 1)
+        user && user->isCloud() && qnCloudStatusWatcher->cloudSystems().size() > 1
+        && nx::vms::common::saas::saasIsActive(systemContext()))
     {
         m_headerWidget->show();
         m_separatorLine->show();
