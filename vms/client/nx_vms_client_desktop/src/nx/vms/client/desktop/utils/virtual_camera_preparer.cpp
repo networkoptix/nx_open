@@ -46,8 +46,6 @@ QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& rem
     return QnTimePeriod();
 }
 
-const qint64 kOneDayMSecs = 1000ll * 3600ll * 24ll;
-
 } // namespace
 
 
@@ -181,7 +179,11 @@ void VirtualCameraPreparer::checkLocally(VirtualCameraPayload& payload)
                 ignoreTimeZone = virtualCamera->virtualCameraIgnoreTimeZone();
 
             if (ignoreTimeZone)
-                startDateTime.setTimeSpec(Qt::UTC);
+            {
+                // Interpret UTC time from the file as local time, so reduce it by the local time offset
+                const QDateTime now = QDateTime::currentDateTime();
+                timeOffsetMs += now.offsetFromUtc() * 1000;
+            }
 
             startTimeMs = startDateTime.toMSecsSinceEpoch() - timeOffsetMs;
         }
