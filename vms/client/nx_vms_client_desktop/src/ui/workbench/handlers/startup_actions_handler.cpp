@@ -215,11 +215,6 @@ void StartupActionsHandler::handleUserLoggedIn(const QnUserResourcePtr& user)
     if (!user)
         return;
 
-    // We should not change state when using "Open in New Window". Otherwise workbench will be
-    // cleared here even if no state is saved.
-    if (d->delayedDrops.empty() && qnRuntime->isDesktopMode())
-        workbench()->applyLoadedState();
-
     // Sometimes we get here when 'New Layout' has already been added. But all user's layouts must
     // be created AFTER this method. Otherwise the user will see uncreated layouts in layout
     // selection menu. As temporary workaround we can just remove that layouts.
@@ -227,13 +222,18 @@ void StartupActionsHandler::handleUserLoggedIn(const QnUserResourcePtr& user)
     // See: LayoutsHandler::at_openNewTabAction_triggered()
     if (user && !qnRuntime->isAcsMode())
     {
-        for (const QnLayoutResourcePtr& layout: resourcePool()->getResourcesByParentId(
-                 user->getId()).filtered<QnLayoutResource>())
+        for (const QnLayoutResourcePtr& layout:
+            resourcePool()->getResourcesByParentId(user->getId()).filtered<QnLayoutResource>())
         {
             if (layout->hasFlags(Qn::local) && !layout->isFile())
                 resourcePool()->removeResource(layout);
         }
     }
+
+    // We should not change state when using "Open in New Window". Otherwise workbench will be
+    // cleared here even if no state is saved.
+    if (d->delayedDrops.empty() && qnRuntime->isDesktopMode())
+        workbench()->applyLoadedState();
 
     if (workbench()->layouts().empty())
         menu()->trigger(OpenNewTabAction);

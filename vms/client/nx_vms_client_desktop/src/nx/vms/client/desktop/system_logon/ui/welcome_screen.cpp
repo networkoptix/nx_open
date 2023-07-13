@@ -57,7 +57,6 @@
 
 #include "../data/connect_tiles_proxy_model.h"
 #include "../data/systems_visibility_sort_filter_model.h"
-#include "login_dialog.h"
 #include "setup_wizard_dialog.h"
 
 using CredentialsManager = nx::vms::client::core::CredentialsManager;
@@ -542,7 +541,7 @@ void WelcomeScreen::connectToSystemInternal(
 
     NX_DEBUG(this, "Delayed connect to the system %1 after click on tile", address);
     if (context()->user())
-        appContext()->clientStateHandler()->saveWindowsConfiguration();
+        workbench()->saveStateInCache();
 
     LogonData logonData(core::LogonData{
         .address = address,

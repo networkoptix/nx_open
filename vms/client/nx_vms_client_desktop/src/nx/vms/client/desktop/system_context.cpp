@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
+#include <nx/vms/common/system_settings.h>
 #include <server/server_storage_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 
