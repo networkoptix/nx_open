@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <licensing/license_fwd.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/common/system_context_aware.h>
 
@@ -19,10 +20,18 @@ class NX_VMS_COMMON_API ServiceManager:
 public:
     ServiceManager(SystemContext* context, QObject* parent = nullptr);
 
+    /**
+     *  Full SaaS data.
+     */
     nx::vms::api::SaasData data() const;
+    
+    std::pair<bool, QString> isBlocked() const;
+
     std::map<QnUuid, nx::vms::api::SaasService> services() const;
 
     bool loadSaasData(const std::string_view& saasData);
+    void loadSaasData(const nx::vms::api::SaasData& saasData);
+
     bool loadServiceData(const std::string_view& serviceData);
 
     /**
@@ -54,16 +63,22 @@ public:
     
     void updateLicenseV1();
 
+    void setState(nx::vms::api::SaasState state);
+
 signals:
     void dataChanged();
 
 private:
+    void setData(const nx::vms::api::SaasData& data);
+    void saveSaasDataToProperty(const std::string_view& data);
     void onDataChanged();
+    QnLicensePtr localRecordingLicenseV1Unsafe() const;
 
     template <typename ServiceParamsType>
     std::map<QnUuid, ServiceParamsType>  purchasedServices(const QString& serviceType) const;
 
 private:
+    mutable nx::Mutex m_mutex;
     nx::vms::api::SaasData m_data;
     std::map<QnUuid, nx::vms::api::SaasService> m_services;
     std::atomic<bool> m_disabled{false};

@@ -161,8 +161,14 @@ struct NX_VMS_API SaasSecurity
      * Otherwise error message from the license server with description why the license was blocked.
      */
     QString issue;
+
+    /**%apidoc There is issue with service overflow detected by license server.
+     * The issue should be fixed till this date underwise VMS will start to
+     * turn off services.
+     */
+    SaasDateTime issueExpirationDate;
 };
-#define SaasSecurity_fields (checkPeriodS)(lastCheck)(tmpExpirationDate)(issue)
+#define SaasSecurity_fields (checkPeriodS)(lastCheck)(tmpExpirationDate)(issue)(issueExpirationDate)
 NX_REFLECTION_INSTRUMENT(SaasSecurity, SaasSecurity_fields)
 
 /**%apidoc SaasData from license server */
