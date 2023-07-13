@@ -47,6 +47,7 @@ class QnWorkbenchContext:
     using base_type = QObject;
     Q_PROPERTY(QString userId READ userId NOTIFY userIdChanged)
     Q_PROPERTY(QWidget* mainWindow READ mainWindowWidget CONSTANT)
+    Q_PROPERTY(nx::vms::client::desktop::SystemContext* systemContext READ systemContext CONSTANT)
 
 public:
     QnWorkbenchContext(
@@ -121,3 +122,5 @@ private:
 
     bool m_closingDown = false;
 };
+
+Q_DECLARE_OPAQUE_POINTER(nx::vms::client::desktop::SystemContext*);

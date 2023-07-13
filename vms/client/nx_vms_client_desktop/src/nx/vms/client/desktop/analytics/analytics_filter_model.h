@@ -42,7 +42,7 @@ public:
     Q_PROPERTY(bool active WRITE setActive READ isActive NOTIFY activeChanged);
 
 public:
-    AnalyticsFilterModel(TaxonomyManager* taxonomyManager, QObject* parent = nullptr);
+    AnalyticsFilterModel(TaxonomyManager* taxonomyManager = nullptr, QObject* parent = nullptr);
 
     /**
      * Returns filter object types structure corresponding to selected options.

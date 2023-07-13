@@ -56,6 +56,7 @@
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <ui/dialogs/common/message_box.h>
@@ -209,8 +210,7 @@ bool AnalyticsSearchWidget::calculateAllowance() const
 
 AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     q(q),
-    taxonomyManager(qnClientCoreModule->mainQmlEngine()->singletonInstance<TaxonomyManager*>(
-        qmlTypeId("nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager"))),
+    taxonomyManager(q->systemContext()->taxonomyManager()),
     m_areaSelectionButton(q->createCustomFilterButton()),
     m_engineSelectionButton(q->createCustomFilterButton()),
     m_typeSelectionButton(q->createCustomFilterButton()),
