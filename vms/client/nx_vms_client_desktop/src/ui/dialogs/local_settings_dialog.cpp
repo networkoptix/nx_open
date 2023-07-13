@@ -122,6 +122,11 @@ void QnLocalSettingsDialog::updateButtonBox()
     m_restartLabel->setVisible(isRestartRequired());
 }
 
+bool QnLocalSettingsDialog::confirmChangesOnExit()
+{
+    return true;
+}
+
 void QnLocalSettingsDialog::accept()
 {
     executeWithRestartCheck(

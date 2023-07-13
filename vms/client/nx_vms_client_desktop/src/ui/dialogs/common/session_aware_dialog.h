@@ -92,6 +92,7 @@ public:
 
 protected:
     bool tryToApplyOrDiscardChanges();
+    virtual QDialogButtonBox::StandardButton getConfirmationResult() override;
 
     /**
      * Show the dialog, asking what to do with unsaved changes.

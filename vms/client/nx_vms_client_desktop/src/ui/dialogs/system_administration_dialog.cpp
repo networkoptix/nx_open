@@ -111,6 +111,11 @@ QnSystemAdministrationDialog::~QnSystemAdministrationDialog()
     // Required here for forward-declared scoped pointer destruction.
 }
 
+bool QnSystemAdministrationDialog::confirmChangesOnExit()
+{
+    return true;
+}
+
 void QnSystemAdministrationDialog::applyChanges()
 {
     for (const Page& page: modifiedPages())

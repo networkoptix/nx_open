@@ -39,6 +39,9 @@ public:
     virtual void applyChanges() override;
     virtual void loadDataToUi() override;
 
+protected:
+    virtual bool confirmChangesOnExit() override;
+
 private:
     Q_DISABLE_COPY(QnSystemAdministrationDialog)
     nx::utils::ImplPtr<Ui::QnSystemAdministrationDialog> ui;

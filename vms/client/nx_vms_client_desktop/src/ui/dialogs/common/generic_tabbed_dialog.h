@@ -80,6 +80,17 @@ protected:
     void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
 
     /**
+     * @brief shows Dialog window with confirmation of result. 
+     */
+    virtual QDialogButtonBox::StandardButton getConfirmationResult();
+
+    /**
+     * @brief returns bool on if user should confirm exit from window. must be overriden by child class,
+     * default value is false
+     */
+    virtual bool confirmChangesOnExit();
+
+    /**
     * @brief isPageVisible                      Check if page is visible by its key.
     */
     bool isPageVisible(int key) const;
