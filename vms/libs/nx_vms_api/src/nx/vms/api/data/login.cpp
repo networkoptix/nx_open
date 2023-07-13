@@ -9,6 +9,9 @@ namespace nx::vms::api {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LoginUserFilter, (json), LoginUserFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LoginUser, (json), LoginUser_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LoginSessionRequest, (json), LoginSessionRequest_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    TemporaryLoginSessionRequest, (json), TemporaryLoginSessionRequest_Fields)
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LoginSessionFilter, (json), LoginSessionFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LoginSession, (json), LoginSession_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CloudSignature, (json), CloudSignature_Fields)

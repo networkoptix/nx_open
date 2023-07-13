@@ -33,6 +33,7 @@ const QString kPtzCapabilities("ptzCapabilities");
 const QString kPtzTargetId("ptzTargetId");
 const QString kUserPreferredPtzPresetType("userPreferredPtzPresetType");
 const QString kDefaultPreferredPtzPresetType("defaultPreferredPtzPresetType");
+const QString kTemporaryUserFirstLoginTime("temporaryUserFirstLoginTimeS");
 
 const QString kPtzCapabilitiesUserIsAllowedToModify("ptzCapabilitiesUserIsAllowedToModify");
 const QString kPtzCapabilitiesAddedByUser("ptzCapabilitiesAddedByUser");

@@ -10,6 +10,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/analytics/integration_request.h>
 #include <nx/vms/api/data/user_data.h>
+#include <nx/vms/api/data/user_model.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 struct PasswordHashes;
@@ -49,6 +50,11 @@ struct NX_VMS_COMMON_API QnUserHash
         // Recommended local user storage.
         // "scrypt$" + salt + "$" + r + "$" + N + "$" + p + "$" + scrypt(salt, r, N, p, password)
         scrypt,
+
+        /**
+         * Temporary user hash - serialized TemporaryToken struct
+         */
+        temporary,
     };
     static QByteArray toString(const Type& type);
 
@@ -56,6 +62,7 @@ struct NX_VMS_COMMON_API QnUserHash
     QByteArray salt;
     std::optional<nx::scrypt::Options> options; //< TODO: std::variant when there are more options.
     QByteArray hash;
+    std::optional<nx::vms::api::TemporaryToken> temporaryToken;
 
     explicit QnUserHash(const QByteArray& data = "");
     QByteArray toString() const;
@@ -94,6 +101,7 @@ public:
     bool isLdap()  const { return userType() == nx::vms::api::UserType::ldap;  }
     bool isCloud() const { return userType() == nx::vms::api::UserType::cloud; }
     bool isLocal() const { return userType() == nx::vms::api::UserType::local; }
+    bool isTemporary() const { return userType() == nx::vms::api::UserType::temporaryLocal; }
 
     QnUserHash getHash() const;
 
