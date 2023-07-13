@@ -187,6 +187,7 @@ void MotionRegionsItem::Private::setFillOpacity(qreal value)
 QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
 {
     auto geometryNode = static_cast<QSGGeometryNode*>(node);
+    bool nodeCreated{false};
     if (!geometryNode)
     {
         geometryNode = new QSGGeometryNode();
@@ -197,6 +198,7 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
         geometryNode->setMaterial(new Material());
         geometryNode->material()->setFlag(QSGMaterial::Blending);
         node = geometryNode;
+        nodeCreated = true;
     }
 
     ensureRegionsTexture();
@@ -208,7 +210,7 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
     const bool resized = resolution != m_currentState.resolution;
     m_currentState.resolution = resolution;
 
-    if (resized)
+    if (resized || nodeCreated)
     {
         const auto tw = 1.0 + 1.0 / resolution.width();
         const auto th = 1.0 + 1.0 / resolution.height();
@@ -661,11 +663,6 @@ void MotionRegionsItem::Private::Shader::updateSampledImage(
 
     Material* tx = static_cast<Material*>(newMaterial);
     QSGTexture* t = tx->uniforms.texture.get();
-
-    t->setHorizontalWrapMode(QSGTexture::ClampToEdge);
-    t->setVerticalWrapMode(QSGTexture::ClampToEdge);
-    t->setFiltering(QSGTexture::Nearest);
-
     t->commitTextureOperations(state.rhi(), state.resourceUpdateBatch());
     *texture = t;
 }
