@@ -5,11 +5,12 @@
 #include <optional>
 
 #include <QtCore/QPointer>
+#include <QtGui/QGuiApplication>
+#include <QtWidgets/QGraphicsPixmapItem>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QStyleOptionGraphicsItem>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -34,9 +35,12 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace camera_hotspots;
+
 namespace {
 
-static constexpr auto kTooltipOffset = camera_hotspots::kHotspotRadius + 8;
+static constexpr auto kTooltipOffset = kHotspotRadius + 8;
+static constexpr auto kInvalidPixmapRole = Qt::UserRole;
 
 } // namespace
 
@@ -47,30 +51,80 @@ struct CameraHotspotItem::Private
 {
     CameraHotspotItem* const q;
 
-    nx::vms::common::CameraHotspotData hotspotData;
-    QnWorkbenchContext* context;
+    const nx::vms::common::CameraHotspotData hotspotData;
+    QnWorkbenchContext* const context;
 
     QPointer<QMenu> contextMenu;
     QPointer<ThumbnailTooltip> tooltip;
 
-    QnVirtualCameraResourcePtr hotspotCamera() const;
+    Private(
+        CameraHotspotItem* const q,
+        nx::vms::common::CameraHotspotData hotspotData,
+        QnWorkbenchContext* context);
 
     QnMediaResourceWidget* mediaResourceWidget() const;
+    QnVirtualCameraResourcePtr hotspotCamera() const;
 
+    // Preview tooltip.
     nx::api::CameraImageRequest tooltipImageRequest() const;
     QString tooltipText() const;
     QPoint tooltipGlobalPos() const;
     ThumbnailTooltip* createTooltip() const;
 
+    // Interactive actions.
     ui::action::Parameters::ArgumentHash itemPlaybackParameters() const;
-
     void openItem();
     void opemItemInNewLayout();
     void openItemInPlace();
+
+    // Optimized hotspot painting routines.
+    void setDevicePixelRatio(qreal value);
+    void setHovered(bool value);
+    void setDecorationIconKey(QnResourceIconCache::Key value);
+
+    CameraHotspotDisplayOption hotspotDisplayOption() const;
+    void updateHotspotPixmapIfNeeded() const;
+    void updateHotspotDecorationPixmapIfNeeded() const;
+
+private:
+    QGraphicsPixmapItem* const hotspotPixmapItem;
+    QGraphicsPixmapItem* hotspotDecorationPixmapItem = nullptr;
+
+    qreal devicePixelRatio = qGuiApp->devicePixelRatio();
+    bool hovered = false;
+    QnResourceIconCache::Key decorationIconKey;
 };
 
 //-------------------------------------------------------------------------------------------------
 // CameraHotspotItem::Private definition.
+
+CameraHotspotItem::Private::Private(
+    CameraHotspotItem* const q,
+    common::CameraHotspotData hotspotData,
+    QnWorkbenchContext* context)
+    :
+    q(q),
+    hotspotData(hotspotData),
+    context(context),
+    hotspotPixmapItem(new QGraphicsPixmapItem(q))
+{
+    if (hotspotData.hasDirection())
+    {
+        hotspotPixmapItem->setTransformationMode(Qt::SmoothTransformation);
+        hotspotDecorationPixmapItem = new QGraphicsPixmapItem(hotspotPixmapItem);
+        hotspotDecorationPixmapItem->setFlag(QGraphicsItem::ItemIgnoresTransformations);
+    }
+    else
+    {
+        hotspotPixmapItem->setFlag(QGraphicsItem::ItemIgnoresTransformations);
+    }
+}
+
+QnMediaResourceWidget* CameraHotspotItem::Private::mediaResourceWidget() const
+{
+    const auto hotspotsOverlayWidget = q->parentItem();
+    return dynamic_cast<QnMediaResourceWidget*>(hotspotsOverlayWidget->parentItem());
+}
 
 QnVirtualCameraResourcePtr CameraHotspotItem::Private::hotspotCamera() const
 {
@@ -79,12 +133,6 @@ QnVirtualCameraResourcePtr CameraHotspotItem::Private::hotspotCamera() const
         resourcePool->getResourceById<QnVirtualCameraResource>(hotspotData.cameraId);
     NX_ASSERT(camera, "Hotspot refers to a nonexistent camera");
     return camera;
-}
-
-QnMediaResourceWidget* CameraHotspotItem::Private::mediaResourceWidget() const
-{
-    const auto hotspotsOverlayWidget = q->parentItem();
-    return dynamic_cast<QnMediaResourceWidget*>(hotspotsOverlayWidget->parentItem());
 }
 
 nx::api::CameraImageRequest CameraHotspotItem::Private::tooltipImageRequest() const
@@ -214,6 +262,88 @@ void CameraHotspotItem::Private::openItemInPlace()
     context->menu()->trigger(ui::action::ReplaceLayoutItemAction, parameters);
 }
 
+void CameraHotspotItem::Private::setDevicePixelRatio(qreal value)
+{
+    if (qFuzzyEquals(devicePixelRatio, value))
+        return;
+
+    devicePixelRatio = value;
+
+    hotspotPixmapItem->setData(kInvalidPixmapRole, true);
+    if (hotspotDecorationPixmapItem)
+        hotspotDecorationPixmapItem->setData(kInvalidPixmapRole, true);
+}
+
+void CameraHotspotItem::Private::setHovered(bool value)
+{
+    if (hovered == value)
+        return;
+
+    hovered = value;
+
+    hotspotPixmapItem->setData(kInvalidPixmapRole, true);
+}
+
+void CameraHotspotItem::Private::setDecorationIconKey(QnResourceIconCache::Key value)
+{
+    if (decorationIconKey == value)
+        return;
+
+    decorationIconKey = value;
+
+    if (hotspotDecorationPixmapItem)
+        hotspotDecorationPixmapItem->setData(kInvalidPixmapRole, true);
+    else
+        hotspotPixmapItem->setData(kInvalidPixmapRole, true);
+}
+
+CameraHotspotDisplayOption CameraHotspotItem::Private::hotspotDisplayOption() const
+{
+    CameraHotspotDisplayOption hotspotOption;
+
+    hotspotOption.cameraState = CameraHotspotDisplayOption::CameraState::valid;
+    hotspotOption.state = q->isUnderMouse()
+        ? CameraHotspotDisplayOption::State::hovered
+        : CameraHotspotDisplayOption::State::none;
+    hotspotOption.decoration = qnResIconCache->icon(decorationIconKey);
+
+    return hotspotOption;
+}
+
+void CameraHotspotItem::Private::updateHotspotPixmapIfNeeded() const
+{
+    const auto invalidVar = hotspotPixmapItem->data(kInvalidPixmapRole);
+    if (!invalidVar.isNull() && !invalidVar.toBool())
+        return;
+
+    auto displayOption = hotspotDisplayOption();
+    if (hotspotDecorationPixmapItem)
+        displayOption.displayedComponents = CameraHotspotDisplayOption::Component::body;
+
+    const auto pixmap = paintHotspotPixmap(hotspotData, displayOption, devicePixelRatio);
+    hotspotPixmapItem->setPixmap(pixmap);
+    hotspotPixmapItem->setOffset(-QRectF({}, pixmap.deviceIndependentSize()).center());
+    hotspotPixmapItem->setData(kInvalidPixmapRole, false);
+}
+
+void CameraHotspotItem::Private::updateHotspotDecorationPixmapIfNeeded() const
+{
+    if (!hotspotDecorationPixmapItem)
+        return;
+
+    const auto invalidVar = hotspotDecorationPixmapItem->data(kInvalidPixmapRole);
+    if (!invalidVar.isNull() && !invalidVar.toBool())
+        return;
+
+    auto displayOption = hotspotDisplayOption();
+    displayOption.displayedComponents = CameraHotspotDisplayOption::Component::decoration;
+
+    const auto pixmap = paintHotspotPixmap(hotspotData, displayOption, devicePixelRatio);
+    hotspotDecorationPixmapItem->setPixmap(pixmap);
+    hotspotDecorationPixmapItem->setOffset(-QRectF({}, pixmap.deviceIndependentSize()).center());
+    hotspotDecorationPixmapItem->setData(kInvalidPixmapRole, false);
+}
+
 //-------------------------------------------------------------------------------------------------
 // CameraHotspotItem definition.
 
@@ -228,8 +358,6 @@ CameraHotspotItem::CameraHotspotItem(
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons({Qt::LeftButton, Qt::RightButton});
 
-    setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-
     setProperty(Qn::BlockMotionSelection, true);
     setProperty(Qn::NoHandScrollOver, true);
 }
@@ -242,7 +370,7 @@ CameraHotspotItem::~CameraHotspotItem()
 
 QRectF CameraHotspotItem::boundingRect() const
 {
-    return camera_hotspots::makeHotspotOutline().boundingRect();
+    return makeHotspotOutline().boundingRect();
 }
 
 nx::vms::common::CameraHotspotData CameraHotspotItem::hotspotData() const
@@ -250,57 +378,14 @@ nx::vms::common::CameraHotspotData CameraHotspotItem::hotspotData() const
     return d->hotspotData;
 }
 
-void CameraHotspotItem::paint(
-    QPainter* painter,
-    const QStyleOptionGraphicsItem* option,
-    QWidget*)
+void CameraHotspotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
-    using namespace nx::vms::client::core;
-    using namespace camera_hotspots;
+    d->setDevicePixelRatio(painter->device()->devicePixelRatioF());
+    d->setHovered(isUnderMouse());
+    d->setDecorationIconKey(qnResIconCache->key(d->hotspotCamera()));
 
-    painter->setRenderHint(QPainter::Antialiasing);
-
-    CameraHotspotDisplayOption hotspotOption;
-
-    if (option->state.testFlag(QStyle::State_MouseOver))
-        hotspotOption.state = camera_hotspots::CameraHotspotDisplayOption::State::hovered;
-
-    hotspotOption.cameraState = CameraHotspotDisplayOption::CameraState::valid;
-    hotspotOption.decoration = qnResIconCache->icon(d->hotspotCamera());
-
-    auto paintedHotspotData = d->hotspotData;
-    if (paintedHotspotData.hasDirection())
-    {
-        const auto hotspotsOverlayWidget = parentItem();
-        const auto mediaResourceWidget = hotspotsOverlayWidget->parentItem();
-
-        QTransform rotationMatrix;
-        rotationMatrix.rotate(mediaResourceWidget->rotation());
-
-        paintedHotspotData.direction = rotationMatrix.map(d->hotspotData.direction);
-    }
-
-    // Paint the hotspot to a pixmap first to get the proper antialiased look.
-
-    QSize hotspotPixmapSize(option->rect.size() * 2); //< Larger pixmap size to avoid clipping.
-    QPixmap hotspotPixmap(hotspotPixmapSize * painter->device()->devicePixelRatio());
-    hotspotPixmap.setDevicePixelRatio(painter->device()->devicePixelRatio());
-    hotspotPixmap.fill(QColor(0, 0, 0, 0));
-
-    QPainter hotspotPixmapPaiter(&hotspotPixmap);
-    hotspotPixmapPaiter.setRenderHint(QPainter::Antialiasing);
-
-    camera_hotspots::paintHotspot(
-        &hotspotPixmapPaiter,
-        paintedHotspotData,
-        QPoint(hotspotPixmapSize.width() / 2, hotspotPixmapSize.height() / 2),
-        hotspotOption);
-
-    QPoint pixmapOffset(
-        (option->rect.width() - hotspotPixmapSize.width()) / 2,
-        (option->rect.height() - hotspotPixmapSize.height()) / 2);
-
-    painter->drawPixmap(option->rect.topLeft() + pixmapOffset, hotspotPixmap);
+    d->updateHotspotPixmapIfNeeded();
+    d->updateHotspotDecorationPixmapIfNeeded();
 }
 
 void CameraHotspotItem::hoverEnterEvent(QGraphicsSceneHoverEvent*)
