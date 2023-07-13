@@ -7,6 +7,7 @@
 #include <nx/vms/client/desktop/rules/cross_system_notifications_listener.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/rules/actions/repeat_sound_action.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
@@ -41,7 +42,7 @@ void NotificationActionExecutor::onContextUserChanged()
 {
     const auto user = context()->user();
 
-    if (user && user->isCloud())
+    if (user && user->isCloud() && nx::vms::common::saas::saasIsActive(systemContext()))
     {
         m_listener = std::make_unique<CrossSystemNotificationsListener>();
         connect(m_listener.get(),
