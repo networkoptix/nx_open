@@ -117,7 +117,8 @@ Item
                 width: parent.width
                 bottomPadding: 16
 
-                model: Analytics.TaxonomyManager.createFilterModel()
+                model: workbenchContext.systemContext.taxonomyManager()
+                    .createFilterModel(analyticsPanel)
 
                 Connections
                 {

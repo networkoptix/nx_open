@@ -141,8 +141,7 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
     motionMetadataProvider(new client::core::ConsumingMotionMetadataProvider()),
     analyticsMetadataProvider(
         AnalyticsMetadataProviderFactory::instance()->createMetadataProvider(resource)),
-    taxonomyManager(qnClientCoreModule->mainQmlEngine()->singletonInstance<TaxonomyManager*>(
-        qmlTypeId("nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager"))),
+    taxonomyManager(SystemContext::fromResource(resource)->taxonomyManager()),
     m_accessController(SystemContext::fromResource(resource)->accessController())
 {
     QSignalBlocker blocker(this);

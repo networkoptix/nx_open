@@ -349,10 +349,7 @@ nx::vms::license::VideoWallLicenseUsageHelper* QnClientModule::videoWallLicenseU
 
 nx::vms::client::desktop::analytics::TaxonomyManager* QnClientModule::taxonomyManager() const
 {
-    using TaxonomyManager = nx::vms::client::desktop::analytics::TaxonomyManager;
-
-    return appContext()->qmlEngine()->singletonInstance<TaxonomyManager*>(
-        qmlTypeId("nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager"));
+    return systemContext()->taxonomyManager();
 }
 
 nx::vms::client::desktop::analytics::AttributeHelper*

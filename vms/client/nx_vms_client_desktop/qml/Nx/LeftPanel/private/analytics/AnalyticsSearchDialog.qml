@@ -185,12 +185,6 @@ Window
                         }
                     }
 
-                    TaxonomyCache
-                    {
-                        id: taxonomyCache
-                        active: content.visible
-                    }
-
                     AnalyticsFilters
                     {
                         id: analyticsFilters
@@ -666,7 +660,9 @@ Window
 
         property var analyticsFiltersByEngine: ({})
 
-        property var filterModel: Analytics.TaxonomyManager.createFilterModel()
+        property var filterModel: workbenchContext
+            ? workbenchContext.systemContext.taxonomyManager().createFilterModel(dialog)
+            : emptyFilterModel
 
         readonly property Analytics.Engine selectedAnalyticsEngine:
             tabBar.currentItem ? tabBar.currentItem.engine : null
@@ -674,6 +670,8 @@ Window
         property var delayedAttributesFilter: []
 
         readonly property bool pluginTabsShown: filterModel.engines.length > 1
+
+        Analytics.FilterModel { id: emptyFilterModel }
 
         PropertyUpdateFilter on delayedAttributesFilter
         {
@@ -722,6 +720,7 @@ Window
         Connections
         {
             target: analyticsFilters
+            enabled: eventModel.analyticsSetup
             function onSelectedAnalyticsObjectTypeIdsChanged()
             {
                 eventModel.analyticsSetup.objectTypes =

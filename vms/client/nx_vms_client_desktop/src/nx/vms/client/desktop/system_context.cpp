@@ -61,6 +61,7 @@ struct SystemContext::Private
     std::unique_ptr<SystemSpecificLocalSettings> localSettings;
     std::unique_ptr<RestApiHelper> restApiHelper;
     std::unique_ptr<DelayedDataLoader> delayedDataLoader;
+    std::unique_ptr<analytics::TaxonomyManager> taxonomyManager;
 
     void initLocalRuntimeInfo()
     {
@@ -111,6 +112,7 @@ SystemContext::SystemContext(
             d->localSettings = std::make_unique<SystemSpecificLocalSettings>(this);
             d->restApiHelper = std::make_unique<RestApiHelper>(this);
             d->delayedDataLoader = std::make_unique<DelayedDataLoader>(this);
+            d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             break;
 
         case Mode::crossSystem:
@@ -221,9 +223,8 @@ RestApiHelper* SystemContext::restApiHelper() const
 
 analytics::TaxonomyManager* SystemContext::taxonomyManager() const
 {
-    // TODO: #sivanov Re-implement to system-context wide storage.
-    return appContext()->qmlEngine()->singletonInstance<analytics::TaxonomyManager*>(
-        qmlTypeId("nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager"));
+    QQmlEngine::setObjectOwnership(d->taxonomyManager.get(), QQmlEngine::CppOwnership);
+    return d->taxonomyManager.get();
 }
 
 common::SessionTokenHelperPtr SystemContext::getSessionTokenHelper() const

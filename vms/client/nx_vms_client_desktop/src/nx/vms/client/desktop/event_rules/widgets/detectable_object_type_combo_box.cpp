@@ -4,11 +4,10 @@
 
 #include <QtQml/QQmlEngine>
 
-#include <client/client_module.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -17,10 +16,7 @@ DetectableObjectTypeComboBox::DetectableObjectTypeComboBox(QWidget* parent):
 {
     using nx::vms::client::desktop::analytics::TaxonomyManager;
 
-    const auto taxonomyManager =
-        qnClientCoreModule->mainQmlEngine()->singletonInstance<TaxonomyManager*>(
-            qmlTypeId("nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager"));
-
+    const auto taxonomyManager = appContext()->currentSystemContext()->taxonomyManager();
     const auto filterModel = taxonomyManager->createFilterModel(this);
 
     setModel(new DetectableObjectTypeModel(filterModel, this));

@@ -14,10 +14,9 @@
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 #include "taxonomy/state_view.h"
-
-class QnCommonModule;
 
 namespace nx::vms::client::desktop {
 namespace analytics {
@@ -29,14 +28,14 @@ using Taxonomy = nx::analytics::taxonomy::AbstractState;
 
 class TaxonomyManager:
     public QObject,
-    public QnCommonModuleAware
+    public SystemContextAware
 {
     Q_OBJECT
     Q_PROPERTY(nx::analytics::taxonomy::AbstractState* currentTaxonomy
         READ qmlCurrentTaxonomy NOTIFY currentTaxonomyChanged)
 
 public:
-    explicit TaxonomyManager(QnCommonModule* commonModule, QObject* parent = nullptr);
+    explicit TaxonomyManager(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~TaxonomyManager() override;
 
     static void registerQmlTypes();

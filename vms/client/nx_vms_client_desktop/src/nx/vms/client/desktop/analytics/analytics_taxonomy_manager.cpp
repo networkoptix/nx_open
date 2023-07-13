@@ -4,12 +4,9 @@
 
 #include <QtQml/QtQml>
 
-#include <client/client_module.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/range_adapters.h>
-#include <nx/vms/common/system_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "analytics_filter_model.h"
 #include "taxonomy/attribute.h"
@@ -106,14 +103,15 @@ struct TaxonomyManager::Private
     }
 };
 
-TaxonomyManager::TaxonomyManager(QnCommonModule* commonModule, QObject* parent):
+TaxonomyManager::TaxonomyManager(
+    SystemContext* systemContext,
+    QObject* parent):
     QObject(parent),
-    QnCommonModuleAware(commonModule),
+    SystemContextAware(systemContext),
     d(new Private())
 {
-    const auto taxonomyStateWatcher = commonModule
-        ? commonModule->systemContext()->analyticsTaxonomyStateWatcher()
-        : nullptr;
+    const auto taxonomyStateWatcher = systemContext->analyticsTaxonomyStateWatcher();
+
     if (!NX_CRITICAL(taxonomyStateWatcher, "Common module singletons must be initialized"))
         return;
 
@@ -133,13 +131,13 @@ TaxonomyManager::~TaxonomyManager()
 
 std::shared_ptr<Taxonomy> TaxonomyManager::currentTaxonomy() const
 {
-    d->ensureTaxonomy(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
+    d->ensureTaxonomy(systemContext()->analyticsTaxonomyStateWatcher());
     return d->currentTaxonomy.value();
 }
 
 Taxonomy* TaxonomyManager::qmlCurrentTaxonomy() const
 {
-    d->ensureTaxonomy(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
+    d->ensureTaxonomy(systemContext()->analyticsTaxonomyStateWatcher());
     return d->currentTaxonomy.value().get();
 }
 
@@ -169,7 +167,7 @@ bool TaxonomyManager::isEngineRelevant(AbstractEngine* engine) const
     if (!NX_ASSERT(engine))
         return false;
 
-    d->ensureRelevancyInfo(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
+    d->ensureRelevancyInfo(systemContext()->analyticsTaxonomyStateWatcher());
     return d->relevantEngines.contains(engine);
 }
 
@@ -178,30 +176,27 @@ bool TaxonomyManager::isRelevantForEngine(AbstractObjectType* type, AbstractEngi
     if (!NX_ASSERT(type))
         return false;
 
-    d->ensureRelevancyInfo(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
+    d->ensureRelevancyInfo(systemContext()->analyticsTaxonomyStateWatcher());
     return d->relevantObjectTypes->value(engine).contains(type);
 }
 
 QSet<nx::analytics::taxonomy::AbstractEngine*> TaxonomyManager::relevantEngines() const
 {
-    d->ensureRelevancyInfo(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
+    d->ensureRelevancyInfo(systemContext()->analyticsTaxonomyStateWatcher());
     return d->relevantEngines;
 }
 
 QSet<AbstractObjectType*> TaxonomyManager::relevantObjectTypes(AbstractEngine* engine) const
 {
-    d->ensureRelevancyInfo(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
+    d->ensureRelevancyInfo(systemContext()->analyticsTaxonomyStateWatcher());
     return d->relevantObjectTypes->value(engine);
 }
 
 void TaxonomyManager::registerQmlTypes()
 {
-    qmlRegisterSingletonType<TaxonomyManager>(
+    qmlRegisterUncreatableType<TaxonomyManager>(
         "nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager",
-        [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
-        {
-            return new TaxonomyManager(qnClientModule->clientCoreModule()->commonModule());
-        });
+        "Cannot create an instance of TaxonomyManager");
 
     qmlRegisterUncreatableType<taxonomy::StateView>(
         "nx.vms.client.desktop.analytics", 1, 0, "StateView",
@@ -238,6 +233,9 @@ void TaxonomyManager::registerQmlTypes()
     qmlRegisterUncreatableType<AbstractGroup>(
         "nx.vms.client.desktop.analytics", 1, 0, "Group",
         "Cannot create an instance of Group");
+
+    qmlRegisterType<taxonomy::AnalyticsFilterModel>(
+        "nx.vms.client.desktop.analytics", 1, 0, "FilterModel");
 }
 
 } // namespace analytics

@@ -116,18 +116,18 @@ AnalyticsFilterModel::AnalyticsFilterModel(TaxonomyManager* taxonomyManager, QOb
     QObject(parent),
     m_taxonomyManager(taxonomyManager)
 {
-    if (!NX_ASSERT(taxonomyManager))
-        return;
+    if (taxonomyManager)
+    {
+        connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
+            this,
+            [this]
+            {
+                if (m_isActive)
+                    rebuild();
+            });
 
-    connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
-        this,
-        [this]
-        {
-            if (m_isActive)
-                rebuild();
-        });
-
-    rebuild();
+        rebuild();
+    }
 }
 
 std::vector<taxonomy::ObjectType*> AnalyticsFilterModel::objectTypes() const
@@ -267,6 +267,9 @@ void AnalyticsFilterModel::setSelected(
 
 void AnalyticsFilterModel::rebuild()
 {
+    if (!m_taxonomyManager)
+        return;
+
     setObjectTypes({});
     setEngines({});
 
