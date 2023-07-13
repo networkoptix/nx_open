@@ -8,6 +8,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/reflect/json/deserializer.h>
+#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/common/system_context_aware.h>
@@ -118,8 +120,14 @@ struct ResourceSupportProxy::Private:
             device->getProperty(QnVirtualCameraResource::kDeviceAgentManifestsProperty);
 
         using DeviceAgentManifests = std::map<QnUuid, DeviceAgentManifest>;
-        DeviceAgentManifests manifests = QJson::deserialized<DeviceAgentManifests>(
-            serializedManifests.toUtf8());
+
+        auto [manifests, result] = 
+            nx::reflect::json::deserialize<DeviceAgentManifests>(serializedManifests.toUtf8().toStdString());
+
+        if (!result.success)
+        {
+            NX_WARNING(this, "Failed to deserialize manifest: %1", result.toString());
+        }
 
         for (const auto& [engineId, manifest]: manifests)
         {

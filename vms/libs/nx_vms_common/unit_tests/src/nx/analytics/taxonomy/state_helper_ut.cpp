@@ -3,13 +3,14 @@
 #include <gtest/gtest.h>
 
 #include <memory>
+#include <qjsonobject.h>
 
 #include <QtCore/QFile>
 
 #include <nx/analytics/taxonomy/state_compiler.h>
 #include <nx/analytics/taxonomy/state_helper.h>
 #include <nx/analytics/taxonomy/support/test_resource_support_proxy.h>
-#include <nx/fusion/model_functions.h>
+#include <nx/reflect/json/deserializer.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/common/test_support/resource/analytics_engine_resource_mock.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
@@ -39,7 +40,8 @@ struct TestScope
     QString groupId;
 };
 #define TestScope_Fields (engineId)(groupId)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TestScope, (json), TestScope_Fields, (brief, true));
+
+NX_REFLECTION_INSTRUMENT(TestScope, TestScope_Fields);
 
 struct TestDescriptor
 {
@@ -48,7 +50,8 @@ struct TestDescriptor
     std::vector<TestScope> scopes;
 };
 #define TestDescriptor_Fields (id)(name)(scopes)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TestDescriptor, (json), TestDescriptor_Fields, (brief, true));
+
+NX_REFLECTION_INSTRUMENT(TestDescriptor, TestDescriptor_Fields);
 
 struct TestDescriptors
 {
@@ -122,7 +125,8 @@ struct TestDescriptors
     (eventTypeDescriptors)\
     (objectTypeDescriptors)\
     (engineDescriptors)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TestDescriptors, (json), TestDescriptors_Fields, (brief, true));
+
+NX_REFLECTION_INSTRUMENT(TestDescriptors, TestDescriptors_Fields);
 
 struct TestScopedEntity
 {
@@ -131,8 +135,8 @@ struct TestScopedEntity
     QString entityId;
 };
 #define TestScopedEntity_Fields (engineId)(groupId)(entityId)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    TestScopedEntity, (json), TestScopedEntity_Fields, (brief, true));
+
+NX_REFLECTION_INSTRUMENT(TestScopedEntity, TestScopedEntity_Fields);
 
 struct TestGroupScope
 {
@@ -140,8 +144,8 @@ struct TestGroupScope
     std::vector<QString> entities;
 };
 #define TestGroupScope_Fields (group)(entities)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    TestGroupScope, (json), TestGroupScope_Fields, (brief, true));
+
+NX_REFLECTION_INSTRUMENT(TestGroupScope, TestGroupScope_Fields);
 
 struct TestEngineScope
 {
@@ -149,8 +153,8 @@ struct TestEngineScope
     std::vector<TestGroupScope> groups;
 };
 #define TestEngineScope_Fields (engine)(groups)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    TestEngineScope, (json), TestEngineScope_Fields, (brief, true));
+
+NX_REFLECTION_INSTRUMENT(TestEngineScope, TestEngineScope_Fields);
 
 class StateHelperTest: public ::testing::Test
 {
@@ -161,8 +165,12 @@ protected:
         if (!file.open(QFile::ReadOnly))
             FAIL();
 
-        QJsonObject fullData;
-        if (!QJson::deserialize(file.readAll(), &fullData))
+        const QByteArray data = file.readAll();
+
+        auto [fullData, jsonResult] = 
+            nx::reflect::json::deserialize<QJsonObject>(data.toStdString());
+
+        if (!jsonResult.success)
             FAIL();
 
         if (!fullData.contains(kInputDataKey) || !fullData[kInputDataKey].isObject())
@@ -172,8 +180,13 @@ protected:
         if (!inputData.contains(kTaxonomyKey) || !inputData[kTaxonomyKey].isObject())
             FAIL();
 
-        TestDescriptors descriptors;
-        if (!QJson::deserialize(inputData[kTaxonomyKey], &descriptors))
+        const QJsonObject taxonomyObject = inputData[kTaxonomyKey].toObject();
+        const QByteArray taxonomyObectAsBytes = QJsonDocument(taxonomyObject).toJson();
+
+        auto [descriptors, result] = 
+            nx::reflect::json::deserialize<TestDescriptors>(taxonomyObectAsBytes.toStdString());
+   
+        if (!result.success)
             FAIL();
 
         const std::shared_ptr<AbstractState> state = descriptors.toState();
@@ -265,9 +278,13 @@ protected:
         const QString deviceStringId = deviceParameters[kIdKey].toString();
         device->setIdUnsafe(toUuid(deviceStringId));
 
-        std::set<QString> enabledAnalyticsEngineStringIds;
-        QJson::deserialize(
-            deviceParameters[kEnabledAnalyticsEnginesKey], &enabledAnalyticsEngineStringIds);
+        const QJsonArray enabledAnalyticsenginesArray = deviceParameters[kEnabledAnalyticsEnginesKey].toArray();
+        const QByteArray enabledAnalyticsenginesArrayAsBytes = QJsonDocument(enabledAnalyticsenginesArray).toJson();
+
+        auto [enabledAnalyticsEngineStringIds, enabledAnalyticsenginesResult] = 
+            nx::reflect::json::deserialize<std::set<QString>>(enabledAnalyticsenginesArrayAsBytes.toStdString());
+
+        ASSERT_TRUE(enabledAnalyticsenginesResult.success);
 
         QnUuidSet enabledAnalyticsEngineIds;
         for (const QString& stringId: enabledAnalyticsEngineStringIds)
@@ -275,9 +292,13 @@ protected:
 
         device->setEnabledAnalyticsEngines(std::move(enabledAnalyticsEngineIds));
 
-        std::set<QString> compatibleAnalyticsEngineIds;
-        QJson::deserialize(
-            deviceParameters[kCompatibleAnalyticsEnginesKey], &compatibleAnalyticsEngineIds);
+        const QJsonArray compatibleAnalyticsEnginesArray = deviceParameters[kCompatibleAnalyticsEnginesKey].toArray();
+        const QByteArray compatibleAnalyticsEnginesArrayAsBytes = QJsonDocument(compatibleAnalyticsEnginesArray).toJson();
+
+        auto [compatibleAnalyticsEngineIds, compatibleAnalyticsEnginesResult] = 
+            nx::reflect::json::deserialize<std::set<QString>>(compatibleAnalyticsEnginesArrayAsBytes.toStdString());
+
+        ASSERT_TRUE(compatibleAnalyticsEnginesResult.success);
 
         AnalyticsEngineResourceList compatibleAnalyticsEngineResources;
         for (const QString& engineId: compatibleAnalyticsEngineIds)
@@ -288,8 +309,13 @@ protected:
 
         device->setCompatibleAnalyticsEngineResources(compatibleAnalyticsEngineResources);
 
-        std::map<QString, std::set<QString>> eventTypesByEngineStringId;
-        QJson::deserialize(deviceParameters[kSupportedEventTypesKey], &eventTypesByEngineStringId);
+        const QJsonObject supportedEventTypesObject = deviceParameters[kSupportedEventTypesKey].toObject();
+        const QByteArray supportedEventTypesArrayAsBytes = QJsonDocument(supportedEventTypesObject).toJson();
+
+        auto [eventTypesByEngineStringId, eventTypesByEngineStringIdResult] = 
+            nx::reflect::json::deserialize<std::map<QString, std::set<QString>>>(supportedEventTypesArrayAsBytes.toStdString());
+
+        ASSERT_TRUE(eventTypesByEngineStringIdResult.success);
 
         QnVirtualCameraResource::AnalyticsEntitiesByEngine eventTypesByEngine;
         for (auto& [stringId, eventTypeIds]: eventTypesByEngineStringId)
@@ -297,9 +323,13 @@ protected:
 
         device->setSupportedEventTypes(QMap<QnUuid, std::set<QString>>(eventTypesByEngine));
 
-        std::map<QString, std::set<QString>> objectTypesByEngineStringId;
-        QJson::deserialize(
-            deviceParameters[kSupportedObjectTypesKey], &objectTypesByEngineStringId);
+        const QJsonObject supportedObjectTypesObject = deviceParameters[kSupportedObjectTypesKey].toObject();
+        const QByteArray supportedObjectTypesArrayAsBytes = QJsonDocument(supportedObjectTypesObject).toJson();
+
+        auto [objectTypesByEngineStringId, objectTypesByEngineStringIdResult] = 
+            nx::reflect::json::deserialize<std::map<QString, std::set<QString>>>(supportedObjectTypesArrayAsBytes.toStdString());
+
+        ASSERT_TRUE(objectTypesByEngineStringIdResult.success);
 
         QnVirtualCameraResource::AnalyticsEntitiesByEngine objectTypesByEngine;
         for (auto& [stringId, objectTypeIds]: objectTypesByEngineStringId)
@@ -342,10 +372,32 @@ protected:
 
         static const QString kAdditionalEntitiesKey = "additionalEntities";
         if (testParameters.contains(kAdditionalEntitiesKey))
-            QJson::deserialize(testParameters[kAdditionalEntitiesKey], &m_additionalEntities);
+        {
+            const QJsonArray array = testParameters[kAdditionalEntitiesKey].toArray();
+            const QByteArray arrayAsBytes = QJsonDocument(array).toJson();
 
-        QJson::deserialize(s_expectedData[testName], &m_expectedEntities);
-        QJson::deserialize(s_expectedData[testName], &m_expectedEntityTree);
+            auto [deserializationResult, result] = 
+                nx::reflect::json::deserialize<std::vector<TestScopedEntity>>(arrayAsBytes.toStdString());
+
+            ASSERT_TRUE(result.success);
+
+            m_additionalEntities = deserializationResult;
+        }
+
+        const QJsonArray array = s_expectedData[testName].toArray();
+        const QByteArray arrayAsBytes = QJsonDocument(array).toJson();
+
+        auto [asVector, asVectorResult] = 
+            nx::reflect::json::deserialize<std::vector<TestEngineScope>>(arrayAsBytes.toStdString());
+
+        m_expectedEntityTree = asVector;
+
+        auto [asSet, asSetResult] = 
+            nx::reflect::json::deserialize<std::set<QString>>(arrayAsBytes.toStdString());
+
+        m_expectedEntities = asSet; 
+
+        ASSERT_TRUE(asVectorResult.success || asSetResult.success);
     }
 
 //-------------------------------------------------------------------------------------------------

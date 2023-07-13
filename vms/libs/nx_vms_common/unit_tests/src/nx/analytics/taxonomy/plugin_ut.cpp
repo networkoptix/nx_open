@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <qjsonobject.h>
 #include <gtest/gtest.h>
 
 #include <QtCore/QFile>
@@ -8,7 +9,7 @@
 #include <nx/analytics/taxonomy/support/test_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/state_compiler.h>
 
-#include <nx/fusion/model_functions.h>
+#include <nx/reflect/json/deserializer.h>
 
 using namespace nx::vms::api::analytics;
 
@@ -22,7 +23,17 @@ protected:
         TestData testData;
         ASSERT_TRUE(loadDescriptorsTestData(filePath, &testData));
         m_descriptors = std::move(testData.descriptors);
-        ASSERT_TRUE(QJson::deserialize(testData.fullData["result"].toObject(), &m_expectedData));
+
+        const QJsonObject object = testData.fullData["result"].toObject();
+        const QByteArray obectAsBytes = QJsonDocument(object).toJson();
+
+        auto [deserializationResult, result] = 
+            nx::reflect::json::deserialize<std::map<QString, PluginDescriptor>>(obectAsBytes.toStdString());
+        
+        m_expectedData = deserializationResult;
+        
+        ASSERT_TRUE(result.success);
+
         ASSERT_FALSE(m_expectedData.empty());
     }
 

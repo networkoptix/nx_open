@@ -8,7 +8,7 @@
 #include <nx/analytics/taxonomy/support/test_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/state_compiler.h>
 
-#include <nx/fusion/model_functions.h>
+#include <nx/reflect/json/deserializer.h>
 
 using namespace nx::vms::api::analytics;
 
@@ -22,7 +22,17 @@ protected:
         TestData testData;
         ASSERT_TRUE(loadDescriptorsTestData(filePath, &testData));
         m_descriptors = std::move(testData.descriptors);
-        ASSERT_TRUE(QJson::deserialize(testData.fullData["result"].toObject(), &m_expectedData));
+
+        const QJsonObject object = testData.fullData["result"].toObject();
+        const QByteArray objectAsBytes = QJsonDocument(object).toJson();
+
+        auto [deserializationResult, result] = 
+            nx::reflect::json::deserialize<std::map<QString, GroupDescriptor>>(objectAsBytes.toStdString());
+        
+        m_expectedData = deserializationResult;
+        
+        ASSERT_TRUE(result.success);
+
         ASSERT_FALSE(m_expectedData.empty());
     }
 

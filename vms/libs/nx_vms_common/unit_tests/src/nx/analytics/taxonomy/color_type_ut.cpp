@@ -8,7 +8,7 @@
 #include <nx/analytics/taxonomy/support/test_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/state_compiler.h>
 
-#include <nx/fusion/model_functions.h>
+#include <nx/reflect/json/deserializer.h>
 
 using namespace nx::vms::api::analytics;
 
@@ -29,8 +29,7 @@ struct ColorTypeTestExpectedData
     (items) \
     (ownItems)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ColorTypeTestExpectedData, (json),
-    EnumTypeTestExpectedData_Fields, (brief, true))
+NX_REFLECTION_INSTRUMENT(ColorTypeTestExpectedData, EnumTypeTestExpectedData_Fields);
 
 class ColorTypeTest: public ::testing::Test
 {
@@ -40,7 +39,16 @@ protected:
         TestData testData;
         ASSERT_TRUE(loadDescriptorsTestData(filePath, &testData));
         m_descriptors = std::move(testData.descriptors);
-        ASSERT_TRUE(QJson::deserialize(testData.fullData["result"].toObject(), &m_expectedData));
+
+        const QJsonObject object = testData.fullData["result"].toObject();
+        const QByteArray objectAsBytes = QJsonDocument(object).toJson();
+
+        auto [deserializationResult, result] = 
+            nx::reflect::json::deserialize<std::map<QString, ColorTypeTestExpectedData>>(objectAsBytes.toStdString());
+        
+        m_expectedData = deserializationResult;
+        
+        ASSERT_TRUE(result.success);
     }
 
     void afterDescriptorsCompilation()

@@ -470,8 +470,15 @@ AnalyticsEntitiesByEngine QnVirtualCameraResource::calculateSupportedObjectTypes
 QnVirtualCameraResource::DeviceAgentManifestMap
     QnVirtualCameraResource::fetchDeviceAgentManifests() const
 {
-    return QJson::deserialized<DeviceAgentManifestMap>(
-        getProperty(kDeviceAgentManifestsProperty).toUtf8());
+    auto [deserializedManifestMap, result] = 
+        nx::reflect::json::deserialize<DeviceAgentManifestMap>(getProperty(kDeviceAgentManifestsProperty).toUtf8().toStdString());
+
+    if (!result.success)
+    {
+        NX_WARNING(this, "Failed to deserialize manifest: %1", result.toString());
+    }
+
+    return deserializedManifestMap;
 }
 
 std::optional<nx::vms::api::analytics::DeviceAgentManifest>
@@ -494,7 +501,7 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
 
     setProperty(
         kDeviceAgentManifestsProperty,
-        QString::fromUtf8(QJson::serialized(manifests)));
+        QString::fromUtf8(nx::reflect::json::serialize(manifests)));
     m_cachedDeviceAgentManifests.reset();
 }
 
