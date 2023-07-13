@@ -93,12 +93,22 @@ QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageRequest, (json), NX_VMS_API);
 
 struct DeviceDiagnosis
 {
+    /**%apidoc Device id. */
     QnUuid id;
+
+    /**%apidoc Device status. */
     ResourceStatus status = ResourceStatus::undefined;
+
+    /**%apidoc Last Device initialization result. */
     QString init;
+
+    /**%apidoc Device video stream state. */
+    QString stream;
+
+    /**%apidoc Last Device media error if any. */
     QString media;
 };
-#define DeviceDiagnosis_Fields (id)(status)(init)(media)
+#define DeviceDiagnosis_Fields (id)(status)(init)(stream)(media)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceDiagnosis, (json), NX_VMS_API);
 
 } // namespace nx::vms::api
