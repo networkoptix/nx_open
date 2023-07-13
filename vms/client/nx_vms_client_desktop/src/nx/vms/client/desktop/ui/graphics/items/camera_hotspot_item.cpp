@@ -218,7 +218,6 @@ CameraHotspotItem::CameraHotspotItem(
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons({Qt::LeftButton, Qt::RightButton});
 
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
     setProperty(Qn::NoHandScrollOver, true);
@@ -318,7 +317,12 @@ void CameraHotspotItem::hoverLeaveEvent(QGraphicsSceneHoverEvent*)
 
 void CameraHotspotItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    if (event->button() == Qt::RightButton && event->modifiers() == Qt::NoModifier)
+    if (event->button() == Qt::LeftButton)
+    {
+        event->accept();
+        return;
+    }
+    else if (event->button() == Qt::RightButton && event->modifiers() == Qt::NoModifier)
     {
         event->accept();
 
