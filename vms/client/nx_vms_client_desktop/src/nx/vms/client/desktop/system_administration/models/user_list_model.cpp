@@ -392,9 +392,10 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
             {
                 case UserWarningColumn:
                 {
-                    return user->externalId().dn.isEmpty() || user->externalId().syncId == d->syncId
-                        ? QVariant{}
-                        : QVariant(qnSkin->icon("user_settings/user_alert.svg"));
+                    if (user->externalId().dn.isEmpty() || user->externalId().syncId == d->syncId)
+                        return {};
+
+                    return QString("user_settings/user_alert.svg");
                 }
 
                 case UserTypeColumn:
@@ -434,7 +435,8 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
 
         case Qt::DecorationRole:
         {
-            return data(index, Qn::DecorationPathRole);
+            const auto path = data(index, Qn::DecorationPathRole).toString();
+            return path.isEmpty() ? QVariant() : QVariant::fromValue(qnSkin->icon(path));
         }
 
         case Qt::ForegroundRole:

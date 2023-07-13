@@ -263,18 +263,21 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             switch (index.column())
             {
                 case GroupWarningColumn:
-                    return group.externalId.dn.isEmpty() || group.externalId.syncId == d->syncId
-                        ? QVariant{}
-                        : QVariant(qnSkin->icon("user_settings/user_alert.svg"));
+                {
+                    if (group.externalId.dn.isEmpty() || group.externalId.syncId == d->syncId)
+                        return {};
+
+                    return QString("user_settings/user_alert.svg");
+                }
 
                 case GroupTypeColumn:
                 {
                     if (group.type == nx::vms::api::UserType::ldap)
-                        return qnSkin->icon("user_settings/group_ldap.svg");
+                        return QString("user_settings/group_ldap.svg");
 
                     return Private::isBuiltIn(group)
-                        ? qnSkin->icon("user_settings/group_built_in.svg")
-                        : qnSkin->icon("user_settings/group_custom.svg");
+                        ? QString("user_settings/group_built_in.svg")
+                        : QString("user_settings/group_custom.svg");
                 }
 
                 case PermissionsColumn:
@@ -292,7 +295,8 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
 
         case Qt::DecorationRole:
         {
-            return data(index, Qn::DecorationPathRole);
+            const auto path = data(index, Qn::DecorationPathRole).toString();
+            return path.isEmpty() ? QVariant() : QVariant::fromValue(qnSkin->icon(path));
         }
 
         case Qt::CheckStateRole:
