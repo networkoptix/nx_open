@@ -317,13 +317,18 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
 
     if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        Qn::Permissions forbidden = Qn::NoPermissions;
+        Qn::Permissions permissions = basePermissions;
         if (camera->licenseType() == Qn::LC_VMAX && !camera->isScheduleEnabled())
-            forbidden |= Qn::ViewLivePermission | Qn::ViewFootagePermission;
+            permissions &= ~(Qn::ViewLivePermission | Qn::ViewFootagePermission);
 
         if (camera->hasFlags(Qn::cross_system))
-            forbidden |= Qn::WritePermission | Qn::WriteNamePermission | Qn::SavePermission;
-        return basePermissions & ~forbidden;
+            permissions &= ~(Qn::WritePermission | Qn::WriteNamePermission | Qn::SavePermission);
+
+        // In desktop client, cameras are openable on the scene if they are generally accessible.
+        if (permissions.testFlag(Qn::ReadPermission))
+            permissions.setFlag(Qn::ViewContentPermission);
+
+        return permissions;
     }
 
     return basePermissions;
