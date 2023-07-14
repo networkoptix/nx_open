@@ -7,14 +7,14 @@
 #include <nx/utils/log/log_main.h>
 
 #include "device_hid.h"
-#include "os_hid/os_hid_driver.h"
+#include "osal/osal_driver.h"
 
 namespace nx::vms::client::desktop::joystick {
 
 ManagerHid::ManagerHid(QObject* parent):
     base_type(parent)
 {
-    connect(OsHidDriver::getDriver(), &OsHidDriver::deviceListChanged,
+    connect(OsalDriver::getDriver(), &OsalDriver::deviceListChanged,
         this, &ManagerHid::onHidDeviceListChanged);
 }
 
@@ -23,7 +23,7 @@ void ManagerHid::onHidDeviceListChanged()
 {
     QSet<QString> foundDevices;
 
-    const auto& deviceList = OsHidDriver::getDriver()->deviceList();
+    const auto& deviceList = OsalDriver::getDriver()->deviceList();
 
     for (const auto& deviceInfo: deviceList)
     {

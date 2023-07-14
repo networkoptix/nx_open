@@ -9,9 +9,9 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/joystick/settings/device_hid.h>
-#include <nx/vms/client/desktop/joystick/settings/os_hid/implementations/os_hid_device_virtual_mac.h>
-#include <nx/vms/client/desktop/joystick/settings/os_hid/implementations/os_hid_driver_mac.h>
-#include <nx/vms/client/desktop/joystick/settings/os_hid/os_hid_driver.h>
+#include <nx/vms/client/desktop/joystick/settings/osal/implementations/os_hid_device_virtual_mac.h>
+#include <nx/vms/client/desktop/joystick/settings/osal/implementations/os_hid_driver_mac.h>
+#include <nx/vms/client/desktop/joystick/settings/osal/osal_driver.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../utils/debug_custom_actions.h"
@@ -164,7 +164,7 @@ int VirtualJoystickDialog::buttonShiftFromName(const QString& name) const
 
 void VirtualJoystickDialog::attachVirtualJoystick()
 {
-    auto driver = dynamic_cast<joystick::OsHidDriverMac*>(joystick::OsHidDriver::getDriver());
+    auto driver = dynamic_cast<joystick::OsHidDriverMac*>(joystick::OsalDriver::getDriver());
 
     if (!NX_ASSERT(driver))
         return;
@@ -177,7 +177,7 @@ void VirtualJoystickDialog::attachVirtualJoystick()
 
 void VirtualJoystickDialog::detachVirtualJoystick()
 {
-    auto driver = dynamic_cast<joystick::OsHidDriverMac*>(joystick::OsHidDriver::getDriver());
+    auto driver = dynamic_cast<joystick::OsHidDriverMac*>(joystick::OsalDriver::getDriver());
 
     if (!NX_ASSERT(driver) || !NX_ASSERT(m_virtualJoystickDevice))
         return;
