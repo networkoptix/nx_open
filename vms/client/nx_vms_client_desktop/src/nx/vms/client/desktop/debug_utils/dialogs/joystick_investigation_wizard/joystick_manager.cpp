@@ -5,7 +5,7 @@
 #include <QtQml/QtQml>
 
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/desktop/joystick/settings/os_hid/os_hid_driver.h>
+#include <nx/vms/client/desktop/joystick/settings/osal/osal_driver.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "joystick_device.h"
@@ -17,7 +17,7 @@ struct JoystickManager::Private
     struct JoystickData
     {
         JoystickDevice* device = nullptr;
-        OsHidDeviceInfo info;
+        JoystickDeviceInfo info;
 
         JoystickDevice* createDevice(QObject* parent)
         {
@@ -44,7 +44,7 @@ struct JoystickManager::Private
 JoystickManager::JoystickManager():
     d(new Private())
 {
-    connect(OsHidDriver::getDriver(), &OsHidDriver::deviceListChanged,
+    connect(OsalDriver::getDriver(), &OsalDriver::deviceListChanged,
         this, &JoystickManager::updateHidDeviceList);
     updateHidDeviceList();
 }
@@ -66,7 +66,7 @@ void JoystickManager::updateHidDeviceList()
     const QSet<QString> previousDeviceKeys = d->devicePaths();
     QSet<QString> detectedDeviceKeys;
 
-    for (const auto& deviceInfo: OsHidDriver::getDriver()->deviceList())
+    for (const auto& deviceInfo: OsalDriver::getDriver()->deviceList())
     {
         detectedDeviceKeys.insert(deviceInfo.path);
 

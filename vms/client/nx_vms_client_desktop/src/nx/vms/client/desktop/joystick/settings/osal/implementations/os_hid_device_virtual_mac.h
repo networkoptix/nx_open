@@ -7,14 +7,13 @@
 namespace nx::vms::client::desktop::joystick {
 
 struct JoystickDescriptor;
-class OsHidDriverVirtual;
 
 class OsHidDeviceVirtual: public OsHidDevice
 {
 public:
     OsHidDeviceVirtual();
 
-    virtual OsHidDeviceInfo info() const override;
+    virtual JoystickDeviceInfo info() const override;
 
     virtual int read(unsigned char* buffer, int bufferSize) override;
 
@@ -27,7 +26,7 @@ public:
     void setState(const QBitArray& newState);
 
     static JoystickDescriptor* joystickConfig();
-    static OsHidDeviceInfo deviceInfo();
+    static JoystickDeviceInfo deviceInfo();
 
 protected:
     QBitArray m_state;

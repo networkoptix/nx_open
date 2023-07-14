@@ -1,46 +1,37 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "device_hid.h"
+#include "non_blocking_device_win.h"
 
-#include <QtCore/QBitArray>
 #include <QtCore/QPair>
 
 #include "osal/osal_driver.h"
 
-namespace {
-
-bool mapButtonState(const QBitArray& state)
-{
-    // We assume that button has only two states: either pressed or not.
-    return state.count(true) > 0;
-}
-
-} // namespace
-
 namespace nx::vms::client::desktop::joystick {
 
-class DeviceHidStateListener: public OsalDeviceListener
+class NonBlockingDeviceWinStateListener: public OsalDeviceListener
 {
 public:
-    DeviceHidStateListener(DeviceHid* device): OsalDeviceListener(device), m_device(device) {}
+    NonBlockingDeviceWinStateListener(NonBlockingDeviceWin* device)
+        :
+        OsalDeviceListener(device),
+        m_device(device)
+    {
+    }
 
     virtual void onStateChanged(const OsalDevice::State& newState) override
     {
-        if (!NX_ASSERT(newState.rawData.canConvert<QBitArray>()))
-            return;
-
-        m_device->onStateChanged(newState.rawData.toBitArray());
+        m_device->onStateChanged(newState);
     }
 
 private:
-    DeviceHid* m_device;
+    NonBlockingDeviceWin* m_device;
 };
 
-struct DeviceHid::Private
+struct NonBlockingDeviceWin::Private
 {
-    DeviceHid* const q;
+    NonBlockingDeviceWin* const q;
 
-    DeviceHidStateListener* stateListener;
+    OsalDeviceListener* stateListener;
 
     int bufferSize = 0;
     QScopedArrayPointer<unsigned char> buffer;
@@ -50,19 +41,15 @@ struct DeviceHid::Private
     std::vector<ParsedFieldLocation> buttonLocations;
 };
 
-DeviceHid::DeviceHid(
+NonBlockingDeviceWin::NonBlockingDeviceWin(
     const JoystickDescriptor& modelInfo,
     const QString& path,
     QObject* parent)
     :
     base_type(modelInfo, path, nullptr, parent),
-    d(new Private{.q = this, .stateListener = new DeviceHidStateListener(this)})
+    d(new Private{.q = this, .stateListener = new NonBlockingDeviceWinStateListener(this)})
 {
     OsalDriver::getDriver()->setupDeviceListener(path, d->stateListener);
-
-    d->bitCount = modelInfo.reportSize.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    d->bufferSize = (d->bitCount + 7) / 8;
-    d->buffer.reset(new unsigned char[d->bufferSize]);
 
     for (int axisIndex = 0; axisIndex < Device::axisIndexCount; ++axisIndex)
         setAxisInitialized((Device::AxisIndexes)axisIndex, true);
@@ -79,31 +66,45 @@ DeviceHid::DeviceHid(
     updateStickAxisLimits(modelInfo);
 }
 
-DeviceHid::~DeviceHid()
+NonBlockingDeviceWin::~NonBlockingDeviceWin()
 {
     OsalDriver::getDriver()->removeDeviceListener(d->stateListener);
 }
 
-bool DeviceHid::isValid() const
+bool NonBlockingDeviceWin::isValid() const
 {
-    // We don't need this method with OsalDriver.
+    // We don't need this method with non-polling device.
     return true;
 }
 
-void DeviceHid::onStateChanged(const QBitArray& newOsHidLevelState)
+void NonBlockingDeviceWin::onStateChanged(const OsalDevice::State& state)
 {
-    const State newState = parseOsHidLevelState(newOsHidLevelState);
+    std::vector<bool> buttonStates;
+    for (int i = 0; i < state.buttons.count(); i++)
+        buttonStates.push_back(state.buttons[i]);
+
+    formAxisLimits(state.minX, state.maxX, &m_axisLimits[xIndex]);
+    formAxisLimits(state.minY, state.maxY, &m_axisLimits[yIndex]);
+    formAxisLimits(state.minZ, state.maxZ, &m_axisLimits[zIndex]);
+
+    StickPosition newStickPosition{
+        mapAxisState(state.x, m_axisLimits[xIndex]),
+        mapAxisState(state.y, m_axisLimits[yIndex]),
+        mapAxisState(state.z, m_axisLimits[zIndex])
+    };
+
+    const State newState = { .stickPosition = newStickPosition, .buttonStates = buttonStates };
 
     processNewState(newState);
 }
 
-Device::State DeviceHid::getNewState()
+Device::State NonBlockingDeviceWin::getNewState()
 {
     NX_ASSERT(false, "This method should no be used in case of non-polling device.");
     return {};
 }
 
-Device::AxisLimits DeviceHid::parseAxisLimits(
+Device::AxisLimits NonBlockingDeviceWin::parseAxisLimits(
     const AxisDescriptor& descriptor,
     const AxisLimits& /*oldLimits*/) const
 {
@@ -124,9 +125,10 @@ Device::AxisLimits DeviceHid::parseAxisLimits(
     return result;
 }
 
-DeviceHid::ParsedFieldLocation DeviceHid::parseLocation(const FieldLocation& location)
+NonBlockingDeviceWin::ParsedFieldLocation NonBlockingDeviceWin::parseLocation(
+    const FieldLocation& location)
 {
-    DeviceHid::ParsedFieldLocation result;
+    NonBlockingDeviceWin::ParsedFieldLocation result;
 
     for (const auto& interval: location.split(',', Qt::SkipEmptyParts))
     {
@@ -156,47 +158,15 @@ DeviceHid::ParsedFieldLocation DeviceHid::parseLocation(const FieldLocation& loc
     return result;
 }
 
-QBitArray DeviceHid::parseData(const QBitArray& buffer, const ParsedFieldLocation& location)
+void NonBlockingDeviceWin::formAxisLimits(int min, int max, Device::AxisLimits* limits)
 {
-    QBitArray result(location.size);
+    limits->min = min;
+    limits->max = max;
+    limits->mid = (max - min) / 2;
 
-    int pos = 0;
-    for (const auto& interval: location.intervals)
-    {
-        // Iterate over data bits. TODO: support inverted bit order if some devices would use it.
-        for (int i = interval.first; i <= interval.second; ++i)
-        {
-            result.setBit(pos, buffer.at(i));
-            ++pos;
-        }
-    }
-
-    return result;
-}
-
-Device::State DeviceHid::parseOsHidLevelState(const QBitArray& osHidLevelState)
-{
-    StickPosition newStickPosition;
-    newStickPosition.fill(0);
-    for (size_t i = 0; i < d->axisLocations.size() && i < newStickPosition.max_size(); ++i)
-    {
-        const auto state = parseData(osHidLevelState, d->axisLocations[i]);
-
-        int rawValue = 0;
-        for (int j = 0; j < state.size(); ++j)
-        {
-            if (state.at(j))
-                rawValue |= 1 << j;
-        }
-
-        newStickPosition[i] = mapAxisState(rawValue, m_axisLimits[i]);
-    }
-
-    ButtonStates newButtonStates;
-    for (const auto& location: d->buttonLocations)
-        newButtonStates.push_back(mapButtonState(parseData(osHidLevelState, location)));
-
-    return {newStickPosition, newButtonStates};
+    const int minBounce = (max - min) / 100.0 * kMinBounceInPercentages;
+    if (minBounce > limits->bounce)
+        limits->bounce = minBounce;
 }
 
 } // namespace nx::vms::client::desktop::joystick
