@@ -460,9 +460,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     result |= Qn::ReadPermission;
 
     constexpr AccessRights kViewContentRequirements = AccessRight::view
-        | AccessRight::viewArchive
-        | AccessRight::viewBookmarks
-        | AccessRight::userInput;
+        | AccessRight::viewArchive;
 
     if (accessRights.testAnyFlags(kViewContentRequirements))
         result |= Qn::ViewContentPermission;
