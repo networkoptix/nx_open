@@ -2446,7 +2446,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
                     return Qn::ViewLivePermission;
 
                 const auto screenRecordingAction = action(ui::action::ToggleScreenRecordingAction);
-                return screenRecordingAction->isChecked()
+                return screenRecordingAction && screenRecordingAction->isChecked()
                     ? (Qn::ViewFootagePermission | Qn::ExportPermission)
                     : Qn::ViewFootagePermission;
             }();
