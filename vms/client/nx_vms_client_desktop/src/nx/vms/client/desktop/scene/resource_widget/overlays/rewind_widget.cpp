@@ -143,12 +143,13 @@ void RewindWidget::tick(int deltaMs)
         return;
 
     auto animator = opacityAnimator(m_background);
+    animator->setEasingCurve(QEasingCurve::InOutCirc);
     auto animator1 = opacityAnimator(m_triangle1);
     auto animator2 = opacityAnimator(m_triangle2);
     auto animator3 = opacityAnimator(m_triangle3);
 
-    if (!animator1 || !animator2 || !animator3 || animator1->isRunning() || !animator
-        || animator2->isRunning() || animator3->isRunning() || animator->isRunning())
+    if (!animator || !animator1 || !animator2 || !animator3 || animator1->isRunning()
+        || animator2->isRunning() || animator3->isRunning())
     {
         return;
     }
@@ -156,10 +157,10 @@ void RewindWidget::tick(int deltaMs)
     m_totalMs += deltaMs;
     if (m_totalMs < 100)
     {
-        if (m_background->opacity() == 0.0)
-            m_background->setOpacity(0.1);
-        animator->setTimeLimit(100);
-        animator->animateTo(0.4);
+        if (animator->isRunning())
+            animator->stop();
+        animator->setTimeLimit(250);
+        animator->animateTo(1.0);
         animator1->setTimeLimit(100);
         animator1->animateTo(0.5);
         return;
@@ -167,8 +168,6 @@ void RewindWidget::tick(int deltaMs)
 
     if (m_totalMs < 200)
     {
-        animator->setTimeLimit(100);
-        animator->animateTo(0.8);
         animator1->setTimeLimit(100);
         animator1->animateTo(1.0);
         animator2->setTimeLimit(100);
@@ -178,8 +177,6 @@ void RewindWidget::tick(int deltaMs)
 
     if (m_totalMs < 300)
     {
-        animator->setTimeLimit(50);
-        animator->animateTo(1.0);
         animator1->setTimeLimit(100);
         animator1->animateTo(0.5);
         animator2->setTimeLimit(100);
@@ -211,12 +208,14 @@ void RewindWidget::tick(int deltaMs)
 
     if (m_totalMs < 600)
     {
+        if (animator->isRunning())
+            animator->stop();
+        animator->setTimeLimit(200);
+        animator->animateTo(0.0);
         animator2->setTimeLimit(100);
         animator2->animateTo(0.0);
         animator3->setTimeLimit(100);
         animator3->animateTo(0.5);
-        animator->setTimeLimit(100);
-        animator->animateTo(0.5);
         return;
     }
 
@@ -224,8 +223,6 @@ void RewindWidget::tick(int deltaMs)
     {
         animator3->setTimeLimit(100);
         animator3->animateTo(0.0);
-        animator->setTimeLimit(100);
-        animator->animateTo(0.1);
         return;
     }
 
