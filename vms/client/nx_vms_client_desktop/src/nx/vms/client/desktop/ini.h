@@ -142,19 +142,24 @@ struct Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(false, crossSystemLayoutsExtendedDebug, "[Dev] Cross-system layouts debug info.");
 
-    NX_INI_FLAG(false,
-        allowOwnCloudNotifications,
+    NX_INI_FLAG(false, allowOwnCloudNotifications,
         "[Dev] Allow receiving cloud notifications from the current cloud system");
 
-    NX_INI_FLAG(true,
-        restApiResourceChangesManager,
+    NX_INI_FLAG(true, restApiResourceChangesManager,
         "[Dev] Enable rest api for resource change manager requests");
 
     NX_INI_FLAG(false, joystickInvestigationWizard,
-                "[Dev] Enables joystick investigation wizard (works only on MacOS).");
+        "[Dev] Enables joystick investigation wizard (works only on MacOS).");
 
     NX_INI_FLAG(false, virtualJoystick,
         "[Dev] Enables joystick emulator (works only on MacOS).");
+
+    NX_INI_FLAG(false, joystickPollingInSeparateThread,
+        "[Dev] Joystick manager on Windows with polling in the separate thread.");
+
+    NX_INI_INT(200, maxSeverRequestCountPerMinunte,
+        "[Dev] The maximum number of requests to the server per minute, after which it is\n"
+        "considered that there are too many requests.");
 
     // ---------------------------------------------------------------------------------------------
     // Design section

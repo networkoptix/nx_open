@@ -11,10 +11,10 @@ namespace nx::vms::client::desktop::joystick {
 class OsHidDeviceMac: public OsHidDevice
 {
 public:
-    OsHidDeviceMac(const OsHidDeviceInfo& info);
+    OsHidDeviceMac(const JoystickDeviceInfo& info);
     virtual ~OsHidDeviceMac() override;
 
-    virtual OsHidDeviceInfo info() const override;
+    virtual JoystickDeviceInfo info() const override;
 
     virtual bool isOpened() const override;
     virtual bool open() override;
