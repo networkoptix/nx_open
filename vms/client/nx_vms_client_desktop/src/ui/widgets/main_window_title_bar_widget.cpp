@@ -357,7 +357,6 @@ void QnMainWindowTitleBarWidget::setHomeTabActive(bool isActive)
         else
             setFixedHeight(kFullTitleBarHeight);
     }
-    d->tabPlaceholder->setVisible(!isActive);
     d->resizer->setVisible(!isActive);
     d->homeTabActive = isActive;
     emit homeTabActivationChanged(isActive);
@@ -677,7 +676,6 @@ void QnMainWindowTitleBarWidget::collapse()
             setPaletteColor(line, QPalette::Shadow, core::colorTheme()->color("dark8"));
         }
     }
-    d->tabPlaceholder->hide();
     d->layoutBar->setSingleLevelContentMargins();
     d->layoutBar->setSingleLevelPalette();
     setFixedHeight(kSystemBarHeight);
@@ -701,12 +699,14 @@ void QnMainWindowTitleBarWidget::expand()
             line->setContentsMargins(kDoubleLevelVLineContentMargins);
             setPaletteColor(line, QPalette::Shadow, core::colorTheme()->color("dark12"));
         }
+        if (d->homeTabActive)
+            widget->hide();
     }
-    d->tabPlaceholder->show();
     d->systemBar->show();
     d->layoutBar->setDoubleLevelContentMargins();
     d->layoutBar->setDoubleLevelPalette();
-    setFixedHeight(kFullTitleBarHeight);
+    if (!d->homeTabActive)
+        setFixedHeight(kFullTitleBarHeight);
     emit toggled(true);
 }
 
