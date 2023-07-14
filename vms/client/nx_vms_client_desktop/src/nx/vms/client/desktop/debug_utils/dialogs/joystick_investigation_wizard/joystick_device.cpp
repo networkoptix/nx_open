@@ -6,11 +6,11 @@
 
 namespace nx::vms::client::desktop::joystick {
 
-JoystickDevice::JoystickDevice(OsHidDeviceInfo deviceInfo, QObject* parent):
-    OsHidDeviceSubscriber(parent),
+JoystickDevice::JoystickDevice(JoystickDeviceInfo deviceInfo, QObject* parent):
+    OsalDeviceListener(parent),
     m_deviceInfo(deviceInfo)
 {
-    OsHidDriver::getDriver()->setupDeviceSubscriber(m_deviceInfo.path, this);
+    OsalDriver::getDriver()->setupDeviceListener(m_deviceInfo.path, this);
 
     NX_DEBUG(this, "Joystick device subscriber created for device: %1 %2 (%3)",
         m_deviceInfo.manufacturerName, m_deviceInfo.modelName, m_deviceInfo.id);
@@ -18,23 +18,23 @@ JoystickDevice::JoystickDevice(OsHidDeviceInfo deviceInfo, QObject* parent):
 
 JoystickDevice::~JoystickDevice()
 {
-    OsHidDriver::getDriver()->removeDeviceSubscriber(this);
+    OsalDriver::getDriver()->removeDeviceListener(this);
 
     NX_DEBUG(this, "Joystick device subscriber destroyed for device: %1 %2 (%3)",
         m_deviceInfo.manufacturerName, m_deviceInfo.modelName, m_deviceInfo.id);
 }
 
-QObject* JoystickDevice::parent() const
-{
-    return QObject::parent();
-}
-
-void JoystickDevice::onStateChanged(const QBitArray& newState)
+void JoystickDevice::onStateChanged(const OsalDevice::State& newState)
 {
     QList<bool> state;
 
-    for (int i = 0; i < newState.size(); ++i)
-        state.append(newState[i]);
+    if (!NX_ASSERT(newState.rawData.canConvert<QBitArray>()))
+        return;
+
+    const QBitArray bitState = newState.rawData.toBitArray();
+
+    for (int i = 0; i < bitState.size(); ++i)
+        state.append(bitState[i]);
 
     emit stateChanged(state);
 }

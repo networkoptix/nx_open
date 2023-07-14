@@ -29,7 +29,7 @@ constexpr milliseconds kEnumerationInterval = 2500ms;
 
 namespace nx::vms::client::desktop::joystick {
 
-static OsHidDeviceInfo loadDeviceInfo(hid_device_info* dev)
+static JoystickDeviceInfo loadDeviceInfo(hid_device_info* dev)
 {
     return
         {
@@ -45,20 +45,20 @@ struct OsHidDriverMac::Private
 {
     QTimer* pollingTimer = nullptr;
     QMap<QString, OsHidDevice*> devices;
-    QMap<QString, OsHidDeviceInfo> deviceInfos;
+    QMap<QString, JoystickDeviceInfo> deviceInfos;
     QSet<QString> virtualDevices;
     QQueue<OsHidDevice*> attachingVirtualDevices;
     QQueue<QString> detachingVirtualDevicePaths;
 
     struct Subscription
     {
-        const OsHidDeviceSubscriber* subscriber;
+        const OsalDeviceListener* listener;
         QMetaObject::Connection connection;
     };
 
-    QMap<QString, QList<Subscription>> deviceSubscribers;
+    QMap<QString, QList<Subscription>> deviceSubscriptions;
 
-    // TODO: Pack devices, deviceInfos and deviceSubscribers into single structure.
+    // TODO: Pack devices, deviceInfos and deviceSubscriptions into single structure.
 
     QSet<QString> deviceKeys() const
     {
@@ -66,7 +66,7 @@ struct OsHidDriverMac::Private
         return QSet<QString>(keys.begin(), keys.end());
     }
 
-    void processRealDeviceDetection(const OsHidDeviceInfo& deviceInfo, bool& devicesChanged)
+    void processRealDeviceDetection(const JoystickDeviceInfo& deviceInfo, bool& devicesChanged)
     {
         OsHidDevice* hidDevice;
         auto hidDeviceIt = devices.find(deviceInfo.path);
@@ -88,11 +88,11 @@ struct OsHidDriverMac::Private
             hidDevice = *hidDeviceIt;
         }
 
-        if (deviceSubscribers.contains(deviceInfo.path))
+        if (deviceSubscriptions.contains(deviceInfo.path))
             updateDeviceSubscriptions(hidDevice);
     }
 
-    void processVirtualDeviceDetection(const OsHidDeviceInfo& deviceInfo)
+    void processVirtualDeviceDetection(const JoystickDeviceInfo& deviceInfo)
     {
         OsHidDevice* hidDevice;
         auto hidDeviceIt = devices.find(deviceInfo.path);
@@ -102,7 +102,7 @@ struct OsHidDriverMac::Private
 
         hidDevice = *hidDeviceIt;
 
-        if (deviceSubscribers.contains(deviceInfo.path))
+        if (deviceSubscriptions.contains(deviceInfo.path))
             updateDeviceSubscriptions(hidDevice);
     }
 
@@ -117,7 +117,7 @@ struct OsHidDriverMac::Private
         devices[deviceInfo.path] = device;
         virtualDevices.insert(deviceInfo.path);
 
-        if (deviceSubscribers.contains(deviceInfo.path))
+        if (deviceSubscriptions.contains(deviceInfo.path))
             updateDeviceSubscriptions(device);
     }
 
@@ -125,7 +125,7 @@ struct OsHidDriverMac::Private
     {
         const auto& deviceInfo = device->info();
 
-        for (auto& subscription: deviceSubscribers[deviceInfo.path])
+        for (auto& subscription: deviceSubscriptions[deviceInfo.path])
         {
             if (subscription.connection)
                 continue;
@@ -143,7 +143,7 @@ struct OsHidDriverMac::Private
             }
 
             subscription.connection = connect(device, &OsHidDevice::stateChanged,
-                subscription.subscriber, &OsHidDeviceSubscriber::onStateChanged);
+                subscription.listener, &OsalDeviceListener::onStateChanged);
         }
     }
 };
@@ -166,9 +166,9 @@ OsHidDriverMac::~OsHidDriverMac()
     for (auto device: d->devices)
     {
         const auto& path = device->info().path;
-        if (d->deviceSubscribers.contains(path))
+        if (d->deviceSubscriptions.contains(path))
         {
-            for (const auto& subscription: d->deviceSubscribers[path])
+            for (const auto& subscription: d->deviceSubscriptions[path])
             {
                 if (subscription.connection)
                     disconnect(subscription.connection);
@@ -179,7 +179,7 @@ OsHidDriverMac::~OsHidDriverMac()
         device->deleteLater();
     }
 
-    d->deviceSubscribers.clear();
+    d->deviceSubscriptions.clear();
 
     hid_exit();
 }
@@ -207,7 +207,7 @@ void OsHidDriverMac::enumerateDevices()
         osLevelDeviceInfo;
         osLevelDeviceInfo = osLevelDeviceInfo->next)
     {
-        const OsHidDeviceInfo deviceInfo = loadDeviceInfo(osLevelDeviceInfo);
+        const JoystickDeviceInfo deviceInfo = loadDeviceInfo(osLevelDeviceInfo);
 
         if (osLevelDeviceInfo->usage_page != kGenericDesktopPage
             || kJoystickUsages.contains(osLevelDeviceInfo->usage))
@@ -222,7 +222,7 @@ void OsHidDriverMac::enumerateDevices()
 
     for (const auto& devicePath: d->virtualDevices)
     {
-        const OsHidDeviceInfo deviceInfo = d->deviceInfos[devicePath];
+        const JoystickDeviceInfo deviceInfo = d->deviceInfos[devicePath];
 
         actualDevicePaths.insert(deviceInfo.path);
 
@@ -253,11 +253,11 @@ void OsHidDriverMac::enumerateDevices()
         const bool isDeviceVirtual = d->virtualDevices.contains(devicePath);
         OsHidDevice* device = d->devices.take(devicePath);
 
-        if (d->deviceSubscribers.contains(devicePath))
+        if (d->deviceSubscriptions.contains(devicePath))
         {
             if (isDeviceVirtual)
             {
-                for (auto& subscription: d->deviceSubscribers[devicePath])
+                for (auto& subscription: d->deviceSubscriptions[devicePath])
                 {
                     if (subscription.connection)
                         disconnect(subscription.connection);
@@ -265,7 +265,7 @@ void OsHidDriverMac::enumerateDevices()
             }
             else
             {
-                d->deviceSubscribers.remove(devicePath);
+                d->deviceSubscriptions.remove(devicePath);
             }
         }
 
@@ -291,45 +291,46 @@ void OsHidDriverMac::enumerateDevices()
         emit deviceListChanged();
 }
 
-QList<OsHidDeviceInfo> OsHidDriverMac::deviceList()
+QList<JoystickDeviceInfo> OsHidDriverMac::deviceList()
 {
     return d->deviceInfos.values();
 }
 
-void OsHidDriverMac::setupDeviceSubscriber(const QString& path,
-    const OsHidDeviceSubscriber* subscriber)
+void OsHidDriverMac::setupDeviceListener(
+    const QString& path,
+    const OsalDeviceListener* listener)
 {
-    if (!d->deviceSubscribers.contains(path))
+    if (!d->deviceSubscriptions.contains(path))
     {
-        d->deviceSubscribers.insert(path, {{.subscriber = subscriber}});
+        d->deviceSubscriptions.insert(path, {{.listener = listener}});
     }
     else
     {
         auto it = std::find_if(
-            d->deviceSubscribers[path].begin(),
-            d->deviceSubscribers[path].end(),
-            [subscriber](const Private::Subscription& subscription)
+            d->deviceSubscriptions[path].begin(),
+            d->deviceSubscriptions[path].end(),
+            [listener](const Private::Subscription& subscription)
             {
-                return subscription.subscriber == subscriber;
+                return subscription.listener == listener;
             });
 
-        if (it == d->deviceSubscribers[path].end())
-            d->deviceSubscribers[path].append({{.subscriber = subscriber}});
+        if (it == d->deviceSubscriptions[path].end())
+            d->deviceSubscriptions[path].append({{.listener = listener}});
     }
 }
 
-void OsHidDriverMac::removeDeviceSubscriber(const OsHidDeviceSubscriber* subscriber)
+void OsHidDriverMac::removeDeviceListener(const OsalDeviceListener* listener)
 {
-    for (auto& subscribers: d->deviceSubscribers)
+    for (auto& listeners: d->deviceSubscriptions)
     {
-        const auto& it = std::find_if(subscribers.begin(), subscribers.end(),
-            [subscriber](const Private::Subscription& subscription)
+        const auto& it = std::find_if(listeners.begin(), listeners.end(),
+            [listener](const Private::Subscription& subscription)
             {
-                return subscription.subscriber == subscriber;
+                return subscription.listener == listener;
             });
 
-        if (it != subscribers.end())
-            subscribers.erase(it);
+        if (it != listeners.end())
+            listeners.erase(it);
     }
 }
 
