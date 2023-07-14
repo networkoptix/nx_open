@@ -2,24 +2,26 @@
 
 #pragma once
 
-#include <QtCore/QObject>
+#include <QtCore/QString>
 
 #include <nx/utils/impl_ptr.h>
 
-#include "../os_hid_driver.h"
+#include "../os_hid_device.h"
+#include "../osal_driver.h"
 
 namespace nx::vms::client::desktop::joystick {
 
-class OsHidDriverMac: public OsHidDriver
+class OsHidDriverMac: public OsalDriver
 {
 public:
     OsHidDriverMac();
     virtual ~OsHidDriverMac() override;
 
-    virtual QList<OsHidDeviceInfo> deviceList() override;
-    virtual void setupDeviceSubscriber(const QString& path,
-        const OsHidDeviceSubscriber* subscriber) override;
-    virtual void removeDeviceSubscriber(const OsHidDeviceSubscriber* subscriber) override;
+    virtual QList<JoystickDeviceInfo> deviceList() override;
+    virtual void setupDeviceListener(
+        const QString& path,
+        const OsalDeviceListener* listener) override;
+    virtual void removeDeviceListener(const OsalDeviceListener* listener) override;
 
     void attachVirtualDevice(OsHidDevice* device);
     void detachVirtualDevice(OsHidDevice* device);

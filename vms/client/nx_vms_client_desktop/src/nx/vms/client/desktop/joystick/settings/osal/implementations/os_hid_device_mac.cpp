@@ -24,11 +24,11 @@ struct OsHidDeviceMac::Private
 {
     hid_device* dev = nullptr;
     std::unique_ptr<QTimer> pollingTimer;
-    OsHidDeviceInfo deviceInfo;
+    JoystickDeviceInfo deviceInfo;
     QBitArray state;
 };
 
-OsHidDeviceMac::OsHidDeviceMac(const OsHidDeviceInfo& info):
+OsHidDeviceMac::OsHidDeviceMac(const JoystickDeviceInfo& info):
     d(new Private{.deviceInfo = info})
 {
 }
@@ -38,7 +38,7 @@ OsHidDeviceMac::~OsHidDeviceMac()
     stall();
 }
 
-OsHidDeviceInfo OsHidDeviceMac::info() const
+JoystickDeviceInfo OsHidDeviceMac::info() const
 {
     return d->deviceInfo;
 }
@@ -89,11 +89,16 @@ void OsHidDeviceMac::poll()
     if (bytesRead <= 0)
         return;
 
-    const QBitArray newState(QBitArray::fromBits(buffer, bytesRead * 8));
+    const QBitArray bitState = QBitArray::fromBits(buffer, bytesRead * 8);
 
-    if (newState != d->state)
+    if (bitState != d->state)
     {
-        d->state = newState;
+        d->state = bitState;
+
+        const State newState {
+            .rawData = bitState,
+        };
+
         emit stateChanged(newState);
     }
 }
