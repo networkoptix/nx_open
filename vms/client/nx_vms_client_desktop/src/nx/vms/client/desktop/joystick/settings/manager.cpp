@@ -11,17 +11,19 @@
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 #include "action_factory.h"
 #include "descriptors.h"
 
 #if defined(Q_OS_LINUX)
-#include "manager_linux.h"
+    #include "manager_linux.h"
 #elif defined(Q_OS_WINDOWS)
-#include "manager_win.h"
+    #include "manager_win.h"
+    #include "non_blocking_manager_win.h"
 #else
-#include "manager_hid.h"
+    #include "manager_hid.h"
 #endif
 
 using namespace std::chrono;
@@ -62,7 +64,10 @@ Manager* Manager::create(QObject* parent)
 #if defined(Q_OS_LINUX)
     return new ManagerLinux(parent);
 #elif defined(Q_OS_WINDOWS)
-    return new ManagerWindows(parent);
+    if (ini().joystickPollingInSeparateThread)
+        return new NonBlockingManagerWin(parent);
+    else
+        return new ManagerWindows(parent);
 #else
     return new ManagerHid(parent);
 #endif

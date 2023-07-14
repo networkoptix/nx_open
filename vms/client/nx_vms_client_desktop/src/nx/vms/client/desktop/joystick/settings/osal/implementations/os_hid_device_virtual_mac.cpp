@@ -21,7 +21,7 @@ OsHidDeviceVirtual::OsHidDeviceVirtual()
     m_state = QBitArray(joystickConfig()->reportSize.toInt());
 }
 
-OsHidDeviceInfo OsHidDeviceVirtual::info() const
+JoystickDeviceInfo OsHidDeviceVirtual::info() const
 {
     return OsHidDeviceVirtual::deviceInfo();
 }
@@ -35,9 +35,14 @@ int OsHidDeviceVirtual::read(unsigned char* buffer, int bufferSize)
     return size;
 }
 
-void OsHidDeviceVirtual::setState(const QBitArray& newState)
+void OsHidDeviceVirtual::setState(const QBitArray& newBitState)
 {
-    m_state = newState;
+    m_state = newBitState;
+
+    const State newState {
+        .rawData = newBitState,
+    };
+
     emit stateChanged(newState);
 }
 
@@ -63,9 +68,9 @@ JoystickDescriptor* OsHidDeviceVirtual::joystickConfig()
     return m_config;
 }
 
-OsHidDeviceInfo OsHidDeviceVirtual::deviceInfo()
+JoystickDeviceInfo OsHidDeviceVirtual::deviceInfo()
 {
-    return OsHidDeviceInfo{
+    return JoystickDeviceInfo{
         .id = joystickConfig()->id,
         .path = "/not/a/real/path/virtual",
         .modelName = joystickConfig()->model,

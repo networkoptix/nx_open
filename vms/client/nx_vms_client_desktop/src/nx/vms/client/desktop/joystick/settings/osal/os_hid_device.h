@@ -2,27 +2,13 @@
 
 #pragma once
 
-#include <QtCore/QBitArray>
-#include <QtCore/QObject>
-#include <QtCore/QString>
+#include "osal_device.h"
 
 namespace nx::vms::client::desktop::joystick {
 
-struct OsHidDeviceInfo
+class OsHidDevice: public OsalDevice
 {
-    QString id;
-    QString path;
-    QString modelName;
-    QString manufacturerName;
-};
-
-class OsHidDevice: public QObject
-{
-    Q_OBJECT
-
 public:
-    virtual OsHidDeviceInfo info() const = 0;
-
     virtual bool isOpened() const = 0;
     virtual bool open() = 0;
 
@@ -30,9 +16,6 @@ public:
 
 protected:
     virtual int read(unsigned char* buffer, int bufferSize) = 0;
-
-signals:
-    void stateChanged(const QBitArray& newState);
 };
 
 } // namespace nx::vms::client::desktop::joystick

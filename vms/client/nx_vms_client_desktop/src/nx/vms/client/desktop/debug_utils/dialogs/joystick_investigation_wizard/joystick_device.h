@@ -5,13 +5,13 @@
 #include <QtCore/QBitArray>
 #include <QtCore/QObject>
 
-#include <nx/vms/client/desktop/joystick/settings/os_hid/os_hid_driver.h>
+#include <nx/vms/client/desktop/joystick/settings/osal/osal_driver.h>
 
 namespace nx::vms::client::desktop::joystick {
 
 class JoystickManager;
 
-class JoystickDevice: public OsHidDeviceSubscriber
+class JoystickDevice: public OsalDeviceListener
 {
     Q_OBJECT
 
@@ -23,18 +23,16 @@ public:
     Q_INVOKABLE QString modelName() const { return m_deviceInfo.modelName; }
     Q_INVOKABLE QString manufacturerName() const { return m_deviceInfo.manufacturerName; }
 
-    Q_INVOKABLE QObject* parent() const;
-
-public slots:
-    void onStateChanged(const QBitArray& newState);
+public:
+    virtual void onStateChanged(const OsalDevice::State& newState) override;
 
 signals:
     void stateChanged(const QList<bool>& state); //< This signal is for using in QML.
 
 protected:
-    JoystickDevice(OsHidDeviceInfo deviceInfo, QObject* parent);
+    JoystickDevice(JoystickDeviceInfo deviceInfo, QObject* parent);
 
-    OsHidDeviceInfo m_deviceInfo;
+    JoystickDeviceInfo m_deviceInfo;
 
     friend class JoystickManager;
 };
