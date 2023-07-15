@@ -1073,7 +1073,10 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
 
     NX_DEBUG(this, "Disconnecting from the server");
     const bool wasLoggedIn = (bool) context()->user();
-    if (disconnectFromServer(flags) && wasLoggedIn)
+    if (!disconnectFromServer(flags))
+        return;
+
+    if (wasLoggedIn)
         appContext()->clientStateHandler()->clientDisconnected();
 
     menu()->trigger(ui::action::RemoveSystemFromTabBarAction);
