@@ -180,6 +180,8 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
             &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
         connect(camera.get(), &QnVirtualCameraResource::compatibleObjectTypesMaybeChanged, this,
             &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
+        connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
+            this, &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
         connect(camera.get(), &QnVirtualCameraResource::motionRegionChanged, this,
             [this] { m_motionSkipMaskCache.reset(); } );
 
