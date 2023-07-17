@@ -471,6 +471,11 @@ struct Attribute
     
     /**%apidoc Attribute value. */
     std::string value;
+
+    bool operator==(const Attribute& rhs) const
+    {
+        return name == rhs.name && value == rhs.value;
+    }
 };
 
 /**%apidoc Array of Attributes. */

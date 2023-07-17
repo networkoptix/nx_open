@@ -37,6 +37,8 @@ static constexpr char kSystemUserPath[] = "/cdb/systems/{systemId}/users/{accoun
 
 static constexpr char kSystemAttributesPath[] = "/cdb/systems/{systemId}/attributes";
 static constexpr char kSystemAttributePath[] = "/cdb/systems/{systemId}/attributes/{attributeName}";
+static constexpr char kSystemUserAttributesPath[] = "/cdb/systems/{systemId}/users/{accountEmail}/attributes";
+static constexpr char kSystemUserAttributePath[] = "/cdb/systems/{systemId}/users/{accountEmail}/attributes/{attributeName}";
 static constexpr char kSystemAttributeParam[] = "attributeName";
 
 static constexpr char kSendNotificationQueryParam[] = "sendNotification";

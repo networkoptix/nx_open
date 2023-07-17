@@ -193,6 +193,32 @@ public:
         const std::string& systemId,
         const std::string& attrName,
         std::function<void(api::ResultCode)> completionHandler) = 0;       
+
+    //---------------------------------------------------------------------------------------------
+    // User attributes methods.
+
+    virtual void updateUserAttributes(
+        const std::string& systemId,
+        const std::string& email,
+        const std::vector<api::Attribute>& attributes,
+        std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler) = 0;
+
+    virtual void getUserAttributes(
+        const std::string& systemId,
+        const std::string& email,
+        std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler) = 0;
+
+    virtual void updateUserAttribute(
+        const std::string& systemId,
+        const std::string& email,
+        const api::Attribute& attribute,
+        std::function<void(api::ResultCode, api::Attribute)> completionHandler) = 0;
+
+    virtual void deleteUserAttribute(
+        const std::string& systemId,
+        const std::string& email,
+        const std::string& attrName,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

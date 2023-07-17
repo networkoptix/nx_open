@@ -135,7 +135,31 @@ public:
     virtual void deleteSystemAttribute(
         const std::string& systemId,
         const std::string& attrName,
-        std::function<void(api::ResultCode)> completionHandler) override;       
+        std::function<void(api::ResultCode)> completionHandler) override;  
+
+    virtual void updateUserAttributes(
+        const std::string& systemId,
+        const std::string& email,
+        const std::vector<api::Attribute>& attributes,
+        std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler) override;
+
+    virtual void updateUserAttribute(
+        const std::string& systemId,
+        const std::string& email,
+        const api::Attribute& attribute,
+        std::function<void(api::ResultCode, api::Attribute)> completionHandler) override;
+
+    virtual void getUserAttributes(
+        const std::string& systemId,
+        const std::string& email,
+        std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler) override;
+
+    virtual void deleteUserAttribute(
+        const std::string& systemId,
+        const std::string& email,
+        const std::string& attrName,
+        std::function<void(api::ResultCode)> completionHandler) override; 
+
 };
 
 } // namespace nx::cloud::db::client
