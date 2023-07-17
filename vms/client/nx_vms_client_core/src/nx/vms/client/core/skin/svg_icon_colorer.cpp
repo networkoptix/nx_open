@@ -2,14 +2,16 @@
 
 #include "svg_icon_colorer.h"
 
-#include <QFileInfo>
+#include <functional>
 
+#include <QtCore/QFileInfo>
 #include <QtCore/QMap>
 #include <QtCore/QString>
 #include <QtXml/QDomElement>
 
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/skin/color_substitutions.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -83,31 +85,43 @@ QByteArray substituteColors(
         NX_ASSERT(false, "Cannot parse svg icon: %1", res.errorMessage);
         return data;
     }
-    auto paths = doc.elementsByTagName("path");
-    for (int i = 0; i < paths.size(); ++i)
-    {
-        auto element = paths.at(i).toElement();
-        if (auto _class = element.attribute("class", "");
-            themeSubstitutions.contains(_class))
+
+    const auto updateElement = 
+        [&themeSubstitutions](QDomElement element)
         {
-            QColor value;
-            if (NX_ASSERT(themeSubstitutions[_class] != kInvalidColor,
-                "Color theme is missing for icon, %1 is not specified", _class))
+            if (auto _class = element.attribute("class", "");
+                themeSubstitutions.contains(_class))
             {
-                value = colorTheme()->color(themeSubstitutions[_class]);
+                QColor value;
+                if (NX_ASSERT(themeSubstitutions[_class] != kInvalidColor,
+                    "Color theme is missing for icon, %1 is not specified", _class))
+                {
+                    value = colorTheme()->color(themeSubstitutions[_class]);
+                }
+                else
+                {
+                    // Use special value to make invalid icons noticeable in the dev builds.
+                    value = build_info::publicationType() == build_info::PublicationType::release
+                        ? Qt::transparent
+                        : Qt::magenta;
+                }
+                
+                if (themeSubstitutions.alpha < 1.0)
+                    element.setAttribute("opacity", themeSubstitutions.alpha);
+                element.setAttribute("fill", value.name().toLatin1());
             }
-            else
-            {
-                // Use special value to make invalid icons noticeable in the dev builds.
-                value = build_info::publicationType() == build_info::PublicationType::release
-                    ? Qt::transparent
-                    : Qt::magenta;
+        };
+    
+    auto recursiveDfs = nx::utils::y_combinator(
+        [updateElement](auto recursiveDfs, QDomElement element) -> void
+        {
+            updateElement(element);
+            auto children = element.childNodes();
+            for (int i = 0; i < children.size(); ++i)
+                recursiveDfs(children.at(i).toElement());
+        });
 
-            }
-            element.setAttribute("fill", value.name().toLatin1());
-        }
-    }
-
+    recursiveDfs(doc.documentElement());
     return doc.toByteArray();
 }
 
@@ -116,17 +130,17 @@ QByteArray substituteColors(
 static const SvgIconColorer::ThemeColorsRemapData kUnspecified;
 
 const SvgIconColorer::IconSubstitutions SvgIconColorer::kTreeIconSubstitutions = {
-    { QnIcon::Disabled, {
+    { QIcon::Disabled, {
         { kBasePrimaryColor, "dark14" },
         { kBaseSecondaryColor, "dark17" },
         { kBaseWindowTextColor, "light16" },
     }},
-    { QnIcon::Selected, {
+    { QIcon::Selected, {
         { kBasePrimaryColor, "light4" },
         { kBaseSecondaryColor, "light1" },
         { kBaseWindowTextColor, "light10" },
     }},
-    { QnIcon::Active, {  //< Hovered
+    { QIcon::Active, {  //< Hovered
         { kBasePrimaryColor, "brand_core" },
         { kBaseSecondaryColor, "light3" },
         { kBaseWindowTextColor, "light14" },
@@ -138,8 +152,7 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kTreeIconSubstitutions =
     }},
 };
 
-const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitutions 
-    = kTreeIconSubstitutions;
+const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitutions = {};
 
 SvgIconColorer::SvgIconColorer(
     const QByteArray& sourceIconData,

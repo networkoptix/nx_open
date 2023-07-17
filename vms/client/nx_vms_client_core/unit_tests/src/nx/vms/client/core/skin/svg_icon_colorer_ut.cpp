@@ -173,7 +173,7 @@ protected:
 
         m_colorer.reset(new SvgIconColorer(kSvgData,
             "mock_svg",
-            SvgIconColorer::kDefaultIconSubstitutions,
+            SvgIconColorer::kTreeIconSubstitutions,
             themeSubstitutions));
         m_colorTheme.reset(new ColorTheme(
             ":/skin/basic_colors.json", ":/unit_tests/svg_icon_colorer_ut/test_skin_colors.json"));

@@ -67,7 +67,9 @@ bool isCompatibleServer(const QnResourcePtr& resource)
     return NX_ASSERT(server) && server->isCompatible();
 }
 
-QIcon loadIcon(const QString& name, const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions = {})
+QIcon loadIcon(const QString& name,
+    const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>&
+        themeSubstitutions = {})
 {
     static const QnIcon::Suffixes kResourceIconSuffixes({
         {QnIcon::Active,   "accented"},
@@ -75,7 +77,12 @@ QIcon loadIcon(const QString& name, const QMap<QIcon::Mode, nx::vms::client::cor
         {QnIcon::Selected, "selected"},
     });
 
-    return qnSkin->icon(name, QString(), &kResourceIconSuffixes, nx::vms::client::core::SvgIconColorer::kDefaultIconSubstitutions, {}, themeSubstitutions);
+    return qnSkin->icon(name,
+        /* checkedName */ QString(),
+        &kResourceIconSuffixes,
+        nx::vms::client::core::SvgIconColorer::kDefaultIconSubstitutions,
+        /* svgCheckedColorSubstitutions */ {},
+        themeSubstitutions);
 }
 
 using Key = QnResourceIconCache::Key;
