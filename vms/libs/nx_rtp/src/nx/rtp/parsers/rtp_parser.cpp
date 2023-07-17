@@ -105,7 +105,22 @@ Result RtpParser::processRtpExtension(
         if (onvifExtension.read(headerData, headerSize))
             m_onvifExtensionTimestamp = onvifExtension.ntp;
 
-        return true;
+        if (header.lengthBytes() == kOnvifHeaderExtensionLength * 4)
+            return true;
+
+        // See https://www.onvif.org/specs/stream/ONVIF-Streaming-Spec-v1606.pdf
+        // 6.2.2 Compatibility with the JPEG header extension
+        data += kOnvifHeaderExtensionLength * 4;
+        size -= kOnvifHeaderExtensionLength * 4;
+        if (size < RtpHeaderExtensionHeader::kSize)
+        {
+            NX_DEBUG(this, "Invalid size of RTP header with an double extension, size: %1", size);
+            return false;
+        }
+        RtpHeaderExtensionHeader jpegHeader = *(RtpHeaderExtensionHeader*)(data);
+        data += RtpHeaderExtensionHeader::kSize;
+        size -= RtpHeaderExtensionHeader::kSize;
+        return m_codecParser->processRtpExtension(jpegHeader, data, size);
     }
 
     return m_codecParser->processRtpExtension(header, data, size);
