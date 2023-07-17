@@ -345,4 +345,55 @@ void SystemManager::deleteSystemAttribute(
         std::move(completionHandler)); 
 }
 
+void SystemManager::updateUserAttributes(
+    const std::string& systemId,
+    const std::string& email,
+    const std::vector<api::Attribute>& attributes,
+    std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler)
+{
+    executeRequest<std::vector<api::Attribute>>(
+        nx::network::http::Method::put,
+         nx::network::http::rest::substituteParameters(
+            kSystemUserAttributesPath, {systemId, email}),
+        std::move(attributes),
+        std::move(completionHandler));
+}
+
+void SystemManager::getUserAttributes(
+    const std::string& systemId,
+    const std::string& email,
+    std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler)
+{
+    executeRequest<std::vector<api::Attribute>>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(
+            kSystemUserAttributesPath, {systemId, email}),
+        std::move(completionHandler));
+}
+
+void SystemManager::updateUserAttribute(
+    const std::string& systemId,
+    const std::string& email,
+    const api::Attribute& attribute,
+    std::function<void(api::ResultCode, api::Attribute)> completionHandler)
+{
+    executeRequest<api::Attribute>(
+        nx::network::http::Method::put,
+        nx::network::http::rest::substituteParameters(kSystemUserAttributePath, {systemId, email, attribute.name}),
+        std::move(attribute),
+        std::move(completionHandler));
+}
+
+void SystemManager::deleteUserAttribute(
+    const std::string& systemId,
+    const std::string& email,
+    const std::string& attrName,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    executeRequest</*Reply*/ void>(
+        nx::network::http::Method::delete_,
+        nx::network::http::rest::substituteParameters(kSystemUserAttributePath, {systemId, email, attrName}),
+        std::move(completionHandler));
+}
+
 } // namespace nx::cloud::db::client
