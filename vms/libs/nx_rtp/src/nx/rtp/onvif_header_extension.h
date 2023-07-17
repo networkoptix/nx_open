@@ -10,6 +10,7 @@ namespace nx::rtp {
 
 constexpr int kOnvifHeaderExtensionId = 0xabac;
 constexpr int kOnvifHeaderExtensionAltId = 0xabad;
+constexpr int kOnvifHeaderExtensionLength = 3; //< in 32 bit units
 
 // See: ONVIF Streaming Specification Ver. 17.06 (6.3 RTP header extension)
 struct NX_RTP_API OnvifHeaderExtension
