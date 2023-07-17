@@ -26,12 +26,16 @@ namespace nx::vms::client::desktop {
 struct UserGroupListModel::Private
 {
     UserGroupListModel* const q;
-    const QString syncId;
+    QString syncId;
 
     UserGroupDataList orderedGroups;
     QSet<QnUuid> checkedGroupIds;
 
-    Private(UserGroupListModel* q): q(q), syncId(q->globalSettings()->ldap().syncId()) {}
+    Private(UserGroupListModel* q): q(q), syncId(q->globalSettings()->ldap().syncId())
+    {
+        connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged,
+            [this]() { syncId = this->q->globalSettings()->ldap().syncId(); });
+    }
 
     QStringList getParentGroupNames(const UserGroupData& group) const
     {

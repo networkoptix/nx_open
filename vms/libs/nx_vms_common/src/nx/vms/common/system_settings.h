@@ -85,7 +85,6 @@ struct SystemSettingNames
         cloudSystemID,
         lastMergeMasterId,
         lastMergeSlaveId,
-        ldap,
         localSystemId,
         specificFeatures,
         statisticsReportLastNumber,
@@ -96,7 +95,6 @@ struct SystemSettingNames
 
     static const inline std::set<QString> kWriteOnlyNames = {
         cloudAuthKey,
-        ldap,
     };
 
     static const inline std::set<QString> kOwnerOnlyNames = {
@@ -112,6 +110,10 @@ struct SystemSettingNames
         sessionsLimitPerUser,
         trafficEncryptionForced,
         webSocketEnabled,
+    };
+
+    static const inline std::set<QString> kHiddenNames = {
+        ldap,
     };
 };
 

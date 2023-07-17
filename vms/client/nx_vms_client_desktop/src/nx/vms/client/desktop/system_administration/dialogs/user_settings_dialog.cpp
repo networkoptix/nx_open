@@ -68,7 +68,7 @@ namespace nx::vms::client::desktop {
 struct UserSettingsDialog::Private
 {
     UserSettingsDialog* const q;
-    const QString syncId;
+    QString syncId;
     QWidget* parentWidget = nullptr;
     QPointer<SessionNotifier> sessionNotifier;
     DialogType dialogType;
@@ -90,6 +90,8 @@ struct UserSettingsDialog::Private
         editingContext(q->rootObjectHolder(), "editingContext"),
         self(q->rootObjectHolder(), "self")
     {
+        connect(parent->globalSettings(), &common::SystemSettings::ldapSettingsChanged,
+            [this]() { syncId = q->globalSettings()->ldap().syncId(); });
     }
 };
 

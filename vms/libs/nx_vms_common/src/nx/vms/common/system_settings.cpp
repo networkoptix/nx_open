@@ -72,6 +72,11 @@ SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
             adapter->markWriteOnly();
         if (Names::kOwnerOnlyNames.contains(adapter->key()))
             adapter->markOwnerOnly();
+        if (Names::kHiddenNames.contains(adapter->key()))
+        {
+            adapter->markReadOnly();
+            adapter->markWriteOnly();
+        }
     }
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,

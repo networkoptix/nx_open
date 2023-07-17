@@ -19,6 +19,7 @@
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
@@ -88,6 +89,25 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
             paramData->value.clear();
         }
 
+        return true;
+    }
+
+    if (accessData != Qn::kSystemAccess && paramData->name == "ldap")
+    {
+        bool success = false;
+        auto ldap =
+            QJson::deserialized(paramData->value.toUtf8(), nx::vms::api::LdapSettings(), &success);
+        if (success)
+        {
+            ldap.adminPassword.reset();
+            paramData->value = QJson::serialized(ldap);
+        }
+        else
+        {
+            NX_DEBUG(nx::utils::log::Tag(QString("AmendOutputData")),
+                "Failed to deserialize LDAP settings %1", paramData->value);
+            paramData->value.clear();
+        }
         return true;
     }
 
