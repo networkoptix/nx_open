@@ -404,16 +404,6 @@ Result MjpegParser::processRtpExtension(
     return { true };
 }
 
-bool getUint16(const quint8** data, int* size, quint16* result)
-{
-    if (*size < 2)
-        return false;
-    *result = ((*data)[0] << 8) + (*data)[1];
-    *data += 2;
-    *size -= 2;
-    return true;
-};
-
 void MjpegParser::fixResolution(int* width, int* height)
 {
     if (*width == 0)
