@@ -36,13 +36,13 @@ void Timer::start(
     if (timeout == std::chrono::milliseconds::zero())
         timeout = std::chrono::milliseconds(1);
 
-    m_handler = std::move(timerFunc);
     m_timeout = timeout;
     m_timerStartClock = std::chrono::steady_clock::now();
 
     dispatch(
-        [this, timeout]()
+        [this, timeout, handler = std::move(timerFunc)]() mutable
         {
+            m_handler = std::move(handler);
             ++m_internalTimerId;
             m_aioService.registerTimer(&pollable(), timeout, this);
         });
