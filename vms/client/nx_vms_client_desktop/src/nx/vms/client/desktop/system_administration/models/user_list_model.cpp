@@ -48,7 +48,7 @@ class UserListModel::Private:
     UserListModel* const model;
 
 public:
-    const QString syncId;
+    QString syncId;
     boost::container::flat_set<QnUserResourcePtr> users;
     QHash<QString, QSet<QnUuid>> sameNameUsers; //< Used for detection of non-unique user names.
     QHash<QnUuid, QString> prevName; //< Cache for user names before change.
@@ -93,6 +93,9 @@ public:
                     removeUser(user);
                 }
             });
+
+        connect(globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
+            [this]() { syncId = globalSettings()->ldap().syncId(); });
     }
 
     void at_resourcePool_resourceChanged(const QnResourcePtr& resource);
@@ -630,8 +633,7 @@ bool UserListModel::isInteractiveColumn(int column)
     return column == CheckBoxColumn;
 }
 
-SortedUserListModel::SortedUserListModel(const QString& syncId, QObject* parent):
-    base_type(parent), m_syncId(syncId)
+SortedUserListModel::SortedUserListModel(QObject* parent): base_type(parent)
 {
 }
 
@@ -639,6 +641,11 @@ void SortedUserListModel::setDigestFilter(std::optional<bool> value)
 {
     m_digestFilter = value;
     invalidateFilter();
+}
+
+void SortedUserListModel::setSyncId(const QString& syncId)
+{
+    m_syncId = syncId;
 }
 
 bool SortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
