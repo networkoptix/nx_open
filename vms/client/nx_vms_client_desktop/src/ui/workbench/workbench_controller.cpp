@@ -111,6 +111,9 @@ using nx::vms::client::core::Geometry;
 
 namespace {
 
+static auto kDoubleClickPeriodMs = 1000;
+static auto kAnimationRestartPeriodMs = 500;
+
 QPoint invalidDragDelta()
 {
     return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
@@ -733,20 +736,13 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
             if (m_rewindTimer->isActive() && m_rewindDirection == direction)
                 return true;
             
-            if (direction == ShiftDirection::rewind
-                && m_rewindButtonPressedTimer.restart() < 1000)
-            {
-                m_rewindTimer->stop();
-                navigator()->rewind(/*jumpToPreviousChunk*/ true);
-                return true;
-            }
-
-            m_rewindTimer->start(500);
-            m_rewindDirection = direction;
             if (direction == ShiftDirection::fastForward)
                 menu()->trigger(ui::action::FastForwardAction);
             if (direction == ShiftDirection::rewind)
                 menu()->trigger(ui::action::RewindAction);
+
+            m_rewindTimer->start(kAnimationRestartPeriodMs);
+            m_rewindDirection = direction;
             return true;
         };
 
@@ -908,6 +904,16 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
     const auto stopShift =
         [this]()
         {
+            if (m_rewindDirection == ShiftDirection::rewind)
+            {
+                if (!m_rewindButtonPressedTimer.isValid())
+                    m_rewindButtonPressedTimer.start();
+            
+                // This part should be triggered on double click on rewind only.
+                if (m_rewindButtonPressedTimer.restart() < kDoubleClickPeriodMs)
+                    navigator()->rewind(/*jumpToPreviousChunk*/ true);
+            }
+
             m_rewindTimer->stop();
         };
 
