@@ -36,7 +36,6 @@ QString LdapSettings::syncId() const
 
     QString data = uri.toString()
         + adminDn
-        + adminPassword.value_or(QString())
         + loginAttribute.value_or(QString())
         + groupObjectClass.value_or(QString())
         + memberAttribute.value_or(QString());

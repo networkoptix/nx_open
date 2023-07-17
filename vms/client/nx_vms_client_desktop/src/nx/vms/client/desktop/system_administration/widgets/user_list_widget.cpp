@@ -170,8 +170,7 @@ class UserListWidget::Private: public QObject
 
 public:
     UserListModel* const usersModel{new UserListModel(q)};
-    SortedUserListModel* const sortModel{
-        new SortedUserListModel(q->globalSettings()->ldap().syncId(), q)};
+    SortedUserListModel* const sortModel{new SortedUserListModel(q)};
     CheckableHeaderView* const header{new CheckableHeaderView(UserListModel::CheckBoxColumn, q)};
     QAction* filterDigestAction = nullptr;
 
@@ -314,6 +313,7 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
     sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     sortModel->setFilterKeyColumn(-1);
     sortModel->setSourceModel(usersModel);
+    sortModel->setSyncId(q->globalSettings()->ldap().syncId());
 
     connect(sortModel, &QAbstractItemModel::rowsInserted, this,
         [this](const QModelIndex&, int first, int last)
@@ -349,6 +349,9 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
 
             modelUpdated();
         });
+
+    connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged,
+        [this]() { sortModel->setSyncId(this->q->globalSettings()->ldap().syncId()); });
 }
 
 void UserListWidget::Private::setupUi()
