@@ -24,8 +24,7 @@ public:
     virtual ~IconLoader();
 
     QIcon polish(const QIcon& icon);
-    QIcon load(
-        const QString& name,
+    QIcon load(const QString& name,
         const QString& checkedName = QString(),
         const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions = {},
         const QnIcon::Suffixes* suffixes = nullptr,

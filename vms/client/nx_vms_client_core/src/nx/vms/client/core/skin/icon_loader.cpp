@@ -273,7 +273,7 @@ QIcon IconLoader::loadSvgIconInternal(
     const QByteArray baseData = source.readAll();
     const core::SvgIconColorer colorer(baseData, name, substitutions, themeSubstitutions);
     builder.addSvg(colorer, QnIcon::Normal, QIcon::Off);
-    for (const auto& modeSubstitutions: substitutions.keys())
+    for (const auto& modeSubstitutions: substitutions.keys() + themeSubstitutions.keys())
         builder.addSvg(colorer, modeSubstitutions, QIcon::Off);
 
     if (!checkedName.isEmpty())
@@ -283,18 +283,27 @@ QIcon IconLoader::loadSvgIconInternal(
         if (NX_ASSERT(source.open(QIODevice::ReadOnly), "Cannot load icon %1", checkedName))
         {
             const QByteArray checkedData = source.readAll();
-            const core::SvgIconColorer colorer(checkedData, checkedName, 
-                checkedSubstitutions.empty() ? substitutions : checkedSubstitutions, themeSubstitutions);
+            const auto actualSubstitutions =
+                checkedSubstitutions.empty() ? substitutions : checkedSubstitutions;
+            const core::SvgIconColorer colorer(
+                checkedData, checkedName, actualSubstitutions, themeSubstitutions);
             builder.addSvg(colorer, QnIcon::Normal, QIcon::On);
-            for (const auto& modeSubstitutions: substitutions.keys())
+            for (const auto& modeSubstitutions:
+                actualSubstitutions.keys() + themeSubstitutions.keys())
+            {
                 builder.addSvg(colorer, modeSubstitutions, QIcon::On);
+            }
         }
     }
     else if (!checkedSubstitutions.empty())
     {
-        const core::SvgIconColorer checkedColorer(baseData, name, checkedSubstitutions, themeSubstitutions);
-        for (const auto& modeSubstitutions: checkedSubstitutions.keys())
+        const core::SvgIconColorer checkedColorer(
+            baseData, name, checkedSubstitutions, themeSubstitutions);
+        for (const auto& modeSubstitutions:
+            checkedSubstitutions.keys() + themeSubstitutions.keys())
+        {
             builder.addSvg(checkedColorer, modeSubstitutions, QIcon::On);
+        }
     }
 
     return builder.createIcon();
