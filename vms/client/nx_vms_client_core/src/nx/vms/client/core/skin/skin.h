@@ -40,8 +40,7 @@ public:
     QIcon icon(const QString& name,
         const QString& checkedName = QString(),
         const QnIcon::Suffixes* suffixes = nullptr,
-        const SvgIconColorer::IconSubstitutions& svgColorSubstitutions =
-            SvgIconColorer::kDefaultIconSubstitutions,
+        const SvgIconColorer::IconSubstitutions& svgColorSubstitutions = {},
         const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {},
         const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& svgThemeSubstitutions = {});
     QIcon icon(const char* name, const char* checkedName = nullptr);
@@ -53,7 +52,11 @@ public:
         const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
         const QString& checkedName,
         const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {});
-    
+    QIcon icon(const QString& name,
+        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions);
+    QIcon icon(const QString& name,
+        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions,
+        const QString& checkedName);
 
     /**
      * Loads pixmap with appropriate size according to current hidpi settings.

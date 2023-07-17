@@ -22,6 +22,7 @@ public:
         QString primary = kInvalidColor;
         QString secondary = kInvalidColor;
         QString tertiary = kInvalidColor;
+        double alpha = 1.0;
 
         bool contains(QString name) const
         {
@@ -92,7 +93,7 @@ private:
     const QByteArray m_sourceIconData;
     QString m_iconName;
     const IconSubstitutions m_substitutions;
-    const QMap<QIcon::Mode, ThemeColorsRemapData> m_themeSubstitutions;
+    QMap<QIcon::Mode, ThemeColorsRemapData> m_themeSubstitutions;
 };
 
 } // namespace nx::vms::client::core

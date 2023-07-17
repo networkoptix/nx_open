@@ -165,12 +165,23 @@ QIcon Skin::icon(const QString& name,
     const QString& checkedName,
     const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions)
 {
+    return m_iconLoader->load(
+        name, checkedName, {}, nullptr, svgColorSubstitutions, svgCheckedColorSubstitutions);
+}
+
+QIcon Skin::icon(const QString& name,
+    const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions)
+{
+    return m_iconLoader->load(name, QString(), themeSubstitutions);
+}
+
+QIcon Skin::icon(const QString& name,
+    const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions,
+    const QString& checkedName)
+{
     return m_iconLoader->load(name,
         checkedName,
-        {},
-        nullptr,
-        svgColorSubstitutions,
-        svgCheckedColorSubstitutions);
+        themeSubstitutions);
 }
 
 QPixmap Skin::pixmap(const QString& name, bool correctDevicePixelRatio, const QSize& desiredSize)
