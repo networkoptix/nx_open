@@ -288,7 +288,5 @@ private:
     ShiftDirection m_rewindDirection = ShiftDirection::noShift;
     QTimer* const m_rewindTimer;
 
-    /** Whether the video was playing when user started to rewind or fast forward. */
-    bool m_isPlayingOnShift = false;
     QElapsedTimer m_rewindButtonPressedTimer;
 };
