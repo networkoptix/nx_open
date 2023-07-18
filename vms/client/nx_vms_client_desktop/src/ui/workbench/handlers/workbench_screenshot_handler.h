@@ -11,6 +11,7 @@
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
 #include <nx/vms/client/desktop/image_providers/image_provider.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/aspect_ratio.h>
 
@@ -18,6 +19,17 @@ class QPainter;
 class QnMediaResourceWidget;
 
 namespace nx::vms::client::desktop { class ProgressDialog; }
+
+struct SharedScreenshotParameters
+{
+    QString filename;
+    nx::core::transcoding::FilterParams cameraNameParams;
+    nx::core::transcoding::TimestampParams timestampParams;
+    bool operator==(const SharedScreenshotParameters&) const = default;
+    bool isInitialized() const;
+};
+NX_REFLECTION_INSTRUMENT(
+    SharedScreenshotParameters, (filename)(cameraNameParams)(timestampParams))
 
 struct QnScreenshotParameters
 {
@@ -27,9 +39,8 @@ struct QnScreenshotParameters
     qint64 utcTimestampMsec = 0;
     bool isUtc = false;
     qint64 displayTimeMsec = 0;
-    QString filename;
-    nx::core::transcoding::TimestampParams timestampParams;
-    nx::core::transcoding::FilterParams cameraNameParams;
+    SharedScreenshotParameters sharedParameters;
+
     nx::vms::api::ImageCorrectionData imageCorrectionParams;
     nx::vms::api::dewarping::ViewData itemDewarpingParams;
     QRectF zoomRect;
@@ -98,6 +109,7 @@ private slots:
 private:
     bool updateParametersFromDialog(QnScreenshotParameters &parameters);
     void takeDebugScreenshotsSet(QnMediaResourceWidget *widget);
+    std::vector<QnCustomFileDialog::FileFilter> generateFileFilters();
 
     qint64 screenshotTimeMSec(QnMediaResourceWidget *widget, bool adjust = false);
     void takeScreenshot(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters);

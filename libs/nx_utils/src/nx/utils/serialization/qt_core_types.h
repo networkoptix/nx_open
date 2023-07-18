@@ -56,6 +56,13 @@ constexpr auto nxReflectVisitAllEnumItems(Qt::SortOrder*, Visitor&& visitor)
     );
 }
 
+NX_REFLECTION_INSTRUMENT_ENUM(Corner,
+    TopLeftCorner,
+    TopRightCorner,
+    BottomLeftCorner,
+    BottomRightCorner
+)
+
 #if defined(__GNUC__)
     #pragma GCC diagnostic pop
 #elif defined(_MSC_VER)

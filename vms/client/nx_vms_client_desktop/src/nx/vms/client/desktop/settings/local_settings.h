@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/jsapi/auth_allowed_urls.h>
 #include <nx/vms/common/system_health/message_type.h>
+#include <ui/workbench/handlers/workbench_screenshot_handler.h>
 
 #include "types/background_image.h"
 #include "types/detected_object.h"
@@ -127,7 +128,7 @@ public:
     Property<QString> lastDownloadDir{this, "lastDownloadDir"};
     Property<QString> lastExportDir{this, "lastExportDir"};
     Property<QString> lastRecordingDir{this, "lastRecordingDir"};
-    Property<QString> lastScreenshotDir{this, "lastScreenshotDir"};
+    Property<SharedScreenshotParameters> lastScreenshotParams{this, "lastScreenshotParams"};
 
     Property<QString> backgroundsFolder{this, "backgroundsFolder", {},
         "Last used path for the layout backgrounds."};
