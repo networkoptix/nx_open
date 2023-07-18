@@ -178,11 +178,11 @@ inline void setLevelReducerEnabled(bool value)
 #define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, ...) do \
 { \
     struct ScopeTag{}; /*< Used by NX_SCOPE_TAG to get scope from demangled type_info::name(). */ \
-    if ((LEVEL) <= nx::utils::log::maxLevel()) \
+    if ((LEVEL) <= ::nx::utils::log::maxLevel()) \
     { \
         const auto systemErrorBak = SystemError::getLastOSErrorCode(); \
-        static nx::utils::log::detail::LevelReducer levelReducer(LEVEL); \
-        if (auto helper = nx::utils::log::detail::Helper(&levelReducer, (TAG))) \
+        static ::nx::utils::log::detail::LevelReducer levelReducer(LEVEL); \
+        if (auto helper = ::nx::utils::log::detail::Helper(&levelReducer, (TAG))) \
             helper.log(::nx::format(__VA_ARGS__)); \
         SystemError::setLastErrorCode(systemErrorBak); \
     } \
@@ -192,10 +192,10 @@ inline void setLevelReducerEnabled(bool value)
     for (auto stream = \
             [&]() \
             { \
-                if ((LEVEL) > nx::utils::log::maxLevel()) \
-                    return nx::utils::log::detail::Stream(); \
-                static nx::utils::log::detail::LevelReducer levelReducer(LEVEL); \
-                return nx::utils::log::detail::Stream(&levelReducer, (TAG));  \
+                if ((LEVEL) > ::nx::utils::log::maxLevel()) \
+                    return ::nx::utils::log::detail::Stream(); \
+                static ::nx::utils::log::detail::LevelReducer levelReducer(LEVEL); \
+                return ::nx::utils::log::detail::Stream(&levelReducer, (TAG));  \
             }(); \
         stream; stream.flush()) \
             stream /* <<... */
@@ -237,15 +237,15 @@ inline void setLevelReducerEnabled(bool value)
         args_required /*< Chosen when called without arguments; leads to an error. */ \
     )(__VA_ARGS__))
 
-#define NX_ERROR(...) NX_UTILS_LOG(nx::utils::log::Level::error, __VA_ARGS__)
-#define NX_WARNING(...) NX_UTILS_LOG(nx::utils::log::Level::warning, __VA_ARGS__)
-#define NX_INFO(...) NX_UTILS_LOG(nx::utils::log::Level::info, __VA_ARGS__)
-#define NX_DEBUG(...) NX_UTILS_LOG(nx::utils::log::Level::debug, __VA_ARGS__)
-#define NX_VERBOSE(...) NX_UTILS_LOG(nx::utils::log::Level::verbose, __VA_ARGS__)
-#define NX_TRACE(...) NX_UTILS_LOG(nx::utils::log::Level::trace, __VA_ARGS__)
+#define NX_ERROR(...) NX_UTILS_LOG(::nx::utils::log::Level::error, __VA_ARGS__)
+#define NX_WARNING(...) NX_UTILS_LOG(::nx::utils::log::Level::warning, __VA_ARGS__)
+#define NX_INFO(...) NX_UTILS_LOG(::nx::utils::log::Level::info, __VA_ARGS__)
+#define NX_DEBUG(...) NX_UTILS_LOG(::nx::utils::log::Level::debug, __VA_ARGS__)
+#define NX_VERBOSE(...) NX_UTILS_LOG(::nx::utils::log::Level::verbose, __VA_ARGS__)
+#define NX_TRACE(...) NX_UTILS_LOG(::nx::utils::log::Level::trace, __VA_ARGS__)
 
 /** Use as a logging tag in functions without "this". */
-#define NX_SCOPE_TAG nx::utils::log::Tag(nx::scopeOfFunction(typeid(ScopeTag), __FUNCTION__))
+#define NX_SCOPE_TAG ::nx::utils::log::Tag(::nx::scopeOfFunction(typeid(ScopeTag), __FUNCTION__))
 
 } // namespace log
 } // namespace utils
