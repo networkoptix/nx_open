@@ -24,7 +24,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
-#include <vx/graphics/resource_widget_factory.h>
+#include <vx/hooks/resource_widget_factory.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
