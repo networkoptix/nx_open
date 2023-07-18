@@ -2011,6 +2011,11 @@ void QnMediaResourceWidget::setDewarpingParams(const nx::vms::api::dewarping::Me
     emit dewarpingParamsChanged();
 }
 
+bool QnMediaResourceWidget::dewarpingApplied() const
+{
+    return m_dewarpingParams.enabled && (item()->dewarpingParams().enabled || isZoomWindow());
+}
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
