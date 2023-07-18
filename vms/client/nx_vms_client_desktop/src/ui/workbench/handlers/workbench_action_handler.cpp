@@ -156,6 +156,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/widgets/main_window.h>
+#include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h> //< TODO: #sivanov Fix dependencies.
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
@@ -1119,10 +1120,18 @@ void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 
 void ActionHandler::at_openNewWindowAction_triggered()
 {
+    if (ini().enableMultiSystemTabBar)
+    {
+        if (mainWindow()->titleBar()->isExpanded())
+            mainWindow()->setWelcomeScreenVisible(true);
+        else
+            at_openWelcomeScreenAction_triggered();
+        return;
+    }
+
     std::optional<core::LogonData> logonData;
     if (auto connection = this->connection())
         logonData = connection->createLogonData();
-
     appContext()->clientStateHandler()->createNewWindow(logonData);
 }
 
