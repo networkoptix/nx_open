@@ -733,12 +733,6 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
             if (m_rewindTimer->isActive() && m_rewindDirection == direction)
                 return true;
             
-            if (navigator()->isPlaying())
-            {
-                m_isPlayingOnShift = true;
-                navigator()->setPlaying(false);
-            }
-
             if (direction == ShiftDirection::rewind
                 && m_rewindButtonPressedTimer.restart() < 1000)
             {
@@ -914,11 +908,6 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
     const auto stopShift =
         [this]()
         {
-            if (m_isPlayingOnShift)
-            {
-                navigator()->setPlaying(true);
-                m_isPlayingOnShift = false;
-            }
             m_rewindTimer->stop();
         };
 
