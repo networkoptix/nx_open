@@ -22,7 +22,7 @@ MenuItem
     onTriggered:
     {
         if (menu && menu.hasOwnProperty("triggered"))
-            menu.triggered(menuItem, action && action.data)
+            menu.triggered(action, menuItem)
     }
 
     contentItem: Item
