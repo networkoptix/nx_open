@@ -99,7 +99,7 @@ SelectableTextButton
 
     menu: limitToCurrentCamera ? null : menuControl
 
-    PlatformMenu
+    Menu
     {
         id: menuControl
 
@@ -107,12 +107,12 @@ SelectableTextButton
 
         MenuAction { data: RightPanel.CameraSelection.layout }
         MenuAction { data: RightPanel.CameraSelection.current }
-        PlatformMenuSeparator {}
+        MenuSeparator {}
         MenuAction { data: RightPanel.CameraSelection.custom }
-        PlatformMenuSeparator {}
+        MenuSeparator {}
         MenuAction { id: defaultAction; data: RightPanel.CameraSelection.all }
 
-        onTriggered: action =>
+        onTriggered: (action) =>
         {
             if (!setup)
                 return

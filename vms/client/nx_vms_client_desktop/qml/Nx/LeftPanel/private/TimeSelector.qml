@@ -55,7 +55,7 @@ SelectableTextButton
         }
     }
 
-    menu: PlatformMenu
+    menu: Menu
     {
         id: menuControl
 
@@ -64,10 +64,10 @@ SelectableTextButton
         MenuAction { data: RightPanel.TimeSelection.day }
         MenuAction { data: RightPanel.TimeSelection.week }
         MenuAction { data: RightPanel.TimeSelection.month }
-        PlatformMenuSeparator {}
+        MenuSeparator {}
         MenuAction { id: defaultTimeSelection; data: RightPanel.TimeSelection.anytime }
 
-        onTriggered:
+        onTriggered: (action) =>
         {
             if (setup)
                 setup.timeSelection = action.data
