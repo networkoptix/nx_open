@@ -11,6 +11,7 @@ struct TimestampParams
     FilterParams filterParams;
     qint64 displayOffset = 0;
     qint64 timeMs = 0;
+    bool operator==(const TimestampParams&) const = default;
 };
-
+NX_REFLECTION_INSTRUMENT(TimestampParams, (filterParams)(displayOffset)(timeMs))
 } // namespace nx::core::transcoding

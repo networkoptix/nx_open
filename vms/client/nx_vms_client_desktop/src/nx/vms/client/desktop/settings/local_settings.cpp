@@ -170,7 +170,6 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateValue(settings->lastDownloadDir);
     migrateValue(settings->lastExportDir, "export/previousDir");
     migrateValue(settings->lastRecordingDir, "videoRecording/previousDir");
-    migrateValue(settings->lastScreenshotDir);
     migrateValue(settings->backgroundsFolder);
     migrateValue(settings->mediaFolders);
     migrateValue(settings->allowMtDecoding);

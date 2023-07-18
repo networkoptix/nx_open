@@ -6,6 +6,7 @@
 
 #include <QtCore/QStack>
 #include <QtCore/QTimer>
+#include <QtCore/qstring.h>
 #include <QtGui/QAction>
 #include <QtGui/QImageWriter>
 #include <QtGui/QPainter>
@@ -33,7 +34,6 @@
 #include <nx/vms/time/formatter.h>
 #include <platform/environment.h>
 #include <transcoding/filters/filter_helper.h>
-#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -54,12 +54,17 @@ namespace {
     const qint64 latestScreenshotTime = -1;
 }
 
+bool SharedScreenshotParameters::isInitialized() const
+{
+    return !filename.isEmpty();
+}
+
 QnScreenshotParameters::QnScreenshotParameters()
 {
-    timestampParams.filterParams.enabled = true;
-    timestampParams.filterParams.corner = Qt::BottomRightCorner;
-    cameraNameParams.enabled = true;
-    cameraNameParams.corner = Qt::BottomRightCorner;
+    sharedParameters.timestampParams.filterParams.enabled = true;
+    sharedParameters.timestampParams.filterParams.corner = Qt::BottomRightCorner;
+    sharedParameters.cameraNameParams.enabled = true;
+    sharedParameters.cameraNameParams.corner = Qt::BottomRightCorner;
 }
 
 QString QnScreenshotParameters::timeString(bool forFilename) const
@@ -78,10 +83,10 @@ QString QnScreenshotParameters::timeString(bool forFilename) const
     return nx::vms::time::toString(displayTimeMsec, timeFormat);
 }
 
-template <typename CornerData>
-QComboBox* createCornerComboBox(
-    const QString& emptySettingName,
+template<typename CornerData>
+QComboBox* createCornerComboBox(const QString& emptySettingName,
     const CornerData& data,
+    const CornerData& lastSessionData,
     QDialog* parent)
 {
     const auto comboBox = new QComboBox(parent);
@@ -91,15 +96,20 @@ QComboBox* createCornerComboBox(
     comboBox->addItem(QnScreenshotLoader::tr("Bottom left corner"), Qt::BottomLeftCorner);
     comboBox->addItem(QnScreenshotLoader::tr("Bottom right corner"), Qt::BottomRightCorner);
 
-    if (data.enabled)
+    int itemIndex = 0;
+    if (appContext()->localSettings()->lastScreenshotParams().isInitialized())
     {
-        const int itemIndex = comboBox->findData(data.corner, Qt::UserRole, Qt::MatchExactly);
-        comboBox->setCurrentIndex(itemIndex);
+        // Check the selected options from the last session. If `data` is disabled, it means
+        // that the option with the index 0 was used.
+        itemIndex = lastSessionData.enabled
+            ? comboBox->findData(lastSessionData.corner, Qt::UserRole, Qt::MatchExactly)
+            : 0;
     }
-    else
+    else if (data.enabled)
     {
-        comboBox->setCurrentIndex(0);
+        itemIndex = comboBox->findData(data.corner, Qt::UserRole, Qt::MatchExactly);
     }
+    comboBox->setCurrentIndex(itemIndex);
     return comboBox;
 }
 
@@ -266,11 +276,12 @@ qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *w
 }
 
 void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget *widget) {
-
     QStack<QString> keyStack;
-
-    if (!appContext()->localSettings()->lastScreenshotDir().isEmpty())
-        keyStack.push(appContext()->localSettings()->lastScreenshotDir() + "/");
+    SharedScreenshotParameters lastParams = appContext()->localSettings()->lastScreenshotParams();
+    QString previousDir =
+        lastParams.isInitialized() ? QFileInfo(lastParams.filename).absolutePath() : QString();
+    if (!previousDir.isEmpty())
+        keyStack.push(previousDir + "/");
 
     keyStack.push(widget->resource()->toResource()->getName());
 
@@ -372,22 +383,22 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
                     for (const crn_type &crn: tsCorners) {
                         Key tsKey(keyStack, crn.first);
 
-                        auto& filterParams = parameters.timestampParams.filterParams;
+                        auto& filterParams = parameters.sharedParameters.timestampParams.filterParams;
                         filterParams.enabled = crn.second >= 0;
                         if (filterParams.enabled)
                             filterParams.corner = static_cast<Qt::Corner>(crn.second);
 
                         for (const QString &fmt: formats) {
                             Key fmtKey(keyStack, fmt);
-                            parameters.filename = path();
+                            parameters.sharedParameters.filename = path();
 
                             {
                                 dialog->setValue(current);
                                 current++;
-                                dialog->setText(QString("%1 (%2 of %3)")
-                                    .arg(parameters.filename)
-                                    .arg(current)
-                                    .arg(count));
+                                dialog->setText(nx::format("%1 (%2 of %3)",
+                                    parameters.sharedParameters.filename,
+                                    current,
+                                    count));
                                 qApp->processEvents();
                                 if (dialog->wasCanceled())
                                     return;
@@ -431,7 +442,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.utcTimestampMsec = screenshotTimeMSec(widget);
     parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
     parameters.displayTimeMsec = screenshotTimeMSec(widget, true);
-    parameters.filename = filename;
+    parameters.sharedParameters.filename = filename;
     // TODO: #sivanov Store full screenshot settings.
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
     parameters.resource = widget->resource();
@@ -442,25 +453,54 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     takeScreenshot(widget, parameters);
 }
 
-bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParameters &parameters) {
-    QString previousDir = appContext()->localSettings()->lastScreenshotDir();
-    if (previousDir.isEmpty() && !appContext()->localSettings()->mediaFolders().isEmpty())
+std::vector<QnCustomFileDialog::FileFilter> QnWorkbenchScreenshotHandler::generateFileFilters()
+{
+    const QnCustomFileDialog::FileFilter pngFilter{tr("PNG Image"), "png"};
+
+    std::vector<QnCustomFileDialog::FileFilter> allowedFilters{pngFilter};
+    if (QImageWriter::supportedImageFormats().contains("jpg"))
+    {
+        const QnCustomFileDialog::FileFilter jpgFilter{tr("JPEG Image"), {"jpg", "jpeg"}};
+
+        // Depending on the latest screenshot parameters put the JPEG filter to the begining or
+        // the end of the filter list.
+        if (QFileInfo(appContext()->localSettings()->lastScreenshotParams().filename)
+            .fileName().endsWith("png"))
+        {
+            allowedFilters.push_back(jpgFilter);
+        }
+        else
+        {
+            allowedFilters.insert(allowedFilters.begin(), jpgFilter);
+        }
+    }
+
+    return allowedFilters;
+}
+
+bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParameters& parameters)
+{
+    QString previousDir;
+    bool useLastScreenshotParams =
+        appContext()->localSettings()->lastScreenshotParams().isInitialized();
+    if (useLastScreenshotParams)
+    {
+        previousDir = QFileInfo(appContext()->localSettings()->lastScreenshotParams().filename)
+            .absolutePath();
+    }
+    else if (!appContext()->localSettings()->mediaFolders().isEmpty())
+    {
         previousDir = appContext()->localSettings()->mediaFolders().first();
+    }
 
     static constexpr int kMaxFileNameLength = 200;
-    const auto baseFileName = parameters.filename.length() > kMaxFileNameLength
-        ? parameters.filename.left(kMaxFileNameLength) + '~'
-        : parameters.filename;
+    const auto baseFileName = parameters.sharedParameters.filename.length() > kMaxFileNameLength
+        ? parameters.sharedParameters.filename.left(kMaxFileNameLength) + '~'
+        : parameters.sharedParameters.filename;
     QString suggestion = nx::utils::replaceNonFileNameCharacters(baseFileName
         + QLatin1Char('_') + parameters.timeString(true), QLatin1Char('_')).
         replace(QChar::Space, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
-
-    static const QnCustomFileDialog::FileFilter kPngFilter{tr("PNG Image"), "png"};
-
-    std::vector<QnCustomFileDialog::FileFilter> allowedFilters{kPngFilter};
-    if (QImageWriter::supportedImageFormats().contains("jpg"))
-        allowedFilters.push_back({tr("JPEG Image"), {"jpg", "jpeg"}});
 
     bool wasLoggedIn = !context()->user().isNull();
 
@@ -469,18 +509,20 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         mainWindowWidget(),
         tr("Save Screenshot As..."),
         suggestion,
-        QnCustomFileDialog::createFilter(allowedFilters)));
+        QnCustomFileDialog::createFilter(generateFileFilters())));
 
     dialog->setFileMode(QFileDialog::AnyFile);
     dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-    const auto timestampComboBox = createCornerComboBox(
-        tr("No timestamp"),
-        parameters.timestampParams.filterParams,
+    const auto lastScreenshotParameters = appContext()->localSettings()->lastScreenshotParams();
+    const auto timestampComboBox = createCornerComboBox(tr("No timestamp"),
+        parameters.sharedParameters.timestampParams.filterParams,
+        lastScreenshotParameters.timestampParams.filterParams,
         dialog.data());
-    const auto cameraNameComboBox = createCornerComboBox(
-        tr("No camera name"),
-        parameters.cameraNameParams,
+
+    const auto cameraNameComboBox = createCornerComboBox(tr("No camera name"),
+        parameters.sharedParameters.cameraNameParams,
+        lastScreenshotParameters.cameraNameParams,
         dialog.data());
 
     dialog->addWidget(tr("Timestamp:"), timestampComboBox);
@@ -536,9 +578,9 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         break;
     }
 
-    updateCornerData(timestampComboBox, parameters.timestampParams.filterParams);
-    updateCornerData(cameraNameComboBox, parameters.cameraNameParams);
-    parameters.filename = fileName;
+    updateCornerData(timestampComboBox, parameters.sharedParameters.timestampParams.filterParams);
+    updateCornerData(cameraNameComboBox, parameters.sharedParameters.cameraNameParams);
+    parameters.sharedParameters.filename = fileName;
     return true;
 }
 
@@ -562,7 +604,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
     if (!result.isNull()) {
         // TODO: #sivanov Simplify the logic.
-        parameters.timestampParams.timeMs = parameters.utcTimestampMsec == latestScreenshotTime
+        parameters.sharedParameters.timestampParams.timeMs = parameters.utcTimestampMsec == latestScreenshotTime
             ? QDateTime::currentMSecsSinceEpoch()
             : parameters.displayTimeMsec;
 
@@ -571,8 +613,8 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         transcodeParams.itemDewarpingParams = parameters.itemDewarpingParams;
         transcodeParams.resource = parameters.resource;
         transcodeParams.contrastParams = parameters.imageCorrectionParams;
-        transcodeParams.timestampParams = parameters.timestampParams;
-        transcodeParams.cameraNameParams = parameters.cameraNameParams;
+        transcodeParams.timestampParams = parameters.sharedParameters.timestampParams;
+        transcodeParams.cameraNameParams = parameters.sharedParameters.cameraNameParams;
         transcodeParams.rotation = parameters.rotationAngle;
         transcodeParams.zoomWindow = parameters.zoomRect;
         transcodeParams.watermark = watermark();
@@ -593,7 +635,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         }
     }
 
-    QString filename = parameters.filename;
+    QString filename = parameters.sharedParameters.filename;
 
     if (result.isNull() || !result.save(filename))
     {
@@ -720,21 +762,24 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     loader->setBaseProvider(imageProvider); // preload screenshot here
 
     /* Check if name is already given - that usually means silent mode. */
-    if(localParameters.filename.isEmpty()) {
-        localParameters.filename = widget->resource()->toResource()->getName();  /*< suggested name */
+    if (localParameters.sharedParameters.filename.isEmpty())
+    {
+        localParameters.sharedParameters.filename =
+            widget->resource()->toResource()->getName(); //< Suggested name.
         if (!updateParametersFromDialog(localParameters))
             return;
 
-        loader->setParameters(localParameters); //update changed fields
-        appContext()->localSettings()->lastScreenshotDir =
-            QFileInfo(localParameters.filename).absolutePath();
-        // TODO: #sivanov Store screenshot settings.
+        loader->setParameters(localParameters); //< Update changed fields.
 
-        showProgressDelayed(tr("Saving %1").arg(QFileInfo(localParameters.filename).fileName()));
-        connect(m_screenshotProgressDialog, &ProgressDialog::canceled, loader.get(),
+        appContext()->localSettings()->lastScreenshotParams = localParameters.sharedParameters;
+
+        showProgressDelayed(
+            tr("Saving %1").arg(QFileInfo(localParameters.sharedParameters.filename).fileName()));
+        connect(m_screenshotProgressDialog,
+            &ProgressDialog::canceled,
+            loader.get(),
             &QnScreenshotLoader::deleteLater);
     }
-
     m_canceled = false;
     loader.take()->loadAsync(); //< Remove owning
 }
