@@ -9,10 +9,12 @@
 #include <nx/vms/client/desktop/camera_hotspots/camera_hotspots_display_utils.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/ui/graphics/items/camera_hotspot_item.h>
+#include <nx/vms/client/desktop/utils/dewarping_transform.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_item.h>
 
 namespace nx::vms::client::desktop {
 
@@ -110,6 +112,8 @@ void CameraHotspotsOverlayWidget::Private::initHotspotItems()
 
 void CameraHotspotsOverlayWidget::Private::updateHotspotItem(CameraHotspotItem* hotspotItem) const
 {
+    using namespace nx::vms::api;
+
     if (!Geometry::contains(q->rect().size(), kHotspotsDisplaySizeThreshold))
     {
         hotspotItem->setVisible(false);
@@ -119,8 +123,32 @@ void CameraHotspotsOverlayWidget::Private::updateHotspotItem(CameraHotspotItem* 
     const auto unitRect = QRectF(0.0, 0.0, 1.0, 1.0);
     auto relativePos = hotspotItem->hotspotData().pos;
 
-    if (const auto zoomRect = parentMediaResourceWidget->zoomRect(); zoomRect.isValid())
-        relativePos = Geometry::subPoint(Geometry::unsubRect(unitRect, zoomRect), relativePos);
+    if (parentMediaResourceWidget->dewarpingApplied())
+    {
+        auto mediaData = parentMediaResourceWidget->dewarpingParams();
+        auto viewData = parentMediaResourceWidget->item()->dewarpingParams();
+        DewarpingTransform transform(mediaData, viewData, resourceWidgetCamera()->aspectRatio());
+        if (const auto dewarpedPos = transform.mapToView(relativePos))
+        {
+            relativePos = dewarpedPos.value();
+            if (dewarping::MediaData::isFisheye(mediaData.cameraProjection)
+                && mediaData.viewMode == dewarping::FisheyeCameraMount::ceiling)
+            {
+                relativePos = Geometry::rotated(relativePos, unitRect.center(), 180.0);
+            }
+        }
+        else
+        {
+            hotspotItem->setVisible(false);
+            hotspotItem->setPos(q->rect().center());
+            return;
+        }
+    }
+    else if (parentMediaResourceWidget->isZoomWindow())
+    {
+        relativePos = Geometry::subPoint(
+            Geometry::unsubRect(unitRect, parentMediaResourceWidget->zoomRect()), relativePos);
+    }
 
     hotspotItem->setVisible(unitRect.contains(relativePos));
     hotspotItem->setPos(camera_hotspots::hotspotOrigin(relativePos, q->rect()));
@@ -173,6 +201,13 @@ CameraHotspotsOverlayWidget::CameraHotspotsOverlayWidget(QnMediaResourceWidget* 
         [this] { d->initHotspotItems(); });
 
     connect(d->parentMediaResourceWidget, &QnMediaResourceWidget::zoomRectChanged, this,
+        [this]
+        {
+            for (auto hotspotItem: d->hotspotItems)
+                d->updateHotspotItem(hotspotItem);
+        });
+
+    connect(d->parentMediaResourceWidget, &QnMediaResourceWidget::dewarpingParamsChanged, this,
         [this]
         {
             for (auto hotspotItem: d->hotspotItems)

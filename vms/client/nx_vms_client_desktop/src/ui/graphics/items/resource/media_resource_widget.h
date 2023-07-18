@@ -167,6 +167,8 @@ public:
     nx::vms::api::dewarping::MediaData dewarpingParams() const;
     void setDewarpingParams(const nx::vms::api::dewarping::MediaData& params);
 
+    bool dewarpingApplied() const;
+
     /** Check if the widget has video. It can be absent in I/O Module, for example. */
     bool hasVideo() const;
 
