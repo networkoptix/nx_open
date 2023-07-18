@@ -11,7 +11,7 @@ Nx.TextField
 {
     id: searchField
 
-    property PlatformMenu menu: null
+    property var menu: null
 
     property color hoveredButtonColor: activeFocus
         ? ColorTheme.shadow
@@ -79,7 +79,9 @@ Nx.TextField
 
         onClicked:
         {
-            if (menu)
+            if (menu instanceof Menu)
+                menu.popup(actionButton, 0, actionButton.height)
+            else if (menu instanceof PlatformMenu)
                 menu.open(actionButton)
         }
     }
