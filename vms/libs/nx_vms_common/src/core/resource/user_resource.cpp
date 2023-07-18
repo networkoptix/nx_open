@@ -10,22 +10,19 @@
 #include <core/resource_management/resource_properties.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/app_info.h>
-#include <nx/network/http/auth_tools.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/algorithm.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/random.h>
-#include <nx/utils/scope_guard.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/switch.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/id.h>
-#include <utils/common/synctime.h>
 
 const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 const QString QnUserResource::kIntegrationRequestDataProperty("integrationRequestData");
@@ -562,7 +559,7 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
             "%1: User type was designed to be read-only", this);
 
         bool isEmptyOtherPasswordAcceptable = false;
-        if (m_hash != localOther->m_hash)
+        if (m_hash != localOther->m_hash && m_userType != nx::vms::api::UserType::ldap)
         {
             if (m_password.isEmpty() && localOther->m_password.isEmpty() && m_hash != QnUserHash())
             {
