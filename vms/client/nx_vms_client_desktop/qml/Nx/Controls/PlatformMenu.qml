@@ -4,6 +4,9 @@ import QtQuick 2.15
 
 import Qt.labs.platform 1.1
 
+// IMPORTANT! Currently we have click handling issues on MacOS with PlatformMenu,
+// and issues on all platforms with positioning on hi-dpi displays.
+
 Menu
 {
     id: menu
