@@ -33,6 +33,7 @@
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/help/help_topics.h>
 #include <utils/media/sse_helper.h>
+#include <vx/fwd/vxfwd.h>
 
 #include "resource_widget.h"
 
@@ -477,6 +478,8 @@ private:
     void traceFps() const;
 
 private:
+    friend class vx::MonitoringResourceWidgetBase;
+
     nx::utils::ImplPtr<nx::vms::client::desktop::MediaResourceWidgetPrivate> d;
 
     /** Associated renderer. */
