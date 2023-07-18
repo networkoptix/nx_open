@@ -10,6 +10,7 @@ import Nx.Instruments
 import Nx.Items
 
 import nx.client.core
+import nx.vms.client.core
 import nx.vms.client.desktop
 
 import "../Components"
@@ -26,8 +27,6 @@ Item
     readonly property int kColumnWidth: 64
 
     property var buttonBox
-
-    property bool automaticDependenciesSwitchVisible: false
 
     property bool editingEnabled: true
 
@@ -445,20 +444,26 @@ Item
             anchors.leftMargin: 16
             anchors.verticalCenter: parent.verticalCenter
 
-            checked: true
-            visible: control.editingEnabled && control.automaticDependenciesSwitchVisible
+            visible: control.editingEnabled
+                && GlobalTemporaries.automaticAccessDependencySwitchVisible
 
             text: qsTr("Automatically add dependent access rights")
+
+            Component.onCompleted:
+                checked = GlobalTemporaries.automaticAccessDependenciesEnabledByDefault
+
+            onCheckedChanged:
+                GlobalTemporaries.automaticAccessDependenciesEnabledByDefault = checked
         }
     }
 
     Shortcut
     {
         sequence: "Ctrl+Shift+A"
-        enabled: !control.automaticDependenciesSwitchVisible
+        enabled: !GlobalTemporaries.automaticAccessDependencySwitchVisible
 
         onActivated:
-            control.automaticDependenciesSwitchVisible = true
+            GlobalTemporaries.automaticAccessDependencySwitchVisible = true
     }
 
     Shortcut

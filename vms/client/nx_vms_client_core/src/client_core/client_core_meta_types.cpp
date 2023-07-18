@@ -47,6 +47,7 @@
 #include <nx/vms/client/core/resource/media_dewarping_params.h>
 #include <nx/vms/client/core/resource/media_resource_helper.h>
 #include <nx/vms/client/core/resource/resource_helper.h>
+#include <nx/vms/client/core/settings/global_temporaries.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
 #include <nx/vms/client/core/thumbnails/abstract_resource_thumbnail.h>
 #include <nx/vms/client/core/time/calendar_model.h>
@@ -151,6 +152,7 @@ void initializeMetaTypes()
     AbstractTimePeriodStorage::registerQmlType();
     ChunkProvider::registerQmlType();
     ColorTheme::registerQmlType();
+    GlobalTemporaries::registerQmlType();
     analytics::IconManager::registerQmlType();
 
     MediaPlayer::registerQmlTypes();
