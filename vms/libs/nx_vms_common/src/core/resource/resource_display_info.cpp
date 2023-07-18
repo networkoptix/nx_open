@@ -151,7 +151,24 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     if (flags.testFlag(Qn::user))
     {
         if (const auto user = m_resource.dynamicCast<QnUserResource>())
-            m_extraInfo = nx::vms::common::userGroupNames(user).join(", ");
+        {
+            const auto names = nx::vms::common::userGroupNames(user);
+            switch (names.size())
+            {
+                case 0:
+                    m_extraInfo = QnUserResource::tr("Custom");
+                    break;
+
+                case 1:
+                    m_extraInfo = names.front();
+                    break;
+
+                default:
+                    m_extraInfo = nx::format("%1 (%2)", QnUserResource::tr("Multiple groups"),
+                        names.size());
+                    break;
+            }
+        }
     }
     else
     {
