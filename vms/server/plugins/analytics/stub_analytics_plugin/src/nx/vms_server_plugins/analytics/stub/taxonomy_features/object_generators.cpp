@@ -288,7 +288,7 @@ Ptr<ObjectMetadata> generateInstanceOfOfBaseTypeLibraryObjectType()
             "Medium"),
         makePtr<Attribute>(
             "Color",
-            "grey"),
+            "gray"),
     });
 
     return objectMetadata;
