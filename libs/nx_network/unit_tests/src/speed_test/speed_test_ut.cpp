@@ -224,7 +224,7 @@ protected:
 
         whenSetSystemCredentials(); //< Start the test.
 
-        while (m_bandwidthTestSequence != 1)
+        while (m_bandwidthTestSequence < 1)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
