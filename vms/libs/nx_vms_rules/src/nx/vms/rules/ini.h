@@ -19,6 +19,9 @@ struct NX_VMS_RULES_API Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(false, showSystemRules,
         "Show system rules in the rules editor.");
+
+    NX_INI_FLAG(false, enableCSNwithoutSaaS,
+        "[Dev] Enable cross system notifications without SaaS.");
 };
 
 NX_VMS_RULES_API Ini& ini();
