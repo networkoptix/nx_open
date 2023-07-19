@@ -4,12 +4,12 @@
 
 #include <nx/media/audio_data_packet.h>
 #include <nx/media/ffmpeg_helper.h>
+#include <nx/media/ffmpeg/io_context.h>
 #include <nx/media/video_data_packet.h>
-#include <utils/media/io_context.h>
 
 namespace nx::media::ffmpeg {
 
-class Demuxer
+class NX_MEDIA_CORE_API Demuxer
 {
 public:
     ~Demuxer();

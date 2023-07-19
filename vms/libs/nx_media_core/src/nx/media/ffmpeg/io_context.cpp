@@ -88,6 +88,8 @@ IoContextPtr openFile(const std::string& fileName)
         {
             switch (whence)
             {
+                if (file->eof())
+                    file->clear();
                 case SEEK_SET:
                     file->seekg(pos, std::ios_base::beg);
                     break;
@@ -105,7 +107,7 @@ IoContextPtr openFile(const std::string& fileName)
     return ioContext;
 }
 
-IoContextPtr NX_VMS_COMMON_API fromBuffer(const uint8_t* data, int size)
+IoContextPtr fromBuffer(const uint8_t* data, int size)
 {
     struct MemoryFile
     {
@@ -148,6 +150,42 @@ IoContextPtr NX_VMS_COMMON_API fromBuffer(const uint8_t* data, int size)
         };
     return ioContext;
 
+}
+
+IoContextPtr createFile(const std::string& fileName)
+{
+    auto file = std::make_shared<std::ofstream>(fileName, std::ios::binary);
+    if (!file->is_open())
+        return nullptr;
+
+    auto ioContext = std::make_unique<IoContext>(1024*64, /*writable*/true, /*seekable*/true);
+    ioContext->writeHandler =
+        [file](uint8_t* buffer, int size)
+        {
+            file->write((char*)buffer, size);
+            return size;
+        };
+
+    ioContext->seekHandler =
+        [file] (int64_t pos, int whence)
+        {
+            switch (whence)
+            {
+                case SEEK_SET:
+                    file->seekp(pos, std::ios_base::beg);
+                    break;
+                case SEEK_CUR:
+                    file->seekp(pos, std::ios_base::cur);
+                    break;
+                case SEEK_END:
+                    file->seekp(pos, std::ios_base::end);
+                    break;
+                default:
+                    return AVERROR(ENOENT);
+            }
+            return (int)file->tellp();
+        };
+    return ioContext;
 }
 
 } // namespace nx::media::ffmpeg

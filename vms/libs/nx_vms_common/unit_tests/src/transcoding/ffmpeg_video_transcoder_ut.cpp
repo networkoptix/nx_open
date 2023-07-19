@@ -6,6 +6,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_property_key.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/media/ffmpeg/demuxer.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
 
@@ -151,4 +152,65 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(640, 480));
     }
+}
+
+std::unique_ptr<QnFfmpegVideoTranscoder> createTranscoder(
+    const QnConstCompressedVideoDataPtr& videoData)
+{
+    auto transcoder = std::make_unique<QnFfmpegVideoTranscoder>(
+        DecoderConfig(), nullptr, AV_CODEC_ID_H264);
+    transcoder->setUseMultiThreadEncode(true);
+    transcoder->setUseMultiThreadDecode(true);
+
+    transcoder->setQuality(Qn::StreamQuality::highest);
+    if (!transcoder->open(videoData))
+        return nullptr;
+
+    return transcoder;
+}
+
+TEST(FfmpegVideoTranscoder, FlushBFrames)
+{
+    QFile mkvFile(":/test_b_frames.mkv");
+    ASSERT_TRUE(mkvFile.open(QIODevice::ReadOnly));
+    QByteArray mkvByteArray = mkvFile.readAll();
+
+    auto ioInput = nx::media::ffmpeg::fromBuffer(
+        (const uint8_t*)mkvByteArray.data(), mkvByteArray.size());
+
+    ASSERT_TRUE(ioInput);
+    nx::media::ffmpeg::Demuxer demuxer;
+    ASSERT_TRUE(demuxer.open(std::move(ioInput)));
+
+    int inputFrames = 0;
+    int outFrames = 0;
+    std::unique_ptr<QnFfmpegVideoTranscoder> transcoder;
+    while(true)
+    {
+        auto videoData = demuxer.getNextData();
+        if (!videoData)
+            break;
+
+        if (!transcoder)
+            transcoder = createTranscoder(std::dynamic_pointer_cast<QnCompressedVideoData>(videoData));
+        ASSERT_TRUE(transcoder != nullptr);
+
+        QnAbstractMediaDataPtr result;
+        ++inputFrames;
+        transcoder->transcodePacket(videoData, &result);
+        if (result && result->dataSize() > 0)
+            ++outFrames;
+    }
+    // Flush
+    while (true)
+    {
+        QnAbstractMediaDataPtr result;
+        transcoder->transcodePacket(QnAbstractMediaDataPtr(), &result);
+        if (!result || result->dataSize() == 0)
+            break;
+
+        NX_DEBUG(this, "flushed packet: %1", result->timestamp);
+        ++outFrames;
+    }
+    ASSERT_EQ(outFrames, inputFrames);
 }

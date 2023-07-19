@@ -274,6 +274,7 @@ void QnFfmpegVideoTranscoder::setPreciseStartPosition(int64_t startTimeUs)
 {
     m_startTimeUs = startTimeUs;
 }
+
 bool decodeFrame(CLVideoDecoderOutputPtr* result);
 
 std::pair<uint32_t, QnFfmpegVideoDecoder*> QnFfmpegVideoTranscoder::getDecoder(
@@ -305,10 +306,7 @@ std::pair<uint32_t, QnFfmpegVideoDecoder*> QnFfmpegVideoTranscoder::getDecoder(
 
 int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result)
 {
-    if (!video)
-        return 0;
-
-    if (!m_encoderCtx)
+    if (!m_encoderCtx && video)
         open(video);
 
     if (!m_encoderCtx)
@@ -400,7 +398,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
             QnFfmpegHelper::avErrorToString(encodeResult));
         return encodeResult;
     }
-    m_metrics->encodedPixels() += decodedFrame->width * decodedFrame->height;
+    if (m_metrics)
+        m_metrics->encodedPixels() += decodedFrame->width * decodedFrame->height;
     if (!got_packet)
         return 0;
 
