@@ -1062,10 +1062,10 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetServerUserAttributesList(fullData.serversUserAttributesList);
     resetCameraUserAttributesList(fullData.cameraUserAttributesList);
     resetPropertyList(fullData.allProperties);
+    resetUserGroups(fullData.userGroups);
     resetResources(fullData);
     resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
-    resetUserGroups(fullData.userGroups);
     resetLicenses(fullData.licenses);
 
     // TODO: #sivanov Logic is not perfect, who will clean them on disconnect?
