@@ -7,6 +7,7 @@ find_package(Qt6
 nx_add_test(nx_vms_common_ut
     PUBLIC_LIBS
         nx_utils
+        nx_media_core
         nx_vms_common
         Qt6::Test
     PRIVATE_LIBS
