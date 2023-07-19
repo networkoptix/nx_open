@@ -13,6 +13,7 @@
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/actions/show_on_alarm_layout_action.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
@@ -42,7 +43,9 @@ void NotificationActionExecutor::onContextUserChanged()
 {
     const auto user = context()->user();
 
-    if (user && user->isCloud() && nx::vms::common::saas::saasIsActive(systemContext()))
+    using namespace nx::vms;
+    if (user && user->isCloud()
+        && (common::saas::saasIsActive(systemContext()) || rules::ini().enableCSNwithoutSaaS))
     {
         m_listener = std::make_unique<CrossSystemNotificationsListener>();
         connect(m_listener.get(),
