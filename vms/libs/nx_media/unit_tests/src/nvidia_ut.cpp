@@ -5,8 +5,8 @@
 #if 0 //This code is only for a fast debugging decoder without a desktop client rendering framework.
 
 #include <nx/utils/log/log.h>
-#include <utils/media/io_context.h>
 #include <nx/media/ffmpeg/demuxer.h>
+#include <nx/media/ffmpeg/io_context.h>
 #include <nx/media/nvidia/nvidia_video_decoder.h>
 #include <nx/media/nvidia/nvidia_video_frame.h>
 #include <nx/media/quick_sync/quick_sync_video_decoder.h>
