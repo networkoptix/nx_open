@@ -108,6 +108,7 @@ public:
         Cycle,
         CanEditParents,
         CanEditMembers,
+        IsPredefined
     };
 
     MembersModel();

@@ -560,6 +560,7 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     roles[Cycle] = "cycle";
     roles[CanEditParents] = "canEditParents";
     roles[CanEditMembers] = "canEditMembers";
+    roles[IsPredefined] = "isPredefined";
     return roles;
 }
 
@@ -627,6 +628,9 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
 
         case IsUserRole:
             return !m_cache->info(id).isGroup;
+
+        case IsPredefined:
+            return MembersCache::isPredefined(id);
 
         case OffsetRole:
             return 0;
