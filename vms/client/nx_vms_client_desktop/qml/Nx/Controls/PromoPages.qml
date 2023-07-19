@@ -15,7 +15,7 @@ SwipeView
 
     leftPadding: 20
     rightPadding: 20
-    topPadding: closeButton.y + closeButton.height
+    topPadding: closeButton.y + closeButton.height + 8
     bottomPadding: promoPageButtons.height
 
     interactive: false
