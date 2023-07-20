@@ -614,7 +614,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     // ONVIF Profile G remote archive automatic export.
 
     ui->remoteArchiveAutoExportGroupBox->setVisible(
-        remoteArchiveMdSupported && state.expert.remoteArchiveSyncronizationMode.hasValue());
+        ini().enableRemoteArchiveSynchronization && remoteArchiveMdSupported);
 
     ui->disableImportFromDeviceRadioButton->setChecked(
         state.expert.remoteArchiveSyncronizationMode
