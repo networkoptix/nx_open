@@ -94,6 +94,7 @@ struct ResourceAccessRightsModel::Private
     nx::utils::ScopedConnections contextConnections;
 
     void updateInfo(bool suppressSignals = false);
+    QVector<ResourceAccessInfo> calculateInfo() const;
     QnResourceList getResources() const;
     QnResourceList getGroupResources(const QnUuid& groupId) const;
     std::vector<QnUuid> getGroupContents(const QnUuid& groupId) const;
@@ -412,128 +413,132 @@ QnResourceList ResourceAccessRightsModel::Private::getResources() const
 
 void ResourceAccessRightsModel::Private::updateInfo(bool suppressSignals)
 {
-    QVector<ResourceAccessInfo> newResourceAccessInfo;
-
-    const int count = accessRightList.size();
-    newResourceAccessInfo.resize(count);
-
-    const auto groupId = q->groupId();
-    const bool isResourceGroup = !groupId.isNull();
-
-    if (context && !context->currentSubjectId().isNull() && (resource || isResourceGroup))
-    {
-        for (int i = 0; i < count; ++i)
-        {
-            auto& newInfo = newResourceAccessInfo[i];
-            if (isResourceGroup)
-            {
-                if (context->hasOwnAccessRight(groupId, accessRightList[i]))
-                {
-                    newInfo.providedVia = ResourceAccessInfo::ProvidedVia::own;
-                }
-                else
-                {
-                    countGroupResources(groupId, accessRightList[i],
-                        newInfo.checkedChildCount, newInfo.totalChildCount);
-                }
-
-                continue;
-            }
-
-            const auto details = context->accessDetails(resource, accessRightList[i]);
-            if (details.contains(context->currentSubjectId()))
-            {
-                const auto providers = details.value(context->currentSubjectId());
-                if (providers.contains(resource))
-                {
-                    const auto resourceGroupId =
-                        AccessSubjectEditingContext::specialResourceGroupFor(resource);
-
-                    const auto accessViaResourceGroup = !resourceGroupId.isNull()
-                        && context->hasOwnAccessRight(resourceGroupId, accessRightList[i]);
-
-                    if (accessViaResourceGroup)
-                        newInfo.parentResourceGroupId = resourceGroupId;
-
-                    newInfo.providedVia = accessViaResourceGroup
-                        ? ResourceAccessInfo::ProvidedVia::ownResourceGroup
-                        : ResourceAccessInfo::ProvidedVia::own;
-                }
-                else
-                {
-                    for (const auto& provider: providers)
-                    {
-                        if (!NX_ASSERT(provider))
-                            continue;
-
-                        static const auto priorityKey =
-                            [](ResourceAccessInfo::ProvidedVia providerType)
-                            {
-                                switch (providerType)
-                                {
-                                    case ResourceAccessInfo::ProvidedVia::videowall:
-                                        return 1;
-                                    case ResourceAccessInfo::ProvidedVia::layout:
-                                        return 2;
-                                    default:
-                                        return 0;
-                                }
-                            };
-
-                        const auto providedVia = providerType(provider.get());
-                        if (priorityKey(providedVia) > priorityKey(newInfo.providedVia))
-                            newInfo.providedVia = providedVia;
-
-                        // Keep arrays sorted for easy comparison.
-                        const auto insertionPos = std::upper_bound(
-                            newInfo.indirectProviders.begin(),
-                            newInfo.indirectProviders.end(),
-                            provider.get());
-
-                        newInfo.indirectProviders.insert(insertionPos, provider);
-                    }
-                }
-            }
-            else if (!details.empty())
-            {
-                newInfo.providedVia = ResourceAccessInfo::ProvidedVia::parentUserGroup;
-            }
-
-            if (newInfo.providedVia != ResourceAccessInfo::ProvidedVia::none)
-            {
-                const QSet<QnUuid> providerIds{details.keyBegin(), details.keyEnd()};
-
-                // Show only the direct parents which provide current access rights.
-                const auto directParents =
-                    context->subjectHierarchy()->directParents(context->currentSubjectId());
-
-                newInfo.providerUserGroups = {};
-                for (const auto& key: directParents)
-                {
-                    if (providerIds.contains(key)
-                        || context->subjectHierarchy()->isRecursiveMember(key, providerIds))
-                    {
-                        newInfo.providerUserGroups << key;
-                    }
-                }
-
-                // Keep arrays sorted for easy comparison.
-                std::sort(newInfo.providerUserGroups.begin(), newInfo.providerUserGroups.end());
-            }
-        }
-    }
-
+    const auto newResourceAccessInfo = calculateInfo();
     if (newResourceAccessInfo == info)
         return;
 
     info = newResourceAccessInfo;
-
     if (info.size() > 0 && !suppressSignals)
     {
         emit q->dataChanged(
             q->index(0, 0),
             q->index(info.size() - 1, 0));
     }
+}
+
+QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() const
+{
+    const auto groupId = q->groupId();
+    const bool isResourceGroup = !groupId.isNull();
+
+    const int count = accessRightList.size();
+    QVector<ResourceAccessInfo> result(count);
+
+    if (!context || context->currentSubjectId().isNull() || (!resource && !isResourceGroup))
+        return result;
+
+    for (int i = 0; i < count; ++i)
+    {
+        auto& newInfo = result[i];
+        if (isResourceGroup)
+        {
+            if (context->hasOwnAccessRight(groupId, accessRightList[i]))
+            {
+                newInfo.providedVia = ResourceAccessInfo::ProvidedVia::own;
+            }
+            else
+            {
+                countGroupResources(groupId, accessRightList[i],
+                    newInfo.checkedChildCount, newInfo.totalChildCount);
+            }
+
+            continue;
+        }
+
+        const auto details = context->accessDetails(resource, accessRightList[i]);
+        if (details.contains(context->currentSubjectId()))
+        {
+            const auto providers = details.value(context->currentSubjectId());
+            if (providers.contains(resource))
+            {
+                const auto resourceGroupId =
+                    AccessSubjectEditingContext::specialResourceGroupFor(resource);
+
+                const auto accessViaResourceGroup = !resourceGroupId.isNull()
+                    && context->hasOwnAccessRight(resourceGroupId, accessRightList[i]);
+
+                if (accessViaResourceGroup)
+                    newInfo.parentResourceGroupId = resourceGroupId;
+
+                newInfo.providedVia = accessViaResourceGroup
+                    ? ResourceAccessInfo::ProvidedVia::ownResourceGroup
+                    : ResourceAccessInfo::ProvidedVia::own;
+            }
+
+            for (const auto& provider: providers)
+            {
+                if (!NX_ASSERT(provider))
+                    continue;
+                
+                if (newInfo.providedVia == ResourceAccessInfo::ProvidedVia::none)
+                {
+                    static const auto priorityKey =
+                        [](ResourceAccessInfo::ProvidedVia providerType)
+                        {
+                            switch (providerType)
+                            {
+                                case ResourceAccessInfo::ProvidedVia::videowall:
+                                    return 1;
+                                case ResourceAccessInfo::ProvidedVia::layout:
+                                    return 2;
+                                default:
+                                    return 0;
+                            }
+                        };
+
+                    const auto providedVia = providerType(provider.get());
+                    if (priorityKey(providedVia) > priorityKey(newInfo.providedVia))
+                        newInfo.providedVia = providedVia;
+                }
+
+                // Keep arrays sorted for easy comparison.
+                const auto insertionPos = std::upper_bound(
+                    newInfo.indirectProviders.begin(),
+                    newInfo.indirectProviders.end(),
+                    provider.get());
+
+                newInfo.indirectProviders.insert(insertionPos, provider);
+            }
+        }
+        else if (!details.empty())
+        {
+            newInfo.providedVia = ResourceAccessInfo::ProvidedVia::parentUserGroup;
+        }
+
+        if (newInfo.providedVia != ResourceAccessInfo::ProvidedVia::none)
+        {
+            const QSet<QnUuid> providerIds{details.keyBegin(), details.keyEnd()};
+
+            // Show only the direct parents which provide current access rights.
+            const auto directParents =
+                context->subjectHierarchy()->directParents(context->currentSubjectId());
+
+            newInfo.providerUserGroups = {};
+            for (const auto& key: directParents)
+            {
+                if (providerIds.contains(key)
+                    || context->subjectHierarchy()->isRecursiveMember(key, providerIds))
+                {
+                    newInfo.providerUserGroups << key;
+                }
+            }
+
+            // Keep arrays sorted for easy comparison.
+            std::sort(newInfo.providerUserGroups.begin(), newInfo.providerUserGroups.end());
+        }
+    }
+
+    return result;
 }
 
 QnResourceList ResourceAccessRightsModel::Private::getGroupResources(const QnUuid& groupId) const
@@ -713,14 +718,6 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
                 .arg(html::bold(*nodeName));
     }
 
-    if (!groups.empty())
-    {
-        descriptions << makeDescription(
-            tr("Access granted by %1 group"),
-            tr("Access granted by %n groups: %1", "", groups.size()),
-            groups);
-    }
-
     if (!layouts.empty())
     {
         descriptions << makeDescription(
@@ -735,6 +732,14 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
             tr("Access granted by %1 video wall"),
             tr("Access granted by %n video walls: %1", "", videoWalls.size()),
             videoWalls);
+    }
+
+    if (!groups.empty())
+    {
+        descriptions << makeDescription(
+            tr("Access granted by %1 group"),
+            tr("Access granted by %n groups: %1", "", groups.size()),
+            groups);
     }
 
     return descriptions.join("<br>");
