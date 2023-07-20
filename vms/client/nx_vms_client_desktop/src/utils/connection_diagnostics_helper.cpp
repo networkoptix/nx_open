@@ -16,6 +16,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
@@ -348,19 +349,31 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
 
     if (error.code == RemoteConnectionErrorCode::cloudSessionExpired)
     {
-        QnMessageBox msgBox(icon,
+        if (!NX_ASSERT(QThread::currentThread() == qApp->thread(),
+            "Trying to send report not in GUI thread."))
+        {
+            return;
+        }
+
+        static QnMessageBox* msgBox = nullptr;
+        if (msgBox)
+            return;
+        msgBox = new QnMessageBox(icon,
             title,
             extras,
             /*buttons*/ QDialogButtonBox::Ok,
             /*defaultButton*/ QDialogButtonBox::NoButton,
             parentWidget);
-        auto okButton = msgBox.button(QDialogButtonBox::Ok);
+
+        auto okButton = msgBox->button(QDialogButtonBox::Ok);
         okButton->setText(tr("Log In..."));
         connect(okButton,
             &QPushButton::clicked,
             [context]() { context->menu()->trigger(ui::action::LoginToCloud); });
 
-        msgBox.exec();
+        msgBox->exec();
+        msgBox->deleteLater();
+        msgBox = nullptr;
         return;
     }
 
