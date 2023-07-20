@@ -28,6 +28,8 @@ NotificationBellWidget::NotificationBellWidget(QWidget* parent):
                 m_widgetState = State::left;
             else
                 NX_ASSERT(false, "Unexpected current icon value");
+
+            updateIconLabel();
         });
 
     m_normalIcon = qnSkin->icon("events/tabs/notifications.svg");
@@ -70,6 +72,9 @@ void NotificationBellWidget::setAlarmState(bool enabled)
 
 void NotificationBellWidget::setIconMode(QIcon::Mode state)
 {
+    if (m_state == state)
+        return;
+    
     m_state = state;
     updateIconLabel();
 }
