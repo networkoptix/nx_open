@@ -300,16 +300,28 @@ bool QnWebResourceWidget::verifyCertificate(const QString& pemString, const QUrl
 bool QnWebResourceWidget::askUserToAcceptCertificate(
     const nx::network::ssl::CertificateChain& chain, const nx::utils::Url& url)
 {
+    const auto webPage = resource().dynamicCast<QnWebPageResource>();
+    const bool isIntegration = ini().webPagesAndIntegrations
+        && webPage->getOptions().testFlag(QnWebPageResource::Integration);
+
     QnSessionAwareMessageBox warning(mainWindowWidget());
-    warning.setText(tr("Open this web page?"));
+    warning.setText(isIntegration
+        ? tr("Open this integration?")
+        : tr("Open this web page?"));
     warning.setIcon(QnMessageBox::Icon::Question);
 
-    const QString addressLine =
-        nx::vms::common::html::bold(tr("Web page")).append(": ").append(url.toDisplayString());
-    const QString infoText = tr("You try to open the\n%1\nbut this web page presented an"
-        " untrusted certificate auth.\nWe recommend you not to open this web page. If you"
-        " understand the risks, you can open the web page.", "%1 is the web page address")
-            .arg(addressLine);
+    const QString addressLine = isIntegration
+        ? nx::vms::common::html::bold(tr("Integration")).append(": ").append(url.toDisplayString())
+        : nx::vms::common::html::bold(tr("Web Page")).append(": ").append(url.toDisplayString());
+
+    const QString infoText = isIntegration
+        ? tr("You try to open the\n%1\nbut this integration presented an untrusted certificate"
+            " auth.\nWe recommend you not to open this integration. If you understand the risks,"
+            " you can open the integration.", "%1 is the integration address").arg(addressLine)
+        : tr("You try to open the\n%1\nbut this web page presented an untrusted certificate auth."
+            "\nWe recommend you not to open this web page. If you understand the risks, you can"
+            " open the web page.", "%1 is the web page address").arg(addressLine);
+
     warning.setInformativeText(infoText);
 
     warning.addButton(
@@ -318,18 +330,23 @@ bool QnWebResourceWidget::askUserToAcceptCertificate(
     warning.setStandardButtons({QDialogButtonBox::Cancel});
     warning.button(QDialogButtonBox::Cancel)->setFocus();
 
-    if (menu()->canTrigger(ui::action::WebPageSettingsAction, resource()))
+    const auto settingsAction =
+        isIntegration ? ui::action::IntegrationSettingsAction : ui::action::WebPageSettingsAction;
+
+    if (menu()->canTrigger(settingsAction, webPage))
     {
         auto settingsLink = new QLabel(
-            nx::vms::common::html::localLink(tr("Web page settings...")));
+            nx::vms::common::html::localLink(
+                isIntegration ? tr("Integration settings...") : tr("Web Page settings...")));
+
         warning.addCustomWidget(settingsLink, QnMessageBox::Layout::ButtonBox);
         connect(settingsLink, &QLabel::linkActivated, this,
-            [this]()
+            [this, settingsAction]()
             {
-                menu()->triggerIfPossible(ui::action::WebPageSettingsAction, resource());
+                menu()->triggerIfPossible(settingsAction, resource());
             });
     }
 
     return warning.exec() == QDialogButtonBox::AcceptRole
-        || !resource().dynamicCast<QnWebPageResource>()->isCertificateCheckEnabled();
+        || !webPage->isCertificateCheckEnabled();
 }
