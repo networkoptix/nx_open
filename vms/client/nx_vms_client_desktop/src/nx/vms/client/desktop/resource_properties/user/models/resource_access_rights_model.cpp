@@ -442,12 +442,21 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
         auto& newInfo = result[i];
         if (isResourceGroup)
         {
+            newInfo.providerUserGroups = context->resourceGroupAccessProviders(
+                groupId, accessRightList[i]);
+
+            // Keep arrays sorted for easy comparison.
+            std::sort(newInfo.providerUserGroups.begin(), newInfo.providerUserGroups.end());
+
             if (context->hasOwnAccessRight(groupId, accessRightList[i]))
             {
                 newInfo.providedVia = ResourceAccessInfo::ProvidedVia::own;
             }
             else
             {
+                if (!newInfo.providerUserGroups.empty())
+                    newInfo.providedVia = ResourceAccessInfo::ProvidedVia::parentUserGroup;
+
                 countGroupResources(groupId, accessRightList[i],
                     newInfo.checkedChildCount, newInfo.totalChildCount);
             }
@@ -479,7 +488,7 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
             {
                 if (!NX_ASSERT(provider))
                     continue;
-                
+
                 if (newInfo.providedVia == ResourceAccessInfo::ProvidedVia::none)
                 {
                     static const auto priorityKey =
@@ -614,7 +623,7 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
 
     for (const auto& groupId: accessInfo.providerUserGroups)
     {
-        if (const auto group = resource->systemContext()->userGroupManager()->find(groupId))
+        if (const auto group = context->systemContext()->userGroupManager()->find(groupId))
             groupsData.push_back(*group);
     }
 
