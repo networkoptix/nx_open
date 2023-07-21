@@ -171,7 +171,7 @@ Item
     // Convenience signal translation.
     onDewarpingEnabledChanged: dataChanged()
     onCenterXChanged: !is360VR() && dataChanged()
-    onCenterYChanged: !is360VR() && dataChanged
+    onCenterYChanged: !is360VR() && dataChanged()
     onRadiusChanged: !is360VR() && dataChanged()
     onStretchChanged: !is360VR() && dataChanged()
     onRollCorrectionDegreesChanged: !is360VR() && dataChanged()
