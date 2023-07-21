@@ -57,6 +57,14 @@ public:
         nx::vms::api::AccessRight accessRight) const;
 
     /**
+     * Returns direct parent user groups from which a specified access right to a specified
+     * resource group is inherited.
+     */
+    QList<QnUuid> resourceGroupAccessProviders(
+        const QnUuid& resourceGroupId,
+        nx::vms::api::AccessRight accessRight) const;
+
+    /**
      * Returns resource filter that accepts resources for which the current subject has had
      * any access rights since resetAccessibleResourcesFilter() was called.
      */

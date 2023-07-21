@@ -328,6 +328,22 @@ ResourceAccessDetails AccessSubjectEditingContext::accessDetails(
         : d->accessRightsResolver->accessDetails(d->currentSubjectId, resource, accessRight);
 }
 
+QList<QnUuid> AccessSubjectEditingContext::resourceGroupAccessProviders(
+    const QnUuid& resourceGroupId, AccessRight accessRight) const
+{
+    if (d->currentSubjectId.isNull())
+        return {};
+
+    QList<QnUuid> result;
+    for (const auto groupId: d->currentHierarchy->directParents(d->currentSubjectId))
+    {
+        if (d->accessRightsResolver->accessRights(groupId, resourceGroupId).testFlag(accessRight))
+            result.push_back(groupId);
+    }
+
+    return result;
+}
+
 nx::vms::common::ResourceFilter AccessSubjectEditingContext::accessibleResourcesFilter() const
 {
     const auto resourceFilter =
