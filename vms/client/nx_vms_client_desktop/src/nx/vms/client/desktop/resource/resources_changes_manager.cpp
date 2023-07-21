@@ -19,6 +19,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <nx/reflect/json/serializer.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/data/server_model.h>
@@ -614,8 +615,10 @@ void ResourcesChangesManager::saveServer(const QnMediaServerResourcePtr& server,
         nx::vms::api::ServerModel body;
 
         auto change = server->userAttributes();
+
         body.id = change.serverId;
-        body.name = change.serverName;
+        body.backupBitrateBytesPerSecond = change.backupBitrateBytesPerSecond;
+        body.name = change.serverName.isEmpty() ? server->getName() : change.serverName;
         body.url = server->getUrl();
         auto modifiedProperties = resourcePropertyDictionary()->modifiedProperties(server->getId());
 
@@ -632,7 +635,7 @@ void ResourcesChangesManager::saveServer(const QnMediaServerResourcePtr& server,
         api->putRest(tokenHelper,
             QString("/rest/v3/servers/%1").arg(server->getId().toString()),
             network::rest::Params{},
-            QJson::serialized(body),
+            QByteArray::fromStdString(nx::reflect::json::serialize(body)),
             handler,
             thread());
     }
