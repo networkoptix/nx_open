@@ -287,24 +287,24 @@ Item
                             }
 
                             color: cell.foregroundColor
+                        }
 
-                            Text
-                            {
-                                id: checkedChildResourceCounter
+                        Text
+                        {
+                            id: checkedChildResourceCounter
 
-                                anchors.fill: parent
-                                horizontalAlignment: Qt.AlignHCenter
-                                verticalAlignment: Qt.AlignVCenter
+                            height: parent.height
+                            width: (icon.source != "") ? icon.x : parent.width
 
-                                visible: accessRightsModel.isResourceGroup
-                                    && model.providedVia != ResourceAccessInfo.ProvidedVia.own
-                                    && model.providedVia !=
-                                            ResourceAccessInfo.ProvidedVia.ownResourceGroup
-                                    && model.checkedChildCount
+                            horizontalAlignment: Qt.AlignHCenter
+                            verticalAlignment: Qt.AlignVCenter
 
-                                color: cell.foregroundColor
-                                text: model.checkedChildCount
-                            }
+                            visible: accessRightsModel.isResourceGroup
+                                && model.providedVia == ResourceAccessInfo.ProvidedVia.none
+                                && model.checkedChildCount
+
+                            color: cell.foregroundColor
+                            text: model.checkedChildCount
                         }
                     }
                 }
