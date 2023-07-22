@@ -41,8 +41,9 @@ struct PredefinedUserGroups::Private
     static QString description(const QnUuid& groupId)
     {
         if (groupId == kAdministratorsGroupId)
-            return tr("This user has unlimited System privileges."
-                " Can merge Systems and link or unlink to Nx Cloud accounts.");
+            return tr("This user has unlimited System privileges and cannot be deleted."
+                " Can create and modify Administrators, and can merge Systems and link or unlink"
+                " to Nx Cloud accounts.");
 
         if (groupId == kPowerUsersGroupId)
             return tr("Has full control of System configuration, but cannot create or modify"
