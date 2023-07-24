@@ -688,19 +688,24 @@ struct SaveUserAccess
         if (hasSystemAccess(accessData))
             return ModifyResourceAccess()(systemContext, accessData, param);
 
-        const bool hasUserWithSameName = systemContext->resourcePool()->contains<QnUserResource>(
-            [name = param.name.toLower(), id = param.id](const auto& u)
-            {
-                return u->getName().toLower() == name && u->getId() != id;
-            });
-        if (hasUserWithSameName)
+        auto resourcePool = systemContext->resourcePool();
+
+        // Allow to edit disabled user even if it is clashed by name.
+        if (param.isEnabled)
         {
-            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                "User '%1' will not be saved because of the name duplication."), param.name));
+            const bool hasUserWithSameName = resourcePool->contains<QnUserResource>(
+                [name = param.name.toLower(), id = param.id](const auto& u)
+                {
+                    return u->isEnabled() && u->getName().toLower() == name && u->getId() != id;
+                });
+            if (hasUserWithSameName)
+            {
+                return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                    "User '%1' will not be saved because of the name duplication."), param.name));
+            }
         }
 
-        const auto existingUser =
-            systemContext->resourcePool()->getResourceById<QnUserResource>(param.id);
+        const auto existingUser = resourcePool->getResourceById<QnUserResource>(param.id);
         if (existingUser)
         {
             if (existingUser->attributes().testFlag(nx::vms::api::UserAttribute::readonly))
