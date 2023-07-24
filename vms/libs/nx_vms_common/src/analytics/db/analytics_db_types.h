@@ -14,6 +14,7 @@
 #include <nx/utils/byte_array.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/utils/url_query.h>
 #include <recording/time_period.h>
 
@@ -119,7 +120,7 @@ struct ObjectTrack
     ObjectRegion objectPosition;
     BestShot bestShot;
     QnUuid analyticsEngineId;
-    
+
     /**
      * Groups data under specified value. I.e., it allows to store multiple independent sets of
      * data in a single DB instead of having to create a separate DB instance for each unique

@@ -14,6 +14,7 @@
 #include <QtCore/QDateTime>
 
 #include <nx/network/socket_common.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/buffer.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/software_version.h>
@@ -269,8 +270,11 @@ enum Value: int
     gatewayTimeOut = 504,
 };
 
+NX_REFLECTION_TAG_TYPE(Value, useStringConversionForSerialization)
+
 NX_NETWORK_API std::string toString(Value);
 NX_NETWORK_API std::string toString(int);
+
 /** Returns true if  statusCode is 2xx */
 NX_NETWORK_API bool isSuccessCode(Value statusCode);
 /** Returns true if  statusCode is 2xx */

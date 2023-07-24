@@ -26,12 +26,13 @@ public:
 };
 
 bool NX_VMS_API fromString(const std::string& value, SaasDateTime* target);
+NX_REFLECTION_TAG_TYPE(SaasDateTime, useStringConversionForSerialization)
 
 /**%apidoc Saas service state */
 NX_REFLECTION_ENUM_CLASS(SaasServiceState,
     /**%apidoc active */
     active,
-    
+
     /**%apidoc disabled */
     obsolete
 );

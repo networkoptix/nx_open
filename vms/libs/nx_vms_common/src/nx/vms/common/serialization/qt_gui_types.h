@@ -5,7 +5,11 @@
 #include <string>
 #include <string_view>
 
+#include <nx/reflect/instrument.h>
+
 class QColor;
 
 NX_VMS_COMMON_API std::string toString(const QColor& value);
 NX_VMS_COMMON_API bool fromString(const std::string_view& str, QColor* value);
+
+NX_REFLECTION_TAG_TYPE(QColor, useStringConversionForSerialization)

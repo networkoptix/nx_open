@@ -5,6 +5,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
+#include <nx/reflect/instrument.h>
+
 namespace nx::vms::client::desktop {
 
 /**
@@ -33,6 +35,8 @@ struct NX_VMS_CLIENT_DESKTOP_API SessionId
 private:
     QByteArray m_bytes;
 };
+
+NX_REFLECTION_TAG_TYPE(SessionId, useStringConversionForSerialization)
 
 /** GTest output support. */
 NX_VMS_CLIENT_DESKTOP_API void PrintTo(const SessionId& value, ::std::ostream* os);

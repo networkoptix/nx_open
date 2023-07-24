@@ -12,6 +12,7 @@
 #include <nx/reflect/instrument.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/utils/serialization/qt_core_types.h>
 
 namespace nx::vms::client::desktop {
 namespace joystick {

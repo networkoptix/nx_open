@@ -10,9 +10,12 @@
  */
 
 #include <QtCore/QMap>
+#include <QtCore/QMultiMap>
 #include <QtCore/QSet>
 
 #include <nx/reflect/json.h>
+
+#include "qt_core_types.h"
 
 //-------------------------------------------------------------------------------------------------
 // QSet
@@ -61,6 +64,9 @@ struct IsQtAssociativeContainer { static constexpr bool value = false; };
 
 template<typename... Args>
 struct IsQtAssociativeContainer<QMap<Args...>> { static constexpr bool value = true; };
+
+template<typename... Args>
+struct IsQtAssociativeContainer<QMultiMap<Args...>> { static constexpr bool value = true; };
 
 template<typename... Args>
 struct IsQtAssociativeContainer<QHash<Args...>> { static constexpr bool value = true; };

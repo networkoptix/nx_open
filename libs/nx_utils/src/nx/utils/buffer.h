@@ -13,6 +13,7 @@
 
 #include <QtCore/QByteArray>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/log/assert.h>
 
 #include "base64.h"
@@ -225,6 +226,8 @@ private:
 
     void moveDataToStr();
 };
+
+NX_REFLECTION_TAG_TEMPLATE_TYPE(BasicBuffer, useStringConversionForSerialization)
 
 //-------------------------------------------------------------------------------------------------
 
