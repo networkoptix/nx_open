@@ -211,7 +211,7 @@ QString UserSettingsDialog::validateEmail(const QString& email, bool forCloud)
     TextValidateFunction validateFunction =
         [this](const QString& text) -> ValidationResult
         {
-            auto result = defaultNonEmptyValidator(tr("Email cannot be empty."))(text);
+            auto result = defaultNonEmptyValidator(tr("Email cannot be empty"))(text);
             if (result.state != QValidator::Acceptable)
                 return result;
 

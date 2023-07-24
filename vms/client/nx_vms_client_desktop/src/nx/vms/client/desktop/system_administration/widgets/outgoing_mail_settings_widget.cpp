@@ -206,7 +206,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
         {
             return nx::email::isValidAddress(text)
                 ? ValidationResult::kValid
-                : ValidationResult(tr("Email is not valid."));
+                : ValidationResult(tr("Email is not valid"));
         });
 
     ui->passwordInput->setValidator(defaultPasswordValidator(/*allowEmpty*/ true));

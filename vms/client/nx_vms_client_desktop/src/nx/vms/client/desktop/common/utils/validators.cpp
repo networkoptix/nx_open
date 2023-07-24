@@ -42,11 +42,11 @@ TextValidateFunction defaultEmailValidator(bool allowEmpty)
             {
                 return allowEmpty
                     ? ValidationResult::kValid
-                    : ValidationResult(QnValidatorStrings::tr("Email cannot be empty."));
+                    : ValidationResult(QnValidatorStrings::tr("Email cannot be empty"));
             }
 
             if (!nx::email::isValidAddress(text)) //< isValid() trims it before checking.
-                return ValidationResult(QnValidatorStrings::tr("Email is not valid."));
+                return ValidationResult(QnValidatorStrings::tr("Email is not valid"));
 
             return ValidationResult::kValid;
         };
