@@ -16,6 +16,32 @@ template<typename T>
 DeserializationResult deserialize(
     const DeserializationContext& ctx,
     T* data,
+    std::enable_if_t<std::is_same_v<T, QJsonObject>>* = nullptr)
+{
+    const auto& val = ctx.value;
+    if (!val.IsObject())
+    {
+        return DeserializationResult(
+            false, "Can't parse a QJson object", getStringRepresentation(val));
+    }
+
+    auto qStrVal = QString::fromStdString(getStringRepresentation(val));
+    QJsonParseError error;
+    auto qjsonDoc = QJsonDocument::fromJson(qStrVal.toUtf8(), &error);
+    if (qjsonDoc.isNull())
+    {
+        return DeserializationResult(
+            false, error.errorString().toStdString(), getStringRepresentation(val));
+    }
+
+    *data = qjsonDoc.object();
+    return DeserializationResult(true);
+}
+
+template<typename T>
+DeserializationResult deserialize(
+    const DeserializationContext& ctx,
+    T* data,
     std::enable_if_t<std::is_same_v<T, QJsonValue>>* = nullptr)
 {
     const auto& val = ctx.value;
@@ -58,6 +84,10 @@ DeserializationResult deserialize(
 }
 
 } // namespace nx::reflect::json_detail
+
+NX_UTILS_API void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const QJsonObject& data);
 
 NX_UTILS_API void serialize(
     nx::reflect::json::SerializationContext* ctx,

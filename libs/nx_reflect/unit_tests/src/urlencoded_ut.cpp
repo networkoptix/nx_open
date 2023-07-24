@@ -8,6 +8,7 @@
 #include <QUuid>
 
 #include <nx/reflect/instrument.h>
+#include <nx/reflect/tags.h>
 #include <nx/reflect/urlencoded.h>
 
 namespace nx::reflect::urlencoded::test {
@@ -249,6 +250,8 @@ struct Stringizable
         return Stringizable{std::string(str)};
     }
 };
+
+NX_REFLECTION_TAG_TYPE(Stringizable, useStringConversionForSerialization)
 
 struct Foo1
 {

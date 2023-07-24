@@ -6,6 +6,14 @@
 
 void serialize(
     nx::reflect::json::SerializationContext* ctx,
+    const QJsonObject& data)
+{
+    ctx->composer.writeRawString(
+        QJsonDocument(data).toJson(QJsonDocument::Compact).toStdString());
+}
+
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
     const QJsonValue& data)
 {
     if (data.isArray())

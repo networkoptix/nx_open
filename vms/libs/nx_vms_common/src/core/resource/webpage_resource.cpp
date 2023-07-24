@@ -6,6 +6,7 @@
 #include <nx/reflect/json/serializer.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/serialization/qt_core_types.h>
 #include <nx/vms/api/data/webpage_data.h>
 
 namespace {
