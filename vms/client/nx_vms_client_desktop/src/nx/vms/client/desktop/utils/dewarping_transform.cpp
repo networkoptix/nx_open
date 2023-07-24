@@ -42,6 +42,26 @@ QVector3D sphericalToCartesian(const QPointF& spherical)
         sin(phi));
 }
 
+double wrapValue(double value, double min, double max)
+{
+    if (min > max)
+        std::swap(min, max);
+
+    if (qFuzzyBetween(min, value, max))
+        return value;
+
+    if (qFuzzyEquals(min, max))
+        return min;
+
+    const auto remainder = std::fmod(value - min, max - min);
+    if (qFuzzyIsNull(remainder))
+        return min;
+
+    return remainder > 0.0
+        ? remainder + min
+        : remainder + max;
+}
+
 } // namespace
 
 using namespace nx::vms::api;
@@ -131,7 +151,7 @@ QTransform DewarpingTransform::Private::toViewSpace() const
     {
         case dewarping::ViewProjection::equirectangular:
         {
-            transform.translate(std::remainderf(itemParams.xAngle, M_PI * 2.0), -itemParams.yAngle);
+            transform.translate(wrapValue(itemParams.xAngle, -M_PI, M_PI), -itemParams.yAngle);
             transform.scale(itemParams.fov, itemParams.fov / itemParams.panoFactor);
             transform.translate(-0.5, -0.5);
             break;
@@ -352,15 +372,16 @@ std::optional<QPointF> DewarpingTransform::mapToView(const QPointF& framePoint) 
     {
         if (d->viewProjectionType() == dewarping::ViewProjection::equirectangular)
         {
-            unitRectViewPoint.setX(std::remainderf(unitRectViewPoint.x(),
-                d->frameAspectRatio.toFloat() * M_PI / d->itemParams.fov));
+            unitRectViewPoint.rx() = wrapValue(unitRectViewPoint.x(),
+                0.5 - M_PI / d->itemParams.fov,
+                0.5 + M_PI / d->itemParams.fov);
         }
         else if (d->viewProjectionType() == dewarping::ViewProjection::rectilinear)
         {
-            if (std::abs(std::remainderf(
-                d->itemParams.xAngle, M_PI * 2.0) - normalizedFramePoint.x()) > M_PI_2)
+            if (QVector3D::dotProduct(spherePoint,
+                sphericalToCartesian({d->itemParams.xAngle, -d->itemParams.yAngle})) < 0)
             {
-                return std::nullopt;
+                return std::nullopt; //< Projected from behind, not a valid result.
             }
         }
     }
