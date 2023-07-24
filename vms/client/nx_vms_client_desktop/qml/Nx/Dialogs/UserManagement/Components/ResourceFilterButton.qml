@@ -89,7 +89,7 @@ Item
 
             MenuAction
             {
-                text: qsTr("With Permissions")
+                text: qsTr("Available by Permissions")
                 filter: 0
                 visible: editingEnabled
             }
