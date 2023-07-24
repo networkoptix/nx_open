@@ -4,8 +4,11 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/reflect/instrument.h>
 #include <nx/reflect/compare.h>
+#include <nx/reflect/instrument.h>
+#include <nx/reflect/json/deserializer.h>
+#include <nx/reflect/json/serializer.h>
+
 
 namespace nx::reflect::test {
 
@@ -68,6 +71,18 @@ TEST(Compare, fuzzyEqualityDouble)
 
     Simple s1{5, 0.0f, d1, "hello"};
     ASSERT_TRUE(nx::reflect::equals(s1, Simple{5, 0.0f, d2, "hello"}));
+}
+
+TEST(Compare, fuzzyEqualityDoubleAfterDeserialized)
+{
+    Double value = {0.3};
+
+    const auto serializedValue = nx::reflect::json::serialize(value);
+    const auto [deserializedValue, result] =
+        nx::reflect::json::deserialize<Double>(serializedValue);
+    
+    ASSERT_TRUE(result.success);
+    ASSERT_TRUE(nx::reflect::equals(value, deserializedValue));
 }
 
 } // namespace nx::reflect::test

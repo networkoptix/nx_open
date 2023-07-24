@@ -15,7 +15,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
-#include <nx/vms/common/api/client_update_settings.h>
+#include <nx/vms/api/data/client_update_settings.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/common/update/persistent_update_storage.h>
 #include <utils/email/email_fwd.h>
@@ -393,8 +393,8 @@ public:
     FileToPeerList downloaderPeers() const;
     void setdDownloaderPeers(const FileToPeerList& downloaderPeers);
 
-    nx::vms::common::api::ClientUpdateSettings clientUpdateSettings() const;
-    void setClientUpdateSettings(const nx::vms::common::api::ClientUpdateSettings& settings);
+    nx::vms::api::ClientUpdateSettings clientUpdateSettings() const;
+    void setClientUpdateSettings(const nx::vms::api::ClientUpdateSettings& settings);
 
     int maxVirtualCameraArchiveSynchronizationThreads() const;
     void setMaxVirtualCameraArchiveSynchronizationThreads(int newValue);
@@ -646,7 +646,7 @@ private:
     QnResourcePropertyAdaptor<nx::vms::common::update::PersistentUpdateStorage>* m_targetPersistentUpdateStorageAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::common::update::PersistentUpdateStorage>* m_installedPersistentUpdateStorageAdaptor = nullptr;
     QnResourcePropertyAdaptor<FileToPeerList>* m_downloaderPeersAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::vms::common::api::ClientUpdateSettings>*
+    QnResourcePropertyAdaptor<nx::vms::api::ClientUpdateSettings>*
         m_clientUpdateSettingsAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::WatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
 
