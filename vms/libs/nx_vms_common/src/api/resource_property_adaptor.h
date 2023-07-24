@@ -138,7 +138,7 @@ public:
     bool isDefault() const; //< True if no explicit (not default) value has been set.
     QString serializedValue() const;
     bool deserializeValue(const QString& serializedValue, QVariant* outValue) const;
-    virtual QJsonValue jsonValue() const = 0;
+    virtual QJsonValue jsonValue(QnJsonContext* context = nullptr) const = 0;
 
     bool testAndSetValue(const QVariant &expectedValue, const QVariant &newValue);
     virtual void setValue(const QVariant& value) = 0;
@@ -245,10 +245,15 @@ public:
         return m_defaultValue;
     }
 
-    virtual QJsonValue jsonValue() const override
+    virtual QJsonValue jsonValue(QnJsonContext* context = nullptr) const override
     {
         QJsonValue result;
-        QJson::serialize(value(), &result);
+
+        if (context)
+            QJson::serialize(context, value(), &result);
+        else
+            QJson::serialize(value(), &result);
+        
         return result;
     }
 
