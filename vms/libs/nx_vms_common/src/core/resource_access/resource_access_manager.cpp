@@ -1168,10 +1168,7 @@ bool QnResourceAccessManager::hasAccessToAllCameras(
     if (user->isAdministrator())
         return true;
 
-    return hasAccessRights(
-        user,
-        nx::vms::api::kAllDevicesGroupId,
-        accessRights | nx::vms::api::AccessRight::view);
+    return hasAccessRights(user, nx::vms::api::kAllDevicesGroupId, accessRights);
 }
 
 bool QnResourceAccessManager::hasAccessToAllCameras(
