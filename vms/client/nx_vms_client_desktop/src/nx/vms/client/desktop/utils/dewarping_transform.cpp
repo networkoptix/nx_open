@@ -217,6 +217,8 @@ QVector3D DewarpingTransform::Private::cameraUnproject(const QPointF& normalized
         case dewarping::CameraProjection::equidistant:
         {
             const auto r = Geometry::length(normalizedFramePoint);
+            if (qFuzzyIsNull(r))
+                return QVector3D(0.0, 1.0, 0.0);
             const auto theta = r * M_PI_2;
             const auto xz = normalizedFramePoint * (sin(theta) / r);
             return QVector3D(xz.x(), cos(theta), xz.y());
@@ -256,8 +258,9 @@ QPointF DewarpingTransform::Private::viewProject(const QVector3D& pointOnSphere)
         {
             const auto projectedPoint = viewUnprojectionTransform().inverted().map(pointOnSphere);
             QPointF viewPoint(projectedPoint.x(), projectedPoint.y());
-            if (!qFuzzyIsNull(projectedPoint.z()))
-                viewPoint /= projectedPoint.z();
+            viewPoint = !qFuzzyIsNull(projectedPoint.z())
+                ? viewPoint / projectedPoint.z()
+                : viewPoint * std::numeric_limits<qreal>::infinity();
             return viewPoint;
         }
 
