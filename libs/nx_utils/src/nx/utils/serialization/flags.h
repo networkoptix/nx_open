@@ -152,3 +152,5 @@ bool fromString(const std::string_view& str, QFlags<T>* result)
 
     return valid;
 }
+
+NX_REFLECTION_TAG_TEMPLATE_TYPE(QFlags, useStringConversionForSerialization)

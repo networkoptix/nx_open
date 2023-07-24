@@ -5,6 +5,8 @@
 #include <QtCore/QString>
 #include <QtCore/qobjectdefs.h>
 
+#include <nx/reflect/instrument.h>
+
 // On some Linux systems "major" and "minor" are pre-defined macros in sys/types.h.
 #undef major
 #undef minor
@@ -55,6 +57,8 @@ public:
     int bugfix = 0;
     int build = 0;
 };
+
+NX_REFLECTION_TAG_TYPE(SoftwareVersion, useStringConversionForSerialization)
 
 NX_UTILS_API std::ostream& operator<<(std::ostream&, const SoftwareVersion&);
 

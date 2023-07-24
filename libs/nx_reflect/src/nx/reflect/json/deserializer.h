@@ -18,6 +18,7 @@
 #include <nx/reflect/type_utils.h>
 
 #include "utils.h"
+#include "../tags.h"
 
 namespace nx::reflect {
 
@@ -273,6 +274,12 @@ template<typename... U> inline constexpr bool IsDeserializableV =
 
 //-------------------------------------------------------------------------------------------------
 
+template<typename T, bool result>
+static void reportUnsupportedType()
+{
+    static_assert(result, "Type is not deserializable");
+}
+
 template<typename T>
 DeserializationResult deserializeValue(const DeserializationContext& ctx, T* data)
 {
@@ -289,6 +296,8 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
                 "Object value expected",
                 getStringRepresentation(ctx.value)};
         }
+
+        // ADL. Custom deserialize() overload will be invoked here if present.
         return deserialize(ctx, data);
     }
     if constexpr (std::is_same_v<T, std::string>)
@@ -364,14 +373,18 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
             "Either a number or a string is expected for an enum value",
             getStringRepresentation(ctx.value)};
     }
+    // Checking if custom deserialize() overload is defined for a non-instrumented type T.
+    // Invoking this custom method before fromString() since this deserialize() is more specific
+    // to the format.
     else if constexpr (IsDeserializableV<T>)
     {
-        // ADL call happens here.
+        // ADL call.
         return deserialize(ctx, data);
     }
     else if constexpr (
         std::is_object_v<T> &&
-        !nx::reflect::IsInstrumented<T>::value)
+        !nx::reflect::IsInstrumented<T>::value &&
+        useStringConversionForSerialization((const T*) nullptr))
     {
         *data = T();
         if (!ctx.value.IsString())
@@ -393,7 +406,7 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
     }
     else
     {
-        *data = T();
+        reportUnsupportedType<T, false>();
         return {false, "Unknown type", getStringRepresentation(ctx.value)};
     }
 }

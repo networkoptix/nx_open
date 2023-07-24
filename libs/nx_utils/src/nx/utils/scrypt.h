@@ -4,6 +4,8 @@
 
 #include <string>
 
+#include <nx/reflect/instrument.h>
+
 #include "exception.h"
 
 namespace nx::scrypt {
@@ -38,6 +40,8 @@ struct NX_UTILS_API Options
     bool isValid() const;
     QString toString() const;
 };
+
+NX_REFLECTION_TAG_TYPE(Options, useStringConversionForSerialization)
 
 NX_UTILS_API std::string encodeOrThrow(
     const std::string& password,

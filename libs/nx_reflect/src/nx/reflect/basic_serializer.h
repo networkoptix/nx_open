@@ -14,6 +14,7 @@
 #include <nx/reflect/generic_visitor.h>
 #include <nx/reflect/instrument.h>
 
+#include "tags.h"
 #include "to_string.h"
 #include "type_utils.h"
 
@@ -123,6 +124,12 @@ inline constexpr bool IsStringAlikeV =
     reflect::detail::HasToStdStringV<T> ||
     reflect::detail::HasToStringV<T>;
 
+template<typename T, bool result>
+static void reportUnsupportedType()
+{
+    static_assert(result, "Type is not serializable");
+}
+
 } // namespace detail
 
 template<typename SerializationContext, typename Data>
@@ -220,9 +227,21 @@ void serialize(
     {
         ctx->composer.writeValue(val);
     }
-    else if constexpr (!nx::reflect::IsInstrumentedV<Value>)
+    else if constexpr (
+        std::is_convertible_v<Value, std::string>
+        || std::is_convertible_v<Value, std::string_view>)
     {
         ctx->composer.writeValue(nx::reflect::toString(val));
+    }
+    else if constexpr (
+        useStringConversionForSerialization((const Value*) nullptr)
+        || nx::reflect::IsInstrumentedEnumV<Value>)
+    {
+        ctx->composer.writeValue(nx::reflect::toString(val));
+    }
+    else
+    {
+        detail::reportUnsupportedType<Value, false>();
     }
 }
 

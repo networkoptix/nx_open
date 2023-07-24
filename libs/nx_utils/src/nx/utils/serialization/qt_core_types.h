@@ -3,6 +3,8 @@
 #pragma once
 
 #include <QtCore/qnamespace.h>
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
@@ -70,3 +72,8 @@ NX_REFLECTION_INSTRUMENT_ENUM(Corner,
 #endif
 
 } // namespace Qt
+
+//-------------------------------------------------------------------------------------------------
+
+NX_REFLECTION_TAG_TYPE(QString, useStringConversionForSerialization)
+NX_REFLECTION_TAG_TYPE(QByteArray, useStringConversionForSerialization)

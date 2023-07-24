@@ -28,6 +28,7 @@
 #include <QtNetwork/QHostAddress>
 
 #include <nx/reflect/instrument.h>
+#include <nx/reflect/tags.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/type_utils.h>
 
@@ -188,6 +189,8 @@ private:
         std::optional<in6_addr> ipV6);
 };
 
+NX_REFLECTION_TAG_TYPE(HostAddress, useStringConversionForSerialization)
+
 NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
 NX_NETWORK_API void PrintTo(const HostAddress& val, ::std::ostream* os);
 
@@ -307,6 +310,7 @@ struct NX_NETWORK_API KeepAliveOptions
 };
 
 NX_NETWORK_API void PrintTo(const KeepAliveOptions& val, ::std::ostream* os);
+NX_REFLECTION_TAG_TYPE(KeepAliveOptions, useStringConversionForSerialization)
 
 } // namespace nx::network
 
