@@ -660,7 +660,7 @@ QString OutgoingMailSettingsWidget::Private::smtpErrorCodeToString(nx::email::Sm
         case SmtpError::sendDataTimeout:
         case SmtpError::connectionTimeout:
         case SmtpError::serverFailure:
-            return tr("Connection timed out");
+            return tr("Connection failed");
 
         case SmtpError::authenticationFailed:
             return tr("Authentication failed");

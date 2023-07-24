@@ -114,7 +114,7 @@ public:
             case RemoteConnectionErrorCode::connectionTimeout:
             {
                 return {
-                    tr("Connection timed out"),
+                    tr("Connection failed"),
                     connectionError()
                 };
             }
