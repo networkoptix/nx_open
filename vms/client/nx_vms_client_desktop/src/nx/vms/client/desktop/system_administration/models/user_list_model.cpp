@@ -498,7 +498,7 @@ QVariant UserListModel::headerData(int section, Qt::Orientation orientation, int
         case LoginColumn:
             return tr("Login");
         case FullNameColumn:
-            return tr("Name");
+            return tr("Full Name");
         case EmailColumn:
             return tr("Email");
         case UserGroupsColumn:
