@@ -5,7 +5,8 @@
 namespace nx::reflect::json {
 
 /**
- * The default overload for the `jsonSerializeChronoDurationAsNumber` tag.
+ * When set, std::chrono::duration types are serialized as a numeric value into a JSON document.
+ * By default, durations are serialized as a string holding the numeric representation.
  */
 template<typename T>
 static constexpr bool jsonSerializeChronoDurationAsNumber(const T*)

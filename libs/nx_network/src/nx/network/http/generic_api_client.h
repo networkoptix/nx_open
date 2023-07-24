@@ -458,6 +458,9 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::getResultCode(
 {
     if constexpr (std::is_same<ResultType, network::http::StatusCode::Value>::value)
     {
+        if (systemErrorCode != SystemError::noError)
+            return network::http::StatusCode::internalServerError;
+
         return response
             ? static_cast<network::http::StatusCode::Value>(response->statusLine.statusCode)
             : network::http::StatusCode::internalServerError;

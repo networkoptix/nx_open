@@ -9,6 +9,8 @@
 #include <QtCore/QString>
 #include <QtCore/QUuid>
 
+#include <nx/reflect/instrument.h>
+
 class NX_UTILS_API QnUuid
 {
     Q_GADGET
@@ -97,6 +99,8 @@ private:
 
     friend NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
 };
+
+NX_REFLECTION_TAG_TYPE(QnUuid, useStringConversionForSerialization)
 
 namespace std {
 

@@ -7,13 +7,14 @@
 #include <vector>
 
 #include <nx/reflect/instrument.h>
+#include <nx/reflect/tags.h>
 
 namespace nx::reflect::test {
 
-class Stringable
+class StringConvertible
 {
 public:
-    Stringable& operator=(const std::string& value)
+    StringConvertible& operator=(const std::string& value)
     {
         m_value = value;
         return *this;
@@ -21,9 +22,9 @@ public:
 
     std::string toStdString() const { return m_value; }
 
-    static Stringable fromStdString(const std::string& str)
+    static StringConvertible fromStdString(const std::string& str)
     {
-        Stringable result;
+        StringConvertible result;
         result = str;
         return result;
     }
@@ -31,6 +32,8 @@ public:
 private:
     std::string m_value;
 };
+
+NX_REFLECTION_TAG_TYPE(StringConvertible, useStringConversionForSerialization)
 
 struct C
 {
@@ -45,6 +48,8 @@ struct C
 std::string toString(const C& c);
 bool fromString(const std::string& str, C* c);
 
+NX_REFLECTION_TAG_TYPE(C, useStringConversionForSerialization)
+
 namespace BB {
 
 class B
@@ -52,7 +57,7 @@ class B
 public:
     int num = 0;
     std::string str;
-    Stringable text;
+    StringConvertible text;
     std::vector<int> numbers;
     std::vector<std::string> strings;
 

@@ -6,6 +6,9 @@
 
 #include <QtCore/QUrl>
 
+#include <nx/reflect/instrument.h>
+#include <nx/utils/serialization/qt_core_types.h>
+
 namespace nx::utils {
 
 class NX_UTILS_API Url
@@ -178,6 +181,8 @@ private:
 
     Url(const QUrl& other);
 };
+
+NX_REFLECTION_TAG_TYPE(Url, useStringConversionForSerialization)
 
 inline size_t qHash(const Url& url)
 {

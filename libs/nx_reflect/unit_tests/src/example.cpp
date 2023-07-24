@@ -4,6 +4,7 @@
 #include <string>
 
 #include <nx/reflect/instrument.h>
+#include <nx/reflect/tags.h>
 
 namespace nx::reflect::test {
 
@@ -32,6 +33,8 @@ enum class Race
     african,
     unknown,
 };
+
+NX_REFLECTION_TAG_TYPE(Race, useStringConversionForSerialization)
 
 std::string toString(Race race)
 {

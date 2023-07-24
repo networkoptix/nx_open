@@ -6,6 +6,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/serialization/qjson.h>
 #include <nx/vms/api/types/motion_types.h>
 
 #include "settings.h"

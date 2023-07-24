@@ -44,7 +44,7 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
 
 bool ServiceManager::loadSaasData(const std::string_view& data)
 {
-    bool result = nx::reflect::json::deserialize(data, &m_data);
+    const auto result = nx::reflect::json::deserialize(data, &m_data);
     if (result)
     {
         auto propertyDict = systemContext()->resourcePropertyDictionary();

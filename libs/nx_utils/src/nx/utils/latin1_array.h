@@ -5,6 +5,7 @@
 
 #include <QtCore/QByteArray>
 
+#include <nx/reflect/instrument.h>
 #include <nx/reflect/from_string.h>
 #include <nx/reflect/to_string.h>
 
@@ -19,6 +20,8 @@ public:
     QnLatin1Array(const QByteArray &other): QByteArray(other) {}
     QnLatin1Array(const char* data): QByteArray(data) {}
 };
+
+NX_REFLECTION_TAG_TYPE(QnLatin1Array, useStringConversionForSerialization)
 
 namespace nx::reflect::detail {
 

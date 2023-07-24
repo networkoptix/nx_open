@@ -7,6 +7,7 @@
 #include <boost/preprocessor/stringize.hpp>
 
 #include "enum_instrument.h"
+#include "tags.h"
 #include "utils.h"
 
 namespace nx::reflect {
@@ -308,3 +309,10 @@ constexpr bool IsInstrumentedV = IsInstrumented<U...>::value;
  */
 #define NX_REFLECTION_TAG_TYPE(TYPE, TAG) \
     static constexpr bool TAG(const TYPE*) { return true; }
+
+/**
+ * Similar to NX_REFLECTION_TAG_TYPE. But, works for template types.
+ */
+#define NX_REFLECTION_TAG_TEMPLATE_TYPE(TEMPLATE_TYPE, TAG) \
+    template<typename... Args> \
+    static constexpr bool TAG(const TEMPLATE_TYPE<Args...>*) { return true; }

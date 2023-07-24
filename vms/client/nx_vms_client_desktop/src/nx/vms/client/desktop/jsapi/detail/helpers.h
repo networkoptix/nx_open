@@ -7,6 +7,7 @@
 #include <QtCore/QJsonObject>
 
 #include <nx/reflect/json.h>
+#include <nx/utils/serialization/qt_core_types.h>
 
 namespace nx::vms::client::desktop::jsapi::detail {
 

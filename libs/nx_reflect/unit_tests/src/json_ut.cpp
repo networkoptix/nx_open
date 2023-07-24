@@ -83,6 +83,8 @@ struct Stringizable
     bool operator<(const Stringizable& right) const { return s < right.s; }
 };
 
+NX_REFLECTION_TAG_TYPE(Stringizable, useStringConversionForSerialization)
+
 struct StringizablePrime
 {
     std::string s;
@@ -93,6 +95,8 @@ struct StringizablePrime
 
     bool operator==(const StringizablePrime& right) const { return s == right.s; }
 };
+
+NX_REFLECTION_TAG_TYPE(StringizablePrime, useStringConversionForSerialization)
 
 struct Base64Convertible
 {
@@ -131,6 +135,8 @@ struct Base64Convertible
     void append(Base64Convertible value) { s += std::move(value.s); }
     void reserve(int) {}
 };
+
+NX_REFLECTION_TAG_TYPE(Base64Convertible, useStringConversionForSerialization)
 
 } // namespace nx::reflect::test
 
@@ -295,6 +301,42 @@ TEST_F(Json, std_optional_is_supported)
 TEST_F(Json, stringizable_type_is_supported)
 {
     testSerialization(R"({"num":12,"t":"Hello"})", FooStringizable{12, {"Hello"}});
+}
+
+// This type is not tagged with
+// NX_REFLECTION_TAG_TYPE(NotTaggedStringizable, useStringConversionForSerialization).
+// So, it cannot be used in json or other serialization.
+struct NotTaggedStringizable
+{
+    std::string toString() const { return "test"; }
+    static NotTaggedStringizable fromString(const std::string_view&) { return {}; }
+};
+
+using FooNotTaggedStringizable = Foo<NotTaggedStringizable>;
+NX_REFLECTION_INSTRUMENT(FooNotTaggedStringizable, (num)(t))
+
+namespace {
+
+template<typename T, typename = std::void_t<>>
+struct IsSerializable: std::false_type{};
+
+template<typename T>
+struct IsSerializable<
+    T,
+    std::void_t<decltype(nx::reflect::json::serialize(std::declval<const T&>()))>
+>: std::true_type {};
+
+} // namespace
+
+TEST_F(Json, not_tagged_stringizable_type_is_not_supported)
+{
+    // nx::reflect::json::serialize(NotTaggedStringizable());
+    // Compile error on the previous line actually tells that
+    // NX_REFLECTION_TAG_TYPE(NotTaggedStringizable, useStringConversionForSerialization)
+    // is required to serialize. But, it is not clear how to put this check into a static_assert
+    // like static_assert(!IsSerializable<NotTaggedStringizable>::value);
+
+    static_assert(IsSerializable<Stringizable>::value);
 }
 
 TEST_F(Json, base64_convertible_type_is_supported)
@@ -539,6 +581,8 @@ struct StringizableNonTemplateContainer: std::vector<std::string>
         return result;
     }
 };
+
+NX_REFLECTION_TAG_TYPE(StringizableNonTemplateContainer, useStringConversionForSerialization)
 
 using FooStringizableNonTemplateContainer = Foo<StringizableNonTemplateContainer>;
 NX_REFLECTION_INSTRUMENT(FooStringizableNonTemplateContainer, (num)(t))
