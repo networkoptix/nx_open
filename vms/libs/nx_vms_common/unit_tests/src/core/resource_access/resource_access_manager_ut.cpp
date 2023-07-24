@@ -1689,14 +1689,6 @@ TEST_F(ResourceAccessManagerTest, accessRightsIndependency)
 
     ASSERT_EQ(permissions(camera), Qn::NoPermissions);
 
-    const Qn::Permissions kRelevantPermissions =
-        Qn::ViewContentPermission
-        | Qn::ViewFootagePermission
-        | Qn::ViewBookmarksPermission
-        | Qn::ManageBookmarksPermission
-        | Qn::UserInputPermissions
-        | Qn::GenericEditPermissions;
-
     static const std::map<AccessRight, Qn::Permissions> kTestAccessRights{
         {AccessRight::view, Qn::ViewContentPermission | Qn::ViewLivePermission},
         {AccessRight::viewArchive, Qn::ViewContentPermission | Qn::ViewFootagePermission},
@@ -1711,6 +1703,7 @@ TEST_F(ResourceAccessManagerTest, accessRightsIndependency)
         EXPECT_EQ(permissions(camera), Qn::ReadPermission | expectedPermissions);
     }
 
+    // TODO: #vkutin AccessRight::exportArchive should be independent of AccessRight::viewArchive.
     // The only exception is AccessRight::exportArchive.
     setOwnAccessRights(m_currentUser->getId(), {{layout->getId(), AccessRight::exportArchive}});
     EXPECT_FALSE(hasPermissions(m_currentUser, camera, Qn::ExportPermission));
