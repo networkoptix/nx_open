@@ -11,6 +11,15 @@
 
 namespace nx::vms::api {
 
+constexpr std::array<std::pair<AccessRight, GlobalPermissionDeprecated>, 6> kLut{{
+    {AccessRight::viewArchive, GlobalPermissionDeprecated::viewArchive},
+    {AccessRight::exportArchive, GlobalPermissionDeprecated::exportArchive},
+    {AccessRight::viewBookmarks, GlobalPermissionDeprecated::viewBookmarks},
+    {AccessRight::manageBookmarks, GlobalPermissionDeprecated::manageBookmarks},
+    {AccessRight::userInput, GlobalPermissionDeprecated::userInput},
+    {AccessRight::edit, GlobalPermissionDeprecated::editCameras},
+}};
+
 std::tuple<GlobalPermissions, std::vector<QnUuid>, std::map<QnUuid, AccessRights>>
     migrateAccessRights(
         GlobalPermissionsDeprecated permissions,
@@ -29,18 +38,11 @@ std::tuple<GlobalPermissions, std::vector<QnUuid>, std::map<QnUuid, AccessRights
         groups = {kLiveViewersGroupId};
 
     AccessRights accessRights = AccessRight::view;
-    if (permissions.testFlag(GlobalPermissionDeprecated::editCameras))
-        accessRights |= AccessRight::edit;
-    if (permissions.testFlag(GlobalPermissionDeprecated::viewArchive))
-        accessRights |= AccessRight::viewArchive;
-    if (permissions.testFlag(GlobalPermissionDeprecated::exportArchive))
-        accessRights |= AccessRight::exportArchive;
-    if (permissions.testFlag(GlobalPermissionDeprecated::viewBookmarks))
-        accessRights |= AccessRight::viewBookmarks;
-    if (permissions.testFlag(GlobalPermissionDeprecated::manageBookmarks))
-        accessRights |= AccessRight::manageBookmarks;
-    if (permissions.testFlag(GlobalPermissionDeprecated::userInput))
-        accessRights |= AccessRight::userInput;
+    for (const auto [accessRight, permission]: kLut)
+    {
+        if (permissions.testFlag(permission))
+            accessRights.setFlag(accessRight);
+    }
 
     std::map<QnUuid, AccessRights> accessMap;
     if (permissions.testFlag(GlobalPermissionDeprecated::accessAllMedia))
@@ -65,14 +67,6 @@ std::tuple<GlobalPermissions, std::vector<QnUuid>, std::map<QnUuid, AccessRights
 
 static GlobalPermissionsDeprecated accessRightsToGlobalPermissions(AccessRights accessRights)
 {
-    constexpr std::array<std::pair<AccessRight, GlobalPermissionDeprecated>, 6> kLut{{
-        {AccessRight::viewArchive, GlobalPermissionDeprecated::viewArchive},
-        {AccessRight::exportArchive, GlobalPermissionDeprecated::exportArchive},
-        {AccessRight::viewBookmarks, GlobalPermissionDeprecated::viewBookmarks},
-        {AccessRight::manageBookmarks, GlobalPermissionDeprecated::manageBookmarks},
-        {AccessRight::userInput, GlobalPermissionDeprecated::userInput},
-        {AccessRight::edit, GlobalPermissionDeprecated::editCameras},
-    }};
     GlobalPermissionsDeprecated result;
     for (const auto [accessRight, permission]: kLut)
     {
