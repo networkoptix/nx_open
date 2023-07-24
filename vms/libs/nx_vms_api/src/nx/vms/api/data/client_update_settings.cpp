@@ -5,7 +5,7 @@
 #include <nx/branding.h>
 #include <nx/fusion/model_functions.h>
 
-namespace nx::vms::common::api {
+namespace nx::vms::api {
 
 ClientUpdateSettings::ClientUpdateSettings():
     enabled(nx::branding::clientAutoUpdateEnabledByDefault()
