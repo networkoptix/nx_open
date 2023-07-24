@@ -2175,6 +2175,7 @@ void SystemSettings::update(const vms::api::SystemSettings& value)
     m_timeSynchronizationEnabledAdaptor->setValue(value.timeSynchronizationEnabled);
     m_primaryTimeServerAdaptor->setValue(value.primaryTimeServer);
     m_customReleaseListUrlAdaptor->setValue(value.customReleaseListUrl);
+    m_clientUpdateSettingsAdaptor->setValue(value.clientUpdateSettings);
     m_backupSettingsAdaptor->setValue(value.backupSettings);
     m_metadataStorageChangePolicyAdaptor->setValue(value.metadataStorageChangePolicy);
 }

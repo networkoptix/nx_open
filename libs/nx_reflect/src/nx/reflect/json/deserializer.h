@@ -88,9 +88,7 @@ DeserializationResult deserialize(
     T* data,
     std::enable_if_t<std::is_floating_point_v<T>>* = nullptr)
 {
-    if (ctx.value.IsFloat())
-        *data = (T) ctx.value.GetFloat();
-    else if (ctx.value.IsDouble())
+    if (ctx.value.IsDouble())
         *data = (T) ctx.value.GetDouble();
     else if (ctx.value.IsInt64())
         *data = (T) ctx.value.GetInt64();
