@@ -153,7 +153,7 @@ Dialog
 
         CenteredField
         {
-            text: qsTr("Synchronisation<br>Interval")
+            text: qsTr("Synchronization<br>Interval")
 
             leftSideMargin: 180
             rightSideMargin: 0

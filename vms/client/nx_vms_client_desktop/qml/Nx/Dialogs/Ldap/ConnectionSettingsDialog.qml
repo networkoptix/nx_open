@@ -186,7 +186,7 @@ Dialog
                 CheckBox
                 {
                     id: starTlsCheckbox
-                    text: qsTr("Use StarTLS")
+                    text: qsTr("Use StartTLS")
                     wrapMode: Text.WordWrap
 
                     property bool prevChecked: false
