@@ -125,7 +125,11 @@ UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
     user.permissions = std::move(permissions);
     user.resourceAccessRights = std::move(resourceAccessRights);
     if (user.type == UserType::temporaryLocal && NX_ASSERT(temporaryToken))
-        user.hash = QJson::serialized(*temporaryToken);
+    {
+        QnJsonContext context;
+        context.setChronoSerializedAsDouble(true);
+        QJson::serialize(&context, *temporaryToken, &user.hash);
+    }
 
     return {std::move(user)};
 }
@@ -146,8 +150,14 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
         if (!baseData.resourceAccessRights.empty())
             model.resourceAccessRights = std::move(baseData.resourceAccessRights);
 
-        if (model.hash)
-            model.temporaryToken = QJson::deserialized<TemporaryToken>(*model.hash);
+        if (model.type == UserType::temporaryLocal && NX_ASSERT(model.hash))
+        {
+            QnJsonContext context;
+            context.setStrictMode(true);
+            TemporaryToken temporaryToken;
+            if (NX_ASSERT(QJson::deserialize(&context, *model.hash, &temporaryToken)))
+                model.temporaryToken = std::move(temporaryToken);
+        }
 
         result.push_back(std::move(model));
     }

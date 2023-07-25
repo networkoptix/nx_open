@@ -209,6 +209,12 @@ bool QJsonDetail::deserialize_json(
         }
         case QJsonValue::Undefined:
         default:
+            if (value.trimmed().isEmpty())
+            {
+                *outTarget = QJsonValue(QJsonValue::Undefined);
+                return true;
+            }
+
             if (errorMessage)
             {
                 static QString kUndefinedJsonValueError("Internal error: Undefined JSON value.");

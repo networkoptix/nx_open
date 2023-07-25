@@ -565,8 +565,7 @@ inline void serialize(
 {
     if (!value)
     {
-        if (ctx->isOptionalDefaultSerialization<T>())
-            QJson::serialize<T>(ctx, T{}, target);
+        *target = QJsonValue(QJsonValue::Undefined);
         return;
     }
 
@@ -581,6 +580,12 @@ inline bool deserialize(
 {
     if (!ctx->doesDeserializeReplaceExistingOptional() && *target)
         return true;
+
+    if (value.isUndefined())
+    {
+        target->reset();
+        return true;
+    }
 
     *target = T();
     return QJson::deserialize<T>(ctx, value, &**target);

@@ -941,6 +941,21 @@ TEST_F(QnJsonBoostOptionalField, serialize_optional_json_value)
         "{\"field\":null}", QJson::serialized(OptionalJsonValue{QJsonValue()}).toStdString());
 }
 
+TEST_F(QnJsonBoostOptionalField, serialize_optional)
+{
+    ASSERT_EQ("0", QJson::serialized(std::optional<int>(0)));
+    ASSERT_EQ("", QJson::serialized(std::optional<int>()));
+}
+
+TEST_F(QnJsonBoostOptionalField, deserialize_optional)
+{
+    ASSERT_EQ(QJson::deserialized<std::optional<int>>(" 1 ").value_or(0), 1);
+
+    bool ok = false;
+    ASSERT_FALSE(QJson::deserialized("  ", std::optional<int>(), &ok));
+    ASSERT_TRUE(ok);
+}
+
 //-------------------------------------------------------------------------------------------------
 
 namespace {
