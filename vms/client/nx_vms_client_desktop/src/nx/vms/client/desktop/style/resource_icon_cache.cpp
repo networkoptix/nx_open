@@ -80,7 +80,9 @@ QIcon loadIcon(const QString& name,
     return qnSkin->icon(name,
         /* checkedName */ QString(),
         &kResourceIconSuffixes,
-        nx::vms::client::core::SvgIconColorer::kDefaultIconSubstitutions,
+        name.endsWith(".svg")
+            ? nx::vms::client::core::SvgIconColorer::kTreeIconSubstitutions
+            : nx::vms::client::core::SvgIconColorer::kDefaultIconSubstitutions,
         /* svgCheckedColorSubstitutions */ {},
         themeSubstitutions);
 }
