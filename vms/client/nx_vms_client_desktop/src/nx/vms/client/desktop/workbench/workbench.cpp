@@ -173,8 +173,14 @@ struct Workbench::Private
 
     int layoutIndex(const LayoutResourcePtr& resource) const
     {
-        auto iter = std::find_if(layouts.cbegin(), layouts.cend(),
-            [resource](const auto& layout) { return layout->resource() == resource; });
+        auto iter = std::find_if(
+            layouts.cbegin(),
+            layouts.cend(),
+            [resource](const auto& layout)
+            {
+                return NX_ASSERT(layout) && layout->resource() == resource;
+            });
+
         return iter != layouts.cend()
             ? std::distance(layouts.cbegin(), iter)
             : -1;
