@@ -138,6 +138,17 @@ struct NX_VMS_API LdapSettings: LdapSettingsBase
      */
     bool isHttpDigestEnabledOnImport = false;
 
+    /**%apidoc[opt]
+     * If `true` use TLS protocol to communicate with LDAP server.
+     */
+     bool startTls = false;
+
+    /**%apidoc[opt]
+     * If `true` ignore SSL/TLS certificate errors when connecting to LDAP server.
+     */
+     bool ignoreCertificateErrors = false;
+
+
     bool operator==(const LdapSettings&) const = default;
     Void getId() const { return Void(); }
     QString syncId() const;
@@ -148,7 +159,10 @@ struct NX_VMS_API LdapSettings: LdapSettingsBase
     (continuousSyncIntervalS) \
     (preferredMasterSyncServer) \
     (masterSyncServerCheckIntervalS) \
-    (isHttpDigestEnabledOnImport)
+    (isHttpDigestEnabledOnImport) \
+    (startTls) \
+    (ignoreCertificateErrors)
+
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(LdapSettings, LdapSettings_Fields)
 
@@ -171,7 +185,7 @@ struct NX_VMS_API LdapSettingsDeprecated: LdapSettingsBase
     QString searchFilter;
 
     LdapSettingsDeprecated() = default;
-    LdapSettingsDeprecated(LdapSettings settings);
+    explicit LdapSettingsDeprecated(LdapSettings settings);
     bool operator==(const LdapSettingsDeprecated&) const = default;
 };
 #define LdapSettingsDeprecated_Fields LdapSettingsBase_Fields(searchBase)(searchFilter)
@@ -207,4 +221,3 @@ NX_VMS_API_DECLARE_STRUCT_EX(LdapStatus, (json))
 NX_REFLECTION_INSTRUMENT(LdapStatus, LdapStatus_Fields)
 
 } // namespace nx::vms::api
-
