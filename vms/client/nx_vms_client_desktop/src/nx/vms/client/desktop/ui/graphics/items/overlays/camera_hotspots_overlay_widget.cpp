@@ -125,17 +125,39 @@ void CameraHotspotsOverlayWidget::Private::updateHotspotItem(CameraHotspotItem* 
 
     if (parentMediaResourceWidget->dewarpingApplied())
     {
-        auto mediaData = parentMediaResourceWidget->dewarpingParams();
-        auto viewData = parentMediaResourceWidget->item()->dewarpingParams();
+        const auto mediaData = parentMediaResourceWidget->dewarpingParams();
+        const auto viewData = parentMediaResourceWidget->item()->dewarpingParams();
+        const auto isCeilingFisheye = mediaData.isFisheye()
+            && mediaData.viewMode == dewarping::FisheyeCameraMount::ceiling;
+
         DewarpingTransform transform(mediaData, viewData, resourceWidgetCamera()->aspectRatio());
         if (const auto dewarpedPos = transform.mapToView(relativePos))
         {
-            relativePos = dewarpedPos.value();
-            if (dewarping::MediaData::isFisheye(mediaData.cameraProjection)
-                && mediaData.viewMode == dewarping::FisheyeCameraMount::ceiling)
+            if (hotspotItem->hotspotData().hasDirection())
             {
-                relativePos = Geometry::rotated(relativePos, unitRect.center(), 180.0);
+                const auto directionVector = hotspotItem->hotspotData().direction;
+                const auto directionPoint = relativePos + directionVector * 0.001;
+
+                // Angular difference in radians between dewarped directional hotspot and
+                // untransformed one.
+                double dewarpedHotspotRotation = 0.0;
+
+                if (const auto dewarpedDirectionPoint = transform.mapToView(directionPoint))
+                {
+                    const auto dewarpedDirectionVector =
+                        dewarpedDirectionPoint.value() - dewarpedPos.value();
+                    dewarpedHotspotRotation += Geometry::atan2(dewarpedDirectionVector);
+                    dewarpedHotspotRotation -= Geometry::atan2(directionVector);
+                }
+                if (isCeilingFisheye)
+                    dewarpedHotspotRotation += M_PI;
+
+                hotspotItem->setRotation(qRadiansToDegrees(dewarpedHotspotRotation));
             }
+
+            relativePos = dewarpedPos.value();
+            if (isCeilingFisheye)
+                relativePos = Geometry::rotated(relativePos, unitRect.center(), 180.0);
         }
         else
         {
@@ -144,10 +166,16 @@ void CameraHotspotsOverlayWidget::Private::updateHotspotItem(CameraHotspotItem* 
             return;
         }
     }
-    else if (parentMediaResourceWidget->isZoomWindow())
+    else
     {
-        relativePos = Geometry::subPoint(
-            Geometry::unsubRect(unitRect, parentMediaResourceWidget->zoomRect()), relativePos);
+        if (hotspotItem->hotspotData().hasDirection())
+            hotspotItem->setRotation(0.0);
+
+        if (parentMediaResourceWidget->isZoomWindow())
+        {
+            relativePos = Geometry::subPoint(
+                Geometry::unsubRect(unitRect, parentMediaResourceWidget->zoomRect()), relativePos);
+        }
     }
 
     hotspotItem->setVisible(unitRect.contains(relativePos));
