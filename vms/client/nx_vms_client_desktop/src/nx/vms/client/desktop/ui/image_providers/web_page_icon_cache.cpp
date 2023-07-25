@@ -139,17 +139,4 @@ void WebPageIconCache::update(const QUrl& webPageUrl, const QImage& icon)
     saveIcon(webPageUrl, icon.scaled(kIconSize), icon.scaled(kIconSize * 2));
 }
 
-void WebPageIconCache::callOnUpdate(
-    const QUrl& targetWebPageUrl,
-    QObject* receiver,
-    std::function<void()> updateFunction)
-{
-    connect(this, &WebPageIconCache::iconChanged, receiver,
-        [updateFunction, targetWebPageUrl](const QUrl& webPageUrl)
-        {
-            if (targetWebPageUrl == webPageUrl)
-                updateFunction();
-        });
-}
-
 } // namespace nx::vms::client::desktop
