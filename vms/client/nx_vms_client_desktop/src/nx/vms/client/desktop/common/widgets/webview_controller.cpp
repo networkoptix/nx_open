@@ -394,7 +394,7 @@ struct WebViewController::Private: public QObject
         else
         {
             const auto url = requestObject->property("url").toUrl();
-            text = url.toString(QUrl::RemovePassword | QUrl::RemovePath);
+            text = url.toString(QUrl::RemovePassword | QUrl::RemovePath | QUrl::RemoveQuery);
         }
 
         PasswordDialog dialog(widget());
