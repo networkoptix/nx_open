@@ -18,7 +18,28 @@ namespace nx::vms::api {
 
 using namespace std::chrono_literals;
 
-struct NX_VMS_API LdapSettingsBase
+struct NX_VMS_API LdapSettingSearchFilter
+{
+    /**%apidoc[opt]
+     * %example Users
+     */
+    QString name;
+
+    /**%apidoc
+     * %example ou=users,dc=la
+     */
+    QString base;
+
+    /**%apidoc[opt] */
+    QString filter;
+
+    bool operator==(const LdapSettingSearchFilter&) const = default;
+};
+#define LdapSettingSearchFilter_Fields (name)(base)(filter)
+QN_FUSION_DECLARE_FUNCTIONS(LdapSettingSearchFilter, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(LdapSettingSearchFilter, LdapSettingSearchFilter_Fields)
+
+struct NX_VMS_API LdapSettings
 {
     /**%apidoc:string
      * %example ldap://organization-server-address.com
@@ -67,57 +88,23 @@ struct NX_VMS_API LdapSettingsBase
     /**%apidoc[opt] */
     int searchPageSize = 1000;
 
-    bool operator==(const LdapSettingsBase&) const = default;
-    bool isValid(bool checkPassword = true) const;
-
-    static int defaultPort(bool useSsl = false);
-};
-#define LdapSettingsBase_Fields \
-    (uri) \
-    (adminDn) \
-    (adminPassword) \
-    (loginAttribute) \
-    (groupObjectClass) \
-    (memberAttribute) \
-    (passwordExpirationPeriodMs) \
-    (searchTimeoutS) \
-    (searchPageSize)
-
-struct NX_VMS_API LdapSettingSearchFilter
-{
-    /**%apidoc[opt]
-     * %example Users
-     */
-    QString name;
-
-    /**%apidoc
-     * %example ou=users,dc=la
-     */
-    QString base;
-
-    /**%apidoc[opt] */
-    QString filter;
-
-    bool operator==(const LdapSettingSearchFilter&) const = default;
-};
-#define LdapSettingSearchFilter_Fields (name)(base)(filter)
-QN_FUSION_DECLARE_FUNCTIONS(LdapSettingSearchFilter, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(LdapSettingSearchFilter, LdapSettingSearchFilter_Fields)
-
-struct NX_VMS_API LdapSettings: LdapSettingsBase
-{
     /**%apidoc[opt] LDAP users and groups are collected using all these filters. */
     std::vector<LdapSettingSearchFilter> filters;
 
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(Sync,
+        /**%apidoc Nothing is synchronized. */
         disabled,
+
+        /**%apidoc Only Groups are synchronized. */
         groupsOnly,
+
+        /**%apidoc Users and Groups are synchronized. */
         usersAndGroups);
 
-    /**%apidoc[opt] */
+    /**%apidoc[opt] Automatic synchronization policy. */
     Sync continuousSync = Sync::disabled;
 
-    /**%apidoc[opt]
+    /**%apidoc[opt] Delay between automatic synchronization cycles.
      * %example 0
      */
     std::chrono::seconds continuousSyncIntervalS = 0s;
@@ -141,19 +128,31 @@ struct NX_VMS_API LdapSettings: LdapSettingsBase
     /**%apidoc[opt]
      * If `true` use TLS protocol to communicate with LDAP server.
      */
-     bool startTls = false;
+    bool startTls = false;
 
     /**%apidoc[opt]
      * If `true` ignore SSL/TLS certificate errors when connecting to LDAP server.
      */
-     bool ignoreCertificateErrors = false;
-
+    bool ignoreCertificateErrors = false;
 
     bool operator==(const LdapSettings&) const = default;
     Void getId() const { return Void(); }
+
+    bool isValid(bool checkPassword = true) const;
     QString syncId() const;
+
+    static int defaultPort(bool useSsl = false);
 };
-#define LdapSettings_Fields LdapSettingsBase_Fields \
+#define LdapSettings_Fields \
+    (uri) \
+    (adminDn) \
+    (adminPassword) \
+    (loginAttribute) \
+    (groupObjectClass) \
+    (memberAttribute) \
+    (passwordExpirationPeriodMs) \
+    (searchTimeoutS) \
+    (searchPageSize) \
     (filters) \
     (continuousSync) \
     (continuousSyncIntervalS) \
@@ -174,33 +173,6 @@ struct NX_VMS_API LdapSettingsChange: LdapSettings
 #define LdapSettingsChange_Fields LdapSettings_Fields (removeRecords)
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettingsChange, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(LdapSettingsChange, LdapSettingsChange_Fields)
-
-// TODO: Remove this struct after `/api/testLdapSettings` support is dropped.
-struct NX_VMS_API LdapSettingsDeprecated: LdapSettingsBase
-{
-    /**%apidoc[opt] */
-    QString searchBase;
-
-    /**%apidoc[opt] LDAP User search filter. */
-    QString searchFilter;
-
-    LdapSettingsDeprecated() = default;
-    explicit LdapSettingsDeprecated(LdapSettings settings);
-    bool operator==(const LdapSettingsDeprecated&) const = default;
-};
-#define LdapSettingsDeprecated_Fields LdapSettingsBase_Fields(searchBase)(searchFilter)
-QN_FUSION_DECLARE_FUNCTIONS(LdapSettingsDeprecated, (json), NX_VMS_API)
-
-// TODO: Remove this struct after `/api/testLdapSettings` support is dropped.
-struct NX_VMS_API LdapUser
-{
-    QString dn;
-    QString login;
-    QString fullName;
-    QString email;
-};
-#define LdapUser_Fields (dn)(login)(fullName)(email)
-NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(LdapUser, (json))
 
 struct NX_VMS_API LdapStatus
 {

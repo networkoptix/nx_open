@@ -110,8 +110,6 @@ void Metatypes::initialize()
     qRegisterMetaType<LicenseData>();
     qRegisterMetaType<LicenseOverflowData>();
     qRegisterMetaType<LockData>();
-    qRegisterMetaType<LdapUser>();
-    qRegisterMetaType<LdapUserList>();
     qRegisterMetaType<MediaServerData>();
     qRegisterMetaType<MediaServerDataList>();
     qRegisterMetaType<MediaServerDataEx>();
