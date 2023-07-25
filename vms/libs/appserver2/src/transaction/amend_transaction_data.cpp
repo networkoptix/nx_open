@@ -46,8 +46,9 @@ extern const std::set<QString> kResourceParamToAmend =
         return s;
     }();
 
-bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
-    QnResourceAccessManager* /*accessManager*/,
+bool amendOutputDataIfNeeded(
+    const Qn::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
     nx::vms::api::ResourceParamData* paramData)
 {
     if (kResourceParamToAmend.contains(paramData->name))
@@ -59,8 +60,11 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
         else if (paramData->name == ResourcePropertyKey::kCredentials
             || paramData->name == ResourcePropertyKey::kDefaultCredentials)
         {
-            paramData->value = nx::vms::api::Credentials::parseColon(
-                nx::crypt::decodeStringFromHexStringAES128CBC(paramData->value)).asString();
+            const bool hidePassword = !accessManager->globalSettings()->exposeDeviceCredentials()
+                || !accessManager->hasPowerUserPermissions(accessData);
+            const auto value = nx::crypt::decodeStringFromHexStringAES128CBC(paramData->value);
+            paramData->value =
+                nx::vms::api::Credentials::parseColon(value, hidePassword).asString();
         }
         else
         {

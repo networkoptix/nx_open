@@ -187,6 +187,8 @@ std::vector<DeviceModel> DeviceModel::fromDbTypes(DbListTypes all)
                 [id = model.getId()](const auto& status) { return status.id == id; });
             if (status)
                 model.status = status->status;
+            else
+                model.status = ResourceStatus::undefined;
 
             return model;
         });
@@ -199,7 +201,7 @@ void DeviceModel::extractFromList(const QnUuid& id, ResourceParamWithRefDataList
     if (const auto it = parameters.find(kCredentials); it != parameters.end())
     {
         if (const auto value = it->second.toString(); !value.isEmpty())
-            credentials = Credentials::parseColon(value);
+            credentials = Credentials::parseColon(value, /*hidePassword*/ false);
         parameters.erase(it);
     }
     if (const auto it = parameters.find(kDefaultCredentials); it != parameters.end())
@@ -207,7 +209,7 @@ void DeviceModel::extractFromList(const QnUuid& id, ResourceParamWithRefDataList
         if (!credentials)
         {
             if (const auto value = it->second.toString(); !value.isEmpty())
-                credentials = Credentials::parseColon(value);
+                credentials = Credentials::parseColon(value, /*hidePassword*/ false);
         }
         parameters.erase(it);
     }
@@ -216,6 +218,10 @@ void DeviceModel::extractFromList(const QnUuid& id, ResourceParamWithRefDataList
     {
         capabilities = static_cast<DeviceCapabilities>(it->second.toInt());
         parameters.erase(it);
+    }
+    else
+    {
+        capabilities = DeviceCapability::noCapabilities;
     }
 }
 
