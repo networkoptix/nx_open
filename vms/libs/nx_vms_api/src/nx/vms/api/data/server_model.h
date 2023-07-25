@@ -79,6 +79,11 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
     /**%apidoc[opt] */
     ServerFlags flags = SF_None;
 
+    /**%apidoc[opt]
+     * If `isFailoverEnabled` is true then Devices are moved across the Servers with the same `locationId`.
+     */
+    int locationId = 0;
+
     /**%apidoc[opt] */
     bool isFailoverEnabled = false;
     std::optional<int> maxCameras = 0;
@@ -119,7 +124,8 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
 };
 #define ServerModel_Fields \
     (id)(name)(url)(version)(endpoints)(authKey)(osInfo)(flags) \
-    (isFailoverEnabled)(maxCameras)(backupBitrateBytesPerSecond)(status)(storages)(parameters)
+    (isFailoverEnabled)(locationId)(maxCameras)(backupBitrateBytesPerSecond) \
+    (status)(storages)(parameters)
 QN_FUSION_DECLARE_FUNCTIONS(ServerModel, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ServerModel, ServerModel_Fields);
 
