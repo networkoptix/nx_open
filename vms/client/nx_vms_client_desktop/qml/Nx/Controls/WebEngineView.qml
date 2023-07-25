@@ -298,9 +298,15 @@ Item
 
         onStatusChanged:
         {
-            const resourceUrl = controller && controller.resourceUrl()
-            const iconCache = controller && controller.iconCache()
-            if (status === Image.Ready && resourceUrl && iconCache)
+            if (status !== Image.Ready || !controller)
+                return;
+
+            const resourceUrl = controller.resourceUrl()
+            const iconCache = controller.iconCache()
+            const currentHost = (new URL(webView.url)).host
+            const webPageHost = resourceUrl ? (new URL(resourceUrl)).host : ""
+
+            if (resourceUrl && iconCache && currentHost.includes(webPageHost))
                 icon.grabToImage((result) => iconCache.update(resourceUrl, result.image))
         }
     }

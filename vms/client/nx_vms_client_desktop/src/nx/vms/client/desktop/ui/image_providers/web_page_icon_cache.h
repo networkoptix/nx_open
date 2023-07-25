@@ -44,11 +44,6 @@ public:
     /** Updates the icon associated with webPageUrl if there is no loaded icon. */
     Q_INVOKABLE void update(const QUrl& webPageUrl, const QImage& image);
 
-    void callOnUpdate(
-        const QUrl& targetWebPageUrl,
-        QObject* receiver,
-        std::function<void()> updateFunction);
-
 signals:
     /** Emitted when the icon associated with webPageUrl changes. */
     void iconChanged(const QUrl& webPageUrl);
