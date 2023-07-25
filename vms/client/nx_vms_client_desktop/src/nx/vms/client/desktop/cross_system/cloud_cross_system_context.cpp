@@ -166,7 +166,9 @@ struct CloudCrossSystemContext::Private
         // solution would be to listen `systemContextRemoved` in all appropriate places, but it
         // is way more complex.
         const auto resources = systemContext->resourcePool()->getResources();
-        systemContext->resourcePool()->removeResources(resources);
+        const auto resourcePool = systemContext->resourcePool();
+        resourcePool->disconnect(q);
+        resourcePool->removeResources(resources);
 
         appContext()->removeSystemContext(systemContext.get());
     }
