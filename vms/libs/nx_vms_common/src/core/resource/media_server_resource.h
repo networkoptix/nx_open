@@ -185,6 +185,8 @@ signals:
     void versionChanged(const QnResourcePtr& resource);
     void redundancyChanged(const QnResourcePtr& resource);
     void backupScheduleChanged(const QnResourcePtr& resource);
+    void locationIdChanged(const QnResourcePtr& resource);
+    void maxCamerasChanged(const QnResourcePtr& resource);
     void apiUrlChanged(const QnResourcePtr& resource);
     void primaryAddressChanged(const QnResourcePtr& resource);
     void compatibilityChanged(const QnResourcePtr& resource);

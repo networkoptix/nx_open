@@ -2,8 +2,8 @@
 
 #include "server_model.h"
 
-#include <nx/utils/std/algorithm.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::api {
 
@@ -32,6 +32,7 @@ ServerModel::DbUpdateTypes ServerModel::toDbTypes() &&
     attributesData.maxCameras = maxCameras.value_or(0);
     attributesData.allowAutoRedundancy = isFailoverEnabled;
     attributesData.backupBitrateBytesPerSecond = backupBitrateBytesPerSecond;
+    attributesData.locationId = locationId;
 
     attributesData.checkResourceExists = CheckResourceExists::no;
 
@@ -81,6 +82,7 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
                     model.maxCameras = attrs->maxCameras;
                 model.isFailoverEnabled = attrs->allowAutoRedundancy;
                 model.backupBitrateBytesPerSecond = attrs->backupBitrateBytesPerSecond;
+                model.locationId = attrs->locationId;
             }
 
             if (const auto status = nx::utils::find_if(
