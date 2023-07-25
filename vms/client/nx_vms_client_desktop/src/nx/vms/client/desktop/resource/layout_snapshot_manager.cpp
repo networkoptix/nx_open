@@ -181,12 +181,19 @@ void LayoutSnapshotManager::restore(const LayoutResourcePtr &resource)
 
         // Cleanup from snapshot resources which are already deleted from the resource pool.
         common::LayoutItemDataMap existingItems;
-        for (const auto& item: restored->getItems())
+        for (auto& item: restored->getItems())
         {
-            if (!getResourceByDescriptor(item.resource))
-                continue;
+            if (const auto resource = getResourceByDescriptor(item.resource))
+            {
+                // Restore the resource descriptor from the resource. Required as the resource name
+                // is not present in the snapshot. The resource name is a temporary solution for
+                // the cross-system layouts.
+                // TODO: #mmalofeev remove this workaround when cross-system layouts will not
+                // require this property any more.
+                item.resource = descriptor(resource);
 
-            existingItems.insert(item.uuid, item);
+                existingItems.insert(item.uuid, item);
+            }
         }
 
         restored->setItems(existingItems);
