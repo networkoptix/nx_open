@@ -192,7 +192,7 @@ void ServerCertificateViewer::setCertificateData(
         const auto& cert = m_certificates[i];
         auto newItem = new QTreeWidgetItem(lastItem);
         newItem->setIcon(0, qnSkin->icon("misc/certificate_icon.svg"));
-        newItem->setText(0, name(cert.subject()));
+        newItem->setText(0, name(cert.subject(), certificateDafaultName()));
         newItem->setData(0, Qt::UserRole, i); //< Store certificate index as UserRole data.
         lastItem = newItem;
     }
@@ -230,9 +230,9 @@ void ServerCertificateViewer::showSelectedCertificate()
     const auto& cert = m_certificates[index];
     const auto expiresAt = duration_cast<std::chrono::seconds>(cert.notAfter().time_since_epoch());
 
-    ui->subject->setText(name(cert.subject()));
+    ui->subject->setText(name(cert.subject(), certificateDafaultName()));
 
-    ui->issuedByValueLabel->setText(name(cert.issuer()));
+    ui->issuedByValueLabel->setText(name(cert.issuer(), certificateDafaultName()));
     ui->expiresValueLabel->setText(
         QDateTime::fromSecsSinceEpoch(expiresAt.count()).toString());
 
@@ -347,6 +347,11 @@ QString ServerCertificateViewer::calculateServerInfo(
         default:
             return tr("The certificate was presented by %1").arg(serverInfo);
     }
+}
+
+QString ServerCertificateViewer::certificateDafaultName()
+{
+    return QString("<%1>").arg(tr("Not Part Of Certificate"));
 }
 
 } // namespace nx::vms::client::desktop
