@@ -1046,7 +1046,7 @@ void WebViewController::requestAuthenticationDialog(QJSValue request)
     if (!d->acceptDialogRequest(requestObject))
         return;
 
-    if (!NX_ASSERT(d->authRequest.toQObject() == nullptr))
+    if (d->authRequest.toQObject() != nullptr)
     {
         QMetaObject::invokeMethod(requestObject, "dialogReject");
         return;
