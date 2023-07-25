@@ -730,7 +730,7 @@ Handle ServerConnection::searchCamera(
         prepareUrl(QString("/rest/v3/devices/*/searches/"), {}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         nx::reflect::json::serialize(deviceSearchData));
-    
+
     proxyRequestUsingServer(request, targetServerId);
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -1797,29 +1797,6 @@ std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorM
 
             invoke(context, internal_callback, success, serverId.toString());
         };
-}
-
-Handle ServerConnection::testLdapSettingsDeprecatedAsync(
-    const nx::vms::api::LdapSettingsDeprecated& settings,
-    LdapSettingsCallback&& callback,
-    QThread* targetThread)
-{
-    nx::network::rest::Params params;
-    params.insert(nx::network::http::header::kContentType, "application/json");
-
-    Timeouts timeouts = d->httpClientPool->defaultTimeouts();
-    timeouts.responseReadTimeout = settings.searchTimeoutS;
-    timeouts.messageBodyReadTimeout = settings.searchTimeoutS;
-
-    auto callback_wrapper =
-        [callback](bool success, int handle, nx::network::rest::JsonResult data)
-        {
-            auto response = data.deserialized<nx::vms::api::LdapUserList>(&success);
-            callback(success, handle, response, data.errorString);
-        };
-
-    return postJsonResult("/api/testLdapSettings", {},
-        QJson::serialized(settings), callback_wrapper, targetThread, timeouts);
 }
 
 Handle ServerConnection::ldapAuthenticateAsync(

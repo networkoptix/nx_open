@@ -704,17 +704,6 @@ public:
         Result<RestResultWithData<QnCameraDiagnosticsReply>>::type&& callback,
         QThread* targetThread = nullptr);
 
-    using LdapSettingsCallback = std::function<void(
-        bool success,
-        Handle requestId,
-        const nx::vms::api::LdapUserList& result,
-        const QString& message)>;
-
-    Handle testLdapSettingsDeprecatedAsync(
-        const nx::vms::api::LdapSettingsDeprecated& settings,
-        LdapSettingsCallback&& callback,
-        QThread* targetThread = nullptr);
-
     using LdapAuthenticateCallback = std::function<void(
         Handle requestId,
         ErrorOrData<nx::vms::api::UserModelV3> userOrError,
