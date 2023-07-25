@@ -707,9 +707,19 @@ void ResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     if (!connection)
         return;
 
+    auto webPageCallback =
+        [this, callback](bool success, const QnWebPageResourcePtr& webPage)
+        {
+            // TODO: #sivanov Properties are not rolled back in case of failure.
+            resourcePropertyDictionary()->saveParamsAsync({webPage->getId()});
+
+            if (callback)
+                callback(success, webPage);
+        };
+
     auto replyProcessor =
         makeSaveResourceReplyProcessor<QnWebPageResource, nx::vms::api::WebPageData>(
-            this, webPage, callback);
+            this, webPage, webPageCallback);
 
     if (applyChanges)
         applyChanges(webPage);
@@ -717,9 +727,6 @@ void ResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     ec2::fromResourceToApi(webPage, apiWebpage);
 
     connection->getWebPageManager(Qn::kSystemAccess)->save(apiWebpage, replyProcessor, this);
-
-    // TODO: #sivanov Properties are not rolled back in case of failure.
-    resourcePropertyDictionary()->saveParamsAsync({webPage->getId()});
 }
 
 } // namespace nx::vms::client::desktop
