@@ -620,6 +620,9 @@ void ResourcesChangesManager::saveServer(const QnMediaServerResourcePtr& server,
         body.backupBitrateBytesPerSecond = change.backupBitrateBytesPerSecond;
         body.name = change.serverName.isEmpty() ? server->getName() : change.serverName;
         body.url = server->getUrl();
+        body.isFailoverEnabled = change.allowAutoRedundancy;
+        body.maxCameras = change.maxCameras;
+        body.locationId = change.locationId;
         auto modifiedProperties = resourcePropertyDictionary()->modifiedProperties(server->getId());
 
         std::map<QString, QJsonValue> result;
