@@ -49,7 +49,7 @@ public:
 #define NX_MUTEX_LOCKER \
     struct NX_CONCATENATE(NxUtilsMutexLocker, __LINE__): public ::nx::MutexLocker \
     { \
-        NX_CONCATENATE(NxUtilsMutexLocker, __LINE__)(::nx::Mutex* mutex): \
+        explicit NX_CONCATENATE(NxUtilsMutexLocker, __LINE__)(::nx::Mutex* mutex): \
             ::nx::MutexLocker(mutex, __FILE__, __LINE__) {}  \
     }
 

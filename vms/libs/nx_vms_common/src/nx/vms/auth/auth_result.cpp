@@ -16,10 +16,10 @@ class AuthResultTranslations
     Q_DECLARE_TR_FUNCTIONS(AuthResultTranslations)
 
 public:
-    QString toErrorMessage(AuthResult value) const;
+    static QString toErrorMessage(AuthResult value);
 };
 
-QString AuthResultTranslations::toErrorMessage(AuthResult value) const
+QString AuthResultTranslations::toErrorMessage(AuthResult value)
 {
     switch (value)
     {
@@ -61,6 +61,8 @@ QString AuthResultTranslations::toErrorMessage(AuthResult value) const
 
         case Auth_ClashedLogin:
             return tr("More than one user with the same login are presented.");
+        case Auth_LdapTlsError:
+            return tr("Unable to verify LDAP server SSL/TLS certificate.");
     }
 
     NX_ASSERT(false, "Unhandled value: %1", value);
