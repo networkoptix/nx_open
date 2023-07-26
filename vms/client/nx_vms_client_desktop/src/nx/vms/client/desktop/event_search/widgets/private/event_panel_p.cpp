@@ -76,6 +76,12 @@ static const QSize kToolTipMaxThumbnailSize{240, 180};
 static constexpr int kMaxMultiThumbnailCount = 5;
 static constexpr int kMultiThumbnailSpacing = 1;
 
+const QMap<QIcon::Mode, core::SvgIconColorer::ThemeColorsRemapData> kTabIconSubstitutions = {
+    {QnIcon::Disabled, {.primary = "dark14"}},
+    {QnIcon::Selected, {.primary = "light4"}},
+    {QnIcon::Active, {.primary = "brand_core"}},
+    {QnIcon::Normal, {.primary = "light10"}}};
+
 QRect globalGeometry(QWidget* widget)
 {
     return widget
@@ -498,32 +504,32 @@ void EventPanel::Private::rebuildTabs()
 
     updateTab(m_notificationsTab,
         true,
-        qnSkin->icon("events/tabs/notifications.svg"),
+        qnSkin->icon("events/tabs/notifications.svg", kTabIconSubstitutions),
         tr("Notifications", "Notifications tab title"));
 
     updateTab(m_motionTab,
         m_motionTab->isAllowed(),
-        qnSkin->icon(lit("events/tabs/motion.svg")),
+        qnSkin->icon("events/tabs/motion.svg", kTabIconSubstitutions),
         tr("Motion", "Motion tab title"));
 
     updateTab(m_bookmarksTab,
         m_bookmarksTab->searchWidget()->isAllowed(),
-        qnSkin->icon(lit("events/tabs/bookmarks.svg")),
+        qnSkin->icon("events/tabs/bookmarks.svg", kTabIconSubstitutions),
         tr("Bookmarks", "Bookmarks tab title"));
 
     updateTab(m_eventsTab,
         m_eventsTab->searchWidget()->isAllowed(),
-        qnSkin->icon(lit("events/tabs/events.svg")),
+        qnSkin->icon("events/tabs/events.svg", kTabIconSubstitutions),
         tr("Events", "Events tab title"));
 
     updateTab(m_vmsEventsTab,
         m_vmsEventsTab->searchWidget()->isAllowed(),
-        qnSkin->icon(lit("events/tabs/events.svg")),
+        qnSkin->icon("events/tabs/events.svg", kTabIconSubstitutions),
         eventTabPrefix + tr("Events", "Events tab title"));
 
     updateTab(m_analyticsTab,
         m_analyticsTab->searchWidget()->isAllowed(),
-        qnSkin->icon(lit("events/tabs/analytics.svg")),
+        qnSkin->icon("events/tabs/analytics.svg", kTabIconSubstitutions),
         tr("Objects", "Analytics tab title"));
 
     // Update current tab to the one that was explicitly selected early.
