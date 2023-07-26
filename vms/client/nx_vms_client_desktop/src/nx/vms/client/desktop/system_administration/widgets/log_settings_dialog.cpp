@@ -68,7 +68,8 @@ ConfigurableLogSettings::ConfigurableLogSettings(const nx::vms::api::ServerLogSe
     loggingLevel(settings.mainLog.primaryLevel),
     maxVolumeSizeB(settings.maxVolumeSizeB),
     maxFileSizeB(settings.maxFileSizeB),
-    maxFileTime(settings.maxFileTimePeriodS)
+    maxFileTime(settings.maxFileTimePeriodS),
+    splitByTimeState(maxFileTime == kDontSplitByTime ? Qt::Unchecked : Qt::Checked)
 {
     // Note: now we read log level from the main log settings only, but store it both for the main
     // and the http loggers.
@@ -107,6 +108,9 @@ void ConfigurableLogSettings::intersectWith(const ConfigurableLogSettings& other
 
     if (maxFileTime != other.maxFileTime)
         maxFileTime = std::nullopt;
+
+    if (splitByTimeState != other.splitByTimeState)
+        splitByTimeState = Qt::PartiallyChecked;
 }
 
 ConfigurableLogSettings ConfigurableLogSettings::defaults()
@@ -274,6 +278,8 @@ void LogSettingsDialog::loadDataToUi(const ConfigurableLogSettings& settings)
     setMaxFileSize(settings.maxFileSizeB);
     setMaxFileTime(settings.maxFileTime);
 
+    ui->splitByTimeChechBox->setCheckState(settings.splitByTimeState);
+
     setUpdatesEnabled(true);
 }
 
@@ -359,13 +365,6 @@ void LogSettingsDialog::setMaxFileTime(ConfigurableLogSettings::Time time)
         setValueToGuiElements(
             std::chrono::seconds(*time).count(), ui->splitByTimeValue, ui->splitByTimeUnits);
     }
-
-    if (time == std::nullopt)
-        ui->splitByTimeChechBox->setCheckState(Qt::PartiallyChecked);
-    else if (time == kDontSplitByTime)
-        ui->splitByTimeChechBox->setCheckState(Qt::Unchecked);
-    else
-        ui->splitByTimeChechBox->setCheckState(Qt::Checked);
 }
 
 } // namespace nx::vms::client::desktop
