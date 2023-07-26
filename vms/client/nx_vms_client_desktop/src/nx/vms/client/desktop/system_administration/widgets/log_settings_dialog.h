@@ -34,6 +34,8 @@ struct ConfigurableLogSettings
     Size maxVolumeSizeB;
     Size maxFileSizeB;
     Time maxFileTime;
+
+    Qt::CheckState splitByTimeState = Qt::Unchecked;
 };
 
 class LogSettingsDialog: public QnDialog
