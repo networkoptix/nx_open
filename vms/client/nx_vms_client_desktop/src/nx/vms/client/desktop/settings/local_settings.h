@@ -8,6 +8,7 @@
 
 #include <common/common_globals.h>
 #include <nx/branding.h>
+#include <nx/build_info.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/property_storage/storage.h>
 #include <nx/vms/client/core/system_logon/connection_data.h>
@@ -93,7 +94,9 @@ public:
     Property<std::set<nx::vms::common::system_health::MessageType>> popupSystemHealth{
         this, "popupSystemHealth", nx::vms::common::system_health::defaultMessageTypes()};
 
-    Property<bool> downmixAudio{this, "downmixAudio"};
+    Property<bool> downmixAudio{this,
+        "downmixAudio",
+        nx::build_info::isMacOsX()}; //< Mac version uses SPDIF by default for multichannel audio.
     Property<qreal> audioVolume{this, "audioVolume", 1.0};
 
     Property<bool> muteOnAudioTransmit{this, "muteOnAudioTransmit", true,
