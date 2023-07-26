@@ -6,7 +6,6 @@
 #include <QtCore/QStandardPaths>
 
 #include <nx/branding.h>
-#include <nx/build_info.h>
 #include <nx/media/hardware_acceleration_type.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/json.h>
@@ -290,9 +289,6 @@ void LocalSettings::migrateOldSettings()
 void LocalSettings::setDefaults()
 {
     maxSceneVideoItems = (sizeof(void*) == sizeof(qint32)) ? 24 : 64;
-
-    if (nx::build_info::isMacOsX())
-        downmixAudio = true; //< Mac version uses SPDIF by default for multichannel audio.
 
     if (backgroundsFolder().isEmpty())
         backgroundsFolder = getDefaultBackgroundsFolder();
