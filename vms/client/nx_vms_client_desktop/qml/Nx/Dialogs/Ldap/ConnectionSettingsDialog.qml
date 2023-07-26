@@ -42,7 +42,7 @@ Dialog
     property string testMessage: ""
 
     readonly property alias ldapScheme: schemeCombobox.currentValue
-    readonly property alias hostAndPort: ldapUri.text
+    readonly property string hostAndPort: ldapUri.text.trim()
 
     title: qsTr("LDAP - Connection Settings")
 
