@@ -15,18 +15,31 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-QString highlightMatch(QString text, const QRegularExpression& rx, const QColor& color)
+QString highlightMatch(const QString& text, const QRegularExpression& rx, const QColor& color)
 {
-    if (const auto match = rx.match(text); match.hasMatch())
+    QString result;
+    if (!text.isEmpty())
     {
         const QString fontBegin = QString("<font color=\"%1\">").arg(color.name());
         static const QString fontEnd = "</font>";
+        int pos = 0;
+        auto matchIterator = rx.globalMatch(text);
+        while (matchIterator.hasNext())
+        {
+            auto match = matchIterator.next();
+            if (match.capturedLength() == 0)
+                break;
 
-        text.insert(match.capturedEnd(), fontEnd);
-        text.insert(match.capturedStart(), fontBegin);
+            result.append(text.mid(pos, match.capturedStart() - pos).toHtmlEscaped());
+            result.append(fontBegin);
+            result.append(match.captured().toHtmlEscaped());
+            result.append(fontEnd);
+            pos = match.capturedEnd();
+        }
+        result.append(text.mid(pos).toHtmlEscaped());
     }
 
-    return text;
+    return result;
 }
 
 } // namespace

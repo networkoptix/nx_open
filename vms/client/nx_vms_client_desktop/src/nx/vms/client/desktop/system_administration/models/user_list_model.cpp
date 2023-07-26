@@ -371,10 +371,10 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 }
 
                 case LoginColumn:
-                    return user->getName();
+                    return user->getName().toHtmlEscaped();
 
                 case FullNameColumn:
-                    return user->fullName();
+                    return user->fullName().toHtmlEscaped();
 
                 case EmailColumn:
                     return user->getEmail();
