@@ -240,13 +240,13 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
     }
 
     // Truncate biggest file. So, it is error checking.
-    int availableMediaRecords = m_detailedMetadataFile.size() / m_index.header.recordSize;
+    int64_t availableMediaRecords = m_detailedMetadataFile.size() / m_index.header.recordSize;
     if (m_noGeometryMetadataFile)
     {
-        availableMediaRecords = std::min(availableMediaRecords,
-            (int) m_noGeometryMetadataFile->size() / m_index.header.noGeometryRecordSize());
+        availableMediaRecords = std::min(availableMediaRecords, 
+            (int64_t) m_noGeometryMetadataFile->size() / m_index.header.noGeometryRecordSize());
     }
-    int mediaRecords = m_index.truncateTo(availableMediaRecords);
+    int64_t mediaRecords = m_index.truncateTo(availableMediaRecords);
     if (!resizeFile(&m_detailedIndexFile, m_index.indexFileSize()))
     {
         NX_WARNING(this, "Failed to resize file %1 to size %2",
