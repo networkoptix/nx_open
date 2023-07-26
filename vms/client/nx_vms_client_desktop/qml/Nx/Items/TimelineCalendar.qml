@@ -283,6 +283,7 @@ Control
                             visualSelectionEnd.getDate(),
                             end + 1, 0, 0)
                     )
+                    control.visibleMonth = control.selection.start.getMonth()
                 }
             }
         }
