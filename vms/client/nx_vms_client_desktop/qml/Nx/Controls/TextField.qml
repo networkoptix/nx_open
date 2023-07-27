@@ -70,10 +70,8 @@ T.TextField
         control: parent
     }
 
-    RowLayout
+    PlaceholderText
     {
-        readonly property alias effectiveHorizontalAlignment: control.horizontalAlignment 
-
         anchors
         {
             fill: control
@@ -82,35 +80,26 @@ T.TextField
             topMargin: control.topPadding
             bottomMargin: control.bottomPadding
         }
+        verticalAlignment: control.verticalAlignment
 
-        PlaceholderText
-        {
-            id: placeholder
-
-            Layout.alignment: control.horizontalAlignment | control.verticalAlignment
-
-            text: control.placeholderText
-            font: control.font
-            color: control.placeholderTextColor
-            renderType: control.renderType
-            elide: Text.ElideRight
-
-            Rectangle
-            {
-                anchors.fill: parent
-                anchors.bottomMargin: 1
-
-                z: -1
-
-                color: control.selectionColor
-                visible: control.selectPlaceholderOnFocus && control.activeFocus
-            }
-        }
+        text: control.placeholderText
+        font: control.font
+        color: control.placeholderTextColor
+        renderType: control.renderType
+        elide: Text.ElideRight
 
         visible: !control.length && !control.preeditText
             && (!control.activeFocus
                 || (!control.hidePlaceholderOnFocus
                     && control.horizontalAlignment !== Qt.AlignHCenter))
+
+        Rectangle
+        {
+            anchors.fill: parent
+            z: -1
+            color: control.selectionColor
+            visible: control.selectPlaceholderOnFocus && control.activeFocus
+        }
     }
 
     ContextMenuMouseArea
