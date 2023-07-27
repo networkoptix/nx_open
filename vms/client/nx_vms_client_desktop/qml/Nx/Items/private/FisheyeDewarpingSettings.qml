@@ -376,7 +376,12 @@ Item
                 Layout.alignment: Qt.AlignTop
 
                 Label { text: qsTr("Size"); Layout.alignment: Qt.AlignRight }
-                Image { source: "image://svg/skin/fisheye/circle_small_24.svg" }
+                Image
+                {
+                    source: "image://svg/skin/fisheye/circle_small_24.svg"
+                    sourceSize.width: 24
+                    sourceSize.height: 24
+                }
 
                 Slider
                 {
@@ -404,10 +409,20 @@ Item
                     }
                 }
 
-                Image { source: "image://svg/skin/fisheye/circle_big_24.svg" }
+                Image
+                {
+                    source: "image://svg/skin/fisheye/circle_big_24.svg"
+                    sourceSize.width: 24
+                    sourceSize.height: 24
+                }
 
                 Label { text: qsTr("X Offset"); Layout.alignment: Qt.AlignRight }
-                Image { source: "image://svg/skin/fisheye/arrow_left_24.svg" }
+                Image
+                {
+                    source: "image://svg/skin/fisheye/arrow_left_24.svg"
+                    sourceSize.width: 24
+                    sourceSize.height: 24
+                }
 
                 Slider
                 {
@@ -435,10 +450,20 @@ Item
                     }
                 }
 
-                Image { source: "image://svg/skin/fisheye/arrow_right_24.svg" }
+                Image
+                {
+                    source: "image://svg/skin/fisheye/arrow_right_24.svg"
+                    sourceSize.width: 24
+                    sourceSize.height: 24
+                }
 
                 Label { text: qsTr("Y Offset"); Layout.alignment: Qt.AlignRight }
-                Image { source: "image://svg/skin/fisheye/arrow_down_24.svg" }
+                Image
+                {
+                    source: "image://svg/skin/fisheye/arrow_down_24.svg"
+                    sourceSize.width: 24
+                    sourceSize.height: 24
+                }
 
                 Slider
                 {
@@ -466,10 +491,20 @@ Item
                     }
                 }
 
-                Image { source: "image://svg/skin/fisheye/arrow_up_24.svg" }
+                Image
+                {
+                    source: "image://svg/skin/fisheye/arrow_up_24.svg"
+                    sourceSize.width: 24
+                    sourceSize.height: 24
+                }
 
                 Label { text: qsTr("Ellipticity"); Layout.alignment: Qt.AlignRight }
-                Image { source: "image://svg/skin/fisheye/ellipse_vertical_24.svg" }
+                Image
+                {
+                    source: "image://svg/skin/fisheye/ellipse_vertical_24.svg"
+                    sourceSize.width: 24
+                    sourceSize.height: 24
+                }
 
                 Slider
                 {
@@ -503,7 +538,12 @@ Item
                     }
                 }
 
-                Image { source: "image://svg/skin/fisheye/ellipse_horizontal_24.svg" }
+                Image
+                {
+                    source: "image://svg/skin/fisheye/ellipse_horizontal_24.svg"
+                    sourceSize.width: 24
+                    sourceSize.height: 24
+                }
             }
         }
     }
