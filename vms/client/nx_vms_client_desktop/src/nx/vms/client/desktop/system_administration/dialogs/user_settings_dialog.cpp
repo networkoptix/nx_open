@@ -90,7 +90,7 @@ struct UserSettingsDialog::Private
         editingContext(q->rootObjectHolder(), "editingContext"),
         self(q->rootObjectHolder(), "self")
     {
-        connect(parent->globalSettings(), &common::SystemSettings::ldapSettingsChanged,
+        connect(parent->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
             [this]() { syncId = q->globalSettings()->ldap().syncId(); });
     }
 };

@@ -352,7 +352,7 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
             modelUpdated();
         });
 
-    connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged,
+    connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
         [this]() { sortModel->setSyncId(this->q->globalSettings()->ldap().syncId()); });
 }
 
