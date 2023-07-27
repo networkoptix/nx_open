@@ -22,7 +22,7 @@ public:
         IndexColumn,
         CameraColumn,
         ColorPaletteColumn,
-        OrientedCheckBoxColumn,
+        PointedCheckBoxColumn,
         DeleteButtonColumn,
 
         ColumnCount,

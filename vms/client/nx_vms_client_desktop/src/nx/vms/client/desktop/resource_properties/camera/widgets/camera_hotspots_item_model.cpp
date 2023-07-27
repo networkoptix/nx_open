@@ -87,7 +87,7 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
     if (role == Qn::ResourceRole && index.column() == CameraColumn && camera)
         return QVariant::fromValue(camera);
 
-    if (role == Qt::CheckStateRole && index.column() == OrientedCheckBoxColumn)
+    if (role == Qt::CheckStateRole && index.column() == PointedCheckBoxColumn)
         return hotspotData.hasDirection() ? Qt::Checked : Qt::Unchecked;
 
     if (role == HotspotCameraIdRole && index.column() == CameraColumn && !cameraId.isNull())
@@ -136,8 +136,8 @@ QVariant CameraHotspotsItemModel::headerData(
             case ColorPaletteColumn:
                 return tr("Color");
 
-            case OrientedCheckBoxColumn:
-                return tr("Oriented");
+            case PointedCheckBoxColumn:
+                return tr("Pointed");
 
             case DeleteButtonColumn:
                 return {};
