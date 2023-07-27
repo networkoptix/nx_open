@@ -10,6 +10,8 @@ struct CrossSystemLayoutData;
 
 class CrossSystemLayoutResource: public LayoutResource
 {
+    Q_OBJECT
+
 public:
     CrossSystemLayoutResource();
 

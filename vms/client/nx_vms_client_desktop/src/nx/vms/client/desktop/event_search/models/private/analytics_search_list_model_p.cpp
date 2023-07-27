@@ -47,7 +47,6 @@
 #include <server/server_storage_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topics.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/delayed.h>

@@ -32,6 +32,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
@@ -40,6 +41,7 @@
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_widget.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
@@ -96,7 +98,6 @@
 #include <utils/common/util.h>
 
 #include "toggle.h"
-#include "workbench_access_controller.h"
 #include "workbench_context.h"
 #include "workbench_display.h"
 #include "workbench_grid_mapper.h"
@@ -476,8 +477,12 @@ QnWorkbenchController::QnWorkbenchController(QObject* parent):
     connect(action(action::EscapeHotkeyAction), &QAction::triggered, this,
         &QnWorkbenchController::at_unmaximizeItemAction_triggered);
 
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
-        &QnWorkbenchController::at_accessController_permissionsChanged);
+    const auto cachingController = qobject_cast<CachingAccessController*>(accessController());
+    if (NX_ASSERT(cachingController))
+    {
+        connect(cachingController, &CachingAccessController::permissionsChanged,
+            this, &QnWorkbenchController::at_accessController_permissionsChanged);
+    }
 
     connect(
         action(action::GoToNextItemAction), &QAction::triggered,
@@ -735,7 +740,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
             // If two arrow keys are pressed simultaneously, change direction to the next one.
             if (m_rewindTimer->isActive() && m_rewindDirection == direction)
                 return true;
-            
+
             if (direction == ShiftDirection::fastForward)
                 menu()->trigger(ui::action::FastForwardAction);
             if (direction == ShiftDirection::rewind)

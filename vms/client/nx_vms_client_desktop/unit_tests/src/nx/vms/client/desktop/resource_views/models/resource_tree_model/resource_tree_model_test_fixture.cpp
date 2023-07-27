@@ -24,6 +24,7 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
@@ -34,7 +35,6 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/id.h>
 
 namespace nx::vms::client::desktop {
@@ -72,7 +72,7 @@ QnResourcePool* ResourceTreeModelTest::resourcePool() const
     return systemContext()->resourcePool();
 }
 
-QnWorkbenchAccessController* ResourceTreeModelTest::workbenchAccessController() const
+ResourceTreeModelTest::AccessController* ResourceTreeModelTest::accessController() const
 {
     return systemContext()->accessController();
 }
@@ -511,7 +511,7 @@ QnUserResourcePtr ResourceTreeModelTest::loginAs(
     else
         user = addUser(name, groupId);
 
-    systemContext()->accessController()->setUser(user);
+    accessController()->setUser(user);
     return user;
 }
 
@@ -542,12 +542,12 @@ QnUserResourcePtr ResourceTreeModelTest::loginAsCustomUser(const QString& name) 
 
 QnUserResourcePtr ResourceTreeModelTest::currentUser() const
 {
-    return systemContext()->accessController()->user();
+    return accessController()->user();
 }
 
 void ResourceTreeModelTest::logout() const
 {
-    systemContext()->accessController()->setUser(QnUserResourcePtr());
+    accessController()->setUser(QnUserResourcePtr());
 }
 
 void ResourceTreeModelTest::setFilterMode(

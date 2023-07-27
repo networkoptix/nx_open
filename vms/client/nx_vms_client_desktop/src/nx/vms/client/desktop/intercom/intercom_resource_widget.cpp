@@ -9,7 +9,6 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/event/action_parameters.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 

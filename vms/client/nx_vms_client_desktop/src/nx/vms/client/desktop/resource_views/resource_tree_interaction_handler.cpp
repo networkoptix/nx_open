@@ -33,7 +33,6 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_layout.h>

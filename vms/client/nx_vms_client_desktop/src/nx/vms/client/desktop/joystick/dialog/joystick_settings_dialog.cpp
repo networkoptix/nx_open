@@ -12,6 +12,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/utils/qml_property.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
@@ -20,11 +21,11 @@
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/help/help_handler.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "joystick_button_settings_model.h"
@@ -38,6 +39,8 @@ namespace nx::vms::client::desktop::joystick {
 
 using namespace entity_item_model;
 using namespace entity_resource_tree;
+
+using nx::vms::client::core::AccessController;
 
 struct JoystickSettingsDialog::Private
 {
@@ -78,7 +81,7 @@ JoystickSettingsDialog::Private::Private(JoystickSettingsDialog* owner, Manager*
     buttonBaseActionChoiceModel(new JoystickButtonActionChoiceModel(true, owner)),
     buttonModifiedActionChoiceModel(new JoystickButtonActionChoiceModel(false, owner))
 {
-    treeEntityBuilder->setUser(q->accessController()->user());
+    treeEntityBuilder->setUser(q->systemContext()->accessController()->user());
     layoutsEntity = treeEntityBuilder->createDialogAllLayoutsEntity();
     layoutModel.setRootEntity(layoutsEntity.get());
     iconDecoratorModel.setSourceModel(&layoutModel);
@@ -276,10 +279,10 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
                 openLayoutChoiceVisible);
         });
 
-    d->connections << connect(accessController(), &QnWorkbenchAccessController::userChanged,
+    d->connections << connect(systemContext()->accessController(), &AccessController::userChanged,
         [this]
         {
-            d->treeEntityBuilder->setUser(accessController()->user());
+            d->treeEntityBuilder->setUser(systemContext()->accessController()->user());
             auto layoutsEntity = d->treeEntityBuilder->createDialogAllLayoutsEntity();
             d->layoutModel.setRootEntity(layoutsEntity.get());
             d->layoutsEntity = std::move(layoutsEntity);

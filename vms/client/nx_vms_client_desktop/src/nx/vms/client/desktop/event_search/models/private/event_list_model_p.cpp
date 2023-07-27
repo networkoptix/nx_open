@@ -6,9 +6,9 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
 
@@ -130,7 +130,7 @@ QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventDat
     if (event.previewCamera->hasFlags(Qn::ResourceFlag::cross_system))
         return event.previewCamera;
 
-    auto accessController = ResourceAccessManager::accessController(event.previewCamera);
+    const auto accessController = ResourceAccessManager::accessController(event.previewCamera);
     if (!NX_ASSERT(accessController))
         return {};
 

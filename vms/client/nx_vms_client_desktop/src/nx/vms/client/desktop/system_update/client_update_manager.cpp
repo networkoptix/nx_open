@@ -20,6 +20,7 @@
 #include <nx/vms/api/data/client_update_settings.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/protocol_version.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -30,7 +31,6 @@
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/tools.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/synctime.h>
@@ -200,7 +200,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
         this,
         [this](const QnUuid& notificationId)
         {
-            if (!accessController()->hasPowerUserPermissions())
+            if (!systemContext()->accessController()->hasPowerUserPermissions())
                 return;
 
             if (notificationId == errorNotificationId
@@ -337,7 +337,7 @@ void ClientUpdateManager::Private::notifyUserAboutClientAutoUpdate()
     if (!autoUpdateFeatureNotificationId.isNull())
         return;
 
-    if (!accessController()->hasPowerUserPermissions())
+    if (!systemContext()->accessController()->hasPowerUserPermissions())
         return;
 
     NX_VERBOSE(this, "Showing a notification about Client-only auto-update feature.");

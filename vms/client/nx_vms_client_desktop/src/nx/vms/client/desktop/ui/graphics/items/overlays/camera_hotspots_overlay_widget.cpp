@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/camera_hotspots/camera_hotspots_display_utils.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
@@ -12,13 +13,13 @@
 #include <nx/vms/client/desktop/utils/dewarping_transform.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 
 namespace nx::vms::client::desktop {
 
-using Geometry = nx::vms::client::core::Geometry;
+using nx::vms::client::core::AccessController;
+using nx::vms::client::core::Geometry;
 
 namespace {
 
@@ -40,6 +41,8 @@ struct CameraHotspotsOverlayWidget::Private
 
     std::vector<CameraHotspotItem*> hotspotItems;
 
+    QHash<QnResourcePtr, AccessController::NotifierPtr> notifiers;
+
     QnResourcePool* resourcePool() const;
     QnWorkbenchContext* workbenchContext() const;
 
@@ -48,6 +51,7 @@ struct CameraHotspotsOverlayWidget::Private
 
     void initHotspotItems();
     void updateHotspotItem(CameraHotspotItem* hotspotItem) const;
+    void removeNotifiers(const QnResourceList& resources);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -100,7 +104,20 @@ void CameraHotspotsOverlayWidget::Private::initHotspotItems()
         if (const auto hotspotCamera =
             resourcePool()->getResourceById<QnVirtualCameraResource>(hotspotData.cameraId))
         {
-            if (!ResourceAccessManager::hasPermissions(hotspotCamera, Qn::ReadPermission))
+            const auto accessController = ResourceAccessManager::accessController(hotspotCamera);
+            if (!accessController)
+                continue;
+
+            if (!notifiers.contains(hotspotCamera))
+            {
+                const auto notifier = accessController->createNotifier(hotspotCamera);
+                notifiers.insert(hotspotCamera, notifier);
+
+                connect(notifier.get(), &AccessController::Notifier::permissionsChanged, q,
+                    [this]() { initHotspotItems(); });
+            }
+
+            if (!accessController->hasPermissions(hotspotCamera, Qn::ReadPermission))
                 continue;
 
             CameraHotspotItem* item(new CameraHotspotItem(hotspotData, workbenchContext(), q));
@@ -154,6 +171,18 @@ void CameraHotspotsOverlayWidget::Private::updateHotspotItem(CameraHotspotItem* 
     hotspotItem->setPos(camera_hotspots::hotspotOrigin(relativePos, q->rect()));
 }
 
+void CameraHotspotsOverlayWidget::Private::removeNotifiers(const QnResourceList& resources)
+{
+    for (const auto& resource: resources)
+    {
+        if (const auto it = notifiers.find(resource); it != notifiers.end())
+        {
+            it.value()->disconnect(q);
+            notifiers.erase(it);
+        }
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 // CameraHotspotsOverlayWidget definition.
 
@@ -184,21 +213,12 @@ CameraHotspotsOverlayWidget::CameraHotspotsOverlayWidget(QnMediaResourceWidget* 
     connect(camera->resourcePool(), &QnResourcePool::resourcesAdded,
         this, initHotspotsOnResourcePoolChange);
 
-    connect(camera->resourcePool(), &QnResourcePool::resourcesRemoved,
-        this, initHotspotsOnResourcePoolChange);
-
-    const auto accessController = ResourceAccessManager::accessController(camera);
-    NX_ASSERT(accessController);
-
-    connect(accessController, &QnWorkbenchAccessController::permissionsChanged, this,
-        [this](const QnResourcePtr& resource)
+    connect(camera->resourcePool(), &QnResourcePool::resourcesRemoved, this,
+        [this, initHotspotsOnResourcePoolChange](const QnResourceList& resources)
         {
-            if (d->resourceWidgetCameraHotspotsIds().contains(resource->getId()))
-                d->initHotspotItems();
+            d->removeNotifiers(resources);
+            initHotspotsOnResourcePoolChange(resources);
         });
-
-    connect(accessController, &QnWorkbenchAccessController::permissionsReset, this,
-        [this] { d->initHotspotItems(); });
 
     connect(d->parentMediaResourceWidget, &QnMediaResourceWidget::zoomRectChanged, this,
         [this]

@@ -16,6 +16,7 @@
 #include <core/resource/resource_property_key.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
@@ -29,10 +30,11 @@
 #include <nx/vms/license/usage_helper.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/handlers/workbench_videowall_handler.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
+
+using nx::vms::client::core::AccessController;
 
 class ResourceStatusHelper::Private: public QObject
 {
@@ -64,6 +66,7 @@ private:
 private:
     QPointer<QnWorkbenchContext> m_context;
     QnResourcePtr m_resource;
+    AccessController::NotifierHelper m_accessNotifier;
     QnVirtualCameraResourcePtr m_camera;
     std::unique_ptr<nx::vms::license::SingleCamLicenseStatusHelper> m_licenseHelper;
     nx::utils::ScopedConnections m_contextConnections;
@@ -153,20 +156,8 @@ void ResourceStatusHelper::Private::setContext(QnWorkbenchContext* value)
 
     if (m_context)
     {
-        const auto handlePermissionsChanged =
-            [this](const QnResourcePtr& resource)
-            {
-                if (resource == m_camera)
-                    updateStatus();
-            };
-
-        m_contextConnections << connect(m_context->accessController(),
-            &QnWorkbenchAccessController::permissionsChanged,
-            this,
-            handlePermissionsChanged);
-
-        m_contextConnections << connect(m_context->accessController(),
-            &QnWorkbenchAccessController::globalPermissionsChanged,
+        m_contextConnections << connect(m_context->systemContext()->accessController(),
+            &AccessController::globalPermissionsChanged,
             this,
             &Private::updateStatus);
 
@@ -212,6 +203,7 @@ void ResourceStatusHelper::Private::setResource(QnResource* value)
 
     m_resourceConnections.reset();
     m_licenseHelper.reset();
+    m_accessNotifier.reset();
 
     m_resource = value ? value->toSharedPointer() : QnResourcePtr();
     m_camera = m_resource.objectCast<QnVirtualCameraResource>();
@@ -240,11 +232,17 @@ void ResourceStatusHelper::Private::setResource(QnResource* value)
                 this, &Private::updateLicenseUsage);
         }
 
-        auto systemContext = SystemContext::fromResource(m_resource);
-        m_resourceConnections << connect(systemContext->videoWallOnlineScreensWatcher(),
-            &VideoWallOnlineScreensWatcher::onlineScreensChanged,
-            this,
-            &Private::updateStatus);
+        const auto systemContext = SystemContext::fromResource(m_resource);
+        if (NX_ASSERT(systemContext))
+        {
+            m_resourceConnections << connect(systemContext->videoWallOnlineScreensWatcher(),
+                &VideoWallOnlineScreensWatcher::onlineScreensChanged,
+                this,
+                &Private::updateStatus);
+
+            m_accessNotifier = systemContext->accessController()->createNotifier(m_resource);
+            m_accessNotifier.callOnPermissionsChanged(this, &Private::updateStatus);
+        }
     }
 
     emit q->resourceChanged();
@@ -292,7 +290,8 @@ void ResourceStatusHelper::Private::updateStatus()
     }
 
     status.setFlag(StatusFlag::canChangePasswords, qnRuntime->isDesktopMode()
-        && m_context->accessController()->hasPowerUserPermissions());
+        && m_context->systemContext()->accessController()->hasGlobalPermissions(
+            GlobalPermission::powerUser));
 
     const auto resourceStatus = m_resource->getStatus();
     status.setFlag(StatusFlag::offline, resourceStatus == nx::vms::api::ResourceStatus::offline);

@@ -6,12 +6,14 @@
 #include <client/client_message_processor.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/lookup_list_data.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
+
+using nx::vms::client::core::AccessController;
 
 struct DelayedDataLoader::Private
 {
@@ -76,11 +78,11 @@ DelayedDataLoader::DelayedDataLoader(SystemContext* systemContext, QObject* pare
     SystemContextAware(systemContext),
     d(new Private{.q=this})
 {
-    connect(accessController(), &QnWorkbenchAccessController::userChanged, this,
-        [this](const QnUserResourcePtr& user)
+    connect(accessController(), &AccessController::userChanged, this,
+        [this]()
         {
             d->cancelRequest();
-            if (user)
+            if (accessController()->user())
                 d->loadData();
         });
 }

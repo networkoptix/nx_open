@@ -26,6 +26,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/unicode_chars.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/helpers.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -33,6 +34,7 @@
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/ui/server_certificate_viewer.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
@@ -41,7 +43,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 
@@ -317,7 +318,9 @@ void QnServerSettingsWidget::updateReadOnly()
     {
         if (!m_server)
             return true;
-        return !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
+
+        return !systemContext()->accessController()->hasPermissions(
+            m_server, Qn::WritePermission | Qn::SavePermission);
     }();
 
     setReadOnly(readOnly);

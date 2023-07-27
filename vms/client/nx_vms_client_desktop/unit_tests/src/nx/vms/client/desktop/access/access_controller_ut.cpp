@@ -14,20 +14,20 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/global_permission_deprecated.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
 const QString userName1 = QStringLiteral("unit_test_user_1");
 const QString userName2 = QStringLiteral("unit_test_user_2");
-}
+} // namespace
 
 namespace nx::vms::client::desktop::test {
 
-class WorkbenchAccessControllerTest: public ContextBasedTest
+class AccessControllerTest: public ContextBasedTest
 {
 protected:
     virtual void TearDown()
@@ -122,7 +122,7 @@ protected:
 /************************************************************************/
 
 /** Fix permissions for exported layouts (files). */
-TEST_F(WorkbenchAccessControllerTest, checkExportedLayouts)
+TEST_F(AccessControllerTest, checkExportedLayouts)
 {
     auto layout = createLayout(Qn::exported_layout);
     layout->setUrl("path/to/file");
@@ -146,7 +146,7 @@ TEST_F(WorkbenchAccessControllerTest, checkExportedLayouts)
 }
 
 /** Fix permissions for exported layouts (files). */
-TEST_F(WorkbenchAccessControllerTest, checkEncryptedExportedLayouts)
+TEST_F(AccessControllerTest, checkEncryptedExportedLayouts)
 {
     auto layout = createLayout(Qn::exported_layout);
     layout->setUrl("path/to/file");
@@ -167,7 +167,7 @@ TEST_F(WorkbenchAccessControllerTest, checkEncryptedExportedLayouts)
 }
 
 /** Fix permissions for locked exported layouts (files). */
-TEST_F(WorkbenchAccessControllerTest, checkExportedLayoutsLocked)
+TEST_F(AccessControllerTest, checkExportedLayoutsLocked)
 {
     auto layout = createLayout(Qn::exported_layout, true);
     layout->setUrl("path/to/file");
@@ -193,7 +193,7 @@ TEST_F(WorkbenchAccessControllerTest, checkExportedLayoutsLocked)
 /************************************************************************/
 
 /** Check permissions for layouts when the user is not logged in. */
-TEST_F(WorkbenchAccessControllerTest, checkLocalLayoutsUnlogged)
+TEST_F(AccessControllerTest, checkLocalLayoutsUnlogged)
 {
     auto layout = createLayout(Qn::local);
     resourcePool()->addResource(layout);
@@ -212,7 +212,7 @@ TEST_F(WorkbenchAccessControllerTest, checkLocalLayoutsUnlogged)
 /************************************************************************/
 
 /** Check permissions for unsaved layouts when the user is logged in. */
-TEST_F(WorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
+TEST_F(AccessControllerTest, checkLocalLayoutsLoggedIn)
 {
     loginAs(api::GlobalPermissionDeprecated::liveViewerPermissions);
 
@@ -231,7 +231,7 @@ TEST_F(WorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
 }
 
 /** Check permissions for locked unsaved layouts when the user is logged in. */
-TEST_F(WorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
+TEST_F(AccessControllerTest, checkLockedLocalLayoutsLoggedIn)
 {
     loginAs(api::GlobalPermissionDeprecated::liveViewerPermissions);
 
@@ -251,7 +251,7 @@ TEST_F(WorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
 }
 
 /** Check Qn::WriteDigestPermission permission for a new cloud user (should be missing). */
-TEST_F(WorkbenchAccessControllerTest, checkPermissionForNewCloudUser)
+TEST_F(AccessControllerTest, checkPermissionForNewCloudUser)
 {
     loginAs(api::GlobalPermissionDeprecated::adminPermissions);
 

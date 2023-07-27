@@ -12,11 +12,11 @@
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/system_administration/models/user_list_model.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 #include "../globals/user_settings_global.h"
 
@@ -670,9 +670,13 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
 
 bool MembersModel::canEditMembers(const QnUuid& id) const
 {
+    const auto accessController = qobject_cast<AccessController*>(
+        systemContext()->accessController());
+
     return m_cache
         && !m_cache->info(id).isLdap
-        && systemContext()->accessController()->canCreateUser(
+        && NX_ASSERT(accessController)
+        && accessController->canCreateUser(
             /*targetPermissions*/ {},
             /*targetGroups*/ {id});
 }

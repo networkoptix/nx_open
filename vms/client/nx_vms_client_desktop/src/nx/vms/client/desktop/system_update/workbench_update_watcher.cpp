@@ -13,6 +13,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -30,7 +31,6 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/util.h>
 
@@ -116,7 +116,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
                 }
             }
         });
-    
+
     connect(m_notificationsManager,
         &workbench::LocalNotificationsManager::cancelRequested,
         this,
@@ -125,7 +125,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
             m_notificationsManager->remove(updateNotificationId);
             updateNotificationId = {};
         });
-    
+
     connect(m_updateAction.data(),
         &QAction::triggered,
         this,
@@ -135,7 +135,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
             updateNotificationId = {};
             menu()->trigger(action::SystemUpdateAction);
         });
-    
+
     connect(m_skipAction.data(),
         &QAction::triggered,
         this,
@@ -300,7 +300,7 @@ void WorkbenchUpdateWatcher::notifyUserAboutWorkbenchUpdate(
 
     if (!accessController()->hasPowerUserPermissions())
         return;
-    
+
     NX_VERBOSE(this, "Showing a notification about Workbench update feature.");
 
     m_notifiedVersion = targetVersion;
@@ -331,7 +331,7 @@ void WorkbenchUpdateWatcher::notifyUserAboutWorkbenchUpdate(
         true);
 
     m_notificationsManager->setLevel(
-        updateNotificationId, 
+        updateNotificationId,
         majorVersionChange
             ? QnNotificationLevel::Value::ImportantNotification
             : QnNotificationLevel::Value::CommonNotification);

@@ -7,7 +7,7 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 
-class QnWorkbenchAccessController;
+namespace nx::vms::client::core { class AccessController; }
 
 namespace nx::vms::client::desktop {
 
@@ -24,7 +24,7 @@ public:
     static bool hasPermissions(const QnResourcePtr& resource, Qn::Permissions requiredPermissions);
 
     /** Access controller of the resource's System Context (if any), nullptr otherwise. */
-    static QnWorkbenchAccessController* accessController(const QnResourcePtr& resource);
+    static nx::vms::client::core::AccessController* accessController(const QnResourcePtr& resource);
 };
 
 } // namespace nx::vms::client::desktop

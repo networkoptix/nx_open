@@ -11,6 +11,7 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -24,7 +25,6 @@
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/help/business_help.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -103,7 +103,7 @@ bool SimpleMotionSearchListModel::hasAccessRights() const
 {
     // Panel is hidden for live viewers but should be visible when browsing local files offline.
     return !isOnline()
-        || accessController()->hasPermissionsForAnyDevice(Qn::Permission::ViewFootagePermission);
+        || systemContext()->accessController()->hasDevicePermissions(Qn::ViewFootagePermission);
 }
 
 int SimpleMotionSearchListModel::rowCount(const QModelIndex& parent) const

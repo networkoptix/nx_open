@@ -5,13 +5,13 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
 #include <nx/vms/client/desktop/system_administration/models/recursive_members_model.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
 

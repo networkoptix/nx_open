@@ -9,7 +9,6 @@
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "helpers.h"

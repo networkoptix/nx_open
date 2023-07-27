@@ -20,6 +20,7 @@
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_model.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
 #include <nx/vms/client/core/network/network_module.h>
@@ -30,7 +31,6 @@
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/delayed.h>
 
 #include "cloud_cross_system_context_data_loader.h"

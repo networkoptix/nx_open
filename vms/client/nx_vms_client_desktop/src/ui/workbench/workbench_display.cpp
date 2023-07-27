@@ -86,7 +86,6 @@
 #include <utils/math/color_transformations.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
-#include "workbench_access_controller.h"
 #include "workbench_context.h"
 #include "workbench_grid_mapper.h"
 #include "workbench_item.h"

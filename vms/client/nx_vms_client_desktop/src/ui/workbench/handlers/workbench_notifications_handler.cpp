@@ -17,6 +17,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/json.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -33,7 +34,6 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>

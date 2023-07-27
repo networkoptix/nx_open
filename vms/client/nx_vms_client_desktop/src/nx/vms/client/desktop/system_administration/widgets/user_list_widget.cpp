@@ -19,6 +19,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/data/ldap.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -40,7 +41,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -220,6 +220,8 @@ private:
     void visibleAdded(int first, int last);
     void visibleAboutToBeRemoved(int first, int last);
     void visibleModified(int first, int last);
+
+    nx::vms::client::core::AccessController* accessController() const;
 };
 
 UserListWidget::UserListWidget(QWidget* parent):
@@ -531,7 +533,7 @@ void UserListWidget::Private::updateSelection()
         [this](const QnUserResourcePtr& user)
         {
             const auto requiredPermissions = Qn::WriteAccessRightsPermission | Qn::SavePermission;
-            return q->accessController()->hasPermissions(user, requiredPermissions);
+            return accessController()->hasPermissions(user, requiredPermissions);
         };
 
     const bool canEnable = std::any_of(users.cbegin(), users.cend(),
@@ -549,7 +551,7 @@ void UserListWidget::Private::updateSelection()
     const bool canDelete = std::any_of(users.cbegin(), users.cend(),
         [this](const QnUserResourcePtr& user)
         {
-            return q->accessController()->hasPermissions(user, Qn::RemovePermission);
+            return accessController()->hasPermissions(user, Qn::RemovePermission);
         });
 
     const auto canForceSecureAuth = std::any_of(users.cbegin(), users.cend(),
@@ -597,7 +599,7 @@ void UserListWidget::Private::createUser()
 
 bool UserListWidget::Private::enableUser(const QnUserResourcePtr& user, bool enabled)
 {
-    if (!q->accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission))
+    if (!accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission))
         return false;
 
     usersModel->setUserEnabled(user, enabled);
@@ -621,7 +623,7 @@ void UserListWidget::Private::deleteSelected()
     const auto users = visibleSelectedUsers();
     for (const auto& user: users)
     {
-        if (!q->accessController()->hasPermissions(user, Qn::RemovePermission))
+        if (!accessController()->hasPermissions(user, Qn::RemovePermission))
             continue;
 
         usersToDelete << user;
@@ -730,7 +732,7 @@ QnUserResourceList UserListWidget::Private::visibleSelectedUsers() const
 
 bool UserListWidget::Private::canDisableDigest(const QnUserResourcePtr& user) const
 {
-    return q->accessController()->hasPermissions(user, Qn::WriteDigestPermission);
+    return accessController()->hasPermissions(user, Qn::WriteDigestPermission);
 }
 
 void UserListWidget::Private::handleHeaderCheckStateChanged(Qt::CheckState state)
@@ -778,6 +780,11 @@ void UserListWidget::Private::handleUsersTableClicked(const QModelIndex& index)
 void UserListWidget::Private::loadData()
 {
     usersModel->resetUsers();
+}
+
+nx::vms::client::core::AccessController* UserListWidget::Private::accessController() const
+{
+    return q->systemContext()->accessController();
 }
 
 } // namespace nx::vms::client::desktop

@@ -25,7 +25,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>

@@ -57,7 +57,6 @@ public:
     static void registerQmlType();
     static SystemContext* fromResource(const QnResourcePtr& resource);
 
-    QnWorkbenchAccessController* accessController() const;
     VideoWallOnlineScreensWatcher* videoWallOnlineScreensWatcher() const;
     ServerRuntimeEventConnector* serverRuntimeEventConnector() const;
     QnServerStorageManager* serverStorageManager() const;
