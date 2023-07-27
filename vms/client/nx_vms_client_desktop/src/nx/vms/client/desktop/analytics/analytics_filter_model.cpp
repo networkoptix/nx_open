@@ -250,7 +250,7 @@ QStringList AnalyticsFilterModel::getAnalyticsObjectTypeIds(ObjectType* filterOb
     if (!filterObjectType)
         return {};
 
-    const auto ids = filterObjectType->fullSubtreeTypeIds();
+    const auto ids = filterObjectType->typeIds();
     return QStringList{ids.begin(), ids.end()};
 }
 
