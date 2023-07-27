@@ -27,10 +27,7 @@ public:
 
     std::vector<Model> read(Filter filter, const nx::network::rest::Request& request)
     {
-        auto processor = m_queryProcessor->getAccess(
-            request.method() == nx::network::http::Method::patch
-                ? Qn::UserSession(Qn::kSystemAccess)
-                : request.userSession);
+        auto processor = m_queryProcessor->getAccess(request.userSession);
         validateType(processor, filter);
 
         auto query =
