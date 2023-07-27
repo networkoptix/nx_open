@@ -48,18 +48,16 @@ Control
 
     background: Rectangle
     {
-        opacity: control.enabled ? 0.4 : 1.0
-        border
-        {
-            width: 1
-            color: boxMouseArea.containsMouse && control.enabled
-                ? ColorTheme.colors.dark5
-                : ColorTheme.colors.dark4
-        }
+        color: popupObject.visible
+            ? ColorTheme.colors.dark4
+            : boxMouseArea.containsMouse
+                ? ColorTheme.colors.dark6
+                : ColorTheme.colors.dark5
 
-        color: boxMouseArea.containsMouse && control.enabled
-            ? ColorTheme.colors.dark6
-            : ColorTheme.colors.dark5
+        border.width: 1
+        border.color: ColorTheme.darker(color, 1)
+
+        opacity: control.enabled ? 1.0 : 0.3
     }
 
     contentItem: Item
@@ -81,9 +79,9 @@ Control
                 }
                 text: qsTr("Select")
 
-                opacity: control.enabled ? 0.4 : 1.0
+                opacity: control.enabled ? 1.0 : 0.3
                 visible: model.parentGroups.length == 0
-                color: ColorTheme.colors.dark13
+                color: ColorTheme.colors.light16
                 font: Qt.font({pixelSize: 14, weight: Font.Normal})
             }
         }
@@ -246,7 +244,7 @@ Control
 
                             elide: Text.ElideRight
                             text: model.text
-                            color: ColorTheme.colors.light10
+                            color: ColorTheme.colors.light4
                             font: Qt.font({pixelSize: 14, weight: Font.Normal})
                         }
 
@@ -300,7 +298,7 @@ Control
 
             autoPaddingEnabled: true
             shadowEnabled: true
-            shadowColor: "#121517"
+            shadowColor: ColorTheme.colors.dark4
             shadowOpacity: 0.5
 
             shadowVerticalOffset: 10
@@ -368,23 +366,12 @@ Control
                     onClicked: searchField.text = ""
                 }
 
-                Instrument
+                onAccepted:
                 {
-                    item: searchField
-
-                    onKeyPress: event =>
+                    if (groupListView.count == 1)
                     {
-                        switch (event.key)
-                        {
-                            case Qt.Key_Return:
-                            case Qt.Key_Enter:
-                                if (groupListView.count == 1)
-                                {
-                                    groupListView.itemAtIndex(0).setChecked(true)
-                                    popupObject.close()
-                                }
-                                return
-                        }
+                        groupListView.itemAtIndex(0).setChecked(true)
+                        popupObject.close()
                     }
                 }
 
@@ -421,51 +408,23 @@ Control
 
                 background: Rectangle
                 {
-                    Image
+                    IconImage
                     {
-                        id: searchIcon
-                        layer.enabled: true
-                        visible: false
-                        anchors
-                        {
-                            verticalCenter: parent.verticalCenter
-                            left: parent.left
-                            leftMargin: 6
-                        }
+                        x: 6
+                        anchors.verticalCenter: parent.verticalCenter
 
                         sourceSize: Qt.size(16, 16)
                         source: "image://svg/skin/user_settings/search.svg"
-                    }
-
-                    MultiEffect
-                    {
-                        source: searchIcon
-                        anchors.fill: searchIcon
-                        colorization: 1.0
-                        colorizationColor: searchField.color
+                        color: searchField.color
                     }
 
                     radius: 2
+                    color: searchField.activeFocus
+                        ? ColorTheme.colors.dark8
+                        : ColorTheme.colors.dark10
 
-                    border
-                    {
-                        width: 1
-                        color: 
-                        {
-                            if (searchField.hovered && !searchField.activeFocus)
-                                return ColorTheme.colors.dark11
-
-                            return ColorTheme.colors.dark9
-                        }
-                    }
-
-                    color:
-                    {
-                        if (searchField.activeFocus)
-                            ColorTheme.colors.dark8
-
-                        return ColorTheme.colors.dark10
-                    }
+                    border.width: 1
+                    border.color: ColorTheme.colors.dark9
                 }
             }
 
@@ -595,8 +554,8 @@ Control
                             Text
                             {
                                 color: model.isParent
-                                    ? ColorTheme.colors.light4
-                                    : ColorTheme.colors.light10
+                                    ? ColorTheme.colors.light1
+                                    : ColorTheme.colors.light4
                                 font: Qt.font({pixelSize: 14, weight: Font.Normal})
                                 Layout.fillWidth: true
 

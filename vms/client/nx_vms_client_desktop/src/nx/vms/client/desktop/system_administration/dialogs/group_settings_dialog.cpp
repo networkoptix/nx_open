@@ -110,8 +110,8 @@ GroupSettingsDialog::GroupSettingsDialog(
     base_type(
         parent,
         dialogType == editGroup
-            ? "qrc:/qml/Nx/Dialogs/UserManagement/GroupEditDialog.qml"
-            : "qrc:/qml/Nx/Dialogs/UserManagement/GroupCreateDialog.qml"),
+            ? "Nx/Dialogs/UserManagement/GroupEditDialog.qml"
+            : "Nx/Dialogs/UserManagement/GroupCreateDialog.qml"),
     SystemContextAware(systemContext),
     d(new Private(this, dialogType))
 {
