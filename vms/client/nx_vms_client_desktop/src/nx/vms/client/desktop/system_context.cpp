@@ -88,10 +88,13 @@ SystemContext::SystemContext(
     base_type(mode, std::move(peerId), resourceAccessMode, parent),
     d(new Private{.q = this})
 {
+    resetAccessController(mode == Mode::client || mode == Mode::unitTests
+        ? new CachingAccessController(this)
+        : new AccessController(this));
+
     switch (mode)
     {
         case Mode::client:
-            resetAccessController(new CachingAccessController(this));
             d->initLocalRuntimeInfo();
             d->videoWallOnlineScreensWatcher = std::make_unique<VideoWallOnlineScreensWatcher>(
                 this);
@@ -116,7 +119,6 @@ SystemContext::SystemContext(
             break;
 
         case Mode::crossSystem:
-            resetAccessController(new AccessController(this));
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
@@ -129,7 +131,6 @@ SystemContext::SystemContext(
             break;
 
         case Mode::unitTests:
-            resetAccessController(new CachingAccessController(this));
             break;
     }
 }
