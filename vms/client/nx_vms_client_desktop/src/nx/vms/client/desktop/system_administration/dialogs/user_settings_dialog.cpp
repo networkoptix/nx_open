@@ -101,8 +101,8 @@ UserSettingsDialog::UserSettingsDialog(
     QWidget* parent)
     :
     base_type(parent, dialogType == EditUser
-        ? "qrc:/qml/Nx/Dialogs/UserManagement/UserEditDialog.qml"
-        : "qrc:/qml/Nx/Dialogs/UserManagement/UserCreateDialog.qml"),
+        ? "Nx/Dialogs/UserManagement/UserEditDialog.qml"
+        : "Nx/Dialogs/UserManagement/UserCreateDialog.qml"),
     SystemContextAware(systemContext),
     d(new Private(this, dialogType))
 {
