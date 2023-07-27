@@ -114,7 +114,7 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
     header->setSectionResizeMode(
         CameraHotspotsItemModel::ColorPaletteColumn, QHeaderView::ResizeToContents);
     header->setSectionResizeMode(
-        CameraHotspotsItemModel::OrientedCheckBoxColumn, QHeaderView::ResizeToContents);
+        CameraHotspotsItemModel::PointedCheckBoxColumn, QHeaderView::ResizeToContents);
     header->setSectionResizeMode(
         CameraHotspotsItemModel::DeleteButtonColumn, QHeaderView::ResizeToContents);
 }
@@ -298,7 +298,7 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
             if (index.column() == CameraHotspotsItemModel::DeleteButtonColumn)
                 hotspotsEditor->removeHotstpotAt(hotspotIndex);
 
-            if (index.column() == CameraHotspotsItemModel::OrientedCheckBoxColumn)
+            if (index.column() == CameraHotspotsItemModel::PointedCheckBoxColumn)
             {
                 if (hotspot.hasDirection())
                 {
