@@ -18,9 +18,4 @@ SystemContext* SystemContextAware::systemContext() const
     return dynamic_cast<SystemContext*>(nx::vms::common::SystemContextAware::systemContext());
 }
 
-QnWorkbenchAccessController* SystemContextAware::accessController() const
-{
-    return systemContext()->accessController();
-}
-
 } // namespace nx::vms::client::desktop

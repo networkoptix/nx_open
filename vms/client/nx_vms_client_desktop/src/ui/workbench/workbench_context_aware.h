@@ -10,10 +10,11 @@
 class QWidget;
 
 class QnWorkbenchContext;
-class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchCustomizer;
+
+namespace nx::vms::client::core { class AccessController; }
 
 namespace nx::vms::client::desktop {
 
@@ -81,7 +82,7 @@ protected:
 
     nx::vms::client::desktop::Workbench* workbench() const;
 
-    QnWorkbenchAccessController* accessController() const;
+    nx::vms::client::core::AccessController* accessController() const;
 
     QnWorkbenchDisplay* display() const;
 

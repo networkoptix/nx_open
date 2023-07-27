@@ -11,6 +11,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
@@ -19,7 +20,6 @@
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h> // TODO: this one does not belong here.
 #include <ui/workbench/workbench_layout.h>
@@ -252,7 +252,7 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
         return InvisibleAction;
 
     if (m_globalPermission != GlobalPermission::none &&
-        !accessController()->hasGlobalPermission(m_globalPermission))
+        !accessController()->hasGlobalPermissions(m_globalPermission))
     {
         return InvisibleAction;
     }

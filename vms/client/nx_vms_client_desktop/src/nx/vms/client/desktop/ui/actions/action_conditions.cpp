@@ -38,6 +38,7 @@
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
+#include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -74,7 +75,6 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/widgets/main_window.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -1175,9 +1175,12 @@ ActionVisibility NewUserLayoutCondition::check(const Parameters& parameters, QnW
     if (nodeType != ResourceTree::NodeType::resource)
         return InvisibleAction;
 
+    const auto accessController = qobject_cast<AccessController*>(
+        context->accessController());
+
     nx::vms::api::LayoutData layoutData;
     layoutData.parentId = user->getId();
-    return context->accessController()->canCreateLayout(layoutData)
+    return accessController->canCreateLayout(layoutData)
         ? EnabledAction
         : InvisibleAction;
 }
@@ -1200,7 +1203,7 @@ bool OpenInLayoutCondition::canOpen(
     const QnLayoutResourcePtr& layout) const
 {
     auto getAccessController =
-        [](const QnResourcePtr& resource) -> QnWorkbenchAccessController*
+        [](const QnResourcePtr& resource) -> nx::vms::client::core::AccessController*
         {
             auto systemContext = SystemContext::fromResource(resource);
             if (NX_ASSERT(systemContext))
@@ -2030,7 +2033,7 @@ ConditionWrapper hasGlobalPermission(GlobalPermission permission)
     return new CustomBoolCondition(
         [permission](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
-            return context->accessController()->hasGlobalPermission(permission);
+            return context->accessController()->hasGlobalPermissions(permission);
         });
 }
 
@@ -2430,7 +2433,7 @@ ConditionWrapper hasPermissionsForResources(Qn::Permissions permissions)
         [permissions](const QnResourceList& resources, QnWorkbenchContext* context)
         {
             if (resources.empty())
-                return context->accessController()->hasPermissionsForAnyDevice(permissions);
+                return context->accessController()->hasDevicePermissions(permissions);
 
             return std::all_of(resources.begin(), resources.end(),
                 [permissions](auto resource)

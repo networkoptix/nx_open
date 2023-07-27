@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
@@ -38,6 +39,8 @@ public:
     SoftwareTriggersWatcher(
         SystemContext* context,
         QObject* parent = nullptr);
+
+    virtual ~SoftwareTriggersWatcher() override;
 
     void setResourceId(const QnUuid& resourceId);
 
@@ -79,9 +82,8 @@ private:
     void updateTriggerByVmsRule(const nx::vms::rules::Rule* rule);
 
 private:
-    QnUuid m_resourceId;
-    ServerResourcePtr m_server;
-    DescriptionsHash m_data;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::core

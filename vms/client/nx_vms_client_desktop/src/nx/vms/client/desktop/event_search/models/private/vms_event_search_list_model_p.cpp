@@ -33,7 +33,6 @@
 #include <nx/vms/rules/utils/field.h>
 #include <ui/common/notification_levels.h>
 #include <ui/help/help_topics.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 

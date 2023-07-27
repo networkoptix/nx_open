@@ -3,7 +3,8 @@
 #include "event_search_list_model.h"
 #include "private/event_search_list_model_p.h"
 
-#include <ui/workbench/workbench_access_controller.h>
+#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -53,7 +54,7 @@ bool EventSearchListModel::isConstrained() const
 
 bool EventSearchListModel::hasAccessRights() const
 {
-    return accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
+    return systemContext()->accessController()->hasGlobalPermissions(GlobalPermission::viewLogs);
 }
 
 } // namespace nx::vms::client::desktop

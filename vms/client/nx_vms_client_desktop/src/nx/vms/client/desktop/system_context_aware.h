@@ -6,8 +6,6 @@
 
 #include <nx/vms/client/core/system_context_aware.h>
 
-class QnWorkbenchAccessController;
-
 namespace nx::vms::client::desktop {
 
 class SystemContext;
@@ -21,8 +19,6 @@ public:
     using nx::vms::client::core::SystemContextAware::SystemContextAware;
 
     SystemContext* systemContext() const;
-
-    QnWorkbenchAccessController* accessController() const;
 };
 
 } // namespace nx::vms::client::desktop

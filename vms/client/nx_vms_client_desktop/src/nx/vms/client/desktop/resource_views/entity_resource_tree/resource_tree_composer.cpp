@@ -6,6 +6,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/flattening_group_entity.h>
@@ -13,9 +14,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
@@ -33,8 +32,8 @@ ResourceTreeComposer::ResourceTreeComposer(
     m_resourceTreeSettings(resourceTreeSettings),
     m_entityBuilder(new ResourceTreeEntityBuilder(systemContext))
 {
-    connect(systemContext->accessController(), &QnWorkbenchAccessController::userChanged,
-        this, &ResourceTreeComposer::onWorkbenchUserChanged);
+    connect(accessController(), &AccessController::userChanged,
+        this, &ResourceTreeComposer::onUserChanged);
 
     if (m_resourceTreeSettings)
     {
@@ -48,7 +47,7 @@ ResourceTreeComposer::ResourceTreeComposer(
             &ResourceTreeComposer::onTreeSettingsChanged);
     }
 
-    onWorkbenchUserChanged(systemContext->accessController()->user());
+    onUserChanged();
 }
 
 ResourceTreeComposer::~ResourceTreeComposer()
@@ -57,9 +56,9 @@ ResourceTreeComposer::~ResourceTreeComposer()
         m_attachedModel->setRootEntity(nullptr);
 }
 
-void ResourceTreeComposer::onWorkbenchUserChanged(const QnUserResourcePtr& user)
+void ResourceTreeComposer::onUserChanged()
 {
-    m_entityBuilder->setUser(user);
+    m_entityBuilder->setUser(accessController()->user());
     rebuildEntity();
 }
 
@@ -78,9 +77,8 @@ AbstractEntityPtr ResourceTreeComposer::createDevicesEntity() const
     if (!m_resourceTreeSettings)
         return m_entityBuilder->createServersGroupEntity(/*showProxiedResources*/ false);
 
-    const bool userCanSeeServers =
-        accessController()->hasPowerUserPermissions()
-            || systemSettings()->showServersInTreeForNonAdmins();
+    const bool userCanSeeServers = accessController()->hasPowerUserPermissions()
+        || systemSettings()->showServersInTreeForNonAdmins();
 
     const bool showServers = userCanSeeServers
         && m_resourceTreeSettings->showServersInTree();

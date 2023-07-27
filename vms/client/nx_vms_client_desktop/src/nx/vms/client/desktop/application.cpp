@@ -72,7 +72,6 @@
 #include <ui/statistics/modules/session_restore_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/combobox_wheel_filter.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>

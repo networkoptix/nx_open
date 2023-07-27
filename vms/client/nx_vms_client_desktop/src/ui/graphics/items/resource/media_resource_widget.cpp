@@ -50,6 +50,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/trace/trace.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
@@ -123,7 +124,6 @@
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -446,7 +446,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
         this,
         &QnMediaResourceWidget::updateWatermark);
     connect(systemContext->accessController(),
-        &QnWorkbenchAccessController::userChanged,
+        &nx::vms::client::core::AccessController::userChanged,
         this,
         &QnMediaResourceWidget::updateWatermark);
 
@@ -3253,7 +3253,7 @@ void QnMediaResourceWidget::updateWatermark()
 
     // First create normal watermark according to current client state.
     if (context->globalSettings()->watermarkSettings().useWatermark
-        && !accessController->hasGlobalPermission(nx::vms::api::GlobalPermission::powerUser)
+        && !accessController->hasGlobalPermissions(nx::vms::api::GlobalPermission::powerUser)
         && user
         && !user->getName().isEmpty())
     {

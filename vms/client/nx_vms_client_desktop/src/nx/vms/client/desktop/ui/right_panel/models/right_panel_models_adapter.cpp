@@ -31,6 +31,7 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/types/event_rule_types.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/thumbnails/abstract_caching_resource_thumbnail.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -59,7 +60,6 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -897,28 +897,25 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
         {
             // Prohibited for live viewers but should be allowed when browsing local files offline.
             return !q->isOnline()
-                || accessController->hasPermissionsForAnyDevice(
-                    Qn::Permission::ViewFootagePermission);
+                || accessController->hasDevicePermissions(Qn::Permission::ViewFootagePermission);
         }
 
         case Type::bookmarks:
         {
             return q->isOnline()
-                && accessController->hasPermissionsForAnyDevice(
-                    Qn::Permission::ViewBookmarksPermission);
+                && accessController->hasDevicePermissions(Qn::Permission::ViewBookmarksPermission);
         }
 
         case Type::events:
         {
             return q->isOnline()
-                && accessController->hasGlobalPermission(GlobalPermission::viewLogs);
+                && accessController->hasGlobalPermissions(GlobalPermission::viewLogs);
         }
 
         case Type::analytics:
         {
             const bool hasPermissions = q->isOnline()
-                && accessController->hasPermissionsForAnyDevice(
-                    Qn::Permission::ViewFootagePermission);
+                && accessController->hasDevicePermissions(Qn::Permission::ViewFootagePermission);
 
             if (!hasPermissions)
                 return false;

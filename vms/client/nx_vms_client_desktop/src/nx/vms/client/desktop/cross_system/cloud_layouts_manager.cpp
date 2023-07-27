@@ -20,6 +20,7 @@
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -29,7 +30,6 @@
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/delayed.h>
 
 #include "cross_system_layout_data.h"

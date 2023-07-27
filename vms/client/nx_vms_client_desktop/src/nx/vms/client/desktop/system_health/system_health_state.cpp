@@ -21,6 +21,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
@@ -33,7 +34,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <server/server_storage_manager.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/email/email.h>
 

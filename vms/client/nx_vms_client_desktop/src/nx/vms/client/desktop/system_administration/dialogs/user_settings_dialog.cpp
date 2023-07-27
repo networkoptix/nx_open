@@ -21,6 +21,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/user_data.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
@@ -39,7 +40,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <recording/time_period.h>
 #include <ui/dialogs/audit_log_dialog.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../globals/session_notifier.h"

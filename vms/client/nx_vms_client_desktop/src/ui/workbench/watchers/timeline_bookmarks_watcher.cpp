@@ -14,6 +14,7 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -21,7 +22,6 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/utils/bookmark_merge_helper.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/camera/bookmark_helpers.h>
@@ -69,15 +69,16 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
             updateCurrentCamera();
         });
 
-    connect(accessController(), &QnWorkbenchAccessController::permissionsReset,
-        this, &QnTimelineBookmarksWatcher::updatePermissions);
-
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (resource == m_currentCamera)
-                updatePermissions();
-        });
+    const auto cachingController = qobject_cast<CachingAccessController*>(accessController());
+    if (NX_ASSERT(cachingController))
+    {
+        connect(cachingController, &CachingAccessController::permissionsChanged, this,
+            [this](const QnResourcePtr& resource)
+            {
+                if (resource == m_currentCamera)
+                    updatePermissions();
+            });
+    }
 
     navigator()->timeSlider()->setBookmarksHelper(m_mergeHelper);
 

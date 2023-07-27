@@ -11,6 +11,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -44,7 +45,6 @@
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/help/business_help.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 #include <utils/media/audio_player.h>
@@ -122,7 +122,12 @@ QnVirtualCameraResourceList getAlarmCameras(
 
     std::sort(alarmCameras.begin(), alarmCameras.end());
     alarmCameras.erase(std::unique(alarmCameras.begin(), alarmCameras.end()), alarmCameras.end());
-    alarmCameras = context->accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
+
+    alarmCameras = alarmCameras.filtered(
+        [context](const auto& camera)
+        {
+            return context->accessController()->hasPermissions(camera, Qn::ViewContentPermission);
+        });
 
     return alarmCameras;
 }
@@ -528,7 +533,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     else if (actionType == ActionType::showPopupAction)
     {
         const bool hasViewPermission = resource &&
-            accessController()->hasPermissions(resource, Qn::ViewContentPermission);
+            systemContext()->accessController()->hasPermissions(resource, Qn::ViewContentPermission);
 
         switch (params.eventType)
         {
@@ -600,10 +605,14 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
             case EventType::userDefinedEvent:
             {
-                auto sourceCameras = camera_id_helper::findCamerasByFlexibleId(
-                    resourcePool(),
-                    params.metadata.cameraRefs);
-                sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewContentPermission);
+                const auto sourceCameras = camera_id_helper::findCamerasByFlexibleId(
+                    resourcePool(), params.metadata.cameraRefs).filtered(
+                        [this](const auto& camera)
+                        {
+                            return systemContext()->accessController()->hasPermissions(camera,
+                                Qn::ViewContentPermission);
+                        });
+
                 if (!sourceCameras.isEmpty())
                 {
                     if (sourceCameras.size() == 1)
@@ -763,8 +772,11 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         return;
 
     const auto camera = resourcePool()->getResourceById(cameraId);
-    if (!camera || !accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission))
+    if (!camera || !systemContext()->accessController()->hasPermissions(camera,
+        Qn::ManageBookmarksPermission))
+    {
         return;
+    }
 
     eventData.removable = false;
     eventData.level = QnNotificationLevel::Value::CriticalNotification;
@@ -860,8 +872,11 @@ QString NotificationListModel::Private::tooltip(const vms::event::AbstractAction
             NX_ASSERT(!id.isNull());
             if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
             {
-                if (accessController()->hasPermissions(camera, Qn::ViewContentPermission))
+                if (systemContext()->accessController()->hasPermissions(camera,
+                    Qn::ViewContentPermission))
+                {
                     tooltip << QnResourceDisplayInfo(camera).toString(resourceInfoLevel);
+                }
             }
         }
     }

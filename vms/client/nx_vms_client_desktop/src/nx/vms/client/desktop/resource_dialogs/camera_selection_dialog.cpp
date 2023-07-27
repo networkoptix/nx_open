@@ -11,6 +11,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
@@ -18,7 +19,6 @@
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -26,11 +26,11 @@ namespace {
 bool shouldDisplayServersInTree(QnWorkbenchContext* context)
 {
     auto systemContext = context->systemContext();
-    const auto isAdmin =
+    const auto isPowerUser =
         systemContext->accessController()->hasPowerUserPermissions();
 
     const bool currentUserAllowedToShowServers =
-        isAdmin || systemContext->globalSettings()->showServersInTreeForNonAdmins();
+        isPowerUser || systemContext->globalSettings()->showServersInTreeForNonAdmins();
 
     const bool showServersInTree = currentUserAllowedToShowServers
         && context->resourceTreeSettings()->showServersInTree();

@@ -13,9 +13,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/system_administration/widgets/logs_management_widget.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/widgets/system_settings/database_management_widget.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -98,8 +99,10 @@ void AdvancedSystemSettingsWidget::Private::setCurrentTab(int idx)
 
 bool AdvancedSystemSettingsWidget::Private::backupAndRestoreIsVisible() const
 {
-    const auto isAdministrator = q->accessController()->hasGlobalPermission(GlobalPermission::administrator);
-    const auto isPowerUser = q->accessController()->hasGlobalPermission(GlobalPermission::powerUser);
+    const auto accessController = q->systemContext()->accessController();
+    const auto isAdministrator =
+        accessController->hasGlobalPermissions(GlobalPermission::administrator);
+    const auto isPowerUser = accessController->hasGlobalPermissions(GlobalPermission::powerUser);
 
     const auto hasOwnerApiForAdmins = q->context()->currentServer()->getServerFlags().testFlag(
         nx::vms::api::SF_AdminApiForPowerUsers);

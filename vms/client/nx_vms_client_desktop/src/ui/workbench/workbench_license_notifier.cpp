@@ -6,11 +6,11 @@
 #include <client/client_runtime_settings.h>
 #include <core/resource/user_resource.h>
 #include <licensing/license.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/license/validator.h>
 #include <ui/dialogs/license_notification_dialog.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 

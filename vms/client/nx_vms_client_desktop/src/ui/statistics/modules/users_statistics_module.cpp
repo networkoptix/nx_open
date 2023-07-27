@@ -4,13 +4,13 @@
 #include "users_statistics_module.h"
 
 #include <core/resource/user_resource.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/reflect/string_conversion.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace {
 

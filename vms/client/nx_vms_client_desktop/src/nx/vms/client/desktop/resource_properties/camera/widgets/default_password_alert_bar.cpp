@@ -5,11 +5,12 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QHBoxLayout>
 
+#include <core/resource/camera_resource.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <ui/workbench/workbench_access_controller.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace {
 
@@ -86,7 +87,9 @@ void DefaultPasswordAlertBar::updateState()
     static const auto kAskAdministratorText = ' ' +
         tr("Ask your system administrator to do it.");
 
-    const bool hasAdminAccess = accessController()->hasPowerUserPermissions();
+    const bool hasAdminAccess = systemContext()->accessController()->hasGlobalPermissions(
+        GlobalPermission::powerUser);
+
     const auto suffix = hasAdminAccess ? QString() : kAskAdministratorText;
     if (m_cameras.empty())
         setText(QString());

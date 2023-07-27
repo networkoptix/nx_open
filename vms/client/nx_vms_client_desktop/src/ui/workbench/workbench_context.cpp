@@ -10,6 +10,7 @@
 #include <core/resource/user_resource.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/director/director.h>
@@ -41,7 +42,6 @@
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_watcher.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 
@@ -72,7 +72,6 @@ QnWorkbenchContext::QnWorkbenchContext(SystemContext* systemContext, QObject* pa
     connect(m_userWatcher, &nx::vms::client::core::UserWatcher::userChanged, this,
         [this](const QnUserResourcePtr& user)
         {
-            accessController()->setUser(user);
             emit userChanged(user);
             emit userIdChanged();
         });

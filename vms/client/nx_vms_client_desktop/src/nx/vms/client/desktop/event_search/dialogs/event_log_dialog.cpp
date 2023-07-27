@@ -20,6 +20,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/rules/event_log.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
@@ -46,7 +47,6 @@
 #include <ui/utils/table_export_helper.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
@@ -628,7 +628,7 @@ void EventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
     const auto resources = m_model->resourcesForPlayback(idx).filtered(
         [this](const QnResourcePtr& resource)
         {
-            return accessController()->hasPermissions(resource, Qn::ReadPermission);
+            return systemContext()->accessController()->hasPermissions(resource, Qn::ReadPermission);
         });
 
     if (resources.isEmpty())
@@ -638,8 +638,8 @@ void EventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
         [this](const QnResourcePtr& resource)
         {
             const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-            return camera
-                && accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+            return camera && systemContext()->accessController()->hasPermissions(camera,
+                Qn::ViewFootagePermission);
         });
 
     ui::action::Parameters params(resources);
@@ -757,7 +757,8 @@ void EventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     {
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         auto manager = context()->menu();
-        if (resource && accessController()->hasPermissions(resource, Qn::ViewContentPermission))
+        if (resource && systemContext()->accessController()->hasPermissions(resource,
+            Qn::ViewContentPermission))
         {
             ui::action::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);

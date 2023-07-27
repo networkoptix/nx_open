@@ -3,7 +3,8 @@
 #include "bookmark_search_list_model.h"
 #include "private/bookmark_search_list_model_p.h"
 
-#include <ui/workbench/workbench_access_controller.h>
+#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -25,7 +26,7 @@ bool BookmarkSearchListModel::isConstrained() const
 
 bool BookmarkSearchListModel::hasAccessRights() const
 {
-    return accessController()->hasPermissionsForAnyDevice(Qn::Permission::ViewBookmarksPermission);
+    return systemContext()->accessController()->hasDevicePermissions(Qn::ViewBookmarksPermission);
 }
 
 void BookmarkSearchListModel::dynamicUpdate(const QnTimePeriod& period)

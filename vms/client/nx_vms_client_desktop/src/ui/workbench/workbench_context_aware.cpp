@@ -6,6 +6,7 @@
 #include <QtQml/QtQml>
 #include <QtWidgets/QGraphicsItem>
 
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/graphics/view/graphics_scene.h>
@@ -154,9 +155,9 @@ Workbench* QnWorkbenchContextAware::workbench() const
     return context()->workbench();
 }
 
-QnWorkbenchAccessController* QnWorkbenchContextAware::accessController() const
+nx::vms::client::core::AccessController* QnWorkbenchContextAware::accessController() const
 {
-    return context()->accessController();
+    return systemContext()->accessController();
 }
 
 QnWorkbenchDisplay* QnWorkbenchContextAware::display() const

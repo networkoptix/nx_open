@@ -17,11 +17,11 @@
 
 #include "resource_tree_model_index_condition.h"
 
-class QnWorkbenchAccessController;
 class QnResourceAccessManager;
 class QnRuntimeInfoManager;
 
 namespace nx::vms::api { enum class WebPageSubtype; }
+namespace nx::vms::client::core { class AccessController; }
 
 namespace nx::vms::client::desktop {
 
@@ -40,12 +40,13 @@ class ResourceTreeModelTest:
 protected:
     using NodeType = ResourceTree::NodeType;
     using WebPageSubtype = nx::vms::api::WebPageSubtype;
+    using AccessController = nx::vms::client::core::AccessController;
 
     virtual void SetUp() override;
     virtual void TearDown() override;
 
     QnResourcePool* resourcePool() const;
-    QnWorkbenchAccessController* workbenchAccessController() const;
+    AccessController* accessController() const;
     QnResourceAccessManager* resourceAccessManager() const;
     LayoutSnapshotManager* layoutSnapshotManager() const;
     QnRuntimeInfoManager* runtimeInfoManager() const;

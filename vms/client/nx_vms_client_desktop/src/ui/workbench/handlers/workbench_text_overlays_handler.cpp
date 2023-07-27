@@ -24,7 +24,6 @@
 #include <nx/vms/rules/utils/action.h>
 #include <ui/graphics/items/controls/html_text_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <utils/common/delayed.h>

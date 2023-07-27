@@ -14,7 +14,6 @@
 #include <nx/utils/model_row_iterator.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 

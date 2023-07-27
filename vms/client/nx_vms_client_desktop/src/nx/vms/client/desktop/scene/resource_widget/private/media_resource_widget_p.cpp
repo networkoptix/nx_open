@@ -24,7 +24,6 @@
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/license/usage_helper.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/delayed.h>
 
 using nx::vms::api::StreamDataFilter;
@@ -142,11 +141,14 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
     analyticsMetadataProvider(
         AnalyticsMetadataProviderFactory::instance()->createMetadataProvider(resource)),
     taxonomyManager(SystemContext::fromResource(resource)->taxonomyManager()),
-    m_accessController(SystemContext::fromResource(resource)->accessController())
+    m_accessController(SystemContext::fromResource(resource)->accessController()),
+    m_accessNotifier(m_accessController
+        ? m_accessController->createNotifier(resource)
+        : AccessController::NotifierPtr{})
 {
     QSignalBlocker blocker(this);
 
-    NX_ASSERT(mediaResource);
+    NX_ASSERT(mediaResource && m_accessController && m_accessNotifier);
 
     ioModuleMonitor.reset(new QnIOModuleMonitor(camera));
 
@@ -155,15 +157,8 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
     connect(resource.get(), &QnResource::statusChanged, this,
         &MediaResourceWidgetPrivate::updateIsUnauthorized);
 
-    connect(m_accessController, &QnWorkbenchAccessController::globalPermissionsChanged,
-        this, &MediaResourceWidgetPrivate::updateAccess);
-
-    connect(m_accessController, &QnWorkbenchAccessController::permissionsChanged, this,
-        [this](const QnResourcePtr& updatedResource)
-        {
-            if (updatedResource == this->resource)
-                updateAccess();
-        });
+    connect(m_accessNotifier.get(), &AccessController::Notifier::permissionsChanged, this,
+        &MediaResourceWidgetPrivate::updateAccess);
 
     if (camera)
     {
@@ -267,7 +262,7 @@ bool MediaResourceWidgetPrivate::hasAccess() const
     return m_hasAccess;
 }
 
-QnWorkbenchAccessController* MediaResourceWidgetPrivate::accessController() const
+MediaResourceWidgetPrivate::AccessController* MediaResourceWidgetPrivate::accessController() const
 {
     return m_accessController;
 }

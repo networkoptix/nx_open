@@ -6,7 +6,8 @@
 
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
-#include <ui/workbench/workbench_access_controller.h>
+#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "../flux/camera_settings_dialog_store.h"
 
@@ -22,13 +23,17 @@ CameraSettingsGlobalPermissionsWatcher::CameraSettingsGlobalPermissionsWatcher(
     NX_ASSERT(store);
 
     auto updateGlobalPermissions = nx::utils::guarded(store,
-        [this, store]()
+        [this, store](auto...)
         {
-            store->setHasPowerUserPermissions(accessController()->hasPowerUserPermissions());
+            store->setHasPowerUserPermissions(
+                systemContext()->accessController()->hasPowerUserPermissions());
         });
 
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
+    connect(systemContext()->accessController(),
+        &nx::vms::client::core::AccessController::globalPermissionsChanged,
+        this,
         updateGlobalPermissions);
+
     updateGlobalPermissions();
 }
 

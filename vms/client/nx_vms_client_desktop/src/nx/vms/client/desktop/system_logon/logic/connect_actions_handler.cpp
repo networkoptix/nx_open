@@ -83,7 +83,6 @@
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/widgets/main_window.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_license_notifier.h>

@@ -75,7 +75,7 @@ private:
         localResourcesGroup
     };
 
-    void onWorkbenchUserChanged(const QnUserResourcePtr& user);
+    void onUserChanged();
     void onTreeSettingsChanged();
     entity_item_model::AbstractEntityPtr createDevicesEntity() const;
     void rebuildEntity();
