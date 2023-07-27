@@ -107,7 +107,6 @@ SystemContext::SystemContext(
                 std::make_unique<nx::vms::rules::Initializer>(this),
                 /*separateThread*/ false);
             d->systemSettingsManager = std::make_unique<SystemSettingsManager>(this);
-            resetAccessController(new AccessController(this));
             break;
 
         case Mode::crossSystem:
@@ -116,16 +115,16 @@ SystemContext::SystemContext(
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
             d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(
                 this);
-            resetAccessController(new AccessController(this));
             break;
 
         case Mode::cloudLayouts:
             break;
 
         case Mode::unitTests:
-            resetAccessController(new AccessController(this));
             break;
     }
+
+    resetAccessController(new AccessController(this));
 
     if (d->userWatcher)
     {
