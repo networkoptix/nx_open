@@ -284,6 +284,7 @@ Control
                             end + 1, 0, 0)
                     )
                     control.visibleMonth = control.selection.start.getMonth()
+                    control.visibleYear = control.selection.start.getFullYear()
                 }
             }
         }
