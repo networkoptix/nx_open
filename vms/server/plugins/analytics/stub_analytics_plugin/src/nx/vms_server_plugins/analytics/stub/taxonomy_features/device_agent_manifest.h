@@ -39,6 +39,14 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             "_comment": "Supported Attributes of a nested Object are declared via `.`."
         },
         {
+            "id": "nx.stub.objectTypeEnumAtributesWithInlineItems",
+            "attributes":
+            [
+                "(Base) Enum attribute"
+            ],
+            "_comment": "Object Type containing Enum attributes with inline items.",
+        },
+        {
             "objectTypeId": "nx.stub.derivedObjectType",
             "attributes":
             [
@@ -270,6 +278,23 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                         "name": "(Base) Conditional Attribute",
                         "type": "String",
                         "condition": "\"(Base) Show Conditional Attribute\" = true"
+                    }
+                ]
+            },
+            {
+                "_comment": "Object Type containing Enum attributes with inline items.",
+                "id": "nx.stub.objectTypeEnumAtributesWithInlineItems",
+                "name": "Stub: Object Type Enum attributes with inline items",
+                "attributes":
+                [
+                    {
+                        "type": "Enum",
+                        "name": "(Base) Enum attribute",
+                        "items":
+                        [
+                            "Enum Type item 1",
+                            "Enum Type item 2"
+                        ]
                     }
                 ]
             },
