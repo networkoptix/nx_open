@@ -311,7 +311,7 @@ BackupSettings BackupSettingsDecoratorModel::globalBackupSettings() const
 {
     return m_changedGlobalBackupSettings
         ? *m_changedGlobalBackupSettings
-        : systemSettings()->backupSettings();
+        : systemContext()->systemSettings()->backupSettings;
 }
 
 void BackupSettingsDecoratorModel::setGlobalBackupSettings(const BackupSettings& backupSettings)
@@ -319,7 +319,7 @@ void BackupSettingsDecoratorModel::setGlobalBackupSettings(const BackupSettings&
     auto globalBackupSettingsChangesNotifier = makeGlobalBackupSettingsChangesNotifier(this);
     auto hasChangesNotifier = makeHasChangesNotifier(this);
 
-    const auto savedGlobalBackupSettings = systemSettings()->backupSettings();
+    const auto savedGlobalBackupSettings = systemContext()->systemSettings()->backupSettings;
     if (savedGlobalBackupSettings == backupSettings)
         m_changedGlobalBackupSettings.reset();
     else
