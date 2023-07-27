@@ -12,12 +12,12 @@
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/test_support/client_camera_resource_stub.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -49,7 +49,7 @@ protected:
         systemContext()->deleteMessageProcessor();
     }
 
-    QnWorkbenchAccessController* accessController() const
+    nx::vms::client::core::AccessController* accessController() const
     {
         return systemContext()->accessController();
     }

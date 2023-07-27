@@ -13,6 +13,7 @@
 #include <client/client_globals.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
@@ -33,7 +34,6 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 #include "private/highlighted_text_item_delegate.h"
 

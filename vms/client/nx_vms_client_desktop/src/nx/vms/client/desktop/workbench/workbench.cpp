@@ -18,6 +18,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -35,7 +36,6 @@
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_grid_mapper.h>
@@ -249,9 +249,13 @@ Workbench::Workbench(QObject* parent):
         [this](const QnResourceList& resources) { d->handleResourcesRemoved(resources); });
 
     // Only currenly connected context resources are checked actually.
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
-        [this](const QnResourcePtr& resource) { d->removeInaccessibleItems(resource); });
-
+    const auto cachingController = qobject_cast<CachingAccessController*>(accessController());
+    if (NX_ASSERT(cachingController))
+    {
+        connect(cachingController, &CachingAccessController::permissionsChanged, this,
+            [this](const QnResourcePtr& resource) { d->removeInaccessibleItems(resource); });
+    }
+    
     // TODO: #sivanov Move to the appropriate place.
     using WebEngineProfileManager = utils::WebEngineProfileManager;
     connect(WebEngineProfileManager::instance(),

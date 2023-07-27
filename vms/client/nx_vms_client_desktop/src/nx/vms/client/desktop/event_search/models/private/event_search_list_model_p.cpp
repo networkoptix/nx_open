@@ -28,7 +28,6 @@
 #include <nx/vms/event/strings_helper.h>
 #include <ui/common/notification_levels.h>
 #include <ui/help/help_topics.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/synctime.h>
 
 namespace nx::vms::client::desktop {

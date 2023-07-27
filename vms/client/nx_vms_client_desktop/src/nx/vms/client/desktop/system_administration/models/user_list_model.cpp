@@ -20,7 +20,6 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
 

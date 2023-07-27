@@ -27,6 +27,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/random.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
@@ -47,7 +48,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/business/business_rule_widget.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
@@ -560,7 +560,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked()
 
 void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
 {
-    if (!accessController()->hasPowerUserPermissions())
+    if (!systemContext()->accessController()->hasPowerUserPermissions())
         return;
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
@@ -660,7 +660,7 @@ void QnBusinessRulesDialog::createActions() {
 
 bool QnBusinessRulesDialog::hasEditPermissions() const
 {
-    return accessController()->hasPowerUserPermissions();
+    return systemContext()->accessController()->hasPowerUserPermissions();
 }
 
 bool QnBusinessRulesDialog::hasChanges() const

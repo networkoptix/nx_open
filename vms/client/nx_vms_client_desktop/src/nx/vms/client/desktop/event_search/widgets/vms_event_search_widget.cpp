@@ -17,6 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
@@ -33,13 +34,14 @@
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/utils/string_helper.h>
 #include <nx/vms/rules/utils/type.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
 using namespace nx::vms::rules;
+
+using nx::vms::client::core::AccessController;
 
 namespace {
 
@@ -153,7 +155,7 @@ VmsEventSearchWidget::Private::Private(VmsEventSearchWidget* q):
                 resetType();
         });
 
-    connect(q->accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
+    connect(q->systemContext()->accessController(), &AccessController::globalPermissionsChanged,
         q, &VmsEventSearchWidget::updateAllowance);
 
     connect(q->model(), &AbstractSearchListModel::isOnlineChanged,
@@ -407,7 +409,7 @@ QString VmsEventSearchWidget::itemCounterText(int count) const
 bool VmsEventSearchWidget::calculateAllowance() const
 {
     return model()->isOnline()
-        && accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewLogs)
+        && systemContext()->accessController()->hasGlobalPermissions(GlobalPermission::viewLogs)
         && systemContext()->vmsRulesEngine()->isEnabled();
 }
 

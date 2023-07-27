@@ -29,6 +29,7 @@ namespace nx::vms::rules { class Engine; }
 
 namespace nx::vms::client::core {
 
+class AccessController;
 class SystemSettingsManager;
 class UserWatcher;
 class WatermarkWatcher;
@@ -131,11 +132,14 @@ public:
 
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const;
 
+    AccessController* accessController() const;
+
 signals:
     void remoteIdChanged(const QnUuid& id);
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;
+    void resetAccessController(AccessController* accessController);
 
 private:
     struct Private;

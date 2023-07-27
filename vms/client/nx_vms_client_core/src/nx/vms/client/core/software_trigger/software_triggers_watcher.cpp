@@ -12,6 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -145,12 +146,23 @@ SoftwareTriggersWatcher::DescriptionPtr SoftwareTriggersWatcher::Description::cr
 
 //-------------------------------------------------------------------------------------------------
 
+struct SoftwareTriggersWatcher::Private
+{
+    QnUuid resourceId;
+    ServerResourcePtr server;
+    DescriptionsHash data;
+    AccessController::NotifierHelper accessNotifier;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 SoftwareTriggersWatcher::SoftwareTriggersWatcher(
     SystemContext* context,
     QObject* parent)
     :
     base_type(parent),
-    SystemContextAware(context)
+    SystemContextAware(context),
+    d(new Private{})
 {
     auto ruleManager = systemContext()->eventRuleManager();
 
@@ -179,43 +191,34 @@ SoftwareTriggersWatcher::SoftwareTriggersWatcher(
     connect(this, &SoftwareTriggersWatcher::resourceIdChanged,
         this, &SoftwareTriggersWatcher::updateTriggers);
 
-    // TODO: #vkutin Refactor this when QnWorkbenchAccessController is moved to client::core.
-
-    const auto notifier = systemContext()->resourceAccessManager()->createNotifier(this);
-
-    connect(systemContext()->userWatcher(), &nx::vms::client::core::UserWatcher::userChanged, this,
-        [this, notifier](const QnUserResourcePtr& user)
-        {
-            notifier->setSubjectId(user ? user->getId() : QnUuid{});
-            updateTriggers();
-        });
-
-    connect(notifier, &QnResourceAccessManager::Notifier::resourceAccessChanged,
-        this, &SoftwareTriggersWatcher::updateTriggers);
-
-    connect(systemContext()->resourceAccessManager(), &QnResourceAccessManager::resourceAccessReset,
-        this, &SoftwareTriggersWatcher::updateTriggers);
-
     connect(systemContext()->resourcePool(), &QnResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources)
         {
-            if (m_server && resources.contains(m_server))
-                m_server.clear();
+            if (d->server && resources.contains(d->server))
+                d->server.clear();
         });
+}
+
+SoftwareTriggersWatcher::~SoftwareTriggersWatcher()
+{
+    // Required here for forward declared scoped pointer destruction.
 }
 
 void SoftwareTriggersWatcher::setResourceId(const QnUuid& resourceId)
 {
-    if (resourceId == m_resourceId)
+    if (resourceId == d->resourceId)
         return;
 
-    m_resourceId = resourceId;
-    m_server.clear();
+    d->resourceId = resourceId;
+    d->server.clear();
+    d->accessNotifier.reset();
 
     if (const auto camera =
-        resourcePool()->getResourceById<QnSecurityCamResource>(m_resourceId))
+        resourcePool()->getResourceById<QnSecurityCamResource>(d->resourceId))
     {
-        m_server = camera->getParentServer().dynamicCast<ServerResource>();
+        d->server = camera->getParentServer().dynamicCast<ServerResource>();
+        d->accessNotifier = accessController()->createNotifier(camera);
+        d->accessNotifier.callOnPermissionsChanged(this, &SoftwareTriggersWatcher::updateTriggers);
     }
 
     emit resourceIdChanged();
@@ -259,13 +262,13 @@ QString SoftwareTriggersWatcher::triggerIcon(const QnUuid& id) const
 
 void SoftwareTriggersWatcher::tryRemoveTrigger(const QnUuid& id)
 {
-    if (m_data.remove(id))
+    if (d->data.remove(id))
         emit triggerRemoved(id);
 }
 
 void SoftwareTriggersWatcher::updateTriggers()
 {
-    auto removedIds = nx::utils::toQSet(m_data.keys());
+    auto removedIds = nx::utils::toQSet(d->data.keys());
 
     for (const auto& rule: systemContext()->eventRuleManager()->rules())
     {
@@ -288,7 +291,7 @@ void SoftwareTriggersWatcher::updateTriggers()
 
 void SoftwareTriggersWatcher::updateTriggersAvailability()
 {
-    for (const auto& id: m_data.keys())
+    for (const auto& id: d->data.keys())
         updateTriggerAvailability(id);
 }
 
@@ -297,13 +300,13 @@ void SoftwareTriggersWatcher::updateTriggerByRule(const nx::vms::event::RulePtr&
     const auto currentUser = systemContext()->userWatcher()->user();
     DescriptionPtr newData;
 
-    const auto resource = resourcePool()->getResourceById(m_resourceId);
+    const auto resource = resourcePool()->getResourceById(d->resourceId);
 
     if (systemContext()->resourceAccessManager()->hasPermission(
             currentUser,
             resource,
             Qn::Permission::SoftTriggerPermission)
-        && appropriateSoftwareTriggerRule(rule, currentUser, m_resourceId))
+        && appropriateSoftwareTriggerRule(rule, currentUser, d->resourceId))
     {
         newData = Description::create(rule);
     }
@@ -316,13 +319,13 @@ void SoftwareTriggersWatcher::updateTriggerByVmsRule(const nx::vms::rules::Rule*
     const auto currentUser = systemContext()->userWatcher()->user();
     DescriptionPtr newData;
 
-    const auto resource = resourcePool()->getResourceById(m_resourceId);
+    const auto resource = resourcePool()->getResourceById(d->resourceId);
 
     if (systemContext()->resourceAccessManager()->hasPermission(
             currentUser,
             resource,
             Qn::Permission::SoftTriggerPermission)
-        && appropriateSoftwareTriggerRule(rule, currentUser, m_resourceId))
+        && appropriateSoftwareTriggerRule(rule, currentUser, d->resourceId))
     {
         newData = Description::create(rule, systemContext()->vmsRulesEngine());
     }
@@ -341,7 +344,7 @@ void SoftwareTriggersWatcher::updateTriggerByData(QnUuid id, const DescriptionPt
     const auto currentData = findTrigger(id);
     if (!currentData)
     {
-        m_data.insert(id, newData);
+        d->data.insert(id, newData);
         emit triggerAdded(id, newData->icon, newData->name, newData->prolonged, newData->enabled);
         return;
     }
@@ -359,7 +362,7 @@ void SoftwareTriggersWatcher::updateTriggerByData(QnUuid id, const DescriptionPt
 
     if (fields != NoField)
     {
-        m_data[id] = newData;
+        d->data[id] = newData;
         emit triggerFieldsChanged(id, fields);
     }
 
@@ -372,9 +375,9 @@ void SoftwareTriggersWatcher::updateTriggerAvailability(QnUuid id)
     if (!description)
         return;
 
-    const auto dateTime = m_server
+    const auto dateTime = d->server
         ? systemContext()->serverTimeWatcher()
-            ->serverTime(m_server, qnSyncTime->currentMSecsSinceEpoch())
+            ->serverTime(d->server, qnSyncTime->currentMSecsSinceEpoch())
         : qnSyncTime->currentDateTime();
 
     bool enabled = description->enabled;
@@ -405,8 +408,8 @@ void SoftwareTriggersWatcher::updateTriggerAvailability(QnUuid id)
 
 SoftwareTriggersWatcher::DescriptionPtr SoftwareTriggersWatcher::findTrigger(QnUuid id) const
 {
-    const auto it = m_data.find(id);
-    return (it == m_data.end()) ? DescriptionPtr() : it.value();
+    const auto it = d->data.find(id);
+    return (it == d->data.end()) ? DescriptionPtr() : it.value();
 }
 
 } // namespace nx::vms::client::core

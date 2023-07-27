@@ -6,7 +6,6 @@
 
 #include <core/resource/user_resource.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 

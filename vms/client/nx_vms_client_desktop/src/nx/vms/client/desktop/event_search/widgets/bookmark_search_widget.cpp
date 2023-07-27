@@ -12,10 +12,11 @@
 #include <nx/utils/metatypes.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/event_search/models/bookmark_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
-#include <ui/workbench/workbench_access_controller.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
@@ -23,6 +24,8 @@
 namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
+
+using nx::vms::client::core::AccessController;
 
 namespace {
 
@@ -113,7 +116,7 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
                 updateTimer->stop();
         });
 
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
+    connect(systemContext()->accessController(), &AccessController::permissionsMaybeChanged,
         this, &BookmarkSearchWidget::updateAllowance);
 
     // Signals that can potentially be emitted during this widget destruction must be
@@ -150,8 +153,8 @@ QString BookmarkSearchWidget::itemCounterText(int count) const
 
 bool BookmarkSearchWidget::calculateAllowance() const
 {
-    return model()->isOnline()
-        && accessController()->hasPermissionsForAnyDevice(Qn::Permission::ViewBookmarksPermission);
+    return model()->isOnline() && systemContext()->accessController()->hasDevicePermissions(
+        Qn::Permission::ViewBookmarksPermission);
 }
 
 } // namespace nx::vms::client::desktop

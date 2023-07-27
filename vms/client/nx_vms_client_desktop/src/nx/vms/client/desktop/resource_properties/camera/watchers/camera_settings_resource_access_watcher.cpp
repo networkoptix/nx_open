@@ -6,8 +6,8 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 #include "../flux/camera_settings_dialog_store.h"
 
@@ -45,18 +45,7 @@ CameraSettingsResourceAccessWatcher::CameraSettingsResourceAccessWatcher(
                     nx::vms::api::AccessRight::edit));
         };
 
-    const auto notifier = systemContext->resourceAccessManager()->createNotifier(this);
-    if (const auto user = systemContext->accessController()->user())
-        notifier->setSubjectId(user->getId());
-
-    connect(systemContext->accessController(), &QnWorkbenchAccessController::userChanged, this,
-        [notifier, updateUserAccessRightsInfo](const QnUserResourcePtr& user)
-        {
-            updateUserAccessRightsInfo();
-            notifier->setSubjectId(user ? user->getId() : QnUuid());
-        });
-
-    connect(notifier, &QnResourceAccessManager::Notifier::resourceAccessChanged,
+    connect(systemContext->accessController(), &core::AccessController::permissionsMaybeChanged,
         this, updateUserAccessRightsInfo);
 
     updateUserAccessRightsInfo();

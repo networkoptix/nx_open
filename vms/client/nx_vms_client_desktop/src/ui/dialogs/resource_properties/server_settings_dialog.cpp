@@ -12,6 +12,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/http/http_types.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
@@ -21,6 +22,7 @@
 #include <nx/vms/client/desktop/resource_properties/server/watchers/server_plugin_data_watcher.h>
 #include <nx/vms/client/desktop/resource_properties/server/widgets/backup_settings_widget.h>
 #include <nx/vms/client/desktop/resource_properties/server/widgets/server_plugins_settings_widget.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/help/help_topic_accessor.h>
@@ -29,7 +31,6 @@
 #include <ui/widgets/properties/storage_analytics_widget.h>
 #include <ui/widgets/properties/storage_config_widget.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
 
@@ -219,7 +220,9 @@ void QnServerSettingsDialog::retranslateUi()
     base_type::retranslateUi();
     if (d->server)
     {
-        bool readOnly = !accessController()->hasPermissions(d->server, Qn::WritePermission | Qn::SavePermission);
+        const bool readOnly = !systemContext()->accessController()->hasPermissions(d->server,
+            Qn::WritePermission | Qn::SavePermission);
+
         setWindowTitle(readOnly
             ? tr("Server Settings - %1 (readonly)").arg(d->server->getName())
             : tr("Server Settings - %1").arg(d->server->getName()));

@@ -12,7 +12,6 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/license/usage_helper.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../flux/camera_settings_dialog_state.h"

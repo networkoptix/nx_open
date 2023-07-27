@@ -40,6 +40,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -60,7 +61,6 @@
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop {
@@ -78,6 +78,8 @@ using namespace nx::analytics::taxonomy;
 using namespace nx::vms::client::desktop::analytics;
 using namespace nx::vms::client::desktop::ui;
 using namespace analytics::taxonomy;
+
+using nx::vms::client::core::AccessController;
 
 // ------------------------------------------------------------------------------------------------
 // AnalyticsSearchWidget::Private
@@ -153,7 +155,7 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
     connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
         &AnalyticsSearchWidget::updateAllowance);
 
-    connect(accessController(), &QnWorkbenchAccessController::permissionsReset, this,
+    connect(systemContext()->accessController(), &AccessController::permissionsMaybeChanged, this,
         &AnalyticsSearchWidget::updateAllowance);
 
     connect(action(action::ObjectSearchModeAction), &QAction::toggled, this,
@@ -199,8 +201,8 @@ bool AnalyticsSearchWidget::calculateAllowance() const
     if (!d->taxonomyManager)
         return false;
 
-    const bool hasPermissions = model()->isOnline()
-        && accessController()->hasPermissionsForAnyDevice(Qn::Permission::ViewFootagePermission);
+    const bool hasPermissions = model()->isOnline() && systemContext()->accessController()->
+        hasDevicePermissions(Qn::Permission::ViewFootagePermission);
 
     return hasPermissions && !d->engines().empty();
 }

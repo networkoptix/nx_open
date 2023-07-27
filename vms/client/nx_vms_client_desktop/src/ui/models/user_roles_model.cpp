@@ -13,7 +13,6 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <ui/models/private/user_roles_model_p.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_context.h>
 

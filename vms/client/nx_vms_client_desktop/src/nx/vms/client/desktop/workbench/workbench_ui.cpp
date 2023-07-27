@@ -19,6 +19,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/trace/trace.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/components/performance_info.h>
 #include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
@@ -57,7 +58,6 @@
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>

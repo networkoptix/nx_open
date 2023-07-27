@@ -22,11 +22,13 @@
 #include <nx/audio/audiodevice.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/licensing/customer_support.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
@@ -36,7 +38,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client;
@@ -105,7 +106,7 @@ void QnAboutDialog::generateServersReport()
 {
     using namespace nx::vms::common;
 
-    const bool isAdmin = accessController()->hasPowerUserPermissions();
+    const bool isAdmin = systemContext()->accessController()->hasPowerUserPermissions();
     QnMediaServerResourceList servers;
     QStringList report;
 

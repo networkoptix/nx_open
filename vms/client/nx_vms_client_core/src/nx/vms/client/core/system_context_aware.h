@@ -20,6 +20,7 @@ using ServerConnectionPtr = std::shared_ptr<ServerConnection>;
 
 namespace nx::vms::client::core {
 
+class AccessController;
 class RemoteSession;
 class ServerTimeWatcher;
 class SystemContext;
@@ -30,6 +31,8 @@ public:
     using nx::vms::common::SystemContextAware::SystemContextAware;
 
     SystemContext* systemContext() const;
+
+    AccessController* accessController() const;
 
     QnClientMessageProcessor* clientMessageProcessor() const;
 

@@ -21,6 +21,7 @@
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -34,7 +35,6 @@
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/help/business_help.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 
@@ -597,7 +597,7 @@ bool QnEventLogModel::hasAccessToCamera(const QnUuid& cameraId) const
     if (!camera)
         return false;
 
-    return accessController()->hasPermissions(camera, Qn::ReadPermission);
+    return systemContext()->accessController()->hasPermissions(camera, Qn::ReadPermission);
 }
 
 bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
@@ -607,7 +607,7 @@ bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
     if (!camera)
         return false;
 
-    return accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+    return systemContext()->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
 }
 
 int QnEventLogModel::helpTopicIdData(Column column, const vms::event::ActionData& action)

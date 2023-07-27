@@ -8,7 +8,6 @@
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../flux/camera_settings_dialog_store.h"

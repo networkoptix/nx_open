@@ -24,6 +24,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
@@ -49,7 +50,6 @@
 #include <ui/utils/table_export_helper.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
@@ -643,7 +643,7 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
     QnResourceList resources = m_model->resourcesForPlayback(idx).filtered(
         [this](const QnResourcePtr& resource)
         {
-            return accessController()->hasPermissions(resource, Qn::ReadPermission);
+            return systemContext()->accessController()->hasPermissions(resource, Qn::ReadPermission);
         });
 
     if (!resources.isEmpty())
@@ -767,7 +767,8 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     {
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         auto manager = context()->menu();
-        if (resource && accessController()->hasPermissions(resource, Qn::ViewContentPermission))
+        if (resource && systemContext()->accessController()->hasPermissions(resource,
+            Qn::ViewContentPermission))
         {
             action::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);

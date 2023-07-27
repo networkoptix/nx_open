@@ -3,7 +3,9 @@
 #include "analytics_search_list_model.h"
 #include "private/analytics_search_list_model_p.h"
 
-#include <ui/workbench/workbench_access_controller.h>
+#include <common/common_globals.h>
+#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -116,7 +118,7 @@ void AnalyticsSearchListModel::setLiveTimestampGetter(LiveTimestampGetter value)
 
 bool AnalyticsSearchListModel::hasAccessRights() const
 {
-    return accessController()->hasPermissionsForAnyDevice(Qn::Permission::ViewFootagePermission);
+    return systemContext()->accessController()->hasDevicePermissions(Qn::ViewFootagePermission);
 }
 
 } // namespace nx::vms::client::desktop

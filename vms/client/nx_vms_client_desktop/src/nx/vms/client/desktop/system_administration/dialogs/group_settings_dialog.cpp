@@ -13,6 +13,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -22,7 +23,6 @@
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../globals/session_notifier.h"
@@ -349,8 +349,12 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
             state.groupId,
             Qn::WriteAccessRightsPermission);
 
+        const auto accessController = qobject_cast<AccessController*>(
+            systemContext()->accessController());
+
         state.membersEditable = !state.isLdap
-            && systemContext()->accessController()->canCreateUser(
+            && NX_ASSERT(accessController)
+            && accessController->canCreateUser(
                 /*targetPermissions*/ {},
                 /*targetGroups*/ {groupId});
 

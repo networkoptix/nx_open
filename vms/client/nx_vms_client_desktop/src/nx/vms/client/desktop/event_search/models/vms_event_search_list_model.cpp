@@ -1,10 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "vms_event_search_list_model.h"
-
-#include <ui/workbench/workbench_access_controller.h>
-
 #include "private/vms_event_search_list_model_p.h"
+
+#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -53,7 +53,7 @@ bool VmsEventSearchListModel::isConstrained() const
 
 bool VmsEventSearchListModel::hasAccessRights() const
 {
-    return accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
+    return systemContext()->accessController()->hasGlobalPermissions(GlobalPermission::viewLogs);
 }
 
 } // namespace nx::vms::client::desktop
