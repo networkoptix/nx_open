@@ -368,7 +368,7 @@ std::optional<QPointF> DewarpingTransform::mapToView(const QPointF& framePoint) 
     const auto viewPoint = d->viewProject(spherePoint);
     auto unitRectViewPoint = d->toViewSpace().inverted().map(viewPoint);
 
-    if (d->mediaParams.cameraProjection == dewarping::CameraProjection::equirectangular360)
+    if (d->mediaParams.is360VR() || d->isHorizontallyMountedFisheyeCamera())
     {
         if (d->viewProjectionType() == dewarping::ViewProjection::equirectangular)
         {
