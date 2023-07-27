@@ -38,7 +38,7 @@ StackLayout
         id: settingsView
 
         property string itemType: "Engine"
-        property string engineId: null
+        property string engineId: ""
 
         headerItem: IntegrationPanel
         {
