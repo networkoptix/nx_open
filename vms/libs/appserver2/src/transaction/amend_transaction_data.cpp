@@ -125,31 +125,31 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     userData->adaptForDeprecatedApi();
 
     if (accessData == Qn::kSystemAccess)
-        return true;
+        return false;
 
     // All owners should be able to see all password data. This is required for merge with
     // taking remote settings.
     if (const auto accessUser = accessManager->systemContext()->resourcePool()
         ->getResourceById<QnUserResource>(accessData.userId); accessUser && accessUser->isOwner())
     {
-        return true;
+        return false;
     }
 
     if (userData->id == QnUserResource::kAdminGuid)
     {
        // Only admin should see it's own password hashes!
        if (accessData.userId == userData->id)
-           return true;
+           return false;
     }
     else if (accessManager->hasGlobalPermission(accessData, GlobalPermission::admin))
     {
-        return true;
+        return false;
     }
     else if (const auto user = accessManager->systemContext()->resourcePool()
              ->getResourceById<QnUserResource>(userData->id);
         accessManager->hasPermission(accessData, user, Qn::SavePermission))
     {
-        return true;
+        return false;
     }
 
     userData->digest.clear();
