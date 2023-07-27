@@ -92,7 +92,6 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
             setCloudSystems(appContext()->cloudStatusWatcher()->cloudSystems());
         });
 
-
     NX_VERBOSE(this, "Initialized");
 }
 

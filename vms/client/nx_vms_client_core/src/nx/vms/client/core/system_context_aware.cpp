@@ -14,6 +14,11 @@ SystemContext* SystemContextAware::systemContext() const
     return dynamic_cast<SystemContext*>(nx::vms::common::SystemContextAware::systemContext());
 }
 
+AccessController* SystemContextAware::accessController() const
+{
+    return systemContext()->accessController();
+}
+
 QnClientMessageProcessor* SystemContextAware::clientMessageProcessor() const
 {
     return static_cast<QnClientMessageProcessor*>(this->messageProcessor());

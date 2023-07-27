@@ -37,6 +37,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -61,7 +62,6 @@
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -1078,7 +1078,7 @@ bool QnWorkbenchNavigator::canJump() const
 {
     if (const auto loader = loaderByWidget(m_currentMediaWidget))
         return !loader->periods(Qn::RecordingContent).empty();
-            
+
     return false;
 }
 
@@ -2531,7 +2531,7 @@ bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& c
     if (!NX_ASSERT(systemContext))
         return false;
 
-    if (!systemContext->accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
+    if (!accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
         return false;
 
     auto footageServers = systemContext->cameraHistoryPool()->getCameraFootageData(camera, true);

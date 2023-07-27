@@ -21,6 +21,7 @@
 #include <nx/utils/metatypes.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
@@ -62,7 +63,6 @@
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/handlers/workbench_videowall_handler.h> //< TODO: #sivanov Dependencies.
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -222,20 +222,24 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             }
         });
 
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
-        [this](const QnResourcePtr& resource)
-        {
-            // Remove layouts if current user has lost access to them.
-            if (auto layoutResource = resource.dynamicCast<LayoutResource>();
-                layoutResource
-                && !accessController()->hasPermissions(layoutResource, Qn::ReadPermission))
+    const auto cachingController = qobject_cast<CachingAccessController*>(accessController());
+    if (NX_ASSERT(cachingController))
+    {
+        connect(cachingController, &CachingAccessController::permissionsChanged, this,
+            [this](const QnResourcePtr& resource)
             {
-                workbench()->removeLayout(layoutResource);
+                // Remove layouts if current user has lost access to them.
+                const auto layoutResource = resource.dynamicCast<LayoutResource>();
+                if (layoutResource && !accessController()->hasPermissions(
+                    layoutResource, Qn::ReadPermission))
+                {
+                    workbench()->removeLayout(layoutResource);
 
-                if (workbench()->layouts().empty())
-                    menu()->trigger(action::OpenNewTabAction);
-            }
-        });
+                    if (workbench()->layouts().empty())
+                        menu()->trigger(action::OpenNewTabAction);
+                }
+            });
+    }
 
     connect(systemContext()->messageProcessor(), &QnCommonMessageProcessor::businessActionReceived,
         this, &LayoutsHandler::at_businessActionReceived);

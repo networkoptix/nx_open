@@ -3,9 +3,9 @@
 #include "resource_access_manager.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
 
@@ -50,7 +50,8 @@ bool ResourceAccessManager::hasPermissions(
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
 }
 
-QnWorkbenchAccessController* ResourceAccessManager::accessController(const QnResourcePtr& resource)
+nx::vms::client::core::AccessController* ResourceAccessManager::accessController(
+    const QnResourcePtr& resource)
 {
     if (!NX_ASSERT(resource))
         return nullptr;

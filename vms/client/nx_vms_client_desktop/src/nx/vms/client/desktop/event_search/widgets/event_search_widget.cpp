@@ -19,6 +19,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
@@ -32,12 +33,13 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/engine.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace std::chrono;
 
 namespace {
+
+using nx::vms::client::core::AccessController;
 
 static const QColor kLight12Color = "#91A7B2";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
@@ -162,7 +164,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
                 resetType();
         });
 
-    connect(q->accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
+    connect(q->systemContext()->accessController(), &AccessController::globalPermissionsChanged,
         q, &EventSearchWidget::updateAllowance);
 
     connect(q->model(), &AbstractSearchListModel::isOnlineChanged,
@@ -425,7 +427,7 @@ QString EventSearchWidget::itemCounterText(int count) const
 bool EventSearchWidget::calculateAllowance() const
 {
     return model()->isOnline()
-        && accessController()->hasGlobalPermission(vms::api::GlobalPermission::viewLogs)
+        && systemContext()->accessController()->hasGlobalPermissions(GlobalPermission::viewLogs)
         && systemContext()->vmsRulesEngine()->isOldEngineEnabled();
 }
 

@@ -17,7 +17,6 @@
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_title_item.h>
 #include <ui/graphics/items/overlays/status_overlay_controller.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;

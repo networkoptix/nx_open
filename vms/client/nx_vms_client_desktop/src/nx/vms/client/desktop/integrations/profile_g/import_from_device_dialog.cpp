@@ -12,11 +12,11 @@
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "import_from_device_dialog_model.h"
@@ -61,7 +61,7 @@ ImportFromDeviceDialog::Private::Private(ImportFromDeviceDialog* owner):
     importDataModel(q),
     filter(q->rootObjectHolder(), "filter")
 {
-    treeEntityBuilder->setUser(q->accessController()->user());
+    treeEntityBuilder->setUser(q->systemContext()->accessController()->user());
     devicesEntity = treeEntityBuilder->createFlatCamerasListEntity();
     devicesModel.setRootEntity(devicesEntity.get());
     iconDecoratorModel.setSourceModel(&devicesModel);

@@ -13,6 +13,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -30,7 +31,6 @@
 #include <ui/common/read_only.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/models/search_bookmarks_model.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_item.h>
@@ -364,7 +364,8 @@ QnVirtualCameraResourceList QnSearchBookmarksDialogPrivate::availableCameras() c
     return resourcePool()->getAllCameras(QnResourcePtr(), true).filtered(
         [this](const QnVirtualCameraResourcePtr& camera)
         {
-            return accessController()->hasPermissions(camera, Qn::ViewContentPermission);
+            return systemContext()->accessController()->hasPermissions(camera,
+                Qn::ViewContentPermission);
         }
     );
 }

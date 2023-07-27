@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/system_settings.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
@@ -66,6 +67,7 @@ struct SystemContext::Private
     std::unique_ptr<ServerPrimaryInterfaceWatcher> serverPrimaryInterfaceWatcher;
     std::unique_ptr<nx::vms::rules::EngineHolder> vmsRulesEngineHolder;
     std::unique_ptr<SystemSettingsManager> systemSettingsManager;
+    std::unique_ptr<AccessController> accessController;
 
     mutable nx::Mutex sessionMutex;
 
@@ -105,6 +107,7 @@ SystemContext::SystemContext(
                 std::make_unique<nx::vms::rules::Initializer>(this),
                 /*separateThread*/ false);
             d->systemSettingsManager = std::make_unique<SystemSettingsManager>(this);
+            resetAccessController(new AccessController(this));
             break;
 
         case Mode::crossSystem:
@@ -113,13 +116,26 @@ SystemContext::SystemContext(
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
             d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(
                 this);
+            resetAccessController(new AccessController(this));
             break;
 
         case Mode::cloudLayouts:
+            break;
+
         case Mode::unitTests:
+            resetAccessController(new AccessController(this));
             break;
     }
 
+    if (d->userWatcher)
+    {
+        connect(d->userWatcher.get(), &UserWatcher::userChanged, this,
+            [this](const QnUserResourcePtr& user)
+            {
+                if (d->accessController)
+                    d->accessController->setUser(user);
+            });
+    }
 }
 
 SystemContext::~SystemContext()
@@ -270,6 +286,16 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
         vmsRulesEngine(),
         clientMessageProcessor,
         Qt::QueuedConnection);
+}
+
+AccessController* SystemContext::accessController() const
+{
+    return d->accessController.get();
+}
+
+void SystemContext::resetAccessController(AccessController* accessController)
+{
+    d->accessController.reset(accessController);
 }
 
 } // namespace nx::vms::client::desktop

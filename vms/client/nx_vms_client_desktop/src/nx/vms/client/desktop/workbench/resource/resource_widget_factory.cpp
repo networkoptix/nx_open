@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/intercom/intercom_resource_widget.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -19,7 +20,6 @@
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>

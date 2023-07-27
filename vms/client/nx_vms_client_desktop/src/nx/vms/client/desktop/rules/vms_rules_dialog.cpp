@@ -15,7 +15,6 @@
 #include <nx/vms/rules/utils/api.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 #include "edit_vms_rule_dialog.h"
 #include "model_view/rules_table_model.h"

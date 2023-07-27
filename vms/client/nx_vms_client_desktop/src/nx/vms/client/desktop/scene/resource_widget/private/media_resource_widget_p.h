@@ -7,6 +7,7 @@
 #include <core/resource/client_resource_fwd.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/media/abstract_metadata_consumer_owner.h>
 #include <nx/vms/client/core/media/abstract_motion_metadata_provider.h>
@@ -19,8 +20,6 @@
 namespace nx::analytics { class MetadataLogParser; }
 namespace nx::analytics::db { struct Filter; }
 namespace nx::vms::client::core { class ConsumingMotionMetadataProvider; }
-
-class QnWorkbenchAccessController;
 
 namespace nx::vms::client::desktop {
 
@@ -39,6 +38,7 @@ class MediaResourceWidgetPrivate: public QObject
         licenseStatus READ licenseStatus NOTIFY licenseStatusChanged)
 
     using base_type = QObject;
+    using AccessController = nx::vms::client::core::AccessController;
 
 public:
     const QnResourcePtr resource;
@@ -76,7 +76,7 @@ public:
     QnResourceDisplayPtr display() const;
     void setDisplay(const QnResourceDisplayPtr& display);
 
-    QnWorkbenchAccessController* accessController() const;
+    AccessController* accessController() const;
 
     bool isPlayingLive() const;
     bool isOffline() const;
@@ -134,7 +134,8 @@ private:
 private:
     QnResourceDisplayPtr m_display;
     QScopedPointer<nx::vms::license::SingleCamLicenseStatusHelper> m_licenseStatusHelper;
-    QPointer<QnWorkbenchAccessController> m_accessController;
+    const QPointer<AccessController> m_accessController;
+    const AccessController::NotifierPtr m_accessNotifier;
 
     bool m_isPlayingLive = false;
     bool m_isOffline = false;

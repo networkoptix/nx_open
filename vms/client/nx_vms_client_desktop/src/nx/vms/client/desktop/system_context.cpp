@@ -12,6 +12,8 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
 #include <nx/branding.h>
+#include <nx/vms/client/desktop/access/access_controller.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
@@ -26,7 +28,6 @@
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
 #include <server/server_storage_manager.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 #include "application_context.h"
 
@@ -44,7 +45,6 @@ Qn::SerializationFormat serializationFormat()
 struct SystemContext::Private
 {
     SystemContext* const q;
-    std::unique_ptr<QnWorkbenchAccessController> accessController;
     std::unique_ptr<VideoWallOnlineScreensWatcher> videoWallOnlineScreensWatcher;
     std::unique_ptr<QnIncompatibleServerWatcher> incompatibleServerWatcher;
     std::unique_ptr<ServerRuntimeEventConnector> serverRuntimeEventConnector;
@@ -87,11 +87,10 @@ SystemContext::SystemContext(
     base_type(mode, std::move(peerId), resourceAccessMode, parent),
     d(new Private{.q = this})
 {
-    d->accessController = std::make_unique<QnWorkbenchAccessController>(this, resourceAccessMode);
-
     switch (mode)
     {
         case Mode::client:
+            resetAccessController(new CachingAccessController(this));
             d->initLocalRuntimeInfo();
             d->videoWallOnlineScreensWatcher = std::make_unique<VideoWallOnlineScreensWatcher>(
                 this);
@@ -116,6 +115,7 @@ SystemContext::SystemContext(
             break;
 
         case Mode::crossSystem:
+            resetAccessController(new AccessController(this));
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
@@ -128,9 +128,9 @@ SystemContext::SystemContext(
             break;
 
         case Mode::unitTests:
+            resetAccessController(new CachingAccessController(this));
             break;
     }
-
 }
 
 SystemContext::~SystemContext()
@@ -149,11 +149,6 @@ SystemContext* SystemContext::fromResource(const QnResourcePtr& resource)
         return {};
 
     return dynamic_cast<SystemContext*>(resource->systemContext());
-}
-
-QnWorkbenchAccessController* SystemContext::accessController() const
-{
-    return d->accessController.get();
 }
 
 VideoWallOnlineScreensWatcher* SystemContext::videoWallOnlineScreensWatcher() const

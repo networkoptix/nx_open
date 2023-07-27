@@ -8,7 +8,6 @@
 #include <client/client_module.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "overlapped_id.h"

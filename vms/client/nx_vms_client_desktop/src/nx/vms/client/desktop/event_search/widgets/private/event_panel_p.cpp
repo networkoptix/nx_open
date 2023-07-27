@@ -53,7 +53,6 @@
 #include <ui/common/notification_levels.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>

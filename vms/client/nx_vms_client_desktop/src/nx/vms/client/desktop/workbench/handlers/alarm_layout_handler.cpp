@@ -19,6 +19,7 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
@@ -35,7 +36,6 @@
 #include <nx/vms/rules/utils/type.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -103,8 +103,12 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
         [this]
         {
             const auto parameters = menu()->currentParameters(sender());
-            auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
-            cameras = accessController()->filtered(cameras, Qn::ViewContentPermission);
+            const auto cameras = parameters.resources().filtered<QnVirtualCameraResource>(
+                [this](const auto& camera)
+                {
+                    return systemContext()->accessController()->hasPermissions(camera,
+                        Qn::ViewContentPermission);
+                });
             if (!cameras.isEmpty())
                 openCamerasInAlarmLayout(cameras, /*switchToLayoutNeeded*/ true, DATETIME_NOW);
         });
@@ -144,8 +148,18 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
                 targetCameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                     action->getSourceResources(resourcePool()));
             }
-            targetCameras = nx::utils::toQSet(
-                accessController()->filtered(targetCameras, Qn::ViewContentPermission)).values();
+
+            // Remove duplicates.
+            std::sort(targetCameras.begin(), targetCameras.end());
+            targetCameras.erase(std::unique(targetCameras.begin(), targetCameras.end()),
+                targetCameras.end());
+
+            targetCameras = targetCameras.filtered(
+                [this](const auto& camera)
+                {
+                    return systemContext()->accessController()->hasPermissions(camera,
+                        Qn::ViewContentPermission);
+                });
 
             if (targetCameras.isEmpty())
                 return;

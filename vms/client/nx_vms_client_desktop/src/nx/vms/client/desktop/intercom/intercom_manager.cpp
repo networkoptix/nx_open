@@ -10,6 +10,7 @@
 #include <core/resource/user_resource.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -27,7 +28,6 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace std::chrono;
@@ -44,16 +44,16 @@ struct IntercomManager::Private: public QObject
     Private(IntercomManager* owner):
         q(owner)
     {
-        connect(q->accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        const auto accessController = qobject_cast<CachingAccessController*>(q->accessController());
+        NX_ASSERT(accessController);
+
+        connect(accessController, &CachingAccessController::permissionsChanged, this,
             [this](const QnResourcePtr& resource)
             {
                 const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
                 if (camera && Private::isIntercom(camera))
                     updateLocalLayouts({camera});
             });
-
-        connect(q->accessController(), &QnWorkbenchAccessController::permissionsReset, this,
-            [this]() { updateLocalLayouts(getAllIntercomCameras()); });
 
         tryCreateLayouts(getAllIntercomCameras());
 

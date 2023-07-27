@@ -46,6 +46,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -73,6 +74,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
@@ -160,7 +162,6 @@
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h> //< TODO: #sivanov Fix dependencies.
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>

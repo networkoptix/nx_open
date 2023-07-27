@@ -2,8 +2,6 @@
 
 #include "debug_custom_actions.h"
 
-#include <nx/utils/log/assert.h>
-
 namespace nx::vms::client::desktop {
 
 namespace {
@@ -14,7 +12,6 @@ static std::map<QString, DebugActionHandler> kDebugActions;
 
 void registerDebugAction(const QString& name, DebugActionHandler handler)
 {
-    NX_ASSERT(!kDebugActions.contains(name));
     kDebugActions[name] = handler;
 }
 

@@ -11,16 +11,18 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/unicode_chars.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/simple_motion_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/common/read_only.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
 
 using nx::vms::client::core::MotionSelection;
+using nx::vms::client::core::AccessController;
 
 namespace nx::vms::client::desktop {
 
@@ -135,7 +137,7 @@ SimpleMotionSearchWidget::SimpleMotionSearchWidget(QnWorkbenchContext* context, 
 
     connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
         &SimpleMotionSearchWidget::updateAllowance);
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
+    connect(systemContext()->accessController(), &AccessController::permissionsMaybeChanged, this,
         &SimpleMotionSearchWidget::updateAllowance);
 }
 
@@ -162,8 +164,8 @@ QString SimpleMotionSearchWidget::itemCounterText(int count) const
 bool SimpleMotionSearchWidget::calculateAllowance() const
 {
     // Panel is hidden for live viewers but should be visible when browsing local files offline.
-    return !model()->isOnline()
-        || accessController()->hasPermissionsForAnyDevice(Qn::Permission::ViewFootagePermission);
+    return !model()->isOnline() || systemContext()->accessController()->hasDevicePermissions(
+        Qn::Permission::ViewFootagePermission);
 }
 
 } // namespace nx::vms::client::desktop

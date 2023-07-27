@@ -1,15 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "detailed_resource_tree_widget.h"
-
 #include "ui_detailed_resource_tree_widget.h"
 
 #include <QtCore/QModelIndex>
 
 #include <core/resource/resource.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
-#include <ui/delegates/resource_item_delegate.h>
+#include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
@@ -17,6 +14,8 @@
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/delegates/resource_item_delegate.h>
 
 namespace nx::vms::client::desktop {
 
@@ -35,13 +34,13 @@ DetailedResourceTreeWidget::DetailedResourceTreeWidget(
 {
     ui->setupUi(this);
 
-    connect(accessController(), &QnWorkbenchAccessController::userChanged, this,
-        [this](const QnUserResourcePtr& user)
+    connect(accessController(), &AccessController::userChanged, this,
+        [this]()
         {
             if (!m_entityFactoryFunction)
                 return;
 
-            m_treeEntityBuilder->setUser(user);
+            m_treeEntityBuilder->setUser(accessController()->user());
             auto newTreeEntity = m_entityFactoryFunction(m_treeEntityBuilder.get());
             m_entityModel->setRootEntity(newTreeEntity.get());
             m_treeEntity = std::move(newTreeEntity);
