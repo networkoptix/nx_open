@@ -368,22 +368,27 @@ std::optional<QPointF> DewarpingTransform::mapToView(const QPointF& framePoint) 
     const auto viewPoint = d->viewProject(spherePoint);
     auto unitRectViewPoint = d->toViewSpace().inverted().map(viewPoint);
 
-    if (d->mediaParams.is360VR() || d->isHorizontallyMountedFisheyeCamera())
+    switch (d->viewProjectionType())
     {
-        if (d->viewProjectionType() == dewarping::ViewProjection::equirectangular)
-        {
-            unitRectViewPoint.rx() = wrapValue(unitRectViewPoint.x(),
-                0.5 - M_PI / d->itemParams.fov,
-                0.5 + M_PI / d->itemParams.fov);
-        }
-        else if (d->viewProjectionType() == dewarping::ViewProjection::rectilinear)
-        {
-            if (QVector3D::dotProduct(spherePoint,
-                sphericalToCartesian({d->itemParams.xAngle, -d->itemParams.yAngle})) < 0)
+        case dewarping::ViewProjection::equirectangular:
+            if (d->mediaParams.is360VR() || d->isHorizontallyMountedFisheyeCamera())
             {
-                return std::nullopt; //< Projected from behind, not a valid result.
+                unitRectViewPoint.rx() = wrapValue(unitRectViewPoint.x(),
+                    0.5 - M_PI / d->itemParams.fov,
+                    0.5 + M_PI / d->itemParams.fov);
             }
-        }
+            break;
+
+        case dewarping::ViewProjection::rectilinear:
+            if (d->mediaParams.is360VR())
+            {
+                if (QVector3D::dotProduct(spherePoint,
+                    sphericalToCartesian({d->itemParams.xAngle, -d->itemParams.yAngle})) < 0)
+                {
+                    return std::nullopt; //< Projected from behind, not a valid result.
+                }
+            }
+            break;
     }
 
     return kUnitRect.contains(unitRectViewPoint)
