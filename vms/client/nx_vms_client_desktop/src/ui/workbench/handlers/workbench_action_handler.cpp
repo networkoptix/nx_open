@@ -474,7 +474,11 @@ void ActionHandler::addToLayout(
     // Force cloud resource descriptor for cloud layouts.
     LayoutItemData data = layoutItemFromResource(resource,
         /*forceCloud*/ layout->hasFlags(Qn::cross_system));
-    data.flags = Qn::PendingGeometryAdjustment;
+
+    data.flags = params.size.has_value() && params.position.has_value() && !params.size->isEmpty()
+        ? Qn::Pinned
+        : Qn::PendingGeometryAdjustment;
+
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
 
