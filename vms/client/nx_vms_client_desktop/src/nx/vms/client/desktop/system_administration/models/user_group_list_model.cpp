@@ -33,7 +33,7 @@ struct UserGroupListModel::Private
 
     Private(UserGroupListModel* q): q(q), syncId(q->globalSettings()->ldap().syncId())
     {
-        connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged,
+        connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
             [this]() { syncId = this->q->globalSettings()->ldap().syncId(); });
     }
 
