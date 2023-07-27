@@ -26,6 +26,10 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
     {QIcon::Active, {{kLight10Color, "light11"}}},
 };
 
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutionsError = {
+    {QIcon::Normal, {{kLight10Color, "red_l2"}}},
+};
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -66,7 +70,8 @@ public:
         if (m_owner->isVerificationErrorVisible() && !data->verificationMessage.isEmpty())
         {
             m_left->setText(data->verificationMessage);
-            m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
+            m_left->setIcon(
+                qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutionsError));
             leftHidden = false;
             errorStyle = true;
         }
@@ -128,7 +133,8 @@ public:
                     break;
                 case StatusCode::error:
                     m_left->setText(data->statusMessage);
-                    m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
+                    m_left->setIcon(
+                        qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutionsError));
                     leftHidden = false;
                     errorStyle = true;
                     break;
