@@ -121,7 +121,7 @@ QString ObjectType::id() const
     if (d->cachedId)
         return *d->cachedId;
 
-    const std::vector<QString> ids = fullSubtreeTypeIds();
+    const std::vector<QString> ids = typeIds();
     d->cachedId = makeId(QStringList{ids.begin(), ids.end()});
     return *d->cachedId;
 }
