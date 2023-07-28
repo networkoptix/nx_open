@@ -2,21 +2,42 @@
 
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+## Overview
+
+The key elements of the HTTP server is the listener and request handler.  
+A listener is created by nx::network::http::server::Builder::build function.  
+Request handler inherits nx::network::http::AbstractRequestHandler class. A request listener can do
+any kind of job such as:
+- authentication
+- dispatching requests based on various rules
+- implementing application's business logic
+
+For example, a typical HTTP authenticator (nx::network::http::server::AuthenticationManager) is a
+request handler that implements HTTP authentication and forwards the request down the processing
+pipeline on authentication success or replies with 401 HTTP status on authentication failure.
+
+Request handler chaining is used to create HTTP processing pipelines. Common pipeline is  
+authenticator -> dispatcher -> business logic handler.
+
 ## REST API server example
 
-Let's say we need to implement a "key: value" dictionary over HTTP.
-This application have the following API:
-- GET /elements/<key>. Returns element with the specified key or reports "404 Not Found"
-- POST /elements. Adds a new element to the dictionary
-- DELETE /elements/<key>. Removes an elements with a specified key.
+The example below demonstrates an HTTP server implementing "key: value" dictionary over HTTP.  
+This application has the following API:
+- GET /elements/<key>. Returns element with the specified key or reports "404 Not Found".
+- PUT /elements/<key>. Adds new or replaces existing element in the dictionary.
+- DELETE /elements/<key>. Removes an element with a specified key.
+
+All requests require authentication with predefined credentials "admin:admin".
 
 
-    #include <map>
+    #include <initializer_list>
+    #include <unordered_map>
 
     #include <nx/network/socket_global.h>
     #include <nx/network/http/buffer_source.h>
     #include <nx/network/http/server/abstract_api_request_handler.h>
     #include <nx/network/http/server/http_server_builder.h>
+    #include <nx/network/http/server/http_server_authentication_manager.h>
     #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
     #include <nx/utils/argument_parser.h>
     #include <nx/utils/deprecated_settings.h>
@@ -29,24 +50,41 @@ This application have the following API:
     class Dictionary
     {
     public:
-        std::optional<std::string /*value*/> get(const std::string& key) const;
-        bool add(const std::string& key, const std::string& value);
-        bool delete_(const std::string& key);
+        std::optional<std::string /*value*/> get(const std::string& key) const
+        {
+            auto it = m_data.find(key);
+            return it != m_data.end() ? std::make_optional(it->second) : std::nullopt;
+        }
+
+        // Adds new elements or replaces existing element with the given key.
+        void save(const std::string& key, const std::string& value)
+        {
+            m_data[key] = value;
+        }
+
+        // Erase element with the given key.
+        // Returns true if element was found and removed, false if not found.
+        bool delete_(const std::string& key)
+        {
+            return m_data.erase(key) > 0;
+        }
 
     private:
-        std::map<std::string, std::string> m_data;
+        std::unordered_map<std::string, std::string> m_data;
     };
 
     //-------------------------------------------------------------------------------------------------
 
     using namespace nx::network;
 
-    // This class provides HTTP API to the business logic layer.
+    // Provides HTTP API to the business logic layer. This class is layer that converts HTTP calls
+    // into Dictionary class invocations.
     class ApiServer
     {
     public:
         ApiServer(Dictionary* dictionary);
 
+        // Registers neccessary HTTP handlers under the dispatcher.
         void registerApi(http::server::rest::MessageDispatcher* dispatcher);
 
     private:
@@ -54,12 +92,43 @@ This application have the following API:
     };
 
     //-------------------------------------------------------------------------------------------------
+    // Simple class that represents a credentials source.
+
+    class CredentialsProvider: public http::server::AbstractAuthenticationDataProvider
+    {
+    public:
+        CredentialsProvider(std::initializer_list<std::pair<const std::string, std::string>> credentials):
+            m_credentials(std::move(credentials))
+        {
+        }
+
+        virtual void getPasswordByUserName(
+            const std::string& userName,
+            AbstractAuthenticationDataProvider::LookupResultHandler completionHandler) override
+        {
+            if (m_credentials.contains(userName))
+            {
+                completionHandler({
+                    http::server::PasswordLookupResult::Code::ok,
+                    http::PasswordAuthToken(m_credentials.at(userName))});
+            }
+            else
+            {
+                completionHandler({http::server::PasswordLookupResult::Code::notFound, {}});
+            }
+        }
+
+    private:
+        std::unordered_map</*userName*/ std::string, /*password*/ std::string> m_credentials;
+    };
+
+    //-------------------------------------------------------------------------------------------------
 
     // Application usage example:
     // $ ./a.out --http/endpoints=127.0.0.1:12345
-    // $ curl -X POST -H "Content-Type:text/plain" -d "Hello, world" http://127.0.0.1:12345/elements/key1
-    //
-    // $ curl http://127.0.0.1:12345/elements/key1
+    // $ curl --digest --user admin:admin -X PUT -H "Content-Type:text/plain" -d "Hello, world" http://127.0.0.1:12345/elements/key1
+    // Hello, world
+    // $ curl --digest --user admin:admin http://127.0.0.1:12345/elements/key1
     // Hello, world
 
     int main(int argc, const char** argv)
@@ -74,10 +143,24 @@ This application have the following API:
         Dictionary dict;
 
         //---------------------------------------------------------------------------------------------
-        // Initializing the HTTP API to our business logic.
+        // The dispatcher is reponsible for forwarding request to the appropriate application handler.
         http::server::rest::MessageDispatcher dispatcher;
+
+        //---------------------------------------------------------------------------------------------
+        // Initializing the HTTP API to our business logic.
         ApiServer apiServer(&dict);
         apiServer.registerApi(&dispatcher);
+
+        //---------------------------------------------------------------------------------------------
+        // Initializing authentication.
+        CredentialsProvider credsProvider({{"admin", "admin"}});
+
+        http::server::AuthenticationManager authenticator(
+            &dispatcher,    //< If request authenticated successfully, pass request to the dispatcher.
+            &credsProvider);
+        // NOTE: The authenticator will receive every HTTP request. When it is desired to use
+        // different authenticators for different request paths,
+        // nx::network::http::server::AuthenticationDispatcher should be used.
 
         //---------------------------------------------------------------------------------------------
         // Launching HTTP server that invokes our API.
@@ -86,16 +169,13 @@ This application have the following API:
         http::server::Settings httpSettings;
         httpSettings.load(QnSettings(nx::utils::ArgumentParser(argc, argv)));
 
-        // Building the server from settings.
-        // Note: the builder will binds to endpoints, but does not start listening.
-        auto [server, err] = http::server::Builder::build(
-            httpSettings,
-            nullptr, // AbstractAuthenticationManager can be used here to do authentication.
-            &dispatcher);
+        // Building the HTTP listener from settings.
+        // Note: the builder will bind listener to endpoints, but won't start listening.
+        // The HTTP listener will submit every request to the authenticator.
+        auto [server, err] = http::server::Builder::build(httpSettings, &authenticator);
         if (!server)
         {
-            std::cerr << "Failed to start HTTP server. " <<
-                SystemError::toString(err) << std::endl;
+            std::cerr << "Failed to start HTTP server. " << SystemError::toString(err) << std::endl;
             return 1;
         }
 
@@ -107,30 +187,14 @@ This application have the following API:
             return 2;
         }
 
+        // Waiting for the user input to stop the application.
         for (std::string s; s != "stop"; std::cin >> s) {}
 
         return 0;
     }
 
     //-------------------------------------------------------------------------------------------------
-
-    std::optional<std::string /*value*/> Dictionary::get(const std::string& key) const
-    {
-        auto it = m_data.find(key);
-        return it != m_data.end() ? std::make_optional(it->second) : std::nullopt;
-    }
-
-    bool Dictionary::add(const std::string& key, const std::string& value)
-    {
-        return m_data.emplace(key, value).second;
-    }
-
-    bool Dictionary::delete_(const std::string& key)
-    {
-        return m_data.erase(key) > 0;
-    }
-
-    //-------------------------------------------------------------------------------------------------
+    // ApiServer class implementation.
 
     ApiServer::ApiServer(Dictionary* dictionary): m_dictionary(dictionary) {}
 
@@ -138,16 +202,18 @@ This application have the following API:
     {
         // Add element to the dictionary.
         dispatcher->registerRequestProcessorFunc(
-            http::Method::post,
+            http::Method::put,
             "/elements/{key}",
             [this](
                 http::RequestContext requestCtx,
                 http::RequestProcessedHandler completionHandler)
             {
-                m_dictionary->add(
-                    requestCtx.requestPathParams.getByName("key"),
-                    requestCtx.request.messageBody.takeStdString());
-                completionHandler(http::StatusCode::ok);
+                std::string value = requestCtx.request.messageBody.takeStdString();
+                m_dictionary->save(requestCtx.requestPathParams.getByName("key"), value);
+
+                http::RequestResult result(http::StatusCode::ok);
+                result.body = std::make_unique<http::BufferSource>("text/plain", std::move(value));
+                completionHandler(std::move(result));
             });
 
         // Get element.
@@ -163,8 +229,7 @@ This application have the following API:
                     return completionHandler(http::StatusCode::notFound);
 
                 http::RequestResult result(http::StatusCode::ok);
-                result.dataSource = std::make_unique<http::BufferSource>(
-                    "text/plain", std::move(*value));
+                result.body = std::make_unique<http::BufferSource>("text/plain", std::move(*value));
                 completionHandler(std::move(result));
             });
 

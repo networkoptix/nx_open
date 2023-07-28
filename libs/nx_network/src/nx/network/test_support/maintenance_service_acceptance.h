@@ -18,7 +18,7 @@ namespace {
 
 /**
  * NOTE: These credentials were created using htdigest command line using realm "VMS", which MUST
- * match BaseAuthenticationManager::realm().
+ * match AuthenticationManager::realm().
  */
 static constexpr std::tuple<const char*, const char*, const char*> kValidCredentialsHa1{
     "nx",
