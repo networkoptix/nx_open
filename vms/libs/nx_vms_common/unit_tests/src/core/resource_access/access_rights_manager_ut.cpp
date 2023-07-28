@@ -42,7 +42,12 @@ public:
     void checkPredefinedGroupAccessRights()
     {
         for (const auto& id: PredefinedUserGroups::ids())
-            EXPECT_EQ(manager->ownResourceAccessMap(id), PredefinedUserGroups::accessRights(id));
+        {
+            const auto group = PredefinedUserGroups::find(id).value_or(UserGroupData{});
+
+            EXPECT_EQ(manager->ownResourceAccessMap(id), ResourceAccessMap(
+                group.resourceAccessRights.begin(), group.resourceAccessRights.end()));
+        }
     }
 
 protected:

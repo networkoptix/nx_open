@@ -19,18 +19,6 @@ UserGroupData::UserGroupData(
 {
 }
 
-UserGroupData UserGroupData::makePredefined(
-    const QnUuid& id,
-    const QString& name,
-    const QString& description,
-    GlobalPermissions permissions)
-{
-    UserGroupData role(id, name, permissions);
-    role.description = description;
-    role.attributes = UserAttribute::readonly;
-    return role;
-}
-
 QString UserGroupData::toString() const
 {
     return QJson::serialized(*this);
