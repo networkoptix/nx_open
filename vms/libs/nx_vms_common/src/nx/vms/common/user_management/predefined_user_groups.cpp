@@ -97,7 +97,7 @@ struct PredefinedUserGroups::Private
         return {};
     };
 
-    static ResourceAccessMap accessRights(const QnUuid& groupId)
+    static const std::map<QnUuid, AccessRights>& accessRights(const QnUuid& groupId)
     {
         static constexpr AccessRights kViewerAccessRights = AccessRight::view
             | AccessRight::viewArchive
@@ -109,11 +109,19 @@ struct PredefinedUserGroups::Private
             | AccessRight::userInput;
 
         if (groupId == kAdministratorsGroupId || groupId == kPowerUsersGroupId)
-            return kFullResourceAccessMap;
+        {
+            static const std::map<QnUuid, AccessRights> kPowerUserResourceAccessMap{
+                {kAllDevicesGroupId, kFullAccessRights},
+                {kAllWebPagesGroupId, AccessRight::view},
+                {kAllServersGroupId, AccessRight::view},
+                {kAllVideoWallsGroupId, AccessRight::edit}};
+
+            return kPowerUserResourceAccessMap;
+        }
 
         if (groupId == kAdvancedViewersGroupId)
         {
-            static const ResourceAccessMap kAdvancedViewerResourceAccessMap{
+            static const std::map<QnUuid, AccessRights> kAdvancedViewerResourceAccessMap{
                 {kAllDevicesGroupId, kAdvancedViewerAccessRights},
                 {kAllWebPagesGroupId, AccessRight::view},
                 {kAllServersGroupId, AccessRight::view}};
@@ -123,7 +131,7 @@ struct PredefinedUserGroups::Private
 
         if (groupId == kViewersGroupId)
         {
-            static const ResourceAccessMap kViewerResourceAccessMap{
+            static const std::map<QnUuid, AccessRights> kViewerResourceAccessMap{
                 {kAllDevicesGroupId, kViewerAccessRights},
                 {kAllWebPagesGroupId, AccessRight::view},
                 {kAllServersGroupId, AccessRight::view}};
@@ -133,7 +141,7 @@ struct PredefinedUserGroups::Private
 
         if (groupId == kLiveViewersGroupId)
         {
-            static const ResourceAccessMap kLiveViewerResourceAccessMap{
+            static const std::map<QnUuid, AccessRights> kLiveViewerResourceAccessMap{
                 {kAllDevicesGroupId, AccessRight::view},
                 {kAllWebPagesGroupId, AccessRight::view},
                 {kAllServersGroupId, AccessRight::view}};
@@ -143,14 +151,15 @@ struct PredefinedUserGroups::Private
 
         if (groupId == kSystemHealthViewersGroupId)
         {
-            static const ResourceAccessMap kSystemHealthViewerResourceAccessMap{
+            static const std::map<QnUuid, AccessRights> kSystemHealthViewerResourceAccessMap{
                 {kAllServersGroupId, AccessRight::view}};
 
             return kSystemHealthViewerResourceAccessMap;
         }
 
         NX_ASSERT(false, "Not a predefined user group: %1", groupId);
-        return {};
+        static const std::map<QnUuid, AccessRights> kEmpty;
+        return kEmpty;
     }
 
     static const std::unordered_map<QnUuid, UserGroupData>& dataById()
@@ -161,31 +170,17 @@ struct PredefinedUserGroups::Private
                 std::unordered_map<QnUuid, UserGroupData> result;
                 for (const auto groupId: PredefinedUserGroups::ids())
                 {
-                    result.emplace(groupId, UserGroupData::makePredefined(
-                        groupId,
-                        name(groupId),
-                        description(groupId),
-                        globalPermissions(groupId)));
+                    UserGroupData group(groupId, name(groupId), globalPermissions(groupId));
+                    group.attributes = UserAttribute::readonly;
+                    group.description = description(groupId);
+                    group.resourceAccessRights = accessRights(groupId);
+                    result.emplace(groupId, std::move(group));
                 }
 
                 return result;
             }();
 
         return kDataById;
-    }
-
-    static const std::unordered_map<QnUuid, ResourceAccessMap>& accessRightsById()
-    {
-        static const auto kAccessRightsById =
-            []()
-            {
-                std::unordered_map<QnUuid, ResourceAccessMap> result;
-                for (const auto& groupId: PredefinedUserGroups::ids())
-                    result.emplace(groupId, accessRights(groupId));
-                return result;
-            }();
-
-        return kAccessRightsById;
     }
 };
 
@@ -206,17 +201,6 @@ std::optional<UserGroupData> PredefinedUserGroups::find(const QnUuid& predefined
     }
 
     return std::nullopt;
-}
-
-ResourceAccessMap PredefinedUserGroups::accessRights(const QnUuid& groupId)
-{
-    if (const auto it = Private::accessRightsById().find(groupId);
-        it != Private::accessRightsById().end())
-    {
-        return it->second;
-    }
-
-    return {};
 }
 
 const UserGroupDataList& PredefinedUserGroups::list()
