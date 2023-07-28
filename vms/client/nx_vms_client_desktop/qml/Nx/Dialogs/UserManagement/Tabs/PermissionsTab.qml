@@ -350,8 +350,7 @@ Item
 
             imageSource: "image://svg/skin/user_settings/no_resources.svg"
 
-            text: qsTr("No resources")
-            additionalText: qsTr("Try changing search criteria")
+            text: qsTr("No resources found")
         }
     }
 
