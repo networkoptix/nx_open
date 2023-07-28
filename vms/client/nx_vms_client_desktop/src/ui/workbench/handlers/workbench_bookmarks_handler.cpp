@@ -126,7 +126,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
         {
             statisticsModule()->controls()->registerClick("bookmark_tooltip_tag");
             menu()->triggerIfPossible(action::OpenBookmarksSearchAction,
-                {Qn::BookmarkTagRole, tag});
+                ui::action::Parameters().withArgument(Qn::BookmarkTagRole, tag));
         });
 }
 
