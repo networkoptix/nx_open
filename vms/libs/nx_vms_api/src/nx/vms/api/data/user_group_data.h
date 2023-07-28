@@ -47,12 +47,6 @@ struct NX_VMS_API UserGroupData: IdData
         const QnUuid& id, const QString& name,
         GlobalPermissions permissions = {}, std::vector<QnUuid> parentGroupIds = {});
 
-    static UserGroupData makePredefined(
-        const QnUuid& id,
-        const QString& name,
-        const QString& description,
-        GlobalPermissions permissions);
-
     bool operator==(const UserGroupData& other) const = default;
     QString toString() const;
 };
