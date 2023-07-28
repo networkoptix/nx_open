@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "http_server_base_authentication_manager.h"
+#include "http_server_authentication_manager.h"
 
 namespace nx::network::http::server {
 

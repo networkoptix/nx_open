@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "http_server_base_authentication_manager.h"
+#include "http_server_authentication_manager.h"
 
 #include <optional>
 
@@ -16,7 +16,7 @@
 
 namespace nx::network::http::server {
 
-BaseAuthenticationManager::BaseAuthenticationManager(
+AuthenticationManager::AuthenticationManager(
     AbstractRequestHandler* nextHandler,
     AbstractAuthenticationDataProvider* authenticationDataProvider,
     Role role)
@@ -27,12 +27,12 @@ BaseAuthenticationManager::BaseAuthenticationManager(
 {
 }
 
-BaseAuthenticationManager::~BaseAuthenticationManager()
+AuthenticationManager::~AuthenticationManager()
 {
     m_startedAsyncCallsCounter.wait();
 }
 
-void BaseAuthenticationManager::serve(
+void AuthenticationManager::serve(
     RequestContext ctx,
     nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler)
 {
@@ -73,12 +73,12 @@ void BaseAuthenticationManager::serve(
         isSsl);
 }
 
-std::string BaseAuthenticationManager::realm()
+std::string AuthenticationManager::realm()
 {
     return nx::network::AppInfo::realm();
 }
 
-void BaseAuthenticationManager::reportAuthenticationFailure(
+void AuthenticationManager::reportAuthenticationFailure(
     AuthenticationCompletionHandler completionHandler, bool isProxy)
 {
     completionHandler(nx::network::http::RequestResult(
@@ -88,7 +88,7 @@ void BaseAuthenticationManager::reportAuthenticationFailure(
 }
 
 std::pair<std::string, std::string>
-    BaseAuthenticationManager::generateWwwAuthenticateHeader(bool isProxy)
+    AuthenticationManager::generateWwwAuthenticateHeader(bool isProxy)
 {
     header::WWWAuthenticate wwwAuthenticate;
     wwwAuthenticate.authScheme = header::AuthScheme::digest;
@@ -100,7 +100,7 @@ std::pair<std::string, std::string>
         wwwAuthenticate.toString());
 }
 
-void BaseAuthenticationManager::lookupPassword(
+void AuthenticationManager::lookupPassword(
     RequestContext requestContext,
     AuthenticationCompletionHandler completionHandler,
     nx::network::http::header::DigestAuthorization authorizationHeader,
@@ -149,7 +149,7 @@ void BaseAuthenticationManager::lookupPassword(
         });
 }
 
-void BaseAuthenticationManager::validatePlainTextCredentials(
+void AuthenticationManager::validatePlainTextCredentials(
     RequestContext requestContext,
     const http::header::Authorization& authorizationHeader,
     const AuthToken& passwordLookupToken,
@@ -183,14 +183,14 @@ void BaseAuthenticationManager::validatePlainTextCredentials(
         isProxy(requestContext.request.requestLine.method));
 }
 
-void BaseAuthenticationManager::reportSuccess(
+void AuthenticationManager::reportSuccess(
     RequestContext requestContext,
     AuthenticationCompletionHandler completionHandler)
 {
     nextHandler()->serve(std::move(requestContext), std::move(completionHandler));
 }
 
-std::string BaseAuthenticationManager::generateNonce()
+std::string AuthenticationManager::generateNonce()
 {
     // TODO: #akolesnikov Introduce external nonce provider.
 
@@ -201,12 +201,12 @@ std::string BaseAuthenticationManager::generateNonce()
         nonceLength);
 }
 
-bool BaseAuthenticationManager::validateNonce(const std::string& /*nonce*/)
+bool AuthenticationManager::validateNonce(const std::string& /*nonce*/)
 {
     return true;
 }
 
-bool BaseAuthenticationManager::isProxy(const Method& method) const
+bool AuthenticationManager::isProxy(const Method& method) const
 {
     return (m_role == Role::proxy) || (method == Method::connect);
 }

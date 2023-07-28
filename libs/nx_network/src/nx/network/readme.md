@@ -20,5 +20,7 @@ Framework for creating a wide range of asynchronous network applications such as
 - Asynchronous I/O framework (@ref nx_network_aio)
 
 @subpage nx_network_aio
+
 @subpage nx_network_http
+
 @subpage nx_network_cloud_connect

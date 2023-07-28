@@ -19,7 +19,10 @@ struct NX_NETWORK_API PasswordLookupResult
         otherError,
     };
 
-    Code code;
+    // Lookup result code.
+    Code code = Code::otherError;
+
+    // Found token. Valid only in case of `code == Code::ok`.
     AuthToken authToken;
 };
 
