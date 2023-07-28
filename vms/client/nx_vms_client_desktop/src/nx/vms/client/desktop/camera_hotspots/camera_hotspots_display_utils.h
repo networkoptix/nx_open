@@ -18,6 +18,9 @@ static constexpr auto kHotspotRadius = 16;
 QPointF hotspotOrigin(const QPointF& hotspotRelativePos, const QRectF& rect);
 QPointF hotspotOrigin(const nx::vms::common::CameraHotspotData& hotspot, const QRectF& rect);
 
+QPointF hotspotPointerTip(const QPointF& origin, const QPointF& direction);
+QPointF hotspotPointerTip(const nx::vms::common::CameraHotspotData& hotspot, const QRectF& rect);
+
 void setHotspotPositionFromPointInRect(
     const QRectF& sourceRect,
     const QPointF& sourcePoint,

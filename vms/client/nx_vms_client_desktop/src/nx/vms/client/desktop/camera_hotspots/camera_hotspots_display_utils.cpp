@@ -8,6 +8,7 @@
 #include <QtGui/QPainter>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -51,6 +52,20 @@ QPointF hotspotOrigin(const QPointF& hotspotRelativePos, const QRectF& rect)
     return Geometry::bounded(origin, Geometry::eroded(rect, kHotspotRadius + kHotspotBoundsOffset));
 }
 
+QPointF hotspotPointerTip(const QPointF& origin, const QPointF& direction)
+{
+    if (!NX_ASSERT(!qFuzzyIsNull(direction)))
+        return origin;
+
+    return origin + Geometry::normalized(direction) * kHotspotRadius
+        / std::sin(qDegreesToRadians(kHotspotPointerAngle * 0.5));
+}
+
+QPointF hotspotPointerTip(const common::CameraHotspotData& hotspot, const QRectF& rect)
+{
+    return hotspotPointerTip(hotspotOrigin(hotspot, rect), hotspot.direction);
+}
+
 void setHotspotPositionFromPointInRect(
     const QRectF& sourceRect,
     const QPointF& sourcePoint,
@@ -71,15 +86,14 @@ QPainterPath makeHotspotOutline(const QPointF& origin, const QPointF& direction)
         return hotspotRoundOutline;
 
     const auto radiusDirection = Geometry::normalized(direction) * kHotspotRadius;
-    const auto hotspotPointerAngleRad = kHotspotPointerAngle * std::numbers::pi / 180.0;
-
-    const auto pointerTipPoint = origin + radiusDirection / std::sin(hotspotPointerAngleRad * 0.5);
 
     const auto pointerCcwTangentPoint = origin +
         Geometry::rotated(radiusDirection, QPointF(), -90.0 + kHotspotPointerAngle * 0.5);
 
     const auto pointerCwTangentPoint = origin +
         Geometry::rotated(radiusDirection, QPointF(), 90.0 - kHotspotPointerAngle * 0.5);
+
+    const auto pointerTipPoint = hotspotPointerTip(origin, direction);
 
     QPainterPath hotspotPointerOutline;
     hotspotPointerOutline.moveTo(pointerTipPoint);
