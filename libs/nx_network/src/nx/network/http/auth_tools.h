@@ -28,6 +28,9 @@ NX_REFLECTION_ENUM_CLASS(AuthTokenType,
     bearer
 )
 
+/**
+ * An HTTP auth token. It can be either password, HA1 hash or a bearer token.
+ */
 class NX_NETWORK_API AuthToken
 {
 public:

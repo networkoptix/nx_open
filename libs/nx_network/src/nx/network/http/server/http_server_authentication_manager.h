@@ -9,6 +9,9 @@
 
 namespace nx::network::http::server {
 
+/**
+ * Interface of a class providing credentials to AuthenticationManager.
+ */
 class NX_NETWORK_API AbstractAuthenticationDataProvider
 {
 public:
@@ -27,21 +30,34 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Authenticates request using HTTP Digest authentication.
+ * Implements standard HTTP authentication.
+ * Supports:
+ * - HTTP Digest over SSL and non-SSL connections
+ * - HTTP Basic over SSL only
+ * - Authorization and Proxy-Authorization headers
+ *
  * User credentials are taken from AbstractAuthenticationDataProvider instance.
+ * For SSL connection detection nx::network::http::server::rest::HttpsRequestDetector class is used.
+ * On authentication success the request is passed down the processing pipeline, to the next handler.
+ * On authentication failure, 401 HTTP status is reported.
  */
-class NX_NETWORK_API BaseAuthenticationManager:
+class NX_NETWORK_API AuthenticationManager:
     public AbstractAuthenticationManager
 {
     using base_type = AbstractAuthenticationManager;
 
 public:
-    BaseAuthenticationManager(
+    /**
+     * @param nextHandler Receives the request after successful authentication.
+     * @param authenticationDataProvider Provides password based on the username found in the request.
+     * @param role Server role (resource server/proxy)
+     */
+    AuthenticationManager(
         AbstractRequestHandler* nextHandler,
         AbstractAuthenticationDataProvider* authenticationDataProvider,
         Role role = Role::resourceServer);
 
-    virtual ~BaseAuthenticationManager() override;
+    virtual ~AuthenticationManager() override;
 
     virtual void serve(
         RequestContext requestContext,

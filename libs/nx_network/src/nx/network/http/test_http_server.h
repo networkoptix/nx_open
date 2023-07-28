@@ -11,7 +11,7 @@
 #include "server/authentication_dispatcher.h"
 #include "server/handler/http_server_handler_custom.h"
 #include "server/http_message_dispatcher.h"
-#include "server/http_server_base_authentication_manager.h"
+#include "server/http_server_authentication_manager.h"
 #include "server/http_server_plain_text_credentials_provider.h"
 #include "server/http_stream_socket_server.h"
 #include "server/rest/http_server_rest_message_dispatcher.h"
@@ -144,7 +144,7 @@ public:
 private:
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::server::PlainTextCredentialsProvider m_credentialsProvider;
-    server::BaseAuthenticationManager m_authenticationManager;
+    server::AuthenticationManager m_authenticationManager;
     std::vector<std::unique_ptr<IntermediaryHandler>> m_installedIntermediateRequestHandlers;
     server::AuthenticationDispatcher m_authDispatcher;
     std::unique_ptr<nx::network::http::HttpStreamSocketServer> m_httpServer;
