@@ -1013,7 +1013,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
         auto layoutsList = makeKeyList<QnResourcePtr>(
             simpleResourceItemCreator(m_itemFactory.get()), layoutsOrder());
 
-        layoutsList->installItemSource(m_itemKeySourcePool->layoutsSource(user()));
+        layoutsList->installItemSource(m_itemKeySourcePool->shareableLayoutsSource(user()));
 
         if (maySkipGroup && resourceTypes == (int) ResourceTree::ResourceFilter::layouts)
             return layoutsList; //< Only layouts, return without a group element.
