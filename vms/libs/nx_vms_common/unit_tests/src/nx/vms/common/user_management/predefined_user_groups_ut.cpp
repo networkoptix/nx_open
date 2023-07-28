@@ -88,10 +88,13 @@ TEST(PredefinedUserGroups, globalPermissions)
 
 TEST(PredefinedUserGroups, accessRights)
 {
-    EXPECT_EQ(PredefinedUserGroups::accessRights(kAdministratorsGroupId), kFullResourceAccessMap);
-    EXPECT_EQ(PredefinedUserGroups::accessRights(kPowerUsersGroupId), kFullResourceAccessMap);
+    static const std::map<QnUuid, AccessRights> kPowerUserResourceAccessMap{
+        {kAllDevicesGroupId, kFullAccessRights},
+        {kAllWebPagesGroupId, AccessRight::view},
+        {kAllServersGroupId, AccessRight::view},
+        {kAllVideoWallsGroupId, AccessRight::edit}};
 
-    EXPECT_EQ(PredefinedUserGroups::accessRights(kAdvancedViewersGroupId), ResourceAccessMap({
+    static const std::map<QnUuid, AccessRights> kAdvancedViewersResourceAccessMap{
         {kAllDevicesGroupId, AccessRight::view
             | AccessRight::viewArchive
             | AccessRight::exportArchive
@@ -99,23 +102,41 @@ TEST(PredefinedUserGroups, accessRights)
             | AccessRight::manageBookmarks
             | AccessRight::userInput},
         {kAllWebPagesGroupId, AccessRight::view},
-        {kAllServersGroupId, AccessRight::view}}));
+        {kAllServersGroupId, AccessRight::view}};
 
-    EXPECT_EQ(PredefinedUserGroups::accessRights(kViewersGroupId), ResourceAccessMap({
+    static const std::map<QnUuid, AccessRights> kViewersResourceAccessMap{
         {kAllDevicesGroupId, AccessRight::view
             | AccessRight::viewArchive
             | AccessRight::exportArchive
             | AccessRight::viewBookmarks},
         {kAllWebPagesGroupId, AccessRight::view},
-        {kAllServersGroupId, AccessRight::view}}));
+        {kAllServersGroupId, AccessRight::view}};
 
-    EXPECT_EQ(PredefinedUserGroups::accessRights(kLiveViewersGroupId), ResourceAccessMap({
+    static const std::map<QnUuid, AccessRights> kLiveViewersResourceAccessMap{
         {kAllDevicesGroupId, AccessRight::view},
         {kAllWebPagesGroupId, AccessRight::view},
-        {kAllServersGroupId, AccessRight::view}}));
+        {kAllServersGroupId, AccessRight::view}};
 
-    EXPECT_EQ(PredefinedUserGroups::accessRights(kSystemHealthViewersGroupId), ResourceAccessMap({
-        {kAllServersGroupId, AccessRight::view}}));
+    static const std::map<QnUuid, AccessRights> kHealthViewersResourceAccessMap{
+        {kAllServersGroupId, AccessRight::view}};
+
+    EXPECT_EQ(PredefinedUserGroups::find(kAdministratorsGroupId)->resourceAccessRights,
+        kPowerUserResourceAccessMap);
+
+    EXPECT_EQ(PredefinedUserGroups::find(kPowerUsersGroupId)->resourceAccessRights,
+        kPowerUserResourceAccessMap);
+
+    EXPECT_EQ(PredefinedUserGroups::find(kAdvancedViewersGroupId)->resourceAccessRights,
+        kAdvancedViewersResourceAccessMap);
+
+    EXPECT_EQ(PredefinedUserGroups::find(kViewersGroupId)->resourceAccessRights,
+        kViewersResourceAccessMap);
+
+    EXPECT_EQ(PredefinedUserGroups::find(kLiveViewersGroupId)->resourceAccessRights,
+        kLiveViewersResourceAccessMap);
+
+    EXPECT_EQ(PredefinedUserGroups::find(kSystemHealthViewersGroupId)->resourceAccessRights,
+        kHealthViewersResourceAccessMap);
 }
 
 } // namespace test

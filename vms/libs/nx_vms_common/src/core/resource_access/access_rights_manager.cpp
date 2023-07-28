@@ -36,8 +36,12 @@ AccessRightsManager::~AccessRightsManager()
 
 ResourceAccessMap AccessRightsManager::ownResourceAccessMap(const QnUuid& subjectId) const
 {
-    if (PredefinedUserGroups::contains(subjectId))
-        return PredefinedUserGroups::accessRights(subjectId);
+    if (auto predefinedGroup = PredefinedUserGroups::find(subjectId))
+    {
+        return ResourceAccessMap{
+            predefinedGroup->resourceAccessRights.cbegin(),
+            predefinedGroup->resourceAccessRights.cend()};
+    }
 
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->ownAccessMaps.value(subjectId);

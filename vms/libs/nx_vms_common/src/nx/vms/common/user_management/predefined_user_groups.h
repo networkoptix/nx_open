@@ -25,9 +25,6 @@ public:
     /** Returns information structure for a predefined user group, if exists. */
     static std::optional<nx::vms::api::UserGroupData> find(const QnUuid& predefinedGroupId);
 
-    /** Returns access rights of a predefined user group. */
-    static nx::core::access::ResourceAccessMap accessRights(const QnUuid& predefinedGroupId);
-
     /** Returns list of all predefined user group information structures. */
     static const nx::vms::api::UserGroupDataList& list();
 
