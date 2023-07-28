@@ -5,7 +5,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/http/server/http_server_base_authentication_manager.h>
+#include <nx/network/http/server/http_server_authentication_manager.h>
 #include <nx/network/http/server/http_server_plain_text_credentials_provider.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_builder.h>
@@ -30,11 +30,11 @@ static constexpr char kDefaultPath[]{"/test"};
 
 } // namespace
 
-class BaseAuthenticationManager:
+class AuthenticationManager:
     public ::testing::Test
 {
 public:
-    BaseAuthenticationManager():
+    AuthenticationManager():
         m_authManager(nullptr, &m_credsProvider)
     {
         m_authManager.setNextHandler(&m_httpServer.httpMessageDispatcher());
@@ -110,11 +110,11 @@ public:
 
 private:
     PlainTextCredentialsProvider m_credsProvider;
-    server::BaseAuthenticationManager m_authManager;
+    server::AuthenticationManager m_authManager;
     TestHttpServer m_httpServer;
 };
 
-TEST_F(BaseAuthenticationManager, https_no_authorization_rejected)
+TEST_F(AuthenticationManager, https_no_authorization_rejected)
 {
     const auto response = makeRequest(
         Method::get,
@@ -125,7 +125,7 @@ TEST_F(BaseAuthenticationManager, https_no_authorization_rejected)
     ASSERT_EQ(StatusCode::unauthorized, response->statusLine.statusCode);
 }
 
-TEST_F(BaseAuthenticationManager, https_basic_authorization_accepted)
+TEST_F(AuthenticationManager, https_basic_authorization_accepted)
 {
     const auto response = makeRequest(
         Method::get,
@@ -136,7 +136,7 @@ TEST_F(BaseAuthenticationManager, https_basic_authorization_accepted)
     ASSERT_EQ(StatusCode::ok, response->statusLine.statusCode);
 }
 
-TEST_F(BaseAuthenticationManager, https_basic_authorization_invalid_credentials_rejected)
+TEST_F(AuthenticationManager, https_basic_authorization_invalid_credentials_rejected)
 {
     const auto reponse = makeRequest(
         Method::get,
@@ -147,13 +147,13 @@ TEST_F(BaseAuthenticationManager, https_basic_authorization_invalid_credentials_
     ASSERT_EQ(StatusCode::unauthorized, reponse->statusLine.statusCode);
 }
 
-TEST_F(BaseAuthenticationManager, https_basic_authorization_accepted_against_ha1_credentials)
+TEST_F(AuthenticationManager, https_basic_authorization_accepted_against_ha1_credentials)
 {
     Credentials creds{"basicdude", PasswordAuthToken{"PazzWerd"}};
 
     // This tests exists to test that Basic Authorization with plain text credentials can
     // authenticate successfully against ha1 credentials stored in the
-    // BaseAuthenticationManager, so credentials must be encoded into ha1.
+    // AuthenticationManager, so credentials must be encoded into ha1.
     addCredentials(creds.username, creds.authToken.value, AuthTokenType::ha1);
 
     const auto response = makeRequest(
@@ -165,7 +165,7 @@ TEST_F(BaseAuthenticationManager, https_basic_authorization_accepted_against_ha1
     ASSERT_EQ(StatusCode::ok, response->statusLine.statusCode);
 }
 
-TEST_F(BaseAuthenticationManager, https_basic_authorization_invalid_credentials_rejected_against_ha1_credentials)
+TEST_F(AuthenticationManager, https_basic_authorization_invalid_credentials_rejected_against_ha1_credentials)
 {
     addCredentials("httpsguy", "PazzWerd", AuthTokenType::ha1);
 
