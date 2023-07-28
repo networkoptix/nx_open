@@ -108,8 +108,14 @@ struct CameraHotspotsEditorWidget::Private
     CameraHotspotDataList hotspots;
     std::optional<int> selectedHotspotIndex;
     std::optional<int> hoveredHotspotIndex;
-    bool isDragMove = false;
-    bool isDragChange = false;
+
+    enum class DragAction
+    {
+        moveOrigin,
+        setDirection,
+    };
+    std::optional<DragAction> dragAction;
+    bool hasModificationsByDrag = false;
 
     QRect thumbnailRect() const;
 
@@ -150,7 +156,7 @@ void CameraHotspotsEditorWidget::Private::setSelectedHotspotIndex(std::optional<
     if (selectedHotspotIndex == index)
         return;
 
-    isDragMove = false;
+    dragAction.reset();
 
     selectedHotspotIndex = index;
     q->update();
@@ -501,15 +507,27 @@ void CameraHotspotsEditorWidget::mouseMoveEvent(QMouseEvent* event)
 {
     base_type::mouseMoveEvent(event);
 
-    if (d->isDragMove)
+    if (d->dragAction)
     {
-        setCursor(Qt::SizeAllCursor);
         auto& draggedHotspot = d->hotspots[d->selectedHotspotIndex.value()];
-        camera_hotspots::setHotspotPositionFromPointInRect(
-            d->thumbnailRect(),
-            d->resolveHotspotsCollision(event->pos(), d->selectedHotspotIndex.value()),
-            draggedHotspot);
-        d->isDragChange = true;
+        switch (d->dragAction.value())
+        {
+            case Private::DragAction::moveOrigin:
+                setCursor(Qt::SizeAllCursor);
+                camera_hotspots::setHotspotPositionFromPointInRect(
+                    d->thumbnailRect(),
+                    d->resolveHotspotsCollision(event->pos(), d->selectedHotspotIndex.value()),
+                    draggedHotspot);
+                break;
+
+            case Private::DragAction::setDirection:
+                setCursor(Qt::CrossCursor);
+                draggedHotspot.direction = Geometry::normalized(event->pos()
+                    - camera_hotspots::hotspotOrigin(draggedHotspot.pos, d->thumbnailRect()));
+                break;
+        }
+
+        d->hasModificationsByDrag = true;
         update();
     }
     else
@@ -530,22 +548,37 @@ void CameraHotspotsEditorWidget::mousePressEvent(QMouseEvent* event)
     if (d->hoveredHotspotIndex)
     {
         d->setSelectedHotspotIndex(d->hoveredHotspotIndex);
-        d->isDragMove = true;
+        d->dragAction = Private::DragAction::moveOrigin;
+
+        const auto hotspot = d->hotspots.at(d->hoveredHotspotIndex.value());
+        if (hotspot.hasDirection())
+        {
+            const auto originPoint = camera_hotspots::hotspotOrigin(hotspot, d->thumbnailRect());
+            const auto pointerTipPoint
+                = camera_hotspots::hotspotPointerTip(hotspot, d->thumbnailRect());
+
+            if (Geometry::length(originPoint - event->pos())
+                > Geometry::length(pointerTipPoint - event->pos()))
+            {
+                d->dragAction = Private::DragAction::setDirection;
+            }
+        }
     }
 }
 
-void CameraHotspotsEditorWidget::mouseReleaseEvent(QMouseEvent* event) //discard drag move
+void CameraHotspotsEditorWidget::mouseReleaseEvent(QMouseEvent* event)
 {
     base_type::mouseReleaseEvent(event);
 
     if (!event->buttons().testFlag(Qt::LeftButton))
     {
-        d->isDragMove = false;
+        d->dragAction.reset();
         setCursor(Qt::ArrowCursor);
     }
-    if (d->isDragChange)
+
+    if (d->hasModificationsByDrag)
     {
-        d->isDragChange = false;
+        d->hasModificationsByDrag = false;
         emit hotspotsDataChanged();
     }
 }
@@ -554,13 +587,10 @@ void CameraHotspotsEditorWidget::wheelEvent(QWheelEvent* event)
 {
     base_type::wheelEvent(event);
 
-    // TODO: #vbreus Implement QWheelEvent::pixelDelta() processing, implement high frequency wheel
-    // events accumulation.
-
     if (event->angleDelta().y() == 0)
         return;
 
-    if (d->isDragMove || !d->hoveredHotspotIndex || !d->selectedHotspotIndex)
+    if (d->dragAction || !d->hoveredHotspotIndex || !d->selectedHotspotIndex)
         return;
 
     if (d->hoveredHotspotIndex != d->selectedHotspotIndex)
