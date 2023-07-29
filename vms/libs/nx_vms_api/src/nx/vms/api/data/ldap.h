@@ -58,26 +58,26 @@ struct NX_VMS_API LdapSettings
      */
     std::optional<QString> adminPassword;
 
-    /**%apidoc
+    /**%apidoc[opt]
      * LDAP attribute for name field in VMS DB. Autodetected by VMS if not specified
      *     (Active Directory: sAMAccountName, Open LDAP: uid).
      * %example uid
      */
-    std::optional<QString> loginAttribute;
+    QString loginAttribute;
 
-    /**%apidoc
+    /**%apidoc[opt]
      * LDAP objectClass attribute to detect Groups. Autodetected by VMS if not specified
      *     (Active Directory: group, Open LDAP: groupOfNames).
      * %example groupOfNames
      */
-    std::optional<QString> groupObjectClass;
+    QString groupObjectClass;
 
     /**%apidoc[opt]
      * LDAP Group attribute to detect it's members. Autodetected by VMS if not specified
      *     (Active Directory: member, Open LDAP: member).
      * %example member
      */
-    std::optional<QString> memberAttribute;
+    QString memberAttribute;
 
     /**%apidoc[opt] */
     std::chrono::milliseconds passwordExpirationPeriodMs = 5min;

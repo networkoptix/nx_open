@@ -24,11 +24,7 @@ QString LdapSettings::syncId() const
     if (!isValid(/*checkPassword*/ false))
         return QString();
 
-    QString data = uri.toString()
-        + adminDn
-        + loginAttribute.value_or(QString())
-        + groupObjectClass.value_or(QString())
-        + memberAttribute.value_or(QString());
+    QString data = uri.toString() + adminDn + loginAttribute + groupObjectClass + memberAttribute;
     std::set<QString> uniqueFilters;
     for (auto filter: filters)
         uniqueFilters.insert(filter.base + filter.filter);
