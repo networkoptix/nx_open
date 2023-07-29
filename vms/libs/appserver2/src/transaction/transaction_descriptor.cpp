@@ -1254,7 +1254,8 @@ private:
             __func__, isBackupTurnedOff, isParamEnablingBackupForDevice, doesBackupGoFromOffToOn,
             hasBackupCloudStorage);
 
-        if (doesBackupGoFromOffToOn && hasBackupCloudStorage)
+        const auto saasManager = systemContext->saasServiceManager();
+        if (doesBackupGoFromOffToOn && hasBackupCloudStorage && saasManager->isEnabled())
         {
             const auto saasData = systemContext->saasServiceManager()->data();
             if (saasData.state != nx::vms::api::SaasState::active)
