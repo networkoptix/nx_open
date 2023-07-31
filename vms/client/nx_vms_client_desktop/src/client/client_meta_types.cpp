@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/index_list_model.h>
 #include <nx/vms/client/desktop/common/models/linearization_list_model.h>
+#include <nx/vms/client/desktop/common/models/row_selection_model.h>
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
 #include <nx/vms/client/desktop/common/utils/list_navigation_helper.h>
 #include <nx/vms/client/desktop/common/utils/qml_client_state_selegate.h>
@@ -239,6 +240,7 @@ void QnClientMetaTypes::registerQmlTypes()
     AccessRightsList::registerQmlTypes();
     LayoutModel::registerQmlType();
     LinearizationListModel::registerQmlType();
+    RowSelectionModel::registerQmlType();
     IndexListModel::registerQmlType();
     QmlClientStateDelegate::registerQmlType();
     RightPanelModelsAdapter::registerQmlTypes();

@@ -8,14 +8,12 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static constexpr int kCheckBoxColumnIndex = 0;
-
 QString attribute(const nx::vms::api::LookupListData& list, int column)
 {
-    if (column <= kCheckBoxColumnIndex || column > list.attributeNames.size())
+    if (column >= list.attributeNames.size())
         return {};
 
-    return list.attributeNames[column - 1];
+    return list.attributeNames[column];
 }
 
 } // namespace
@@ -23,8 +21,6 @@ QString attribute(const nx::vms::api::LookupListData& list, int column)
 LookupListEntriesModel::LookupListEntriesModel(QObject* parent):
     base_type(parent)
 {
-    for (int i = 0; i < m_checkBoxCount_TEMP; ++i)
-        m_checkBoxState_TEMP[i] = Qt::Unchecked;
 }
 
 LookupListEntriesModel::~LookupListEntriesModel()
@@ -40,16 +36,8 @@ QVariant LookupListEntriesModel::headerData(
     if (orientation != Qt::Orientation::Horizontal)
         return QVariant();
 
-    if (section == kCheckBoxColumnIndex)
-    {
-        if (role == Qt::CheckStateRole)
-            return Qt::Unchecked;
-    }
-    else
-    {
-        if (role == Qt::DisplayRole)
-            return attribute(m_data->rawData(), section);
-    }
+    if (role == Qt::DisplayRole)
+        return attribute(m_data->rawData(), section);
 
     return QVariant();
 }
@@ -62,7 +50,7 @@ int LookupListEntriesModel::rowCount(const QModelIndex& parent) const
 int LookupListEntriesModel::columnCount(const QModelIndex& parent) const
 {
     // Reserve one for checkbox column.
-    return m_data ? (int) m_data->rawData().attributeNames.size() + 1 : 0;
+    return m_data ? (int) m_data->rawData().attributeNames.size() : 0;
 }
 
 QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
@@ -74,12 +62,6 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
     {
         case Qt::DisplayRole:
         {
-            if (index.column() == kCheckBoxColumnIndex)
-            {
-                if (index.row() < m_checkBoxCount_TEMP)
-                    return m_checkBoxState_TEMP[index.row()];
-            }
-
             const auto key = attribute(m_data->rawData(), index.column());
             if (key.isEmpty())
                 return QString();
@@ -89,14 +71,6 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
             if (iter != entry.cend())
                 return iter->second;
             return QString();
-        }
-
-        case TypeRole:
-        {
-            if (index.column() == kCheckBoxColumnIndex)
-                return "checkbox";
-
-            return "text";
         }
 
         case ObjectTypeIdRole:
@@ -117,19 +91,6 @@ bool LookupListEntriesModel::setData(const QModelIndex& index, const QVariant& v
 {
     if (!NX_ASSERT(m_data))
         return false;
-
-    if (role == Qt::EditRole)
-    {
-        if (index.column() == kCheckBoxColumnIndex)
-        {
-            if (index.row() < m_checkBoxCount_TEMP)
-            {
-                m_checkBoxState_TEMP[index.row()] = value.toInt();
-                emit dataChanged(index, index, {Qt::DisplayRole});
-                return true;
-            }
-        }
-    }
 
     if (role != Qt::DisplayRole)
         return false;
@@ -154,7 +115,6 @@ bool LookupListEntriesModel::setData(const QModelIndex& index, const QVariant& v
 QHash<int, QByteArray> LookupListEntriesModel::roleNames() const
 {
     auto roles = base_type::roleNames();
-    roles[TypeRole] = "type";
     roles[ObjectTypeIdRole] = "objectTypeId";
     roles[AttributeNameRole] = "attributeName";
     return roles;

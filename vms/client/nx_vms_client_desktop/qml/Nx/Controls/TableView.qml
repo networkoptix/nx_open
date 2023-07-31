@@ -18,8 +18,18 @@ TableView
 {
     id: control
 
+    property bool showCheckboxColumn: false
+
     property alias horizontalHeaderVisible: columnsHeader.visible
     property alias headerBackgroundColor: columnsHeader.color
+
+    function getSelectedRowIndexes()
+    {
+        if (!showCheckboxColumn)
+            return []
+
+        return rowSelectionModel.getSelectedRows()
+    }
 
     function getButtonItem(columnIndex)
     {
@@ -66,6 +76,25 @@ TableView
             let headerItem = repeater.itemAt(columnIndex)
             headerItem.width = headerItem.calculateWidth(control.columnWidthProvider(columnIndex))
         }
+    }
+
+    onModelChanged:
+    {
+        if (!showCheckboxColumn)
+            return
+
+        if (model !== rowSelectionModel.sourceModel
+            && model !== rowSelectionModel)
+        {
+            rowSelectionModel.sourceModel = model
+            model = rowSelectionModel
+            control.forceLayout()
+        }
+    }
+
+    RowSelectionModel
+    {
+        id: rowSelectionModel
     }
 
     Rectangle
@@ -165,6 +194,7 @@ TableView
                         : ""
 
                     isCheckbox: isCheckboxColumn(control.model, index)
+
                     onCheckStateChanged: (checkState) =>
                     {
                         if (checkState === Qt.PartiallyChecked)

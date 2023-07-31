@@ -24,8 +24,7 @@ class LookupListEntriesModel: public QAbstractTableModel
 
     enum DataRole
     {
-        TypeRole = Qt::UserRole,
-        ObjectTypeIdRole,
+        ObjectTypeIdRole = Qt::UserRole,
         AttributeNameRole
     };
 
@@ -58,9 +57,6 @@ signals:
 
 private:
     QPointer<LookupListModel> m_data;
-
-    static constexpr int m_checkBoxCount_TEMP = 100;
-    int m_checkBoxState_TEMP[m_checkBoxCount_TEMP];
 };
 
 } // namespace nx::vms::client::desktop
