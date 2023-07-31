@@ -2,13 +2,32 @@
 
 #include "layout_item_data.h"
 
-#include <nx/reflect/compare.h>
+#include <nx/utils/math/fuzzy.h>
 
 namespace nx::vms::common {
 
 bool LayoutItemData::operator==(const LayoutItemData& other) const
 {
-    return nx::reflect::equals(*this, other);
+    return resource.id == other.resource.id
+        && resource.path == other.resource.path
+        // ResourceDescriptor::name comparision skipped intensionally as it is a temporary solution
+        // for the cross system layouts which must not affects on LayoutItemData items comparision.
+        // TODO: #mmalofeev remove this workaround when cross-system layouts will not
+        // require this property any more.
+        && uuid == other.uuid
+        && flags == other.flags
+        && qFuzzyEquals(combinedGeometry, other.combinedGeometry)
+        && zoomTargetUuid == other.zoomTargetUuid
+        && qFuzzyEquals(zoomRect, other.zoomRect)
+        && qFuzzyEquals(rotation, other.rotation)
+        && displayInfo == other.displayInfo
+        && controlPtz == other.controlPtz
+        && displayAnalyticsObjects == other.displayAnalyticsObjects
+        && displayRoi == other.displayRoi
+        && frameDistinctionColor == other.frameDistinctionColor
+        && contrastParams == other.contrastParams
+        && dewarpingParams == other.dewarpingParams
+        && displayHotspots == other.displayHotspots;
 }
 
 } // namespace nx::vms::common
