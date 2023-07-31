@@ -201,13 +201,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
 
     // Setup input validators.
 
-    ui->emailInput->setValidator(
-        [](const QString& text)
-        {
-            return nx::email::isValidAddress(text)
-                ? ValidationResult::kValid
-                : ValidationResult(tr("Email is not valid"));
-        });
+    ui->emailInput->setValidator(defaultEmailValidator(/*allowEmpty*/ false));
 
     ui->passwordInput->setValidator(defaultPasswordValidator(/*allowEmpty*/ true));
 
