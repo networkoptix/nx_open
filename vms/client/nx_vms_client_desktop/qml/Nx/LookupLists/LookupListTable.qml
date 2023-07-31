@@ -32,6 +32,7 @@ TableView
     columnSpacing: 0
     rowSpacing: 0
 
+    showCheckboxColumn: true
     horizontalHeaderVisible: true
 
     columnWidthProvider: function (columnIndex)
@@ -63,13 +64,11 @@ TableView
     {
         id: chooser
 
-        role: "type"
-
         DelegateChoice
         {
             id: delegateChoice
 
-            roleValue: "checkbox"
+            column: 0
 
             Rectangle
             {
@@ -90,15 +89,12 @@ TableView
                         if (checkState !== model.display)
                             model.edit = checkState
                     }
-
                 }
             }
         }
 
         DelegateChoice
         {
-            roleValue: "text"
-
             Rectangle
             {
                 implicitWidth: Math.max(124, delegateItem.implicitWidth)
