@@ -57,8 +57,8 @@ public:
      */
     std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> cloudStorageData() const;
 
-    // Set `disabled` flag. It is needed for debugging via ini config.
-    void setDisabled();
+    // Set `enabled` flag. It is needed for debugging via ini config.
+    void setEnabled(bool value);
     bool isEnabled() const;
     
     void updateLicenseV1();
@@ -81,7 +81,7 @@ private:
     mutable nx::Mutex m_mutex;
     nx::vms::api::SaasData m_data;
     std::map<QnUuid, nx::vms::api::SaasService> m_services;
-    std::atomic<bool> m_disabled{false};
+    std::atomic<bool> m_enabled{false};
 
 };
 
