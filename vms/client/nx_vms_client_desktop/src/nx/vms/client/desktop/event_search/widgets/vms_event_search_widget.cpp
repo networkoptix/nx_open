@@ -31,6 +31,7 @@
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/events/analytics_event.h>
 #include <nx/vms/rules/group.h>
+#include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/utils/string_helper.h>
 #include <nx/vms/rules/utils/type.h>
@@ -408,7 +409,8 @@ QString VmsEventSearchWidget::itemCounterText(int count) const
 
 bool VmsEventSearchWidget::calculateAllowance() const
 {
-    return model()->isOnline()
+    return nx::vms::rules::ini().fullSupport
+        && model()->isOnline()
         && systemContext()->accessController()->hasGlobalPermissions(GlobalPermission::viewLogs)
         && systemContext()->vmsRulesEngine()->isEnabled();
 }
