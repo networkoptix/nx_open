@@ -2372,7 +2372,7 @@ Callback<ResultType> ServerConnection::makeSessionAwareCallback(
                                 // Update credentials.
                                 NX_MUTEX_LOCKER lock(&self->d->mutex);
                                 self->d->directConnect->credentials.authToken =
-                                        nx::network::http::BearerAuthToken(token->value);
+                                    nx::network::http::BearerAuthToken(token->value);
                             }
 
                             const auto originalHandle = handle;
@@ -2398,13 +2398,14 @@ Callback<ResultType> ServerConnection::makeSessionAwareCallback(
                                         self->d->substitutions.erase(originalHandle);
                                     }
 
-                                    callback(success, originalHandle, result);
+                                    if (callback)
+                                        callback(success, originalHandle, result);
                                 };
 
                             // We need to update the request too, since it stores credentials.
                             auto fixedRequest = request;
                             fixedRequest.credentials->authToken =
-                                    nx::network::http::BearerAuthToken(token->value);
+                                nx::network::http::BearerAuthToken(token->value);
 
                             // Resend the request.
                             const auto handle = self->executeRequest(
@@ -2420,7 +2421,7 @@ Callback<ResultType> ServerConnection::makeSessionAwareCallback(
                                 self->d->substitutions[originalHandle] = handle;
                             }
                         }
-                        else
+                        else if (callback)
                         {
                             // Token was not updated. Process the callback in its target thread.
                             executeInThread(targetThread,
@@ -2436,7 +2437,8 @@ Callback<ResultType> ServerConnection::makeSessionAwareCallback(
             }
 
             // Default path -- pass the result to the original callback.
-            callback(success, handle, result);
+            if (callback)
+                callback(success, handle, result);
         };
 }
 
