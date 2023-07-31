@@ -74,14 +74,14 @@ bool ServiceManager::loadSaasData(const std::string_view& data)
     return true;
 }
 
-void ServiceManager::setDisabled()
+void ServiceManager::setEnabled(bool value)
 {
-    m_disabled = true;
+    m_enabled = value;
 }
 
 bool ServiceManager::isEnabled() const
 {
-    return !m_disabled;
+    return m_enabled;
 }
 
 bool ServiceManager::loadServiceData(const std::string_view& data)
