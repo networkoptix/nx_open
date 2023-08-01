@@ -412,25 +412,20 @@ void WelcomeScreen::connectToLocalSystemUsingSavedPassword(
     bool storePassword)
 {
     const auto system = qnSystemsFinder->getSystem(systemId);
-    NX_ASSERT(system, "System is empty");
-    if (!system)
+    if (!NX_ASSERT(system, "System is empty"))
         return;
 
     const QnUuid localSystemId = system->localId();
-
     const auto credentials = CredentialsManager::credentials(
         localSystemId,
         userName.toStdString());
+    const nx::utils::Url url = parseConnectionUrlFromUserInput(serverUrl);
 
-    if (!NX_ASSERT(credentials))
-        return;
-
-    nx::utils::Url url = parseConnectionUrlFromUserInput(serverUrl);
     connectToSystemInternal(
         systemId,
         serverId.isEmpty() ? std::nullopt : std::optional{QnUuid::fromStringSafe(serverId)},
         nx::network::SocketAddress::fromUrl(url),
-        *credentials,
+        credentials.value_or(network::http::Credentials{}),
         storePassword);
 }
 
