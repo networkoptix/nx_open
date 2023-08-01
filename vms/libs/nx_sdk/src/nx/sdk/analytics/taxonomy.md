@@ -107,10 +107,11 @@ following fields:
 
    Optional identifier of an Enum type to inherit items from.
 
-- `"items"`: List<Name (String)>
+- `"items"`: List<Name (String) or Object>
 
-    List of the enumeration values. Each item is a Name as defined in the "General information"
-    section. May look like `[ "Sedan", "Truck or SUV" ]`.
+    List of the enumeration values. Each item is either a Name as defined in the "General information"
+    section, or an object with an id and a list of dependent attributes. 
+    May look like `[ "Sedan", "Truck or SUV" ]`.
 
 - `"baseItems"`: Array<String>
 
@@ -344,9 +345,11 @@ containing the following fields:
     Must have one of the values listed below in the "Attribute types" section.
 
 - `"attributeList"`: String
+
     Id of an Attribute List. If present, all other fields are ignored.
 
 - `"condition"`: String
+
     Condition string that defines whether this Attribute makes sense for the Object or Event Type
     depending on values of the other Attributes. Uses the same syntax as in the Object Search panel.
 

@@ -44,7 +44,16 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             [
                 "(Base) Enum attribute"
             ],
-            "_comment": "Object Type containing Enum attributes with inline items.",
+            "_comment": "Object Type containing Enum attributes with inline items."
+        },
+        {
+            "id": "nx.stub.objectTypeWithDependentAttributes",
+            "attributes":
+            [
+                "(Base) Enum attribute 1",
+                "(Base) Enum attribute 2"
+            ],
+            "_comment": "Object Type containing dependent attributes."
         },
         {
             "objectTypeId": "nx.stub.derivedObjectType",
@@ -294,6 +303,38 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                         [
                             "Enum Type item 1",
                             "Enum Type item 2"
+                        ]
+                    }
+                ]
+            },
+            {
+                "_comment": "Object Type containing dependent attributes.",
+                "id": "nx.stub.objectTypeWithDependentAttributes",
+                "name": "Stub: Object Type with dependent attributes",
+                "attributes":
+                [
+                    {
+                        "type": "Enum",
+                        "name": "(Base) Enum attribute 1",
+                        "items":
+                        [
+                            "Enum Type item 1",
+                            {
+                                "value": "Enum Type item 2",
+                                "dependentAttributes": 
+                                [
+                                    {
+                                        "type": "Enum",
+                                        "name": "(Base) Enum attribute 2",
+                                        "items": 
+                                        [ 
+                                            "Enum Type item 1", 
+                                            "Enum Type item 2", 
+                                            "Enum Type item 3" 
+                                        ]
+                                    }
+                                ]
+                            }
                         ]
                     }
                 ]

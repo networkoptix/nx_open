@@ -75,12 +75,27 @@ constexpr auto nxReflectVisitAllEnumItems(AttributeType*, Visitor&& visitor)
         Item{AttributeType::object, "Object"});
 }
 
+struct AttributeDescription;
+
+struct ItemObject
+{
+    QString value;
+    std::vector<AttributeDescription> dependentAttributes;
+
+    bool operator==(const ItemObject& other) const = default;
+};
+#define ItemObject_Fields \
+    (value) \
+    (dependentAttributes)
+
+using Item = std::variant<ItemObject, QString>;
+
 struct AttributeDescription
 {
     QString name;
     AttributeType type;
     QString subtype; //< One of: empty, a Name, "integer" or "float" for Numbers.
-    std::optional<std::vector<QString>> items; //< Only for Enums.
+    std::optional<std::vector<Item>> items; //< Only for Enums.
     QString unit; //< Only for Number. Can be empty.
     std::optional<double> minValue; //< Only for Number.
     std::optional<double> maxValue; //< Only for Number.
@@ -105,6 +120,8 @@ struct AttributeDescription
     (maxValue)\
     (attributeList)\
     (condition)
+
+NX_REFLECTION_INSTRUMENT(ItemObject, ItemObject_Fields);
 
 NX_REFLECTION_INSTRUMENT(AttributeDescription, AttributeDescription_Fields);
 
@@ -239,6 +256,7 @@ bool NX_VMS_API operator==(const EventType& lh, const EventType& rh);
 QN_FUSION_DECLARE_FUNCTIONS(ColorItem, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(ColorType, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(EnumType, (json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(ItemObject, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(AttributeDescription, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(ExtendedType, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(EventType, (json), NX_VMS_API)
