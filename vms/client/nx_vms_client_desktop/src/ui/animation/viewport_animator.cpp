@@ -1,14 +1,19 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "viewport_animator.h"
+
 #include <cmath> /* For std::log, std::exp. */
 #include <limits>
-#include <QtWidgets/QGraphicsView>
+
 #include <QtCore/QMargins>
+#include <QtWidgets/QGraphicsView>
+
+#include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <utils/common/checked_cast.h>
 #include <utils/math/linear_combination.h>
 #include <utils/math/magnitude.h>
+
 #include "viewport_geometry_accessor.h"
 
 using nx::vms::client::core::Geometry;
@@ -207,7 +212,10 @@ QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF 
 
         /* Adjust so that adjusted rect lies inside the real one. */
         realCenter.rx() = qBound(adjustedRect.right()  - realSize.width()  / 2, realCenter.x(), adjustedRect.left() + realSize.width()  / 2);
-        realCenter.ry() = qBound(adjustedRect.bottom() - realSize.height() / 2, realCenter.y(), adjustedRect.top()  + realSize.height() / 2);
+        auto max = adjustedRect.top() + realSize.height() / 2;
+        if (qFuzzyEquals(max, adjustedRect.bottom() - realSize.height() / 2))
+            max = adjustedRect.bottom() - realSize.height() / 2;
+        realCenter.ry() = qBound(adjustedRect.bottom() - realSize.height() / 2, realCenter.y(), max);
     }
 
     return QRectF(realCenter - Geometry::toPoint(realSize) / 2, realSize);

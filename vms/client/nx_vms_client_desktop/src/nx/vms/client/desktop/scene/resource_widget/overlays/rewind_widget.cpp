@@ -7,6 +7,7 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
@@ -35,11 +36,11 @@ public:
     void paint(QPainter* painter)
     {
         const auto ratio = qApp->devicePixelRatio();
-        if (q->m_size.isEmpty())
+        if (q->m_size.isEmpty() || qFuzzyEquals(opacity(), 0.0) )
             return;
 
         const auto pixmapSize = QSize(q->m_size.width() * 0.4, q->m_size.height()) * ratio;
-        const auto m_backgroundColor = core::colorTheme()->color("light1", kAlpha);
+        const auto m_backgroundColor = core::colorTheme()->color("light1", 1 + int(kAlpha * opacity()));
 
         painter->setPen(Qt::NoPen);
         painter->setBrush(m_backgroundColor);
@@ -143,7 +144,7 @@ void RewindWidget::tick(int deltaMs)
         return;
 
     auto animator = opacityAnimator(m_background);
-    animator->setEasingCurve(QEasingCurve::InOutCirc);
+    animator->setEasingCurve(QEasingCurve::OutCirc);
     auto animator1 = opacityAnimator(m_triangle1);
     auto animator2 = opacityAnimator(m_triangle2);
     auto animator3 = opacityAnimator(m_triangle3);
@@ -157,10 +158,12 @@ void RewindWidget::tick(int deltaMs)
     m_totalMs += deltaMs;
     if (m_totalMs < 100)
     {
-        if (animator->isRunning())
-            animator->stop();
-        animator->setTimeLimit(250);
-        animator->animateTo(1.0);
+        if (!animator->isRunning())
+        {
+            animator->setTimeLimit(250);
+            animator->animateTo(1.0);
+        }
+        
         animator1->setTimeLimit(100);
         animator1->animateTo(0.5);
         return;
@@ -208,10 +211,12 @@ void RewindWidget::tick(int deltaMs)
 
     if (m_totalMs < 600)
     {
-        if (animator->isRunning())
-            animator->stop();
-        animator->setTimeLimit(200);
-        animator->animateTo(0.0);
+        if (!animator->isRunning())
+        {
+            animator->setEasingCurve(QEasingCurve::OutCirc);
+            animator->setTimeLimit(200);
+            animator->animateTo(0.0);
+        }
         animator2->setTimeLimit(100);
         animator2->animateTo(0.0);
         animator3->setTimeLimit(100);
@@ -226,7 +231,6 @@ void RewindWidget::tick(int deltaMs)
         return;
     }
 
-    m_background->setOpacity(0.0);
     m_totalMs = kStopped;
     setVisible(false);
 }
@@ -235,13 +239,15 @@ void RewindWidget::blink()
 {
     setVisible(true);
     
+    auto animator = opacityAnimator(m_background);
     auto animator1 = opacityAnimator(m_triangle1);
     auto animator2 = opacityAnimator(m_triangle2);
     auto animator3 = opacityAnimator(m_triangle3);
 
-    if (!NX_ASSERT(animator1 && animator2 && animator3))
+    if (!NX_ASSERT(animator && animator1 && animator2 && animator3))
         return; //< Some unexpected unpredictable case.
     
+    animator->stop();
     animator1->stop();
     animator2->stop();
     animator3->stop();
