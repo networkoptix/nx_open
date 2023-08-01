@@ -64,11 +64,6 @@ QVector<QnUuid> toIdList(const QSet<QnUuid>& src)
     return QVector<QnUuid>(src.begin(), src.end());
 }
 
-QSet<QnUuid> toIdSet(const QVector<QnUuid>& src)
-{
-    return QSet(src.begin(), src.end());
-}
-
 QSet<QnUuid> toIds(const QnResourceList& resources)
 {
     return nx::utils::toQSet(resources.ids());
@@ -427,8 +422,8 @@ void QnBusinessRuleViewModel::loadFromRule(const vms::event::RulePtr& businessRu
         updateEventStateModel();
     }
 
-    m_eventResources = filterEventResources(toIdSet(businessRule->eventResources()),
-        m_eventType);
+    m_eventResources =
+        filterEventResources(nx::utils::toQSet(businessRule->eventResources()), m_eventType);
 
     m_eventParams = businessRule->eventParams();
 
@@ -436,7 +431,7 @@ void QnBusinessRuleViewModel::loadFromRule(const vms::event::RulePtr& businessRu
 
     m_actionType = businessRule->actionType();
 
-    m_actionResources = toIdSet(businessRule->actionResources());
+    m_actionResources = nx::utils::toQSet(businessRule->actionResources());
 
     m_actionParams = businessRule->actionParams();
 
@@ -1156,7 +1151,9 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     nx::vms::common::getUsersAndGroups(systemContext(),
                         m_eventParams.metadata.instigators, users, groups);
 
-                    const auto eventResources = resourcePool()->getResourcesByIds(filtered);
+                    const auto eventResources = filtered.empty()
+                        ? resourcePool()->getAllCameras()
+                        : resourcePool()->getResourcesByIds<QnVirtualCameraResource>(filtered);
 
                     const auto isUserValid =
                         [this, &eventResources](const QnUserResourcePtr& user)
@@ -1173,7 +1170,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                         };
 
                     const auto isRoleValid =
-                        [this, eventResources](const nx::vms::api::UserGroupData& group)
+                        [this, &eventResources](const nx::vms::api::UserGroupData& group)
                         {
                             return std::any_of(eventResources.begin(), eventResources.end(),
                                 [this, &group](const auto& resource)
