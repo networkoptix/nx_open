@@ -31,6 +31,7 @@ class Validator:
     public QObject,
     public nx::vms::common::SystemContextAware
 {
+    Q_OBJECT
     using base_type = QObject;
 
 public:
