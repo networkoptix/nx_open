@@ -21,6 +21,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ColorType, (json), ColorType_Fields, (brief, tr
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EnumType, (json), EnumType_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     AttributeDescription, (json), AttributeDescription_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ItemObject, (json), ItemObject_Fields, (brief, true))
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ExtendedType, (json), ExtendedType_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json), EventType_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectType, (json), ObjectType_Fields, (brief, true))

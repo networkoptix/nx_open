@@ -2,6 +2,8 @@
 
 #include "device_agent_manifest.h"
 
+#include <set>
+
 namespace nx::vms::api::analytics {
 
 class ListProcessor

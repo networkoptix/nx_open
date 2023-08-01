@@ -135,8 +135,7 @@ static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
     const char* deviceAgentManifestStr = deviceAgentManifest->str();
     ASSERT_TRUE(deviceAgentManifestStr);
     ASSERT_TRUE(deviceAgentManifestStr[0] != '\0');
-    NX_PRINT << "DeviceAgent manifest:\n" << deviceAgentManifest;
-
+    NX_PRINT << "DeviceAgent manifest:\n" << deviceAgentManifestStr;
     std::string deviceAgentManifestError;
     const nx::kit::Json deviceAgentManifestJson =
         nx::kit::Json::parse(deviceAgentManifest->str(), deviceAgentManifestError);
