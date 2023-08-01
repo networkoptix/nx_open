@@ -534,6 +534,9 @@ void EventPanel::Private::rebuildTabs()
 
     // Update current tab to the one that was explicitly selected early.
     setCurrentTab(m_requestedTab);
+
+    // Make sure the number of notifications doesn't get obscured by the bell icon.
+    m_counterLabel->raise();
 }
 
 void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)
