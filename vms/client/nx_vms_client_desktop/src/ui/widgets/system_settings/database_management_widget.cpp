@@ -148,7 +148,7 @@ void QnDatabaseManagementWidget::backupDb()
             if (!NX_ASSERT(!path.isEmpty()))
                 return;
 
-            QDesktopServices::openUrl(path);
+            QDesktopServices::openUrl(QUrl::fromLocalFile(path));
         });
 }
 
