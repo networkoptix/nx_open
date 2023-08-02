@@ -70,7 +70,7 @@ function(nx_go_build_test target working_dir package_path)
     nx_go_fix_target_exe(${target} target_exe)
     set(target_path ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_exe})
 
-    set(compile_command ${NX_GO_COMPILER} test -c ${package_path} -o ${target_exe})
+    set(compile_command ${CMAKE_COMMAND} -E env TMPDIR=${CMAKE_CURRENT_BINARY_DIR} ${NX_GO_COMPILER} test -c ${package_path} -o ${target_exe})
 
     file(GLOB_RECURSE test_source_files FOLLOW_SYMLINKS "${package_path}/*.go")
 
