@@ -234,6 +234,7 @@ function(nx_go_add_api_client target yaml)
         "${CMAKE_CURRENT_LIST_DIR}/generated_client.go"
         "${CMAKE_CURRENT_LIST_DIR}/generated_client_mock.go"
     )
+    set_target_properties(${full_target_name} PROPERTIES FOLDER cloud/utility)
     nx_go_openapi_gen_command(
         "${yaml}"
         "${CMAKE_CURRENT_LIST_DIR}/generated_client.go"

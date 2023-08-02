@@ -47,7 +47,7 @@ function(nx_go_add_test target)
         endif()
 
         if(NX_TEST_JIRA_PROJECT)
-            nx_store_test_metainformation(${target_ut} PROJECT ${NX_TEST_JIRA_PROJECT})
+            nx_store_test_metainformation(${target_ut})
         endif()
 
         nx_go_build_test(
