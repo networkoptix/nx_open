@@ -84,10 +84,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Connection timed out</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>The server is incompatible.</source>
         <translation></translation>
     </message>
@@ -188,6 +184,10 @@
         <source>You can enable two-factor authentication in your %1.</source>
         <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>Connection failed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
