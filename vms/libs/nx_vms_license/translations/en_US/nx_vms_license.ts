@@ -51,11 +51,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>License is not validated by %1</source>
-        <comment>%1 is the short cloud name (like Cloud)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Invalid type</source>
         <translation type="unfinished"></translation>
     </message>

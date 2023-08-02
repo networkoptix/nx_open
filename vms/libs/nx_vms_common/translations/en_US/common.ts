@@ -1642,6 +1642,10 @@
         <comment>%1 is a company name</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>RTP timeout (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::recording::Error</name>
