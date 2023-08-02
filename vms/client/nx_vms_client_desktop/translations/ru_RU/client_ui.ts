@@ -675,7 +675,7 @@
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Web-интерфейс</translation>
+      <translation>Web-страница</translation>
     </message>
     <message>
       <source>Web Page Port</source>
@@ -951,6 +951,13 @@
     <message>
       <source>In the Future</source>
       <translation>В будущем</translation>
+    </message>
+  </context>
+  <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation>Эта система подключена к</translation>
     </message>
   </context>
   <context>
@@ -2878,6 +2885,10 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>Автоопределение встроенных и USB веб-камер</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation type="unfinished">Server Location ID:</translation>
     </message>
   </context>
   <context>

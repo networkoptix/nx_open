@@ -59,11 +59,6 @@
       <translation>תוקף הרשיון פג</translation>
     </message>
     <message>
-      <source>License is not validated by %1</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
-    </message>
-    <message>
       <source>Invalid type</source>
       <translation>סוג שגוי</translation>
     </message>

@@ -162,15 +162,15 @@
     </message>
     <message>
       <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
+      <translation>Sprawdź ustawienia administracyjne, aby skonfigurować tę wtyczkę.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>Ta wtyczka nie ma ustawień na poziomie systemu.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Ta wtyczka nie ma ustawień dla tej kamery.</translation>
     </message>
   </context>
   <context>
@@ -196,6 +196,13 @@
     <message>
       <source>Hotkey %1</source>
       <translation>Klawisz skrótu %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
     </message>
   </context>
   <context>
@@ -545,6 +552,17 @@
     </message>
   </context>
   <context>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation type="unfinished">Select the joystick.</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation type="unfinished">No devices connected.</translation>
+    </message>
+  </context>
+  <context>
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
@@ -569,6 +587,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>Przełącz powtarzanie</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation type="unfinished">Save</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation type="unfinished">Previous</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Dalej</translation>
     </message>
   </context>
   <context>
@@ -1046,6 +1079,21 @@ aby aktywować PTZ</translation>
     </message>
   </context>
   <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation type="unfinished">Choose file to save</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation type="unfinished">JSON files (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation type="unfinished">File to save the results:</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1348,7 +1396,28 @@ aby aktywować PTZ</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Nie masz dostępu do %1. Sprawdź swoje połączenie internetowe.</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation type="unfinished">Move the joystick left and right several times.</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation type="unfinished">Move the joystick up and down several times.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
     </message>
   </context>
 </TS>

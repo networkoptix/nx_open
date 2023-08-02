@@ -376,6 +376,13 @@
     </message>
   </context>
   <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Caméra retirée</translation>
+    </message>
+  </context>
+  <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
@@ -1157,7 +1164,7 @@
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Autorisation de session requise.</translation>
     </message>
   </context>
   <context>
@@ -1432,10 +1439,6 @@
       <translation>Nombre de tentatives RTP</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>Délai RTP (millisecondes)</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation>Durée maximale de connexion RTSP (secondes)</translation>
     </message>
@@ -1593,11 +1596,6 @@
       <translation>Activer les fonctions API obsolètes (non sécurisées)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Activer les fonctions API obsolètes actuellement utilisées par le logiciel %1 (non sécurisées)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>Exposer les adresses IP pour la découverte automatique</translation>
     </message>
@@ -1640,6 +1638,15 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>Mettre à jour l'URL du fichier releases.json</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Activer les fonctions API obsolètes actuellement utilisées par le logiciel %1 (non sécurisées)</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>Délai RTP (millisecondes)</translation>
     </message>
   </context>
   <context>
@@ -2325,26 +2332,19 @@
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Également défini sur la caméra source</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Déclenche également sur la caméra source</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Enregistrer également la caméra source</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
-    </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-      <source>Removed camera</source>
-      <translation>Caméra retirée</translation>
+      <translation>Jouer également sur la caméra source</translation>
     </message>
   </context>
 </TS>

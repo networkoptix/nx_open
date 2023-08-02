@@ -376,6 +376,13 @@
     </message>
   </context>
   <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Fjernet kamera</translation>
+    </message>
+  </context>
+  <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
@@ -1431,10 +1438,6 @@
       <translation>Antall RTP-forsøk på nytt</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>RTP timeout (millisekunder)</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation>Maks RTSP-tilkoblingsvarighet (sekunder)</translation>
     </message>
@@ -1591,11 +1594,6 @@
       <translation>Aktiver utdaterte API-funksjoner (usikre)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Aktiver utdaterte API-funksjoner som for øyeblikket brukes av %1 programvare (usikkert)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>La IP-adresser bli automatisk oppdaget</translation>
     </message>
@@ -1638,6 +1636,15 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>Oppdater nettadressen til releases.json-filen</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Aktiver utdaterte API-funksjoner som brukes av %1 programvare (usikkert)</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>RTP timeout (millisekunder)</translation>
     </message>
   </context>
   <context>
@@ -2336,13 +2343,6 @@
     <message>
       <source>Also play on source camera</source>
       <translation>Spill også på kildekamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-      <source>Removed camera</source>
-      <translation>Fjernet kamera</translation>
     </message>
   </context>
 </TS>

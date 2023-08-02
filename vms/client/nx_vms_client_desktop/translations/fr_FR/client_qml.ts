@@ -195,6 +195,13 @@
     </message>
   </context>
   <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>Appuyez plusieurs fois sur chaque bouton et écrivez les noms de ces boutons dans le tableau ci-dessous.</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
@@ -537,6 +544,17 @@
     </message>
   </context>
   <context>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>Sélectionnez le joystick.</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>Aucun appareil connecté.</translation>
+    </message>
+  </context>
+  <context>
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
@@ -561,6 +579,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>Activer/désactiver Répéter</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>Enregistrer</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>Précédent</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Suivant</translation>
     </message>
   </context>
   <context>
@@ -1028,6 +1061,21 @@ pour activer le PTZ</translation>
     </message>
   </context>
   <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>Choisir le fichier à enregistrer</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>Fichiers JSON (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>Fichier pour enregistrer les résultats :</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1327,6 +1375,27 @@ pour activer le PTZ</translation>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
       <translation>Vous n'avez pas accès à %1. Veuillez vérifier votre connexion Internet.</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>Déplacez le joystick à gauche et à droite plusieurs fois.</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>Déplacez le joystick de haut en bas plusieurs fois.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>Faites pivoter le joystick dans le sens horaire et dans le sens inverse des aiguilles d'une montre plusieurs fois.</translation>
     </message>
   </context>
 </TS>

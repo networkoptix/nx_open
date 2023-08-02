@@ -1155,21 +1155,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Resimler</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Tüm Dosyalar</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1189,7 +1174,7 @@
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>Yürütülebilir %1 Medya Dosyası</translation>
     </message>
   </context>
   <context>
@@ -1857,11 +1842,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation type="unfinished">May lead to privacy issues</translation>
+      <translation>Gizlilik sorunlarına yol açabilir</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation type="unfinished">Connect only servers with public certificate</translation>
+      <translation>Yalnızca genel sertifikaya sahip sunucuları bağlayın</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
@@ -1869,7 +1854,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>Geçerli istemci bağlantısı kesilecek.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
@@ -1885,7 +1870,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>Sunucuya ilk bağlantıda, hata içeriyorsa sertifikanın kabul edilmesi için onayınız istenecektir</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -2900,7 +2885,7 @@ to %1</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>%1 ile Sistem bağlantısını kesmek için hesap şifrenizi girin</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2927,7 +2912,7 @@ to %1</source>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Sisteme yerel bir yönetici hesabıyla yerel ağ üzerinden erişilebilecektir.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2936,7 +2921,11 @@ to %1</source>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>%1 ile Sistem bağlantısı kesilemiyor</translation>
+    </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>Sisteme sadece yerel ağ üzerinden erişilebilecektir.</translation>
     </message>
   </context>
   <context>
@@ -3151,6 +3140,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Resimler</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Tüm Dosyalar</translation>
+    </message>
+  </context>
+  <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
@@ -3194,7 +3198,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Yedek oluşturmak için hesap şifrenizi girin</translation>
     </message>
     <message>
       <source>Create</source>
@@ -5171,7 +5175,7 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation type="unfinished">Ask your system administrator to enter the encryption password to decrypt this archive</translation>
+      <translation>Bu arşivin şifresini çözmek için sistem yöneticinizden şifreleme parolasını girmesini isteyin</translation>
     </message>
     <message>
       <source>Unlock</source>
@@ -5461,7 +5465,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>Depolama alanı mevcuttur, ancak halihazırda mevcut olan depolama birimlerine kıyasla çok küçük olduğu için yazılamaz</translation>
     </message>
   </context>
   <context>
@@ -5975,7 +5979,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <translation>Yalnızca harflere, sayılara ve sembollere %1 izin verilir.</translation>
     </message>
   </context>
   <context>
@@ -6707,11 +6711,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB veya web kameraları sunucular arasında taşınamaz. Bu cihazlar %1 üzerinde kalacak:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Sanal kameralar sunucular arasında taşınamaz. Bu cihazlar %1 üzerinde kalacak:</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
@@ -6723,7 +6727,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+      <translation>USB veya web kameraları sunucular arasında taşınamaz</translation>
     </message>
     <message>
       <source>Only some of the selected devices can be moved to %1</source>
@@ -7089,7 +7093,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Filtreleri değiştirmeyi deneyin veya kamera eklentisi ayarlarında nesne algılamayı yapılandırın</translation>
     </message>
   </context>
   <context>
@@ -7119,19 +7123,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+      <translation>Bu cihazın ses girişi yok veya doğru şekilde yapılandırılmamış. Ses kaynağı olarak başka bir cihaz seçin.</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+      <translation>Bu kameranın ses girişi yok veya doğru yapılandırılmamış. Ses kaynağı olarak başka bir kamera seçin.</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+      <translation>Bu aygıtın ses çıkışı yok veya doğru şekilde yapılandırılmamış. Ses oynatmak için başka bir cihaz seçin.</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+      <translation>Bu kameranın ses çıkışı yok veya doğru yapılandırılmamış. Ses oynatma için başka bir kamera seçin.</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
@@ -7159,27 +7163,27 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Seçilen cihazın ses girişi yok veya doğru şekilde yapılandırılmamış. Ses akışı mevcut değil.</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Seçilen cihazın ses çıkışı yok veya doğru şekilde yapılandırılmamış. Ses akışı mevcut değil.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Seçilen cihazın ses girişi&apos; yok veya doğru şekilde yapılandırılmamış. Ses akışı mevcut değil.</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Seçilen kameranın ses girişi&apos; yok veya doğru şekilde yapılandırılmamış. Ses akışı mevcut değil.</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Seçilen cihazın ses çıkışı yok veya doğru yapılandırılmamış. 2 yönlü ses mevcut değil.</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Seçilen kameranın ses çıkışı yok veya doğru yapılandırılmamış. 2 yönlü ses mevcut değil.</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
@@ -7191,15 +7195,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+      <translation>%1 başka bir sunucuya bağlı. Ses akışı kullanılamıyor</translation>
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+      <translation>Seçilen cihaz başka bir sunucuya bağlı. Ses akışı mevcut değil.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>Seçilen kamera başka bir sunucuya bağlı. Ses akışı mevcut değil.</translation>
     </message>
   </context>
   <context>
@@ -7213,7 +7217,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>Kamerada ne kayıt ne de kayıt programı var</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
@@ -7305,11 +7309,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>Sistemdeki tüm sunucularda yeni eklenen kameralar için yedekleme açılacaktır.</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>Sistemdeki tüm sunucularda yeni eklenen kameralar için yedekleme kapatılacaktır.</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7323,7 +7327,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
+      <translation>Yedeklemeyi etkinleştirmek için %1 üzerine yedek depolama olarak kullanmak üzere disk ekleyin</translation>
     </message>
   </context>
   <context>
@@ -7334,7 +7338,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
-      <translation type="unfinished">Skip backup for existing footage?</translation>
+      <translation>Mevcut kayıtlar için yedekleme atlansın mı?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7342,7 +7346,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
-      <translation type="unfinished">Applies only to the cameras connected to current server.</translation>
+      <translation>Yalnızca geçerli sunucuya bağlı kameralar için geçerlidir.</translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
@@ -7390,7 +7394,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Zaman çizelgesinde bir zaman aralığı seçin ve bir yer imi oluşturmak için vurgulanan bölüme sağ tıklayın</translation>
     </message>
   </context>
   <context>
@@ -7588,11 +7592,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for.</translation>
+      <translation>Seçilen hassasiyeti ayarlamak için önizlemede alanları seçin.</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for.</translation>
+      <translation>Bir hareket algılama hassasiyeti seçin ve bunu ayarlamak için önizlemede bazı alanları seçin.</translation>
     </message>
   </context>
   <context>
@@ -7798,11 +7802,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Geçersiz programı &quot;Her Zaman Kaydet&quot; olarak değiştir</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+      <translation>Kayıt programının bazı hücreleri geçersiz bir kayıt moduna ayarlanmıştır: %1. Geçersiz bir kayıt moduna ayarlanan saatlerde kamera &quot;Her Zaman Kayıt&quot; modunda kayıt yapacaktır.</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -7838,28 +7842,28 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>%n cihazlarda ses etkinleştirilemedi</numerusform>
         <numerusform>Failed to enable audio on %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
       <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>Bu cihazların ses girişleri yoktur veya doğru şekilde yapılandırılmamıştır.</numerusform>
         <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+        <numerusform>%n cihazda 2 yönlü ses etkinleştirilemedi</numerusform>
         <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
       <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>Bu cihazlarda ses çıkışı yoktur veya doğru şekilde yapılandırılmamıştır.</numerusform>
         <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
       </translation>
     </message>
@@ -7869,7 +7873,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
-      <translation type="unfinished">You need to select a device that will provide audio.</translation>
+      <translation>Ses sağlayacak bir cihaz seçmeniz gerekiyor.</translation>
     </message>
     <message>
       <source>2-way audio will be disabled</source>
@@ -7877,7 +7881,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation type="unfinished">You need to select a device to transmit the audio stream to and use for audio playback.</translation>
+      <translation>Ses akışını iletmek ve ses oynatmak için kullanılmak üzere bir cihaz seçmeniz gerekir.</translation>
     </message>
   </context>
   <context>
@@ -7927,7 +7931,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>Kendinizi %1 üzerinde doğrulamak için bir sertifika seçin:</translation>
     </message>
     <message>
       <source>Select</source>
@@ -8111,7 +8115,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Application will be closed.</translation>
+      <translation>Server'a bağlanılamadı. Uygulama kapatılacaktır.</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
@@ -8140,10 +8144,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Local System owner is absent or disabled.</source>
       <translation>Yerel Sistem sahibi yok veya devre dışı.</translation>
-    </message>
-    <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>Sunucularınızın hiçbiri İnternete bağlı değil.</translation>
     </message>
     <message>
       <source>System connected to %1</source>
@@ -8178,6 +8178,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>Dahili sunucu hatası. Lütfen daha sonra tekrar deneyiniz.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Sunucularınızdan hiçbirinin %1 ile bağlantısı yok.</translation>
     </message>
   </context>
   <context>
@@ -8256,7 +8261,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+      <translation>Kayıt Takvimi, seçilen kameralar tarafından desteklenmeyen kayıt modları içermektedir. Desteklenmeyen kayıt modları &quot;Her Zaman Kayıt&quot; olarak değiştirilecektir.</translation>
     </message>
   </context>
   <context>
@@ -8382,7 +8387,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
-      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
+      <translation>Ağdaki cihazların aranması, HTTPS bağlantılarını destekleyen kameralarla sınırlıdır. Bu, %1 ayarlarında değiştirilebilir.</translation>
     </message>
     <message>
       <source>System Administration</source>
@@ -8693,7 +8698,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
-      <translation type="unfinished">To revert this change user password reset will be required.</translation>
+      <translation>Bu değişikliği geri almak için kullanıcı şifresinin sıfırlanması gerekecektir.</translation>
     </message>
     <message>
       <source>Do not show this message again</source>
@@ -9194,7 +9199,7 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</translation>
+      <translation>Seçilen Sistem, mevcut Sistem ile uyumsuz olan daha eski bir yazılım sürümüne sahiptir. Geçerli olan Sistem ile birleştirmek için seçili Sistemi en son sürüme güncelleyin.</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -9266,7 +9271,7 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
+      <translation>%1 sistemlerinin farklı sahipleri vardır. Birleştirmeye izin verilmiyor.</translation>
     </message>
   </context>
   <context>
@@ -9288,31 +9293,31 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     <name>nx::vms::client::desktop::MotionStreamAlerts</name>
     <message>
       <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
-      <translation type="unfinished">Current stream has high resolution. Analyzing it for motion increases CPU load.</translation>
+      <translation>Mevcut akış yüksek çözünürlüğe sahiptir. Hareket için analiz etmek CPU yükünü artırır.</translation>
     </message>
     <message>
       <source>Motion detection for this camera is not currently working because of changed stream resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera is not currently working because of changed stream resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Bu kamera için hareket algılama, değişen akış çözünürlüğü nedeniyle şu anda çalışmıyor.
+Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translation>
     </message>
     <message>
       <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for some cameras will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Kalan akış çok yüksek çözünürlüğe sahip olduğundan, bazı kameralar için hareket algılama çalışmaz.
+Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translation>
     </message>
     <message>
       <source>Motion detection for this camera will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Kalan akış çok yüksek çözünürlüğe sahip olduğundan bu kamera için hareket algılama çalışmayacak.
+Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translation>
     </message>
   </context>
   <context>
@@ -9944,7 +9949,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
+      <translation>&lt;b&gt;Genel&lt;/b&gt; sekmesinde web sayfası proxy'sini açın.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
@@ -10233,11 +10238,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Bu kameranın yalnızca bir akışı vardır. Hareketli ve hareketsiz kayıtlar aynı çözünürlüğü veya kaliteyi paylaşacaktır.</translation>
     </message>
     <message>
       <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Seçilen kameralardan bazılarının yalnızca bir akışı vardır. Hareketli ve hareketsiz kayıtlar aynı çözünürlüğü veya kaliteyi paylaşacaktır.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
@@ -10261,7 +10266,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+      <translation>Seçilen kameralardan bazıları için hareket ve nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
@@ -10269,15 +10274,15 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected I/O modules</translation>
+      <translation>Seçilen G/Ç modüllerinden bazıları için hareket algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Bu G/Ç modülünde yalnızca bir akış vardır. Hareketli ve hareketsiz kayıtlar aynı çözünürlüğü veya kaliteyi paylaşacaktır.</translation>
     </message>
     <message>
       <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Seçilen G/Ç modüllerinden bazılarının yalnızca bir akışı vardır. Hareketli ve hareketsiz kayıtlar aynı çözünürlüğü veya kaliteyi paylaşacaktır.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
@@ -10289,11 +10294,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this I/O module</translation>
+      <translation>Bu G/Ç modülü için hareket ve nesne algılama devre dışı bırakıldı</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected I/O modules</translation>
+      <translation>Seçilen G/Ç modüllerinden bazıları için hareket ve nesne algılama devre dışı bırakıldı</translation>
     </message>
   </context>
   <context>
@@ -10328,12 +10333,12 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive on another system.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>Arşivi başka bir sistemde geri yüklemek için şifreleme parolası gerekecektir.
+Dikkat: Bu parola sıfırlanamaz. Kaybederseniz arşiv kurtarılamaz.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</translation>
+      <translation>Sistem dışında görüntülenmesini önlemek için arşiv verilerini şifreler. Bu sistem içerisinde video arşivini görüntülemek için şifre girmeniz istenmeyecektir.</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
@@ -10353,11 +10358,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Yerel ve LDAP kullanıcı oturumları belirtilen süreyi aşarsa otomatik olarak kapatılacaktır.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</translation>
+      <translation>Sınırsız kullanıcı oturum ömrü, genel Sistem güvenliğini tehdit eder ve Sistem performansının düşmesine neden olabilir</translation>
     </message>
     <message>
       <source>Learn more.</source>
@@ -10392,7 +10397,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
       <source>The certificate was presented by %1</source>
-      <translation type="unfinished">The certificate was presented by %1</translation>
+      <translation>Sertifika %1 tarafından sunuldu</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
@@ -11138,7 +11143,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Unable to connect to the system because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the system because it has become offline</translation>
+      <translation>Çevrimdışı olduğu için sisteme bağlanılamıyor</translation>
     </message>
   </context>
   <context>
@@ -11434,7 +11439,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
     <message>
       <source>Resource is not available for the usage with JS API</source>
-      <translation type="unfinished">Resource is not available for the usage with JS API</translation>
+      <translation>JS API ile kullanım için kaynak mevcut değil</translation>
     </message>
   </context>
   <context>
@@ -11458,6 +11463,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Belirtilen kimliğe sahip bir kaynak bulunamıyor.</translation>
+    </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation>Diğer Sistemlerden kaynak eklenemez.</translation>
     </message>
   </context>
   <context>
@@ -12041,7 +12050,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     <name>nx::vms::client::desktop::ui::workbench::ResourceGroupingActionHandler</name>
     <message>
       <source>Maximum level of nesting is reached</source>
-      <translation type="unfinished">Maximum level of nesting is reached</translation>
+      <translation>Maksimum yerleştirme düzeyine ulaşıldı</translation>
     </message>
   </context>
   <context>
@@ -12189,7 +12198,7 @@ to view more bookmarks</source>
     <message>
       <source>Client is updated to version %1. Restart %2 to finish update.</source>
       <comment>%1 is a version like &apos;4.3.0&apos;, %2 is a VMS name like &apos;Nx Witness&apos;</comment>
-      <translation type="unfinished">Client is updated to version %1. Restart %2 to finish update.</translation>
+      <translation>İstemci sürümü %1 olarak güncellendi. Güncellemeyi bitirmek için %2 yeniden başlatın.</translation>
     </message>
     <message>
       <source>Automatic client updates</source>

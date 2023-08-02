@@ -195,6 +195,13 @@
     </message>
   </context>
   <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>Trykk på hver knapp flere ganger og skriv navnene på disse knappene i tabellen nedenfor.</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
@@ -537,6 +544,17 @@
     </message>
   </context>
   <context>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>Velg joystick.</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>Ingen enheter tilkoblet.</translation>
+    </message>
+  </context>
+  <context>
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
@@ -561,6 +579,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>Slå på gjentakelse</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>Lagre</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>Forrige</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Neste</translation>
     </message>
   </context>
   <context>
@@ -1028,6 +1061,21 @@ for å aktivere PTZ</translation>
     </message>
   </context>
   <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>Velg filen du vil lagre</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>JSON-filer (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>Fil for å lagre resultatene:</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1327,6 +1375,27 @@ for å aktivere PTZ</translation>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
       <translation>Du har ikke tilgang til %1. Vennligst sjekk Internett-tilkoblingen din.</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>Beveg joysticken til venstre og høyre flere ganger.</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>Beveg joysticken opp og ned flere ganger.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>Roter joysticken med klokken og mot klokken flere ganger.</translation>
     </message>
   </context>
 </TS>

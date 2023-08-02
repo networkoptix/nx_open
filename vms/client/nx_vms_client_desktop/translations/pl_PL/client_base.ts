@@ -1161,21 +1161,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Zdjęcia</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Wideo</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Wszystkie pliki</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -3011,6 +2996,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Nie można odłączyć systemu od %1</translation>
     </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>System będzie dostępny tylko w sieci lokalnej.</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -3223,6 +3212,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Aby wygenerować inne zdarzenie, zobacz %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Zdjęcia</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Wideo</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Wszystkie pliki</translation>
     </message>
   </context>
   <context>
@@ -8319,11 +8323,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>%1 Układy to &lt;b&gt;układy międzysystemowe&lt;/b&gt;, które umożliwiają pracę z urządzeniami z różnych systemów. Obecnie dostępne są tylko niektóre funkcje zwykłych układów, ale w przyszłych wersjach będziemy nadal rozszerzać możliwości %1 układów</translation>
     </message>
     <message>
       <source>Read more on the %1</source>
-      <translation type="unfinished">Read more on the %1</translation>
+      <translation>Czytaj więcej na %1</translation>
     </message>
     <message>
       <source>help page</source>
@@ -8386,10 +8390,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       <translation>Lokalny właściciel systemu jest nieobecny lub wyłączony.</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>Żaden z Twoich serwerów nie jest podłączony do Internetu.</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>System podłączony do %1</translation>
@@ -8422,6 +8422,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>Błąd wewnętrzny. Spróbuj ponownie później.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">None of your Servers has connection to %1.</translation>
     </message>
   </context>
   <context>
@@ -9212,8 +9217,8 @@ Poziom rejestrowania &quot;%1&quot; zapewni bardziej szczegółowych informacji.
     <message>
       <source>The selected Logging Level may degrade your system&apos;s performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade your system&apos;s performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>Wybrany poziom logowania może obniżyć wydajność systemu &apos;.
+Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu wystarczającej ilości logów.</translation>
     </message>
   </context>
   <context>
@@ -9304,17 +9309,17 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled on the Client</source>
-      <translation type="unfinished">Debug logging is enabled on the Client</translation>
+      <translation>Rejestrowanie debugowania jest włączone w kliencie</translation>
     </message>
     <message>
       <source>Debug logging is enabled, resulting in degraded system performance.</source>
-      <translation type="unfinished">Debug logging is enabled, resulting in degraded system performance.</translation>
+      <translation>Rejestrowanie debugowania jest włączone, co powoduje obniżenie wydajności systemu.</translation>
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+        <numerusform>Rejestrowanie debugowania jest włączone na %n serwerach</numerusform>
+        <numerusform>Logowanie debugowania jest włączone na %n serwerach</numerusform>
         <numerusform>Debug logging is enabled on %n Servers</numerusform>
         <numerusform>Debug logging is enabled on %n Servers</numerusform>
       </translation>
@@ -9869,7 +9874,7 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     </message>
     <message>
       <source>Uploading client packages to Servers...</source>
-      <translation type="unfinished">Uploading client packages to Servers...</translation>
+      <translation>Przesyłanie pakietów klienta na serwery...</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
@@ -9903,7 +9908,7 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     <message numerus="yes">
       <source>%n notifications</source>
       <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
+        <numerusform>%n powiadomień</numerusform>
         <numerusform>%n notifications</numerusform>
         <numerusform>%n notifications</numerusform>
         <numerusform>%n notifications</numerusform>
@@ -9957,7 +9962,7 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     </message>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+      <translation>Szukasz lokalnego układu? Wybierz tylko jednego użytkownika z &quot; Pokaż listę &quot; aby wyświetlić lokalne układy jako opcję tutaj.</translation>
     </message>
   </context>
   <context>
@@ -10228,7 +10233,7 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     </message>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
+      <translation>Strona internetowa może wchodzić w interakcje z programem Desktop Client i żądać dostępu do sesji użytkownika</translation>
     </message>
   </context>
   <context>
@@ -10708,13 +10713,13 @@ Uwaga: To hasło nie może zostać zresetowane. Jeśli je zgubisz, archiwum nie 
     </message>
     <message>
       <source>Server ID: %1</source>
-      <translation type="unfinished">Server ID: %1</translation>
+      <translation>ID serwera: %1</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
+      <translation>Ktoś może podszywać się pod %1, aby ukraść Twoje dane osobowe.
+Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL serwera.</translation>
     </message>
     <message>
       <source>Custom Certificate</source>
@@ -10987,7 +10992,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+      <translation>Kliknij przycisk &quot; Cofnij Zastąp &quot;, aby kontynuować korzystanie z dwóch urządzeń.</translation>
     </message>
     <message>
       <source>Undo Replace</source>
@@ -11024,7 +11029,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Backup storage is not configured on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
+        <numerusform>Magazyn kopii zapasowych nie jest skonfigurowany na %n serwerach</numerusform>
         <numerusform>Backup storage is not configured on %n Servers</numerusform>
         <numerusform>Backup storage is not configured on %n Servers</numerusform>
         <numerusform>Backup storage is not configured on %n Servers</numerusform>
@@ -11033,7 +11038,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+        <numerusform>Przechowywanie danych analitycznych nie jest ustawione na %n serwerach</numerusform>
         <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
         <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
         <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
@@ -11042,7 +11047,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>System storage is used for analytics data on %n Servers</source>
       <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
+        <numerusform>Pamięć systemowa jest używana do przechowywania danych analitycznych na %n serwerach</numerusform>
         <numerusform>System storage is used for analytics data on %n Servers</numerusform>
         <numerusform>System storage is used for analytics data on %n Servers</numerusform>
         <numerusform>System storage is used for analytics data on %n Servers</numerusform>
@@ -11050,19 +11055,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Not imported archive found on device %1</source>
-      <translation type="unfinished">Not imported archive found on device %1</translation>
+      <translation>Znaleziono niezaimportowane archiwum dla urządzenia %1</translation>
     </message>
     <message>
       <source>Not imported archive found on camera %1</source>
-      <translation type="unfinished">Not imported archive found on camera %1</translation>
+      <translation>Znaleziono niezaimportowane archiwum dla kamery %1</translation>
     </message>
     <message>
       <source>The archive stream settings have been changed by the user</source>
-      <translation type="unfinished">The archive stream settings have been changed by the user</translation>
+      <translation>Ustawienia strumienia archiwum zostały zmienione przez użytkownika</translation>
     </message>
     <message>
       <source>The recording settings have been changed by the user</source>
-      <translation type="unfinished">The recording settings have been changed by the user</translation>
+      <translation>Ustawienia nagrywania zostały zmienione przez użytkownika</translation>
     </message>
   </context>
   <context>
@@ -11242,15 +11247,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>Grupa LDAP</translation>
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>Wbudowana grupa</translation>
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>Grupa niestandardowa</translation>
     </message>
     <message>
       <source>Name</source>
@@ -11262,7 +11267,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Member of</source>
-      <translation type="unfinished">Member of</translation>
+      <translation>Należy do</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -11305,7 +11310,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupy</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11336,7 +11341,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Users with Digest Authentication</source>
-      <translation type="unfinished">Users with Digest Authentication</translation>
+      <translation>Użytkownicy z uwierzytelnianiem Digest</translation>
     </message>
   </context>
   <context>
@@ -11347,11 +11352,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupy</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>
@@ -11765,11 +11770,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Cannot find an item with the specified ID</source>
-      <translation type="unfinished">Cannot find an item with the specified ID</translation>
+      <translation>Nie można znaleźć urządzenia o podanym identyfikatorze</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
-      <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
+      <translation>Nie można znaleźć zasobu o podanym identyfikatorze.</translation>
+    </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation type="unfinished">Cannot add resources from other Systems.</translation>
     </message>
   </context>
   <context>
@@ -11795,7 +11804,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
     <message>
       <source>Not saved</source>
-      <translation type="unfinished">Not saved</translation>
+      <translation>Nie zapisano</translation>
     </message>
   </context>
   <context>
@@ -11814,7 +11823,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Failed to restore rules.</source>
-      <translation type="unfinished">Failed to restore rules.</translation>
+      <translation>Nie udało się przywrócić reguł.</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
@@ -12278,11 +12287,11 @@ Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</tra
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation type="unfinished">Undo replacement completed successfully!</translation>
+      <translation>Cofnięcie zmian zakończono pomyślnie!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
+      <translation>Niektóre ustawienia mogą nie być przeniesione z zastąpionej kamery ze względu na problemy z kompatybilnością.</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>
@@ -12294,7 +12303,7 @@ Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</tra
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
+      <translation>Na serwerze nie ma odpowiednich kamer do wymiany &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -12482,7 +12491,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
-      <translation type="unfinished">Rewind is not available for VMAX</translation>
+      <translation>Przewijanie do tyłu nie jest dostępne dla VMAX</translation>
     </message>
   </context>
   <context>
@@ -12544,7 +12553,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Cannot check Client update availability. Check your internet connection and try again.</translation>
+      <translation>Nie można sprawdzić dostępności aktualizacji klienta. Sprawdź połączenie internetowe i spróbuj ponownie.</translation>
     </message>
   </context>
 </TS>

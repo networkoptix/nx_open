@@ -376,6 +376,13 @@
     </message>
   </context>
   <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Kaldırılmış Kamera</translation>
+    </message>
+  </context>
+  <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
@@ -1431,10 +1438,6 @@
       <translation>RTP deneme sayısı</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>RTP zaman aşımı (milisaniye)</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation>Maks. RTSP bağlantı süresi (saniye)</translation>
     </message>
@@ -1591,11 +1594,6 @@
       <translation>Kullanımdan kaldırılan API fonksiyonlarını etkinleştir (güvenli değil)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Şu anda %1 yazılım tarafından kullanılan, kullanımdan kaldırılmış API fonksiyonlarını etkinleştir (güvenli değil)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>Otomatik bulma için IP adreslerini açığa çıkarın</translation>
     </message>
@@ -1638,6 +1636,15 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>Releases.json dosya URL'sini güncelleyin</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Şu anda %1 tarafından kullanılan, kullanımdan kaldırılmış API fonksiyonlarını etkinleştir (güvenli değil)</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>RTP zaman aşımı (milisaniye)</translation>
     </message>
   </context>
   <context>
@@ -2336,13 +2343,6 @@
     <message>
       <source>Also play on source camera</source>
       <translation>Kaynak kamerada da oynat</translation>
-    </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-      <source>Removed camera</source>
-      <translation>Kaldırılmış Kamera</translation>
     </message>
   </context>
 </TS>
