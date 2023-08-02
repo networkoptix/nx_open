@@ -11,11 +11,17 @@ import Nx.Core
 import nx.vms.client.desktop
 import nx.vms.client.desktop.analytics as Analytics
 
+import "taxonomy_utils.js" as TaxonomyUtils
+
 FocusScope
 {
     id: control
 
     required property Analytics.StateView taxonomy
+    property Analytics.ObjectType objectType: taxonomy.objectTypeById(model.objectTypeId)
+    property Analytics.Attribute attribute:
+        TaxonomyUtils.findAttribute(objectType, model.attributeName)
+
     property bool isEditing: false
     focus: isEditing
     anchors.fill: parent
@@ -33,8 +39,8 @@ FocusScope
 
     function commit()
     {
-        console.log("Commit")
-        model.display = editor.value
+        console.log("Commit " + editor.value)
+        model.edit = editor.value
         isEditing = false
     }
 
@@ -52,14 +58,14 @@ FocusScope
         visible: !control.isEditing
     }
 
-    BasicTableCellDelegate
+    LookupListElementViewer
     {
-        x: 8
-        y: 6
-
-        text: model.display || qsTr("ANY")
-        color: model.display ? ColorTheme.light : ColorTheme.colors.dark17
+        value: model.display ?? ""
         visible: !control.isEditing
+        anchors.fill: parent
+
+        objectType: control.objectType
+        attribute: control.attribute
     }
 
     LookupListElementEditor
@@ -72,9 +78,8 @@ FocusScope
         clip: true
         value: model.display
 
-        taxonomy: control.taxonomy
-        objectTypeId: model.objectTypeId
-        attributeName: model.attributeName
+        objectType: control.objectType
+        attribute: control.attribute
 
         onEditingFinished:
         {

@@ -91,9 +91,9 @@ bool LookupListEntriesModel::setData(const QModelIndex& index, const QVariant& v
 {
     if (!NX_ASSERT(m_data))
         return false;
-
-    if (role != Qt::DisplayRole)
+    if (role != Qt::EditRole)
         return false;
+
 
     const auto key = attribute(m_data->rawData(), index.column());
     if (key.isEmpty())
