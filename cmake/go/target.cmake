@@ -80,7 +80,7 @@ function(nx_go_build target working_dir package_path)
             OUTPUT ${CMAKE_BINARY_DIR}/bin/${target_exe}
             WORKING_DIRECTORY ${working_dir}
             DEPENDS ${GO_BUILD_DEPENDS}
-            COMMAND ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin" ${NX_GO_COMPILER} build ${package_path}
+            COMMAND ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin" TMPDIR=${CMAKE_CURRENT_BINARY_DIR} ${NX_GO_COMPILER} build ${package_path}
             COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
             COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
         )
@@ -89,7 +89,7 @@ function(nx_go_build target working_dir package_path)
             OUTPUT ${CMAKE_BINARY_DIR}/bin/${target_exe}
             WORKING_DIRECTORY ${working_dir}
             DEPENDS ${GO_BUILD_DEPENDS}
-            COMMAND ${NX_GO_COMPILER} build ${package_path}
+            COMMAND ${CMAKE_COMMAND} -E env TMPDIR=${CMAKE_CURRENT_BINARY_DIR} ${NX_GO_COMPILER} build ${package_path}
             COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
             COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
         )
@@ -111,7 +111,7 @@ function(nx_go_build target working_dir package_path)
                 WORKING_DIRECTORY ${working_dir}
                 DEPENDS ${all_go_files} ${GO_BUILD_DEPENDS}
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${GO_BUILD_C_GO_INCLUDE_DIRECTORY}"
-                COMMAND ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin" CC=gcc ${NX_GO_COMPILER} build -o "${CMAKE_CURRENT_BINARY_DIR}/${target_dll}" -buildmode=c-shared ${package_path}
+                COMMAND ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin" TMPDIR=${CMAKE_CURRENT_BINARY_DIR} CC=gcc ${NX_GO_COMPILER} build -o "${CMAKE_CURRENT_BINARY_DIR}/${target_dll}" -buildmode=c-shared ${package_path}
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${target_dll}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_dll}"
                 COMMAND ${CMAKE_COMMAND} -E remove -f "${CMAKE_CURRENT_BINARY_DIR}/${target_dll}"
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${target}.h" "${GO_BUILD_C_GO_INCLUDE_DIRECTORY}/${target}.h"
@@ -129,7 +129,7 @@ function(nx_go_build target working_dir package_path)
                 WORKING_DIRECTORY ${working_dir}
                 DEPENDS ${all_go_files} ${GO_BUILD_DEPENDS}
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${GO_BUILD_C_GO_INCLUDE_DIRECTORY}"
-                COMMAND ${CMAKE_COMMAND} -E env CC=${CMAKE_C_COMPILER} CGO_CFLAGS=${CMAKE_CXX_FLAGS} CGO_LDFLAGS=${CMAKE_C_FLAGS}${CMAKE_SHARED_LINKER_FLAGS} ${NX_GO_COMPILER} build -o "${CMAKE_CURRENT_BINARY_DIR}/${target_lib}" -buildmode=c-shared ${package_path}
+                COMMAND ${CMAKE_COMMAND} -E env TMPDIR=${CMAKE_CURRENT_BINARY_DIR} CC=${CMAKE_C_COMPILER} CGO_CFLAGS=${CMAKE_CXX_FLAGS} CGO_LDFLAGS=${CMAKE_C_FLAGS}${CMAKE_SHARED_LINKER_FLAGS} ${NX_GO_COMPILER} build -o "${CMAKE_CURRENT_BINARY_DIR}/${target_lib}" -buildmode=c-shared ${package_path}
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${target_lib}" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${target_lib}"
                 COMMAND ${CMAKE_COMMAND} -E remove -f "${CMAKE_CURRENT_BINARY_DIR}/${target_lib}"
                 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/lib${target}.h" "${GO_BUILD_C_GO_INCLUDE_DIRECTORY}/${target}.h"
