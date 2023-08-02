@@ -19,10 +19,6 @@
 <context>
     <name>AuthResultTranslations</name>
     <message>
-        <source>This user does not exist.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Wrong password.</source>
         <translation></translation>
     </message>
@@ -57,6 +53,30 @@
     <message>
         <source>This user has been disabled by a system administrator.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>This user does not exist or is unable to login.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>More than one user with the same login are presented.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to verify LDAP server SSL/TLS certificate.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BookmarkFacade</name>
+    <message>
+        <source>Removed camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Event</source>
+        <comment>Shows that the bookmark was created by a system event</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -167,10 +187,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This user has unlimited System privileges. Can merge Systems and link or unlink to Nx Cloud accounts.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Has full control of System configuration, but cannot create or modify other Power Users.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -188,6 +204,10 @@
     </message>
     <message>
         <source>Can view System Health Monitoring information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -423,6 +443,13 @@
     </message>
     <message>
         <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1109,6 +1136,17 @@
     </message>
 </context>
 <context>
+    <name>QnUserResource</name>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Result</name>
     <message>
         <source>Missing required parameter: %1.</source>
@@ -1182,46 +1220,6 @@
 </context>
 <context>
     <name>SystemSettings</name>
-    <message>
-        <source>SMTP host</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Email from</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>SMTP user</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>SMTP password</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Email signature</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Email support link</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>SMTP connection type</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>SMTP port</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>SMTP timeout (seconds)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>SMTP name</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Anonymous statistics report allowed</source>
         <translation></translation>
@@ -1460,10 +1458,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Authorization Session token lifetime (minutes)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Session token count limit on a single Server</source>
         <translation></translation>
     </message>
@@ -1576,11 +1570,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-        <comment>%1 is a company name</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Expose IP addresses for autodiscovery</source>
         <translation></translation>
     </message>
@@ -1630,6 +1619,19 @@
     </message>
     <message>
         <source>LDAP settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authorization Session token lifetime (seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+        <comment>%1 is a company name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2362,13 +2364,6 @@
     <message>
         <source>All Power Users</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-        <source>Removed camera</source>
-        <translation></translation>
     </message>
 </context>
 </TS>

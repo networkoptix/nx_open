@@ -37,13 +37,6 @@
     </message>
 </context>
 <context>
-    <name>ActionTypePickerWidget</name>
-    <message>
-        <source>Do</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>AdjustVideoDialog</name>
     <message>
         <source>Image Enhancement</source>
@@ -666,14 +659,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Import From Device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Import video automatically</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Web Page</source>
         <translation></translation>
     </message>
@@ -686,7 +671,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Import video manually</source>
+        <source>Import Video from Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import camera or server offline periods</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1190,17 +1179,6 @@
     </message>
 </context>
 <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-        <source>When</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Generic event</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
         <source>Login to authenticate (optional)</source>
@@ -1358,25 +1336,6 @@
     <name>FilteredResourceViewWidget</name>
     <message>
         <source>Nothing found</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>FooterWidget</name>
-    <message>
-        <source>Add Comment</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Set Schedule</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Test Action</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Add a comment</source>
         <translation></translation>
     </message>
 </context>
@@ -1638,45 +1597,6 @@
     </message>
     <message>
         <source>Shared layouts</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>LdapSettingsDialog</name>
-    <message>
-        <source>Optional</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Testing...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>LDAP Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server URL</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Search Base</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Search Filter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Search Timeout (s)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Admin DN or CN</source>
         <translation></translation>
     </message>
 </context>
@@ -2064,16 +1984,16 @@
 <context>
     <name>PasswordDialog</name>
     <message>
-        <source>Sign in</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Password</source>
         <translation></translation>
     </message>
     <message>
         <source>Username</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Sign in to web page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2468,10 +2388,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Disable Aero</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Capture Cursor</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2514,29 +2430,6 @@
     </message>
     <message>
         <source>Live</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>RulesDialog</name>
-    <message>
-        <source>Alarm/Event Rules</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New Rule</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete Rule</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select a Rule</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Reset Default Rules</source>
         <translation></translation>
     </message>
 </context>
@@ -3105,10 +2998,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Proxy this webpage via server</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>SELECT SERVER</source>
         <translation></translation>
     </message>
@@ -3122,10 +3011,6 @@
     </message>
     <message>
         <source>Proxy all requested contents</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Allow opening web page without SSL certificate checking</source>
         <translation></translation>
     </message>
 </context>

@@ -27,14 +27,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Full Name Attribute</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Email Attribute</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Allow digest authentication for imported users</source>
         <translation type="unfinished"></translation>
     </message>
@@ -51,39 +43,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>User Membership Attribute</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Group Members Attribute</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Base membership on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Group members</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User’s membership</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Misc</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Synchronization Timeout</source>
+        <source>Group Attribute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>sec</source>
+        <source>Synchronization&lt;br&gt;Interval</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Proxy LDAP requests via server</source>
+        <source>Search Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy LDAP requests&lt;br&gt;via server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -325,6 +301,17 @@
     </message>
 </context>
 <context>
+    <name>AutoTextField</name>
+    <message>
+        <source>This field cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BooleanRadioGroup</name>
     <message>
         <source>Yes</source>
@@ -340,6 +327,13 @@
     <message>
         <source>Hotkey %1</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>Buttons</name>
+    <message>
+        <source>Press each button several times and write the names of these buttons in the table below.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -470,10 +464,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use StarTLS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ignore LDAP server certificate errors</source>
         <translation type="unfinished"></translation>
     </message>
@@ -483,6 +473,14 @@
     </message>
     <message>
         <source>Connecting...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login DN cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use StartTLS</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -567,6 +565,18 @@
     </message>
     <message>
         <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attributes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -791,6 +801,10 @@
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Permission Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GroupEditDialog</name>
@@ -838,19 +852,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not a member of any group</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Permissions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Members</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Permission Groups</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -882,6 +892,21 @@
     </message>
 </context>
 <context>
+    <name>GroupsComboBox</name>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing found</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>GroupsFlow</name>
     <message>
         <source>and %1 more...</source>
@@ -897,10 +922,28 @@
     </message>
 </context>
 <context>
+    <name>ImportFromDeviceDialog</name>
+    <message>
+        <source>Import From Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>InformationBubble</name>
     <message>
         <source>Detected by</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>Initial</name>
+    <message>
+        <source>Select the joystick.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices connected.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -969,6 +1012,21 @@
     <message>
         <source>Toggle Repeat</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1196,9 +1254,24 @@
     </message>
 </context>
 <context>
-    <name>LookupListTable</name>
+    <name>LookupListElementEditor</name>
     <message>
-        <source>NONE</source>
+        <source>Any %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LookupListTableCellDelegate</name>
+    <message>
+        <source>ANY</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1395,19 +1468,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Try changing search criteria or enable editing to see available resources</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Try changing search criteria</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Editing enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Editing disabled</source>
+        <source>Automatically add dependent access rights</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1620,6 +1685,37 @@ to activate PTZ</source>
     </message>
 </context>
 <context>
+    <name>ResourceFilterButton</name>
+    <message>
+        <source>Available by Permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras &amp; Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Pages &amp; Integrations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Health Monitors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Walls</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ResourceList</name>
     <message numerus="yes">
         <source>...and %n more</source>
@@ -1711,6 +1807,21 @@ to activate PTZ</source>
     <message>
         <source>Analytics</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>SavingResults</name>
+    <message>
+        <source>Choose file to save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>JSON files (*.json)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File to save the results:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1886,10 +1997,6 @@ to activate PTZ</source>
         <source>Unsupported firmware version</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Access denied</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>StyledRadioButton</name>
@@ -2062,6 +2169,10 @@ to activate PTZ</source>
         <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Permission Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>UserEditDialog</name>
@@ -2136,19 +2247,11 @@ to activate PTZ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Groups</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not a member of any group</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Permissions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>This user is not found in LDAP database and is not able to log in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Permission Groups</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2168,6 +2271,37 @@ to activate PTZ</source>
     </message>
 </context>
 <context>
+    <name>VmsRulesDialog</name>
+    <message>
+        <source>Vms Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset To Defaults...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>WelcomeScreen</name>
     <message>
         <source>Official Website</source>
@@ -2184,6 +2318,27 @@ to activate PTZ</source>
     <message>
         <source>You do not have access to the %1. Please check your internet connection.</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>XAxis</name>
+    <message>
+        <source>Move the joystick left and right several times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>YAxis</name>
+    <message>
+        <source>Move the joystick up and down several times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ZAxis</name>
+    <message>
+        <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
