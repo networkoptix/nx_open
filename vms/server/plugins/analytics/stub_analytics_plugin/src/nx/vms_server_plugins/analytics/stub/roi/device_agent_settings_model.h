@@ -127,7 +127,7 @@ static const std::string kDeviceAgentSettingsModel = /*suppress newline*/ 1 + R"
             [
                 {
                     "type": "Repeater",
-                    "count": 5,
+                    "count": 10,
                     "template":
                     {
                         "type": "GroupBox",
@@ -168,10 +168,23 @@ static const std::string kDeviceAgentSettingsModel = /*suppress newline*/ 1 + R"
             "items":
             [
                 {
-                    "type": "LineFigure",
-                    "name": "testPolyLine",
-                    "caption": "Polyline",
-                    "maxPoints": 8
+                    "type": "Repeater",
+                    "count": 10,
+                    "template":
+                    {
+                        "type": "GroupBox",
+                        "caption": "Polyline #",
+                        "filledCheckItems": ["testPolyLine#.figure"],
+                        "items":
+                        [
+                            {
+                                "type": "LineFigure",
+                                "name": "testPolyLine#.figure",
+                                "caption": "Polyline",
+                                "maxPoints": 8
+                            }
+                        ]
+                    }
                 }
             ]
         },
