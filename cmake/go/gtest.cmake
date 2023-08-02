@@ -75,7 +75,9 @@ function(nx_go_build_test target working_dir package_path)
     file(GLOB_RECURSE test_source_files FOLLOW_SYMLINKS "${package_path}/*.go")
 
     if(WIN32)
-        list(PREPEND compile_command ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin")
+        list(PREPEND compile_command ${CMAKE_COMMAND} -E env PATH="$ENV{PATH} ${CONAN_MINGW-W64_ROOT}/bin" "GOPROXY=direct")
+    else()
+        list(PREPEND compile_command ${CMAKE_COMMAND} -E env "GOPROXY=direct")
     endif()
 
     add_custom_command(

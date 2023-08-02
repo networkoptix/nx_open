@@ -80,7 +80,7 @@ function(nx_go_build target working_dir package_path)
             OUTPUT ${CMAKE_BINARY_DIR}/bin/${target_exe}
             WORKING_DIRECTORY ${working_dir}
             DEPENDS ${GO_BUILD_DEPENDS}
-            COMMAND ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin" ${NX_GO_COMPILER} build ${package_path}
+            COMMAND ${CMAKE_COMMAND} -E env PATH="$ENV{PATH} ${CONAN_MINGW-W64_ROOT}/bin" "GOPROXY=direct" ${NX_GO_COMPILER} build ${package_path}
             COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
             COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
         )
@@ -89,7 +89,7 @@ function(nx_go_build target working_dir package_path)
             OUTPUT ${CMAKE_BINARY_DIR}/bin/${target_exe}
             WORKING_DIRECTORY ${working_dir}
             DEPENDS ${GO_BUILD_DEPENDS}
-            COMMAND ${NX_GO_COMPILER} build ${package_path}
+            COMMAND ${CMAKE_COMMAND} -E env "GOPROXY=direct" ${NX_GO_COMPILER} build ${package_path}
             COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
             COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
         )
