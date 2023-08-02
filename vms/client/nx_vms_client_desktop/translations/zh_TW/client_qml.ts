@@ -152,19 +152,19 @@
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>請在攝影機設定頁面中確認並進行套件設定。</translation>
     </message>
     <message>
       <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
+      <translation>請在系統管理設定頁面中確認並進行套件設定。</translation>
     </message>
     <message>
       <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>此套件在系統中沒有任何相關可用設定。</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>此套件沒有針對此相機的相關可用設定。</translation>
     </message>
   </context>
   <context>
@@ -190,6 +190,13 @@
     <message>
       <source>Hotkey %1</source>
       <translation>快捷鍵 %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>請按下每個按鈕數次，並將這些按鈕的名稱寫在下表中。</translation>
     </message>
   </context>
   <context>
@@ -533,6 +540,17 @@
     </message>
   </context>
   <context>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>選擇搖桿</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>沒有任何連線裝置。</translation>
+    </message>
+  </context>
+  <context>
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
@@ -557,6 +575,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>循環播放</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>儲存</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>上一個</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>繼續</translation>
     </message>
   </context>
   <context>
@@ -1019,6 +1052,21 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>選擇要儲存的檔案</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>JSON檔 (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>保存結果到文件</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1069,7 +1117,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>部分欄位必須填入參數以進行此操作。</translation>
     </message>
   </context>
   <context>
@@ -1315,7 +1363,28 @@ to activate PTZ</source>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>目前無法連線至 %1，請檢查您的網路連線。</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>左右移動操縱桿數次。</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>上下移動操縱桿數次。</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>順時針和逆時針旋轉操縱桿數次。</translation>
     </message>
   </context>
 </TS>

@@ -954,6 +954,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation>Detta system är anslutet till</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -2878,6 +2885,10 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>Upptäck automatiskt inbyggda webbkameror och USB-webbkameror</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>Serverns plats:</translation>
     </message>
   </context>
   <context>

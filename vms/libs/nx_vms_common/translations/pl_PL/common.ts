@@ -388,6 +388,13 @@
     </message>
   </context>
   <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Usunięta kamera</translation>
+    </message>
+  </context>
+  <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
@@ -1191,21 +1198,21 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>Brak wymaganego parametru: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>Nie udało się przetworzyć żądania.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Zabronione.</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Konflikt.</translation>
     </message>
     <message>
       <source>Bad request.</source>
@@ -1215,7 +1222,7 @@
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Nie zaimplementowano.</translation>
     </message>
     <message>
       <source>Not found.</source>
@@ -1228,11 +1235,11 @@
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>Nieobsługiwany typ nośnika.</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>Usługa niedostępna.</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
@@ -1240,16 +1247,16 @@
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>Sesja wygasła.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2.</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+      <translation>Nieprawidłowy parametr `%1`: %2.</translation>
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Wymagana autoryzacja sesji.</translation>
     </message>
   </context>
   <context>
@@ -1351,23 +1358,23 @@
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
+      <translation>Opóźnienie raportu anonimowych statystyk po aktualizacji</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
+      <translation>Adres URL serwera raportów anonimowych statystyk</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
+      <translation>Anonimowe statystyki - ustawienia klienta</translation>
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
+      <translation>Interwał aktualizacji aktywnego systemu (sekundy, 1s-1godz.)</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
+      <translation>Limit czasu połączenia proxy (sekundy, 1s-1godz.)</translation>
     </message>
     <message>
       <source>Time synchronization enabled</source>
@@ -1415,15 +1422,15 @@
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
+      <translation>Identyfikator scalania ostatniego systemu głównego</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
+      <translation>Identyfikator scalania ostatniego systemu podrzędnego</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
+      <translation>Wyłącz dostawców urządzenia</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
@@ -1436,7 +1443,7 @@
     <message>
       <source>Use %1 service to send emails instead of SMTP client</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Use %1 service to send emails instead of SMTP client</translation>
+      <translation>Użyj usługi %1 do wysyłania wiadomości e-mail zamiast klienta SMTP</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -1464,11 +1471,11 @@
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
+      <translation>Wymuś HTTPS (szyfrowanie przesyłu danych)</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
+      <translation>Wymuś RTSPS (szyfrowanie ruchu wideo)</translation>
     </message>
     <message>
       <source>Enable auto-discovery</source>
@@ -1476,7 +1483,7 @@
     </message>
     <message>
       <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
+      <translation>Włącz automatyczne powiadomienia</translation>
     </message>
     <message>
       <source>Enable update notifications</source>
@@ -1523,10 +1530,6 @@
       <translation type="unfinished">RTP retry count</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>Limit czasu RTP (ms)</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
     </message>
@@ -1560,7 +1563,7 @@
     </message>
     <message>
       <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
+      <translation>Ustawienia aktualizacji klienta</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1683,11 +1686,6 @@
       <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
     </message>
@@ -1730,6 +1728,15 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>Zaktualizuj adres URL pliku releases.json</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (unsecure)</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>Limit czasu RTP (ms)</translation>
     </message>
   </context>
   <context>
@@ -2452,13 +2459,6 @@
     <message>
       <source>Also play on source camera</source>
       <translation type="unfinished">Also play on source camera</translation>
-    </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-      <source>Removed camera</source>
-      <translation>Usunięta kamera</translation>
     </message>
   </context>
 </TS>

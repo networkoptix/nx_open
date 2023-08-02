@@ -376,6 +376,13 @@
     </message>
   </context>
   <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Entfernte Kamera</translation>
+    </message>
+  </context>
+  <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
@@ -1431,10 +1438,6 @@
       <translation>Anzahl der RTP-Wiederholungsversuche</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>RTP-Zeitüberschreitung (Millisekunden)</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation>Maximale RTSP-Verbindungsdauer (Sekunden)</translation>
     </message>
@@ -1591,11 +1594,6 @@
       <translation>Aktivieren veralteter API-Funktionen (unsicher)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Aktiviere veraltete API-Funktionen, die derzeit von %1-Software verwendet werden (unsicher)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>IP-Adressen für die automatische Erkennung freigeben</translation>
     </message>
@@ -1638,6 +1636,15 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation type="unfinished">Update releases.json file URL</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (unsecure)</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>RTP-Zeitüberschreitung (Millisekunden)</translation>
     </message>
   </context>
   <context>
@@ -2336,13 +2343,6 @@
     <message>
       <source>Also play on source camera</source>
       <translation type="unfinished">Also play on source camera</translation>
-    </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-      <source>Removed camera</source>
-      <translation>Entfernte Kamera</translation>
     </message>
   </context>
 </TS>

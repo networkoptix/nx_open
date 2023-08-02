@@ -1155,21 +1155,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Bilder</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Alla filer</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -2943,6 +2928,10 @@ till %1</translation>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Det går inte att koppla bort systemet från %1</translation>
     </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>Systemet kommer att vara tillgängligt via det lokala nätverket.</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -3153,6 +3142,21 @@ till %1</translation>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>För att generera generisk händelse, se %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Bilder</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Alla filer</translation>
     </message>
   </context>
   <context>
@@ -8148,10 +8152,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Lokal systemägare är frånvarande eller inaktiverad.</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>Ingen av dina servrar är anslutna till Internet.</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>System anslutet till %1</translation>
@@ -8184,6 +8184,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>Internt fel. Vänligen försök igen.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Ingen av dina servrar har anslutning till %1.</translation>
     </message>
   </context>
   <context>
@@ -10703,7 +10708,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Export</source>
-      <translation>Exportera</translation>
+      <translation>Export</translation>
     </message>
     <message>
       <source>On-device recordings were found</source>
@@ -11466,6 +11471,10 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Kan inte hitta en resurs med angivet ID.</translation>
+    </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation>Kan inte lägga till resurser från andra system.</translation>
     </message>
   </context>
   <context>

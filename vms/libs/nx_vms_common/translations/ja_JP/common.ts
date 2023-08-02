@@ -246,11 +246,11 @@
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>メディアエラーが多すぎます。デバイス障害ダイアログを開いて詳細を確認してください。</translation>
+      <translation>多数のメディアエラー。デバイス障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>メディアエラーが多すぎます。カメラ障害ダイアログを開いて詳細を確認してください。</translation>
+      <translation>多数のメディアエラー。カメラ障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
@@ -274,7 +274,7 @@
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>メディアエラーが多すぎます。I/Oモジュール障害ダイアログを開いて詳細を確認してください。</translation>
+      <translation>多数のメディアエラー。I/Oモジュール障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
@@ -367,6 +367,13 @@
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
       <translation>無効になっている場合は、I/O モジュール設定で録画を有効にしてください (エラー &quot;%1&quot;)。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>カメラ削除</translation>
     </message>
   </context>
   <context>
@@ -573,7 +580,7 @@
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
       <translation>
-        <numerusform>%n アナログ エンコーダー ライセンス</numerusform>
+        <numerusform>%n アナログエンコーダーライセンス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1385,10 +1392,6 @@
       <translation>RTPリトライ回数</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>RTPタイムアウト (ミリ秒)</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation>最大RTSP接続時間 (秒)</translation>
     </message>
@@ -1545,11 +1548,6 @@
       <translation>非推奨の API 関数を有効にする (非セキュア)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>現在 %1 ソフトウェアで使用されている、非推奨のAPI関数を有効にする (非セキュア)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>自動検出用に IP アドレスを公開する</translation>
     </message>
@@ -1592,6 +1590,15 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>releases.json ファイルの URL を更新</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>現在 %1 ソフトウェアで使用されている、非推奨のAPI関数を有効にする (非セキュア)</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>RTPタイムアウト (ミリ秒)</translation>
     </message>
   </context>
   <context>
@@ -1960,7 +1967,7 @@
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>システムディスク&quot;%1&quot; がほぼいっぱいです。</translation>
+      <translation>システムディスク &quot;%1&quot; の空き容量が少なくなっています。</translation>
     </message>
     <message>
       <source>start</source>
@@ -2069,7 +2076,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>分析ストレージ &quot;%1&quot; は容量が不足しかけています。</translation>
+      <translation>分析ストレージ &quot;%1&quot; の空き容量が少なくなっています。</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
@@ -2278,13 +2285,6 @@
     <message>
       <source>Also play on source camera</source>
       <translation>ソースカメラでも再生</translation>
-    </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-      <source>Removed camera</source>
-      <translation>カメラ削除</translation>
     </message>
   </context>
 </TS>

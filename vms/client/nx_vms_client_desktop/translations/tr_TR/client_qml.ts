@@ -195,6 +195,13 @@
     </message>
   </context>
   <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>Her düğmeye birkaç kez basın ve bu düğmelerin adlarını aşağıdaki tabloya yazın.</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
@@ -537,6 +544,17 @@
     </message>
   </context>
   <context>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>Joystick seçin.</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>Bağlı cihaz yok.</translation>
+    </message>
+  </context>
+  <context>
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
@@ -561,6 +579,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>Tekrarı Değiştir</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>Kaydet</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>Önceki</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>İleri</translation>
     </message>
   </context>
   <context>
@@ -1027,6 +1060,21 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
   </context>
   <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>Kaydedilecek dosyayı seçin</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>JSON dosyaları (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>Sonuçların kayıt edileceği dosya:</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1326,6 +1374,27 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
       <translation>%1 için erişiminiz yok. Lütfen internet bağlantınızı kontrol edin.</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>Joystick'i birkaç kez sola ve sağa hareket ettirin.</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>Joystick'i birkaç kez yukarı ve aşağı hareket ettirin.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>Joystick'i saat yönünde ve saat yönünün tersine birkaç kez çevirin.</translation>
     </message>
   </context>
 </TS>

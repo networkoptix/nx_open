@@ -150,7 +150,7 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Kameraanalyse vil kun fungere, når kameraet vises. Aktivér optagelse for at få det til at fungere hele tiden.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -192,6 +192,13 @@
     <message>
       <source>Hotkey %1</source>
       <translation>Genvejstast %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
     </message>
   </context>
   <context>
@@ -375,7 +382,7 @@
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>Figur</translation>
     </message>
     <message>
       <source>Click to add</source>
@@ -525,7 +532,7 @@
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Vælg videostream fra kameraet til analyse</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -533,7 +540,18 @@
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>Opdaterer...</translation>
+    </message>
+  </context>
+  <context>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation type="unfinished">Select the joystick.</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation type="unfinished">No devices connected.</translation>
     </message>
   </context>
   <context>
@@ -561,6 +579,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>Slå gentag til/fra</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation type="unfinished">Save</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation type="unfinished">Previous</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Næste</translation>
     </message>
   </context>
   <context>
@@ -613,7 +646,7 @@
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>Standardværdi:</translation>
     </message>
   </context>
   <context>
@@ -679,29 +712,29 @@
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Linjen er ikke gyldig. Fjern selvskæringer for at fortsætte.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Denne linje kræver mindst %n point.</numerusform>
+        <numerusform>Denne linje kræver mindst %n point.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Klik på det sidste punkt for at afslutte tegningen af linjen.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Det maksimale antal punkter er nået(%n point).</numerusform>
+        <numerusform>Det maksimale antal punkter er nået(%n point).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Klik på hver pil for at skifte den ønskede retning.</translation>
     </message>
   </context>
   <context>
@@ -730,7 +763,7 @@
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Størrelsesbegrænsninger</translation>
     </message>
   </context>
   <context>
@@ -764,11 +797,11 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Ingen plugins installeret</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Serveren er offline</translation>
     </message>
   </context>
   <context>
@@ -782,24 +815,24 @@
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Polygon er ikke gyldig. Fjern selvskæringer for at fortsætte.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Denne polygon kræver mindst %n point.</numerusform>
+        <numerusform>Denne polygon kræver mindst %n point.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Klik på det sidste punkt for at afslutte tegningen af polygonen.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Det maksimale antal punkter er nået(%n point).</numerusform>
+        <numerusform>Det maksimale antal punkter er nået(%n point).</numerusform>
       </translation>
     </message>
   </context>
@@ -845,36 +878,36 @@
     <message>
       <source>Introducing you
 new PTZ controls</source>
-      <translation type="unfinished">Introducing you
-new PTZ controls</translation>
+      <translation>Vi præsenterer dig for
+nye PTZ-kontroller</translation>
     </message>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation type="unfinished">Here is a quick presentation
-of what has changed</translation>
+      <translation>Her er en hurtig præsentation
+af, hvad der har ændret sig</translation>
     </message>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Træk over en hvilken som helst del af videoen
+for at aktivere PTZ</translation>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation type="unfinished">Press arrows keys to move and plus or minus keys to zoom</translation>
+      <translation>Tryk på piletasterne for at flytte og plus- eller minustasterne for at zoome</translation>
     </message>
     <message>
       <source>Use the mouse wheel to zoom</source>
-      <translation type="unfinished">Use the mouse wheel to zoom</translation>
+      <translation>Brug musehjulet til at zoome</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</translation>
+      <translation>Klik, dobbeltklik eller træk musemarkøren, mens du trykker på Shift-tasten for at bruge avanceret PTZ</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Gå til lokale indstillinger for at aktivere en trækmarkør over midten af videoen</translation>
     </message>
   </context>
   <context>
@@ -1028,6 +1061,21 @@ to activate PTZ</translation>
     </message>
   </context>
   <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation type="unfinished">Choose file to save</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation type="unfinished">JSON files (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation type="unfinished">File to save the results:</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1052,7 +1100,7 @@ to activate PTZ</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Tidslinjeidentifikator, som oprettes, når tiden ændres bagud på en fjern-NVR. Den nye tidslinje kan overlappe den eksisterende.</translation>
     </message>
     <message>
       <source>Select</source>
@@ -1097,7 +1145,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>Minimum objektstørrelse kan ikke være større end maksimum.</translation>
     </message>
   </context>
   <context>
@@ -1327,6 +1375,27 @@ to activate PTZ</translation>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
       <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation type="unfinished">Move the joystick left and right several times.</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation type="unfinished">Move the joystick up and down several times.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
     </message>
   </context>
 </TS>

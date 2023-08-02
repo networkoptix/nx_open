@@ -896,7 +896,7 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Создать</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
@@ -1158,21 +1158,6 @@
         <numerusform>%n раскладкок</numerusform>
         <numerusform>%n раскладкок</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Изображения</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Видео</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Все файлы</translation>
     </message>
   </context>
   <context>
@@ -1910,7 +1895,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Настройки безопасности изменены</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -1918,7 +1903,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>При первом подключении к серверу будет запрошено ваше подтверждение для принятия сертификата, если он содержит ошибки</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -2977,7 +2962,7 @@ to %1</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>Введите пароль своей учетной записи, чтобы отключить систему от %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2986,12 +2971,12 @@ to %1</source>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>Система отключена от %1</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>Вы собираетесь отключить систему от %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -3004,7 +2989,7 @@ to %1</source>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Система будет доступна через локальную сеть с учетной записью локального администратора.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -3013,7 +2998,11 @@ to %1</source>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>Не удается отключить систему от %1</translation>
+    </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>Система будет доступна только через локальную сеть.</translation>
     </message>
   </context>
   <context>
@@ -3195,7 +3184,7 @@ to %1</source>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>Система не совместима с двухфакторной аутентификацией</translation>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
@@ -3227,6 +3216,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Для создания произвольного события см. %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Изображения</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Видео</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Все файлы</translation>
     </message>
   </context>
   <context>
@@ -3269,11 +3273,11 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Сохранить резервную копию БД</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Введите пароль своей учетной записи, чтобы создать резервную копию</translation>
     </message>
     <message>
       <source>Create</source>
@@ -3281,11 +3285,11 @@ to %1</source>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Восстановление из резервной копии базы данных</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
+      <translation>Введите пароль своей учетной записи, чтобы восстановить систему из резервной копии</translation>
     </message>
     <message>
       <source>Restore</source>
@@ -5327,7 +5331,7 @@ to %1</source>
     </message>
     <message>
       <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
+      <translation>ДОСТУП ЗАПРЕЩЕН</translation>
     </message>
   </context>
   <context>
@@ -7339,35 +7343,35 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+      <translation>Это устройство не имеет аудиовхода или неправильно настроено. Выберите другое устройство в качестве источника звука.</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+      <translation>У этой камеры нет аудиовхода, или она неправильно настроена. Выберите другую камеру в качестве источника звука.</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+      <translation>Это устройство не имеет аудиовыхода или неправильно настроено. Выберите другое устройство для воспроизведения звука.</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+      <translation>У этой камеры нет аудиовыхода, или она неправильно настроена. Выберите другую камеру для воспроизведения звука.</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
+      <translation>Используйте это устройство для вывода звука</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
+      <translation>Используйте эту камеру для вывода звука</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
+      <translation>Использовать аудиопоток с другого устройства</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation type="unfinished">Use audio stream from another camera</translation>
+      <translation>Использовать аудиопоток с другой камеры</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
@@ -7375,35 +7379,35 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>Передача аудиопотока на другую камеру</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Выбранное устройство не имеет аудиовхода или не настроено. Аудиопоток недоступен.</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Выбранное устройство не имеет аудиовыхода или не настроено. Аудиопоток недоступен.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Выбранное устройство не имеет аудиовхода или неправильно настроено. Аудиопоток недоступен.</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Выбранная камера не имеет аудиовхода или неправильно настроена. Аудиопоток недоступен.</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Выбранное устройство не имеет аудиовыхода или неправильно настроено. Двухстороннее аудио недоступно.</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Выбранная камера не имеет аудиовыхода или неправильно настроена. Двухстороннее аудио недоступно.</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
+      <translation>Использовать аудиопоток с этого устройства</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
@@ -7411,22 +7415,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+      <translation>%1 подключен к другому серверу. Аудиопоток недоступен</translation>
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+      <translation>Выбранное устройство подключено к другому серверу. Аудиопоток недоступен.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>Выбранная камера подключена к другому серверу. Аудиопоток недоступен.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+      <translation>Выберите область в расписании, чтобы применить выбранные настройки.</translation>
     </message>
   </context>
   <context>
@@ -7441,7 +7445,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>Нет аналитических плагинов</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -7457,34 +7461,34 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>Не может быть изменено для вновь добавленных камер</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>Это устройство обеспечивает только один поток данных</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>Настройки потоковой передачи не применимы к этому типу устройств</translation>
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Не поддерживается</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>Резервное копирование не поддерживается для этого устройства</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>Используйте %1 или %2, чтобы выбрать несколько устройств для пакетного редактирования. Используйте %3, чтобы выбрать все устройства.</translation>
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Какие данные копировать</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7504,7 +7508,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>Нет данных для создания резервной копии</translation>
     </message>
   </context>
   <context>
@@ -7519,19 +7523,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>Новые добавленные камеры</translation>
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
+      <translation>Настройки новых добавленных камер будут применяться ко всем серверам в системе.</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>Резервное копирование будет включено для новых добавленных камер на всех серверах в системе.</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>Резервное копирование будет отключено для новых добавленных камер на всех серверах в системе.</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7540,7 +7544,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>Чтобы включить резервное копирование, измените "Основное" на "Резервное" для некоторых хранилищ в %1</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
@@ -7636,19 +7640,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Нагреватель</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Стеклоочиститель</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Без звука</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Включить звук</translation>
     </message>
     <message>
       <source>Open Door</source>
@@ -7724,7 +7728,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>Сервер не будет передавать настройки времени на камеру.</translation>
     </message>
     <message>
       <source>default</source>
@@ -7918,7 +7922,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>Показать все устройства</translation>
     </message>
     <message>
       <source>Show all cameras</source>
@@ -7926,23 +7930,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Выберите устройства</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Выберите камеры</translation>
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Выбрать устройство</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Выберите камеру</translation>
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Нет доступных камер</translation>
     </message>
   </context>
   <context>
@@ -8036,7 +8040,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Изменить неверное расписание на "Записывать всегда"</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
@@ -8048,11 +8052,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Только объекты</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Только движение и объекты</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -8060,11 +8064,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Объекты + низкое разрешение</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>Движение и объекты + низкое разрешение</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -8119,7 +8123,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>Двустороннее аудио будет отключено</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
@@ -8142,7 +8146,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 требуется</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
@@ -8165,11 +8169,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>Неверный адрес потока</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>Несоответствие протокола потоковой передачи</translation>
     </message>
   </context>
   <context>
@@ -8177,7 +8181,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>Выберите сертификат для аутентификации в %1:</translation>
     </message>
     <message>
       <source>Select</source>
@@ -8255,11 +8259,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
+      <translation>Не могу скачать файл обновления</translation>
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
+      <translation>Недостаточно места для загрузки файла обновления</translation>
     </message>
   </context>
   <context>
@@ -8298,7 +8302,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>Войти в %1</translation>
     </message>
   </context>
   <context>
@@ -8369,15 +8373,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
+      <translation>Требуется повторная аутентификация</translation>
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>Введите пароль для продолжения сеанса</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+      <translation>Ваша сессия истекла. Пожалуйста, войдите снова, чтобы продолжить.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -8389,11 +8393,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Local System owner is absent or disabled.</source>
-      <translation type="unfinished">Local System owner is absent or disabled.</translation>
-    </message>
-    <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your Servers is connected to the Internet.</translation>
+      <translation>Владелец локальной системы отсутствует или отключен.</translation>
     </message>
     <message>
       <source>System connected to %1</source>
@@ -8418,7 +8418,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect System to %1</translation>
+      <translation>Введите пароль своей учетной записи, чтобы подключить систему к %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8428,6 +8428,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>Внутренняя ошибка. Повторите попытку позже.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">None of your Servers has connection to %1.</translation>
     </message>
   </context>
   <context>
@@ -8949,7 +8954,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
+      <translation>Принудительно использовать безопасную аутентификацию?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
@@ -9175,7 +9180,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>Ваша сессия скоро истечет</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
@@ -9183,7 +9188,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>Осталось меньше минуты</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
@@ -9879,7 +9884,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>На вашем компьютере недостаточно места для загрузки обновления клиента. Пожалуйста, освободите место на жестком диске и повторите попытку.</translation>
     </message>
   </context>
   <context>
@@ -9970,7 +9975,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Не поддерживается</translation>
     </message>
     <message>
       <source>This tab will be available in future versions</source>
@@ -10210,11 +10215,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
+      <translation>Добавить проксированную веб-страницу</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>Добавить веб-страницу</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -10417,7 +10422,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
+      <translation>Устройство отключено</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -10484,23 +10489,23 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Движение, Объекты</translation>
     </message>
     <message>
       <source>Motion, Objects
  + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
+      <translation>Движение, объекты
+ + низкое разрешение</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Только объекты</translation>
     </message>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>Объекты
+ + Низкое разрешение</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -10517,11 +10522,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>Обнаружение движения отключено для этой камеры</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>Обнаружение движения отключено для некоторых выбранных камер</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
@@ -10537,7 +10542,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>Обнаружение объектов отключено для некоторых выбранных устройств</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
@@ -10553,11 +10558,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>Обнаружение движения и объектов отключено для этой камеры</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+      <translation>Обнаружение движения и объектов отключено для некоторых выбранных камер</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
@@ -11776,6 +11781,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
+    </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation>Невозможно добавить ресурсы из других систем.</translation>
     </message>
   </context>
   <context>

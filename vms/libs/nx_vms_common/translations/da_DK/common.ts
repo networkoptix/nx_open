@@ -196,7 +196,7 @@
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
-      <translation type="unfinished">Failed to configure parameter %1.</translation>
+      <translation>Kunne ikke konfigurere parameter %1.</translation>
     </message>
     <message>
       <source>Please contact support.</source>
@@ -292,7 +292,7 @@
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation type="unfinished">I/O Module initialization process is in progress.</translation>
+      <translation>I/O Modul initialisering proces er i gang.</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
@@ -376,6 +376,13 @@
     </message>
   </context>
   <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Fjernet kamera</translation>
+    </message>
+  </context>
+  <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
@@ -387,7 +394,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Kunne ikke initialisere lydkoder.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -468,7 +475,7 @@
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -1431,10 +1438,6 @@
       <translation type="unfinished">RTP retry count</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
     </message>
@@ -1591,11 +1594,6 @@
       <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
     </message>
@@ -1638,6 +1636,15 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation type="unfinished">Update releases.json file URL</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (unsecure)</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation type="unfinished">RTP timeout (milliseconds)</translation>
     </message>
   </context>
   <context>
@@ -1695,11 +1702,11 @@
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>Forkert krypteret stream størrelse.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>Beskadiget krypteret stream header.</translation>
     </message>
   </context>
   <context>
@@ -1710,15 +1717,15 @@
     </message>
     <message>
       <source>Panic recording</source>
-      <translation type="unfinished">Panic recording</translation>
+      <translation>Panik optagelse</translation>
     </message>
     <message>
       <source>Write to log</source>
-      <translation type="unfinished">Write to log</translation>
+      <translation>Skriv til log</translation>
     </message>
     <message>
       <source>Repeat sound</source>
-      <translation type="unfinished">Repeat sound</translation>
+      <translation>Gentag lyd</translation>
     </message>
     <message>
       <source>Play sound</source>
@@ -1734,66 +1741,66 @@
     </message>
     <message>
       <source>Show text overlay</source>
-      <translation type="unfinished">Show text overlay</translation>
+      <translation>Vis tekstoverlejring</translation>
     </message>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation type="unfinished">Show on Alarm Layout</translation>
+      <translation>Vis på alarmlayout</translation>
     </message>
     <message>
       <source>Device output</source>
-      <translation type="unfinished">Device output</translation>
+      <translation>Enhedsudgang</translation>
     </message>
     <message>
       <source>Camera output</source>
-      <translation type="unfinished">Camera output</translation>
+      <translation>Kameraudgang</translation>
     </message>
     <message>
       <source>Device recording</source>
-      <translation type="unfinished">Device recording</translation>
+      <translation>Enhedsoptagelse</translation>
     </message>
     <message>
       <source>Camera recording</source>
-      <translation type="unfinished">Camera recording</translation>
+      <translation>Kameraet optager</translation>
     </message>
     <message>
       <source>Generic Event</source>
-      <translation type="unfinished">Generic Event</translation>
+      <translation>Generisk Begivenhed</translation>
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Motion on Cameras</numerusform>
-        <numerusform>Motion on Cameras</numerusform>
+      <translation>
+        <numerusform>Bevægelse på kameraer</numerusform>
+        <numerusform>Bevægelse på kameraer</numerusform>
       </translation>
     </message>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>Netværksproblem</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>Serverfejl</translation>
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation type="unfinished">Server Conflict</translation>
+      <translation>Server Konflikt</translation>
     </message>
     <message>
       <source>Server Started</source>
-      <translation type="unfinished">Server Started</translation>
+      <translation>Server Startet</translation>
     </message>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>Licens problem</translation>
     </message>
     <message>
       <source>Any Server Issue</source>
-      <translation type="unfinished">Any Server Issue</translation>
+      <translation>Ethvert Serverproblem</translation>
     </message>
     <message>
       <source>Any Event</source>
-      <translation type="unfinished">Any Event</translation>
+      <translation>Enhver Begivenhed</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -2336,13 +2343,6 @@
     <message>
       <source>Also play on source camera</source>
       <translation type="unfinished">Also play on source camera</translation>
-    </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-      <source>Removed camera</source>
-      <translation>Fjernet kamera</translation>
     </message>
   </context>
 </TS>

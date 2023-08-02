@@ -983,7 +983,7 @@
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>조이스틱 설정...</translation>
     </message>
     <message>
       <source>Advanced...</source>
@@ -1149,21 +1149,6 @@
       <translation>
         <numerusform>%n 레이아웃</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>그림</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>동영상</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>모든 파일</translation>
     </message>
   </context>
   <context>
@@ -2904,6 +2889,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1에서 시스템의 연결을 끊을 수 없습니다.</translation>
     </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation type="unfinished">System will be accessible only through local network.</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -3113,6 +3102,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>이벤트 설정은 %1을 참조 하세요</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>그림</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>동영상</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>모든 파일</translation>
     </message>
   </context>
   <context>
@@ -8023,10 +8027,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>로컬 시스템 소유자가 없거나 비활성화되었습니다.</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>인터넷에 연결된 서버가 없습니다.</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1에 연결 된 시스템</translation>
@@ -8059,6 +8059,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>내부 오류입니다. 나중에 다시 시도 해주십시오.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">None of your Servers has connection to %1.</translation>
     </message>
   </context>
   <context>
@@ -11255,7 +11260,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>레이아웃 열기</translation>
     </message>
     <message>
       <source>Modifier</source>
@@ -11309,6 +11314,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
+    </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation type="unfinished">Cannot add resources from other Systems.</translation>
     </message>
   </context>
   <context>

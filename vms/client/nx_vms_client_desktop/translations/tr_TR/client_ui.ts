@@ -954,6 +954,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation>Sistem buna bağlandı</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -2878,6 +2885,10 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>Yerleşik ve USB web kameralarını otomatik olarak algıla</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>Sunucu Konum Kimliği:</translation>
     </message>
   </context>
   <context>

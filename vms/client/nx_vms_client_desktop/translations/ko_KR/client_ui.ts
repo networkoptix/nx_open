@@ -954,6 +954,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation>이 시스템은 다음과 연결되어 있습니다.</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -2878,6 +2885,10 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>내장 및 USB 웹캠 자동 감지</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation type="unfinished">Server Location ID:</translation>
     </message>
   </context>
   <context>

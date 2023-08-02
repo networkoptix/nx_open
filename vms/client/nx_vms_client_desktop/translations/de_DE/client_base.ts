@@ -1155,21 +1155,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Bilder</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Alle Dateien</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -2939,6 +2924,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Das System kann nicht von %1 getrennt werden</translation>
     </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>Das System ist nur über das lokale Netz zugänglich.</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -3149,6 +3138,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Um ein Event zu generien, befolgen Sie bitte %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Bilder</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Alle Dateien</translation>
     </message>
   </context>
   <context>
@@ -8144,10 +8148,6 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <translation>Der Besitzer des lokalen Systems ist abwesend oder deaktiviert.</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>Keiner Ihrer Server ist mit dem Internet verbunden.</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>System mit %1 verbunden</translation>
@@ -8180,6 +8180,11 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>Interner Fehler. Bitte versuchen Sie es später noch einmal.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">None of your Servers has connection to %1.</translation>
     </message>
   </context>
   <context>
@@ -11463,6 +11468,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Es konnte keine Ressource mit der angegebenen ID gefunden werden.</translation>
+    </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation type="unfinished">Cannot add resources from other Systems.</translation>
     </message>
   </context>
   <context>

@@ -954,6 +954,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation>Hệ thống này được kết nối với</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1291,7 +1298,7 @@
     <name>FailoverPriorityDialog</name>
     <message>
       <source>Failover Priority</source>
-      <translation>Failover ưu tiên</translation>
+      <translation>Ưu tiên chuyển đổi dự phòng</translation>
     </message>
   </context>
   <context>
@@ -1306,7 +1313,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>Trong (M)</translation>
+      <translation>Trung bình (M)</translation>
     </message>
     <message>
       <source>High</source>
@@ -1318,7 +1325,7 @@
     </message>
     <message>
       <source>No Failover</source>
-      <translation>Không có chuyển đổi dự phòng</translation>
+      <translation>Không chuyển đổi dự phòng</translation>
     </message>
   </context>
   <context>
@@ -1577,7 +1584,7 @@
     </message>
     <message>
       <source>Crop to monitor aspect ratio</source>
-      <translation>&amp;Thay đổi tỉ lệ màn hình</translation>
+      <translation>Cắt theo tỷ lệ màn hình</translation>
     </message>
   </context>
   <context>
@@ -2857,11 +2864,11 @@
     </message>
     <message>
       <source>Failover</source>
-      <translation>Sao lưu</translation>
+      <translation>Chuyển đổi dự phòng</translation>
     </message>
     <message>
       <source>Failover Priority...</source>
-      <translation>Failover ưu tiên...</translation>
+      <translation>Ưu tiên chuyển đổi dự phòng...</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2878,6 +2885,10 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>Tự động phát hiện webcam USB và webcam tích hợp sẵn</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>ID vị trí máy chủ:</translation>
     </message>
   </context>
   <context>

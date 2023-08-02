@@ -1155,21 +1155,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Bilder</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Alle filer</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -2943,6 +2928,10 @@ til %1</translation>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Kan ikke koble systemet fra %1</translation>
     </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>Systemet vil kun være tilgjengelig via lokalt nettverk.</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -3153,6 +3142,21 @@ til %1</translation>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>For å generere generisk hendelse, se %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Bilder</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Alle filer</translation>
     </message>
   </context>
   <context>
@@ -8148,10 +8152,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Lokal systemeier er fraværende eller deaktivert.</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>Ingen av serverne dine er koblet til Internett.</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>System koblet til %1</translation>
@@ -8184,6 +8184,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>Intern feil. Prøv igjen senere.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Ingen av dine servere har tilkobling til %1.</translation>
     </message>
   </context>
   <context>
@@ -11464,6 +11469,10 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Kan ikke finne en ressurs med den angitte IDen.</translation>
+    </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation>Kan ikke legge til ressurser fra andre systemer.</translation>
     </message>
   </context>
   <context>

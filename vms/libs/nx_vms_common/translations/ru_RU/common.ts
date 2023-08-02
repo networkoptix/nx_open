@@ -388,6 +388,13 @@
     </message>
   </context>
   <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Удаленная камера</translation>
+    </message>
+  </context>
+  <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
@@ -1472,7 +1479,7 @@
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>Включить автоматическое обнаружение</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
@@ -1521,10 +1528,6 @@
     <message>
       <source>RTP retry count</source>
       <translation type="unfinished">RTP retry count</translation>
-    </message>
-    <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>Тайм-аут RTP (миллисекунды)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
@@ -1683,11 +1686,6 @@
       <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
     </message>
@@ -1730,6 +1728,15 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>Обновить URL файла releases.json</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (unsecure)</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>Тайм-аут RTP (миллисекунды)</translation>
     </message>
   </context>
   <context>
@@ -2452,13 +2459,6 @@
     <message>
       <source>Also play on source camera</source>
       <translation>Также воспроизводить на исходной камере</translation>
-    </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-      <source>Removed camera</source>
-      <translation>Удаленная камера</translation>
     </message>
   </context>
 </TS>

@@ -193,6 +193,13 @@
     </message>
   </context>
   <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>Nhấn từng nút nhiều lần và viết tên của các nút này vào bảng bên dưới.</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
@@ -255,7 +262,7 @@
     <name>ClosedTileItem</name>
     <message>
       <source>Offline</source>
-      <translation>Ẩn</translation>
+      <translation>Ngoại tuyến</translation>
     </message>
     <message>
       <source>Unreachable</source>
@@ -337,7 +344,7 @@
     </message>
     <message>
       <source>Fisheye</source>
-      <translation>Fisheye</translation>
+      <translation>Mắt cá</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
@@ -348,7 +355,7 @@
     <name>EventsPanel</name>
     <message>
       <source>Category</source>
-      <translation>Loài</translation>
+      <translation>Loại</translation>
     </message>
     <message>
       <source>See %1 for other events</source>
@@ -371,7 +378,7 @@
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation>Đồ họa</translation>
+      <translation>Số liệu</translation>
     </message>
     <message>
       <source>Click to add</source>
@@ -386,11 +393,11 @@
     <name>FigureEditorDialog</name>
     <message>
       <source>Clear</source>
-      <translation>Tẩy</translation>
+      <translation>Xóa</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -408,7 +415,7 @@
     <name>FisheyeDewarpingSettings</name>
     <message>
       <source>Image is not round</source>
-      <translation>Hình ảnh không hợp lệ</translation>
+      <translation>Hình ảnh không tròn</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
@@ -448,7 +455,7 @@
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation>Chỉnh sửa thư viện ảnh</translation>
+      <translation>Chỉnh sửa cuộn camera</translation>
     </message>
     <message>
       <source>Lens projection</source>
@@ -456,15 +463,15 @@
     </message>
     <message>
       <source>Equidistant</source>
-      <translation>Equidistant</translation>
+      <translation>Cách đều nhau</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation>Stereographic</translation>
+      <translation>Lập thể</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation>Equisolid</translation>
+      <translation>Cân bằng</translation>
     </message>
     <message>
       <source>Size</source>
@@ -533,6 +540,17 @@
     </message>
   </context>
   <context>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>Chọn cần điều khiển.</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>Không có thiết bị nào được kết nối.</translation>
+    </message>
+  </context>
+  <context>
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
@@ -557,6 +575,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>Chuyển đổi lặp lại</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>Lưu</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>Trước</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Tiếp tục</translation>
     </message>
   </context>
   <context>
@@ -1019,6 +1052,21 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>Chọn tệp để lưu</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>Tệp JSON (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>File lưu kết quả:</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1316,6 +1364,27 @@ to activate PTZ</source>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
       <translation>Bạn không có quyền truy cập vào %1. Xin vui lòng kiểm tra kết nối Internet của bạn.</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>Di chuyển cần điều khiển sang trái và phải nhiều lần.</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>Di chuyển cần điều khiển lên xuống nhiều lần.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>Xoay cần điều khiển theo chiều kim đồng hồ và ngược chiều kim đồng hồ nhiều lần.</translation>
     </message>
   </context>
 </TS>

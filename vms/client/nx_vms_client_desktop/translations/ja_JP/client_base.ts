@@ -1152,21 +1152,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>画像</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>映像</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>全てのファイル</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1490,7 +1475,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Emailは有効ではありません</translation>
+      <translation>メールアドレスが不正です。</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
@@ -1662,7 +1647,7 @@ License Key: %2</source>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation>カメラから現在位置を取得できません&quot;%1&quot;</translation>
+      <translation>カメラ &quot;%1&quot; から現在のポジションを取得できません</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
@@ -1670,15 +1655,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to get current position</source>
-      <translation>現在の位置の取得に失敗しました</translation>
+      <translation>現在のポジションの取得に失敗しました</translation>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation>カメラの現在位置を設定できません&quot;%1&quot;</translation>
+      <translation>カメラ &quot;%1&quot; のポジションを設定できません</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
-      <translation>現在の位置の設定に失敗しました</translation>
+      <translation>ポジションの設定に失敗しました</translation>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
@@ -2746,7 +2731,7 @@ License Key: %2</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>%1 の録画やモーション検知は無効です</translation>
+      <translation>%1 の録画またはモーション検知が無効です</translation>
     </message>
   </context>
   <context>
@@ -2903,6 +2888,10 @@ to %1</source>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>システムを %1から切断できません</translation>
+    </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>システムはローカルネットワークからのみアクセス可能になります。</translation>
     </message>
   </context>
   <context>
@@ -3116,6 +3105,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>画像</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>映像</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>全てのファイル</translation>
+    </message>
+  </context>
+  <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
@@ -3203,7 +3207,7 @@ to %1</source>
     </message>
     <message>
       <source>LDAP user</source>
-      <translation>LDAPサーバー</translation>
+      <translation>LDAP ユーザー</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -3427,13 +3431,13 @@ to %1</source>
     <message numerus="yes">
       <source>and %n users more...</source>
       <translation>
-        <numerusform>さらに %n ユーザー...</numerusform>
+        <numerusform>ほか %n ユーザー...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
       <translation>
-        <numerusform>さらに %n 件...</numerusform>
+        <numerusform>ほか %n 件...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3712,27 +3716,27 @@ to %1</source>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
       <translation>
-        <numerusform>テスト成功 %n ユーザー検出</numerusform>
+        <numerusform>テスト正常完了: %n 名のユーザーが見つかりました。</numerusform>
       </translation>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>&quot;検索フィルター&quot; 以外のLDAP設定を変更すると、すべてのLDAPフェッチユーザーの接続が失われます。</translation>
+      <translation>&quot;検索フィルター&quot; 以外のLDAP設定を変更すると、LDAP で取得されたすべてのユーザーの接続が失われます。</translation>
     </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation>設定は無効です</translation>
+      <translation>指定された設定は無効です。</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation>テストを実行できません</translation>
+      <translation>テストを実行できませんでした。</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>タイムアウト</translation>
+      <translation>タイムアウトしました</translation>
     </message>
   </context>
   <context>
@@ -3758,31 +3762,31 @@ to %1</source>
     <name>QnLdapUsersDialog</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation>設定は無効です</translation>
+      <translation>指定された設定は無効です。</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation>テストを実行できません</translation>
+      <translation>テストを実行できませんでした。</translation>
     </message>
     <message>
       <source>Could not load users.</source>
-      <translation>ユーザーがロードできません</translation>
+      <translation>ユーザーを読み込めませんでした。</translation>
     </message>
     <message>
       <source>Error while loading users.</source>
-      <translation>ユーザーロード中にエラーが発生しました.</translation>
+      <translation>ユーザーの読み込み中にエラーが発生しました。</translation>
     </message>
     <message>
       <source>No new users found.</source>
-      <translation>新規ユーザーは検出されませんでした.</translation>
+      <translation>新しいユーザーは見つかりませんでした。</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>タイムアウト</translation>
+      <translation>タイムアウトしました</translation>
     </message>
     <message>
       <source>Import Selected</source>
-      <translation>インポートの選択</translation>
+      <translation>選択した項目をインポート</translation>
     </message>
   </context>
   <context>
@@ -4461,7 +4465,7 @@ to %1</source>
     </message>
     <message>
       <source>Normal</source>
-      <translation>ノーマル</translation>
+      <translation>中</translation>
     </message>
     <message>
       <source>High</source>
@@ -4481,11 +4485,11 @@ to %1</source>
     </message>
     <message>
       <source>Stay Time</source>
-      <translation>稼働時間</translation>
+      <translation>待機時間</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation>スピード</translation>
+      <translation>移動速度</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -4516,11 +4520,11 @@ to %1</source>
     </message>
     <message>
       <source>Native</source>
-      <translation>モニタ解像度と同じ</translation>
+      <translation>スクリーン解像度の値を利用</translation>
     </message>
     <message>
       <source>Quarter Native</source>
-      <translation>モニタ解像度の1/4</translation>
+      <translation>スクリーン解像度の縦横半値を利用</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -5063,7 +5067,7 @@ to %1</source>
     </message>
     <message>
       <source>Enable</source>
-      <translation>有効</translation>
+      <translation>有効化</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -5845,7 +5849,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Login cannot be empty.</source>
-      <translation>ログイン情報を入力してください</translation>
+      <translation>ログイン名を入力してください。</translation>
     </message>
     <message>
       <source>User with specified login already exists.</source>
@@ -5920,7 +5924,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Emailは有効ではありません</translation>
+      <translation>メールアドレスが不正です。</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -6097,7 +6101,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recorded Video</source>
-      <translation>ビデオ録画</translation>
+      <translation>録画映像</translation>
     </message>
     <message>
       <source>Save Recording As...</source>
@@ -6525,24 +6529,24 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
       <translation>
-        <numerusform>%n は自動検出</numerusform>
+        <numerusform>このうち %n 台は自動検出で追加されました。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
       <translation>
-        <numerusform>%n カメラは自動検出</numerusform>
+        <numerusform>%n カメラは自動検出で追加されました。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
       <translation>
-        <numerusform>%n I/Oモジュールは自動検出</numerusform>
+        <numerusform>%n I/O モジュールは自動検出で追加されました。</numerusform>
       </translation>
     </message>
     <message>
       <source>They may be auto-discovered again after removing.</source>
-      <translation>削除した後に再度自動検索されるかもしれません</translation>
+      <translation>これらは削除後に再び自動検出される可能性があります。</translation>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
@@ -7504,7 +7508,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Next</source>
-      <translation>次</translation>
+      <translation>次へ</translation>
     </message>
     <message>
       <source>Finish</source>
@@ -8023,10 +8027,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>ローカルシステムのオーナーが欠落しているか、無効になっています。</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>どのサーバーもインターネットに接続されていません。</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>システムは%1 に接続されました</translation>
@@ -8059,6 +8059,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>内部エラーが発生しました。後でもう一度お試しください。</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>どのサーバーも %1に接続できません。</translation>
     </message>
   </context>
   <context>
@@ -8346,7 +8351,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>...and %n more</source>
       <translation>
-        <numerusform>... さらに %n 件</numerusform>
+        <numerusform>...ほか %n 件</numerusform>
       </translation>
     </message>
   </context>
@@ -8577,7 +8582,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enable</source>
-      <translation>有効</translation>
+      <translation>有効化</translation>
     </message>
   </context>
   <context>
@@ -10535,7 +10540,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation>交換されたカメラが見つかりました</translation>
+      <translation>交換済みのカメラが検出されました</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
@@ -10543,7 +10548,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation>2つのデバイスを引き続き使用するに、&quot;交換を元に戻す&quot; ボタンをクリックしてください。</translation>
+      <translation>2つのデバイスを引き続き使用するには、&quot;交換を元に戻す&quot; ボタンをクリックしてください。</translation>
     </message>
     <message>
       <source>Undo Replace</source>
@@ -10830,7 +10835,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>LDAP user</source>
-      <translation>LDAPサーバー</translation>
+      <translation>LDAP ユーザー</translation>
     </message>
     <message>
       <source>Login</source>
@@ -10857,7 +10862,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::UserListWidget</name>
     <message>
       <source>Enable</source>
-      <translation>有効</translation>
+      <translation>有効化</translation>
     </message>
     <message>
       <source>Disable</source>
@@ -10915,7 +10920,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation>パスワードが違います</translation>
+      <translation>パスワードが正しくありません。</translation>
     </message>
   </context>
   <context>
@@ -11309,6 +11314,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Cannot find a resource with the specified ID.</source>
       <translation>指定されたIDのリソースが見つかりません。</translation>
     </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation>他のシステムからリソースを追加することはできません。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
@@ -11527,7 +11536,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Next</source>
-      <translation>次</translation>
+      <translation>次へ</translation>
     </message>
     <message>
       <source>Name is necessary</source>
@@ -11786,7 +11795,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation>交換の差し戻しが正常に完了しました!</translation>
+      <translation>交換の取り消しが正常に完了しました!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
@@ -11794,7 +11803,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Confirm undo replacement?</source>
-      <translation>置換を元に戻しますか？</translation>
+      <translation>交換を元に戻してもよろしいですか?</translation>
     </message>
     <message>
       <source>Select Folder...</source>

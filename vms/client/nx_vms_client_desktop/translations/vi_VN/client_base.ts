@@ -126,7 +126,7 @@
     </message>
     <message>
       <source>Fit in View</source>
-      <translation>Điền view</translation>
+      <translation>Vừa với Chế độ xem</translation>
     </message>
     <message>
       <source>Main Menu</source>
@@ -1149,21 +1149,6 @@
       <translation>
         <numerusform>Bố cục %n</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Hình ảnh</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Tất cả các file</translation>
     </message>
   </context>
   <context>
@@ -2903,6 +2888,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Không thể ngắt kết nối Hệ thống khỏi %1</translation>
     </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>Hệ thống sẽ chỉ có thể truy cập thông qua mạng nội bộ.</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -3112,6 +3101,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Để tạo Sự kiện chung, vui lòng tham khảo %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Hình ảnh</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Tất cả các file</translation>
     </message>
   </context>
   <context>
@@ -4046,15 +4050,15 @@ to %1</source>
     </message>
     <message>
       <source>Stretch</source>
-      <translation>Căng ra</translation>
+      <translation>Kéo giãn</translation>
     </message>
     <message>
       <source>Fit</source>
-      <translation>Phù hợp</translation>
+      <translation>Vừa với màn hình</translation>
     </message>
     <message>
       <source>Crop</source>
-      <translation>Trồng trọt</translation>
+      <translation>Cắt khung</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
@@ -4947,7 +4951,7 @@ to %1</source>
     </message>
     <message>
       <source>Failover</source>
-      <translation>Sao lưu</translation>
+      <translation>Chuyển đổi dự phòng</translation>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
@@ -8021,10 +8025,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Chủ sở hữu Hệ thống cục bộ vắng mặt hoặc bị vô hiệu hóa.</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>Không có Máy chủ nào của bạn được kết nối với Internet.</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Hệ thống kết nối với %1</translation>
@@ -8057,6 +8057,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>Lỗi bên trong. Vui lòng thử lại sau.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Không có Máy chủ nào của bạn có kết nối với %1.</translation>
     </message>
   </context>
   <context>
@@ -8537,7 +8542,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>No Failover</source>
-      <translation>Không có chuyển đổi dự phòng</translation>
+      <translation>Không chuyển đổi dự phòng</translation>
     </message>
   </context>
   <context>
@@ -11307,6 +11312,10 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Không thể tìm thấy tài nguyên có ID chỉ định.</translation>
+    </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation>Không thể thêm tài nguyên từ Hệ thống khác.</translation>
     </message>
   </context>
   <context>

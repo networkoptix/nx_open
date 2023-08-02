@@ -1155,21 +1155,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Afbeeldingen</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Alle bestanden</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -2939,6 +2924,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Kan de verbinding voor het systeem niet verbreken van %1</translation>
     </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>Systeem zal alleen toegankelijk zijn via het lokale netwerk.</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -3149,6 +3138,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Als u Generic Event wilt genereren, raadpleegt u %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Afbeeldingen</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Alle bestanden</translation>
     </message>
   </context>
   <context>
@@ -8144,10 +8148,6 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <translation>Lokale systeemeigenaar is afwezig of uitgeschakeld.</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>Geen van uw servers is verbonden met internet.</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Systeem verbonden met %1</translation>
@@ -8180,6 +8180,11 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>Interne fout. Probeer het later opnieuw.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">None of your Servers has connection to %1.</translation>
     </message>
   </context>
   <context>
@@ -11463,6 +11468,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
+    </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation type="unfinished">Cannot add resources from other Systems.</translation>
     </message>
   </context>
   <context>

@@ -445,7 +445,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>Подсказка</translation>
     </message>
   </context>
   <context>

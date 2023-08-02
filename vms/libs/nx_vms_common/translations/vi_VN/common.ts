@@ -370,6 +370,13 @@
     </message>
   </context>
   <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Camera bị xóa</translation>
+    </message>
+  </context>
+  <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
@@ -1111,7 +1118,7 @@
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Yêu cầu xác thực phiên.</translation>
     </message>
   </context>
   <context>
@@ -1385,10 +1392,6 @@
       <translation>Số lần thử lại RTP</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>Hết thời gian chờ RTP (mili giây)</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation>Thời lượng kết nối RTSP tối đa (giây)</translation>
     </message>
@@ -1545,11 +1548,6 @@
       <translation>Bật các hàm API deprecated (không an toàn)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Bật các hàm API deprecated đang được phần mềm %1 sử dụng (không an toàn)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>Hiển thị địa chỉ IP để tự động phát hiện</translation>
     </message>
@@ -1592,6 +1590,15 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>URL cập nhật tệp phát hành .json</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Bật các hàm API deprecated đang được phần mềm %1 sử dụng (không an toàn)</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>Hết thời gian chờ RTP (mili giây)</translation>
     </message>
   </context>
   <context>
@@ -2265,26 +2272,19 @@
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Cũng cài đặt trên camera nguồn</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Cũng kích hoạt trên camera nguồn</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Cũng ghi camera nguồn</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
-    </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
-    <message>
-      <source>Removed camera</source>
-      <translation>Camera bị xóa</translation>
+      <translation>Cũng hiển thị trên camera nguồn</translation>
     </message>
   </context>
 </TS>

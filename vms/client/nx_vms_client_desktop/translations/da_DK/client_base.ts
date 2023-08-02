@@ -251,23 +251,23 @@
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation type="unfinished">Open in Browser...</translation>
+      <translation>Åbn i browser</translation>
     </message>
     <message>
       <source>System Administration...</source>
-      <translation type="unfinished">System Administration...</translation>
+      <translation>Systemadministration...</translation>
     </message>
     <message>
       <source>System Update...</source>
-      <translation type="unfinished">System Update...</translation>
+      <translation>Systemopdatering...</translation>
     </message>
     <message>
       <source>User Management...</source>
-      <translation type="unfinished">User Management...</translation>
+      <translation>Brugeradministration...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
-      <translation type="unfinished">Local Settings...</translation>
+      <translation>Lokale indstillinger...</translation>
     </message>
     <message>
       <source>Audit Trail...</source>
@@ -298,19 +298,19 @@
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Regler For Begivenhed...</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Enhedsliste</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Kameraliste</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Flet systemer...</translation>
     </message>
     <message>
       <source>About...</source>
@@ -386,7 +386,7 @@
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Åben indeholdende mappe</translation>
     </message>
     <message>
       <source>Identify</source>
@@ -406,11 +406,11 @@
     </message>
     <message>
       <source>Save Current Matrix</source>
-      <translation type="unfinished">Save Current Matrix</translation>
+      <translation>Gem nuværende matrix</translation>
     </message>
     <message>
       <source>Load Matrix</source>
-      <translation type="unfinished">Load Matrix</translation>
+      <translation>Indlæs matrix</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -418,11 +418,11 @@
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation type="unfinished">Stop Video Wall</translation>
+      <translation>Stop videovæg</translation>
     </message>
     <message>
       <source>Clear Screen</source>
-      <translation type="unfinished">Clear Screen</translation>
+      <translation>Ryd skærm</translation>
     </message>
     <message>
       <source>Save Layout</source>
@@ -446,59 +446,59 @@
     </message>
     <message>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Håndter...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation type="unfinished">Show Motion/Smart Search</translation>
+      <translation>Vis bevægelse/Smart Søgning</translation>
     </message>
     <message>
       <source>Show Motion</source>
-      <translation type="unfinished">Show Motion</translation>
+      <translation>Vis Bevægelse</translation>
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
-      <translation type="unfinished">Hide Motion/Smart Search</translation>
+      <translation>Skjul Bevægelse/Smart Søgning</translation>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation type="unfinished">Hide Motion</translation>
+      <translation>Skjul Bevægelse</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
-      <translation type="unfinished">Clear Motion Selection</translation>
+      <translation>Ryd Valg Af Bevægelse</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation type="unfinished">Check File Watermark</translation>
+      <translation>Tjek Fil Vandmærke</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
-      <translation type="unfinished">Image Enhancement...</translation>
+      <translation>Billedforbedring...</translation>
     </message>
     <message>
       <source>0 degrees</source>
-      <translation type="unfinished">0 degrees</translation>
+      <translation>0 grader</translation>
     </message>
     <message>
       <source>90 degrees</source>
-      <translation type="unfinished">90 degrees</translation>
+      <translation>90 grader</translation>
     </message>
     <message>
       <source>180 degrees</source>
-      <translation type="unfinished">180 degrees</translation>
+      <translation>180 grader</translation>
     </message>
     <message>
       <source>270 degrees</source>
-      <translation type="unfinished">270 degrees</translation>
+      <translation>270 grader</translation>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation type="unfinished">Remove from Layout</translation>
+      <translation>Fjern fra layout</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation type="unfinished">Stop Sharing Layout</translation>
+      <translation>Stop Deling Af Layout</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -506,71 +506,71 @@
     </message>
     <message>
       <source>Delete from Disk</source>
-      <translation type="unfinished">Delete from Disk</translation>
+      <translation>Slet fra disk</translation>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation type="unfinished">Set as Layout Background</translation>
+      <translation>Indstil som layoutbaggrund</translation>
     </message>
     <message>
       <source>User Settings...</source>
-      <translation type="unfinished">User Settings...</translation>
+      <translation>Brugerindstillinger...</translation>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation type="unfinished">User Roles...</translation>
+      <translation>Brugerroller...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation type="unfinished">Role Settings...</translation>
+      <translation>Filindstillinger...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
-      <translation type="unfinished">Check Device Issues...</translation>
+      <translation>Kontroller Enhedsproblemer...</translation>
     </message>
     <message>
       <source>Check Devices Issues...</source>
-      <translation type="unfinished">Check Devices Issues...</translation>
+      <translation>Kontroller problemer med enheder...</translation>
     </message>
     <message>
       <source>Check Camera Issues...</source>
-      <translation type="unfinished">Check Camera Issues...</translation>
+      <translation>Kontroller kameraproblemer...</translation>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation type="unfinished">Check Cameras Issues...</translation>
+      <translation>Kontroller kameraproblemer...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation type="unfinished">Check I/O Module Issues...</translation>
+      <translation>Kontroller I/O-modulproblemer...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation type="unfinished">Check I/O Modules Issues...</translation>
+      <translation>Kontroller I/O-modulproblemer...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation type="unfinished">Device Rules...</translation>
+      <translation>Enhedsregler...</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation type="unfinished">Camera Rules...</translation>
+      <translation>Kameraregler...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation type="unfinished">I/O Module Rules...</translation>
+      <translation>I/O-modulregler...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
-      <translation type="unfinished">Device Settings...</translation>
+      <translation>Enhedsindstillinger...</translation>
     </message>
     <message>
       <source>Devices Settings...</source>
-      <translation type="unfinished">Devices Settings...</translation>
+      <translation>Enhedsindstillinger...</translation>
     </message>
     <message>
       <source>Camera Settings...</source>
-      <translation type="unfinished">Camera Settings...</translation>
+      <translation>Kameraindstillinger...</translation>
     </message>
     <message>
       <source>Cameras Settings...</source>
@@ -578,7 +578,7 @@
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation type="unfinished">I/O Module Settings...</translation>
+      <translation>I/O-modulindstillinger...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
@@ -586,7 +586,7 @@
     </message>
     <message>
       <source>File Settings...</source>
-      <translation type="unfinished">File Settings...</translation>
+      <translation>Filindstillinger...</translation>
     </message>
     <message>
       <source>Layout Settings...</source>
@@ -618,7 +618,7 @@
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation type="unfinished">Server Web Page...</translation>
+      <translation>Server webside...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
@@ -1017,19 +1017,19 @@
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
-      <translation type="unfinished">Save Current Layout As Cloud...</translation>
+      <translation>Gem Nuværende Layout Som Cloud...</translation>
     </message>
     <message>
       <source>Save Layout As Cloud...</source>
-      <translation type="unfinished">Save Layout As Cloud...</translation>
+      <translation>Gem Layout Som Sky...</translation>
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>Gem Sky-layout</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>Gem Sky-layout Som...</translation>
     </message>
   </context>
   <context>
@@ -1152,21 +1152,6 @@
         <numerusform>%n layouts</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Billeder</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Alle Filer</translation>
     </message>
   </context>
   <context>
@@ -1318,7 +1303,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>Hardware ID</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1326,7 +1311,7 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>Kunne ikke aktivere gratis licens</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1335,20 +1320,20 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>Hardware-ID: %1
+Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>Kopier Parametre</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Hvis dit system ikke har adgang til internettet, send venligst den angivne Licensnøgle og Hardware ID til %1 for at modtage aktiveringsfilen.</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Hvis dit system ikke har adgang til internettet, send venligst det angivne Licensnøgle og Hardware ID til dit Regionale / Licenssupportteam for at modtage aktiveringsfilen:</translation>
     </message>
   </context>
   <context>
@@ -1493,11 +1478,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
+      <translation>Usikker</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Tjek</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -1505,7 +1490,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>URL er ikke gyldig.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -1513,11 +1498,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Aktiv</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>Ikke konfigureret</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1525,7 +1510,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>Angiv din e-mailadresse eller SMTP server</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
@@ -1767,7 +1752,7 @@ License Key: %2</translation>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Er du sikker på, at du vil forlade denne side? Ændringer, du har foretaget, bliver muligvis ikke gemt.</translation>
     </message>
   </context>
   <context>
@@ -1823,7 +1808,7 @@ License Key: %2</translation>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Billedforbedring:</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
@@ -1890,7 +1875,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Vælg mappe...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
@@ -2332,7 +2317,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Øjeblikkelig</translation>
     </message>
     <message>
       <source>Stops</source>
@@ -2684,11 +2669,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Enhedsliste</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Kameraliste</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
@@ -2754,7 +2739,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -2876,7 +2861,7 @@ devices</translation>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Open %1 Portal</translation>
+      <translation>Åbn %1 portalen</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
@@ -2942,6 +2927,10 @@ to %1</translation>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Kan ikke afbryde systemet fra %1</translation>
+    </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>Systemet vil kun være tilgængeligt via det lokale netværk.</translation>
     </message>
   </context>
   <context>
@@ -3156,10 +3145,25 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Billeder</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Alle Filer</translation>
+    </message>
+  </context>
+  <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation type="unfinished">Save Database Backup...</translation>
+      <translation>Gem Databasesikkerhedskopi...</translation>
     </message>
     <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
@@ -3601,7 +3605,7 @@ to %1</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regler For Begivenhed</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -3609,7 +3613,7 @@ to %1</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Handlings Log</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -3920,7 +3924,7 @@ to %1</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>Licensen er udløbet</translation>
     </message>
     <message>
       <source>Expires soon</source>
@@ -4231,7 +4235,7 @@ to %1</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
   </context>
   <context>
@@ -4531,7 +4535,7 @@ to %1</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Øjeblikkelig</translation>
     </message>
     <message>
       <source>Position</source>
@@ -5498,15 +5502,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Brugeradministration</translation>
     </message>
     <message>
       <source>Time Sync</source>
-      <translation type="unfinished">Time Sync</translation>
+      <translation>Tidssynkronisering</translation>
     </message>
     <message>
       <source>Routing</source>
-      <translation type="unfinished">Routing</translation>
+      <translation>Routing</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -6274,7 +6278,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation type="unfinished">Stop Video Wall?</translation>
+      <translation>Stop videovæg?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -6282,7 +6286,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
@@ -6313,7 +6317,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktivér licens...</translation>
     </message>
   </context>
   <context>
@@ -6669,7 +6673,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
@@ -7072,7 +7076,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>slettet kamera</translation>
     </message>
     <message>
       <source>Unknown track</source>
@@ -7377,7 +7381,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>slettet kamera</translation>
     </message>
   </context>
   <context>
@@ -7524,15 +7528,15 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation type="unfinished">Device Rules</translation>
+      <translation>Enhedsregler</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation type="unfinished">Camera Rules</translation>
+      <translation>Kameraregler</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation type="unfinished">I/O Module Rules</translation>
+      <translation>I/O-modulregler</translation>
     </message>
     <message>
       <source>More Info</source>
@@ -7779,7 +7783,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Devices Settings</source>
-      <translation type="unfinished">Devices Settings</translation>
+      <translation>Enhedsindstillinger</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -8147,10 +8151,6 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <translation>Lokal systemejer er fraværende eller deaktiveret.</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>Ingen af dine servere er forbundet til internettet.</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation type="unfinished">System connected to %1</translation>
@@ -8184,6 +8184,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <source>Internal error. Please try again later.</source>
       <translation>Intern fejl, prøv igen senere.</translation>
     </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">None of your Servers has connection to %1.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
@@ -8197,7 +8202,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Indtast adgangskode...</translation>
     </message>
     <message>
       <source>Administrator password</source>
@@ -9282,7 +9287,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>slettet kamera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -9799,7 +9804,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Intern serverfejl.</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
@@ -10556,7 +10561,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Installerer...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -11126,7 +11131,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Vælg mappe til upload</translation>
     </message>
   </context>
   <context>
@@ -11411,7 +11416,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Åbn layout</translation>
     </message>
     <message>
       <source>Modifier</source>
@@ -11466,6 +11471,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Cannot find a resource with the specified ID.</source>
       <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
     </message>
+    <message>
+      <source>Cannot add resources from other Systems.</source>
+      <translation type="unfinished">Cannot add resources from other Systems.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
@@ -11483,7 +11492,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Øjeblikkelig</translation>
     </message>
   </context>
   <context>
@@ -12074,7 +12083,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Åben indeholdende mappe</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>
