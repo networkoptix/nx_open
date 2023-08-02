@@ -19,10 +19,6 @@
   <context>
     <name>AuthResultTranslations</name>
     <message>
-      <source>This user does not exist.</source>
-      <translation type="unfinished">This user does not exist.</translation>
-    </message>
-    <message>
       <source>Wrong password.</source>
       <translation>סיסמה שגויה.</translation>
     </message>
@@ -57,6 +53,30 @@
     <message>
       <source>This user has been disabled by a system administrator.</source>
       <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+    </message>
+    <message>
+      <source>This user does not exist or is unable to login.</source>
+      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+    </message>
+    <message>
+      <source>More than one user with the same login are presented.</source>
+      <translation type="unfinished">More than one user with the same login are presented.</translation>
+    </message>
+    <message>
+      <source>Unable to verify LDAP server SSL/TLS certificate.</source>
+      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkFacade</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>מצלמה שהוסרה</translation>
+    </message>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation>אירוע מערכת</translation>
     </message>
   </context>
   <context>
@@ -150,6 +170,57 @@
         <numerusform>פטאבייטים</numerusform>
         <numerusform>פטאבייטים</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>PredefinedUserGroups</name>
+    <message>
+      <source>Administrators</source>
+      <translation type="unfinished">Administrators</translation>
+    </message>
+    <message>
+      <source>Power Users</source>
+      <translation type="unfinished">Power Users</translation>
+    </message>
+    <message>
+      <source>Advanced Viewers</source>
+      <translation type="unfinished">Advanced Viewers</translation>
+    </message>
+    <message>
+      <source>Viewers</source>
+      <translation type="unfinished">Viewers</translation>
+    </message>
+    <message>
+      <source>Live Viewers</source>
+      <translation type="unfinished">Live Viewers</translation>
+    </message>
+    <message>
+      <source>System Health Viewers</source>
+      <translation type="unfinished">System Health Viewers</translation>
+    </message>
+    <message>
+      <source>Has full control of System configuration, but cannot create or modify other Power Users.</source>
+      <translation type="unfinished">Has full control of System configuration, but cannot create or modify other Power Users.</translation>
+    </message>
+    <message>
+      <source>Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
+      <translation type="unfinished">Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</translation>
+    </message>
+    <message>
+      <source>Can view and export archive and Bookmarks.</source>
+      <translation type="unfinished">Can view and export archive and Bookmarks.</translation>
+    </message>
+    <message>
+      <source>Can view live videos, I/O modules and web pages.</source>
+      <translation type="unfinished">Can view live videos, I/O modules and web pages.</translation>
+    </message>
+    <message>
+      <source>Can view System Health Monitoring information.</source>
+      <translation type="unfinished">Can view System Health Monitoring information.</translation>
+    </message>
+    <message>
+      <source>This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</source>
+      <translation type="unfinished">This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</translation>
     </message>
   </context>
   <context>
@@ -255,14 +326,6 @@
       <translation>בעיית מצלמה לא ידועה.</translation>
     </message>
     <message>
-      <source>Invalid data was received from the device %1.</source>
-      <translation>מידע לא תקין התקבל מהתקן %1.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the camera %1.</source>
-      <translation>מידע לא תקין התקבל ממצלמה %1.</translation>
-    </message>
-    <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
       <translation>יותר מידי תקלות מדיה. פתח את חלון התקלות של ההתקן למידע נוסף.</translation>
     </message>
@@ -285,10 +348,6 @@
     <message>
       <source>Unknown I/O module issue.</source>
       <translation>שגיאת מודול קלט/פלט שאינה ידועה.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the I/O module %1.</source>
-      <translation>מידע לא תקין התקבל ממודול קלט/פלט %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
@@ -385,6 +444,25 @@
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
       <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
+      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
+      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
+      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>מצלמה שהוסרה</translation>
     </message>
   </context>
   <context>
@@ -817,6 +895,31 @@
         <numerusform>%n/%1 NVR Licenses</numerusform>
       </translation>
     </message>
+    <message>
+      <source>%1 Licenses</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n %1 Licenses</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">
+        <numerusform>%n %1 Licenses</numerusform>
+        <numerusform>%n %1 Licenses</numerusform>
+        <numerusform>%n %1 Licenses</numerusform>
+        <numerusform>%n %1 Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 %2 Licenses</source>
+      <comment>%n will be replaced by the total count,%2 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 %2 Licenses</numerusform>
+        <numerusform>%n/%1 %2 Licenses</numerusform>
+        <numerusform>%n/%1 %2 Licenses</numerusform>
+        <numerusform>%n/%1 %2 Licenses</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
@@ -1129,62 +1232,14 @@
     </message>
   </context>
   <context>
-    <name>QnUserRolesManager</name>
-    <message>
-      <source>Owner</source>
-      <translation>בעלים</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>מנהל</translation>
-    </message>
-    <message>
-      <source>Advanced Viewer</source>
-      <translation>צופה מתקדם</translation>
-    </message>
-    <message>
-      <source>Viewer</source>
-      <translation>צופה</translation>
-    </message>
-    <message>
-      <source>Live Viewer</source>
-      <translation>צופה בשידור חי</translation>
-    </message>
-    <message>
-      <source>Custom Role</source>
-      <translation>תפקיד מותאם אישית</translation>
-    </message>
+    <name>QnUserResource</name>
     <message>
       <source>Custom</source>
       <translation>התאמה אישית</translation>
     </message>
     <message>
-      <source>Can manage all cameras and bookmarks.</source>
-      <translation>יכול לנהל את כל המצלמות והסימניות.</translation>
-    </message>
-    <message>
-      <source>Can view all cameras and export video.</source>
-      <translation>יכול לצפות בכל המצלמות ולייצא וידאו.</translation>
-    </message>
-    <message>
-      <source>Can view live video from all cameras.</source>
-      <translation>יכול לצפות בוידאו חי מכל המצלמות.</translation>
-    </message>
-    <message>
-      <source>Custom user role.</source>
-      <translation>תפקיד משתמש מותאם אישית.</translation>
-    </message>
-    <message>
-      <source>Custom permissions.</source>
-      <translation>הרשאות מותאמות אישית.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can do everything.</source>
-      <translation>יש גישה לכל המערכת ויכול לעשות כל פעולה.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>יש גישה לכל המערכת ויכול לנהל את זה. יכול ליצור משתמשים.</translation>
+      <source>Multiple groups</source>
+      <translation type="unfinished">Multiple groups</translation>
     </message>
   </context>
   <context>
@@ -1261,74 +1316,6 @@
   </context>
   <context>
     <name>SystemSettings</name>
-    <message>
-      <source>SMTP host</source>
-      <translation>מארח SMTP</translation>
-    </message>
-    <message>
-      <source>Email from</source>
-      <translation>אי מייל מ</translation>
-    </message>
-    <message>
-      <source>SMTP user</source>
-      <translation>שם משתמש SMTP</translation>
-    </message>
-    <message>
-      <source>SMTP password</source>
-      <translation>סיסמאת SMTP</translation>
-    </message>
-    <message>
-      <source>Email signature</source>
-      <translation>חתימת דוא"ל</translation>
-    </message>
-    <message>
-      <source>Email support link</source>
-      <translation type="unfinished">Email support link</translation>
-    </message>
-    <message>
-      <source>SMTP connection type</source>
-      <translation>סוג חיבור SMTP</translation>
-    </message>
-    <message>
-      <source>SMTP port</source>
-      <translation>פורט SMTP</translation>
-    </message>
-    <message>
-      <source>SMTP timeout (seconds)</source>
-      <translation type="unfinished">SMTP timeout (seconds)</translation>
-    </message>
-    <message>
-      <source>SMTP name</source>
-      <translation type="unfinished">SMTP name</translation>
-    </message>
-    <message>
-      <source>LDAP URI</source>
-      <translation>כתובת אתר של LDAP</translation>
-    </message>
-    <message>
-      <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
-    </message>
-    <message>
-      <source>LDAP Admin password</source>
-      <translation type="unfinished">LDAP Admin password</translation>
-    </message>
-    <message>
-      <source>LDAP search base</source>
-      <translation>בסיס חיפוש LDAP</translation>
-    </message>
-    <message>
-      <source>LDAP search filter</source>
-      <translation>מסנן חיפוש LDAP</translation>
-    </message>
-    <message>
-      <source>LDAP password expiration (milliseconds)</source>
-      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
-    </message>
-    <message>
-      <source>LDAP search timeout (seconds)</source>
-      <translation type="unfinished">LDAP search timeout (seconds)</translation>
-    </message>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation type="unfinished">Anonymous statistics report allowed</translation>
@@ -1567,10 +1554,6 @@
       <translation>הגדרות סימן מים</translation>
     </message>
     <message>
-      <source>Authorization Session token lifetime (minutes)</source>
-      <translation type="unfinished">Authorization Session token lifetime (minutes)</translation>
-    </message>
-    <message>
       <source>Session token count limit on a single Server</source>
       <translation type="unfinished">Session token count limit on a single Server</translation>
     </message>
@@ -1683,11 +1666,6 @@
       <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
     </message>
@@ -1730,6 +1708,69 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation type="unfinished">Update releases.json file URL</translation>
+    </message>
+    <message>
+      <source>Cloud storage update period in seconds</source>
+      <translation type="unfinished">Cloud storage update period in seconds</translation>
+    </message>
+    <message>
+      <source>LDAP settings</source>
+      <translation type="unfinished">LDAP settings</translation>
+    </message>
+    <message>
+      <source>SMTP settings</source>
+      <translation type="unfinished">SMTP settings</translation>
+    </message>
+    <message>
+      <source>Authorization Session token lifetime (seconds)</source>
+      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (unsecure)</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation type="unfinished">just now</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minute(s) ago</source>
+      <translation type="unfinished">
+        <numerusform>%n minute(s) ago</numerusform>
+        <numerusform>%n minute(s) ago</numerusform>
+        <numerusform>%n minute(s) ago</numerusform>
+        <numerusform>%n minute(s) ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hour(s) ago</source>
+      <translation type="unfinished">
+        <numerusform>%n hour(s) ago</numerusform>
+        <numerusform>%n hour(s) ago</numerusform>
+        <numerusform>%n hour(s) ago</numerusform>
+        <numerusform>%n hour(s) ago</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation type="unfinished">yesterday</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n day(s) ago</source>
+      <translation type="unfinished">
+        <numerusform>%n day(s) ago</numerusform>
+        <numerusform>%n day(s) ago</numerusform>
+        <numerusform>%n day(s) ago</numerusform>
+        <numerusform>%n day(s) ago</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation type="unfinished">a week ago</translation>
     </message>
   </context>
   <context>
@@ -1782,16 +1823,13 @@
       <source>No data exported.</source>
       <translation>ייצוא נתונים לא בוצע.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
     <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>גודל זרם שגוי.</translation>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
     </message>
     <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>כותרת זרם מוצפן פגומה.</translation>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
     </message>
   </context>
   <context>
@@ -2150,10 +2188,6 @@
       <source>Trigger Name</source>
       <translation>שם מיתוג</translation>
     </message>
-    <message>
-      <source>Role</source>
-      <translation>תפקיד</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -2162,19 +2196,6 @@
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
       </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n תפקידים</numerusform>
-        <numerusform>%n תפקידים</numerusform>
-        <numerusform>%n תפקידים</numerusform>
-        <numerusform>%n תפקידים</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation>כל מנהלי המערכת</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -2453,12 +2474,22 @@
       <source>Also play on source camera</source>
       <translation type="unfinished">Also play on source camera</translation>
     </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
     <message>
-      <source>Removed camera</source>
-      <translation>מצלמה שהוסרה</translation>
+      <source>Group</source>
+      <translation type="unfinished">Group</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation type="unfinished">
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Power Users</source>
+      <translation type="unfinished">All Power Users</translation>
     </message>
   </context>
 </TS>

@@ -37,13 +37,6 @@
     </message>
   </context>
   <context>
-    <name>ActionTypePickerWidget</name>
-    <message>
-      <source>Do</source>
-      <translation>То</translation>
-    </message>
-  </context>
-  <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -666,20 +659,35 @@
       <translation type="unfinished">Primary Stream Profile</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
-    </message>
-    <message>
       <source>Web Page</source>
-      <translation>Web-интерфейс</translation>
+      <translation>Web-страница</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation type="unfinished">Web Page Port</translation>
+    </message>
+    <message>
+      <source>Disable import</source>
+      <translation type="unfinished">Disable import</translation>
+    </message>
+    <message>
+      <source>Import Video from Device</source>
+      <translation type="unfinished">Import Video from Device</translation>
+    </message>
+    <message>
+      <source>Import camera or server offline periods</source>
+      <translation type="unfinished">Import camera or server offline periods</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Добавить</translation>
     </message>
   </context>
   <context>
@@ -954,6 +962,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation type="unfinished">This system is connected to</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1164,17 +1179,6 @@
     </message>
   </context>
   <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>Если</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
-    </message>
-  </context>
-  <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
@@ -1333,25 +1337,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Ничего не найдено</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation>Добавить комментарий</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Настроить расписание</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1524,13 +1509,6 @@
     </message>
   </context>
   <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>ID тревожного входа</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
@@ -1623,72 +1601,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Не обязательно</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Проверка...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>Настройки LDAP</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>URL-адрес сервера</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Пароль</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>База поиска</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Фильтр поиска</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Время ожидания поиска (сек)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>DN или CN администратора</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Получить пользователей LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Загрузка...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Ошибка подключения</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>Роль для назначения для импортируемых пользователей</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Отключить импортированных пользователей</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>Разрешить дайджест-аутентификацию для импортированного пользователя</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1613,6 @@
     <message>
       <source>Features</source>
       <translation>Особенности</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Используемые лицензии</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Удалить</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Новая лицензия</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Подробнее...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>ПO лицензировано для</translation>
     </message>
   </context>
   <context>
@@ -2014,17 +1903,6 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Форма</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Текст</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
@@ -2071,16 +1949,8 @@
       <translation type="unfinished">Connection Settings</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Пароль</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Пользователь</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2102,13 +1972,17 @@
       <source>System Signature</source>
       <translation>Информация о системе</translation>
     </message>
+    <message>
+      <source>Username</source>
+      <translation>Имя пользователя</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Войти</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Пароль</translation>
@@ -2116,6 +1990,10 @@
     <message>
       <source>Username</source>
       <translation>Имя пользователя</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
@@ -2207,17 +2085,6 @@
     <message>
       <source>Events</source>
       <translation>События</translation>
-    </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Форма</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Предустановленное</translation>
     </message>
   </context>
   <context>
@@ -2343,49 +2210,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Поиск пользователей</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Включить</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Отключить</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>Удалить...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Принудительная безопасная аутентификация</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Ничего не найдено</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Создать пользователя...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Изменить роли...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>Настройки LDAP...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Получить пользователей LDAP...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2461,17 +2285,6 @@
     </message>
   </context>
   <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Форма</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Качество</translation>
-    </message>
-  </context>
-  <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
@@ -2541,30 +2354,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Временная папка</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Дополнительные настройки</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Отключить интерфейс Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Записывать курсор</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Для наилучшего качества и разрешения рекомендуется использовать мощный компьютер.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Обзор...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Источник</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2376,20 @@
       <translation>Качество записи</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Источник</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>Для наилучшего качества и разрешения рекомендуется использовать мощный компьютер.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>Экран</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Дополнительные настройки</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Записывать курсор</translation>
     </message>
   </context>
   <context>
@@ -2622,29 +2431,6 @@
     <message>
       <source>Live</source>
       <translation>В режиме реального времени</translation>
-    </message>
-  </context>
-  <context>
-    <name>RulesDialog</name>
-    <message>
-      <source>Alarm/Event Rules</source>
-      <translation>Связь с событием</translation>
-    </message>
-    <message>
-      <source>New Rule</source>
-      <translation>Новое правило</translation>
-    </message>
-    <message>
-      <source>Delete Rule</source>
-      <translation>Удалить правило</translation>
-    </message>
-    <message>
-      <source>Select a Rule</source>
-      <translation>Выберите правило</translation>
-    </message>
-    <message>
-      <source>Reset Default Rules</source>
-      <translation>Сброс на правила по умолчанию</translation>
     </message>
   </context>
   <context>
@@ -2752,10 +2538,6 @@
       <translation>Активность пользователя</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Отображать серверы в дереве для пользователей без прав администратора</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Шифрование архива</translation>
     </message>
@@ -2786,6 +2568,10 @@
     <message>
       <source>Manage Users</source>
       <translation>Управление пользователями</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
     </message>
   </context>
   <context>
@@ -2879,6 +2665,10 @@
       <source>Autodetect built-in and USB webcams</source>
       <translation>Автоопределение встроенных и USB веб-камер</translation>
     </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation type="unfinished">Server Location ID:</translation>
+    </message>
   </context>
   <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
@@ -2938,32 +2728,6 @@
     <message>
       <source>Icon</source>
       <translation>Значок</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Форма</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Форма</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Состояние</translation>
     </message>
   </context>
   <context>
@@ -3057,10 +2821,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Роли</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Показать всех пользователей</translation>
     </message>
@@ -3071,6 +2831,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>По вашему запросу нет результатов.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
     </message>
   </context>
   <context>
@@ -3159,10 +2923,6 @@
       <source>+ Add Group</source>
       <translation type="unfinished">+ Add Group</translation>
     </message>
-    <message>
-      <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
-    </message>
   </context>
   <context>
     <name>UserListWidget</name>
@@ -3173,77 +2933,6 @@
     <message>
       <source>+ Add User</source>
       <translation>+ Добавить пользователя</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Изменить пароль...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Имя</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Пользователи</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Удалить роль</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Роли пользователей</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Новая роль</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Особых пользовательские роли еще не настроены.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Нажмите на кнопку &quot;Новая роль&quot; для создания.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Этот пользователь может использовать дайджест-аутентификацию.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Принудительная безопасная аутентификация</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Тип пользователя</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Роль</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Изменить роли...</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +2992,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Форма</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Громкость</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Проверка</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>Общие</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Проксировать эту веб-страницу через сервер</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3342,10 +3012,6 @@
     <message>
       <source>Proxy all requested contents</source>
       <translation>Проксировать все запрашиваемое содержимое</translation>
-    </message>
-    <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Разрешить открытие веб-страницы без проверки SSL-сертификата</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3035,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Примечание: Расписание по серверному времени.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Используемые лицензии</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Подробнее...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>ПO лицензировано для</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Новая лицензия</translation>
     </message>
   </context>
   <context>

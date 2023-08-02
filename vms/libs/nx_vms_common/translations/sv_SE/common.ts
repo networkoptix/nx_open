@@ -19,10 +19,6 @@
   <context>
     <name>AuthResultTranslations</name>
     <message>
-      <source>This user does not exist.</source>
-      <translation>Denna användaren finns inte.</translation>
-    </message>
-    <message>
       <source>Wrong password.</source>
       <translation>Fel lösenord.</translation>
     </message>
@@ -57,6 +53,30 @@
     <message>
       <source>This user has been disabled by a system administrator.</source>
       <translation>Den här användaren är inaktiverad av systemadministratören.</translation>
+    </message>
+    <message>
+      <source>This user does not exist or is unable to login.</source>
+      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+    </message>
+    <message>
+      <source>More than one user with the same login are presented.</source>
+      <translation type="unfinished">More than one user with the same login are presented.</translation>
+    </message>
+    <message>
+      <source>Unable to verify LDAP server SSL/TLS certificate.</source>
+      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkFacade</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Borttagen kamera</translation>
+    </message>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation>Systemhändelse</translation>
     </message>
   </context>
   <context>
@@ -138,6 +158,57 @@
         <numerusform>Petabyte(s)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>PredefinedUserGroups</name>
+    <message>
+      <source>Administrators</source>
+      <translation type="unfinished">Administrators</translation>
+    </message>
+    <message>
+      <source>Power Users</source>
+      <translation type="unfinished">Power Users</translation>
+    </message>
+    <message>
+      <source>Advanced Viewers</source>
+      <translation type="unfinished">Advanced Viewers</translation>
+    </message>
+    <message>
+      <source>Viewers</source>
+      <translation type="unfinished">Viewers</translation>
+    </message>
+    <message>
+      <source>Live Viewers</source>
+      <translation type="unfinished">Live Viewers</translation>
+    </message>
+    <message>
+      <source>System Health Viewers</source>
+      <translation type="unfinished">System Health Viewers</translation>
+    </message>
+    <message>
+      <source>Has full control of System configuration, but cannot create or modify other Power Users.</source>
+      <translation type="unfinished">Has full control of System configuration, but cannot create or modify other Power Users.</translation>
+    </message>
+    <message>
+      <source>Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
+      <translation type="unfinished">Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</translation>
+    </message>
+    <message>
+      <source>Can view and export archive and Bookmarks.</source>
+      <translation type="unfinished">Can view and export archive and Bookmarks.</translation>
+    </message>
+    <message>
+      <source>Can view live videos, I/O modules and web pages.</source>
+      <translation type="unfinished">Can view live videos, I/O modules and web pages.</translation>
+    </message>
+    <message>
+      <source>Can view System Health Monitoring information.</source>
+      <translation type="unfinished">Can view System Health Monitoring information.</translation>
+    </message>
+    <message>
+      <source>This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</source>
+      <translation type="unfinished">This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</translation>
     </message>
   </context>
   <context>
@@ -243,14 +314,6 @@
       <translation>Okänt kameraproblem.</translation>
     </message>
     <message>
-      <source>Invalid data was received from the device %1.</source>
-      <translation>Felaktiga data har tagits emot från enheten %1.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the camera %1.</source>
-      <translation>Felaktiga data har tagits emot från kameran %1.</translation>
-    </message>
-    <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
       <translation>För många mediafel. Vänligen öppna dialogrutan Enhetsproblem för mer information.</translation>
     </message>
@@ -273,10 +336,6 @@
     <message>
       <source>Unknown I/O module issue.</source>
       <translation>Okänd I/O-modulproblem.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the I/O module %1.</source>
-      <translation>Ogiltiga data mottogs från I/O-modulen %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
@@ -373,6 +432,25 @@
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
       <translation>Om den är inaktiverad, försök att aktivera inspelning i I/O-modulinställningar (fel &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
+      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
+      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
+      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Borttagen kamera</translation>
     </message>
   </context>
   <context>
@@ -753,6 +831,27 @@
         <numerusform>%n/%1 NVR licenser</numerusform>
       </translation>
     </message>
+    <message>
+      <source>%1 Licenses</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n %1 Licenses</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">
+        <numerusform>%n %1 Licenses</numerusform>
+        <numerusform>%n %1 Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 %2 Licenses</source>
+      <comment>%n will be replaced by the total count,%2 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 %2 Licenses</numerusform>
+        <numerusform>%n/%1 %2 Licenses</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
@@ -1037,62 +1136,14 @@
     </message>
   </context>
   <context>
-    <name>QnUserRolesManager</name>
-    <message>
-      <source>Owner</source>
-      <translation>Ägare</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Administratör</translation>
-    </message>
-    <message>
-      <source>Advanced Viewer</source>
-      <translation>Avancerad användare</translation>
-    </message>
-    <message>
-      <source>Viewer</source>
-      <translation>Användare</translation>
-    </message>
-    <message>
-      <source>Live Viewer</source>
-      <translation>Begränsad användare</translation>
-    </message>
-    <message>
-      <source>Custom Role</source>
-      <translation>Anpassad roll</translation>
-    </message>
+    <name>QnUserResource</name>
     <message>
       <source>Custom</source>
       <translation>Anpassad</translation>
     </message>
     <message>
-      <source>Can manage all cameras and bookmarks.</source>
-      <translation>Kan hantera alla kameror och bokmärken.</translation>
-    </message>
-    <message>
-      <source>Can view all cameras and export video.</source>
-      <translation>Kan visa alla kameror och exportera video.</translation>
-    </message>
-    <message>
-      <source>Can view live video from all cameras.</source>
-      <translation>Kan visa livevideo från alla kameror.</translation>
-    </message>
-    <message>
-      <source>Custom user role.</source>
-      <translation>Anpassad användarroll.</translation>
-    </message>
-    <message>
-      <source>Custom permissions.</source>
-      <translation>Anpassade behörigheter.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can do everything.</source>
-      <translation>Har tillgång till hela systemet och kan göra allt.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>Har tillgång till hela systemet och kan hantera det. Kan skapa användare.</translation>
+      <source>Multiple groups</source>
+      <translation type="unfinished">Multiple groups</translation>
     </message>
   </context>
   <context>
@@ -1169,74 +1220,6 @@
   </context>
   <context>
     <name>SystemSettings</name>
-    <message>
-      <source>SMTP host</source>
-      <translation>SMTP Server</translation>
-    </message>
-    <message>
-      <source>Email from</source>
-      <translation>E-post från</translation>
-    </message>
-    <message>
-      <source>SMTP user</source>
-      <translation>SMTP användare</translation>
-    </message>
-    <message>
-      <source>SMTP password</source>
-      <translation>SMTP lösenord</translation>
-    </message>
-    <message>
-      <source>Email signature</source>
-      <translation>Epostsignatur</translation>
-    </message>
-    <message>
-      <source>Email support link</source>
-      <translation>E-posta support</translation>
-    </message>
-    <message>
-      <source>SMTP connection type</source>
-      <translation>Typ av SMTP-anslutning</translation>
-    </message>
-    <message>
-      <source>SMTP port</source>
-      <translation>SMTP Port</translation>
-    </message>
-    <message>
-      <source>SMTP timeout (seconds)</source>
-      <translation>SMTP timeout (sekunder)</translation>
-    </message>
-    <message>
-      <source>SMTP name</source>
-      <translation>SMTP namn</translation>
-    </message>
-    <message>
-      <source>LDAP URI</source>
-      <translation>LDAP URI</translation>
-    </message>
-    <message>
-      <source>LDAP Admin DN</source>
-      <translation>LDAP Admin DN</translation>
-    </message>
-    <message>
-      <source>LDAP Admin password</source>
-      <translation>LDAP Admin lösenord</translation>
-    </message>
-    <message>
-      <source>LDAP search base</source>
-      <translation>LDAP-sökbas</translation>
-    </message>
-    <message>
-      <source>LDAP search filter</source>
-      <translation>LDAP-sökfilter</translation>
-    </message>
-    <message>
-      <source>LDAP password expiration (milliseconds)</source>
-      <translation>LDAP-lösenordsutgång (millisekunder)</translation>
-    </message>
-    <message>
-      <source>LDAP search timeout (seconds)</source>
-      <translation>Timeout för LDAP-sökning (sekunder)</translation>
-    </message>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>Anonym statistikrapport tillåten</translation>
@@ -1475,10 +1458,6 @@
       <translation>Vattenmärkesinställningar</translation>
     </message>
     <message>
-      <source>Authorization Session token lifetime (minutes)</source>
-      <translation>Livstid för auktoriseringssessionstoken (minuter)</translation>
-    </message>
-    <message>
       <source>Session token count limit on a single Server</source>
       <translation>Gräns för antalet sessionstoken på en enda server</translation>
     </message>
@@ -1591,11 +1570,6 @@
       <translation>Aktivera föråldrade API-funktioner (osäkra)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Aktivera föråldrade API-funktioner som för närvarande används av %1 -programvara (osäker)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>Exponera IP-adresser för autodiscovery</translation>
     </message>
@@ -1638,6 +1612,63 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>Uppdatera releases.json filens URL</translation>
+    </message>
+    <message>
+      <source>Cloud storage update period in seconds</source>
+      <translation type="unfinished">Cloud storage update period in seconds</translation>
+    </message>
+    <message>
+      <source>LDAP settings</source>
+      <translation type="unfinished">LDAP settings</translation>
+    </message>
+    <message>
+      <source>SMTP settings</source>
+      <translation type="unfinished">SMTP settings</translation>
+    </message>
+    <message>
+      <source>Authorization Session token lifetime (seconds)</source>
+      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Aktivera föråldrade API-funktioner som för närvarande används av %1 -programvara (osäker)</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation type="unfinished">just now</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minute(s) ago</source>
+      <translation type="unfinished">
+        <numerusform>%n minute(s) ago</numerusform>
+        <numerusform>%n minute(s) ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hour(s) ago</source>
+      <translation type="unfinished">
+        <numerusform>%n hour(s) ago</numerusform>
+        <numerusform>%n hour(s) ago</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation type="unfinished">yesterday</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n day(s) ago</source>
+      <translation type="unfinished">
+        <numerusform>%n day(s) ago</numerusform>
+        <numerusform>%n day(s) ago</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation type="unfinished">a week ago</translation>
     </message>
   </context>
   <context>
@@ -1690,16 +1721,13 @@
       <source>No data exported.</source>
       <translation>Ingen data exporterad.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
     <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Fel krypterad strömstorlek.</translation>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
     </message>
     <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Skadad krypterad strömhuvud.</translation>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>Arkivet är inte tillgängligt nu. Vänligen försök igen senare.</translation>
     </message>
   </context>
   <context>
@@ -2038,27 +2066,12 @@
       <source>Trigger Name</source>
       <translation>Utlösarens namn</translation>
     </message>
-    <message>
-      <source>Role</source>
-      <translation>Roll</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
         <numerusform>%n användare</numerusform>
         <numerusform>%n användare</numerusform>
       </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n Roller</numerusform>
-        <numerusform>%n Roller</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation>Alla administratörer</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -2337,12 +2350,20 @@
       <source>Also play on source camera</source>
       <translation>Spela också på källkameran</translation>
     </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
     <message>
-      <source>Removed camera</source>
-      <translation>Borttagen kamera</translation>
+      <source>Group</source>
+      <translation type="unfinished">Group</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation type="unfinished">
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Power Users</source>
+      <translation type="unfinished">All Power Users</translation>
     </message>
   </context>
 </TS>

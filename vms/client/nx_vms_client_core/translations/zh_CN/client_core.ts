@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>所有者：%1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>您的系统</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>不支持此输入设备 %1 示例格式。</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>未选择主要的音频设备。</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -105,10 +82,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 帐户登入暂时无法使用</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>连接超时</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -212,6 +185,10 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>您可以在 %1中启用双重验证功能。</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation type="unfinished">Connection failed</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
@@ -266,6 +243,17 @@
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
       <translation>请检视服务器凭证内容，来了解更多关于此问题的可能原因:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>不支持此输入设备 %1 示例格式。</translation>
+    </message>
+    <message>
+      <source>Primary audio device is not selected.</source>
+      <translation>未选择主要的音频设备。</translation>
     </message>
   </context>
 </TS>

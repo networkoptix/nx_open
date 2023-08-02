@@ -38,6 +38,19 @@
     </message>
   </context>
   <context>
+    <name>CameraPickerStrings</name>
+    <message>
+      <source>Source Camera</source>
+      <translation>แหล่งที่มาของกล้อง</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>แหล่งที่มาและ%n เพิ่มกล้องมากขึ้น</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
@@ -149,14 +162,6 @@
       <translation>แสดงหน้าจอต้อนรับ</translation>
     </message>
     <message>
-      <source>Tab</source>
-      <translation>แท็บ</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>แท็บใหม่</translation>
-    </message>
-    <message>
       <source>Window</source>
       <translation>หน้าต่าง</translation>
     </message>
@@ -169,16 +174,8 @@
       <translation>ชื่อผู้ใช้...</translation>
     </message>
     <message>
-      <source>New User...</source>
-      <translation>ผู้ใช้ใหม่...</translation>
-    </message>
-    <message>
       <source>Video Wall...</source>
       <translation>สร้างจอแสดงผลใหม่...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>Video Wall ใหม่....</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -496,10 +493,6 @@
       <translation>ลบออกจากเค้าโครง</translation>
     </message>
     <message>
-      <source>Stop Sharing Layout</source>
-      <translation>หยุดแชร์เค้าโครง</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>เปลี่ยนชื่อ</translation>
     </message>
@@ -514,14 +507,6 @@
     <message>
       <source>User Settings...</source>
       <translation>การตั้งค่าผู้ใช้งาน...</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation>บทบาทผู้ใช้...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation>ตั้งค่าแฟ้มข้อมูล...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -594,10 +579,6 @@
     <message>
       <source>Video Wall Settings...</source>
       <translation>การตั้งค่า Video Wall...</translation>
-    </message>
-    <message>
-      <source>Add Device...</source>
-      <translation>เพิ่มอุปกรณ์...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
@@ -744,10 +725,6 @@
       <translation>Showreel</translation>
     </message>
     <message>
-      <source>New Showreel...</source>
-      <translation>Showreel ใหม่...</translation>
-    </message>
-    <message>
       <source>Remove from Showreel</source>
       <translation>นำออกจาก Showreel</translation>
     </message>
@@ -816,10 +793,6 @@
       <translation>กล้องเสมือน...</translation>
     </message>
     <message>
-      <source>New Virtual Camera...</source>
-      <translation>ใหม่กล้องเสมือนจริง...</translation>
-    </message>
-    <message>
       <source>Show Tree</source>
       <translation>แสดง Tree</translation>
     </message>
@@ -858,14 +831,6 @@
     <message>
       <source>Switch to Objects tab</source>
       <translation>สลับไปที่แท็บวัตถุ</translation>
-    </message>
-    <message>
-      <source>Pin Calendar</source>
-      <translation>การตรึงปฏิทิน</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>ยกเลิกการตรึงปฏิทิน</translation>
     </message>
     <message>
       <source>Page...</source>
@@ -955,7 +920,7 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>หมุนไป</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -964,10 +929,6 @@
     <message>
       <source>Remove Group</source>
       <translation type="unfinished">Remove Group</translation>
-    </message>
-    <message>
-      <source>Add Proxied Web Page...</source>
-      <translation type="unfinished">Add Proxied Web Page...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
@@ -987,7 +948,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>ขั้นสูง...</translation>
     </message>
     <message>
       <source>Archive filter...</source>
@@ -1028,6 +989,74 @@
     <message>
       <source>Save Cloud Layout As...</source>
       <translation type="unfinished">Save Cloud Layout As...</translation>
+    </message>
+    <message>
+      <source>Lookup Lists...</source>
+      <translation type="unfinished">Lookup Lists...</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>เพิ่ม</translation>
+    </message>
+    <message>
+      <source>Device...</source>
+      <translation type="unfinished">Device...</translation>
+    </message>
+    <message>
+      <source>Add User...</source>
+      <translation>Add User...</translation>
+    </message>
+    <message>
+      <source>Integration...</source>
+      <translation type="unfinished">Integration...</translation>
+    </message>
+    <message>
+      <source>New Integration...</source>
+      <translation type="unfinished">New Integration...</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation>หน้าเว็บใหม่...</translation>
+    </message>
+    <message>
+      <source>Add Showreel...</source>
+      <translation type="unfinished">Add Showreel...</translation>
+    </message>
+    <message>
+      <source>Add Virtual Camera...</source>
+      <translation type="unfinished">Add Virtual Camera...</translation>
+    </message>
+    <message>
+      <source>Integration Settings...</source>
+      <translation type="unfinished">Integration Settings...</translation>
+    </message>
+    <message>
+      <source>Proxied Integration...</source>
+      <translation type="unfinished">Proxied Integration...</translation>
+    </message>
+    <message>
+      <source>Proxied Web Page...</source>
+      <translation type="unfinished">Proxied Web Page...</translation>
+    </message>
+    <message>
+      <source>Layout</source>
+      <translation>เค้าโครง</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>เปิดรูปแบบใหม่</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen</source>
+      <translation type="unfinished">New Welcome Screen</translation>
+    </message>
+    <message>
+      <source>Show Proxied Resources</source>
+      <translation type="unfinished">Show Proxied Resources</translation>
+    </message>
+    <message>
+      <source>Import From Devices...</source>
+      <translation type="unfinished">Import From Devices...</translation>
     </message>
   </context>
   <context>
@@ -1074,6 +1103,41 @@
     <message>
       <source>Auto</source>
       <translation>อัตโนมัติ</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>ไม่มี</translation>
+    </message>
+    <message>
+      <source>Event Occurs</source>
+      <translation type="unfinished">Event Occurs</translation>
+    </message>
+    <message>
+      <source>Event Starts</source>
+      <translation type="unfinished">Event Starts</translation>
+    </message>
+    <message>
+      <source>Event Stops</source>
+      <translation type="unfinished">Event Stops</translation>
+    </message>
+  </context>
+  <context>
+    <name>DurationPickerWidgetStrings</name>
+    <message>
+      <source>Instant</source>
+      <translation>ทางด่วน</translation>
+    </message>
+    <message>
+      <source>No more than once per</source>
+      <translation>ไม่เกินหนึ่งครั้งต่อหนึ่ง</translation>
+    </message>
+    <message>
+      <source>Live</source>
+      <translation>ช่วงเวลา</translation>
+    </message>
+    <message>
+      <source>Rewind for</source>
+      <translation type="unfinished">Rewind for</translation>
     </message>
   </context>
   <context>
@@ -1152,21 +1216,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>รูปภาพ</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>วิดีโอ</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>ไฟล์ทั้งหมด</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1187,6 +1236,25 @@
     <message>
       <source>Executable %1 Media File</source>
       <translation type="unfinished">Executable %1 Media File</translation>
+    </message>
+  </context>
+  <context>
+    <name>FlagsPickerWidgetStrings</name>
+    <message>
+      <source>Error</source>
+      <translation>ข้อผิดพลาด</translation>
+    </message>
+    <message>
+      <source>Warning</source>
+      <translation>คำเตือน</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>ข้อมูล</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>ไม่ได้กำหนด</translation>
     </message>
   </context>
   <context>
@@ -1220,18 +1288,24 @@
     </message>
   </context>
   <context>
+    <name>Groups</name>
+    <message>
+      <source>Delete group?</source>
+      <translation type="unfinished">Delete group?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n group(s)?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n group(s)?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
       <translation>ภาษาไทย</translation>
-    </message>
-  </context>
-  <context>
-    <name>LayoutTourTextFactory</name>
-    <message>
-      <source>Start Showreel</source>
-      <translation>เริ่ม Showreel</translation>
     </message>
   </context>
   <context>
@@ -1481,16 +1555,8 @@ License Key: %2</translation>
       <translation>SSL</translation>
     </message>
     <message>
-      <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
-    </message>
-    <message>
       <source>Check</source>
       <translation>ตรวจสอบ</translation>
-    </message>
-    <message>
-      <source>Email is not valid.</source>
-      <translation>อีเมล์ไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
@@ -1540,10 +1606,6 @@ License Key: %2</translation>
       <translation>สำเร็จ</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>หมดเวลาการเชื่อมต่อ</translation>
-    </message>
-    <message>
       <source>Authentication failed</source>
       <translation>รับรองความถูกต้องล้มเหลว</translation>
     </message>
@@ -1552,13 +1614,29 @@ License Key: %2</translation>
       <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
     </message>
     <message>
+      <source>%1 users will start receiving emails immediately after you apply these settings</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+    </message>
+    <message>
+      <source>Cannot reach the server</source>
+      <translation type="unfinished">Cannot reach the server</translation>
+    </message>
+    <message>
+      <source>Username or Password are incorrect</source>
+      <translation type="unfinished">Username or Password are incorrect</translation>
+    </message>
+    <message>
+      <source>Insecure</source>
+      <translation type="unfinished">Insecure</translation>
+    </message>
+    <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
       <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
     </message>
     <message>
-      <source>%1 users will start receiving emails immediately after you apply these settings</source>
-      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <source>Connection failed</source>
+      <translation>การเชื่อมต่อล้มเหลว</translation>
     </message>
   </context>
   <context>
@@ -1636,26 +1714,6 @@ License Key: %2</translation>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์บนแป้นพิมพ์เท่านั้น</translation>
-    </message>
-  </context>
-  <context>
-    <name>PermissionsInfoTable</name>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>กล้องและทรัพยากร</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation>บันทึกเค้าโครง</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>สิทธิ์</translation>
-    </message>
-    <message>
-      <source>All</source>
-      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
-      <translation>ทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -1797,13 +1855,6 @@ License Key: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnAccessibleLayoutsWidget</name>
-    <message>
-      <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>ให้สิทธิ์การเข้าถึงรูปแบบที่คุณสามารถเข้าถึงกล้องทั้งหมดได้ นอกจากนี้ผู้ใช้จะได้รับสิทธิ์เข้าถึงกล้องถ่ายรูปใหม่ทั้งหมดในรูปแบบเหล่านี้</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -1834,7 +1885,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>แนะนำ</translation>
     </message>
     <message>
       <source>Strict</source>
@@ -2203,12 +2254,12 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation type="unfinished">Connected to %1 via %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation type="unfinished">Disconnected from %1 via %2</translation>
     </message>
   </context>
@@ -2903,6 +2954,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation type="unfinished">Cannot disconnect the System from %1</translation>
     </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation type="unfinished">System will be accessible only through local network.</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -3086,6 +3141,10 @@ to %1</source>
       <source>Failed to log in to System &quot;%1&quot;</source>
       <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
     </message>
+    <message>
+      <source>Log In...</source>
+      <translation type="unfinished">Log In...</translation>
+    </message>
   </context>
   <context>
     <name>QnCustomBusinessEventWidget</name>
@@ -3112,6 +3171,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>เพื่อสร้างเหตุการณ์ทั่วไปโปรดดูที่%1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>รูปภาพ</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>วิดีโอ</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>ไฟล์ทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -3154,7 +3228,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>บันทึกการสำรองฐานข้อมูล</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -3187,135 +3261,6 @@ to %1</source>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
       <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModel</name>
-    <message>
-      <source>Local user</source>
-      <translation>ผู้ใช้ท้องถิ่น</translation>
-    </message>
-    <message>
-      <source>%1 user</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 ผู้ใช้งาน</translation>
-    </message>
-    <message>
-      <source>LDAP user</source>
-      <translation>ผู้ใช้ LDAP</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>เปิดใช้งาน</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>ปิดใช้งาน</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>ชื่อผู้ใช้</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>ชื่อ</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>สิทธิพิเศษ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModelPrivate</name>
-    <message>
-      <source>Owner</source>
-      <translation>เจ้าของ</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>ผู้ดูแลระบบ</translation>
-    </message>
-    <message>
-      <source>View live video</source>
-      <translation>ดูวิดีโอสด</translation>
-    </message>
-    <message>
-      <source>Adjust device settings</source>
-      <translation>ปรับการตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>ปรับการตั้งค่ากล้อง</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>ใช้ตัวควบคุม PTZ</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>ดูวิดีโอที่เก็บ</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>ส่งออกวิดีโอ</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>ควบคุมภาพวิดีโอผนัง</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Edit</source>
-      <translation>แก้ไข</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>ผู้ใช้ทั้งหมด</translation>
-    </message>
-    <message>
-      <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
-    </message>
-    <message>
-      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>ผู้ใช้สามารถนำเข้าจากเซิร์ฟเวอร์ LDAP พวกเขาจะสามารถเข้าสู่ระบบได้เฉพาะเมื่อเซิร์ฟเวอร์ LDAP ออนไลน์และบัญชีของพวกเขาใช้งานได้</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopDataProvider</name>
-    <message>
-      <source>Could not find video encoder %1.</source>
-      <translation>ไม่พบวิดีโอ %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>ไม่สามารถเริ่มต้นการเข้ารหัสวิดีโอ.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น encoder เสียง.</translation>
-    </message>
-    <message>
-      <source>Could not start primary audio device.</source>
-      <translation>ไม่สามารถเริ่มอุปกรณ์เสียงหลัก.</translation>
-    </message>
-    <message>
-      <source>Screen width must be a multiple of 8.</source>
-      <translation>ความกว้างของหน้าจอจะต้องคูณ 8.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>ไม่สามารถเริ่มต้นอุปกรณ์เสียง &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Could not detect capturing resolution</source>
-      <translation>ไม่สามารถตรวจจับความละเอียดในการจับภาพได้</translation>
-    </message>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>
@@ -3593,6 +3538,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGenericTabbedDialog</name>
+    <message>
+      <source>Apply changes before exit?</source>
+      <translation>ใช้การเปลี่ยนแปลงก่อนออก?</translation>
+    </message>
+  </context>
+  <context>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
@@ -3696,92 +3648,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>ไม่สามารถเปิดพอร์ต I / O %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialog</name>
-    <message>
-      <source>Test</source>
-      <translation>ทดสอบ</translation>
-    </message>
-    <message>
-      <source>Test failed</source>
-      <translation>การทดสอบล้มเหลว</translation>
-    </message>
-    <message numerus="yes">
-      <source>Test completed successfully: %n users found.</source>
-      <translation>
-        <numerusform>การทดสอบสมบูรณ์: %n พบผู้ใช้.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>การเปลี่ยนการตั้งค่า LDAP อื่นที่ไม่ใช่ &quot;ตัวกรองการค้นหา&quot; จะทำให้สูญเสียการเชื่อมต่อสำหรับผู้ใช้ที่เรียกใช้ LDAP ทั้งหมด</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialogPrivate</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>การตั้งค่าให้ไม่ถูกต้อง.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>ไม่สามารถดำเนินการทดสอบ.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>หมดเวลา</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUserListModel</name>
-    <message>
-      <source>Login</source>
-      <translation>ชื่อผู้ใช้</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>อีเมล</translation>
-    </message>
-    <message>
-      <source>DN</source>
-      <translation>DN</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>ชื่อ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUsersDialog</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>การตั้งค่าให้ไม่ถูกต้อง.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>ไม่สามารถดำเนินการทดสอบ.</translation>
-    </message>
-    <message>
-      <source>Could not load users.</source>
-      <translation>ไม่สามารถโหลดผู้ใช้.</translation>
-    </message>
-    <message>
-      <source>Error while loading users.</source>
-      <translation>ข้อผิดพลาดในขณะที่ผู้ใช้โหลด.</translation>
-    </message>
-    <message>
-      <source>No new users found.</source>
-      <translation>ไม่พบผู้ใช้ใหม่</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>หมดเวลา</translation>
-    </message>
-    <message>
-      <source>Import Selected</source>
-      <translation>นำเข้าที่เลือกแล้ว</translation>
     </message>
   </context>
   <context>
@@ -3895,60 +3761,9 @@ to %1</source>
       <source>Channels</source>
       <translation>แชนแนล</translation>
     </message>
-  </context>
-  <context>
-    <name>QnLicenseManagerWidget</name>
     <message>
-      <source>Export</source>
-      <translation>ส่งออก</translation>
-    </message>
-    <message>
-      <source>Export licenses to a file</source>
-      <translation>ส่งออกใบอนุญาตไปยังไฟล์</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>ปิดใช้งานใบอนุญาตหรือไม่?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>ลบออก</translation>
-    </message>
-    <message>
-      <source>Deactivate</source>
-      <translation>ปิดใช้งาน</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n channels.</source>
-      <translation>
-        <numerusform>%n ช่อง</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 มีใช้อยู่ในปัจจุบัน</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>จำเป็นต้องกรอกอย่างน้อยหนึ่งหน่วย %1</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n deactivations remaining.</source>
-      <translation>
-        <numerusform>%n การยกเลิกการทำงานที่เหลืออยู่</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+      <source>Not verified</source>
+      <translation type="unfinished">Not verified</translation>
     </message>
   </context>
   <context>
@@ -4002,14 +3817,6 @@ to %1</source>
       <translation>ขั้นสูง</translation>
     </message>
     <message>
-      <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>ไฟล์การตั้งค่าเป็นแบบอ่านอย่างเดียว โปรดติดต่อผู้ดูแลระบบของคุณ การเปลี่ยนแปลงทั้งหมดจะหายไปหลังจากออกจากโปรแกรม</translation>
-    </message>
-    <message>
-      <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>ไม่สามารถบันทึกการตั้งค่าได้ โปรดติดต่อผู้ดูแลระบบของคุณ การเปลี่ยนแปลงทั้งหมดจะหายไปหลังจากออกจากโปรแกรม</translation>
-    </message>
-    <message>
       <source>Restart required</source>
       <translation>ต้องเริ่มต้นใหม่</translation>
     </message>
@@ -4024,6 +3831,10 @@ to %1</source>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
       <translation>การเปลี่ยนแปลงบางอย่างจะมีผลเฉพาะเมื่อเริ่มต้นใหม่อีกครั้ง %1</translation>
+    </message>
+    <message>
+      <source>Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
+      <translation type="unfinished">Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</translation>
     </message>
   </context>
   <context>
@@ -4150,6 +3961,10 @@ to %1</source>
       <source>Object Search</source>
       <translation type="unfinished">Object Search</translation>
     </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
   </context>
   <context>
     <name>QnMessageBox</name>
@@ -4264,49 +4079,6 @@ to %1</source>
     <message>
       <source>Rotation</source>
       <translation>หมุนหน้าจอ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPermissionsWidget</name>
-    <message>
-      <source>Edit camera settings</source>
-      <translation>แก้ไขการตั้งค่ากล้อง</translation>
-    </message>
-    <message>
-      <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>จำเป็นต้องใช้เพื่อสร้าง / แก้ไข PTZ ที่ตั้งไว้ล่วงหน้าและทัวร์</translation>
-    </message>
-    <message>
-      <source>Control video walls</source>
-      <translation>ควบคุมภาพวิดีโอผนัง</translation>
-    </message>
-    <message>
-      <source>View event log</source>
-      <translation>ดูแฟ้มบันทึกเหตุการณ์</translation>
-    </message>
-    <message>
-      <source>View archive</source>
-      <translation>ดูที่เก็บถาวร</translation>
-    </message>
-    <message>
-      <source>Export archive</source>
-      <translation>ส่งออกคลัง</translation>
-    </message>
-    <message>
-      <source>View bookmarks</source>
-      <translation>ดูบุ๊คมาร์ค</translation>
-    </message>
-    <message>
-      <source>Modify bookmarks</source>
-      <translation>แก้ไขบุ๊กมาร์ก</translation>
-    </message>
-    <message>
-      <source>User Input</source>
-      <translation>ป้อนข้อมูลผู้ใช้</translation>
-    </message>
-    <message>
-      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ, เอาต์พุตอุปกรณ์, เสียง 2 ทิศทาง, ทริกเกอร์นุ่ม</translation>
     </message>
   </context>
   <context>
@@ -4492,41 +4264,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRecordingSettingsWidget</name>
-    <message>
-      <source>Screen %1 - %2x%3</source>
-      <translation>หน้าจอ %1 - %2x%3</translation>
-    </message>
-    <message>
-      <source>%1 (Primary)</source>
-      <translation>%1 (หลัก)</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>ดีสุด</translation>
-    </message>
-    <message>
-      <source>Average</source>
-      <translation>ปานกลาง</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>ประสิทธิภาพ</translation>
-    </message>
-    <message>
-      <source>Native</source>
-      <translation>พื้นเมือง</translation>
-    </message>
-    <message>
-      <source>Quarter Native</source>
-      <translation>พื้นเมืองไตรมาส</translation>
-    </message>
-    <message>
-      <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
@@ -4592,23 +4329,6 @@ to %1</source>
   <context>
     <name>QnRequiredPermissionSubjectPolicy</name>
     <message>
-      <source>Role %1 has no %2 permission</source>
-      <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation>บทบาท %1 ไม่มีสิทธิ์ในการใช้ %2</translation>
-    </message>
-    <message>
-      <source>Selected roles have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>บทบาทที่เลือกไม่มีสิทธิ์ในการใช้งาน %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no %2 permission</source>
-      <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n จาก %1 บทบาทที่เลือกไม่มีสิทธิ์ในการได้รับ %2</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
       <translation>ผู้ใช้ %1 ไม่มีสิทธิ์ในการใช้ %2</translation>
@@ -4623,6 +4343,23 @@ to %1</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
       <translation>
         <numerusform>%n จาก %1 ผู้ใช้ที่เลือกไม่มีสิทธิ์ในการใช้ %2</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User group %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user group, %2 is permission name</comment>
+      <translation type="unfinished">User group %1 has no %2 permission</translation>
+    </message>
+    <message>
+      <source>Selected user groups have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation type="unfinished">Selected user groups have no %1 permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected user groups have no %2 permission</source>
+      <comment>%1 is number of selected user groups, %2 is permission name</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
       </translation>
     </message>
   </context>
@@ -4769,6 +4506,27 @@ to %1</source>
     <message>
       <source>Select cameras...</source>
       <translation>เลือกกล้อง...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSelectLayoutsButton</name>
+    <message>
+      <source>Any Layout</source>
+      <translation type="unfinished">Any Layout</translation>
+    </message>
+    <message>
+      <source>All Layouts</source>
+      <translation type="unfinished">All Layouts</translation>
+    </message>
+    <message>
+      <source>Select Layouts...</source>
+      <translation>เลือกรูปแบบ...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Layouts</source>
+      <translation>
+        <numerusform>%n เค้าโครง</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4984,6 +4742,10 @@ to %1</source>
       <source>Save changes before exit?</source>
       <translation>บันทึกการเปลี่ยนแปลงก่อนออก?</translation>
     </message>
+    <message>
+      <source>Apply changes before exit?</source>
+      <translation>ใช้การเปลี่ยนแปลงก่อนออก?</translation>
+    </message>
   </context>
   <context>
     <name>QnShowTextOverlayActionWidget</name>
@@ -5118,10 +4880,6 @@ to %1</source>
     <message>
       <source>Provide</source>
       <translation type="unfinished">Provide</translation>
-    </message>
-    <message>
-      <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
     </message>
   </context>
   <context>
@@ -5416,10 +5174,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>อัพเดท</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>ผู้ใช้งาน</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>ความปลอดภัย</translation>
     </message>
@@ -5442,6 +5196,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Advanced</source>
       <translation>ขั้นสูง</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>การรวบรวม</translation>
     </message>
   </context>
   <context>
@@ -5527,18 +5285,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>เกิดข้อผิดพลาดขณะส่งอีเมล</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been finished</source>
-      <translation>การซิงโครไนส์รีซอร์สจากระยะไกลเสร็จสิ้นแล้ว</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization is in progress</source>
-      <translation>กำลังดำเนินการซิงโครไนส์ข้อมูลสำรองระยะไกล</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>ซิงโครไนซ์ระยะไกลเก็บเริ่มต้นสำหรับอุปกรณ์ต่อไปนี้:</translation>
-    </message>
-    <message>
       <source>Archive integrity problem detected</source>
       <translation>ตรวจพบปัญหาความสมบูรณ์ของที่เก็บถาวร</translation>
     </message>
@@ -5581,10 +5327,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Camera recording schedule is invalid</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been stopped</source>
-      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
-    </message>
-    <message>
       <source>Storage for analytics data is not set</source>
       <translation type="unfinished">Storage for analytics data is not set</translation>
     </message>
@@ -5595,10 +5337,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Analytics data can take up large amounts of space.</source>
       <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization is available</source>
-      <translation type="unfinished">Remote archive synchronization is available</translation>
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
@@ -5686,240 +5424,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>QnUserProfileWidget</name>
+    <name>QnUserRolesModel</name>
     <message>
-      <source>Login</source>
-      <translation>ชื่อผู้ใช้</translation>
+      <source>Custom</source>
+      <translation>แบบกำหนดเอง</translation>
     </message>
     <message>
-      <source>Name</source>
-      <translation>ชื่อ</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>สิทธิพิเศษ</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>อีเมลล์</translation>
-    </message>
-    <message>
-      <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidget</name>
-    <message>
-      <source>Role name cannot be empty.</source>
-      <translation>ชื่อไม่สามารถเว้นว่างได้</translation>
-    </message>
-    <message>
-      <source>Role with same name already exists.</source>
-      <translation>มีบทบาทที่มีชื่อเดียวกันแล้ว</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidgetPrivate</name>
-    <message>
-      <source>No users have this role</source>
-      <translation>ไม่มีผู้ใช้คนนี้มีบทบาทนี้</translation>
-    </message>
-    <message>
-      <source>Custom with no permissions</source>
-      <translation>กำหนดเองโดยไม่มีสิทธิ์</translation>
-    </message>
-    <message>
-      <source>Users will have no permissions unless changed later.</source>
-      <translation>ผู้ใช้จะได้ไม่มีสิทธิ์ถ้าการเปลี่ยนแปลงในภายหลัง</translation>
-    </message>
-    <message>
-      <source>Assign a new role</source>
-      <translation>กำหนดบทบาทใหม่</translation>
-    </message>
-    <message>
-      <source>Delete such users</source>
-      <translation>ลบผู้ใช้ดังกล่าว</translation>
-    </message>
-    <message numerus="yes">
-      <source>Please select an action to perform on %n users with this role</source>
-      <translation>
-        <numerusform>โปรดเลือกการดำเนินการที่จะดำเนินการใน %n ผู้ใช้ที่มีบทบาทนี้</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRolesDialog</name>
-    <message>
-      <source>Role Info</source>
-      <translation>ข้อมูลบทบาท</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>สิทธิ์</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>กล้องและทรัพยากรทั้งหมด</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>เค้าโครง</translation>
-    </message>
-    <message>
-      <source>New Role</source>
-      <translation>บทบาทใหม่</translation>
-    </message>
-    <message>
-      <source>New Role %1</source>
-      <translation>บทบาทใหม่ %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsDialog</name>
-    <message>
-      <source>User Information</source>
-      <translation>ข้อมูลระบบ</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>สิทธิ์</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>กล้องและทรัพยากรทั้งหมด</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>เค้าโครง</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>ผู้ใช้ใหม่...</translation>
-    </message>
-    <message>
-      <source>User Settings - %1 (readonly)</source>
-      <translation>การตั้งค่าเซิร์ฟเวอร์ - %1 (อ่านได้อย่างเดียว)</translation>
-    </message>
-    <message>
-      <source>User Settings - %1</source>
-      <translation>การตั้งค่าเซิร์ฟเวอร์ - %1</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>เปิดใช้งาน</translation>
-    </message>
-    <message>
-      <source>User is disabled</source>
-      <translation>ผู้ใช้ถูกปิดใช้งาน</translation>
-    </message>
-    <message>
-      <source>Apply changes before switching to another user?</source>
-      <translation>ใช้การเปลี่ยนแปลงก่อนเปลี่ยนไปใช้ผู้ใช้รายอื่นหรือไม่?</translation>
-    </message>
-    <message>
-      <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>ผู้ใช้รายนี้ยังไม่ได้สมัคร %1</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
-    </message>
-    <message>
-      <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsWidget</name>
-    <message>
-      <source>Local</source>
-      <translation>ท้องถิ่น</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>ชื่อผู้ใช้</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty.</source>
-      <translation>ช่องผู้ใช้งาน ต้องไม่ปล่อยว่าง.</translation>
-    </message>
-    <message>
-      <source>User with specified login already exists.</source>
-      <translation>มีผู้ใช้งานเข้าสู่ระบบอยู่แล้ว.</translation>
-    </message>
-    <message>
-      <source>User has been renamed. Password must be updated.</source>
-      <translation>ผู้ใช้ที่เปลี่ยนชื่อ รหัสผ่านต้องมีการปรับปรุง.</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>ชื่อ</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>อีเมลล์</translation>
-    </message>
-    <message>
-      <source>Email cannot be empty.</source>
-      <translation>อีเมลต้องไม่ว่างเปล่า</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>รหัสผ่าน</translation>
-    </message>
-    <message>
-      <source>Confirm Password</source>
-      <translation>ยืนยันรหัสผ่าน</translation>
-    </message>
-    <message>
-      <source>Passwords do not match.</source>
-      <translation>รหัสผ่านไม่ตรงกัน.</translation>
-    </message>
-    <message>
-      <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 มีอีเมลผู้ใช้ที่ระบุอยู่แล้ว</translation>
-    </message>
-    <message>
-      <source>Local users</source>
-      <translation>ผู้ใช้ท้องถิ่น</translation>
-    </message>
-    <message>
-      <source>%1 users</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 ผู้ใช้</translation>
-    </message>
-    <message>
-      <source>%1 belong to this system only and are fully managed by system administrators.</source>
-      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 อยู่ในระบบนี้เท่านั้นและได้รับการจัดการอย่างเต็มที่จากผู้ดูแลระบบ</translation>
-    </message>
-    <message>
-      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
-      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 สามารถเข้าถึงระบบได้หลายระบบ ผู้ดูแลระบบสามารถจัดการสิทธิ์ได้เท่านั้น</translation>
-    </message>
-    <message>
-      <source>Password reset is required</source>
-      <translation type="unfinished">Password reset is required</translation>
-    </message>
-    <message>
-      <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <source>Custom access rights</source>
+      <translation type="unfinished">Custom access rights</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
-    <message>
-      <source>Email cannot be empty.</source>
-      <translation>อีเมลต้องไม่ว่างเปล่า</translation>
-    </message>
-    <message>
-      <source>Email is not valid.</source>
-      <translation>อีเมล์ไม่ถูกต้อง</translation>
-    </message>
     <message>
       <source>Password cannot be empty.</source>
       <translation>รหัสผ่านต้องไม่ปล่อยว่าง.</translation>
@@ -5927,6 +5443,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Avoid leading and trailing spaces.</source>
       <translation>หลีกเลี่ยงช่องว่างด้านบนและด้านหลัง</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>อีเมลต้องไม่ว่างเปล่า</translation>
+    </message>
+    <message>
+      <source>Email is not valid</source>
+      <translation type="unfinished">Email is not valid</translation>
     </message>
   </context>
   <context>
@@ -5980,16 +5504,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Open this web page?</translation>
     </message>
     <message>
-      <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
-    </message>
-    <message>
       <source>Connect anyway</source>
       <translation type="unfinished">Connect anyway</translation>
-    </message>
-    <message>
-      <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6001,6 +5517,37 @@ We recommend you not to open this web page. If you understand the risks, you can
 %1
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+    </message>
+    <message>
+      <source>Open this integration?</source>
+      <translation type="unfinished">Open this integration?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation type="unfinished">Integration</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>เว็บเพจ:</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+    </message>
+    <message>
+      <source>Integration settings...</source>
+      <translation type="unfinished">Integration settings...</translation>
+    </message>
+    <message>
+      <source>Web Page settings...</source>
+      <translation type="unfinished">Web Page settings...</translation>
     </message>
   </context>
   <context>
@@ -6415,32 +5962,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>There is another layout with the same name.</source>
       <translation>มีรูปแบบอื่นที่มีชื่อเดียวกัน</translation>
     </message>
-    <message numerus="yes">
-      <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>ผู้ใช้ยังคงสามารถเข้าถึงแหล่งข้อมูลที่ถูกลบออกได้ %n:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to User Settings.</source>
-      <translation>หากต้องการนำสิทธิ์การเข้าถึงออกโปรดไปที่การตั้งค่าของผู้ใช้</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>ผู้ใช้ทั้งหมดที่มีบทบาทนี้จะได้รับสิทธิ์เข้าถึงแหล่งข้อมูล %n:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to Role Settings.</source>
-      <translation>หากต้องการนำสิทธิ์การเข้าถึงออกโปรดไปที่การตั้งค่าบทบาท</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>ผู้ใช้ทั้งหมดที่มีบทบาทนี้จะยังสามารถเข้าถึงทรัพยากรที่ถูกนำออก %n:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Changes will affect other users</source>
       <translation>การเปลี่ยนแปลงจะมีผลต่อผู้ใช้รายอื่น</translation>
@@ -6448,30 +5969,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
       <translation>เค้าโครงนี้แชร์กับผู้ใช้คนอื่น ๆ ดังนั้นคุณจึงต้องเปลี่ยนให้เหมาะกับพวกเขาด้วย</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>ผู้ใช้จะสูญเสียสิทธิ์การเข้าถึงทรัพยากร %n:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>ผู้ใช้ทั้งหมดที่มีบทบาทนี้จะไม่สามารถเข้าถึงทรัพยากร %n:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>ลบ %n รูปแบบที่ใช้ร่วมกันหรือไม่?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>รูปแบบ %n เหล่านี้ถูกแชร์กับผู้ใช้คนอื่น ๆ ดังนั้นคุณจึงลบรูปแบบเหล่านี้ด้วย</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
@@ -6637,6 +6134,69 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Delete %n layouts?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n layouts?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerical form depends on layouts count</comment>
+      <translation type="unfinished">
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Delete user?</source>
+      <translation>ลบผู้ใช้หรือไม่?</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n items were not deleted.</source>
+      <translation type="unfinished">
+        <numerusform>%n items were not deleted.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>ServerPickerStrings</name>
+    <message>
+      <source>Any Server</source>
+      <translation>เซิร์ฟเวอร์ใดก็ได้</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n เซิร์ฟเวอร์</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>เลือกเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>เซิร์ฟเวอร์ต้นทาง</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source Server and %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Source Server and %n Servers</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>ShowreelTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>เริ่ม Showreel</translation>
+    </message>
   </context>
   <context>
     <name>SimpleMotionSearchWidget::Private</name>
@@ -6687,6 +6247,42 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select at least one I/O module</source>
       <translation type="unfinished">Select at least one I/O module</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>ทดสอบ</translation>
+    </message>
+    <message>
+      <source>Also set on source camera</source>
+      <translation type="unfinished">Also set on source camera</translation>
+    </message>
+    <message>
+      <source>Also trigger on source camera</source>
+      <translation type="unfinished">Also trigger on source camera</translation>
+    </message>
+    <message>
+      <source>Also record source camera</source>
+      <translation type="unfinished">Also record source camera</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>กล้องที่มา</translation>
+    </message>
+    <message>
+      <source>Also play on source camera</source>
+      <translation type="unfinished">Also play on source camera</translation>
+    </message>
+    <message>
+      <source>Also show source camera</source>
+      <translation>ยังแสดงให้เห็นกล้องแหล่งที่มา</translation>
+    </message>
+    <message>
+      <source>Also show on source camera</source>
+      <translation>ยังแสดงให้เห็นในกล้องแหล่งที่มา</translation>
+    </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation type="unfinished">Use event source camera</translation>
     </message>
   </context>
   <context>
@@ -6772,42 +6368,40 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>UserListModel</name>
+    <name>UserPickerHelper</name>
     <message>
-      <source>Owner</source>
-      <translation>เจ้าของ</translation>
+      <source>All Users</source>
+      <translation>ผู้ใช้ทั้งหมด</translation>
     </message>
     <message>
-      <source>Administrator</source>
-      <translation>ผู้ดูแลระบบ</translation>
+      <source>Select at least one user</source>
+      <translation>เลือกผู้ใช้งานอย่างน้อยหนึ่งคน</translation>
     </message>
     <message>
-      <source>View live video</source>
-      <translation>ดูวิดีโอสด</translation>
+      <source>Group</source>
+      <translation type="unfinished">Group</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n ผู้ใช้</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation type="unfinished">
+        <numerusform>%n Groups</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Adjust device settings</source>
-      <translation>ปรับการตั้งค่าอุปกรณ์</translation>
+      <source>All Power Users</source>
+      <translation type="unfinished">All Power Users</translation>
     </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>ปรับการตั้งค่ากล้อง</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>ใช้ตัวควบคุม PTZ</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>ดูวิดีโอที่เก็บ</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>ส่งออกวิดีโอ</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>ควบคุมภาพวิดีโอผนัง</translation>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <translation>
+        <numerusform>%n เพิ่มเติม</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6835,6 +6429,21 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>การแสดงแฟ้มภายในเครื่องบนผนังวิดีโอ กรุณาแนบโดยใช้คอมพิวเตอร์ที่เป็นโฮสต์วิดีโอผนัง</translation>
+    </message>
+  </context>
+  <context>
+    <name>VmsRulesDialogHelper</name>
+    <message>
+      <source>Delete Rule?</source>
+      <translation type="unfinished">Delete Rule?</translation>
+    </message>
+    <message>
+      <source>This action cannot be undone</source>
+      <translation type="unfinished">This action cannot be undone</translation>
+    </message>
+    <message>
+      <source>Reset all rules to defaults?</source>
+      <translation type="unfinished">Reset all rules to defaults?</translation>
     </message>
   </context>
   <context>
@@ -6931,6 +6540,65 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Chosen device</source>
       <translation type="unfinished">Chosen device</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AccessRightsList</name>
+    <message>
+      <source>Has access to a resource, can view live footage from a camera</source>
+      <translation type="unfinished">Has access to a resource, can view live footage from a camera</translation>
+    </message>
+    <message>
+      <source>View Archive</source>
+      <translation type="unfinished">View Archive</translation>
+    </message>
+    <message>
+      <source>Can view archive footage</source>
+      <translation type="unfinished">Can view archive footage</translation>
+    </message>
+    <message>
+      <source>Export Archive</source>
+      <translation type="unfinished">Export Archive</translation>
+    </message>
+    <message>
+      <source>Can export parts of archive</source>
+      <translation type="unfinished">Can export parts of archive</translation>
+    </message>
+    <message>
+      <source>View Bookmarks</source>
+      <translation type="unfinished">View Bookmarks</translation>
+    </message>
+    <message>
+      <source>Can view bookmarks</source>
+      <translation type="unfinished">Can view bookmarks</translation>
+    </message>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>จัดการบุ๊กมาร์ก</translation>
+    </message>
+    <message>
+      <source>Can modify bookmarks</source>
+      <translation type="unfinished">Can modify bookmarks</translation>
+    </message>
+    <message>
+      <source>User Input</source>
+      <translation>ป้อนข้อมูลผู้ใช้</translation>
+    </message>
+    <message>
+      <source>Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</source>
+      <translation type="unfinished">Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</translation>
+    </message>
+    <message>
+      <source>Edit Settings</source>
+      <translation type="unfinished">Edit Settings</translation>
+    </message>
+    <message>
+      <source>View Live</source>
+      <translation type="unfinished">View Live</translation>
+    </message>
+    <message>
+      <source>Can edit device settings and video wall layouts</source>
+      <translation type="unfinished">Can edit device settings and video wall layouts</translation>
     </message>
   </context>
   <context>
@@ -7284,6 +6952,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CallNotificationsListModel::Private</name>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
@@ -7396,12 +7071,80 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Auto</source>
-      <comment>Let server determine if Media2 should be used to fetch profiles</comment>
       <translation>อัตโนมัติ</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
+      <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
+      <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotItem</name>
+    <message>
+      <source>Open Camera</source>
+      <translation type="unfinished">Open Camera</translation>
+    </message>
+    <message>
+      <source>Open Camera in new Tab</source>
+      <translation type="unfinished">Open Camera in new Tab</translation>
+    </message>
+    <message>
+      <source>Open Camera in place</source>
+      <translation type="unfinished">Open Camera in place</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsEditorWidget</name>
+    <message>
+      <source>Delete</source>
+      <translation>ลบ</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation type="unfinished">Select Camera...</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation type="unfinished">Pointed</translation>
+    </message>
+    <message>
+      <source>Place Hotspot</source>
+      <translation type="unfinished">Place Hotspot</translation>
+    </message>
+    <message>
+      <source>NO DATA</source>
+      <translation>ไม่มมีข้อมูล</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
+    <message>
+      <source>Camera does not exist</source>
+      <translation type="unfinished">Camera does not exist</translation>
+    </message>
+    <message>
+      <source>Select Camera</source>
+      <translation type="unfinished">Select Camera</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>ลบ</translation>
+    </message>
+    <message>
+      <source>#</source>
+      <translation type="unfinished">#</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>กล้อง</translation>
+    </message>
+    <message>
+      <source>Color</source>
+      <translation type="unfinished">Color</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation type="unfinished">Pointed</translation>
     </message>
   </context>
   <context>
@@ -7586,7 +7329,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>เลือกกล้อง</translation>
     </message>
     <message>
       <source>Select Device</source>
@@ -7716,6 +7459,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Plugins</source>
       <translation>ปลั๊กอิน</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>การรวบรวม</translation>
     </message>
   </context>
   <context>
@@ -8021,10 +7772,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">Local System owner is absent or disabled.</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your Servers is connected to the Internet.</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ระบบเชื่อมต่อกับ %1</translation>
@@ -8057,6 +7804,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Internal error. Please try again later.</source>
       <translation type="unfinished">Internal error. Please try again later.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">None of your Servers has connection to %1.</translation>
     </message>
   </context>
   <context>
@@ -8146,6 +7898,41 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CustomAccessSummaryModel</name>
+    <message>
+      <source>View video archive</source>
+      <translation type="unfinished">View video archive</translation>
+    </message>
+    <message>
+      <source>Export video archive</source>
+      <translation type="unfinished">Export video archive</translation>
+    </message>
+    <message>
+      <source>View bookmarks</source>
+      <translation>ดูบุ๊คมาร์ค</translation>
+    </message>
+    <message>
+      <source>Modify bookmarks</source>
+      <translation>แก้ไขบุ๊กมาร์ก</translation>
+    </message>
+    <message>
+      <source>User input</source>
+      <translation type="unfinished">User input</translation>
+    </message>
+    <message>
+      <source>Edit camera settings</source>
+      <translation>แก้ไขการตั้งค่ากล้อง</translation>
+    </message>
+    <message>
+      <source>View event log</source>
+      <translation>ดูแฟ้มบันทึกเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>View live</source>
+      <translation type="unfinished">View live</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
@@ -8162,6 +7949,41 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Set Password</source>
       <translation>ตั้งรหัสผ่าน</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DesktopDataProvider</name>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation>ไม่สามารถตรวจจับความละเอียดในการจับภาพได้</translation>
+    </message>
+    <message>
+      <source>Could not find video encoder %1.</source>
+      <translation>ไม่พบวิดีโอ %1.</translation>
+    </message>
+    <message>
+      <source>Screen width must be a multiple of 8.</source>
+      <translation>ความกว้างของหน้าจอจะต้องคูณ 8.</translation>
+    </message>
+    <message>
+      <source>Could not initialize video encoder.</source>
+      <translation>ไม่สามารถเริ่มต้นการเข้ารหัสวิดีโอ.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio encoder.</source>
+      <translation>ไม่สามารถเริ่มต้น encoder เสียง.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio device &quot;%1&quot;.</source>
+      <translation>ไม่สามารถเริ่มต้นอุปกรณ์เสียง &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not start primary audio device.</source>
+      <translation>ไม่สามารถเริ่มอุปกรณ์เสียงหลัก.</translation>
     </message>
   </context>
   <context>
@@ -8288,6 +8110,86 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EventLogDialog</name>
+    <message>
+      <source>Filter Similar Rows</source>
+      <translation>กรองแถวที่คล้ายกัน</translation>
+    </message>
+    <message>
+      <source>Copy Selection to Clipboard</source>
+      <translation>คัดลอกส่วนที่เลือกไปยังคลิปบอร์ด</translation>
+    </message>
+    <message>
+      <source>Export Selection to File...</source>
+      <translation>เลือกส่งออกไปยังแฟ้ม...</translation>
+    </message>
+    <message>
+      <source>Select All</source>
+      <translation>เลือกทั้งหมด</translation>
+    </message>
+    <message>
+      <source>Clear Filter</source>
+      <translation>ล้าง Filter</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>รายละเอียด</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>ไม่พบเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Any Action</source>
+      <translation>ทุกการกระทำ</translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for period from %1 to %2 - %n events found</source>
+      <comment>Dates are substituted</comment>
+      <translation>
+        <numerusform>บันทึกเหตุการณ์ตั้งแต่วันที่ %1 ถึง %2 -%n เหตุการณ์ที่พบ</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for %1 - %n events found</source>
+      <comment>Date is substituted</comment>
+      <translation>
+        <numerusform>บันทึกเหตุการณ์สำหรับ%1 - %n เหตุการณ์ที่พบ</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Export selected events to file</source>
+      <translation>เลือกเหตุการณ์ส่งออก</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventLogModel</name>
+    <message>
+      <source>Date/Time</source>
+      <translation>วัน/เวลา</translation>
+    </message>
+    <message>
+      <source>Event</source>
+      <translation>เหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>ต้นทาง</translation>
+    </message>
+    <message>
+      <source>Action</source>
+      <translation>กระทำ</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>เป้าหมาย</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>รายละเอียด</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8390,12 +8292,12 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>จำเป็นต้องมีการแปลงรหัสวิดีโอ</translation>
     </message>
     <message>
-      <source>Archive is encrypted.</source>
-      <translation type="unfinished">Archive is encrypted.</translation>
-    </message>
-    <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
     </message>
   </context>
   <context>
@@ -8606,6 +8508,76 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::GlobalPermissionsModel</name>
+    <message>
+      <source>View event log</source>
+      <translation>ดูแฟ้มบันทึกเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Permission granted by %1 group</source>
+      <translation type="unfinished">Permission granted by %1 group</translation>
+    </message>
+    <message>
+      <source>Generate events</source>
+      <translation type="unfinished">Generate events</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::GroupSettingsDialog</name>
+    <message>
+      <source>Group name cannot be empty.</source>
+      <translation type="unfinished">Group name cannot be empty.</translation>
+    </message>
+    <message>
+      <source>Group with the same name already exists.</source>
+      <translation type="unfinished">Group with the same name already exists.</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation type="unfinished">Delete failed</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation type="unfinished">Apply changes?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>ทิ้ง</translation>
+    </message>
+    <message>
+      <source>New Group</source>
+      <translation type="unfinished">New Group</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation type="unfinished">New Group %1</translation>
+    </message>
+    <message>
+      <source>Save changes</source>
+      <translation>ต้องการบันทึกการเปลี่ยนแปลง</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation type="unfinished">Enter your account password</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>บันทึก</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>ไม่สามารถใช้การเปลี่ยนแปลงได้</translation>
+    </message>
+    <message>
+      <source>Delete groups</source>
+      <translation type="unfinished">Delete groups</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>ลบ</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
@@ -8663,19 +8635,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>ไม่สามารถรวม %1 เข้ากับระบบของเรา</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IndirectAccessDecoratorModel</name>
-    <message>
-      <source>Access granted by:</source>
-      <translation>สิทธิ์การเข้าถึงโดย:</translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n more</source>
-      <translation>
-        <numerusform>และ %n อื่น ๆ</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -8777,6 +8736,132 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::LdapSettingsWidget</name>
+    <message>
+      <source>Disconnect LDAP server?</source>
+      <translation type="unfinished">Disconnect LDAP server?</translation>
+    </message>
+    <message>
+      <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
+      <translation type="unfinished">All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>ตัดการเชื่อมต่อ</translation>
+    </message>
+    <message>
+      <source>Reset Settings</source>
+      <translation type="unfinished">Reset Settings</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation type="unfinished">Enter your account password</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation>รีเซ็ต</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>การเชื่อมต่อล้มเหลว</translation>
+    </message>
+    <message>
+      <source>Remove existing LDAP users and groups?</source>
+      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+    </message>
+    <message>
+      <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
+      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>ใช่</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation type="unfinished">Apply Settings</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>ยอมรับ</translation>
+    </message>
+    <message>
+      <source>Synchronize LDAP Users and Groups</source>
+      <translation type="unfinished">Synchronize LDAP Users and Groups</translation>
+    </message>
+    <message>
+      <source>Synchronize</source>
+      <translation type="unfinished">Synchronize</translation>
+    </message>
+    <message>
+      <source>Connection OK</source>
+      <translation type="unfinished">Connection OK</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>ไม่สามารถใช้การเปลี่ยนแปลงได้</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation type="unfinished">LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n ช่อง</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
+      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>ส่งออก</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 มีใช้อยู่ในปัจจุบัน</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>จำเป็นต้องกรอกอย่างน้อยหนึ่งหน่วย %1</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n deactivations remaining.</source>
+      <translation>
+        <numerusform>%n การยกเลิกการทำงานที่เหลืออยู่</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation>
+        <numerusform>ปิดใช้งานใบอนุญาตหรือไม่?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation>ปิดใช้งาน</translation>
+    </message>
+    <message>
+      <source>Export licenses to a file</source>
+      <translation>ส่งออกใบอนุญาตไปยังไฟล์</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>ลบออก</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
@@ -8873,6 +8958,18 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>Verbose</source>
       <translation>ละเอียด</translation>
     </message>
+    <message>
+      <source>Default Logging level</source>
+      <translation type="unfinished">Default Logging level</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to “info”</source>
+      <translation type="unfinished">Non-default Logging level. We recommend setting it to “info”</translation>
+    </message>
+    <message>
+      <source>Logging level degrades the performance of the system</source>
+      <translation type="unfinished">Logging level degrades the performance of the system</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LogsManagementWatcher</name>
@@ -8940,6 +9037,13 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>Select Folder...</source>
       <translation type="unfinished">Select Folder...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListActionHandler</name>
+    <message>
+      <source>Network request failed</source>
+      <translation type="unfinished">Network request failed</translation>
     </message>
   </context>
   <context>
@@ -9134,21 +9238,6 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
-    <message>
-      <source>Motion</source>
-      <translation>การเคลื่อนไหว</translation>
-    </message>
-    <message>
-      <source>deleted camera</source>
-      <translation>ลบกล้อง</translation>
-    </message>
-    <message>
-      <source>Bookmark it...</source>
-      <translation>การบันทึก บุ๊คมาร์ค...</translation>
     </message>
   </context>
   <context>
@@ -9489,10 +9578,6 @@ You can force it, but it may significantly increase CPU load.</translation>
       <source>Acknowledge</source>
       <translation>รับทราบ</translation>
     </message>
-    <message>
-      <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9680,6 +9765,13 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::PlaybackPositionItem</name>
+    <message>
+      <source>video is paused</source>
+      <translation type="unfinished">video is paused</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
@@ -9791,22 +9883,6 @@ You can force it, but it may significantly increase CPU load.</translation>
       <translation>เว็บเพจ:</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
-    </message>
-    <message>
-      <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
-    </message>
-    <message>
-      <source>Edit Proxied Web Page</source>
-      <translation type="unfinished">Edit Proxied Web Page</translation>
-    </message>
-    <message>
-      <source>Edit Web Page</source>
-      <translation>แก้ไขเว็บเพจ</translation>
-    </message>
-    <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
       <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
     </message>
@@ -9817,6 +9893,58 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
       <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
+    </message>
+    <message>
+      <source>An integration may interact with the Desktop Client and request access to the user session</source>
+      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+    </message>
+    <message>
+      <source>Proxy this integration through the server</source>
+      <translation type="unfinished">Proxy this integration through the server</translation>
+    </message>
+    <message>
+      <source>Proxy this web page through the server</source>
+      <translation type="unfinished">Proxy this web page through the server</translation>
+    </message>
+    <message>
+      <source>Allow opening this integration without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+    </message>
+    <message>
+      <source>Allow opening this web page without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+    </message>
+    <message>
+      <source>New Web Page</source>
+      <translation>หน้าเว็บใหม่</translation>
+    </message>
+    <message>
+      <source>Edit Web Page</source>
+      <translation>แก้ไขเว็บเพจ</translation>
+    </message>
+    <message>
+      <source>New Proxied Web Page</source>
+      <translation type="unfinished">New Proxied Web Page</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Web Page</source>
+      <translation type="unfinished">Edit Proxied Web Page</translation>
+    </message>
+    <message>
+      <source>New Integration</source>
+      <translation type="unfinished">New Integration</translation>
+    </message>
+    <message>
+      <source>Edit Integration</source>
+      <translation type="unfinished">Edit Integration</translation>
+    </message>
+    <message>
+      <source>New Proxied Integration</source>
+      <translation type="unfinished">New Proxied Integration</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Integration</source>
+      <translation type="unfinished">Edit Proxied Integration</translation>
     </message>
   </context>
   <context>
@@ -9852,6 +9980,41 @@ You can force it, but it may significantly increase CPU load.</translation>
       <translation>
         <numerusform>สำหรับการส่งออกเป็นรีวิวรวดเร็ว ความยาววิดีโอควรที่น้อยที่สุด %n วินาที</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RecordingSettingsWidget</name>
+    <message>
+      <source>Screen %1 - %2x%3</source>
+      <translation>หน้าจอ %1 - %2x%3</translation>
+    </message>
+    <message>
+      <source>%1 (Primary)</source>
+      <translation>%1 (หลัก)</translation>
+    </message>
+    <message>
+      <source>Best</source>
+      <translation>ดีสุด</translation>
+    </message>
+    <message>
+      <source>Average</source>
+      <translation>ปานกลาง</translation>
+    </message>
+    <message>
+      <source>Performance</source>
+      <translation>ประสิทธิภาพ</translation>
+    </message>
+    <message>
+      <source>Native</source>
+      <translation>พื้นเมือง</translation>
+    </message>
+    <message>
+      <source>Quarter Native</source>
+      <translation>พื้นเมืองไตรมาส</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
   </context>
   <context>
@@ -9918,6 +10081,68 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
+    <message>
+      <source>Access granted by %1 group</source>
+      <translation type="unfinished">Access granted by %1 group</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n groups: %1</source>
+      <translation type="unfinished">
+        <numerusform>Access granted by %n groups: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Access granted by %1 layout</source>
+      <translation type="unfinished">Access granted by %1 layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n layouts: %1</source>
+      <translation type="unfinished">
+        <numerusform>Access granted by %n layouts: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Access granted by %1 video wall</source>
+      <translation type="unfinished">Access granted by %1 video wall</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n video walls: %1</source>
+      <translation type="unfinished">
+        <numerusform>Access granted by %n video walls: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>กล้องและอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+    </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation type="unfinished">Health Monitors</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>สร้างจอแสดงผลใหม่ (Video Wall)</translation>
+    </message>
+    <message>
+      <source>User&apos;s custom permissions</source>
+      <translation type="unfinished">User&apos;s custom permissions</translation>
+    </message>
+    <message>
+      <source>Group&apos;s custom permissions</source>
+      <translation type="unfinished">Group&apos;s custom permissions</translation>
+    </message>
+    <message>
+      <source>Access granted by %1</source>
+      <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
+      <translation type="unfinished">Access granted by %1</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ResourceTreeModelAdapter</name>
     <message>
       <source>add to current layout</source>
@@ -9934,6 +10159,28 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Health Monitor</source>
       <translation>การตรวจสอบสุขภาพ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ResourcesChangesManager</name>
+    <message>
+      <source>Resource list is empty</source>
+      <translation type="unfinished">Resource list is empty</translation>
+    </message>
+    <message>
+      <source>No connection</source>
+      <translation type="unfinished">No connection</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RestApiHelper</name>
+    <message>
+      <source>Password confirmation is required to apply changes</source>
+      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+    </message>
+    <message>
+      <source>Confirm</source>
+      <translation type="unfinished">Confirm</translation>
     </message>
   </context>
   <context>
@@ -10179,10 +10426,6 @@ You can still change quality and FPS directly on the camera.</translation>
       <translation>ชั่วโมง</translation>
     </message>
     <message>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>ลายน้ำจะปรากฏบนวิดีโอสดที่เก็บถาวรและส่งออกสำหรับผู้ใช้ที่ไม่ใช่ผู้ดูแลระบบเท่านั้น คุณและผู้ดูแลระบบคนอื่นจะไม่เห็นพวกเขา</translation>
-    </message>
-    <message>
       <source>Archive encryption password</source>
       <translation type="unfinished">Archive encryption password</translation>
     </message>
@@ -10235,6 +10478,10 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
       <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
     </message>
   </context>
   <context>
@@ -10296,6 +10543,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Unknown Certificate</source>
       <translation type="unfinished">Unknown Certificate</translation>
     </message>
+    <message>
+      <source>Not Part Of Certificate</source>
+      <translation type="unfinished">Not Part Of Certificate</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
@@ -10310,6 +10561,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Continue</source>
       <translation>ดำเนิน​การ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerListModel</name>
+    <message>
+      <source>Auto</source>
+      <translation>อัตโนมัติ</translation>
     </message>
   </context>
   <context>
@@ -10477,6 +10735,57 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
+    <message>
+      <source>Showreel</source>
+      <translation>showreel</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation>Showreel %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Delete Showreel %1?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelDropPlaceholder</name>
+    <message>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation>ลากโครงร่างหรือกล้องถ่ายรูปที่นี่เพื่อเพิ่มลงใน showreel</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation>ใช้ลูกศรบนแป้นพิมพ์เพื่อเปลี่ยนรูปแบบ เมื่อต้องการออกจาก showreel ให้กด Esc</translation>
+    </message>
+    <message>
+      <source>Press Esc to stop the tour.</source>
+      <translation type="unfinished">Press Esc to stop the tour.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelItemWidget</name>
+    <message>
+      <source>Switch by</source>
+      <comment>Arrows will follow</comment>
+      <translation>เปลี่ยนโดย</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <comment>Time selector will follow</comment>
+      <translation>แสดงผลสำหรับ</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <comment>Time will follow</comment>
+      <translation>เลือกรายการที่เลือกไว้แล้ว</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
@@ -10550,32 +10859,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Undo Replace</translation>
     </message>
     <message>
-      <source>Export</source>
-      <translation>ส่งออก</translation>
-    </message>
-    <message>
-      <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
-    </message>
-    <message>
-      <source>Import in progress...</source>
-      <translation type="unfinished">Import in progress...</translation>
-    </message>
-    <message>
-      <source>Import archive from %1 completed</source>
-      <translation type="unfinished">Import archive from %1 completed</translation>
-    </message>
-    <message>
       <source>Import archive from %1 failed</source>
       <translation type="unfinished">Import archive from %1 failed</translation>
-    </message>
-    <message>
-      <source>Import archive from %1 stopped</source>
-      <translation type="unfinished">Import archive from %1 stopped</translation>
-    </message>
-    <message>
-      <source>Import archive from %1</source>
-      <translation type="unfinished">Import archive from %1</translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n Servers</source>
@@ -10594,22 +10879,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">
         <numerusform>System storage is used for analytics data on %n Servers</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Not imported archive found on device %1</source>
-      <translation type="unfinished">Not imported archive found on device %1</translation>
-    </message>
-    <message>
-      <source>Not imported archive found on camera %1</source>
-      <translation type="unfinished">Not imported archive found on camera %1</translation>
-    </message>
-    <message>
-      <source>The archive stream settings have been changed by the user</source>
-      <translation type="unfinished">The archive stream settings have been changed by the user</translation>
-    </message>
-    <message>
-      <source>The recording settings have been changed by the user</source>
-      <translation type="unfinished">The recording settings have been changed by the user</translation>
     </message>
   </context>
   <context>
@@ -10811,10 +11080,33 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::UserGroupRequestChain</name>
+    <message>
+      <source>Group does not exist</source>
+      <translation type="unfinished">Group does not exist</translation>
+    </message>
+    <message>
+      <source>User does not exist</source>
+      <translation type="unfinished">User does not exist</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::UserGroupsWidget</name>
     <message>
       <source>Delete</source>
       <translation>ลบ</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation type="unfinished">No groups found</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation type="unfinished">Change search criteria or create a new group</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation type="unfinished">Delete failed</translation>
     </message>
   </context>
   <context>
@@ -10837,10 +11129,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>ชื่อผู้ใช้</translation>
     </message>
     <message>
-      <source>Name</source>
-      <translation>ชื่อ</translation>
-    </message>
-    <message>
       <source>Email</source>
       <translation>อีเมล</translation>
     </message>
@@ -10851,6 +11139,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Custom</source>
       <translation>แบบกำหนดเอง</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>ชื่อเต็ม</translation>
     </message>
   </context>
   <context>
@@ -10879,6 +11171,18 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Users with Digest Authentication</source>
       <translation type="unfinished">Users with Digest Authentication</translation>
     </message>
+    <message>
+      <source>No users found</source>
+      <translation type="unfinished">No users found</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation type="unfinished">Change search criteria or create a new user</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation type="unfinished">Delete failed</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>
@@ -10893,6 +11197,62 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>LDAP</source>
       <translation type="unfinished">LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserSettingsDialog</name>
+    <message>
+      <source>To modify your password please enter the existing one.</source>
+      <translation>ในการแก้ไขรหัสผ่านโปรดป้อนรหัสผ่านที่มีอยู่</translation>
+    </message>
+    <message>
+      <source>Invalid current password.</source>
+      <translation>รหัสผ่านปัจจุบันไม่ถูกต้อง.</translation>
+    </message>
+    <message>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 มีอีเมลผู้ใช้ที่ระบุอยู่แล้ว</translation>
+    </message>
+    <message>
+      <source>Login cannot be empty.</source>
+      <translation>ช่องผู้ใช้งาน ต้องไม่ปล่อยว่าง.</translation>
+    </message>
+    <message>
+      <source>Only letters, numbers and symbols %1 are allowed.</source>
+      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+    </message>
+    <message>
+      <source>User with specified login already exists.</source>
+      <translation>มีผู้ใช้งานเข้าสู่ระบบอยู่แล้ว.</translation>
+    </message>
+    <message>
+      <source>Save user</source>
+      <translation type="unfinished">Save user</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation type="unfinished">Enter your account password</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>บันทึก</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>ไม่สามารถใช้การเปลี่ยนแปลงได้</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation type="unfinished">Apply changes?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>ทิ้ง</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>อีเมลต้องไม่ว่างเปล่า</translation>
     </message>
   </context>
   <context>
@@ -10963,6 +11323,43 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::VmsEventSearchWidget</name>
+    <message>
+      <source>Any event</source>
+      <translation>ทุกเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>ปัญหาของกล้อง</translation>
+    </message>
+    <message>
+      <source>Server events</source>
+      <translation>เหตุการณ์เซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>วิเคราะห์เหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>วิเคราะห์เหตุการณ์</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>ไม่พบเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or create an Event Rule</source>
+      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n events</source>
+      <translation>
+        <numerusform>%n กิจกรรม</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::WebViewController</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
@@ -10971,6 +11368,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Select folder to upload</source>
       <translation>เลือกโฟลเดอร์ที่จะอัปโหลด</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
+    <message>
+      <source>Empty schedule is not allowed</source>
+      <translation type="unfinished">Empty schedule is not allowed</translation>
     </message>
   </context>
   <context>
@@ -11081,20 +11485,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>มีเวอร์ชัน %1</translation>
     </message>
     <message>
-      <source>Release Notes</source>
-      <translation>หมายเหตุ</translation>
-    </message>
-    <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
       <translation>ประเด็นสำคัญได้รับการแก้ไขแล้ว ขอแนะนำอย่างยิ่ง</translation>
     </message>
     <message>
-      <source>Update...</source>
-      <translation>อัพเดต...</translation>
+      <source>Updates</source>
+      <translation>อัพเดท</translation>
     </message>
     <message>
-      <source>Do not notify again about this update</source>
-      <translation>อย่าแจ้งให้ทราบอีกครั้งเกี่ยวกับการอัปเดตนี้</translation>
+      <source>Release Notes...</source>
+      <translation type="unfinished">Release Notes...</translation>
+    </message>
+    <message>
+      <source>%1 Version is available</source>
+      <translation type="unfinished">%1 Version is available</translation>
+    </message>
+    <message>
+      <source>%1</source>
+      <translation type="unfinished">%1</translation>
     </message>
   </context>
   <context>
@@ -11192,6 +11600,22 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Shared Layouts</source>
       <translation>บันทึกเค้าโครง</translation>
     </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation type="unfinished">Health Monitors</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>สร้างจอแสดงผลใหม่ (Video Wall)</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>การรวบรวม</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
@@ -11202,6 +11626,45 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>New Group %1</source>
       <translation type="unfinished">New Group %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
+    <message>
+      <source>No data</source>
+      <translation>ไม่มีข้อมูล</translation>
+    </message>
+    <message>
+      <source>All imported</source>
+      <translation type="unfinished">All imported</translation>
+    </message>
+    <message>
+      <source>In progress... (%1 left)</source>
+      <translation type="unfinished">In progress... (%1 left)</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>ปิดใช้งาน</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>ข้อผิดพลาด</translation>
+    </message>
+    <message>
+      <source>Failed to import. Retry in 1 minute.</source>
+      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>ชื่อ</translation>
+    </message>
+    <message>
+      <source>Imported up to</source>
+      <translation type="unfinished">Imported up to</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>สถานะ</translation>
     </message>
   </context>
   <context>
@@ -11254,7 +11717,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>เปิดเคร้าโครง</translation>
     </message>
     <message>
       <source>Modifier</source>
@@ -11311,52 +11774,123 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
+    <name>nx::vms::client::desktop::rules::AnalyticsEventTypePicker</name>
     <message>
-      <source>None</source>
-      <translation>ไม่มี</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>คุณสามารถตั้งค่าเหตุการณ์ Analytics ได้ในกล้องบางเครื่อง</translation>
     </message>
     <message>
-      <source>Starts</source>
-      <translation>เริ่ม</translation>
-    </message>
-    <message>
-      <source>Stops</source>
-      <translation>หยุด</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>ทางด่วน</translation>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>เลือกกล้องโดยใช้ปุ่มด้านบนเพื่อดูรายการกิจกรรมที่สนับสนุน</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
     <message>
-      <source>Not saved</source>
-      <translation type="unfinished">Not saved</translation>
+      <source>Event will trigger only if there are matches any of attributes.</source>
+      <translation type="unfinished">Event will trigger only if there are matches any of attributes.</translation>
+    </message>
+    <message>
+      <source>You can see the names of the attributes and their values on the Objects tab.</source>
+      <translation type="unfinished">You can see the names of the attributes and their values on the Objects tab.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::RulesDialog</name>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectTypePicker</name>
     <message>
-      <source>Restore all rules to default?</source>
-      <translation>คืนค่ากฎทั้งหมดให้เป็นค่าเริ่มต้นหรือไม่?</translation>
+      <source>Analytics object detection can be set up on a certain cameras.</source>
+      <translation type="unfinished">Analytics object detection can be set up on a certain cameras.</translation>
     </message>
     <message>
-      <source>This action cannot be undone.</source>
-      <translation>ไม่สามารถดำเนินการดังกล่าวให้ได้</translation>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>เลือกกล้องโดยใช้ปุ่มด้านบนเพื่อดูรายการกิจกรรมที่สนับสนุน</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
+    <message>
+      <source>Schedule</source>
+      <translation>ตารางบันทึก</translation>
     </message>
     <message>
-      <source>Failed to apply changes.</source>
-      <translation type="unfinished">Failed to apply changes.</translation>
+      <source>Delete</source>
+      <translation>ลบ</translation>
     </message>
     <message>
-      <source>Failed to restore rules.</source>
-      <translation type="unfinished">Failed to restore rules.</translation>
+      <source>WHEN</source>
+      <translation type="unfinished">WHEN</translation>
     </message>
     <message>
-      <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <source>EVENT</source>
+      <translation type="unfinished">EVENT</translation>
+    </message>
+    <message>
+      <source>DO</source>
+      <translation type="unfinished">DO</translation>
+    </message>
+    <message>
+      <source>ACTION</source>
+      <translation type="unfinished">ACTION</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>เปิดใช้งาน</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::KeywordsPicker</name>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>หากช่องว่างกิจกรรมจะเรียกใช้เสมอ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
+    <message>
+      <source>Has attributes</source>
+      <translation type="unfinished">Has attributes</translation>
+    </message>
+    <message>
+      <source>Listed</source>
+      <translation type="unfinished">Listed</translation>
+    </message>
+    <message>
+      <source>Not listed</source>
+      <translation type="unfinished">Not listed</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation type="unfinished">Attributes</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
+    <message>
+      <source>Once in</source>
+      <translation type="unfinished">Once in</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation type="unfinished">For</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::OutputPortPicker</name>
+    <message>
+      <source>automatic</source>
+      <translation>อัตโนมัติ</translation>
     </message>
   </context>
   <context>
@@ -11368,6 +11902,174 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Action</source>
       <translation>กระทำ</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>ต้นทาง</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>เป้าหมาย</translation>
+    </message>
+    <message>
+      <source>Comment</source>
+      <translation type="unfinished">Comment</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation>อุปกรณ์ทั้งหมด</translation>
+    </message>
+    <message>
+      <source>All Cameras</source>
+      <translation>กล้องทั้งหมด</translation>
+    </message>
+    <message>
+      <source>No source</source>
+      <translation type="unfinished">No source</translation>
+    </message>
+    <message>
+      <source>All Servers</source>
+      <translation>เซิร์ฟเวอร์ทั้งหมด</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n เซิร์ฟเวอร์</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>กล้องที่มา</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>แหล่งที่มาและ%n เพิ่มกล้องมากขึ้น</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>No target</source>
+      <translation type="unfinished">No target</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n เค้าโครง</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>ผู้ใช้ทั้งหมด</translation>
+    </message>
+    <message>
+      <source>Group</source>
+      <translation type="unfinished">Group</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n ผู้ใช้</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation type="unfinished">
+        <numerusform>%n Groups</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Power Users</source>
+      <translation type="unfinished">All Power Users</translation>
+    </message>
+    <message>
+      <source>All Server</source>
+      <translation type="unfinished">All Server</translation>
+    </message>
+    <message>
+      <source>Source Server and %1</source>
+      <translation>เซิร์ฟเวอร์ต้นทางและ %1</translation>
+    </message>
+    <message>
+      <source>System</source>
+      <translation>ระบบ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SingleTargetLayoutPicker</name>
+    <message>
+      <source>Select layout...</source>
+      <translation>เลือกเค้าโครง</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners.</source>
+      <translation>เค้าโครงเฉพาะสามารถแสดงต่อเจ้าของได้เท่านั้น</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SoundPicker</name>
+    <message>
+      <source>Manage</source>
+      <translation type="unfinished">Manage</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
+    <message>
+      <source>Soft trigger</source>
+      <translation type="unfinished">Soft trigger</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
+    <message>
+      <source>Contains keywords</source>
+      <translation type="unfinished">Contains keywords</translation>
+    </message>
+    <message>
+      <source>Does not contain keywords</source>
+      <translation type="unfinished">Does not contain keywords</translation>
+    </message>
+    <message>
+      <source>Contains list entries</source>
+      <translation type="unfinished">Contains list entries</translation>
+    </message>
+    <message>
+      <source>Does not contain list entries</source>
+      <translation type="unfinished">Does not contain list entries</translation>
+    </message>
+    <message>
+      <source>Keywords separated by space</source>
+      <translation>คำที่คั่นด้วยช่องว่าง</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
+    <message>
+      <source>Lookup lists network request failed</source>
+      <translation type="unfinished">Lookup lists network request failed</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
+    <message>
+      <source>Delete rule error: </source>
+      <translation type="unfinished">Delete rule error: </translation>
+    </message>
+    <message>
+      <source>Save rule error: </source>
+      <translation type="unfinished">Save rule error: </translation>
+    </message>
+    <message>
+      <source>Reset to defaults error: </source>
+      <translation type="unfinished">Reset to defaults error: </translation>
     </message>
   </context>
   <context>
@@ -11410,13 +12112,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
       <translation type="unfinished">Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
-    <message>
-      <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>ลากโครงร่างหรือกล้องถ่ายรูปที่นี่เพื่อเพิ่มลงใน showreel</translation>
     </message>
   </context>
   <context>
@@ -11466,36 +12161,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
-    <message>
-      <source>Switch with Hotkeys</source>
-      <translation>สลับกับปุ่มลัด</translation>
-    </message>
-    <message>
-      <source>Switch on Timer</source>
-      <translation>เปิดนาฬิกาจับเวลา</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
-    <message>
-      <source>Stop Tour</source>
-      <translation>หยุดทัวร์</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>หยุด Showreel</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>เริ่มต้น ทัวร์</translation>
-    </message>
-    <message>
-      <source>Start Showreel</source>
-      <translation>เริ่ม Showreel</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -11521,6 +12186,40 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Regions of Interest</source>
       <translation type="unfinished">Regions of Interest</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowreelSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation>สลับกับปุ่มลัด</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation>เปิดนาฬิกาจับเวลา</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowreelTextFactory</name>
+    <message>
+      <source>Stop Tour</source>
+      <translation>หยุดทัวร์</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>หยุด Showreel</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>เริ่มต้น ทัวร์</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>เริ่ม Showreel</translation>
     </message>
   </context>
   <context>
@@ -11577,7 +12276,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -11804,49 +12503,9 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
       <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>ใช้ลูกศรบนแป้นพิมพ์เพื่อเปลี่ยนรูปแบบ เมื่อต้องการออกจาก showreel ให้กด Esc</translation>
-    </message>
-    <message>
-      <source>Press Esc to stop the tour.</source>
-      <translation type="unfinished">Press Esc to stop the tour.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourItemWidget</name>
-    <message>
-      <source>Switch by</source>
-      <comment>Arrows will follow</comment>
-      <translation>เปลี่ยนโดย</translation>
-    </message>
-    <message>
-      <source>Display for</source>
-      <comment>Time selector will follow</comment>
-      <translation>แสดงผลสำหรับ</translation>
-    </message>
-    <message>
-      <source>Display selected for</source>
-      <comment>Time will follow</comment>
-      <translation>เลือกรายการที่เลือกไว้แล้ว</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
-    <message>
-      <source>Showreel</source>
-      <translation>showreel</translation>
-    </message>
-    <message>
-      <source>Showreel %1</source>
-      <translation>Showreel %1</translation>
-    </message>
-    <message>
-      <source>Delete Showreel %1?</source>
-      <translation>Delete Showreel %1?</translation>
+      <source>Not enough access rights</source>
+      <translation type="unfinished">Not enough access rights</translation>
     </message>
   </context>
   <context>
@@ -11866,10 +12525,6 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>Enter the name of the layout to create:</source>
       <translation>กรุณาใส่ชื่อของรูปแบบในการสร้าง:</translation>
-    </message>
-    <message>
-      <source>New Layout %1</source>
-      <translation>รูปแบบใหม่ %1</translation>
     </message>
     <message>
       <source>Save Layout As Cloud</source>

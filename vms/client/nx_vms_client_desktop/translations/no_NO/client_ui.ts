@@ -37,13 +37,6 @@
     </message>
   </context>
   <context>
-    <name>ActionTypePickerWidget</name>
-    <message>
-      <source>Do</source>
-      <translation>Gjør</translation>
-    </message>
-  </context>
-  <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -666,20 +659,35 @@
       <translation>Primær strømmeprofil</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation>Importer fra enhet</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation>Importer video automatisk</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation>Nettside</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation>Nettsideport</translation>
+    </message>
+    <message>
+      <source>Disable import</source>
+      <translation type="unfinished">Disable import</translation>
+    </message>
+    <message>
+      <source>Import Video from Device</source>
+      <translation type="unfinished">Import Video from Device</translation>
+    </message>
+    <message>
+      <source>Import camera or server offline periods</source>
+      <translation type="unfinished">Import camera or server offline periods</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Legg til</translation>
     </message>
   </context>
   <context>
@@ -954,6 +962,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation>Dette systemet er koblet til</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1164,17 +1179,6 @@
     </message>
   </context>
   <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>Når</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation>Generisk hendelse</translation>
-    </message>
-  </context>
-  <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
@@ -1333,25 +1337,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Ingenting funnet</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation>Legg til en kommentar</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Sett tidsplan</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation>Test handling</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation>Legg til en kommentar</translation>
     </message>
   </context>
   <context>
@@ -1524,13 +1509,6 @@
     </message>
   </context>
   <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>Inngangs-ID</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
@@ -1623,72 +1601,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Valgfri</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Tester...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP-innstillinger</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>Server URL</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Passord</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>Søkebase</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Søkefilter</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Tidsavbrudd for søk (s)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>Administrer DN eller CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Henter brukere fra LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Laster...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Tilkoblingsfeil</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>Rollen som skal tilordnes til importerte brukere</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Deaktiver importerte brukere</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>Tillat "digest autentisering" for importert bruker</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1613,6 @@
     <message>
       <source>Features</source>
       <translation>Funksjoner</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Aktive lisenser</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Fjern</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Ny lisens</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Detaljer...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>Programvaren er lisensiert til</translation>
     </message>
   </context>
   <context>
@@ -2014,17 +1903,6 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Tekst</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
@@ -2071,16 +1949,8 @@
       <translation>Tilkoblingsinnstillinger</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>E-post</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Passord</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Bruker</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2102,13 +1972,17 @@
       <source>System Signature</source>
       <translation>Systemsignatur</translation>
     </message>
+    <message>
+      <source>Username</source>
+      <translation>Brukernavn</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Logg på</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Passord</translation>
@@ -2116,6 +1990,10 @@
     <message>
       <source>Username</source>
       <translation>Brukernavn</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
@@ -2207,17 +2085,6 @@
     <message>
       <source>Events</source>
       <translation>Hendelser</translation>
-    </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Posisjon</translation>
     </message>
   </context>
   <context>
@@ -2343,49 +2210,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Søk blant brukere</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Aktiver</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Deaktiver</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>Slett...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Krev sikker autentisering</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Ingenting funnet</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Ny bruker...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Rediger roller...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP-innstillinger...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Henter brukere fra LDAP...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2461,17 +2285,6 @@
     </message>
   </context>
   <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Kvalitet</translation>
-    </message>
-  </context>
-  <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
@@ -2541,30 +2354,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Midlertidig mappe</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Ytterligere innstillinger</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Deaktiver Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Fange musepeker</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>En kraftig datamaskin anbefales for &quot;beste&quot; kvalitet og oppløsning.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
-      <translation>Bla gjennom...</translation>
+      <translation>Bla igjennom...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Kilde</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2376,20 @@
       <translation>Opptakskvalitet</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Kilde</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>En kraftig datamaskin anbefales for &quot;beste&quot; kvalitet og oppløsning.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>Skjerm</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Ytterligere innstillinger</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Fange musepeker</translation>
     </message>
   </context>
   <context>
@@ -2622,29 +2431,6 @@
     <message>
       <source>Live</source>
       <translation>Live</translation>
-    </message>
-  </context>
-  <context>
-    <name>RulesDialog</name>
-    <message>
-      <source>Alarm/Event Rules</source>
-      <translation>Alarm/hendelsesregler</translation>
-    </message>
-    <message>
-      <source>New Rule</source>
-      <translation>Ny regel</translation>
-    </message>
-    <message>
-      <source>Delete Rule</source>
-      <translation>Slett regel</translation>
-    </message>
-    <message>
-      <source>Select a Rule</source>
-      <translation>Velg en regel</translation>
-    </message>
-    <message>
-      <source>Reset Default Rules</source>
-      <translation>Tilbakestill standardregler</translation>
     </message>
   </context>
   <context>
@@ -2752,10 +2538,6 @@
       <translation>Brukeraktivitet</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Vis servere i treet for ikke-administratorbrukere</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Arkivkryptering</translation>
     </message>
@@ -2786,6 +2568,10 @@
     <message>
       <source>Manage Users</source>
       <translation>Administrer brukere</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
     </message>
   </context>
   <context>
@@ -2879,6 +2665,10 @@
       <source>Autodetect built-in and USB webcams</source>
       <translation>Oppdag innebygde og USB-webkameraer automatisk</translation>
     </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>Serverplasserings-ID:</translation>
+    </message>
   </context>
   <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
@@ -2938,32 +2728,6 @@
     <message>
       <source>Icon</source>
       <translation>Ikon</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation>Lyd</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation>Administrer</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Delstat</translation>
     </message>
   </context>
   <context>
@@ -3057,10 +2821,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Roller</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Vis alle brukere</translation>
     </message>
@@ -3071,6 +2831,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>Ingenting samsvarer med søket ditt.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
     </message>
   </context>
   <context>
@@ -3159,10 +2923,6 @@
       <source>+ Add Group</source>
       <translation>+ Legg til gruppe</translation>
     </message>
-    <message>
-      <source>No groups found</source>
-      <translation>Ingen grupper funnet</translation>
-    </message>
   </context>
   <context>
     <name>UserListWidget</name>
@@ -3173,77 +2933,6 @@
     <message>
       <source>+ Add User</source>
       <translation>+ Legg til bruker</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>Ingen brukere funnet</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Bytt passord...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Navn</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Brukere</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Slett rolle</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Brukerroller</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Ny rolle</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Det er ingen tilpassede brukerroller ennå.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Klikk på &quot;Ny rolle&quot; knapp for å opprette en.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Denne brukeren kan bruke sammendragsgodkjenning.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Krev sikker autentisering</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Brukertype</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Rolle</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Rediger roller...</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +2992,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Volum</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>Generell</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Proxy denne nettsiden via server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3342,10 +3012,6 @@
     <message>
       <source>Proxy all requested contents</source>
       <translation>Fullmakt for alt etterspurt innhold</translation>
-    </message>
-    <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Tillat åpning av nettside uten SSL-sertifikatkontroll</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3035,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Merk: Tidsplanen er basert på servertid.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Aktive lisenser</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Fjern</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Detaljer...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>Programvaren er lisensiert til</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Ny lisens</translation>
     </message>
   </context>
   <context>

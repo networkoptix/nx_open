@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Владелец: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Ваша система</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Формат устройства ввода %1 не поддерживается.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Первичное звуковое устройство не выбрано.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -105,10 +82,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>Вход в систему с использованием %1 временно недоступен</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>Истекло время ожидания соединения</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -212,6 +185,10 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Вы можете включить двухфакторную аутентификацию в вашем %1.</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Ошибка подключения</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
@@ -266,6 +243,17 @@
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
       <translation>Чтобы узнать больше о текущей проблеме, просмотрите сертификат сервера:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Формат устройства ввода %1 не поддерживается.</translation>
+    </message>
+    <message>
+      <source>Primary audio device is not selected.</source>
+      <translation>Первичное звуковое устройство не выбрано.</translation>
     </message>
   </context>
 </TS>

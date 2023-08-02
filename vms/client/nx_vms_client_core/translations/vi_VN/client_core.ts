@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi_VN" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Chủ sở hữu: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Hệ thống của bạn</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Định dạng mẫu của %1 thiết bị đầu vào không được hỗ trợ.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Thiết bị âm thanh chính không được chọn.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -70,7 +47,7 @@
     <name>RemoteConnectionErrorStrings</name>
     <message>
       <source>Client version: %1</source>
-      <translation>Phiên bản máy trạm: %1</translation>
+      <translation>Phiên bản máy khách: %1</translation>
     </message>
     <message>
       <source>Server version: %1.</source>
@@ -105,10 +82,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 người dùng đăng nhập tạm thời không khả dụng</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>Hết thời gian kết nối</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -212,6 +185,10 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Bạn có thể bật xác thực hai yếu tố tại %1.</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Kết nối thất bại</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
@@ -266,6 +243,17 @@
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
       <translation>Để tìm hiểu thêm về sự cố hiện tại, hãy xem chứng chỉ của máy chủ:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Định dạng mẫu của %1 thiết bị đầu vào không được hỗ trợ.</translation>
+    </message>
+    <message>
+      <source>Primary audio device is not selected.</source>
+      <translation>Thiết bị âm thanh chính không được chọn.</translation>
     </message>
   </context>
 </TS>

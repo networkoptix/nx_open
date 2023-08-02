@@ -37,13 +37,6 @@
     </message>
   </context>
   <context>
-    <name>ActionTypePickerWidget</name>
-    <message>
-      <source>Do</source>
-      <translation>Actie</translation>
-    </message>
-  </context>
-  <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -666,20 +659,35 @@
       <translation type="unfinished">Primary Stream Profile</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation>Webpagina</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation type="unfinished">Web Page Port</translation>
+    </message>
+    <message>
+      <source>Disable import</source>
+      <translation type="unfinished">Disable import</translation>
+    </message>
+    <message>
+      <source>Import Video from Device</source>
+      <translation type="unfinished">Import Video from Device</translation>
+    </message>
+    <message>
+      <source>Import camera or server offline periods</source>
+      <translation type="unfinished">Import camera or server offline periods</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Toevoegen</translation>
     </message>
   </context>
   <context>
@@ -954,6 +962,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation type="unfinished">This system is connected to</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1036,7 +1051,7 @@
     </message>
     <message>
       <source>&lt;Message&gt;</source>
-      <translation>&lt;Message&gt;</translation>
+      <translation type="unfinished">&lt;Message&gt;</translation>
     </message>
     <message>
       <source>Open Folder</source>
@@ -1161,17 +1176,6 @@
     <message>
       <source>Event Rules...</source>
       <translation>Gebeurtenisregels...</translation>
-    </message>
-  </context>
-  <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>Wanneer</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
     </message>
   </context>
   <context>
@@ -1333,25 +1337,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Niets gevonden</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Schema instellen</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1524,13 +1509,6 @@
     </message>
   </context>
   <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>Ingang ID</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
@@ -1623,72 +1601,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Optioneel</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Testen...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP instellingen</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>Server URL</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Wachtwoord</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>Zoekbasis</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Zoekfilter</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Zoek Timeout (s)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>Beheerder DN of CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen van LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Laden...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Netwerkfout</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>Rol om toe te wijzen aan geïmporteerde gebruikers</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Geïmporteerde gebruikers uitschakelen</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>Sta digest authenticatie toe voor geïmporteerde gebruiker</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1613,6 @@
     <message>
       <source>Features</source>
       <translation>Functies</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Actieve licenties</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Verwijder</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Nieuwe licentie</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Details...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>De software is gelicenseerd aan</translation>
     </message>
   </context>
   <context>
@@ -2014,17 +1903,6 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Tekst</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
@@ -2071,16 +1949,8 @@
       <translation type="unfinished">Connection Settings</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>E-mailadres</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Wachtwoord</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Gebruiker</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2102,13 +1972,17 @@
       <source>System Signature</source>
       <translation>Systeem handtekening</translation>
     </message>
+    <message>
+      <source>Username</source>
+      <translation>Gebruikersnaam</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Aanmelden</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Wachtwoord</translation>
@@ -2116,6 +1990,10 @@
     <message>
       <source>Username</source>
       <translation>Gebruikersnaam</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
@@ -2207,17 +2085,6 @@
     <message>
       <source>Events</source>
       <translation>Events</translation>
-    </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Preset</translation>
     </message>
   </context>
   <context>
@@ -2343,49 +2210,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Zoek gebruikers</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Inschakelen</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Uitschakelen</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>Verwijder...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Beveiligde authenticatie forceren</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Niets gevonden</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Nieuwe gebruiker...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Rollen bewerken...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP-instellingen...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen van LDAP...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2461,17 +2285,6 @@
     </message>
   </context>
   <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Kwaliteit</translation>
-    </message>
-  </context>
-  <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
@@ -2541,30 +2354,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Tijdelijke map</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Extra opties</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Schakel Aero uit</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Cursor opnemen</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Een krachtige computer wordt aanbevolen voor &quot;Beste&quot; kwaliteit en resolutie.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Bladeren...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Bron</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2376,20 @@
       <translation>Opnamekwaliteit</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Bron</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>Een krachtige computer wordt aanbevolen voor &quot;Beste&quot; kwaliteit en resolutie.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>Scherm</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Extra opties</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Cursor opnemen</translation>
     </message>
   </context>
   <context>
@@ -2622,29 +2431,6 @@
     <message>
       <source>Live</source>
       <translation>Live</translation>
-    </message>
-  </context>
-  <context>
-    <name>RulesDialog</name>
-    <message>
-      <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
-    </message>
-    <message>
-      <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
-    </message>
-    <message>
-      <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
-    </message>
-    <message>
-      <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
-    </message>
-    <message>
-      <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
     </message>
   </context>
   <context>
@@ -2752,10 +2538,6 @@
       <translation>Gebruikersactiviteit</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Servers in boomstructuur weergeven voor niet-beheerders</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Archief encryptie</translation>
     </message>
@@ -2786,6 +2568,10 @@
     <message>
       <source>Manage Users</source>
       <translation>Gebruikers beheren</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
     </message>
   </context>
   <context>
@@ -2879,6 +2665,10 @@
       <source>Autodetect built-in and USB webcams</source>
       <translation>Automatische detectie van ingebouwde en USB-webcams</translation>
     </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation type="unfinished">Server Location ID:</translation>
+    </message>
   </context>
   <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
@@ -2938,32 +2728,6 @@
     <message>
       <source>Icon</source>
       <translation>Icoon</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Status</translation>
     </message>
   </context>
   <context>
@@ -3057,10 +2821,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Rollen</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Toon alle gebruikers</translation>
     </message>
@@ -3071,6 +2831,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>Geen resultaten overeenkomstig met uw zoekopdracht.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
     </message>
   </context>
   <context>
@@ -3159,10 +2923,6 @@
       <source>+ Add Group</source>
       <translation type="unfinished">+ Add Group</translation>
     </message>
-    <message>
-      <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
-    </message>
   </context>
   <context>
     <name>UserListWidget</name>
@@ -3173,77 +2933,6 @@
     <message>
       <source>+ Add User</source>
       <translation>+ Gebruiker toevoegen</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Wachtwoord wijzigen...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Naam</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Gebruikers</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Rol verwijderen</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Gebruikersrollen</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Nieuwe rol</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Er zijn nog geen aangepaste gebruikersprofielen.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Klik op de &quot;Nieuw profiel&quot; -knop om er een te maken.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Deze gebruiker kan digest authenticatie gebruiken.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Beveiligde authenticatie forceren</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Gebruikerstype</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Rol</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Rollen bewerken...</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +2992,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Volume</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>Algemeen</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Proxy deze webpagina via de server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3342,10 +3012,6 @@
     <message>
       <source>Proxy all requested contents</source>
       <translation>Proxy alle gevraagde inhoud</translation>
-    </message>
-    <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Webpagina openen zonder SSL-certificaat toestaan</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3035,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Opmerking: Schema is gebaseerd op de servertijd.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Actieve licenties</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Details...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>De software is gelicenseerd aan</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Nieuwe licentie</translation>
     </message>
   </context>
   <context>

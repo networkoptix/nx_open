@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sv_SE" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Ägare: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Ditt system</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Samplingsformat för inmatningsenhet %1 stöds inte.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Primär ljudenhet är inte vald.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -105,10 +82,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 användarinloggning är tillfälligt otillgänglig</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>Anslutningen tog för lång tid</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -212,6 +185,10 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Du kan aktivera tvåfaktorsautentisering i din %1.</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Anslutningen misslyckades</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
@@ -266,6 +243,17 @@
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
       <translation>För att lära dig mer om det aktuella problemet, se serverns&apos;s certifikat:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Samplingsformat för inmatningsenhet %1 stöds inte.</translation>
+    </message>
+    <message>
+      <source>Primary audio device is not selected.</source>
+      <translation>Primär ljudenhet är inte vald.</translation>
     </message>
   </context>
 </TS>

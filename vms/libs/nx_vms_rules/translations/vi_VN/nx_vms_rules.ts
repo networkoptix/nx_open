@@ -2,6 +2,21 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi_VN" sourcelanguage="en">
   <context>
+    <name>GroupStrings</name>
+    <message>
+      <source>Any event</source>
+      <translation>Bất kỳ sự kiện nào</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Bất kỳ vấn đề camera</translation>
+    </message>
+    <message>
+      <source>Any server issue</source>
+      <translation type="unfinished">Any server issue</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::AggregatedEvent</name>
     <message>
       <source>Multiple %1 events have occurred</source>
@@ -20,24 +35,24 @@
       <translation>%1 đến %2</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Tiểu bang</translation>
+      <source>Begin When</source>
+      <translation type="unfinished">Begin When</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <source>Occurs at</source>
+      <translation type="unfinished">Occurs at</translation>
     </message>
     <message>
-      <source>Event Type</source>
-      <translation>Loại sự kiện</translation>
+      <source>Of Type</source>
+      <translation type="unfinished">Of Type</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>Chú thích</translation>
+      <source>And Caption</source>
+      <translation type="unfinished">And Caption</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>Miêu tả</translation>
+      <source>And Description</source>
+      <translation type="unfinished">And Description</translation>
     </message>
   </context>
   <context>
@@ -56,16 +71,16 @@
       <translation>Phát hiện phân tích Đối tượng</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <source>Occurs At</source>
+      <translation type="unfinished">Occurs At</translation>
     </message>
     <message>
-      <source>Object Type</source>
-      <translation>Loại đối tượng</translation>
+      <source>Of Type</source>
+      <translation type="unfinished">Of Type</translation>
     </message>
     <message>
-      <source>Attributes</source>
-      <translation>Các đặc tính</translation>
+      <source>And Object</source>
+      <translation type="unfinished">And Object</translation>
     </message>
   </context>
   <context>
@@ -82,12 +97,54 @@
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
-      <source>Unknown event</source>
-      <translation>Sự kiện không xác định</translation>
-    </message>
-    <message>
       <source>%1 event has occurred</source>
       <translation>Đã xảy ra sự kiện %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::BookmarkAction</name>
+    <message>
+      <source>Pre-recording</source>
+      <translation>Trước khi ghi</translation>
+    </message>
+    <message>
+      <source>Post-recording</source>
+      <translation>Trước khi ghi</translation>
+    </message>
+    <message>
+      <source>Create Bookmark</source>
+      <translation type="unfinished">Create Bookmark</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>Tại camera</translation>
+    </message>
+    <message>
+      <source>Fixed Duration</source>
+      <translation type="unfinished">Fixed Duration</translation>
+    </message>
+    <message>
+      <source>Add Tags</source>
+      <translation type="unfinished">Add Tags</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::BuzzerAction</name>
+    <message>
+      <source>Buzzer</source>
+      <translation>Buzzer</translation>
+    </message>
+    <message>
+      <source>Fixed duration</source>
+      <translation>Thời gian cố định</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>Tại camera</translation>
+    </message>
+    <message>
+      <source>Action Throttling</source>
+      <translation type="unfinished">Action Throttling</translation>
     </message>
   </context>
   <context>
@@ -101,20 +158,20 @@
       <translation>%1 vào</translation>
     </message>
     <message>
-      <source>Input Signal on Camera</source>
-      <translation>Tín hiệu đầu vào trên camera</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Tiểu bang</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <source>Input Signal on Device</source>
+      <translation type="unfinished">Input Signal on Device</translation>
     </message>
     <message>
-      <source>Input ID</source>
-      <translation>ID đầu vào</translation>
+      <source>Occurs at</source>
+      <translation type="unfinished">Occurs at</translation>
+    </message>
+    <message>
+      <source>With ID</source>
+      <translation type="unfinished">With ID</translation>
     </message>
   </context>
   <context>
@@ -164,15 +221,15 @@
         <numerusform>Thiết bị ngắt kết nối</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Device ID</source>
-      <translation>ID thiết bị</translation>
-    </message>
     <message numerus="yes">
       <source>Camera Disconnected</source>
       <translation>
         <numerusform>Camera Ngắt kết nối</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>Thiết bị</translation>
     </message>
   </context>
   <context>
@@ -209,18 +266,110 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::DeviceOutputAction</name>
+    <message>
+      <source>Output ID</source>
+      <translation>ID đầu ra</translation>
+    </message>
+    <message>
+      <source>Device Output</source>
+      <translation type="unfinished">Device Output</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>Tại camera</translation>
+    </message>
+    <message>
+      <source>Fixed Duration</source>
+      <translation type="unfinished">Fixed Duration</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceRecordingAction</name>
+    <message>
+      <source>Quality</source>
+      <translation>Hình ảnh</translation>
+    </message>
+    <message>
+      <source>FPS</source>
+      <translation>FPS</translation>
+    </message>
+    <message>
+      <source>Pre-recording</source>
+      <translation>Trước khi ghi</translation>
+    </message>
+    <message>
+      <source>Post-recording</source>
+      <translation>Trước khi ghi</translation>
+    </message>
+    <message>
+      <source>Camera Recording</source>
+      <translation type="unfinished">Camera Recording</translation>
+    </message>
+    <message>
+      <source>On</source>
+      <translation>Mở</translation>
+    </message>
+    <message>
+      <source>Fixed Duration</source>
+      <translation type="unfinished">Fixed Duration</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Khoảng thời gian hành động</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::EnterFullscreenAction</name>
+    <message>
+      <source>Camera</source>
+      <translation>Máy chụp hình</translation>
+    </message>
+    <message>
+      <source>On Layout</source>
+      <translation type="unfinished">On Layout</translation>
+    </message>
+    <message>
+      <source>Set to Fullscreen</source>
+      <translation>Đặt thành Toàn màn hình</translation>
+    </message>
+    <message>
+      <source>Set for</source>
+      <translation type="unfinished">Set for</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation type="unfinished">Rewind</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ExitFullscreenAction</name>
+    <message>
+      <source>On Layout</source>
+      <translation type="unfinished">On Layout</translation>
+    </message>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>Để lại toàn màn hình</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Đến</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
       <source>Fan error at %1</source>
       <translation>Lỗi quạt tại %1</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>Quạt bị lỗi</translation>
+      <source>Fan Failure</source>
+      <translation type="unfinished">Fan Failure</translation>
     </message>
     <message>
-      <source>Server</source>
-      <translation>Máy chủ</translation>
+      <source>At</source>
+      <translation>Tại camera</translation>
     </message>
   </context>
   <context>
@@ -234,32 +383,28 @@
       <translation>Sự kiện Generic %1</translation>
     </message>
     <message>
-      <source>Keywords separated by space</source>
-      <translation>Từ khóa ngăn cách bởi không gian</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>Tiểu bang</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Nguồn</translation>
+      <source>Omit logging</source>
+      <translation type="unfinished">Omit logging</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>Chú thích</translation>
+      <source>And Source</source>
+      <translation type="unfinished">And Source</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>Miêu tả</translation>
+      <source>And Caption</source>
+      <translation type="unfinished">And Caption</translation>
+    </message>
+    <message>
+      <source>And Description</source>
+      <translation type="unfinished">And Description</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAction</name>
-    <message>
-      <source>Interval of action</source>
-      <translation>Khoảng thời gian hành động</translation>
-    </message>
     <message>
       <source>Login</source>
       <translation>Đăng nhập</translation>
@@ -269,24 +414,32 @@
       <translation>Mật khẩu</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation>Thực hiện yêu cầu HTTP(S)</translation>
+      <source>Content type</source>
+      <translation>Kiểu Nội dung</translation>
     </message>
     <message>
-      <source>HTTP(S) URL</source>
-      <translation>URL HTTP(S)</translation>
+      <source>HTTP(S) Request</source>
+      <translation type="unfinished">HTTP(S) Request</translation>
     </message>
     <message>
-      <source>HTTP(S) Content</source>
-      <translation>Nội dung HTTP(S)</translation>
+      <source>URL</source>
+      <translation>Nơi</translation>
     </message>
     <message>
-      <source>Content Type</source>
-      <translation>Loại nội dung</translation>
+      <source>Content</source>
+      <translation>Nội Dung</translation>
     </message>
     <message>
-      <source>Request Method</source>
-      <translation>Phương thức yêu cầu</translation>
+      <source>Method</source>
+      <translation type="unfinished">Method</translation>
+    </message>
+    <message>
+      <source>Authentication Type</source>
+      <translation>Loại Xác Thực,</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Khoảng thời gian hành động</translation>
     </message>
   </context>
   <context>
@@ -319,16 +472,16 @@
       <translation>%1 phát hiện chuyển động</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Tiểu bang</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Máy chụp hình</translation>
-    </message>
-    <message>
       <source>Motion on Camera</source>
       <translation>Chuyển động trên camera</translation>
+    </message>
+    <message>
+      <source>Begin When</source>
+      <translation type="unfinished">Begin When</translation>
+    </message>
+    <message>
+      <source>Occurs at</source>
+      <translation type="unfinished">Occurs at</translation>
     </message>
   </context>
   <context>
@@ -405,16 +558,8 @@
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Show Notification</source>
-      <translation>Hiển thị thông báo</translation>
-    </message>
-    <message>
       <source>To</source>
       <translation>Đến</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation>Khoảng thời gian hành động</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
@@ -432,6 +577,67 @@
       <source>Tooltip</source>
       <translation>Chú giải công cụ</translation>
     </message>
+    <message>
+      <source>Show Desktop Notification</source>
+      <translation type="unfinished">Show Desktop Notification</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Khoảng thời gian hành động</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OpenLayoutAction</name>
+    <message>
+      <source>Open Layout</source>
+      <translation>Mở bố cục</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Đến</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation type="unfinished">Rewind</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Khoảng thời gian hành động</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PanicRecordingAction</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>Chế độ Ghi âm Panic sẽ chuyển cài đặt ghi hình cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
+    </message>
+    <message>
+      <source>Panic Recording</source>
+      <translation type="unfinished">Panic Recording</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PlaySoundAction</name>
+    <message>
+      <source>Volume</source>
+      <translation>Thể tích</translation>
+    </message>
+    <message>
+      <source>Play Sound</source>
+      <translation type="unfinished">Play Sound</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>Tại camera</translation>
+    </message>
+    <message>
+      <source>To Users</source>
+      <translation type="unfinished">To Users</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Khoảng thời gian hành động</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::PluginDiagnosticEvent</name>
@@ -440,24 +646,24 @@
       <translation>Sự kiện chẩn đoán plugin</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <source>Occurs at</source>
+      <translation type="unfinished">Occurs at</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Nguồn</translation>
+      <source>For Plugin</source>
+      <translation type="unfinished">For Plugin</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>Chú thích</translation>
+      <source>And Caption</source>
+      <translation type="unfinished">And Caption</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>Miêu tả</translation>
+      <source>And Description</source>
+      <translation type="unfinished">And Description</translation>
     </message>
     <message>
-      <source>Level</source>
-      <translation>Mức độ</translation>
+      <source>And Level Is</source>
+      <translation type="unfinished">And Level Is</translation>
     </message>
   </context>
   <context>
@@ -476,39 +682,112 @@
       <translation>Lý do: Vượt quá giới hạn công suất (%1)</translation>
     </message>
     <message>
-      <source>PoE over Budget</source>
-      <translation>Quá tải PoE</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Tiểu bang</translation>
-    </message>
-    <message>
       <source>Server</source>
       <translation>Máy chủ</translation>
+    </message>
+    <message>
+      <source>PoE Over Budget</source>
+      <translation type="unfinished">PoE Over Budget</translation>
+    </message>
+    <message>
+      <source>Begin When</source>
+      <translation type="unfinished">Begin When</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PtzPresetAction</name>
+    <message>
+      <source>Execute PTZ Preset</source>
+      <translation type="unfinished">Execute PTZ Preset</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>Tại camera</translation>
+    </message>
+    <message>
+      <source>PTZ Preset</source>
+      <translation type="unfinished">PTZ Preset</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Khoảng thời gian hành động</translation>
+    </message>
+    <message>
+      <source>Execute to users</source>
+      <translation type="unfinished">Execute to users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PushNotificationAction</name>
+    <message>
+      <source>To</source>
+      <translation>Đến</translation>
+    </message>
+    <message>
+      <source>Header</source>
+      <translation>Đầu trang</translation>
+    </message>
+    <message>
+      <source>Body</source>
+      <translation>Nội dung</translation>
+    </message>
+    <message>
+      <source>Send Mobile Notification</source>
+      <translation type="unfinished">Send Mobile Notification</translation>
+    </message>
+    <message>
+      <source>Add Source Device name to Body</source>
+      <translation type="unfinished">Add Source Device name to Body</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Khoảng thời gian hành động</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::RepeatSoundAction</name>
+    <message>
+      <source>Sound</source>
+      <translation>Âm thanh</translation>
+    </message>
+    <message>
+      <source>Volume</source>
+      <translation>Thể tích</translation>
+    </message>
+    <message>
+      <source>Repeat Sound</source>
+      <translation type="unfinished">Repeat Sound</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>Tại camera</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Đến</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
-      <source>Send email</source>
-      <translation>Gửi email</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>đến</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation>Khoảng thời gian hành động</translation>
-    </message>
-    <message>
-      <source>Additional recipients</source>
-      <translation>Người nhận bổ sung</translation>
-    </message>
-    <message>
       <source>Email Message</source>
       <translation>Nội dung email</translation>
+    </message>
+    <message>
+      <source>Send Email</source>
+      <translation type="unfinished">Send Email</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Đến</translation>
+    </message>
+    <message>
+      <source>Additional Recipients</source>
+      <translation type="unfinished">Additional Recipients</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Khoảng thời gian hành động</translation>
     </message>
   </context>
   <context>
@@ -578,6 +857,29 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>Hiển thị trên diện cảnh báo</translation>
+    </message>
+    <message>
+      <source>Alarm: %1</source>
+      <translation>Báo động: %1</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Đến</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation type="unfinished">Rewind</translation>
+    </message>
+    <message>
+      <source>Force Alarm Layout Opening</source>
+      <translation type="unfinished">Force Alarm Layout Opening</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
       <source>Trigger Name</source>
@@ -596,24 +898,20 @@
       <translation>Kích hoạt mềm</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Tiểu bang</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>Máy ảnh</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Người sử dụng</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Tên người sử dụng</translation>
     </message>
     <message>
       <source>Icon</source>
       <translation>Biểu tượng</translation>
+    </message>
+    <message>
+      <source>Occurs at</source>
+      <translation type="unfinished">Occurs at</translation>
+    </message>
+    <message>
+      <source>By</source>
+      <translation type="unfinished">By</translation>
     </message>
   </context>
   <context>
@@ -623,24 +921,24 @@
       <translation>Nói</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>Máy ảnh</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation>Khoảng thời gian hành động</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>Nói với người dùng</translation>
-    </message>
-    <message>
-      <source>Speak the following</source>
-      <translation>Cho biết sau</translation>
-    </message>
-    <message>
       <source>Volume</source>
       <translation>Thể tích</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>Văn bản</translation>
+    </message>
+    <message>
+      <source>At Device</source>
+      <translation type="unfinished">At Device</translation>
+    </message>
+    <message>
+      <source>To users</source>
+      <translation type="unfinished">To users</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Khoảng thời gian hành động</translation>
     </message>
   </context>
   <context>
@@ -697,24 +995,24 @@
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
-      <source>Show text overlay</source>
-      <translation>Hiện lớp phủ văn bản</translation>
+      <source>Show Text Overlay</source>
+      <translation type="unfinished">Show Text Overlay</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>Máy ảnh</translation>
+      <source>At</source>
+      <translation>Tại camera</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>Cũng hiển thị trên máy ảnh nguồn</translation>
+      <source>Fixed Duration</source>
+      <translation type="unfinished">Fixed Duration</translation>
     </message>
     <message>
-      <source>Display text for</source>
-      <translation>Hiển thị văn bản cho</translation>
+      <source>Custom Text</source>
+      <translation type="unfinished">Custom Text</translation>
     </message>
     <message>
-      <source>Text</source>
-      <translation>Văn bản</translation>
+      <source>Show to</source>
+      <translation>Cho Đến</translation>
     </message>
   </context>
   <context>
@@ -741,6 +1039,17 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::WriteToLogAction</name>
+    <message>
+      <source>Write to Log</source>
+      <translation type="unfinished">Write to Log</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Khoảng thời gian hành động</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::utils::StringHelper</name>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -760,6 +1069,24 @@
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>Thời gian：%1 trong %2</translation>
+    </message>
+    <message>
+      <source>All users</source>
+      <translation>Tất cả người dùng</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Removed subjects</source>
+      <translation>
+        <numerusform>%n Chủ đề đã bị xóa</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Unknown event</source>
+      <translation>Sự kiện không xác định</translation>
+    </message>
+    <message>
+      <source>Unknown action</source>
+      <translation type="unfinished">Unknown action</translation>
     </message>
   </context>
 </TS>

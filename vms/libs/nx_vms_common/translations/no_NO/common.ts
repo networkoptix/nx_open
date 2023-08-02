@@ -19,10 +19,6 @@
   <context>
     <name>AuthResultTranslations</name>
     <message>
-      <source>This user does not exist.</source>
-      <translation>Denne brukeren eksisterer ikke.</translation>
-    </message>
-    <message>
       <source>Wrong password.</source>
       <translation>Feil passord.</translation>
     </message>
@@ -57,6 +53,30 @@
     <message>
       <source>This user has been disabled by a system administrator.</source>
       <translation>Denne brukeren har blitt deaktivert av en systemadministrator.</translation>
+    </message>
+    <message>
+      <source>This user does not exist or is unable to login.</source>
+      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+    </message>
+    <message>
+      <source>More than one user with the same login are presented.</source>
+      <translation type="unfinished">More than one user with the same login are presented.</translation>
+    </message>
+    <message>
+      <source>Unable to verify LDAP server SSL/TLS certificate.</source>
+      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkFacade</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Fjernet kamera</translation>
+    </message>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation>Systemhendelse</translation>
     </message>
   </context>
   <context>
@@ -138,6 +158,57 @@
         <numerusform>Petabyte(s)</numerusform>
         <numerusform>Petabyte</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>PredefinedUserGroups</name>
+    <message>
+      <source>Administrators</source>
+      <translation>Administratorer</translation>
+    </message>
+    <message>
+      <source>Power Users</source>
+      <translation>Superbrukere</translation>
+    </message>
+    <message>
+      <source>Advanced Viewers</source>
+      <translation>Avanserte brukere</translation>
+    </message>
+    <message>
+      <source>Viewers</source>
+      <translation>Brukere</translation>
+    </message>
+    <message>
+      <source>Live Viewers</source>
+      <translation>Livebrukere</translation>
+    </message>
+    <message>
+      <source>System Health Viewers</source>
+      <translation>Systemstatus brukere</translation>
+    </message>
+    <message>
+      <source>Has full control of System configuration, but cannot create or modify other Power Users.</source>
+      <translation>Har full kontroll over systemkonfigurasjonen, men kan ikke opprette eller endre andre avanserte brukere.</translation>
+    </message>
+    <message>
+      <source>Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
+      <translation>Kan se og kjøre PTZ-posisjoner og PTZ-turer, bruke 2-veis lyd, betjene I/O-modulknapper, opprette og redigere bokmerker og se hendelsesloggen.</translation>
+    </message>
+    <message>
+      <source>Can view and export archive and Bookmarks.</source>
+      <translation>Kan vise og eksportere arkiv og bokmerker.</translation>
+    </message>
+    <message>
+      <source>Can view live videos, I/O modules and web pages.</source>
+      <translation>Kan se live videoer, I/O-moduler og nettsider.</translation>
+    </message>
+    <message>
+      <source>Can view System Health Monitoring information.</source>
+      <translation>Kan se informasjon om systemstatusovervåking.</translation>
+    </message>
+    <message>
+      <source>This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</source>
+      <translation type="unfinished">This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</translation>
     </message>
   </context>
   <context>
@@ -243,14 +314,6 @@
       <translation>Ukjent kameraproblem.</translation>
     </message>
     <message>
-      <source>Invalid data was received from the device %1.</source>
-      <translation>Ugyldige data ble mottatt fra enheten %1.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the camera %1.</source>
-      <translation>Ugyldige data ble mottatt fra kameraet %1.</translation>
-    </message>
-    <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
       <translation>For mange media feil. Vennligst åpne enhetsproblemdialog for mer informasjon.</translation>
     </message>
@@ -273,10 +336,6 @@
     <message>
       <source>Unknown I/O module issue.</source>
       <translation>Ukjent I / O-modul problem.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the I/O module %1.</source>
-      <translation>Ugyldige data ble mottatt fra I / O-modulen %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
@@ -373,6 +432,25 @@
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
       <translation>Hvis deaktivert, prøv å aktivere opptak i I/O-modulinnstillinger (feil &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
+      <translation>Ugyldige data ble mottatt fra enheten. Detaljer: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
+      <translation>Ugyldige data ble mottatt fra kameraet. Detaljer: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
+      <translation>Ugyldige data ble mottatt fra I/O-modulen. Detaljer: &quot;%1&quot;.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Fjernet kamera</translation>
     </message>
   </context>
   <context>
@@ -753,6 +831,27 @@
         <numerusform>%n/%1 NVR-lisenser</numerusform>
       </translation>
     </message>
+    <message>
+      <source>%1 Licenses</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 lisenser</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n %1 Licenses</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">
+        <numerusform>%n %1 lisenser</numerusform>
+        <numerusform>%n %1 Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 %2 Licenses</source>
+      <comment>%n will be replaced by the total count,%2 is the short cloud name (like Cloud)</comment>
+      <translation>
+        <numerusform>%n/%1 %2 lisenser</numerusform>
+        <numerusform>%n/%1 %2 lisenser</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
@@ -1037,62 +1136,14 @@
     </message>
   </context>
   <context>
-    <name>QnUserRolesManager</name>
-    <message>
-      <source>Owner</source>
-      <translation>Eier</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Administrator</translation>
-    </message>
-    <message>
-      <source>Advanced Viewer</source>
-      <translation>Avansert Bruker</translation>
-    </message>
-    <message>
-      <source>Viewer</source>
-      <translation>Bruker</translation>
-    </message>
-    <message>
-      <source>Live Viewer</source>
-      <translation>Live Bruker</translation>
-    </message>
-    <message>
-      <source>Custom Role</source>
-      <translation>Tilpasset rolle</translation>
-    </message>
+    <name>QnUserResource</name>
     <message>
       <source>Custom</source>
       <translation>Tilpasset</translation>
     </message>
     <message>
-      <source>Can manage all cameras and bookmarks.</source>
-      <translation>Kan håndtere alle kameraer og bokmerker.</translation>
-    </message>
-    <message>
-      <source>Can view all cameras and export video.</source>
-      <translation>Kan vise alle kameraer og eksportere video.</translation>
-    </message>
-    <message>
-      <source>Can view live video from all cameras.</source>
-      <translation>Kan se live video fra alle kameraer.</translation>
-    </message>
-    <message>
-      <source>Custom user role.</source>
-      <translation>Tilpasset brukerrolle.</translation>
-    </message>
-    <message>
-      <source>Custom permissions.</source>
-      <translation>Tilpassede tillatelser.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can do everything.</source>
-      <translation>Har tilgang til hele systemet og kan gjøre alt.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>Har tilgang til hele systemet og kan redigere innstillinger. Kan skape brukere.</translation>
+      <source>Multiple groups</source>
+      <translation type="unfinished">Multiple groups</translation>
     </message>
   </context>
   <context>
@@ -1169,74 +1220,6 @@
   </context>
   <context>
     <name>SystemSettings</name>
-    <message>
-      <source>SMTP host</source>
-      <translation>SMTP-vert</translation>
-    </message>
-    <message>
-      <source>Email from</source>
-      <translation>E-post fra</translation>
-    </message>
-    <message>
-      <source>SMTP user</source>
-      <translation>SMTP-bruker</translation>
-    </message>
-    <message>
-      <source>SMTP password</source>
-      <translation>SMTP passord</translation>
-    </message>
-    <message>
-      <source>Email signature</source>
-      <translation>E-post signatur</translation>
-    </message>
-    <message>
-      <source>Email support link</source>
-      <translation>Link for e-poststøtte</translation>
-    </message>
-    <message>
-      <source>SMTP connection type</source>
-      <translation>SMTP-tilkoblingstype</translation>
-    </message>
-    <message>
-      <source>SMTP port</source>
-      <translation>SMTP-port</translation>
-    </message>
-    <message>
-      <source>SMTP timeout (seconds)</source>
-      <translation>SMTP-tidsavbrudd (sekunder)</translation>
-    </message>
-    <message>
-      <source>SMTP name</source>
-      <translation>SMTP Navn</translation>
-    </message>
-    <message>
-      <source>LDAP URI</source>
-      <translation>LDAP URI</translation>
-    </message>
-    <message>
-      <source>LDAP Admin DN</source>
-      <translation>LDAP Admin DN</translation>
-    </message>
-    <message>
-      <source>LDAP Admin password</source>
-      <translation>LDAP Admin passord</translation>
-    </message>
-    <message>
-      <source>LDAP search base</source>
-      <translation>LDAP-søkebase</translation>
-    </message>
-    <message>
-      <source>LDAP search filter</source>
-      <translation>LDAP-søkefilter</translation>
-    </message>
-    <message>
-      <source>LDAP password expiration (milliseconds)</source>
-      <translation>Utløp av LDAP-passord (millisekunder)</translation>
-    </message>
-    <message>
-      <source>LDAP search timeout (seconds)</source>
-      <translation>Tidsavbrudd for LDAP-søk (sekunder)</translation>
-    </message>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>Anonym statistikkrapport tillatt</translation>
@@ -1475,10 +1458,6 @@
       <translation>Vannmerkeinnstillinger</translation>
     </message>
     <message>
-      <source>Authorization Session token lifetime (minutes)</source>
-      <translation>Levetid for autorisasjonsøkttoken (minutter)</translation>
-    </message>
-    <message>
       <source>Session token count limit on a single Server</source>
       <translation>Begrensning for antall sesjonstokener på en enkelt server</translation>
     </message>
@@ -1591,11 +1570,6 @@
       <translation>Aktiver utdaterte API-funksjoner (usikre)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Aktiver utdaterte API-funksjoner som for øyeblikket brukes av %1 programvare (usikkert)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>La IP-adresser bli automatisk oppdaget</translation>
     </message>
@@ -1638,6 +1612,63 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>Oppdater nettadressen til releases.json-filen</translation>
+    </message>
+    <message>
+      <source>Cloud storage update period in seconds</source>
+      <translation>Oppdateringsperiode for skylagring i sekunder</translation>
+    </message>
+    <message>
+      <source>LDAP settings</source>
+      <translation>LDAP-innstillinger</translation>
+    </message>
+    <message>
+      <source>SMTP settings</source>
+      <translation type="unfinished">SMTP settings</translation>
+    </message>
+    <message>
+      <source>Authorization Session token lifetime (seconds)</source>
+      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Aktiver utdaterte API-funksjoner som brukes av %1 programvare (usikkert)</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation>akkurat nå</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minute(s) ago</source>
+      <translation>
+        <numerusform>%n minutt(er) siden</numerusform>
+        <numerusform>%n minutt(er) siden</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hour(s) ago</source>
+      <translation>
+        <numerusform>%n time(r) siden</numerusform>
+        <numerusform>%n time(r) siden</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation>i går</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n day(s) ago</source>
+      <translation>
+        <numerusform>%n dag(er) siden</numerusform>
+        <numerusform>%n dag(er) siden</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation>en uke siden</translation>
     </message>
   </context>
   <context>
@@ -1690,16 +1721,13 @@
       <source>No data exported.</source>
       <translation>Ingen data eksportert.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
     <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Feil kryptert strømstørrelse.</translation>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>Lås opp denne delen av arkivet for å eksportere innholdet.</translation>
     </message>
     <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Skadet kryptert strøm header.</translation>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>Arkivet er utilgjengelig nå. Prøv igjen senere.</translation>
     </message>
   </context>
   <context>
@@ -2038,27 +2066,12 @@
       <source>Trigger Name</source>
       <translation>Navn på utløser</translation>
     </message>
-    <message>
-      <source>Role</source>
-      <translation>Rolle</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
         <numerusform>%n brukere</numerusform>
         <numerusform>%n brukere</numerusform>
       </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n Roller</numerusform>
-        <numerusform>%n Roller</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation>Alle administratorer</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -2337,12 +2350,20 @@
       <source>Also play on source camera</source>
       <translation>Spill også på kildekamera</translation>
     </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
     <message>
-      <source>Removed camera</source>
-      <translation>Fjernet kamera</translation>
+      <source>Group</source>
+      <translation>Gruppe</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation>
+        <numerusform>%n Grupper</numerusform>
+        <numerusform>%n Grupper</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Power Users</source>
+      <translation>Alle superbrukere</translation>
     </message>
   </context>
 </TS>

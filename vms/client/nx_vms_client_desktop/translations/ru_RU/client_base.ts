@@ -41,6 +41,22 @@
     </message>
   </context>
   <context>
+    <name>CameraPickerStrings</name>
+    <message>
+      <source>Source Camera</source>
+      <translation>Исходная камера</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Исходная камера и ещё %n камера</numerusform>
+        <numerusform>Исходная камера и ещё %n камеры</numerusform>
+        <numerusform>Исходная камера и ещё %n камер</numerusform>
+        <numerusform>Исходная камера и ещё %n камер</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
@@ -152,14 +168,6 @@
       <translation>Показать заставку</translation>
     </message>
     <message>
-      <source>Tab</source>
-      <translation>Вкладку</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>Создать вкладку</translation>
-    </message>
-    <message>
       <source>Window</source>
       <translation>Окно</translation>
     </message>
@@ -172,16 +180,8 @@
       <translation>Пользователя...</translation>
     </message>
     <message>
-      <source>New User...</source>
-      <translation>Создать пользователя...</translation>
-    </message>
-    <message>
       <source>Video Wall...</source>
       <translation>Видеостену...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>Новая видеостена...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -499,10 +499,6 @@
       <translation>Убрать с раскладки</translation>
     </message>
     <message>
-      <source>Stop Sharing Layout</source>
-      <translation>Убрать раскладку из общего</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>Переименовать</translation>
     </message>
@@ -517,14 +513,6 @@
     <message>
       <source>User Settings...</source>
       <translation>Настройки пользователя...</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation>Роли пользователей...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation>Настройки роли...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -597,10 +585,6 @@
     <message>
       <source>Video Wall Settings...</source>
       <translation>Настройки видеостены...</translation>
-    </message>
-    <message>
-      <source>Add Device...</source>
-      <translation>Добавить устройство...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
@@ -747,10 +731,6 @@
       <translation>Прокрутка...</translation>
     </message>
     <message>
-      <source>New Showreel...</source>
-      <translation>Новая прокрутка...</translation>
-    </message>
-    <message>
       <source>Remove from Showreel</source>
       <translation>Удалить из прокрутки</translation>
     </message>
@@ -819,10 +799,6 @@
       <translation>Виртуальная камера...</translation>
     </message>
     <message>
-      <source>New Virtual Camera...</source>
-      <translation>Новая виртуальная камера...</translation>
-    </message>
-    <message>
       <source>Show Tree</source>
       <translation>Показать дерево</translation>
     </message>
@@ -863,14 +839,6 @@
       <translation>Переключиться на вкладку «Объекты»</translation>
     </message>
     <message>
-      <source>Pin Calendar</source>
-      <translation>Прикрепить календарь</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>Открепить календарь</translation>
-    </message>
-    <message>
       <source>Page...</source>
       <translation>Страница...</translation>
     </message>
@@ -896,7 +864,7 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Создать</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
@@ -972,10 +940,6 @@
       <translation>Удалить группу</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page...</source>
-      <translation>Добавить проксированную веб-страницу...</translation>
-    </message>
-    <message>
       <source>Cell Spacing</source>
       <translation>Расстояние между ячейками</translation>
     </message>
@@ -1035,6 +999,74 @@
       <source>Save Cloud Layout As...</source>
       <translation type="unfinished">Save Cloud Layout As...</translation>
     </message>
+    <message>
+      <source>Lookup Lists...</source>
+      <translation type="unfinished">Lookup Lists...</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Добавить</translation>
+    </message>
+    <message>
+      <source>Device...</source>
+      <translation type="unfinished">Device...</translation>
+    </message>
+    <message>
+      <source>Add User...</source>
+      <translation>Добавить пользователя...</translation>
+    </message>
+    <message>
+      <source>Integration...</source>
+      <translation type="unfinished">Integration...</translation>
+    </message>
+    <message>
+      <source>New Integration...</source>
+      <translation type="unfinished">New Integration...</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation>Новая web-страница...</translation>
+    </message>
+    <message>
+      <source>Add Showreel...</source>
+      <translation type="unfinished">Add Showreel...</translation>
+    </message>
+    <message>
+      <source>Add Virtual Camera...</source>
+      <translation type="unfinished">Add Virtual Camera...</translation>
+    </message>
+    <message>
+      <source>Integration Settings...</source>
+      <translation type="unfinished">Integration Settings...</translation>
+    </message>
+    <message>
+      <source>Proxied Integration...</source>
+      <translation type="unfinished">Proxied Integration...</translation>
+    </message>
+    <message>
+      <source>Proxied Web Page...</source>
+      <translation type="unfinished">Proxied Web Page...</translation>
+    </message>
+    <message>
+      <source>Layout</source>
+      <translation>Раскладка</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Новая раскладка</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen</source>
+      <translation type="unfinished">New Welcome Screen</translation>
+    </message>
+    <message>
+      <source>Show Proxied Resources</source>
+      <translation type="unfinished">Show Proxied Resources</translation>
+    </message>
+    <message>
+      <source>Import From Devices...</source>
+      <translation type="unfinished">Import From Devices...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1080,6 +1112,41 @@
     <message>
       <source>Auto</source>
       <translation>Авто</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Нет</translation>
+    </message>
+    <message>
+      <source>Event Occurs</source>
+      <translation type="unfinished">Event Occurs</translation>
+    </message>
+    <message>
+      <source>Event Starts</source>
+      <translation type="unfinished">Event Starts</translation>
+    </message>
+    <message>
+      <source>Event Stops</source>
+      <translation type="unfinished">Event Stops</translation>
+    </message>
+  </context>
+  <context>
+    <name>DurationPickerWidgetStrings</name>
+    <message>
+      <source>Instant</source>
+      <translation>Мгновенно</translation>
+    </message>
+    <message>
+      <source>No more than once per</source>
+      <translation>Не чаще чем раз в</translation>
+    </message>
+    <message>
+      <source>Live</source>
+      <translation>В режиме реального времени</translation>
+    </message>
+    <message>
+      <source>Rewind for</source>
+      <translation type="unfinished">Rewind for</translation>
     </message>
   </context>
   <context>
@@ -1161,21 +1228,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Изображения</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Видео</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Все файлы</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1196,6 +1248,25 @@
     <message>
       <source>Executable %1 Media File</source>
       <translation>Исполняемый медиа-файл %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>FlagsPickerWidgetStrings</name>
+    <message>
+      <source>Error</source>
+      <translation>Ошибка</translation>
+    </message>
+    <message>
+      <source>Warning</source>
+      <translation>Предупреждение</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Информация</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>Неопределено</translation>
     </message>
   </context>
   <context>
@@ -1232,18 +1303,27 @@
     </message>
   </context>
   <context>
+    <name>Groups</name>
+    <message>
+      <source>Delete group?</source>
+      <translation type="unfinished">Delete group?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n group(s)?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n group(s)?</numerusform>
+        <numerusform>Delete %n group(s)?</numerusform>
+        <numerusform>Delete %n group(s)?</numerusform>
+        <numerusform>Delete %n group(s)?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
       <translation>Русский</translation>
-    </message>
-  </context>
-  <context>
-    <name>LayoutTourTextFactory</name>
-    <message>
-      <source>Start Showreel</source>
-      <translation>Запустить прокрутки</translation>
     </message>
   </context>
   <context>
@@ -1514,16 +1594,8 @@ License Key: %2</translation>
       <translation>SSL</translation>
     </message>
     <message>
-      <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
-    </message>
-    <message>
       <source>Check</source>
       <translation>Проверить</translation>
-    </message>
-    <message>
-      <source>Email is not valid.</source>
-      <translation>Некорректный Email.</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
@@ -1573,10 +1645,6 @@ License Key: %2</translation>
       <translation>Успешно</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>Истекло время ожидания соединения</translation>
-    </message>
-    <message>
       <source>Authentication failed</source>
       <translation>Ошибка авторизации</translation>
     </message>
@@ -1585,13 +1653,29 @@ License Key: %2</translation>
       <translation>Неизвестная ошибка</translation>
     </message>
     <message>
+      <source>%1 users will start receiving emails immediately after you apply these settings</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+    </message>
+    <message>
+      <source>Cannot reach the server</source>
+      <translation type="unfinished">Cannot reach the server</translation>
+    </message>
+    <message>
+      <source>Username or Password are incorrect</source>
+      <translation type="unfinished">Username or Password are incorrect</translation>
+    </message>
+    <message>
+      <source>Insecure</source>
+      <translation type="unfinished">Insecure</translation>
+    </message>
+    <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
       <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
     </message>
     <message>
-      <source>%1 users will start receiving emails immediately after you apply these settings</source>
-      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <source>Connection failed</source>
+      <translation>Ошибка подключения</translation>
     </message>
   </context>
   <context>
@@ -1684,26 +1768,6 @@ License Key: %2</translation>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>Допускаются только латинские буквы, цифры и символы.</translation>
-    </message>
-  </context>
-  <context>
-    <name>PermissionsInfoTable</name>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>Камеры и ресурсы</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation>Раскладки с общим доступом</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>Полномочия</translation>
-    </message>
-    <message>
-      <source>All</source>
-      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
-      <translation>Все</translation>
     </message>
   </context>
   <context>
@@ -1845,13 +1909,6 @@ License Key: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnAccessibleLayoutsWidget</name>
-    <message>
-      <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>Предоставляя доступ для некоторых раскладок, вы даете доступ ко всем камерам на них. Также пользователь получит доступ ко всем новым камерам на этих раскладках.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -1910,7 +1967,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Настройки безопасности изменены</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -1918,7 +1975,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>При первом подключении к серверу будет запрошено ваше подтверждение для принятия сертификата, если он содержит ошибки</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -2275,12 +2332,12 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation type="unfinished">Connected to %1 via %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation type="unfinished">Disconnected from %1 via %2</translation>
     </message>
   </context>
@@ -2977,7 +3034,7 @@ to %1</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>Введите пароль своей учетной записи, чтобы отключить систему от %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2986,12 +3043,12 @@ to %1</source>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>Система отключена от %1</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>Вы собираетесь отключить систему от %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -3004,7 +3061,7 @@ to %1</source>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Система будет доступна через локальную сеть с учетной записью локального администратора.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -3013,7 +3070,11 @@ to %1</source>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>Не удается отключить систему от %1</translation>
+    </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation type="unfinished">System will be accessible only through local network.</translation>
     </message>
   </context>
   <context>
@@ -3195,11 +3256,15 @@ to %1</source>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>Система не совместима с двухфакторной аутентификацией</translation>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
       <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Log In...</source>
+      <translation type="unfinished">Log In...</translation>
     </message>
   </context>
   <context>
@@ -3227,6 +3292,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Для создания произвольного события см. %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Изображения</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Видео</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Все файлы</translation>
     </message>
   </context>
   <context>
@@ -3269,11 +3349,11 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Сохранить резервную копию БД</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Введите пароль своей учетной записи, чтобы создать резервную копию</translation>
     </message>
     <message>
       <source>Create</source>
@@ -3281,11 +3361,11 @@ to %1</source>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Восстановление из резервной копии базы данных</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
+      <translation>Введите пароль своей учетной записи, чтобы восстановить систему из резервной копии</translation>
     </message>
     <message>
       <source>Restore</source>
@@ -3302,135 +3382,6 @@ to %1</source>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
       <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModel</name>
-    <message>
-      <source>Local user</source>
-      <translation>Локальный пользователь</translation>
-    </message>
-    <message>
-      <source>%1 user</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 пользователь</translation>
-    </message>
-    <message>
-      <source>LDAP user</source>
-      <translation>Пользователь LDAP</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>Активирован</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Отключено</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Логин</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Имя</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Роль</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModelPrivate</name>
-    <message>
-      <source>Owner</source>
-      <translation>Владелец</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Администратор</translation>
-    </message>
-    <message>
-      <source>View live video</source>
-      <translation>Просмотр видео в реальном времени</translation>
-    </message>
-    <message>
-      <source>Adjust device settings</source>
-      <translation>Настройка камер</translation>
-    </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>Настройка устройств</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>Использование PTZ</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>Просмотр архива</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>Экспорт видео</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>Управление видеостенами</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Edit</source>
-      <translation>Правка</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>Все пользователи</translation>
-    </message>
-    <message>
-      <source>With enabled digest authentication</source>
-      <translation>С включенной дайджест-аутентификацией</translation>
-    </message>
-    <message>
-      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>Пользователи могут быть импортированы с сервера LDAP. Они смогут входить в систему только в том случае, если сервер LDAP подключен к сети, и их учетные записи активны.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopDataProvider</name>
-    <message>
-      <source>Could not find video encoder %1.</source>
-      <translation>Невозможно обнаружить видео кодек %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Невозможно инициализировать видео кодек.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Невозможно инициализировать звуковой кодек.</translation>
-    </message>
-    <message>
-      <source>Could not start primary audio device.</source>
-      <translation>Невозможно инициализировать первичное звуковое устройство.</translation>
-    </message>
-    <message>
-      <source>Screen width must be a multiple of 8.</source>
-      <translation>Ширина экрана должна быть кратна 8.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>Невозможно инициализировать звуковое устройство &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Could not detect capturing resolution</source>
-      <translation>Не удалось обнаружить разрешение захвата</translation>
-    </message>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Устройство захвата звука не поддерживает подходящие аудиоформаты. Выберите другое аудиоустройство или &quot;нет&quot; в настройках записи экрана.</translation>
     </message>
   </context>
   <context>
@@ -3729,6 +3680,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGenericTabbedDialog</name>
+    <message>
+      <source>Apply changes before exit?</source>
+      <translation>Применить изменения перед выходом?</translation>
+    </message>
+  </context>
+  <context>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
@@ -3832,95 +3790,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>Не удалось включить %1 порт ввода/вывода</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialog</name>
-    <message>
-      <source>Test</source>
-      <translation>Проверка</translation>
-    </message>
-    <message>
-      <source>Test failed</source>
-      <translation>Проверка не удалась</translation>
-    </message>
-    <message numerus="yes">
-      <source>Test completed successfully: %n users found.</source>
-      <translation>
-        <numerusform>Проверка завершилась успешно: найден %n пользователь.</numerusform>
-        <numerusform>Проверка завершилась успешно: найдены %n пользователя.</numerusform>
-        <numerusform>Проверка завершилась успешно: найдено %n пользователей.</numerusform>
-        <numerusform>Проверка завершилась успешно: найден %n пользователь.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>Изменение любых параметров LDAP, кроме фильтра, приведет к потере связи для всех пользователей, выбранных для LDAP.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialogPrivate</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>Указанные настройки не верны.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>Невозможно выполнить проверку.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>Время ожидания истекло</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUserListModel</name>
-    <message>
-      <source>Login</source>
-      <translation>Логин</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>DN</source>
-      <translation>DN</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Имя</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUsersDialog</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>Указанные настройки не верны.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>Невозможно выполнить проверку.</translation>
-    </message>
-    <message>
-      <source>Could not load users.</source>
-      <translation>Невозможно загрузить пользователей.</translation>
-    </message>
-    <message>
-      <source>Error while loading users.</source>
-      <translation>Ошибка при загрузке пользователей.</translation>
-    </message>
-    <message>
-      <source>No new users found.</source>
-      <translation>Новые пользователи не найдены.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>Время ожидания истекло</translation>
-    </message>
-    <message>
-      <source>Import Selected</source>
-      <translation>Импортировать выбранных</translation>
     </message>
   </context>
   <context>
@@ -4037,75 +3906,9 @@ to %1</source>
       <source>Channels</source>
       <translation>Канала</translation>
     </message>
-  </context>
-  <context>
-    <name>QnLicenseManagerWidget</name>
     <message>
-      <source>Export</source>
-      <translation>Экспорт</translation>
-    </message>
-    <message>
-      <source>Export licenses to a file</source>
-      <translation>Экспорт лицензий в файл</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Деактивировать лицензию?</numerusform>
-        <numerusform>Деактивировать лицензии?</numerusform>
-        <numerusform>Деактивировать лицензии?</numerusform>
-        <numerusform>Деактивировать лицензии?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Удалить</translation>
-    </message>
-    <message>
-      <source>Deactivate</source>
-      <translation>Деактивировать</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n channels.</source>
-      <translation>
-        <numerusform>%n канал.</numerusform>
-        <numerusform>%n канала.</numerusform>
-        <numerusform>%n каналов.</numerusform>
-        <numerusform>%n каналов.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 уже используeтся</numerusform>
-        <numerusform>%1 уже используются</numerusform>
-        <numerusform>%1 уже используются</numerusform>
-        <numerusform>%1 уже используются</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Требуется по крайней мере %1</numerusform>
-        <numerusform>Требуются по крайней мере %1</numerusform>
-        <numerusform>Требуются по крайней мере %1</numerusform>
-        <numerusform>Требуются по крайней мере %1</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n deactivations remaining.</source>
-      <translation>
-        <numerusform>Осталось %n деактивация.</numerusform>
-        <numerusform>Осталось %n деактивации.</numerusform>
-        <numerusform>Осталось %n деактиваций.</numerusform>
-        <numerusform>Осталось %n деактиваций.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation>У вас не установлена действующая лицензия. Пожалуйста, активируйте свою коммерческую или пробную лицензию.</translation>
+      <source>Not verified</source>
+      <translation type="unfinished">Not verified</translation>
     </message>
   </context>
   <context>
@@ -4159,14 +3962,6 @@ to %1</source>
       <translation>Расширенные</translation>
     </message>
     <message>
-      <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>Файл настроек доступен только для чтения. Пожалуйста, обратитесь к системному администратору. Все изменения будут потеряны после выхода из программы.</translation>
-    </message>
-    <message>
-      <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>Невозможно сохранить настройки. Пожалуйста, обратитесь к системному администратору. Все изменения будут потеряны после выхода из программы.</translation>
-    </message>
-    <message>
       <source>Restart required</source>
       <translation>Требуется перезапуск</translation>
     </message>
@@ -4181,6 +3976,10 @@ to %1</source>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
       <translation>Некоторые изменения вступят в силу только после перезапуска %1</translation>
+    </message>
+    <message>
+      <source>Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
+      <translation type="unfinished">Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</translation>
     </message>
   </context>
   <context>
@@ -4310,6 +4109,10 @@ to %1</source>
       <source>Object Search</source>
       <translation>Поиск объекта</translation>
     </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
   </context>
   <context>
     <name>QnMessageBox</name>
@@ -4424,49 +4227,6 @@ to %1</source>
     <message>
       <source>Rotation</source>
       <translation>Поворот</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPermissionsWidget</name>
-    <message>
-      <source>Edit camera settings</source>
-      <translation>Изменение настроек камеры</translation>
-    </message>
-    <message>
-      <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>А также настройка PTZ позиций и туров.</translation>
-    </message>
-    <message>
-      <source>Control video walls</source>
-      <translation>Управление видеостенами</translation>
-    </message>
-    <message>
-      <source>View event log</source>
-      <translation>Просмотр журнала событий</translation>
-    </message>
-    <message>
-      <source>View archive</source>
-      <translation>Просмотр архива</translation>
-    </message>
-    <message>
-      <source>Export archive</source>
-      <translation>Экспорт архива</translation>
-    </message>
-    <message>
-      <source>View bookmarks</source>
-      <translation>Просмотр закладок</translation>
-    </message>
-    <message>
-      <source>Modify bookmarks</source>
-      <translation>Изменение закладок</translation>
-    </message>
-    <message>
-      <source>User Input</source>
-      <translation>Другие действия</translation>
-    </message>
-    <message>
-      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ, выход устройства, двухстороннее аудио, программные триггеры.</translation>
     </message>
   </context>
   <context>
@@ -4661,41 +4421,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRecordingSettingsWidget</name>
-    <message>
-      <source>Screen %1 - %2x%3</source>
-      <translation>Экран %1 - %2х%3</translation>
-    </message>
-    <message>
-      <source>%1 (Primary)</source>
-      <translation>%1 (Основной)</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>Наилучшее</translation>
-    </message>
-    <message>
-      <source>Average</source>
-      <translation>Среднее</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>Производительность</translation>
-    </message>
-    <message>
-      <source>Native</source>
-      <translation>Оригинальное</translation>
-    </message>
-    <message>
-      <source>Quarter Native</source>
-      <translation>1/4 Оригинального</translation>
-    </message>
-    <message>
-      <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
@@ -4770,26 +4495,6 @@ to %1</source>
   <context>
     <name>QnRequiredPermissionSubjectPolicy</name>
     <message>
-      <source>Role %1 has no %2 permission</source>
-      <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation>Роль %1 не имеет полномочий на %2</translation>
-    </message>
-    <message>
-      <source>Selected roles have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Выбранные роли не имеют разрешения на %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no %2 permission</source>
-      <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n выбранная роль из %1 не имеет полномочий на %2</numerusform>
-        <numerusform>%n выбранные роли из %1 не имеют полномочий на %2</numerusform>
-        <numerusform>%n выбранных ролей из %1 не имеют полномочий на %2</numerusform>
-        <numerusform>%n выбранных ролей из %1 не имеют полномочий на %2</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
       <translation>Пользователь %1 не имеет полномочий на %2</translation>
@@ -4807,6 +4512,26 @@ to %1</source>
         <numerusform>%n выбранных пользователя из %1 не имеют разрешения %2</numerusform>
         <numerusform>%n выбранных пользователей из %1 не имеют разрешения %2</numerusform>
         <numerusform>%n выбранных пользователей из %1 не имеют разрешения %2</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User group %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user group, %2 is permission name</comment>
+      <translation type="unfinished">User group %1 has no %2 permission</translation>
+    </message>
+    <message>
+      <source>Selected user groups have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation type="unfinished">Selected user groups have no %1 permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected user groups have no %2 permission</source>
+      <comment>%1 is number of selected user groups, %2 is permission name</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
       </translation>
     </message>
   </context>
@@ -4953,6 +4678,30 @@ to %1</source>
     <message>
       <source>Select cameras...</source>
       <translation>Выберите камеры...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSelectLayoutsButton</name>
+    <message>
+      <source>Any Layout</source>
+      <translation type="unfinished">Any Layout</translation>
+    </message>
+    <message>
+      <source>All Layouts</source>
+      <translation type="unfinished">All Layouts</translation>
+    </message>
+    <message>
+      <source>Select Layouts...</source>
+      <translation>Выбрать раскладку...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Layouts</source>
+      <translation>
+        <numerusform>%n Раскладкок</numerusform>
+        <numerusform>%n Раскладкок</numerusform>
+        <numerusform>%n Раскладкок</numerusform>
+        <numerusform>%n Раскладкок</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5189,6 +4938,10 @@ to %1</source>
       <source>Save changes before exit?</source>
       <translation>Применить изменения перед выходом?</translation>
     </message>
+    <message>
+      <source>Apply changes before exit?</source>
+      <translation>Применить изменения перед выходом?</translation>
+    </message>
   </context>
   <context>
     <name>QnShowTextOverlayActionWidget</name>
@@ -5324,10 +5077,6 @@ to %1</source>
     <message>
       <source>Provide</source>
       <translation type="unfinished">Provide</translation>
-    </message>
-    <message>
-      <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
     </message>
   </context>
   <context>
@@ -5625,10 +5374,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Обновления</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>Пользователи</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Безопасность</translation>
     </message>
@@ -5651,6 +5396,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Advanced</source>
       <translation>Расширенные</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Интеграции</translation>
     </message>
   </context>
   <context>
@@ -5736,18 +5485,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Ошибка отправки Email</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been finished</source>
-      <translation>Синхронизация удаленного архива завершена</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization is in progress</source>
-      <translation>Выполняется синхронизация удаленного архива</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>Завершена синхронизация удаленного архива для следующего устройства:</translation>
-    </message>
-    <message>
       <source>Archive integrity problem detected</source>
       <translation>Обнаружена проблема целостности архива</translation>
     </message>
@@ -5790,10 +5527,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Некорректный график записи камеры</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been stopped</source>
-      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
-    </message>
-    <message>
       <source>Storage for analytics data is not set</source>
       <translation type="unfinished">Storage for analytics data is not set</translation>
     </message>
@@ -5804,10 +5537,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Analytics data can take up large amounts of space.</source>
       <translation>Данные аналитики могут занимать много места.</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization is available</source>
-      <translation type="unfinished">Remote archive synchronization is available</translation>
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
@@ -5895,243 +5624,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>QnUserProfileWidget</name>
+    <name>QnUserRolesModel</name>
     <message>
-      <source>Login</source>
-      <translation>Логин</translation>
+      <source>Custom</source>
+      <translation>Особые</translation>
     </message>
     <message>
-      <source>Name</source>
-      <translation>Имя</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Роль</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>To enable digest authentication password reset is required</source>
-      <translation>Для включения дайджест-аутентификации требуется сброс пароля</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidget</name>
-    <message>
-      <source>Role name cannot be empty.</source>
-      <translation>Имя роли не может быть пустым.</translation>
-    </message>
-    <message>
-      <source>Role with same name already exists.</source>
-      <translation>Роль с таким же именем уже существует.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidgetPrivate</name>
-    <message>
-      <source>No users have this role</source>
-      <translation>Роль не назначена ни одному пользлвателю</translation>
-    </message>
-    <message>
-      <source>Custom with no permissions</source>
-      <translation>Особая, без полномочий</translation>
-    </message>
-    <message>
-      <source>Users will have no permissions unless changed later.</source>
-      <translation>Пользователи не будут иметь полномочий, пока настройка не будет изменена.</translation>
-    </message>
-    <message>
-      <source>Assign a new role</source>
-      <translation>Назначить новую роль</translation>
-    </message>
-    <message>
-      <source>Delete such users</source>
-      <translation>Удалить таких пользователей</translation>
-    </message>
-    <message numerus="yes">
-      <source>Please select an action to perform on %n users with this role</source>
-      <translation>
-        <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователем с этой ролью</numerusform>
-        <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
-        <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
-        <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRolesDialog</name>
-    <message>
-      <source>Role Info</source>
-      <translation>Информация о роли</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>Полномочия</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>Камеры и ресурсы</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>Раскладки</translation>
-    </message>
-    <message>
-      <source>New Role</source>
-      <translation>Новая роль</translation>
-    </message>
-    <message>
-      <source>New Role %1</source>
-      <translation>Новая роль %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsDialog</name>
-    <message>
-      <source>User Information</source>
-      <translation>Информация пользователе</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>Полномочия</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>Камеры и ресурсы</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>Раскладки</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Создать пользователя...</translation>
-    </message>
-    <message>
-      <source>User Settings - %1 (readonly)</source>
-      <translation>Настройки пользователя - %1 (только для чтения)</translation>
-    </message>
-    <message>
-      <source>User Settings - %1</source>
-      <translation>Настройки пользователя - %1</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>Активирован</translation>
-    </message>
-    <message>
-      <source>User is disabled</source>
-      <translation>Пользователь отключен</translation>
-    </message>
-    <message>
-      <source>Apply changes before switching to another user?</source>
-      <translation>Применить изменения перед переходом к другому пользователю?</translation>
-    </message>
-    <message>
-      <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Этот пользователь еще не зарегистрировался в %1</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for this user</source>
-      <translation>Разрешить дайджест-аутентификацию для этого пользователя</translation>
-    </message>
-    <message>
-      <source>Learn More</source>
-      <translation>Подробнее</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsWidget</name>
-    <message>
-      <source>Local</source>
-      <translation>Локальный</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Логин</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty.</source>
-      <translation>Логин должен быть задан.</translation>
-    </message>
-    <message>
-      <source>User with specified login already exists.</source>
-      <translation>Пользователь с таким логином уже существует.</translation>
-    </message>
-    <message>
-      <source>User has been renamed. Password must be updated.</source>
-      <translation>Имя пользователя изменено. Пароль должен быть обновлён.</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Имя</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>Email cannot be empty.</source>
-      <translation>Email не может быть пустым.</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Пароль</translation>
-    </message>
-    <message>
-      <source>Confirm Password</source>
-      <translation>Подтверждение пароля</translation>
-    </message>
-    <message>
-      <source>Passwords do not match.</source>
-      <translation>Введённые пароли не совпадают.</translation>
-    </message>
-    <message>
-      <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 пользователь с таким Email уже существует.</translation>
-    </message>
-    <message>
-      <source>Local users</source>
-      <translation>Локальные пользователи</translation>
-    </message>
-    <message>
-      <source>%1 users</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 пользователь</translation>
-    </message>
-    <message>
-      <source>%1 belong to this system only and are fully managed by system administrators.</source>
-      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 принадлежат только этой системе и полностью управляются системными администраторами.</translation>
-    </message>
-    <message>
-      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
-      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 может иметь доступ ко многим системам. Администраторы могут управлять только своими правами.</translation>
-    </message>
-    <message>
-      <source>Password reset is required</source>
-      <translation>Требуется сброс пароля</translation>
-    </message>
-    <message>
-      <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation>Допускаются только буквы, цифры и символы %1.</translation>
+      <source>Custom access rights</source>
+      <translation type="unfinished">Custom access rights</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
-    <message>
-      <source>Email cannot be empty.</source>
-      <translation>Email не может быть пустым.</translation>
-    </message>
-    <message>
-      <source>Email is not valid.</source>
-      <translation>Некорректный Email.</translation>
-    </message>
     <message>
       <source>Password cannot be empty.</source>
       <translation>Пароль должен быть задан.</translation>
@@ -6139,6 +5643,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Avoid leading and trailing spaces.</source>
       <translation>Избегайте пробелов в начале и конце.</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>Email не может быть пустым</translation>
+    </message>
+    <message>
+      <source>Email is not valid</source>
+      <translation>Некорректный Email</translation>
     </message>
   </context>
   <context>
@@ -6195,16 +5707,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Открыть эту веб-страницу?</translation>
     </message>
     <message>
-      <source>Web page</source>
-      <translation>Веб-страница</translation>
-    </message>
-    <message>
       <source>Connect anyway</source>
       <translation>Подключиться в любом случае</translation>
-    </message>
-    <message>
-      <source>Web page settings...</source>
-      <translation>Настройки веб-страницы...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6216,6 +5720,37 @@ We recommend you not to open this web page. If you understand the risks, you can
 %1,
 но на этой веб-странице представлен ненадежный сертификат аутентификации.
 Мы рекомендуем вам не открывать эту веб-страницу. Если вы понимаете риски, вы можете открыть веб-страницу.</translation>
+    </message>
+    <message>
+      <source>Open this integration?</source>
+      <translation type="unfinished">Open this integration?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation type="unfinished">Integration</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Web-страница</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+    </message>
+    <message>
+      <source>Integration settings...</source>
+      <translation type="unfinished">Integration settings...</translation>
+    </message>
+    <message>
+      <source>Web Page settings...</source>
+      <translation type="unfinished">Web Page settings...</translation>
     </message>
   </context>
   <context>
@@ -6675,41 +6210,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>There is another layout with the same name.</source>
       <translation>Существует другая раскладка с тем же именем.</translation>
     </message>
-    <message numerus="yes">
-      <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>User will still have access to %n removed resource:</numerusform>
-        <numerusform>User will still have access to %n removed resource:</numerusform>
-        <numerusform>User will still have access to %n removed resource:</numerusform>
-        <numerusform>User will still have access to %n removed resource:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to User Settings.</source>
-      <translation>Чтобы удалить доступ перейдите к настройкам пользователя.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>All users with this role will get access to %n resource:</numerusform>
-        <numerusform>All users with this role will get access to %n resource:</numerusform>
-        <numerusform>All users with this role will get access to %n resource:</numerusform>
-        <numerusform>All users with this role will get access to %n resource:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to Role Settings.</source>
-      <translation>Чтобы удалить доступ перейдите к настройкам роли.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Changes will affect other users</source>
       <translation>Изменения повлияют на других пользователей</translation>
@@ -6717,42 +6217,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
       <translation>Эта раскладка используется совместно с другими пользователями, поэтому изменение коснутся также и их.</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>User will lose access to %n resource:</numerusform>
-        <numerusform>User will lose access to %n resource:</numerusform>
-        <numerusform>User will lose access to %n resource:</numerusform>
-        <numerusform>User will lose access to %n resource:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>All users with this role will lose access to %n resource:</numerusform>
-        <numerusform>All users with this role will lose access to %n resource:</numerusform>
-        <numerusform>All users with this role will lose access to %n resource:</numerusform>
-        <numerusform>All users with this role will lose access to %n resource:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>Удалить %n общую раскладку?</numerusform>
-        <numerusform>Удалить %n общую раскладку?</numerusform>
-        <numerusform>Удалить %n общую раскладку?</numerusform>
-        <numerusform>Удалить %n общую раскладку?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
-        <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
-        <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
-        <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
@@ -6954,6 +6418,87 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Delete %n layouts?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>Delete %n layouts?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerical form depends on layouts count</comment>
+      <translation type="unfinished">
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Delete user?</source>
+      <translation>Удалить пользователя?</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n items were not deleted.</source>
+      <translation type="unfinished">
+        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n items were not deleted.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>ServerPickerStrings</name>
+    <message>
+      <source>Any Server</source>
+      <translation>Любой сервер</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n Server</numerusform>
+        <numerusform>%n сервера</numerusform>
+        <numerusform>%n серверов</numerusform>
+        <numerusform>%n Server</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>Выберите сервер</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Исходный сервер</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source Server and %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Source Server and %n Servers</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>ShowreelTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Запустить прокрутки</translation>
+    </message>
   </context>
   <context>
     <name>SimpleMotionSearchWidget::Private</name>
@@ -7004,6 +6549,42 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select at least one I/O module</source>
       <translation type="unfinished">Select at least one I/O module</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>Проверка</translation>
+    </message>
+    <message>
+      <source>Also set on source camera</source>
+      <translation>Также установить на камере-источнике события</translation>
+    </message>
+    <message>
+      <source>Also trigger on source camera</source>
+      <translation>Также запускать на камере-источнике события</translation>
+    </message>
+    <message>
+      <source>Also record source camera</source>
+      <translation>Также записывать камеру-источник события</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Исходная камера</translation>
+    </message>
+    <message>
+      <source>Also play on source camera</source>
+      <translation>Также воспроизводить на исходной камере</translation>
+    </message>
+    <message>
+      <source>Also show source camera</source>
+      <translation>Показывать также камеру источник события</translation>
+    </message>
+    <message>
+      <source>Also show on source camera</source>
+      <translation>Также показывать на камере источнике события</translation>
+    </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation type="unfinished">Use event source camera</translation>
     </message>
   </context>
   <context>
@@ -7089,42 +6670,49 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>UserListModel</name>
+    <name>UserPickerHelper</name>
     <message>
-      <source>Owner</source>
-      <translation>Владелец</translation>
+      <source>All Users</source>
+      <translation>Все пользователи</translation>
     </message>
     <message>
-      <source>Administrator</source>
-      <translation>Администратор</translation>
+      <source>Select at least one user</source>
+      <translation>Выберите хотя бы одного пользователя</translation>
     </message>
     <message>
-      <source>View live video</source>
-      <translation>Просмотр видео в реальном времени</translation>
+      <source>Group</source>
+      <translation type="unfinished">Group</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n User</numerusform>
+        <numerusform>%n пользователя</numerusform>
+        <numerusform>%n пользователей</numerusform>
+        <numerusform>%n пользователь</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation type="unfinished">
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Adjust device settings</source>
-      <translation>Настройка камер</translation>
+      <source>All Power Users</source>
+      <translation type="unfinished">All Power Users</translation>
     </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>Настройка устройств</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>Использование PTZ</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>Просмотр архива</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>Экспорт видео</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>Управление видеостенами</translation>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <translation>
+        <numerusform>ещё %n</numerusform>
+        <numerusform>ещё %n</numerusform>
+        <numerusform>ещё %n</numerusform>
+        <numerusform>ещё %n</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7152,6 +6740,21 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>Для отображения локальных файлов на видеостене, пожалуйста, поместите их на видеостену на компьютере, с которого она управляется.</translation>
+    </message>
+  </context>
+  <context>
+    <name>VmsRulesDialogHelper</name>
+    <message>
+      <source>Delete Rule?</source>
+      <translation>Удалить правило?</translation>
+    </message>
+    <message>
+      <source>This action cannot be undone</source>
+      <translation>Это действие нельзя будет отменить</translation>
+    </message>
+    <message>
+      <source>Reset all rules to defaults?</source>
+      <translation type="unfinished">Reset all rules to defaults?</translation>
     </message>
   </context>
   <context>
@@ -7257,6 +6860,65 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::AccessRightsList</name>
+    <message>
+      <source>Has access to a resource, can view live footage from a camera</source>
+      <translation type="unfinished">Has access to a resource, can view live footage from a camera</translation>
+    </message>
+    <message>
+      <source>View Archive</source>
+      <translation type="unfinished">View Archive</translation>
+    </message>
+    <message>
+      <source>Can view archive footage</source>
+      <translation type="unfinished">Can view archive footage</translation>
+    </message>
+    <message>
+      <source>Export Archive</source>
+      <translation type="unfinished">Export Archive</translation>
+    </message>
+    <message>
+      <source>Can export parts of archive</source>
+      <translation type="unfinished">Can export parts of archive</translation>
+    </message>
+    <message>
+      <source>View Bookmarks</source>
+      <translation type="unfinished">View Bookmarks</translation>
+    </message>
+    <message>
+      <source>Can view bookmarks</source>
+      <translation type="unfinished">Can view bookmarks</translation>
+    </message>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>Управление закладками</translation>
+    </message>
+    <message>
+      <source>Can modify bookmarks</source>
+      <translation type="unfinished">Can modify bookmarks</translation>
+    </message>
+    <message>
+      <source>User Input</source>
+      <translation>Другие действия</translation>
+    </message>
+    <message>
+      <source>Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</source>
+      <translation type="unfinished">Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</translation>
+    </message>
+    <message>
+      <source>Edit Settings</source>
+      <translation type="unfinished">Edit Settings</translation>
+    </message>
+    <message>
+      <source>View Live</source>
+      <translation type="unfinished">View Live</translation>
+    </message>
+    <message>
+      <source>Can edit device settings and video wall layouts</source>
+      <translation type="unfinished">Can edit device settings and video wall layouts</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>
     <message>
       <source>All Cameras &amp; Resources</source>
@@ -7339,35 +7001,35 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+      <translation>Это устройство не имеет аудиовхода или неправильно настроено. Выберите другое устройство в качестве источника звука.</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+      <translation>У этой камеры нет аудиовхода, или она неправильно настроена. Выберите другую камеру в качестве источника звука.</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+      <translation>Это устройство не имеет аудиовыхода или неправильно настроено. Выберите другое устройство для воспроизведения звука.</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+      <translation>У этой камеры нет аудиовыхода, или она неправильно настроена. Выберите другую камеру для воспроизведения звука.</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
+      <translation>Используйте это устройство для вывода звука</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
+      <translation>Используйте эту камеру для вывода звука</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
+      <translation>Использовать аудиопоток с другого устройства</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation type="unfinished">Use audio stream from another camera</translation>
+      <translation>Использовать аудиопоток с другой камеры</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
@@ -7375,35 +7037,35 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>Передача аудиопотока на другую камеру</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Выбранное устройство не имеет аудиовхода или не настроено. Аудиопоток недоступен.</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Выбранное устройство не имеет аудиовыхода или не настроено. Аудиопоток недоступен.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Выбранное устройство не имеет аудиовхода или неправильно настроено. Аудиопоток недоступен.</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Выбранная камера не имеет аудиовхода или неправильно настроена. Аудиопоток недоступен.</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Выбранное устройство не имеет аудиовыхода или неправильно настроено. Двухстороннее аудио недоступно.</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Выбранная камера не имеет аудиовыхода или неправильно настроена. Двухстороннее аудио недоступно.</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
+      <translation>Использовать аудиопоток с этого устройства</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
@@ -7411,22 +7073,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+      <translation>%1 подключен к другому серверу. Аудиопоток недоступен</translation>
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+      <translation>Выбранное устройство подключено к другому серверу. Аудиопоток недоступен.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>Выбранная камера подключена к другому серверу. Аудиопоток недоступен.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+      <translation>Выберите область в расписании, чтобы применить выбранные настройки.</translation>
     </message>
   </context>
   <context>
@@ -7441,7 +7103,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>Нет аналитических плагинов</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -7457,34 +7119,34 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>Не может быть изменено для вновь добавленных камер</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>Это устройство обеспечивает только один поток данных</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>Настройки потоковой передачи не применимы к этому типу устройств</translation>
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Не поддерживается</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>Резервное копирование не поддерживается для этого устройства</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>Используйте %1 или %2, чтобы выбрать несколько устройств для пакетного редактирования. Используйте %3, чтобы выбрать все устройства.</translation>
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Какие данные копировать</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7504,7 +7166,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>Нет данных для создания резервной копии</translation>
     </message>
   </context>
   <context>
@@ -7519,19 +7181,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>Новые добавленные камеры</translation>
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
+      <translation>Настройки новых добавленных камер будут применяться ко всем серверам в системе.</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>Резервное копирование будет включено для новых добавленных камер на всех серверах в системе.</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>Резервное копирование будет отключено для новых добавленных камер на всех серверах в системе.</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7540,7 +7202,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>Чтобы включить резервное копирование, измените "Основное" на "Резервное" для некоторых хранилищ в %1</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
@@ -7622,6 +7284,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CallNotificationsListModel::Private</name>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
@@ -7636,19 +7305,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Нагреватель</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Стеклоочиститель</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Без звука</translation>
     </message>
     <message>
       <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
+      <translation>Включить звук</translation>
     </message>
     <message>
       <source>Open Door</source>
@@ -7724,7 +7393,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>Сервер не будет передавать настройки времени на камеру.</translation>
     </message>
     <message>
       <source>default</source>
@@ -7737,12 +7406,80 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Auto</source>
-      <comment>Let server determine if Media2 should be used to fetch profiles</comment>
       <translation>Авто</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
+      <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
+      <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotItem</name>
+    <message>
+      <source>Open Camera</source>
+      <translation>Открыть камеру</translation>
+    </message>
+    <message>
+      <source>Open Camera in new Tab</source>
+      <translation type="unfinished">Open Camera in new Tab</translation>
+    </message>
+    <message>
+      <source>Open Camera in place</source>
+      <translation type="unfinished">Open Camera in place</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsEditorWidget</name>
+    <message>
+      <source>Delete</source>
+      <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>Выберите камеру...</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation type="unfinished">Pointed</translation>
+    </message>
+    <message>
+      <source>Place Hotspot</source>
+      <translation type="unfinished">Place Hotspot</translation>
+    </message>
+    <message>
+      <source>NO DATA</source>
+      <translation>НЕТ ДАННЫХ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
+    <message>
+      <source>Camera does not exist</source>
+      <translation type="unfinished">Camera does not exist</translation>
+    </message>
+    <message>
+      <source>Select Camera</source>
+      <translation>Выберите камеру</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>#</source>
+      <translation type="unfinished">#</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Камера</translation>
+    </message>
+    <message>
+      <source>Color</source>
+      <translation type="unfinished">Color</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation type="unfinished">Pointed</translation>
     </message>
   </context>
   <context>
@@ -7918,7 +7655,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>Показать все устройства</translation>
     </message>
     <message>
       <source>Show all cameras</source>
@@ -7926,23 +7663,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Выберите устройства</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Выберите камеры</translation>
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Выбрать устройство</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Выберите камеру</translation>
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Нет доступных камер</translation>
     </message>
   </context>
   <context>
@@ -8036,7 +7773,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Изменить неверное расписание на "Записывать всегда"</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
@@ -8048,11 +7785,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Только объекты</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Только движение и объекты</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -8060,15 +7797,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Объекты + низкое разрешение</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>Движение и объекты + низкое разрешение</translation>
     </message>
     <message>
       <source>Plugins</source>
       <translation>Плагины</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Интеграции</translation>
     </message>
   </context>
   <context>
@@ -8119,7 +7864,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>Двустороннее аудио будет отключено</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
@@ -8142,7 +7887,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 требуется</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
@@ -8165,11 +7910,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>Неверный адрес потока</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>Несоответствие протокола потоковой передачи</translation>
     </message>
   </context>
   <context>
@@ -8177,7 +7922,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>Выберите сертификат для аутентификации в %1:</translation>
     </message>
     <message>
       <source>Select</source>
@@ -8255,11 +8000,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
+      <translation>Не могу скачать файл обновления</translation>
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
+      <translation>Недостаточно места для загрузки файла обновления</translation>
     </message>
   </context>
   <context>
@@ -8298,7 +8043,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>Войти в %1</translation>
     </message>
   </context>
   <context>
@@ -8369,15 +8114,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
+      <translation>Требуется повторная аутентификация</translation>
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>Введите пароль для продолжения сеанса</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+      <translation>Ваша сессия истекла. Пожалуйста, войдите снова, чтобы продолжить.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -8389,11 +8134,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Local System owner is absent or disabled.</source>
-      <translation type="unfinished">Local System owner is absent or disabled.</translation>
-    </message>
-    <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your Servers is connected to the Internet.</translation>
+      <translation>Владелец локальной системы отсутствует или отключен.</translation>
     </message>
     <message>
       <source>System connected to %1</source>
@@ -8418,7 +8159,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect System to %1</translation>
+      <translation>Введите пароль своей учетной записи, чтобы подключить систему к %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8428,6 +8169,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>Внутренняя ошибка. Повторите попытку позже.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">None of your Servers has connection to %1.</translation>
     </message>
   </context>
   <context>
@@ -8517,6 +8263,41 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CustomAccessSummaryModel</name>
+    <message>
+      <source>View video archive</source>
+      <translation type="unfinished">View video archive</translation>
+    </message>
+    <message>
+      <source>Export video archive</source>
+      <translation type="unfinished">Export video archive</translation>
+    </message>
+    <message>
+      <source>View bookmarks</source>
+      <translation>Просмотр закладок</translation>
+    </message>
+    <message>
+      <source>Modify bookmarks</source>
+      <translation>Изменение закладок</translation>
+    </message>
+    <message>
+      <source>User input</source>
+      <translation type="unfinished">User input</translation>
+    </message>
+    <message>
+      <source>Edit camera settings</source>
+      <translation>Изменение настроек камеры</translation>
+    </message>
+    <message>
+      <source>View event log</source>
+      <translation>Просмотр журнала событий</translation>
+    </message>
+    <message>
+      <source>View live</source>
+      <translation type="unfinished">View live</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
@@ -8533,6 +8314,41 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Set Password</source>
       <translation>Установить пароли</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DesktopDataProvider</name>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation>Устройство захвата звука не поддерживает подходящие аудиоформаты. Выберите другое аудиоустройство или &quot;нет&quot; в настройках записи экрана.</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation>Не удалось обнаружить разрешение захвата</translation>
+    </message>
+    <message>
+      <source>Could not find video encoder %1.</source>
+      <translation>Невозможно обнаружить видео кодек %1.</translation>
+    </message>
+    <message>
+      <source>Screen width must be a multiple of 8.</source>
+      <translation>Ширина экрана должна быть кратна 8.</translation>
+    </message>
+    <message>
+      <source>Could not initialize video encoder.</source>
+      <translation>Невозможно инициализировать видео кодек.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio encoder.</source>
+      <translation>Невозможно инициализировать звуковой кодек.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio device &quot;%1&quot;.</source>
+      <translation>Невозможно инициализировать звуковое устройство &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Could not start primary audio device.</source>
+      <translation>Невозможно инициализировать первичное звуковое устройство.</translation>
     </message>
   </context>
   <context>
@@ -8668,6 +8484,92 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EventLogDialog</name>
+    <message>
+      <source>Filter Similar Rows</source>
+      <translation>Отфильтровать похожие строки</translation>
+    </message>
+    <message>
+      <source>Copy Selection to Clipboard</source>
+      <translation>Скопировать выделение в буфер обмена</translation>
+    </message>
+    <message>
+      <source>Export Selection to File...</source>
+      <translation>Экспорт выделения в файл...</translation>
+    </message>
+    <message>
+      <source>Select All</source>
+      <translation>Выбрать всё</translation>
+    </message>
+    <message>
+      <source>Clear Filter</source>
+      <translation>Очистить фильтр</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Описание</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>Нет событий</translation>
+    </message>
+    <message>
+      <source>Any Action</source>
+      <translation>Любое действие</translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for period from %1 to %2 - %n events found</source>
+      <comment>Dates are substituted</comment>
+      <translation>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событиe</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событиz</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for %1 - %n events found</source>
+      <comment>Date is substituted</comment>
+      <translation>
+        <numerusform>Журнал событий за %1 - найдено %n событие</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n события</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Export selected events to file</source>
+      <translation>Экспорт выбранных событий в файл</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventLogModel</name>
+    <message>
+      <source>Date/Time</source>
+      <translation>Дата/Время</translation>
+    </message>
+    <message>
+      <source>Event</source>
+      <translation>Событие</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Источник</translation>
+    </message>
+    <message>
+      <source>Action</source>
+      <translation>Действие</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>Объект</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Описание</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8776,12 +8678,12 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Требуется транскодирование видео.</translation>
     </message>
     <message>
-      <source>Archive is encrypted.</source>
-      <translation>Архив зашифрован.</translation>
-    </message>
-    <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>Архив сейчас недоступен. Пожалуйста, повторите попытку позже.</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
     </message>
   </context>
   <context>
@@ -8949,7 +8851,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
+      <translation>Принудительно использовать безопасную аутентификацию?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
@@ -8995,6 +8897,76 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>Найдено %n устройств</numerusform>
         <numerusform>Найдено %n устройств</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::GlobalPermissionsModel</name>
+    <message>
+      <source>View event log</source>
+      <translation>Просмотр журнала событий</translation>
+    </message>
+    <message>
+      <source>Permission granted by %1 group</source>
+      <translation type="unfinished">Permission granted by %1 group</translation>
+    </message>
+    <message>
+      <source>Generate events</source>
+      <translation>Генерация событий</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::GroupSettingsDialog</name>
+    <message>
+      <source>Group name cannot be empty.</source>
+      <translation type="unfinished">Group name cannot be empty.</translation>
+    </message>
+    <message>
+      <source>Group with the same name already exists.</source>
+      <translation type="unfinished">Group with the same name already exists.</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation type="unfinished">Delete failed</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation type="unfinished">Apply changes?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>Отклонить</translation>
+    </message>
+    <message>
+      <source>New Group</source>
+      <translation>Новая группа</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>Новая группа %1</translation>
+    </message>
+    <message>
+      <source>Save changes</source>
+      <translation>Сохранить изменения</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Введите пароль своей учетной записи</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>Сохранить</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Не удалось применить изменения</translation>
+    </message>
+    <message>
+      <source>Delete groups</source>
+      <translation type="unfinished">Delete groups</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Удалить</translation>
     </message>
   </context>
   <context>
@@ -9055,22 +9027,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>Не удалось объединить %1 с нашей системой.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IndirectAccessDecoratorModel</name>
-    <message>
-      <source>Access granted by:</source>
-      <translation>Доступ предоставлен:</translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n more</source>
-      <translation>
-        <numerusform>и еще %n</numerusform>
-        <numerusform>и еще %n</numerusform>
-        <numerusform>и еще %n</numerusform>
-        <numerusform>и еще %n</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -9172,10 +9128,151 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::LdapSettingsWidget</name>
+    <message>
+      <source>Disconnect LDAP server?</source>
+      <translation type="unfinished">Disconnect LDAP server?</translation>
+    </message>
+    <message>
+      <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
+      <translation type="unfinished">All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>Отключить</translation>
+    </message>
+    <message>
+      <source>Reset Settings</source>
+      <translation type="unfinished">Reset Settings</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Введите пароль своей учетной записи</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation>Сбросить</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Ошибка подключения</translation>
+    </message>
+    <message>
+      <source>Remove existing LDAP users and groups?</source>
+      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+    </message>
+    <message>
+      <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
+      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>Да</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation>Применить настройки</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>Применить</translation>
+    </message>
+    <message>
+      <source>Synchronize LDAP Users and Groups</source>
+      <translation type="unfinished">Synchronize LDAP Users and Groups</translation>
+    </message>
+    <message>
+      <source>Synchronize</source>
+      <translation type="unfinished">Synchronize</translation>
+    </message>
+    <message>
+      <source>Connection OK</source>
+      <translation type="unfinished">Connection OK</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Не удалось применить изменения</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation>LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n канал.</numerusform>
+        <numerusform>%n канала.</numerusform>
+        <numerusform>%n каналов.</numerusform>
+        <numerusform>%n каналов.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
+      <translation>У вас не установлена действующая лицензия. Пожалуйста, активируйте свою коммерческую или пробную лицензию.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Экспорт</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 уже используeтся</numerusform>
+        <numerusform>%1 уже используются</numerusform>
+        <numerusform>%1 уже используются</numerusform>
+        <numerusform>%1 уже используются</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Требуется по крайней мере %1</numerusform>
+        <numerusform>Требуются по крайней мере %1</numerusform>
+        <numerusform>Требуются по крайней мере %1</numerusform>
+        <numerusform>Требуются по крайней мере %1</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n deactivations remaining.</source>
+      <translation>
+        <numerusform>Осталось %n деактивация.</numerusform>
+        <numerusform>Осталось %n деактивации.</numerusform>
+        <numerusform>Осталось %n деактиваций.</numerusform>
+        <numerusform>Осталось %n деактиваций.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation>
+        <numerusform>Деактивировать лицензию?</numerusform>
+        <numerusform>Деактивировать лицензии?</numerusform>
+        <numerusform>Деактивировать лицензии?</numerusform>
+        <numerusform>Деактивировать лицензии?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation>Деактивировать</translation>
+    </message>
+    <message>
+      <source>Export licenses to a file</source>
+      <translation>Экспорт лицензий в файл</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Удалить</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>Ваша сессия скоро истечет</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
@@ -9183,7 +9280,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>Осталось меньше минуты</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
@@ -9271,6 +9368,18 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>Verbose</source>
       <translation>Подробно</translation>
     </message>
+    <message>
+      <source>Default Logging level</source>
+      <translation type="unfinished">Default Logging level</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to “info”</source>
+      <translation type="unfinished">Non-default Logging level. We recommend setting it to “info”</translation>
+    </message>
+    <message>
+      <source>Logging level degrades the performance of the system</source>
+      <translation type="unfinished">Logging level degrades the performance of the system</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LogsManagementWatcher</name>
@@ -9347,6 +9456,13 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>Select Folder...</source>
       <translation type="unfinished">Select Folder...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListActionHandler</name>
+    <message>
+      <source>Network request failed</source>
+      <translation type="unfinished">Network request failed</translation>
     </message>
   </context>
   <context>
@@ -9541,21 +9657,6 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
-    <message>
-      <source>Motion</source>
-      <translation>Движение</translation>
-    </message>
-    <message>
-      <source>deleted camera</source>
-      <translation>удаленная камера</translation>
-    </message>
-    <message>
-      <source>Bookmark it...</source>
-      <translation>Добавить в закладки...</translation>
     </message>
   </context>
   <context>
@@ -9879,7 +9980,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>На вашем компьютере недостаточно места для загрузки обновления клиента. Пожалуйста, освободите место на жестком диске и повторите попытку.</translation>
     </message>
   </context>
   <context>
@@ -9898,10 +9999,6 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Acknowledge</source>
       <translation>Подтвердить</translation>
-    </message>
-    <message>
-      <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
     </message>
   </context>
   <context>
@@ -9970,7 +10067,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Не поддерживается</translation>
     </message>
     <message>
       <source>This tab will be available in future versions</source>
@@ -10092,6 +10189,13 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::PlaybackPositionItem</name>
+    <message>
+      <source>video is paused</source>
+      <translation type="unfinished">video is paused</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
@@ -10209,22 +10313,6 @@ You can force it, but it may significantly increase CPU load.</translation>
       <translation>Web-страница</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
-    </message>
-    <message>
-      <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
-    </message>
-    <message>
-      <source>Edit Proxied Web Page</source>
-      <translation type="unfinished">Edit Proxied Web Page</translation>
-    </message>
-    <message>
-      <source>Edit Web Page</source>
-      <translation>Редактировать web-страницу</translation>
-    </message>
-    <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
       <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
     </message>
@@ -10235,6 +10323,58 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
       <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
+    </message>
+    <message>
+      <source>An integration may interact with the Desktop Client and request access to the user session</source>
+      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+    </message>
+    <message>
+      <source>Proxy this integration through the server</source>
+      <translation type="unfinished">Proxy this integration through the server</translation>
+    </message>
+    <message>
+      <source>Proxy this web page through the server</source>
+      <translation type="unfinished">Proxy this web page through the server</translation>
+    </message>
+    <message>
+      <source>Allow opening this integration without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+    </message>
+    <message>
+      <source>Allow opening this web page without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+    </message>
+    <message>
+      <source>New Web Page</source>
+      <translation>Новая web-страница</translation>
+    </message>
+    <message>
+      <source>Edit Web Page</source>
+      <translation>Редактировать web-страницу</translation>
+    </message>
+    <message>
+      <source>New Proxied Web Page</source>
+      <translation type="unfinished">New Proxied Web Page</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Web Page</source>
+      <translation type="unfinished">Edit Proxied Web Page</translation>
+    </message>
+    <message>
+      <source>New Integration</source>
+      <translation type="unfinished">New Integration</translation>
+    </message>
+    <message>
+      <source>Edit Integration</source>
+      <translation type="unfinished">Edit Integration</translation>
+    </message>
+    <message>
+      <source>New Proxied Integration</source>
+      <translation type="unfinished">New Proxied Integration</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Integration</source>
+      <translation type="unfinished">Edit Proxied Integration</translation>
     </message>
   </context>
   <context>
@@ -10273,6 +10413,41 @@ You can force it, but it may significantly increase CPU load.</translation>
         <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунд.</numerusform>
         <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунд.</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RecordingSettingsWidget</name>
+    <message>
+      <source>Screen %1 - %2x%3</source>
+      <translation>Экран %1 - %2х%3</translation>
+    </message>
+    <message>
+      <source>%1 (Primary)</source>
+      <translation>%1 (Основной)</translation>
+    </message>
+    <message>
+      <source>Best</source>
+      <translation>Наилучшее</translation>
+    </message>
+    <message>
+      <source>Average</source>
+      <translation>Среднее</translation>
+    </message>
+    <message>
+      <source>Performance</source>
+      <translation>Производительность</translation>
+    </message>
+    <message>
+      <source>Native</source>
+      <translation>Оригинальное</translation>
+    </message>
+    <message>
+      <source>Quarter Native</source>
+      <translation>1/4 Оригинального</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
     </message>
   </context>
   <context>
@@ -10339,6 +10514,77 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
+    <message>
+      <source>Access granted by %1 group</source>
+      <translation type="unfinished">Access granted by %1 group</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n groups: %1</source>
+      <translation type="unfinished">
+        <numerusform>Access granted by %n groups: %1</numerusform>
+        <numerusform>Access granted by %n groups: %1</numerusform>
+        <numerusform>Access granted by %n groups: %1</numerusform>
+        <numerusform>Access granted by %n groups: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Access granted by %1 layout</source>
+      <translation type="unfinished">Access granted by %1 layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n layouts: %1</source>
+      <translation type="unfinished">
+        <numerusform>Access granted by %n layouts: %1</numerusform>
+        <numerusform>Access granted by %n layouts: %1</numerusform>
+        <numerusform>Access granted by %n layouts: %1</numerusform>
+        <numerusform>Access granted by %n layouts: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Access granted by %1 video wall</source>
+      <translation type="unfinished">Access granted by %1 video wall</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n video walls: %1</source>
+      <translation type="unfinished">
+        <numerusform>Access granted by %n video walls: %1</numerusform>
+        <numerusform>Access granted by %n video walls: %1</numerusform>
+        <numerusform>Access granted by %n video walls: %1</numerusform>
+        <numerusform>Access granted by %n video walls: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>Камеры и устройства</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+    </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation type="unfinished">Health Monitors</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>Видеостены</translation>
+    </message>
+    <message>
+      <source>User&apos;s custom permissions</source>
+      <translation type="unfinished">User&apos;s custom permissions</translation>
+    </message>
+    <message>
+      <source>Group&apos;s custom permissions</source>
+      <translation type="unfinished">Group&apos;s custom permissions</translation>
+    </message>
+    <message>
+      <source>Access granted by %1</source>
+      <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
+      <translation type="unfinished">Access granted by %1</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ResourceTreeModelAdapter</name>
     <message>
       <source>add to current layout</source>
@@ -10355,6 +10601,28 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Health Monitor</source>
       <translation>Мониторинг ресурсов</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ResourcesChangesManager</name>
+    <message>
+      <source>Resource list is empty</source>
+      <translation type="unfinished">Resource list is empty</translation>
+    </message>
+    <message>
+      <source>No connection</source>
+      <translation type="unfinished">No connection</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RestApiHelper</name>
+    <message>
+      <source>Password confirmation is required to apply changes</source>
+      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+    </message>
+    <message>
+      <source>Confirm</source>
+      <translation type="unfinished">Confirm</translation>
     </message>
   </context>
   <context>
@@ -10417,7 +10685,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
+      <translation>Устройство отключено</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -10484,23 +10752,23 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Движение, Объекты</translation>
     </message>
     <message>
       <source>Motion, Objects
  + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
+      <translation>Движение, объекты
+ + низкое разрешение</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Только объекты</translation>
     </message>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>Объекты
+ + Низкое разрешение</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -10517,11 +10785,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>Обнаружение движения отключено для этой камеры</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>Обнаружение движения отключено для некоторых выбранных камер</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
@@ -10537,7 +10805,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>Обнаружение объектов отключено для некоторых выбранных устройств</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
@@ -10553,11 +10821,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>Обнаружение движения и объектов отключено для этой камеры</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+      <translation>Обнаружение движения и объектов отключено для некоторых выбранных камер</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
@@ -10612,10 +10880,6 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>hours</source>
       <translation>часа</translation>
-    </message>
-    <message>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Водяные знаки будут отображаться поверх живого, архивного и экспортированного видео только для пользователей без прав администратора. Вы и другие администраторы их не увидите.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
@@ -10673,6 +10937,10 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
       <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
     </message>
   </context>
   <context>
@@ -10734,6 +11002,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Unknown Certificate</source>
       <translation type="unfinished">Unknown Certificate</translation>
     </message>
+    <message>
+      <source>Not Part Of Certificate</source>
+      <translation type="unfinished">Not Part Of Certificate</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
@@ -10748,6 +11020,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Continue</source>
       <translation>Продолжить</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerListModel</name>
+    <message>
+      <source>Auto</source>
+      <translation>Авто</translation>
     </message>
   </context>
   <context>
@@ -10918,6 +11197,57 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
+    <message>
+      <source>Showreel</source>
+      <translation>Прокрутка</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation>Прокрутка %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Delete Showreel %1?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelDropPlaceholder</name>
+    <message>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation>Перетащите раскадку или камеру сюда чтобы добавить их в прокрутку</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation>Используйте клавиши со стрелками для переключения раскладок. Для выхода из проктутки нажмите Esc.</translation>
+    </message>
+    <message>
+      <source>Press Esc to stop the tour.</source>
+      <translation>Нажмите Esc для остановки тура.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelItemWidget</name>
+    <message>
+      <source>Switch by</source>
+      <comment>Arrows will follow</comment>
+      <translation>Переключить на</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <comment>Time selector will follow</comment>
+      <translation>Показать для</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <comment>Time will follow</comment>
+      <translation>Отобразить выбранные для</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
@@ -11000,32 +11330,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Undo Replace</translation>
     </message>
     <message>
-      <source>Export</source>
-      <translation>Экспорт</translation>
-    </message>
-    <message>
-      <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
-    </message>
-    <message>
-      <source>Import in progress...</source>
-      <translation type="unfinished">Import in progress...</translation>
-    </message>
-    <message>
-      <source>Import archive from %1 completed</source>
-      <translation type="unfinished">Import archive from %1 completed</translation>
-    </message>
-    <message>
       <source>Import archive from %1 failed</source>
       <translation type="unfinished">Import archive from %1 failed</translation>
-    </message>
-    <message>
-      <source>Import archive from %1 stopped</source>
-      <translation type="unfinished">Import archive from %1 stopped</translation>
-    </message>
-    <message>
-      <source>Import archive from %1</source>
-      <translation type="unfinished">Import archive from %1</translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n Servers</source>
@@ -11053,22 +11359,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>System storage is used for analytics data on %n Servers</numerusform>
         <numerusform>System storage is used for analytics data on %n Servers</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Not imported archive found on device %1</source>
-      <translation type="unfinished">Not imported archive found on device %1</translation>
-    </message>
-    <message>
-      <source>Not imported archive found on camera %1</source>
-      <translation type="unfinished">Not imported archive found on camera %1</translation>
-    </message>
-    <message>
-      <source>The archive stream settings have been changed by the user</source>
-      <translation type="unfinished">The archive stream settings have been changed by the user</translation>
-    </message>
-    <message>
-      <source>The recording settings have been changed by the user</source>
-      <translation type="unfinished">The recording settings have been changed by the user</translation>
     </message>
   </context>
   <context>
@@ -11276,10 +11566,33 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::UserGroupRequestChain</name>
+    <message>
+      <source>Group does not exist</source>
+      <translation type="unfinished">Group does not exist</translation>
+    </message>
+    <message>
+      <source>User does not exist</source>
+      <translation type="unfinished">User does not exist</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::UserGroupsWidget</name>
     <message>
       <source>Delete</source>
       <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation type="unfinished">No groups found</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation type="unfinished">Change search criteria or create a new group</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation type="unfinished">Delete failed</translation>
     </message>
   </context>
   <context>
@@ -11302,10 +11615,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>Логин</translation>
     </message>
     <message>
-      <source>Name</source>
-      <translation>Имя</translation>
-    </message>
-    <message>
       <source>Email</source>
       <translation>Email</translation>
     </message>
@@ -11316,6 +11625,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Custom</source>
       <translation>Особые</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>Полное имя</translation>
     </message>
   </context>
   <context>
@@ -11344,6 +11657,18 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Users with Digest Authentication</source>
       <translation type="unfinished">Users with Digest Authentication</translation>
     </message>
+    <message>
+      <source>No users found</source>
+      <translation type="unfinished">No users found</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation type="unfinished">Change search criteria or create a new user</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation type="unfinished">Delete failed</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>
@@ -11358,6 +11683,62 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>LDAP</source>
       <translation>LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserSettingsDialog</name>
+    <message>
+      <source>To modify your password please enter the existing one.</source>
+      <translation>Чтобы изменить свой пароль, пожалуйста, введите существующий.</translation>
+    </message>
+    <message>
+      <source>Invalid current password.</source>
+      <translation>Текущий пароль неверен.</translation>
+    </message>
+    <message>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 пользователь с таким Email уже существует.</translation>
+    </message>
+    <message>
+      <source>Login cannot be empty.</source>
+      <translation>Логин должен быть задан.</translation>
+    </message>
+    <message>
+      <source>Only letters, numbers and symbols %1 are allowed.</source>
+      <translation>Допускаются только буквы, цифры и символы %1.</translation>
+    </message>
+    <message>
+      <source>User with specified login already exists.</source>
+      <translation>Пользователь с таким логином уже существует.</translation>
+    </message>
+    <message>
+      <source>Save user</source>
+      <translation type="unfinished">Save user</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Введите пароль своей учетной записи</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>Сохранить</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Не удалось применить изменения</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation type="unfinished">Apply changes?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>Отклонить</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>Email не может быть пустым</translation>
     </message>
   </context>
   <context>
@@ -11428,6 +11809,46 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::VmsEventSearchWidget</name>
+    <message>
+      <source>Any event</source>
+      <translation>Любое событие</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Проблемы с камерой</translation>
+    </message>
+    <message>
+      <source>Server events</source>
+      <translation>События сервера</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>События аналитики</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Любое событие аналитики</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>Нет событий</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or create an Event Rule</source>
+      <translation>Попробуйте изменить фильтры или создать правило события</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n events</source>
+      <translation>
+        <numerusform>%n событие</numerusform>
+        <numerusform>%n события</numerusform>
+        <numerusform>%n событий</numerusform>
+        <numerusform>%n событий</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::WebViewController</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
@@ -11436,6 +11857,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Select folder to upload</source>
       <translation>Выберите каталог для передачи</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
+    <message>
+      <source>Empty schedule is not allowed</source>
+      <translation type="unfinished">Empty schedule is not allowed</translation>
     </message>
   </context>
   <context>
@@ -11549,20 +11977,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>Доступна версия %1</translation>
     </message>
     <message>
-      <source>Release Notes</source>
-      <translation>Заметки к релизу</translation>
-    </message>
-    <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
       <translation>Обновление рекомендуется у установке. Были исправлены критические ошибки.</translation>
     </message>
     <message>
-      <source>Update...</source>
-      <translation>Обновление...</translation>
+      <source>Updates</source>
+      <translation>Обновления</translation>
     </message>
     <message>
-      <source>Do not notify again about this update</source>
-      <translation>Не уведомлять больше об этом обновлении</translation>
+      <source>Release Notes...</source>
+      <translation>Заметки к релизу...</translation>
+    </message>
+    <message>
+      <source>%1 Version is available</source>
+      <translation type="unfinished">%1 Version is available</translation>
+    </message>
+    <message>
+      <source>%1</source>
+      <translation>%1</translation>
     </message>
   </context>
   <context>
@@ -11660,6 +12092,22 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Shared Layouts</source>
       <translation>Раскладки с общим доступом</translation>
     </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation type="unfinished">Health Monitors</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>Видеостены</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Интеграции</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
@@ -11670,6 +12118,45 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>New Group %1</source>
       <translation>Новая группа %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
+    <message>
+      <source>No data</source>
+      <translation>Нет данных</translation>
+    </message>
+    <message>
+      <source>All imported</source>
+      <translation type="unfinished">All imported</translation>
+    </message>
+    <message>
+      <source>In progress... (%1 left)</source>
+      <translation type="unfinished">In progress... (%1 left)</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Отключено</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Ошибка</translation>
+    </message>
+    <message>
+      <source>Failed to import. Retry in 1 minute.</source>
+      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Имя</translation>
+    </message>
+    <message>
+      <source>Imported up to</source>
+      <translation type="unfinished">Imported up to</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Статус</translation>
     </message>
   </context>
   <context>
@@ -11779,52 +12266,123 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
+    <name>nx::vms::client::desktop::rules::AnalyticsEventTypePicker</name>
     <message>
-      <source>None</source>
-      <translation>Нет</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>События аналитики могут быть настроены на определенных камерах.</translation>
     </message>
     <message>
-      <source>Starts</source>
-      <translation>Начинается</translation>
-    </message>
-    <message>
-      <source>Stops</source>
-      <translation>Кончается</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Мгновенно</translation>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Выберите камеры с помощью кнопки выше чтобы просмотреть список поддерживаемых событий.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
     <message>
-      <source>Not saved</source>
-      <translation type="unfinished">Not saved</translation>
+      <source>Event will trigger only if there are matches any of attributes.</source>
+      <translation type="unfinished">Event will trigger only if there are matches any of attributes.</translation>
+    </message>
+    <message>
+      <source>You can see the names of the attributes and their values on the Objects tab.</source>
+      <translation type="unfinished">You can see the names of the attributes and their values on the Objects tab.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::RulesDialog</name>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectTypePicker</name>
     <message>
-      <source>Restore all rules to default?</source>
-      <translation>Восстановить все правила по умолчанию?</translation>
+      <source>Analytics object detection can be set up on a certain cameras.</source>
+      <translation>Обнаружение событий аналитики могут быть настроены на определенных камерах.</translation>
     </message>
     <message>
-      <source>This action cannot be undone.</source>
-      <translation>Это действие нельзя будет отменить.</translation>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Выберите камеры с помощью кнопки выше чтобы просмотреть список поддерживаемых событий.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
+    <message>
+      <source>Schedule</source>
+      <translation>Расписание</translation>
     </message>
     <message>
-      <source>Failed to apply changes.</source>
-      <translation>Не удалось применить изменения.</translation>
+      <source>Delete</source>
+      <translation>Удалить</translation>
     </message>
     <message>
-      <source>Failed to restore rules.</source>
-      <translation type="unfinished">Failed to restore rules.</translation>
+      <source>WHEN</source>
+      <translation type="unfinished">WHEN</translation>
     </message>
     <message>
-      <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <source>EVENT</source>
+      <translation type="unfinished">EVENT</translation>
+    </message>
+    <message>
+      <source>DO</source>
+      <translation type="unfinished">DO</translation>
+    </message>
+    <message>
+      <source>ACTION</source>
+      <translation type="unfinished">ACTION</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Активирован</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::KeywordsPicker</name>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>Событие будет срабатывать только в том случае, если в источнике есть совпадения с любым из введенных ключевых слов.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Если поле пустое, событие всегда будет вызываться.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
+    <message>
+      <source>Has attributes</source>
+      <translation type="unfinished">Has attributes</translation>
+    </message>
+    <message>
+      <source>Listed</source>
+      <translation type="unfinished">Listed</translation>
+    </message>
+    <message>
+      <source>Not listed</source>
+      <translation type="unfinished">Not listed</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation>Атрибуты</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
+    <message>
+      <source>Once in</source>
+      <translation type="unfinished">Once in</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation>Для</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::OutputPortPicker</name>
+    <message>
+      <source>automatic</source>
+      <translation>автоматическая</translation>
     </message>
   </context>
   <context>
@@ -11836,6 +12394,189 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Action</source>
       <translation>Действие</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Источник</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>Объект</translation>
+    </message>
+    <message>
+      <source>Comment</source>
+      <translation type="unfinished">Comment</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation>Все устройства</translation>
+    </message>
+    <message>
+      <source>All Cameras</source>
+      <translation>Все камеры</translation>
+    </message>
+    <message>
+      <source>No source</source>
+      <translation type="unfinished">No source</translation>
+    </message>
+    <message>
+      <source>All Servers</source>
+      <translation>Все серверы</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n Server</numerusform>
+        <numerusform>%n сервера</numerusform>
+        <numerusform>%n серверов</numerusform>
+        <numerusform>%n Server</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Исходная камера</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Исходная камера и ещё %n камера</numerusform>
+        <numerusform>Исходная камера и ещё %n камеры</numerusform>
+        <numerusform>Исходная камера и ещё %n камер</numerusform>
+        <numerusform>Исходная камера и ещё %n камер</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>No target</source>
+      <translation type="unfinished">No target</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n раскладкa</numerusform>
+        <numerusform>%n раскладки</numerusform>
+        <numerusform>%n раскладкок</numerusform>
+        <numerusform>%n раскладкок</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Все пользователи</translation>
+    </message>
+    <message>
+      <source>Group</source>
+      <translation type="unfinished">Group</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n User</numerusform>
+        <numerusform>%n пользователя</numerusform>
+        <numerusform>%n пользователей</numerusform>
+        <numerusform>%n пользователь</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation type="unfinished">
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Power Users</source>
+      <translation type="unfinished">All Power Users</translation>
+    </message>
+    <message>
+      <source>All Server</source>
+      <translation type="unfinished">All Server</translation>
+    </message>
+    <message>
+      <source>Source Server and %1</source>
+      <translation>Исходный сервер и %1</translation>
+    </message>
+    <message>
+      <source>System</source>
+      <translation>Система</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SingleTargetLayoutPicker</name>
+    <message>
+      <source>Select layout...</source>
+      <translation>Выберите раскладку...</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners.</source>
+      <translation>Локальные раскладки могут отображаться только их владельцам.</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SoundPicker</name>
+    <message>
+      <source>Manage</source>
+      <translation type="unfinished">Manage</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
+    <message>
+      <source>Soft trigger</source>
+      <translation type="unfinished">Soft trigger</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
+    <message>
+      <source>Contains keywords</source>
+      <translation type="unfinished">Contains keywords</translation>
+    </message>
+    <message>
+      <source>Does not contain keywords</source>
+      <translation type="unfinished">Does not contain keywords</translation>
+    </message>
+    <message>
+      <source>Contains list entries</source>
+      <translation type="unfinished">Contains list entries</translation>
+    </message>
+    <message>
+      <source>Does not contain list entries</source>
+      <translation type="unfinished">Does not contain list entries</translation>
+    </message>
+    <message>
+      <source>Keywords separated by space</source>
+      <translation>Ключевые слова через пробел</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
+    <message>
+      <source>Lookup lists network request failed</source>
+      <translation type="unfinished">Lookup lists network request failed</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
+    <message>
+      <source>Delete rule error: </source>
+      <translation type="unfinished">Delete rule error: </translation>
+    </message>
+    <message>
+      <source>Save rule error: </source>
+      <translation type="unfinished">Save rule error: </translation>
+    </message>
+    <message>
+      <source>Reset to defaults error: </source>
+      <translation type="unfinished">Reset to defaults error: </translation>
     </message>
   </context>
   <context>
@@ -11878,13 +12619,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
       <translation>Событие сработает, только если есть совпадения с любым из атрибутов. Вы можете увидеть имена атрибутов и их значения на вкладке Объекты.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
-    <message>
-      <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>Перетащите раскадку или камеру сюда чтобы добавить их в прокрутку</translation>
     </message>
   </context>
   <context>
@@ -11934,36 +12668,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
-    <message>
-      <source>Switch with Hotkeys</source>
-      <translation>Переключить с помощью горячих клавиш</translation>
-    </message>
-    <message>
-      <source>Switch on Timer</source>
-      <translation>Переключить по таймеру</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
-    <message>
-      <source>Stop Tour</source>
-      <translation>Остановить маршрут обхода</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>Остановить прокрутку</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>Начать маршрут обхода</translation>
-    </message>
-    <message>
-      <source>Start Showreel</source>
-      <translation>Запустить прокрутки</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -11989,6 +12693,40 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Regions of Interest</source>
       <translation>Область интересующего объекта</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowreelSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation>Переключить с помощью горячих клавиш</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation>Переключить по таймеру</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowreelTextFactory</name>
+    <message>
+      <source>Stop Tour</source>
+      <translation>Остановить маршрут обхода</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>Остановить прокрутку</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>Начать маршрут обхода</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Запустить прокрутки</translation>
     </message>
   </context>
   <context>
@@ -12048,7 +12786,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -12302,49 +13040,9 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
       <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>Используйте клавиши со стрелками для переключения раскладок. Для выхода из проктутки нажмите Esc.</translation>
-    </message>
-    <message>
-      <source>Press Esc to stop the tour.</source>
-      <translation>Нажмите Esc для остановки тура.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourItemWidget</name>
-    <message>
-      <source>Switch by</source>
-      <comment>Arrows will follow</comment>
-      <translation>Переключить на</translation>
-    </message>
-    <message>
-      <source>Display for</source>
-      <comment>Time selector will follow</comment>
-      <translation>Показать для</translation>
-    </message>
-    <message>
-      <source>Display selected for</source>
-      <comment>Time will follow</comment>
-      <translation>Отобразить выбранные для</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
-    <message>
-      <source>Showreel</source>
-      <translation>Прокрутка</translation>
-    </message>
-    <message>
-      <source>Showreel %1</source>
-      <translation>Прокрутка %1</translation>
-    </message>
-    <message>
-      <source>Delete Showreel %1?</source>
-      <translation>Delete Showreel %1?</translation>
+      <source>Not enough access rights</source>
+      <translation type="unfinished">Not enough access rights</translation>
     </message>
   </context>
   <context>
@@ -12364,10 +13062,6 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>Enter the name of the layout to create:</source>
       <translation>Введите имя создаваемой раскладки:</translation>
-    </message>
-    <message>
-      <source>New Layout %1</source>
-      <translation>Новая раскладка %1</translation>
     </message>
     <message>
       <source>Save Layout As Cloud</source>

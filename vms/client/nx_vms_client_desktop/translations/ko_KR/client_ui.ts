@@ -37,13 +37,6 @@
     </message>
   </context>
   <context>
-    <name>ActionTypePickerWidget</name>
-    <message>
-      <source>Do</source>
-      <translation>실행</translation>
-    </message>
-  </context>
-  <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -666,20 +659,35 @@
       <translation type="unfinished">Primary Stream Profile</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation>웹페이지:</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation type="unfinished">Web Page Port</translation>
+    </message>
+    <message>
+      <source>Disable import</source>
+      <translation type="unfinished">Disable import</translation>
+    </message>
+    <message>
+      <source>Import Video from Device</source>
+      <translation type="unfinished">Import Video from Device</translation>
+    </message>
+    <message>
+      <source>Import camera or server offline periods</source>
+      <translation type="unfinished">Import camera or server offline periods</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>추가</translation>
     </message>
   </context>
   <context>
@@ -954,6 +962,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation type="unfinished">This system is connected to</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1164,17 +1179,6 @@
     </message>
   </context>
   <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>시점</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
-    </message>
-  </context>
-  <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
@@ -1333,25 +1337,6 @@
     <message>
       <source>Nothing found</source>
       <translation>결과 없음</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1524,13 +1509,6 @@
     </message>
   </context>
   <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>입력 ID</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
@@ -1623,72 +1601,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>추가 조건</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>검사중</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP 설정</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>서버 URL</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>비밀번호</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>검색 기준</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>검색 필터</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>검색 제한 시간</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>도메인 DN 또는 CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>LDAP으로 부터 사용자 정보 일기</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>읽는 중...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>접속 에러</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>가져온된 사용자에 게 할당할 역할</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>가져온 사용자정보를 사용 안 함</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>불러온 사용자에 대한 다이제스트 인증 허용</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1613,6 @@
     <message>
       <source>Features</source>
       <translation>기능</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>라이선스 키 인증</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>제거</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>신규 라이선스 키</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>세부사항</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>소프트웨어 라이선스</translation>
     </message>
   </context>
   <context>
@@ -2014,17 +1903,6 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>문자</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
@@ -2071,16 +1949,8 @@
       <translation type="unfinished">Connection Settings</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>이메일</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>비밀번호</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>사용자:</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2102,13 +1972,17 @@
       <source>System Signature</source>
       <translation>시스템 서명</translation>
     </message>
+    <message>
+      <source>Username</source>
+      <translation>사용자이름</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>로그인</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>비밀번호</translation>
@@ -2116,6 +1990,10 @@
     <message>
       <source>Username</source>
       <translation>사용자이름</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
@@ -2207,17 +2085,6 @@
     <message>
       <source>Events</source>
       <translation>이벤트</translation>
-    </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>프리셋</translation>
     </message>
   </context>
   <context>
@@ -2343,49 +2210,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>사용자 검색</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>사용</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>비활성화</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>삭제...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>강제 보안 인증</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>결과 없음</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>신규 사용자...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>역할 편집...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP 설정</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>LDAP으로 부터 사용자 정보 일기</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2461,17 +2285,6 @@
     </message>
   </context>
   <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>품질</translation>
-    </message>
-  </context>
-  <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
@@ -2541,30 +2354,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>임시 폴더</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>추가옵션</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Aero 비활성화</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>커서 캡처</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>&quot;최상&quot; 품질 및 해상도는 고성능 PC 사용 시에만 설정하기를 권장 합니다.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>찾기...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>소스</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2376,20 @@
       <translation>저장 화질:</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>소스</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>&quot;최상&quot; 품질 및 해상도는 고성능 PC 사용 시에만 설정하기를 권장 합니다.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>화면</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>추가옵션</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>커서 캡처</translation>
     </message>
   </context>
   <context>
@@ -2622,29 +2431,6 @@
     <message>
       <source>Live</source>
       <translation>라이브</translation>
-    </message>
-  </context>
-  <context>
-    <name>RulesDialog</name>
-    <message>
-      <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
-    </message>
-    <message>
-      <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
-    </message>
-    <message>
-      <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
-    </message>
-    <message>
-      <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
-    </message>
-    <message>
-      <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
     </message>
   </context>
   <context>
@@ -2752,10 +2538,6 @@
       <translation>사용자 활동</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>관리자가 아닌 사용자를 위해 트리에 서버 표시</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>아카이브 암호화</translation>
     </message>
@@ -2786,6 +2568,10 @@
     <message>
       <source>Manage Users</source>
       <translation>사용자 관리</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
     </message>
   </context>
   <context>
@@ -2879,6 +2665,10 @@
       <source>Autodetect built-in and USB webcams</source>
       <translation>내장 및 USB 웹캠 자동 감지</translation>
     </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation type="unfinished">Server Location ID:</translation>
+    </message>
   </context>
   <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
@@ -2938,32 +2728,6 @@
     <message>
       <source>Icon</source>
       <translation>아이콘</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>상태</translation>
     </message>
   </context>
   <context>
@@ -3057,10 +2821,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>역할들:</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>모든 사용자 표시</translation>
     </message>
@@ -3071,6 +2831,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>검색과 일치하는 것이 없습니다,</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
     </message>
   </context>
   <context>
@@ -3159,10 +2923,6 @@
       <source>+ Add Group</source>
       <translation type="unfinished">+ Add Group</translation>
     </message>
-    <message>
-      <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
-    </message>
   </context>
   <context>
     <name>UserListWidget</name>
@@ -3173,77 +2933,6 @@
     <message>
       <source>+ Add User</source>
       <translation>+ 사용자 추가</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>암호 변경...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>이름</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>사용자</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>역할 삭제</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>사용자 역할</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>새로운 역할</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>지정된 사용자 역할은 아직 없습니다.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>&quot;새 역할&quot; 버튼을 클릭하여 만듭니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>이 사용자는 다이제스트 인증을 사용할 수 있습니다.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>강제 보안 인증</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>사용자 유형</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>역할</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>역할 편집...</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +2992,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>음량</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>테스트</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>일반</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>서버를 통해 이 웹 페이지 프록시</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3342,10 +3012,6 @@
     <message>
       <source>Proxy all requested contents</source>
       <translation>요청된 모든 콘텐츠 프록시</translation>
-    </message>
-    <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>SSL 인증서 확인 없이 웹페이지 열기 허용</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3035,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>참고: 일정 설정은 서버시간을 기준으로 함</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>라이선스 키 인증</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>제거</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>세부사항</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>소프트웨어 라이선스</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>신규 라이선스 키</translation>
     </message>
   </context>
   <context>

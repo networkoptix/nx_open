@@ -37,13 +37,6 @@
     </message>
   </context>
   <context>
-    <name>ActionTypePickerWidget</name>
-    <message>
-      <source>Do</source>
-      <translation>Gör</translation>
-    </message>
-  </context>
-  <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -666,20 +659,35 @@
       <translation>Primär strömningsprofil</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation>Importera från enhet</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation>Importera video automatiskt</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation>Webbsida</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation>Porten för webbsida</translation>
+    </message>
+    <message>
+      <source>Disable import</source>
+      <translation type="unfinished">Disable import</translation>
+    </message>
+    <message>
+      <source>Import Video from Device</source>
+      <translation type="unfinished">Import Video from Device</translation>
+    </message>
+    <message>
+      <source>Import camera or server offline periods</source>
+      <translation type="unfinished">Import camera or server offline periods</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Lägg till</translation>
     </message>
   </context>
   <context>
@@ -954,6 +962,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation>Detta system är anslutet till</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1164,17 +1179,6 @@
     </message>
   </context>
   <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>När</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation>Generisk händelse</translation>
-    </message>
-  </context>
-  <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
@@ -1333,25 +1337,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Ingenting hittades</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation>Lägg till kommentar</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Ange schema</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation>Testa åtgärd</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation>Lägg till kommentar</translation>
     </message>
   </context>
   <context>
@@ -1524,13 +1509,6 @@
     </message>
   </context>
   <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>Ingångs-ID</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
@@ -1623,72 +1601,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Valfritt</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Testar...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP inställningar</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>Server URL</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Lösenord</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>Sökbas</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Sökfilter</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Sök Timeout (s)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>Admin DN eller CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Hämta användare från LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Laddar...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Anslutningsfel</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>Roll att tilldela importerade användare</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Inaktivera importerade användare</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>Tillåt digest -autentisering för importerade användare</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1613,6 @@
     <message>
       <source>Features</source>
       <translation>Egenskaper</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Aktiva licenser</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Ta bort</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Ny licens</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Detaljer...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>Programvaran är licensierad till</translation>
     </message>
   </context>
   <context>
@@ -2014,17 +1903,6 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Text</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
@@ -2071,16 +1949,8 @@
       <translation>Anslutningsinställningar</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>E-post</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Lösenord</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Användare</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2102,13 +1972,17 @@
       <source>System Signature</source>
       <translation>Systemsignatur</translation>
     </message>
+    <message>
+      <source>Username</source>
+      <translation>Användarnamn</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Logga in</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Lösenord</translation>
@@ -2116,6 +1990,10 @@
     <message>
       <source>Username</source>
       <translation>Användarnamn</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
@@ -2207,17 +2085,6 @@
     <message>
       <source>Events</source>
       <translation>Händelser</translation>
-    </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Förinställning</translation>
     </message>
   </context>
   <context>
@@ -2343,49 +2210,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Sök användare</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Aktivera</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Avaktivera</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>Radera...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Tvinga fram säker autentisering</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Ingenting hittades</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Ny användare...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Redigera roller...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP inställningar...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Hämta användare från LDAP...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2461,17 +2285,6 @@
     </message>
   </context>
   <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Kvalitet</translation>
-    </message>
-  </context>
-  <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
@@ -2541,30 +2354,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Tillfällig mapp</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Fler inställningar</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Inaktivera Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Fånga muspekare</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>En kraftfull dator rekommenderas för &quot;Bästa&quot; kvalitet och upplösning.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Bläddra...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Källa</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2376,20 @@
       <translation>Inspelningskvalitet</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Källa</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>En kraftfull dator rekommenderas för &quot;Bästa&quot; kvalitet och upplösning.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>Skärm</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Fler inställningar</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Fånga muspekare</translation>
     </message>
   </context>
   <context>
@@ -2622,29 +2431,6 @@
     <message>
       <source>Live</source>
       <translation>Realtid</translation>
-    </message>
-  </context>
-  <context>
-    <name>RulesDialog</name>
-    <message>
-      <source>Alarm/Event Rules</source>
-      <translation>Larm/händelseregler</translation>
-    </message>
-    <message>
-      <source>New Rule</source>
-      <translation>Ny regel</translation>
-    </message>
-    <message>
-      <source>Delete Rule</source>
-      <translation>Ta bort regel</translation>
-    </message>
-    <message>
-      <source>Select a Rule</source>
-      <translation>Välj en regel</translation>
-    </message>
-    <message>
-      <source>Reset Default Rules</source>
-      <translation>Återställ standardregler</translation>
     </message>
   </context>
   <context>
@@ -2752,10 +2538,6 @@
       <translation>Användaraktivitet</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Visa servrar i träd för användare som inte är administratörer</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Arkivet är krypterat</translation>
     </message>
@@ -2786,6 +2568,10 @@
     <message>
       <source>Manage Users</source>
       <translation>Hantera användare</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
     </message>
   </context>
   <context>
@@ -2879,6 +2665,10 @@
       <source>Autodetect built-in and USB webcams</source>
       <translation>Upptäck automatiskt inbyggda webbkameror och USB-webbkameror</translation>
     </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>Serverns plats:</translation>
+    </message>
   </context>
   <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
@@ -2938,32 +2728,6 @@
     <message>
       <source>Icon</source>
       <translation>Ikon</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation>Ljud</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation>Hantera</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Läge</translation>
     </message>
   </context>
   <context>
@@ -3057,10 +2821,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Roller</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Visa alla användare</translation>
     </message>
@@ -3071,6 +2831,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>Inget matchar din sökning.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
     </message>
   </context>
   <context>
@@ -3159,10 +2923,6 @@
       <source>+ Add Group</source>
       <translation>+ Lägg till grupp</translation>
     </message>
-    <message>
-      <source>No groups found</source>
-      <translation>Inga grupper hittades</translation>
-    </message>
   </context>
   <context>
     <name>UserListWidget</name>
@@ -3173,77 +2933,6 @@
     <message>
       <source>+ Add User</source>
       <translation>+ Lägg till användare</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>Inga användare hittades</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Ändra lösenord...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Namn</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Användare</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Ta bort roll</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Användarroller</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Ny roll</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Det finns inga anpassade användarroller ännu.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Klicka på &quot;Ny roll&quot; knappen för att skapa en.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Den här användaren kan använda digest-autentisering.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Tvinga fram säker autentisering</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Typ av användare</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Roll</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Redigera roller...</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +2992,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Volym</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>Allmänt</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Proxyanslut denna webbsida via server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3342,10 +3012,6 @@
     <message>
       <source>Proxy all requested contents</source>
       <translation>Proxy allt begärt innehåll</translation>
-    </message>
-    <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Tillåt öppning av webbsida utan kontroll av SSL-certifikat</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3035,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Obs! Schemat är baserat på servertid.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Aktiva licenser</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Ta bort</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Detaljer...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>Programvaran är licensierad till</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Ny licens</translation>
     </message>
   </context>
   <context>

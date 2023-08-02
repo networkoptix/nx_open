@@ -38,6 +38,19 @@
     </message>
   </context>
   <context>
+    <name>CameraPickerStrings</name>
+    <message>
+      <source>Source Camera</source>
+      <translation>ソースカメラ</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>ソースおよびその他 %n 台のカメラ</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
@@ -149,14 +162,6 @@
       <translation>ようこそ画面の表示</translation>
     </message>
     <message>
-      <source>Tab</source>
-      <translation>タブ</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>新規タブ</translation>
-    </message>
-    <message>
       <source>Window</source>
       <translation>画面</translation>
     </message>
@@ -169,16 +174,8 @@
       <translation>ユーザー...</translation>
     </message>
     <message>
-      <source>New User...</source>
-      <translation>新規ユーザー...</translation>
-    </message>
-    <message>
       <source>Video Wall...</source>
       <translation>ビデオウォール...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>新規ビデオウォール...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -496,10 +493,6 @@
       <translation>レイアウトから削除</translation>
     </message>
     <message>
-      <source>Stop Sharing Layout</source>
-      <translation>レイアウト共有を停止</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>名前の変更</translation>
     </message>
@@ -514,14 +507,6 @@
     <message>
       <source>User Settings...</source>
       <translation>ユーザー設定...</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation>ユーザーロール...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation>ロール設定...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -594,10 +579,6 @@
     <message>
       <source>Video Wall Settings...</source>
       <translation>ビデオウォール設定...</translation>
-    </message>
-    <message>
-      <source>Add Device...</source>
-      <translation>デバイス追加...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
@@ -744,10 +725,6 @@
       <translation>シーケンス表示...</translation>
     </message>
     <message>
-      <source>New Showreel...</source>
-      <translation>新規シーケンス表示...</translation>
-    </message>
-    <message>
       <source>Remove from Showreel</source>
       <translation>シーケンス表示から削除</translation>
     </message>
@@ -816,10 +793,6 @@
       <translation>仮想カメラ...</translation>
     </message>
     <message>
-      <source>New Virtual Camera...</source>
-      <translation>新規仮想カメラ...</translation>
-    </message>
-    <message>
       <source>Show Tree</source>
       <translation>ツリーを表示する</translation>
     </message>
@@ -858,14 +831,6 @@
     <message>
       <source>Switch to Objects tab</source>
       <translation>オブジェクトタブに切り替え</translation>
-    </message>
-    <message>
-      <source>Pin Calendar</source>
-      <translation>カレンダー固定</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>カレンダー固定解除</translation>
     </message>
     <message>
       <source>Page...</source>
@@ -966,10 +931,6 @@
       <translation>グループを削除</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page...</source>
-      <translation>プロキシされたウェブページを追加...</translation>
-    </message>
-    <message>
       <source>Cell Spacing</source>
       <translation>セル間隔</translation>
     </message>
@@ -1029,6 +990,74 @@
       <source>Save Cloud Layout As...</source>
       <translation>名前を付けてクラウドレイアウトを保存...</translation>
     </message>
+    <message>
+      <source>Lookup Lists...</source>
+      <translation>検索リスト...</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>追加</translation>
+    </message>
+    <message>
+      <source>Device...</source>
+      <translation>デバイス...</translation>
+    </message>
+    <message>
+      <source>Add User...</source>
+      <translation>ユーザーを追加...</translation>
+    </message>
+    <message>
+      <source>Integration...</source>
+      <translation>インテグレーション...</translation>
+    </message>
+    <message>
+      <source>New Integration...</source>
+      <translation>新しいインテグレーション</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation>新規ウェブページ...</translation>
+    </message>
+    <message>
+      <source>Add Showreel...</source>
+      <translation>シーケンシャル表示を追加...</translation>
+    </message>
+    <message>
+      <source>Add Virtual Camera...</source>
+      <translation>仮想カメラを追加...</translation>
+    </message>
+    <message>
+      <source>Integration Settings...</source>
+      <translation>インテグレーション設定...</translation>
+    </message>
+    <message>
+      <source>Proxied Integration...</source>
+      <translation>プロキシされたインテグレーション...</translation>
+    </message>
+    <message>
+      <source>Proxied Web Page...</source>
+      <translation>プロキシされたウェブページ...</translation>
+    </message>
+    <message>
+      <source>Layout</source>
+      <translation>レイアウト</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>新規レイアウト</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen</source>
+      <translation type="unfinished">New Welcome Screen</translation>
+    </message>
+    <message>
+      <source>Show Proxied Resources</source>
+      <translation type="unfinished">Show Proxied Resources</translation>
+    </message>
+    <message>
+      <source>Import From Devices...</source>
+      <translation type="unfinished">Import From Devices...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1074,6 +1103,41 @@
     <message>
       <source>Auto</source>
       <translation>自動</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>なし</translation>
+    </message>
+    <message>
+      <source>Event Occurs</source>
+      <translation type="unfinished">Event Occurs</translation>
+    </message>
+    <message>
+      <source>Event Starts</source>
+      <translation type="unfinished">Event Starts</translation>
+    </message>
+    <message>
+      <source>Event Stops</source>
+      <translation type="unfinished">Event Stops</translation>
+    </message>
+  </context>
+  <context>
+    <name>DurationPickerWidgetStrings</name>
+    <message>
+      <source>Instant</source>
+      <translation>即時</translation>
+    </message>
+    <message>
+      <source>No more than once per</source>
+      <translation>前回実行から</translation>
+    </message>
+    <message>
+      <source>Live</source>
+      <translation>ライブ</translation>
+    </message>
+    <message>
+      <source>Rewind for</source>
+      <translation>巻き戻し</translation>
     </message>
   </context>
   <context>
@@ -1152,21 +1216,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>画像</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>映像</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>全てのファイル</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1187,6 +1236,25 @@
     <message>
       <source>Executable %1 Media File</source>
       <translation>実行可能な %1 メディアファイル</translation>
+    </message>
+  </context>
+  <context>
+    <name>FlagsPickerWidgetStrings</name>
+    <message>
+      <source>Error</source>
+      <translation>エラー</translation>
+    </message>
+    <message>
+      <source>Warning</source>
+      <translation>警告</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>情報</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>未定義</translation>
     </message>
   </context>
   <context>
@@ -1220,18 +1288,24 @@
     </message>
   </context>
   <context>
+    <name>Groups</name>
+    <message>
+      <source>Delete group?</source>
+      <translation>グループを削除しますか?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n group(s)?</source>
+      <translation>
+        <numerusform>%n グループを削除しますか?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
       <translation>日本語</translation>
-    </message>
-  </context>
-  <context>
-    <name>LayoutTourTextFactory</name>
-    <message>
-      <source>Start Showreel</source>
-      <translation>シーケンス表示開始</translation>
     </message>
   </context>
   <context>
@@ -1481,16 +1555,8 @@ License Key: %2</source>
       <translation>SSL</translation>
     </message>
     <message>
-      <source>Unsecure</source>
-      <translation>安全でない</translation>
-    </message>
-    <message>
       <source>Check</source>
       <translation>チェック</translation>
-    </message>
-    <message>
-      <source>Email is not valid.</source>
-      <translation>Emailは有効ではありません</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
@@ -1540,10 +1606,6 @@ License Key: %2</source>
       <translation>成功</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>接続がタイムアウトしました</translation>
-    </message>
-    <message>
       <source>Authentication failed</source>
       <translation>認証失敗</translation>
     </message>
@@ -1552,13 +1614,29 @@ License Key: %2</source>
       <translation>不明なエラー</translation>
     </message>
     <message>
+      <source>%1 users will start receiving emails immediately after you apply these settings</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation>これらの設定を適用すると、%1 ユーザーへのメール配信がすぐに始まります</translation>
+    </message>
+    <message>
+      <source>Cannot reach the server</source>
+      <translation>サーバーに接続できません</translation>
+    </message>
+    <message>
+      <source>Username or Password are incorrect</source>
+      <translation>ユーザー名またはパスワードが間違っています</translation>
+    </message>
+    <message>
+      <source>Insecure</source>
+      <translation type="unfinished">Insecure</translation>
+    </message>
+    <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
       <translation>アクティブなサーバーのいずれにもインターネット接続がないため、電子メール設定をテストできません</translation>
     </message>
     <message>
-      <source>%1 users will start receiving emails immediately after you apply these settings</source>
-      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation>これらの設定を適用すると、%1 ユーザーへのメール配信がすぐに始まります</translation>
+      <source>Connection failed</source>
+      <translation>接続に失敗しました</translation>
     </message>
   </context>
   <context>
@@ -1639,30 +1717,10 @@ License Key: %2</source>
     </message>
   </context>
   <context>
-    <name>PermissionsInfoTable</name>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>カメラ &amp; リソース</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation>共有レイアウト</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>権限</translation>
-    </message>
-    <message>
-      <source>All</source>
-      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
-      <translation>すべて</translation>
-    </message>
-  </context>
-  <context>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation>カメラから現在位置を取得できません&quot;%1&quot;</translation>
+      <translation>カメラ &quot;%1&quot; から現在のポジションを取得できません</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
@@ -1670,15 +1728,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to get current position</source>
-      <translation>現在の位置の取得に失敗しました</translation>
+      <translation>現在のポジションの取得に失敗しました</translation>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation>カメラの現在位置を設定できません&quot;%1&quot;</translation>
+      <translation>カメラ &quot;%1&quot; のポジションを設定できません</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
-      <translation>現在の位置の設定に失敗しました</translation>
+      <translation>ポジションの設定に失敗しました</translation>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
@@ -1794,13 +1852,6 @@ License Key: %2</source>
     <message>
       <source>Saving...</source>
       <translation>保存中...</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAccessibleLayoutsWidget</name>
-    <message>
-      <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>割り当てたレイアウトに含まれる全てのカメラへのアクセス権も付与されます。そのレイアウトに新しく追加されたカメラへのアクセス権も自動的に付与されます。</translation>
     </message>
   </context>
   <context>
@@ -2203,12 +2254,12 @@ License Key: %2</source>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation>%2 経由で %1 に接続</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation>%2 経由で %1 から切断</translation>
     </message>
   </context>
@@ -2746,7 +2797,7 @@ License Key: %2</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>%1 の録画やモーション検知は無効です</translation>
+      <translation>%1 の録画またはモーション検知が無効です</translation>
     </message>
   </context>
   <context>
@@ -2828,7 +2879,8 @@ License Key: %2</source>
       <source>Connect to your Systems
 from anywhere with any
 devices</source>
-      <translation>場所やデバイスを問わず、このシステムに接続できます</translation>
+      <translation>任意のデバイスでどこからでも
+システムに接続</translation>
     </message>
     <message>
       <source>Disconnect System from %1</source>
@@ -2902,6 +2954,10 @@ to %1</source>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>システムを %1から切断できません</translation>
+    </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>システムはローカルネットワークからのみアクセス可能になります。</translation>
     </message>
   </context>
   <context>
@@ -3086,6 +3142,10 @@ to %1</source>
       <source>Failed to log in to System &quot;%1&quot;</source>
       <translation>システム &quot;%1&quot; へのログインに失敗しました</translation>
     </message>
+    <message>
+      <source>Log In...</source>
+      <translation>ログイン...</translation>
+    </message>
   </context>
   <context>
     <name>QnCustomBusinessEventWidget</name>
@@ -3112,6 +3172,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>汎用イベントを生成するには、 %1を参照してください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>画像</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>映像</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>全てのファイル</translation>
     </message>
   </context>
   <context>
@@ -3187,135 +3262,6 @@ to %1</source>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
       <translation>データベースが正常に復元されました。サーバーアプリケーションはまもなく再起動します。</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModel</name>
-    <message>
-      <source>Local user</source>
-      <translation>ローカル ユーザー</translation>
-    </message>
-    <message>
-      <source>%1 user</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 ユーザー</translation>
-    </message>
-    <message>
-      <source>LDAP user</source>
-      <translation>LDAPサーバー</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>有効</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>無効</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>ログイン</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>名前</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>ロール</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModelPrivate</name>
-    <message>
-      <source>Owner</source>
-      <translation>オーナー</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>アドミニストレーター</translation>
-    </message>
-    <message>
-      <source>View live video</source>
-      <translation>ライブビデオ表示</translation>
-    </message>
-    <message>
-      <source>Adjust device settings</source>
-      <translation>デバイス設定</translation>
-    </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>カメラ設定</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>PTZコントロール</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>再生表示</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>ビデオエクスポート</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>ビデオウォールコントロール</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Edit</source>
-      <translation>編集</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>全ユーザー</translation>
-    </message>
-    <message>
-      <source>With enabled digest authentication</source>
-      <translation>Digest認証有効</translation>
-    </message>
-    <message>
-      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>LDAPサーバーからユーザーをインポートできます。インポートされたユーザーは、 LDAPサーバーがオンラインかつアカウントが有効な場合のみログインできます。</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopDataProvider</name>
-    <message>
-      <source>Could not find video encoder %1.</source>
-      <translation>ビデオエンコーダー%1を検出できません.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>ビデオエンコーダーをイニシャライズできません.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>オーディオエンコーダーをイニシャライズできません.</translation>
-    </message>
-    <message>
-      <source>Could not start primary audio device.</source>
-      <translation>プライマリーオーディオデバイスを開始できません。</translation>
-    </message>
-    <message>
-      <source>Screen width must be a multiple of 8.</source>
-      <translation>スクリーン幅は8の倍数に設定して下さい.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>オーディオデバイス&quot;%1&quot; を初期化できませんでした</translation>
-    </message>
-    <message>
-      <source>Could not detect capturing resolution</source>
-      <translation>キャプチャ解像度を検出できませんでした</translation>
-    </message>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>この録音デバイスは適切な音声形式をサポートしていません。スクリーン録画設定で、別のデバイスまたは &quot;なし&quot; を選択してください。</translation>
     </message>
   </context>
   <context>
@@ -3426,13 +3372,13 @@ to %1</source>
     <message numerus="yes">
       <source>and %n users more...</source>
       <translation>
-        <numerusform>さらに %n ユーザー...</numerusform>
+        <numerusform>ほか %n ユーザー...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
       <translation>
-        <numerusform>さらに %n 件...</numerusform>
+        <numerusform>ほか %n 件...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3593,6 +3539,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGenericTabbedDialog</name>
+    <message>
+      <source>Apply changes before exit?</source>
+      <translation>終了する前に変更を適用しますか？</translation>
+    </message>
+  </context>
+  <context>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
@@ -3696,92 +3649,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>I/O ポート %1 のオンに失敗しました</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialog</name>
-    <message>
-      <source>Test</source>
-      <translation>テスト</translation>
-    </message>
-    <message>
-      <source>Test failed</source>
-      <translation>テスト失敗</translation>
-    </message>
-    <message numerus="yes">
-      <source>Test completed successfully: %n users found.</source>
-      <translation>
-        <numerusform>テスト成功 %n ユーザー検出</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>&quot;検索フィルター&quot; 以外のLDAP設定を変更すると、すべてのLDAPフェッチユーザーの接続が失われます。</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialogPrivate</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>設定は無効です</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>テストを実行できません</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>タイムアウト</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUserListModel</name>
-    <message>
-      <source>Login</source>
-      <translation>ログイン</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>DN</source>
-      <translation>DN</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>名前</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUsersDialog</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>設定は無効です</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>テストを実行できません</translation>
-    </message>
-    <message>
-      <source>Could not load users.</source>
-      <translation>ユーザーがロードできません</translation>
-    </message>
-    <message>
-      <source>Error while loading users.</source>
-      <translation>ユーザーロード中にエラーが発生しました.</translation>
-    </message>
-    <message>
-      <source>No new users found.</source>
-      <translation>新規ユーザーは検出されませんでした.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>タイムアウト</translation>
-    </message>
-    <message>
-      <source>Import Selected</source>
-      <translation>インポートの選択</translation>
     </message>
   </context>
   <context>
@@ -3895,60 +3762,9 @@ to %1</source>
       <source>Channels</source>
       <translation>チャンネル</translation>
     </message>
-  </context>
-  <context>
-    <name>QnLicenseManagerWidget</name>
     <message>
-      <source>Export</source>
-      <translation>エクスポート</translation>
-    </message>
-    <message>
-      <source>Export licenses to a file</source>
-      <translation>ライセンスをファイルにエクスポート</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>ライセンスを無効にしますか？</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>削除</translation>
-    </message>
-    <message>
-      <source>Deactivate</source>
-      <translation>無効化</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n channels.</source>
-      <translation>
-        <numerusform>%nチャンネル</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 を使用中</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>少なくとも%1 が必要</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n deactivations remaining.</source>
-      <translation>
-        <numerusform>残り無効化回数は %n 回です。</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation>有効なライセンスがインストールされていません。商用または試用版のライセンスを有効化してください。</translation>
+      <source>Not verified</source>
+      <translation>未検証</translation>
     </message>
   </context>
   <context>
@@ -4002,14 +3818,6 @@ to %1</source>
       <translation>アドバンス</translation>
     </message>
     <message>
-      <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>設定ファイルが読み取り専用です。システム管理者にお問い合わせください。プログラム終了後、すべての変更が破棄されます。</translation>
-    </message>
-    <message>
-      <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>設定を保存できません。システム管理者にお問い合わせください。プログラム終了後、すべての変更が破棄されます。</translation>
-    </message>
-    <message>
       <source>Restart required</source>
       <translation>再起動が必要</translation>
     </message>
@@ -4024,6 +3832,10 @@ to %1</source>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
       <translation>%1 再起動後に適用される変更があります</translation>
+    </message>
+    <message>
+      <source>Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
+      <translation>設定は読み取り専用です。システム管理者にお問い合わせください。プログラム終了後、すべての変更が破棄されます。</translation>
     </message>
   </context>
   <context>
@@ -4150,6 +3962,10 @@ to %1</source>
       <source>Object Search</source>
       <translation>オブジェクト検索</translation>
     </message>
+    <message>
+      <source>Hotspots</source>
+      <translation>ホットスポット</translation>
+    </message>
   </context>
   <context>
     <name>QnMessageBox</name>
@@ -4264,49 +4080,6 @@ to %1</source>
     <message>
       <source>Rotation</source>
       <translation>回転</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPermissionsWidget</name>
-    <message>
-      <source>Edit camera settings</source>
-      <translation>カメラ設定の編集</translation>
-    </message>
-    <message>
-      <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>PTZ プリセットやツアーを作成/編集する場合にも必要</translation>
-    </message>
-    <message>
-      <source>Control video walls</source>
-      <translation>ビデオウォールの制御</translation>
-    </message>
-    <message>
-      <source>View event log</source>
-      <translation>イベントログの表示</translation>
-    </message>
-    <message>
-      <source>View archive</source>
-      <translation>アーカイブの表示</translation>
-    </message>
-    <message>
-      <source>Export archive</source>
-      <translation>アーカイブのエクスポート</translation>
-    </message>
-    <message>
-      <source>View bookmarks</source>
-      <translation>ブックマークの表示</translation>
-    </message>
-    <message>
-      <source>Modify bookmarks</source>
-      <translation>ブックマークの変更</translation>
-    </message>
-    <message>
-      <source>User Input</source>
-      <translation>ユーザー入力</translation>
-    </message>
-    <message>
-      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ、デバイス出力、双方向オーディオ、ソフトトリガー</translation>
     </message>
   </context>
   <context>
@@ -4460,7 +4233,7 @@ to %1</source>
     </message>
     <message>
       <source>Normal</source>
-      <translation>ノーマル</translation>
+      <translation>中</translation>
     </message>
     <message>
       <source>High</source>
@@ -4480,50 +4253,15 @@ to %1</source>
     </message>
     <message>
       <source>Stay Time</source>
-      <translation>稼働時間</translation>
+      <translation>待機時間</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation>スピード</translation>
+      <translation>移動速度</translation>
     </message>
     <message>
       <source>Invalid</source>
       <translation>無効</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnRecordingSettingsWidget</name>
-    <message>
-      <source>Screen %1 - %2x%3</source>
-      <translation>スクリーン %1 - %2x%3</translation>
-    </message>
-    <message>
-      <source>%1 (Primary)</source>
-      <translation>%1 (プライマリ)</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>最高</translation>
-    </message>
-    <message>
-      <source>Average</source>
-      <translation>普通</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>パフォーマンス優先</translation>
-    </message>
-    <message>
-      <source>Native</source>
-      <translation>モニタ解像度と同じ</translation>
-    </message>
-    <message>
-      <source>Quarter Native</source>
-      <translation>モニタ解像度の1/4</translation>
-    </message>
-    <message>
-      <source>Select Folder...</source>
-      <translation>フォルダー選択...</translation>
     </message>
   </context>
   <context>
@@ -4592,23 +4330,6 @@ to %1</source>
   <context>
     <name>QnRequiredPermissionSubjectPolicy</name>
     <message>
-      <source>Role %1 has no %2 permission</source>
-      <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation>ロール %1 には %2 の権限がありません</translation>
-    </message>
-    <message>
-      <source>Selected roles have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>選択されたロールには %1 権限がありません</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no %2 permission</source>
-      <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation>
-        <numerusform>選択した %1 ロールのうち %n つは、 %2 の権限がありません</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
       <translation>ユーザー%1には%2権限がありません</translation>
@@ -4623,6 +4344,23 @@ to %1</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
       <translation>
         <numerusform>選択した%1個のうち%n個のユーザーに%2権限がありません</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User group %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user group, %2 is permission name</comment>
+      <translation>ユーザーグループ %1 には %2 権限がありません</translation>
+    </message>
+    <message>
+      <source>Selected user groups have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>選択したユーザーグループには %1 権限がありません</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected user groups have no %2 permission</source>
+      <comment>%1 is number of selected user groups, %2 is permission name</comment>
+      <translation>
+        <numerusform>選択されたユーザーグループ %1 のうち %n には %2 権限がありません</numerusform>
       </translation>
     </message>
   </context>
@@ -4769,6 +4507,27 @@ to %1</source>
     <message>
       <source>Select cameras...</source>
       <translation>カメラ選択...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSelectLayoutsButton</name>
+    <message>
+      <source>Any Layout</source>
+      <translation>任意のレイアウト</translation>
+    </message>
+    <message>
+      <source>All Layouts</source>
+      <translation>すべてのレイアウト</translation>
+    </message>
+    <message>
+      <source>Select Layouts...</source>
+      <translation>レイアウトを選択...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Layouts</source>
+      <translation>
+        <numerusform>%n レイアウト</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4984,6 +4743,10 @@ to %1</source>
       <source>Save changes before exit?</source>
       <translation>終了する前に変更を適用しますか？</translation>
     </message>
+    <message>
+      <source>Apply changes before exit?</source>
+      <translation>終了する前に変更を適用しますか？</translation>
+    </message>
   </context>
   <context>
     <name>QnShowTextOverlayActionWidget</name>
@@ -5062,7 +4825,7 @@ to %1</source>
     </message>
     <message>
       <source>Enable</source>
-      <translation>有効</translation>
+      <translation>有効化</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -5119,10 +4882,6 @@ to %1</source>
     <message>
       <source>Provide</source>
       <translation>提供</translation>
-    </message>
-    <message>
-      <source>ACCESS DENIED</source>
-      <translation>アクセスが拒否されました</translation>
     </message>
   </context>
   <context>
@@ -5367,7 +5126,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation>Windowsネットワーク共有リソース</translation>
+      <translation>ネットワーク共有リソース</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
@@ -5417,10 +5176,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更新</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>ユーザー</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>セキュリティ</translation>
     </message>
@@ -5443,6 +5198,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Advanced</source>
       <translation>アドバンス</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>インテグレーション</translation>
     </message>
   </context>
   <context>
@@ -5528,18 +5287,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Email送信中のエラー</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been finished</source>
-      <translation>カメラストレージとの同期が完了しました</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization is in progress</source>
-      <translation>カメラストレージとの同期が進行中です</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>次のデバイスのカメラストレージとの同期が完了しました：</translation>
-    </message>
-    <message>
       <source>Archive integrity problem detected</source>
       <translation>アーカイブの整合性の問題が検出されました</translation>
     </message>
@@ -5582,10 +5329,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>カメラの録画スケジュールが無効です</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been stopped</source>
-      <translation>カメラストレージとの同期が停止されました</translation>
-    </message>
-    <message>
       <source>Storage for analytics data is not set</source>
       <translation>分析データ用ストレージが設定されていません</translation>
     </message>
@@ -5596,10 +5339,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Analytics data can take up large amounts of space.</source>
       <translation>分析データは大量のスペースを占める可能性があります。</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization is available</source>
-      <translation>リモートアーカイブの同期が利用可能です</translation>
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
@@ -5687,240 +5426,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>QnUserProfileWidget</name>
+    <name>QnUserRolesModel</name>
     <message>
-      <source>Login</source>
-      <translation>ログイン</translation>
+      <source>Custom</source>
+      <translation>カスタム</translation>
     </message>
     <message>
-      <source>Name</source>
-      <translation>名前</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>ロール</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>To enable digest authentication password reset is required</source>
-      <translation>Digest認証を有効にするには、パスワードの再設定が必要です</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidget</name>
-    <message>
-      <source>Role name cannot be empty.</source>
-      <translation>ロール名は空欄にできません。</translation>
-    </message>
-    <message>
-      <source>Role with same name already exists.</source>
-      <translation>同じ名前のロールが既に存在します。</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidgetPrivate</name>
-    <message>
-      <source>No users have this role</source>
-      <translation>このロールに割り当てられたユーザーはいません</translation>
-    </message>
-    <message>
-      <source>Custom with no permissions</source>
-      <translation>権限のないカスタム</translation>
-    </message>
-    <message>
-      <source>Users will have no permissions unless changed later.</source>
-      <translation>設定変更しない限り、ユーザーには権限が与えられません。</translation>
-    </message>
-    <message>
-      <source>Assign a new role</source>
-      <translation>新しいロールを割り当てる</translation>
-    </message>
-    <message>
-      <source>Delete such users</source>
-      <translation>該当ユーザーを削除する</translation>
-    </message>
-    <message numerus="yes">
-      <source>Please select an action to perform on %n users with this role</source>
-      <translation>
-        <numerusform>この役割の %n ユーザーの実行するアクションを選択してください</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRolesDialog</name>
-    <message>
-      <source>Role Info</source>
-      <translation>ロール情報</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>権限</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>カメラ &amp;&amp; リソース</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>レイアウト</translation>
-    </message>
-    <message>
-      <source>New Role</source>
-      <translation>新しいロール</translation>
-    </message>
-    <message>
-      <source>New Role %1</source>
-      <translation>新しいロール %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsDialog</name>
-    <message>
-      <source>User Information</source>
-      <translation>ユーザー情報</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>権限</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>カメラ &amp;&amp; リソース</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>レイアウト</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>新規ユーザー...</translation>
-    </message>
-    <message>
-      <source>User Settings - %1 (readonly)</source>
-      <translation>ユーザー設定 - %1 (読み取り専用)</translation>
-    </message>
-    <message>
-      <source>User Settings - %1</source>
-      <translation>ユーザー設定 - %1</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>有効</translation>
-    </message>
-    <message>
-      <source>User is disabled</source>
-      <translation>ユーザーは無効になっています</translation>
-    </message>
-    <message>
-      <source>Apply changes before switching to another user?</source>
-      <translation>別のユーザーに切り替える前に変更を適用しますか？</translation>
-    </message>
-    <message>
-      <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>このユーザーはまだ%1にサインアップしていません</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for this user</source>
-      <translation>このユーザーのDigest認証を許可する</translation>
-    </message>
-    <message>
-      <source>Learn More</source>
-      <translation>詳細</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsWidget</name>
-    <message>
-      <source>Local</source>
-      <translation>ローカル</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>ログイン</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty.</source>
-      <translation>ログイン情報を入力してください</translation>
-    </message>
-    <message>
-      <source>User with specified login already exists.</source>
-      <translation>ユーザーは既に存在します</translation>
-    </message>
-    <message>
-      <source>User has been renamed. Password must be updated.</source>
-      <translation>ユーザーは変更されました　パスワードを更新してください</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>名前</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>Email cannot be empty.</source>
-      <translation>メールを空にすることはできません</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>パスワード</translation>
-    </message>
-    <message>
-      <source>Confirm Password</source>
-      <translation>パスワード確認</translation>
-    </message>
-    <message>
-      <source>Passwords do not match.</source>
-      <translation>パスワードが一致しません</translation>
-    </message>
-    <message>
-      <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>指定されたメールアドレスを持つ%1 ユーザーは既に存在します。</translation>
-    </message>
-    <message>
-      <source>Local users</source>
-      <translation>ローカルユーザー</translation>
-    </message>
-    <message>
-      <source>%1 users</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1ユーザー</translation>
-    </message>
-    <message>
-      <source>%1 belong to this system only and are fully managed by system administrators.</source>
-      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 はこのシステムにのみ属し、システム管理者によって完全に管理されています。</translation>
-    </message>
-    <message>
-      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
-      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 は、多くのシステムへアクセスできます。管理者は、自分の権利のみを管理できます。</translation>
-    </message>
-    <message>
-      <source>Password reset is required</source>
-      <translation>パスワードの再設定が必要です</translation>
-    </message>
-    <message>
-      <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation>文字、数字、記号 %1 のみが許可されます。</translation>
+      <source>Custom access rights</source>
+      <translation>カスタムアクセス権</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
-    <message>
-      <source>Email cannot be empty.</source>
-      <translation>メールを空にすることはできません</translation>
-    </message>
-    <message>
-      <source>Email is not valid.</source>
-      <translation>Emailは有効ではありません</translation>
-    </message>
     <message>
       <source>Password cannot be empty.</source>
       <translation>パスワードを入力してください</translation>
@@ -5928,6 +5445,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Avoid leading and trailing spaces.</source>
       <translation>先頭と末尾の空白を避けてください</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>メールアドレスを入力してください</translation>
+    </message>
+    <message>
+      <source>Email is not valid</source>
+      <translation type="unfinished">Email is not valid</translation>
     </message>
   </context>
   <context>
@@ -5981,16 +5506,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>このWebページを開きますか？</translation>
     </message>
     <message>
-      <source>Web page</source>
-      <translation>Webページ</translation>
-    </message>
-    <message>
       <source>Connect anyway</source>
       <translation>理解した上で接続</translation>
-    </message>
-    <message>
-      <source>Web page settings...</source>
-      <translation>Webページ設定...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6001,6 +5518,37 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>%1
 を開こうとしましたが、このWebページは信頼できない証明書認証を提示しました。
 このWebページを開かないことをお勧めします。リスクを理解していれば、Webページを開いても構いません。</translation>
+    </message>
+    <message>
+      <source>Open this integration?</source>
+      <translation type="unfinished">Open this integration?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation>インテグレーション</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>ウェブページ</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+    </message>
+    <message>
+      <source>Integration settings...</source>
+      <translation type="unfinished">Integration settings...</translation>
+    </message>
+    <message>
+      <source>Web Page settings...</source>
+      <translation type="unfinished">Web Page settings...</translation>
     </message>
   </context>
   <context>
@@ -6096,7 +5644,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recorded Video</source>
-      <translation>ビデオ録画</translation>
+      <translation>録画映像</translation>
     </message>
     <message>
       <source>Save Recording As...</source>
@@ -6415,32 +5963,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>There is another layout with the same name.</source>
       <translation>同じ名前の別のレイアウトがあります</translation>
     </message>
-    <message numerus="yes">
-      <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>ユーザーは削除された %n リソースへアクセスできます</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to User Settings.</source>
-      <translation>アクセスを削除するには、ユーザーの設定をご覧ください</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>このロールを持つすべてのユーザーは、%n リソースへアクセスできます:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to Role Settings.</source>
-      <translation>アクセス権を削除するには、ロール設定に移動してください。</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>このロールを持つすべてのユーザーは、削除された %n リソースへアクセスできます:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Changes will affect other users</source>
       <translation>変更は他のユーザーに影響を与えます</translation>
@@ -6448,30 +5970,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
       <translation>このレイアウトは他のユーザーと共有されています</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>ユーザーは、%n リソースにアクセスをできなくなります</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>このロールを持つすべてのユーザーは、%n リソースへアクセスできなくなります:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>共有されている %n レイアウトを削除しますか？</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>これらの %n レイアウトは他のユーザーと共有されています。削除すると、共有しているユーザーからも参照できなくなります。</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
@@ -6524,24 +6022,24 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
       <translation>
-        <numerusform>%n は自動検出</numerusform>
+        <numerusform>このうち %n 台は自動検出で追加されました。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
       <translation>
-        <numerusform>%n カメラは自動検出</numerusform>
+        <numerusform>%n カメラは自動検出で追加されました。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
       <translation>
-        <numerusform>%n I/Oモジュールは自動検出</numerusform>
+        <numerusform>%n I/O モジュールは自動検出で追加されました。</numerusform>
       </translation>
     </message>
     <message>
       <source>They may be auto-discovered again after removing.</source>
-      <translation>削除した後に再度自動検索されるかもしれません</translation>
+      <translation>これらは削除後に再び自動検出される可能性があります。</translation>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
@@ -6637,6 +6135,69 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>これらのWebページをサーバー &quot;%1&quot; に移動しようとしています。 これらのWebページは要求されたすべてのコンテンツをプロキシし、プロキシサーバーはサーバー &quot;%1&quot; に変更されます。</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Delete %n layouts?</source>
+      <translation>
+        <numerusform>%n レイアウトを削除しますか?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerical form depends on layouts count</comment>
+      <translation>
+        <numerusform>これらのレイアウトは他のユーザーと共有されているため、そのユーザーのアカウントでも削除されます。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <translation>
+        <numerusform>%n レイアウトは他のユーザーと共有されているため、そのユーザーのアカウントでも削除されます。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Delete user?</source>
+      <translation>ユーザーを削除しますか?</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n items were not deleted.</source>
+      <translation>
+        <numerusform>%n 項目は削除されませんでした。</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>ServerPickerStrings</name>
+    <message>
+      <source>Any Server</source>
+      <translation>任意のサーバー</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n サーバー</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>サーバーを選択</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>ソースサーバー</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source Server and %n Servers</source>
+      <translation>
+        <numerusform>ソースサーバーと %n サーバー</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>ShowreelTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>シーケンス表示開始</translation>
+    </message>
   </context>
   <context>
     <name>SimpleMotionSearchWidget::Private</name>
@@ -6687,6 +6248,42 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select at least one I/O module</source>
       <translation>1台以上のI/Oモジュールを選択してください</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>テスト</translation>
+    </message>
+    <message>
+      <source>Also set on source camera</source>
+      <translation>ソースカメラにも設定</translation>
+    </message>
+    <message>
+      <source>Also trigger on source camera</source>
+      <translation>ソースカメラでもトリガー</translation>
+    </message>
+    <message>
+      <source>Also record source camera</source>
+      <translation>ソースカメラも録画</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>ソースカメラ</translation>
+    </message>
+    <message>
+      <source>Also play on source camera</source>
+      <translation>ソースカメラでも再生</translation>
+    </message>
+    <message>
+      <source>Also show source camera</source>
+      <translation>ソースカメラも表示</translation>
+    </message>
+    <message>
+      <source>Also show on source camera</source>
+      <translation>ソースカメラも表示</translation>
+    </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation>イベントソースのカメラを使用</translation>
     </message>
   </context>
   <context>
@@ -6772,42 +6369,40 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>UserListModel</name>
+    <name>UserPickerHelper</name>
     <message>
-      <source>Owner</source>
-      <translation>オーナー</translation>
+      <source>All Users</source>
+      <translation>全てのユーザー</translation>
     </message>
     <message>
-      <source>Administrator</source>
-      <translation>アドミニストレーター</translation>
+      <source>Select at least one user</source>
+      <translation>1人以上のユーザーを選択してください</translation>
     </message>
     <message>
-      <source>View live video</source>
-      <translation>ライブビデオ表示</translation>
+      <source>Group</source>
+      <translation>グループ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>ユーザー %n</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation>
+        <numerusform>%n グループ</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Adjust device settings</source>
-      <translation>デバイス設定</translation>
+      <source>All Power Users</source>
+      <translation>すべてのパワーユーザー</translation>
     </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>カメラ設定</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>PTZコントロール</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>再生表示</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>ビデオエクスポート</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>ビデオウォールコントロール</translation>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <translation>
+        <numerusform>追加 %n 名</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6835,6 +6430,21 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>ローカルファアイルをビデオウォールに表示するにはビデオウォールを表示するコンピューターのローカル ファイルを使用してください</translation>
+    </message>
+  </context>
+  <context>
+    <name>VmsRulesDialogHelper</name>
+    <message>
+      <source>Delete Rule?</source>
+      <translation>ルールを削除?</translation>
+    </message>
+    <message>
+      <source>This action cannot be undone</source>
+      <translation type="unfinished">This action cannot be undone</translation>
+    </message>
+    <message>
+      <source>Reset all rules to defaults?</source>
+      <translation type="unfinished">Reset all rules to defaults?</translation>
     </message>
   </context>
   <context>
@@ -6931,6 +6541,65 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Chosen device</source>
       <translation>選択したデバイス</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AccessRightsList</name>
+    <message>
+      <source>Has access to a resource, can view live footage from a camera</source>
+      <translation>リソースにアクセスでき、カメラのライブ映像を表示できます</translation>
+    </message>
+    <message>
+      <source>View Archive</source>
+      <translation>アーカイブの表示</translation>
+    </message>
+    <message>
+      <source>Can view archive footage</source>
+      <translation>アーカイブ映像を表示できます</translation>
+    </message>
+    <message>
+      <source>Export Archive</source>
+      <translation>アーカイブのエクスポート</translation>
+    </message>
+    <message>
+      <source>Can export parts of archive</source>
+      <translation>アーカイブの一部をエクスポートできます</translation>
+    </message>
+    <message>
+      <source>View Bookmarks</source>
+      <translation>ブックマークの表示</translation>
+    </message>
+    <message>
+      <source>Can view bookmarks</source>
+      <translation>ブックマークを表示できます</translation>
+    </message>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>ブックマークの管理</translation>
+    </message>
+    <message>
+      <source>Can modify bookmarks</source>
+      <translation>ブックマークを変更できます</translation>
+    </message>
+    <message>
+      <source>User Input</source>
+      <translation>ユーザー入力</translation>
+    </message>
+    <message>
+      <source>Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</source>
+      <translation>カメラの PTZ 状態の変更、およびソフトトリガー、双方向音声、I/O ボタンの使用が可能</translation>
+    </message>
+    <message>
+      <source>Edit Settings</source>
+      <translation>設定の編集</translation>
+    </message>
+    <message>
+      <source>View Live</source>
+      <translation type="unfinished">View Live</translation>
+    </message>
+    <message>
+      <source>Can edit device settings and video wall layouts</source>
+      <translation type="unfinished">Can edit device settings and video wall layouts</translation>
     </message>
   </context>
   <context>
@@ -7284,6 +6953,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CallNotificationsListModel::Private</name>
+    <message>
+      <source>Calling...</source>
+      <translation>発信中...</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
@@ -7396,12 +7072,80 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Auto</source>
-      <comment>Let server determine if Media2 should be used to fetch profiles</comment>
       <translation>自動</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation>カメラの内部ストレージに保存された映像は、メインアーカイブに自動的にアップロードされます。</translation>
+      <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
+      <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotItem</name>
+    <message>
+      <source>Open Camera</source>
+      <translation>カメラを開く</translation>
+    </message>
+    <message>
+      <source>Open Camera in new Tab</source>
+      <translation>新しいタブでカメラを開く</translation>
+    </message>
+    <message>
+      <source>Open Camera in place</source>
+      <translation>所定の位置でカメラを開く</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsEditorWidget</name>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>カメラ選択...</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation>ポイント</translation>
+    </message>
+    <message>
+      <source>Place Hotspot</source>
+      <translation>ホットスポットを配置</translation>
+    </message>
+    <message>
+      <source>NO DATA</source>
+      <translation>データがありません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
+    <message>
+      <source>Camera does not exist</source>
+      <translation>カメラが存在しません</translation>
+    </message>
+    <message>
+      <source>Select Camera</source>
+      <translation>カメラ選択</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>#</source>
+      <translation>#</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>カメラ</translation>
+    </message>
+    <message>
+      <source>Color</source>
+      <translation>色</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation>ポイント</translation>
     </message>
   </context>
   <context>
@@ -7495,15 +7239,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation>部分的に転送されます:</translation>
+      <translation>部分的に移転されます:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation>転送されません:</translation>
+      <translation>移転されません:</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation>次</translation>
+      <translation>次へ</translation>
     </message>
     <message>
       <source>Finish</source>
@@ -7515,7 +7259,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation>転送するデータ</translation>
+      <translation>移転するデータ</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
@@ -7523,7 +7267,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation>古いカメラのデータが新しいカメラに転送できるか確認しています。</translation>
+      <translation>古いカメラのデータが新しいカメラに移転できるか確認しています。</translation>
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
@@ -7716,6 +7460,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Plugins</source>
       <translation>プラグイン</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation>ホットスポット</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>インテグレーション</translation>
     </message>
   </context>
   <context>
@@ -8022,10 +7774,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>ローカルシステムのオーナーが欠落しているか、無効になっています。</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>どのサーバーもインターネットに接続されていません。</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>システムは%1 に接続されました</translation>
@@ -8058,6 +7806,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>内部エラーが発生しました。後でもう一度お試しください。</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>どのサーバーも %1に接続できません。</translation>
     </message>
   </context>
   <context>
@@ -8147,6 +7900,41 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CustomAccessSummaryModel</name>
+    <message>
+      <source>View video archive</source>
+      <translation>映像アーカイブの表示</translation>
+    </message>
+    <message>
+      <source>Export video archive</source>
+      <translation>映像アーカイブのエクスポート</translation>
+    </message>
+    <message>
+      <source>View bookmarks</source>
+      <translation>ブックマークの表示</translation>
+    </message>
+    <message>
+      <source>Modify bookmarks</source>
+      <translation>ブックマークの変更</translation>
+    </message>
+    <message>
+      <source>User input</source>
+      <translation>ユーザー入力</translation>
+    </message>
+    <message>
+      <source>Edit camera settings</source>
+      <translation>カメラ設定の編集</translation>
+    </message>
+    <message>
+      <source>View event log</source>
+      <translation>イベントログの表示</translation>
+    </message>
+    <message>
+      <source>View live</source>
+      <translation type="unfinished">View live</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
@@ -8163,6 +7951,41 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Set Password</source>
       <translation>パスワードの設定</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DesktopDataProvider</name>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation>この録音デバイスは適切な音声形式をサポートしていません。スクリーン録画設定で、別のデバイスまたは &quot;なし&quot; を選択してください。</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation>キャプチャ解像度を検出できませんでした</translation>
+    </message>
+    <message>
+      <source>Could not find video encoder %1.</source>
+      <translation>ビデオエンコーダー%1を検出できません.</translation>
+    </message>
+    <message>
+      <source>Screen width must be a multiple of 8.</source>
+      <translation>スクリーン幅は8の倍数に設定して下さい.</translation>
+    </message>
+    <message>
+      <source>Could not initialize video encoder.</source>
+      <translation>ビデオエンコーダーをイニシャライズできません.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio encoder.</source>
+      <translation>オーディオエンコーダーをイニシャライズできません.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio device &quot;%1&quot;.</source>
+      <translation>オーディオデバイス&quot;%1&quot; を初期化できませんでした</translation>
+    </message>
+    <message>
+      <source>Could not start primary audio device.</source>
+      <translation>プライマリーオーディオデバイスを開始できません。</translation>
     </message>
   </context>
   <context>
@@ -8289,6 +8112,86 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EventLogDialog</name>
+    <message>
+      <source>Filter Similar Rows</source>
+      <translation>類似の行をフィルター</translation>
+    </message>
+    <message>
+      <source>Copy Selection to Clipboard</source>
+      <translation>選択箇所をクリップボードにコピー</translation>
+    </message>
+    <message>
+      <source>Export Selection to File...</source>
+      <translation>選択範囲をファイルにエクスポート...</translation>
+    </message>
+    <message>
+      <source>Select All</source>
+      <translation>全て選択</translation>
+    </message>
+    <message>
+      <source>Clear Filter</source>
+      <translation>フィルタークリア</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>説明</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>イベントなし</translation>
+    </message>
+    <message>
+      <source>Any Action</source>
+      <translation>全てのアクション</translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for period from %1 to %2 - %n events found</source>
+      <comment>Dates are substituted</comment>
+      <translation>
+        <numerusform>%1 から %2 までの期間のイベントログ - %n イベントが見つかりました</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for %1 - %n events found</source>
+      <comment>Date is substituted</comment>
+      <translation>
+        <numerusform>イベントログ%1 - %n イベントが見つかりました</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Export selected events to file</source>
+      <translation>選択したイベントをファイルにエクスポート</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventLogModel</name>
+    <message>
+      <source>Date/Time</source>
+      <translation>日時</translation>
+    </message>
+    <message>
+      <source>Event</source>
+      <translation>イベント</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>ソース</translation>
+    </message>
+    <message>
+      <source>Action</source>
+      <translation>アクション</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>ターゲット</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>説明</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8345,7 +8248,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>...and %n more</source>
       <translation>
-        <numerusform>... さらに %n 件</numerusform>
+        <numerusform>...ほか %n 件</numerusform>
       </translation>
     </message>
   </context>
@@ -8391,12 +8294,12 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>ビデオのトランスコーディングが必要です。</translation>
     </message>
     <message>
-      <source>Archive is encrypted.</source>
-      <translation>アーカイブは暗号化されています。</translation>
-    </message>
-    <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>アーカイブは現在利用できません。後でもう一度お試しください。</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>エクスポートするには、アーカイブのこの部分をロック解除してください。</translation>
     </message>
   </context>
   <context>
@@ -8576,7 +8479,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enable</source>
-      <translation>有効</translation>
+      <translation>有効化</translation>
     </message>
   </context>
   <context>
@@ -8604,6 +8507,76 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>
         <numerusform>合計 %n デバイス</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::GlobalPermissionsModel</name>
+    <message>
+      <source>View event log</source>
+      <translation>イベントログの表示</translation>
+    </message>
+    <message>
+      <source>Permission granted by %1 group</source>
+      <translation>%1 グループによる権限</translation>
+    </message>
+    <message>
+      <source>Generate events</source>
+      <translation>イベントの生成</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::GroupSettingsDialog</name>
+    <message>
+      <source>Group name cannot be empty.</source>
+      <translation>グループ名は空にできません。</translation>
+    </message>
+    <message>
+      <source>Group with the same name already exists.</source>
+      <translation>同じ名前のグループがすでに存在します。</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation>削除に失敗しました</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation>変更を適用しますか?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>破棄</translation>
+    </message>
+    <message>
+      <source>New Group</source>
+      <translation>新規グループ</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>新規グループ %1</translation>
+    </message>
+    <message>
+      <source>Save changes</source>
+      <translation>変更を保存</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>アカウントのパスワードを入力してください</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>保存</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>変更を保存できませんでした</translation>
+    </message>
+    <message>
+      <source>Delete groups</source>
+      <translation>グループを削除</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
     </message>
   </context>
   <context>
@@ -8664,19 +8637,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>システムに %1 を統合できませんでした。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IndirectAccessDecoratorModel</name>
-    <message>
-      <source>Access granted by:</source>
-      <translation>アクセスが許可されました:</translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n more</source>
-      <translation>
-        <numerusform>ほか %n 件</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -8778,6 +8738,132 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::LdapSettingsWidget</name>
+    <message>
+      <source>Disconnect LDAP server?</source>
+      <translation>LDAPサーバーを切断しますか?</translation>
+    </message>
+    <message>
+      <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
+      <translation>すべての LDAP ユーザーとグループがシステムから削除されます。&lt;br&gt;&lt;br&gt;LDAP設定も削除されます。</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>切断</translation>
+    </message>
+    <message>
+      <source>Reset Settings</source>
+      <translation>設定をリセット</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>アカウントのパスワードを入力してください</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation>リセット</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>接続に失敗しました</translation>
+    </message>
+    <message>
+      <source>Remove existing LDAP users and groups?</source>
+      <translation>既存の LDAP ユーザーとグループを削除しますか?</translation>
+    </message>
+    <message>
+      <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
+      <translation>LDAP サーバーを変更したようです。 新しい LDAP サーバーからユーザーとグループをインポートする前に、既存のすべての LDAP ユーザーとグループを削除することをお勧めします。</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>はい</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation>設定を適用</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>適用</translation>
+    </message>
+    <message>
+      <source>Synchronize LDAP Users and Groups</source>
+      <translation>LDAP ユーザー・グループを同期</translation>
+    </message>
+    <message>
+      <source>Synchronize</source>
+      <translation>同期</translation>
+    </message>
+    <message>
+      <source>Connection OK</source>
+      <translation>接続OK</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>変更を保存できませんでした</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation>LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%nチャンネル</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
+      <translation>有効なライセンスがインストールされていません。商用または試用版のライセンスを有効化してください。</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>エクスポート</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 を使用中</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>少なくとも%1 が必要</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n deactivations remaining.</source>
+      <translation>
+        <numerusform>残り無効化回数は %n 回です。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation>
+        <numerusform>ライセンスを無効にしますか？</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation>無効化</translation>
+    </message>
+    <message>
+      <source>Export licenses to a file</source>
+      <translation>ライセンスをファイルにエクスポート</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>削除</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
@@ -8802,7 +8888,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LogSettingsDialog</name>
     <message>
       <source>Reset to Default</source>
-      <translation>既定値にリセット</translation>
+      <translation>初期設定にリセット</translation>
     </message>
     <message>
       <source>Must be greater than or equal to the value set for Split File by Size</source>
@@ -8810,19 +8896,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Must be less than or equal to the value set for Limit Max Volume</source>
-      <translation>「最大サイズを制限」の設定値以下である必要があります</translation>
+      <translation>「合計容量制限」の設定値以下である必要があります</translation>
     </message>
     <message>
       <source>The selected Logging Level may not be collecting enough information.
 The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
       <translation>指定されたログレベルでは、十分な情報を収集できない可能性があります。
-ログレベル &quot;%1&quot; はより詳細な情報を提供します。</translation>
+ログレベル &quot;%1&quot; では、より詳細な情報が提供されます。</translation>
     </message>
     <message>
       <source>The selected Logging Level may degrade your system&apos;s performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
       <translation>指定されたログレベルではシステムのパフォーマンスが低下する可能性があります。
-必要なログを収集した後、忘れずにログレベルをデフォルト設定にお戻しください。</translation>
+必要なログを収集した後、忘れずにログレベルを初期設定にお戻しください。</translation>
     </message>
   </context>
   <context>
@@ -8873,6 +8959,18 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>Verbose</source>
       <translation>詳細</translation>
+    </message>
+    <message>
+      <source>Default Logging level</source>
+      <translation type="unfinished">Default Logging level</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to “info”</source>
+      <translation type="unfinished">Non-default Logging level. We recommend setting it to “info”</translation>
+    </message>
+    <message>
+      <source>Logging level degrades the performance of the system</source>
+      <translation type="unfinished">Logging level degrades the performance of the system</translation>
     </message>
   </context>
   <context>
@@ -8941,6 +9039,13 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>Select Folder...</source>
       <translation>フォルダー選択...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListActionHandler</name>
+    <message>
+      <source>Network request failed</source>
+      <translation>ネットワークリクエストに失敗しました</translation>
     </message>
   </context>
   <context>
@@ -9135,21 +9240,6 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 システムのオーナーが異なります。統合は許容されません。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
-    <message>
-      <source>Motion</source>
-      <translation>モーション</translation>
-    </message>
-    <message>
-      <source>deleted camera</source>
-      <translation>削除されたカメラ</translation>
-    </message>
-    <message>
-      <source>Bookmark it...</source>
-      <translation>ブックマークする</translation>
     </message>
   </context>
   <context>
@@ -9490,10 +9580,6 @@ You can force it, but it may significantly increase CPU load.</source>
       <source>Acknowledge</source>
       <translation>確認</translation>
     </message>
-    <message>
-      <source>Calling...</source>
-      <translation>発信中...</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9680,6 +9766,13 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::PlaybackPositionItem</name>
+    <message>
+      <source>video is paused</source>
+      <translation>一時停止中</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
@@ -9791,22 +9884,6 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>ウェブページ</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page</source>
-      <translation>プロキシされたウェブページを追加</translation>
-    </message>
-    <message>
-      <source>Add Web Page</source>
-      <translation>ウェブページを追加</translation>
-    </message>
-    <message>
-      <source>Edit Proxied Web Page</source>
-      <translation>プロキシされたウェブページを編集</translation>
-    </message>
-    <message>
-      <source>Edit Web Page</source>
-      <translation>ウェブページの編集</translation>
-    </message>
-    <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
       <translation>&lt;b&gt;一般&lt;/b&gt; タブでウェブページプロキシをオンにしてください。</translation>
     </message>
@@ -9817,6 +9894,58 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
       <translation>Webページはデスクトップクライアントと通信し、ユーザーセッションへのアクセスを要求することができます</translation>
+    </message>
+    <message>
+      <source>An integration may interact with the Desktop Client and request access to the user session</source>
+      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+    </message>
+    <message>
+      <source>Proxy this integration through the server</source>
+      <translation type="unfinished">Proxy this integration through the server</translation>
+    </message>
+    <message>
+      <source>Proxy this web page through the server</source>
+      <translation type="unfinished">Proxy this web page through the server</translation>
+    </message>
+    <message>
+      <source>Allow opening this integration without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+    </message>
+    <message>
+      <source>Allow opening this web page without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+    </message>
+    <message>
+      <source>New Web Page</source>
+      <translation>新規ウェブページ</translation>
+    </message>
+    <message>
+      <source>Edit Web Page</source>
+      <translation>ウェブページの編集</translation>
+    </message>
+    <message>
+      <source>New Proxied Web Page</source>
+      <translation type="unfinished">New Proxied Web Page</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Web Page</source>
+      <translation>プロキシされたウェブページを編集</translation>
+    </message>
+    <message>
+      <source>New Integration</source>
+      <translation type="unfinished">New Integration</translation>
+    </message>
+    <message>
+      <source>Edit Integration</source>
+      <translation type="unfinished">Edit Integration</translation>
+    </message>
+    <message>
+      <source>New Proxied Integration</source>
+      <translation type="unfinished">New Proxied Integration</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Integration</source>
+      <translation type="unfinished">Edit Proxied Integration</translation>
     </message>
   </context>
   <context>
@@ -9852,6 +9981,41 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>
         <numerusform>ラピッドレビューとしてエクスポートするには、ビデオの長さが %n 秒以上必要です。</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RecordingSettingsWidget</name>
+    <message>
+      <source>Screen %1 - %2x%3</source>
+      <translation>スクリーン %1 - %2x%3</translation>
+    </message>
+    <message>
+      <source>%1 (Primary)</source>
+      <translation>%1 (プライマリ)</translation>
+    </message>
+    <message>
+      <source>Best</source>
+      <translation>最高</translation>
+    </message>
+    <message>
+      <source>Average</source>
+      <translation>普通</translation>
+    </message>
+    <message>
+      <source>Performance</source>
+      <translation>パフォーマンス優先</translation>
+    </message>
+    <message>
+      <source>Native</source>
+      <translation>スクリーン解像度の値を利用</translation>
+    </message>
+    <message>
+      <source>Quarter Native</source>
+      <translation>スクリーン解像度の縦横半値を利用</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>フォルダー選択...</translation>
     </message>
   </context>
   <context>
@@ -9918,6 +10082,68 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
+    <message>
+      <source>Access granted by %1 group</source>
+      <translation>%1 グループによるアクセス許可</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n groups: %1</source>
+      <translation>
+        <numerusform>%n グループによるアクセス許可: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Access granted by %1 layout</source>
+      <translation>%1 レイアウトによるアクセス許可</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n layouts: %1</source>
+      <translation>
+        <numerusform>%n レイアウトによるアクセス許可: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Access granted by %1 video wall</source>
+      <translation>%1 ビデオウォールによるアクセス許可</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n video walls: %1</source>
+      <translation>
+        <numerusform>%n ビデオウォールによるアクセス許可: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>カメラとデバイス</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+    </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation>ヘルスモニター</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>ビデオウォール</translation>
+    </message>
+    <message>
+      <source>User&apos;s custom permissions</source>
+      <translation type="unfinished">User&apos;s custom permissions</translation>
+    </message>
+    <message>
+      <source>Group&apos;s custom permissions</source>
+      <translation type="unfinished">Group&apos;s custom permissions</translation>
+    </message>
+    <message>
+      <source>Access granted by %1</source>
+      <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
+      <translation type="unfinished">Access granted by %1</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ResourceTreeModelAdapter</name>
     <message>
       <source>add to current layout</source>
@@ -9934,6 +10160,28 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Health Monitor</source>
       <translation>ヘルスモニタ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ResourcesChangesManager</name>
+    <message>
+      <source>Resource list is empty</source>
+      <translation>リソースリストが空です</translation>
+    </message>
+    <message>
+      <source>No connection</source>
+      <translation>接続なし</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RestApiHelper</name>
+    <message>
+      <source>Password confirmation is required to apply changes</source>
+      <translation>変更を適用するにはパスワードの確認が必要です</translation>
+    </message>
+    <message>
+      <source>Confirm</source>
+      <translation>確認</translation>
     </message>
   </context>
   <context>
@@ -10178,10 +10426,6 @@ You can still change quality and FPS directly on the camera.</source>
       <translation>時間</translation>
     </message>
     <message>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>透かし模様は、管理者以外のユーザーのライブ、アーカイブ、エクスポートされたビデオに表示されます。あなたや他の管理者が透かし模様を見ることはありません。</translation>
-    </message>
-    <message>
       <source>Archive encryption password</source>
       <translation>アーカイブ暗号化パスワード</translation>
     </message>
@@ -10234,6 +10478,10 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
       <translation>推奨のユーザーセッション期間上限は %1 です。</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
+      <translation>透かし模様は、パワーユーザー以外のユーザーのライブ、アーカイブ、エクスポート後の映像に表示されます。あなたや他のパワーユーザーが透かし模様を見ることはありません。</translation>
     </message>
   </context>
   <context>
@@ -10295,6 +10543,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Unknown Certificate</source>
       <translation>不明な証明書</translation>
     </message>
+    <message>
+      <source>Not Part Of Certificate</source>
+      <translation type="unfinished">Not Part Of Certificate</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
@@ -10309,6 +10561,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Continue</source>
       <translation>続行</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerListModel</name>
+    <message>
+      <source>Auto</source>
+      <translation>自動</translation>
     </message>
   </context>
   <context>
@@ -10476,6 +10735,57 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
+    <message>
+      <source>Showreel</source>
+      <translation>シーケンス表示</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation>シーケンス表示 %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>シーケンス表示「%1」を削除しますか?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelDropPlaceholder</name>
+    <message>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation>レイアウトまたはカメラをここにドラッグしてシーケンスに追加</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation>キーボードの矢印キーでレイアウト切替、Escキーでシーケンス表示を終了</translation>
+    </message>
+    <message>
+      <source>Press Esc to stop the tour.</source>
+      <translation>Escキー押下でツアーを停止します。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelItemWidget</name>
+    <message>
+      <source>Switch by</source>
+      <comment>Arrows will follow</comment>
+      <translation>切り替え</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <comment>Time selector will follow</comment>
+      <translation>表示期間</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <comment>Time will follow</comment>
+      <translation>表示</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
@@ -10534,7 +10844,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation>交換されたカメラが見つかりました</translation>
+      <translation>交換済みのカメラが検出されました</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
@@ -10542,39 +10852,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation>2つのデバイスを引き続き使用するに、&quot;交換を元に戻す&quot; ボタンをクリックしてください。</translation>
+      <translation>2つのデバイスを引き続き使用するには、&quot;交換を元に戻す&quot; ボタンをクリックしてください。</translation>
     </message>
     <message>
       <source>Undo Replace</source>
       <translation>交換を元に戻す</translation>
     </message>
     <message>
-      <source>Export</source>
-      <translation>エクスポート</translation>
-    </message>
-    <message>
-      <source>On-device recordings were found</source>
-      <translation>デバイス内録画が見つかりました</translation>
-    </message>
-    <message>
-      <source>Import in progress...</source>
-      <translation>インポート中...</translation>
-    </message>
-    <message>
-      <source>Import archive from %1 completed</source>
-      <translation>%1 からのアーカイブのインポートが完了しました</translation>
-    </message>
-    <message>
       <source>Import archive from %1 failed</source>
       <translation>%1 からのアーカイブのインポートに失敗しました</translation>
-    </message>
-    <message>
-      <source>Import archive from %1 stopped</source>
-      <translation>%1 からのアーカイブのインポートが停止しました</translation>
-    </message>
-    <message>
-      <source>Import archive from %1</source>
-      <translation>%1 からアーカイブをインポート</translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n Servers</source>
@@ -10593,22 +10879,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>
         <numerusform>%n サーバーで分析データ用にシステムストレージが使用されています</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Not imported archive found on device %1</source>
-      <translation>未インポートのアーカイブがデバイス %1 で見つかりました</translation>
-    </message>
-    <message>
-      <source>Not imported archive found on camera %1</source>
-      <translation>未インポートのアーカイブがカメラ %1 で見つかりました</translation>
-    </message>
-    <message>
-      <source>The archive stream settings have been changed by the user</source>
-      <translation>アーカイブストリームの設定がユーザーによって変更されました</translation>
-    </message>
-    <message>
-      <source>The recording settings have been changed by the user</source>
-      <translation>録画設定がユーザーによって変更されました</translation>
     </message>
   </context>
   <context>
@@ -10705,7 +10975,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation>全サーバー間で同期されます。サーバーごとのOS時刻とは異なる場合があります。</translation>
+      <translation>全サーバーで使用される共通の時刻。サーバーごとのOS時刻とは異なる場合があります。</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
@@ -10717,7 +10987,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation>同期されません。各サーバーは、独自のローカル時間を使用します。</translation>
+      <translation>同期なし。各サーバーはそれぞれのローカル時刻を使用します。</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
@@ -10725,11 +10995,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation>インターネットに接続できません。時刻が同期されていません。</translation>
+      <translation>インターネットに接続できません。時刻は同期されていません。</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation>タイムサーバーはオフラインです。時間が同期されていません。</translation>
+      <translation>タイムサーバーがオフラインです。時刻は同期されていません。</translation>
     </message>
   </context>
   <context>
@@ -10810,10 +11080,33 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::UserGroupRequestChain</name>
+    <message>
+      <source>Group does not exist</source>
+      <translation>グループが存在しません</translation>
+    </message>
+    <message>
+      <source>User does not exist</source>
+      <translation>ユーザーが存在しません</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::UserGroupsWidget</name>
     <message>
       <source>Delete</source>
       <translation>削除</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>グループが見つかりません</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation>検索条件を変更するか、新しいグループを作成してください</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation>削除に失敗しました</translation>
     </message>
   </context>
   <context>
@@ -10829,15 +11122,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>LDAP user</source>
-      <translation>LDAPサーバー</translation>
+      <translation>LDAP ユーザー</translation>
     </message>
     <message>
       <source>Login</source>
       <translation>ログイン</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>名前</translation>
     </message>
     <message>
       <source>Email</source>
@@ -10851,12 +11140,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Custom</source>
       <translation>カスタム</translation>
     </message>
+    <message>
+      <source>Full Name</source>
+      <translation>フルネーム</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserListWidget</name>
     <message>
       <source>Enable</source>
-      <translation>有効</translation>
+      <translation>有効化</translation>
     </message>
     <message>
       <source>Disable</source>
@@ -10878,6 +11171,18 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Users with Digest Authentication</source>
       <translation>ダイジェスト認証を使用するユーザー</translation>
     </message>
+    <message>
+      <source>No users found</source>
+      <translation>ユーザーが見つかりません</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation>検索条件を変更するか、新しいユーザーを作成してください</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation>削除に失敗しました</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>
@@ -10892,6 +11197,62 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>LDAP</source>
       <translation>LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserSettingsDialog</name>
+    <message>
+      <source>To modify your password please enter the existing one.</source>
+      <translation>パスワードを変更するには、既存のパスワードを入力してください</translation>
+    </message>
+    <message>
+      <source>Invalid current password.</source>
+      <translation>現在のパスワードと一致しません</translation>
+    </message>
+    <message>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>指定されたメールアドレスを持つ%1 ユーザーは既に存在します。</translation>
+    </message>
+    <message>
+      <source>Login cannot be empty.</source>
+      <translation>ログイン名を入力してください。</translation>
+    </message>
+    <message>
+      <source>Only letters, numbers and symbols %1 are allowed.</source>
+      <translation>文字、数字、記号 %1 のみが許可されます。</translation>
+    </message>
+    <message>
+      <source>User with specified login already exists.</source>
+      <translation>ユーザーは既に存在します</translation>
+    </message>
+    <message>
+      <source>Save user</source>
+      <translation>ユーザーを保存</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>アカウントのパスワードを入力してください</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>保存</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>変更を保存できませんでした</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation>変更を適用しますか?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>破棄</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>メールアドレスを入力してください</translation>
     </message>
   </context>
   <context>
@@ -10914,7 +11275,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation>パスワードが違います</translation>
+      <translation>パスワードが正しくありません。</translation>
     </message>
   </context>
   <context>
@@ -10962,6 +11323,43 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::VmsEventSearchWidget</name>
+    <message>
+      <source>Any event</source>
+      <translation>全イベント</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>カメラの問題</translation>
+    </message>
+    <message>
+      <source>Server events</source>
+      <translation>サーバーイベント</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>分析イベント</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>全分析イベント</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>イベントなし</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or create an Event Rule</source>
+      <translation>フィルターを変更するか、イベントルールを作成してください</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n events</source>
+      <translation>
+        <numerusform>%n イベント</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::WebViewController</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
@@ -10970,6 +11368,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Select folder to upload</source>
       <translation>アップロードするフォルダーを選択</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
+    <message>
+      <source>Empty schedule is not allowed</source>
+      <translation type="unfinished">Empty schedule is not allowed</translation>
     </message>
   </context>
   <context>
@@ -11080,20 +11485,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>%1 バージョンが利用可能</translation>
     </message>
     <message>
-      <source>Release Notes</source>
-      <translation>リリースノート</translation>
-    </message>
-    <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
       <translation>主要な問題が修正されました。更新を強くお勧めします。</translation>
     </message>
     <message>
-      <source>Update...</source>
-      <translation>更新...</translation>
+      <source>Updates</source>
+      <translation>更新</translation>
     </message>
     <message>
-      <source>Do not notify again about this update</source>
-      <translation>この更新プログラムについて再度通知しない</translation>
+      <source>Release Notes...</source>
+      <translation>リリースノート...</translation>
+    </message>
+    <message>
+      <source>%1 Version is available</source>
+      <translation>%1 バージョンが利用可能</translation>
+    </message>
+    <message>
+      <source>%1</source>
+      <translation>%1</translation>
     </message>
   </context>
   <context>
@@ -11191,6 +11600,22 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Shared Layouts</source>
       <translation>共有レイアウト</translation>
     </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation>ヘルスモニター</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>ビデオウォール</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>インテグレーション</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
@@ -11201,6 +11626,45 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>New Group %1</source>
       <translation>新規グループ %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
+    <message>
+      <source>No data</source>
+      <translation>データがありません</translation>
+    </message>
+    <message>
+      <source>All imported</source>
+      <translation type="unfinished">All imported</translation>
+    </message>
+    <message>
+      <source>In progress... (%1 left)</source>
+      <translation type="unfinished">In progress... (%1 left)</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>無効</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>エラー</translation>
+    </message>
+    <message>
+      <source>Failed to import. Retry in 1 minute.</source>
+      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>名前</translation>
+    </message>
+    <message>
+      <source>Imported up to</source>
+      <translation type="unfinished">Imported up to</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>ステータス</translation>
     </message>
   </context>
   <context>
@@ -11310,52 +11774,123 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
+    <name>nx::vms::client::desktop::rules::AnalyticsEventTypePicker</name>
     <message>
-      <source>None</source>
-      <translation>なし</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>分析イベントは特定のカメラで設定できます。</translation>
     </message>
     <message>
-      <source>Starts</source>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>利用可能なイベントの一覧を表示するには、上のボタンでカメラを選択してください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
+    <message>
+      <source>Event will trigger only if there are matches any of attributes.</source>
+      <translation>イベントは、いずれかの属性が一致する場合にのみトリガーされます。</translation>
+    </message>
+    <message>
+      <source>You can see the names of the attributes and their values on the Objects tab.</source>
+      <translation>属性の名前とその値は、オブジェクトタブで確認できます。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectTypePicker</name>
+    <message>
+      <source>Analytics object detection can be set up on a certain cameras.</source>
+      <translation>分析オブジェクトの検出は、特定のカメラのみ設定できます。</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>利用可能なイベントの一覧を表示するには、上のボタンでカメラを選択してください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
+    <message>
+      <source>Schedule</source>
+      <translation>スケジュール</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>WHEN</source>
+      <translation type="unfinished">WHEN</translation>
+    </message>
+    <message>
+      <source>EVENT</source>
+      <translation type="unfinished">EVENT</translation>
+    </message>
+    <message>
+      <source>DO</source>
+      <translation type="unfinished">DO</translation>
+    </message>
+    <message>
+      <source>ACTION</source>
+      <translation type="unfinished">ACTION</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>有効</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::KeywordsPicker</name>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>この欄に入力したキーワードのうち、いずれかがソースに含まれる場合にイベントが発生します。</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>フィールドが空の場合、イベントは常にトリガーされます。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
+    <message>
+      <source>Has attributes</source>
+      <translation type="unfinished">Has attributes</translation>
+    </message>
+    <message>
+      <source>Listed</source>
+      <translation type="unfinished">Listed</translation>
+    </message>
+    <message>
+      <source>Not listed</source>
+      <translation type="unfinished">Not listed</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation>属性</translation>
+    </message>
+    <message>
+      <source>From</source>
       <translation>開始</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
     <message>
-      <source>Stops</source>
-      <translation>停止</translation>
+      <source>Once in</source>
+      <translation type="unfinished">Once in</translation>
     </message>
     <message>
-      <source>Instant</source>
-      <translation>即時</translation>
+      <source>For</source>
+      <translation>対象ユーザー</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>値</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
+    <name>nx::vms::client::desktop::rules::OutputPortPicker</name>
     <message>
-      <source>Not saved</source>
-      <translation>未保存</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::RulesDialog</name>
-    <message>
-      <source>Restore all rules to default?</source>
-      <translation>すべてのルールを既定に戻しますか？</translation>
-    </message>
-    <message>
-      <source>This action cannot be undone.</source>
-      <translation>この操作は元に戻せません。</translation>
-    </message>
-    <message>
-      <source>Failed to apply changes.</source>
-      <translation>変更を適用できませんでした。</translation>
-    </message>
-    <message>
-      <source>Failed to restore rules.</source>
-      <translation>ルールの復元に失敗しました。</translation>
-    </message>
-    <message>
-      <source>Apply changes before exiting?</source>
-      <translation>終了する前に変更を適用しますか?</translation>
+      <source>automatic</source>
+      <translation>オート</translation>
     </message>
   </context>
   <context>
@@ -11367,6 +11902,174 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Action</source>
       <translation>アクション</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>ソース</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>ターゲット</translation>
+    </message>
+    <message>
+      <source>Comment</source>
+      <translation type="unfinished">Comment</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation>全デバイス</translation>
+    </message>
+    <message>
+      <source>All Cameras</source>
+      <translation>全カメラ</translation>
+    </message>
+    <message>
+      <source>No source</source>
+      <translation type="unfinished">No source</translation>
+    </message>
+    <message>
+      <source>All Servers</source>
+      <translation>すべてのサーバー</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n サーバー</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>ソースカメラ</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>ソースおよびその他 %n 台のカメラ</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>No target</source>
+      <translation type="unfinished">No target</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n レイアウト</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>全てのユーザー</translation>
+    </message>
+    <message>
+      <source>Group</source>
+      <translation>グループ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>ユーザー %n</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation>
+        <numerusform>%n グループ</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Power Users</source>
+      <translation>すべてのパワーユーザー</translation>
+    </message>
+    <message>
+      <source>All Server</source>
+      <translation type="unfinished">All Server</translation>
+    </message>
+    <message>
+      <source>Source Server and %1</source>
+      <translation>ソースサーバーと %1</translation>
+    </message>
+    <message>
+      <source>System</source>
+      <translation>システム</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SingleTargetLayoutPicker</name>
+    <message>
+      <source>Select layout...</source>
+      <translation>少なくとも一つのレイアウトを選択してください</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners.</source>
+      <translation>ローカルレイアウトはその所有者にのみ表示できます。</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation>ローカルレイアウトをお探しですか？ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;表示先&quot; リストからユーザーを1名のみ選択してください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SoundPicker</name>
+    <message>
+      <source>Manage</source>
+      <translation>管理</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
+    <message>
+      <source>Soft trigger</source>
+      <translation>ソフトトリガー</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
+    <message>
+      <source>Contains keywords</source>
+      <translation type="unfinished">Contains keywords</translation>
+    </message>
+    <message>
+      <source>Does not contain keywords</source>
+      <translation type="unfinished">Does not contain keywords</translation>
+    </message>
+    <message>
+      <source>Contains list entries</source>
+      <translation type="unfinished">Contains list entries</translation>
+    </message>
+    <message>
+      <source>Does not contain list entries</source>
+      <translation type="unfinished">Does not contain list entries</translation>
+    </message>
+    <message>
+      <source>Keywords separated by space</source>
+      <translation>キーワード (スペース区切り)</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation>開始</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
+    <message>
+      <source>Lookup lists network request failed</source>
+      <translation type="unfinished">Lookup lists network request failed</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
+    <message>
+      <source>Delete rule error: </source>
+      <translation type="unfinished">Delete rule error: </translation>
+    </message>
+    <message>
+      <source>Save rule error: </source>
+      <translation type="unfinished">Save rule error: </translation>
+    </message>
+    <message>
+      <source>Reset to defaults error: </source>
+      <translation type="unfinished">Reset to defaults error: </translation>
     </message>
   </context>
   <context>
@@ -11409,13 +12112,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
       <translation>イベントは、いずれかの属性に一致する場合にのみトリガーされます。属性の名前とその値は、[オブジェクト] タブで確認できます。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
-    <message>
-      <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>レイアウトまたはカメラをここにドラッグしてシーケンスに追加</translation>
     </message>
   </context>
   <context>
@@ -11465,36 +12161,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
-    <message>
-      <source>Switch with Hotkeys</source>
-      <translation>ホットキーで切替え</translation>
-    </message>
-    <message>
-      <source>Switch on Timer</source>
-      <translation>時間で切替え</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
-    <message>
-      <source>Stop Tour</source>
-      <translation>ツアー停止</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>シーケンス表示停止</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>ツアー開始</translation>
-    </message>
-    <message>
-      <source>Start Showreel</source>
-      <translation>シーケンス表示開始</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -11521,12 +12187,46 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Regions of Interest</source>
       <translation>関心領域</translation>
     </message>
+    <message>
+      <source>Hotspots</source>
+      <translation>ホットスポット</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowreelSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation>ホットキーで切替え</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation>時間で切替え</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowreelTextFactory</name>
+    <message>
+      <source>Stop Tour</source>
+      <translation>ツアー停止</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>シーケンス表示停止</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>ツアー開始</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>シーケンス表示開始</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Next</source>
-      <translation>次</translation>
+      <translation>次へ</translation>
     </message>
     <message>
       <source>Name is necessary</source>
@@ -11576,7 +12276,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -11785,15 +12485,15 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation>交換の差し戻しが正常に完了しました!</translation>
+      <translation>交換の取り消しが正常に完了しました!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation>互換性の問題により、交換したカメラから一部の設定が転送されない場合があります。</translation>
+      <translation>互換性の問題により、交換したカメラから一部の設定が移転されない場合があります。</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>
-      <translation>置換を元に戻しますか？</translation>
+      <translation>交換を元に戻してもよろしいですか?</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -11803,49 +12503,9 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
       <translation>サーバー &quot;%1&quot; には交換に適したカメラがありません</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>キーボードの矢印キーでレイアウト切替、Escキーでシーケンス表示を終了</translation>
-    </message>
-    <message>
-      <source>Press Esc to stop the tour.</source>
-      <translation>Escキー押下でツアーを停止します。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourItemWidget</name>
-    <message>
-      <source>Switch by</source>
-      <comment>Arrows will follow</comment>
-      <translation>切り替え</translation>
-    </message>
-    <message>
-      <source>Display for</source>
-      <comment>Time selector will follow</comment>
-      <translation>表示期間</translation>
-    </message>
-    <message>
-      <source>Display selected for</source>
-      <comment>Time will follow</comment>
-      <translation>表示</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
-    <message>
-      <source>Showreel</source>
-      <translation>シーケンス表示</translation>
-    </message>
-    <message>
-      <source>Showreel %1</source>
-      <translation>シーケンス表示 %1</translation>
-    </message>
-    <message>
-      <source>Delete Showreel %1?</source>
-      <translation>シーケンス表示「%1」を削除しますか?</translation>
+      <source>Not enough access rights</source>
+      <translation type="unfinished">Not enough access rights</translation>
     </message>
   </context>
   <context>
@@ -11865,10 +12525,6 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>Enter the name of the layout to create:</source>
       <translation>登録するレイアウトの名前入力:</translation>
-    </message>
-    <message>
-      <source>New Layout %1</source>
-      <translation>新規レイアウト%1</translation>
     </message>
     <message>
       <source>Save Layout As Cloud</source>
