@@ -1703,13 +1703,13 @@ TEST_F(ResourceAccessManagerTest, accessRightsIndependency)
         EXPECT_EQ(permissions(camera), Qn::ReadPermission | expectedPermissions);
     }
 
-    // TODO: #vkutin AccessRight::exportArchive should be independent of AccessRight::viewArchive.
-    // The only exception is AccessRight::exportArchive.
     setOwnAccessRights(m_currentUser->getId(), {{layout->getId(), AccessRight::exportArchive}});
-    EXPECT_FALSE(hasPermissions(m_currentUser, camera, Qn::ExportPermission));
-    setOwnAccessRights(m_currentUser->getId(),
-        {{layout->getId(), AccessRight::viewArchive | AccessRight::exportArchive}});
     EXPECT_TRUE(hasPermissions(m_currentUser, camera, Qn::ExportPermission));
+    EXPECT_FALSE(hasPermissions(m_currentUser, camera, Qn::ViewFootagePermission));
+
+    setOwnAccessRights(m_currentUser->getId(), {{layout->getId(), AccessRight::viewArchive}});
+    EXPECT_FALSE(hasPermissions(m_currentUser, camera, Qn::ExportPermission));
+    EXPECT_TRUE(hasPermissions(m_currentUser, camera, Qn::ViewFootagePermission));
 }
 
 } // namespace nx::vms::common::test
